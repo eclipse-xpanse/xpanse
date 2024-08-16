@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.models.billing.PriceWithRegion;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
@@ -558,27 +559,52 @@ class ServiceTemplateApiTest extends ApisTestCommon {
     }
 
     void testRegisterThrowsInvalidServiceFlavorsException() throws Exception {
-        // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ServiceFlavorWithPrice favor = ocl.getFlavors().getServiceFlavors().getFirst();
-        ServiceFlavorWithPrice duplicatedFlavor = new ServiceFlavorWithPrice();
-        BeanUtils.copyProperties(favor, duplicatedFlavor);
-        duplicatedFlavor.setFeatures(List.of("Feature"));
-        ocl.getFlavors().getServiceFlavors().add(duplicatedFlavor);
-        String duplicatedFlavorName = duplicatedFlavor.getName();
+        // set duplicate flavor name
+        String duplicatedFlavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
+        ocl.getFlavors().getServiceFlavors().getLast().setName(duplicatedFlavorName);
         String errorMsg1 =
                 String.format("Service flavor with name %s is duplicated.", duplicatedFlavorName);
-        ServiceFlavorWithPrice errorBillingFlavor = ocl.getFlavors().getServiceFlavors().getLast();
-        String errorBillingFlavorName = errorBillingFlavor.getName();
-        errorBillingFlavor.getPricing().setFixedPrice(null);
-        errorBillingFlavor.getPricing().setResourceUsage(null);
-        String errorMsg2 = String.format("Service flavor %s has no 'resourceUsage' defined in "
-                + "'pricing' for the billing mode 'pay-per-use'.", errorBillingFlavorName);
-        String errorMsg3 = String.format("Service flavor %s has no 'fixedPrice' defined in "
-                + "'pricing' for the billing mode 'fixed'.", errorBillingFlavorName);
-        List<String> expectedDetails = Arrays.asList(errorMsg1, errorMsg2, errorMsg3);
 
+        ServiceFlavorWithPrice errorPriceFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
+        // set duplicated region for markUpPrices
+        PriceWithRegion duplicatedRegionMarkUpPrice =
+                errorPriceFlavor.getPricing().getResourceUsage().getMarkUpPrices().getFirst();
+        errorPriceFlavor.getPricing().getResourceUsage().getMarkUpPrices().add(
+                duplicatedRegionMarkUpPrice);
+        String errorMsg2 = String.format("Duplicated region %s in markUpPrices for flavor %s.",
+                duplicatedRegionMarkUpPrice.getRegion(), errorPriceFlavor.getName());
+
+        // set duplicated region for licensePrices
+        PriceWithRegion duplicatedRegionLicensePrice =
+                errorPriceFlavor.getPricing().getResourceUsage().getLicensePrices()
+                        .getFirst();
+        errorPriceFlavor.getPricing().getResourceUsage().getLicensePrices().add(
+                duplicatedRegionLicensePrice);
+        String errorMsg3 = String.format("Duplicated region %s in licensePrices for flavor %s.",
+                duplicatedRegionLicensePrice.getRegion(), errorPriceFlavor.getName());
+
+        // set duplicated region for fixedPrices
+        PriceWithRegion duplicatedRegionFixedPrice =
+                errorPriceFlavor.getPricing().getFixedPrices().getLast();
+        errorPriceFlavor.getPricing().getFixedPrices().add(duplicatedRegionFixedPrice);
+        String errorMsg5 = String.format("Duplicated region %s in fixedPrices for flavor %s.",
+                duplicatedRegionFixedPrice.getRegion(), errorPriceFlavor.getName());
+
+        // set null resourceUsage flavor
+        ServiceFlavorWithPrice errorBillingFlavor = ocl.getFlavors().getServiceFlavors().getLast();
+        errorBillingFlavor.getPricing().setResourceUsage(null);
+        String errorMsg4 = String.format("Service flavor %s has no 'resourceUsage' defined in "
+                + "'pricing' for the billing mode 'pay-per-use'.", errorBillingFlavor.getName());
+
+        // set null fixedPrices flavor
+        errorBillingFlavor.getPricing().setFixedPrices(null);
+        String errorMsg6 = String.format("Service flavor %s has no 'fixedPrices' defined in "
+                + "'pricing' for the billing mode 'fixed'.", errorBillingFlavor.getName());
+
+        List<String> expectedDetails =
+                Arrays.asList(errorMsg1, errorMsg2, errorMsg3, errorMsg4, errorMsg5, errorMsg6);
         // Run the test
         final MockHttpServletResponse registerResponse = register(ocl);
         Response response =

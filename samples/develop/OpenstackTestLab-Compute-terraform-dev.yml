@@ -34,10 +34,12 @@ flavors:
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 6.15
-          currency: USD
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 6.15
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
@@ -50,10 +52,12 @@ flavors:
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 23.75
-          currency: USD
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 23.75
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
@@ -66,10 +70,12 @@ flavors:
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 30.50
-          currency: USD
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 30.50
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:

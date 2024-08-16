@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.billing.Price;
 import org.eclipse.xpanse.modules.models.billing.ResourceUsage;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
+import org.eclipse.xpanse.modules.models.billing.utils.BillingCommonUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -98,10 +99,12 @@ public class HuaweiCloudPriceCalculator {
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
         flavorPriceResult.setRecurringPrice(recurringPrice);
         // Add markup price if not null
-        Price markUpPrice = resourceUsage.getMarkUpPrice();
+        Price markUpPrice = BillingCommonUtils.getSpecificPriceByRegion(
+                resourceUsage.getMarkUpPrices(), request.getRegionName());
         addExtraPaymentPrice(flavorPriceResult, markUpPrice);
         // Add license price if not null
-        Price licensePrice = resourceUsage.getLicensePrice();
+        Price licensePrice = BillingCommonUtils.getSpecificPriceByRegion(
+                resourceUsage.getLicensePrices(), request.getRegionName());
         addExtraPaymentPrice(flavorPriceResult, licensePrice);
         return flavorPriceResult;
     }
@@ -192,7 +195,8 @@ public class HuaweiCloudPriceCalculator {
     }
 
     private FlavorPriceResult getServiceFlavorPriceWithFixed(ServiceFlavorPriceRequest request) {
-        Price fixedPrice = request.getFlavorRatingMode().getFixedPrice();
+        Price fixedPrice = BillingCommonUtils.getSpecificPriceByRegion(
+                request.getFlavorRatingMode().getFixedPrices(), request.getRegionName());
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
         flavorPriceResult.setRecurringPrice(fixedPrice);
         return flavorPriceResult;

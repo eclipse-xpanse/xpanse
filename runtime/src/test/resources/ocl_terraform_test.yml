@@ -20,6 +20,10 @@ cloudServiceProvider:
       area: Asia China
     - name: cn-north-4
       area: Asia China
+    - name: eu-west-0
+      area: Europe Pairs
+    - name: eu-west-101
+      area: Europe Dublin
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
   billingModes:
@@ -58,19 +62,40 @@ flavors:
                 resource_spec: 19_bgp
                 resource_size: 5
                 size_measure_id: 15
-          licensePrice:
-            cost: 100
-            currency: CNY
-            period: oneTime
-          markUpPrice:
-            cost: 100
-            currency: CNY
-            period: oneTime
+          licensePrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+          markUpPrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 300
-          currency: CNY
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 172
+              currency: CNY
+              period: monthly
+          - region: eu-west-101
+            price:
+              cost: 20.00
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
@@ -107,19 +132,40 @@ flavors:
                 resource_spec: 19_bgp
                 resource_size: 5
                 size_measure_id: 15
-          licensePrice:
-            cost: 1.21
-            currency: CNY
-            period: daily
-          markUpPrice:
-            cost: 1.10
-            currency: CNY
-            period: daily
+          licensePrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+          markUpPrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 360
-          currency: CNY
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 360
+              currency: CNY
+              period: monthly
+          - region: eu-west-101
+            price:
+              cost: 35.00
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:

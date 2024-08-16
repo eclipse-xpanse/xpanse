@@ -14,9 +14,9 @@ import org.springframework.beans.BeanUtils;
 class ResourceUsageTest {
 
     @Mock
-    private Price mockLicensePrice;
+    private List<PriceWithRegion> mockLicensePrices;
     @Mock
-    private Price mockMarkUpPrice;
+    private List<PriceWithRegion> mockMarkUpPrices;
     @Mock
     private List<Resource> mockResources;
 
@@ -25,15 +25,15 @@ class ResourceUsageTest {
     @BeforeEach
     void setUp() {
         resourceUsageUnderTest = new ResourceUsage();
-        resourceUsageUnderTest.setLicensePrice(mockLicensePrice);
-        resourceUsageUnderTest.setMarkUpPrice(mockMarkUpPrice);
+        resourceUsageUnderTest.setLicensePrices(mockLicensePrices);
+        resourceUsageUnderTest.setMarkUpPrices(mockMarkUpPrices);
         resourceUsageUnderTest.setResources(mockResources);
     }
 
     @Test
-    void testGetLicensePrice() {
-        assertThat(resourceUsageUnderTest.getLicensePrice()).isEqualTo(mockLicensePrice);
-        assertThat(resourceUsageUnderTest.getMarkUpPrice()).isEqualTo(mockMarkUpPrice);
+    void testGetters() {
+        assertThat(resourceUsageUnderTest.getLicensePrices()).isEqualTo(mockLicensePrices);
+        assertThat(resourceUsageUnderTest.getMarkUpPrices()).isEqualTo(mockMarkUpPrices);
         assertThat(resourceUsageUnderTest.getResources()).isEqualTo(mockResources);
     }
 
@@ -58,8 +58,8 @@ class ResourceUsageTest {
     void testToString() {
         String result = "ResourceUsage("
                 + "resources=" + mockResources
-                + ", licensePrice=" + mockLicensePrice
-                + ", markUpPrice=" + mockMarkUpPrice
+                + ", licensePrices=" + mockLicensePrices
+                + ", markUpPrices=" + mockMarkUpPrices
                 + ")";
         assertThat(resourceUsageUnderTest.toString()).isEqualTo(result);
     }

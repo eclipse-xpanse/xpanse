@@ -31,10 +31,12 @@ flavors:
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 95.20
-          currency: EUR
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 95.20
+              currency: EUR
+              period: monthly
       # Properties for the service, which can be used by the deployment.
       properties:
         worker_nodes_count: 3
@@ -47,10 +49,12 @@ flavors:
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 126.48
-          currency: EUR
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 126.48
+              currency: EUR
+              period: monthly
       # Properties for the service, which can be used by the deployment.
       properties:
         worker_nodes_count: 3
@@ -182,7 +186,7 @@ deployment:
       required_providers {
         flexibleengine = {
           source  = "FlexibleEngineCloud/flexibleengine"
-          version = "~> 1.45.0"
+          version = "~> 1.46.0"
         }
       }
     }
@@ -193,53 +197,45 @@ deployment:
 
     data "flexibleengine_availability_zones" "osc-az" {}
 
-    data "flexibleengine_vpc_v1" "existing" {
-      name  = var.vpc_name
-      count = length(data.flexibleengine_vpc_v1.existing)
-    }
-
-    data "flexibleengine_vpc_subnet_v1" "existing" {
-      name    = var.subnet_name
-      count = length(data.flexibleengine_vpc_subnet_v1.existing)
-    }
-
-    data "flexibleengine_networking_secgroup_v2" "existing" {
-      name  = var.secgroup_name
-      count = length(data.flexibleengine_networking_secgroup_v2.existing)
-    }
-
-    locals {
-      availability_zone = var.availability_zone == "" ? data.flexibleengine_availability_zones.osc-az.names[0] : var.availability_zone
-      admin_passwd      = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
-      vpc_id            = length(data.flexibleengine_vpc_v1.existing) > 0 ? data.flexibleengine_vpc_v1.existing[0].id : flexibleengine_vpc_v1.new[0].id
-      subnet_id         = length(data.flexibleengine_vpc_subnet_v1.existing) > 0 ? data.flexibleengine_vpc_subnet_v1.existing[0].id : flexibleengine_vpc_subnet_v1.new[0].id
-      secgroup_id       = length(data.flexibleengine_networking_secgroup_v2.existing) > 0 ? data.flexibleengine_networking_secgroup_v2.existing[0].id : flexibleengine_networking_secgroup_v2.new[0].id
-      secgroup_name     = length(data.flexibleengine_networking_secgroup_v2.existing) > 0 ? data.flexibleengine_networking_secgroup_v2.existing[0].name : flexibleengine_networking_secgroup_v2.new[0].name
+    data "flexibleengine_vpcs" "existing" {
+      name = var.vpc_name
     }
 
     resource "flexibleengine_vpc_v1" "new" {
-      count = length(data.flexibleengine_vpc_v1.existing) == 0 ? 1 : 0
+      count = length(data.flexibleengine_vpcs.existing.vpcs) == 0 ? 1 : 0
       name  = "${var.vpc_name}-${random_id.new.hex}"
       cidr  = "192.168.0.0/16"
     }
 
+    data "flexibleengine_vpc_subnets" "existing" {
+      name = var.subnet_name
+    }
+    
     resource "flexibleengine_vpc_subnet_v1" "new" {
-      count      = length(data.flexibleengine_vpc_subnet_v1.existing) == 0 ? 1 : 0
+      count      = length(data.flexibleengine_vpc_subnets.existing.subnets) == 0 ? 1 : 0
       vpc_id     = local.vpc_id
       name       = "${var.subnet_name}-${random_id.new.hex}"
       cidr       = "192.168.10.0/24"
       gateway_ip = "192.168.10.1"
-      dns_list   = ["100.125.0.41","100.125.12.161"]
+      dns_list   = ["100.125.0.41", "100.125.12.161"]
     }
 
     resource "flexibleengine_networking_secgroup_v2" "new" {
-      count       = length(data.flexibleengine_networking_secgroup_v2.existing) == 0 ? 1 : 0
       name        = "${var.secgroup_name}-${random_id.new.hex}"
       description = "K8S cluster security group"
     }
+    
+    locals {
+      availability_zone = var.availability_zone == "" ? data.flexibleengine_availability_zones.osc-az.names[0] : var.availability_zone
+      admin_passwd      = var.admin_passwd == "" ? random_password.password.result : var.admin_passwd
+      vpc_id            = length(data.flexibleengine_vpcs.existing.vpcs) > 0 ? data.flexibleengine_vpcs.existing.vpcs[0].id : flexibleengine_vpc_v1.new[0].id
+      subnet_id         = length(data.flexibleengine_vpc_subnets.existing.subnets) > 0 ? data.flexibleengine_vpc_subnets.existing.subnets[0].id : flexibleengine_vpc_subnet_v1.new[0].id
+      secgroup_id       = flexibleengine_networking_secgroup_v2.new.id
+      secgroup_name     = flexibleengine_networking_secgroup_v2.new.name
+    }
+
 
     resource "flexibleengine_networking_secgroup_rule_v2" "secgroup_rule_0" {
-      count             = length(data.flexibleengine_networking_secgroup_v2.existing) == 0 ? 1 : 0
       direction         = "ingress"
       ethertype         = "IPv4"
       protocol          = "tcp"
@@ -248,8 +244,6 @@ deployment:
       remote_ip_prefix  = "121.37.117.211/32"
       security_group_id = local.secgroup_id
     }
-
-
 
     resource "random_id" "new" {
       byte_length = 4
@@ -287,7 +281,10 @@ deployment:
       }
       user_data = <<EOF
             #!bin/bash
-            echo root:${local.admin_passwd} | sudo chpasswd
+            sudo sed -i 's/^#*PermitRootLogin.*$/PermitRootLogin yes/' /etc/ssh/sshd_config
+            sudo sed -i 's/^#*PasswordAuthentication.*$/PasswordAuthentication yes/' /etc/ssh/sshd_config
+            sudo systemctl restart ssh
+            echo "root:${local.admin_passwd}" | sudo chpasswd
             sudo sh /root/k8s-init.sh true ${local.admin_passwd} ${var.worker_nodes_count} > /root/init.log
           EOF
     }

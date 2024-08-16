@@ -20,6 +20,10 @@ cloudServiceProvider:
       area: Asia China
     - name: cn-north-4
       area: Asia China
+    - name: eu-west-0
+      area: Europe Pairs
+    - name: eu-west-101
+      area: Europe Dublin
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
   billingModes:
@@ -48,27 +52,50 @@ flavors:
                 cloud_service_type: hws.service.type.ebs
                 resource_type: hws.resource.type.volume
                 resource_spec: SSD
-                resourceSize: 40
+                resource_size: 40
+                size_measure_id: 17
             - deployResourceKind: publicIP
               count: 1
               properties:
                 cloud_service_type: hws.service.type.vpc
                 resource_type: hws.resource.type.bandwidth
                 resource_spec: 19_bgp
-                resourceSize: 5
-          licensePrice:
-            cost: 0.80
-            currency: CNY
-            period: hourly
-          markUpPrice:
-            cost: 0.72
-            currency: CNY
-            period: hourly
+                resource_size: 5
+                size_measure_id: 15
+          licensePrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+          markUpPrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 300
-          currency: CNY
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 172
+              currency: CNY
+              period: monthly
+          - region: eu-west-101
+            price:
+              cost: 20.00
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
@@ -95,27 +122,50 @@ flavors:
                 cloud_service_type: hws.service.type.ebs
                 resource_type: hws.resource.type.volume
                 resource_spec: SSD
-                resourceSize: 40
+                resource_size: 40
+                size_measure_id: 17
             - deployResourceKind: publicIP
               count: 1
               properties:
                 cloud_service_type: hws.service.type.vpc
                 resource_type: hws.resource.type.bandwidth
                 resource_spec: 19_bgp
-                resourceSize: 5
-          licensePrice:
-            cost: 1.21
-            currency: CNY
-            period: hourly
-          markUpPrice:
-            cost: 1.10
-            currency: CNY
-            period: hourly
+                resource_size: 5
+                size_measure_id: 15
+          licensePrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+          markUpPrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 360
-          currency: CNY
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 360
+              currency: CNY
+              period: monthly
+          - region: eu-west-101
+            price:
+              cost: 35.00
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
@@ -128,7 +178,10 @@ flavors:
     isServiceInterrupted: true
   isDowngradeAllowed: true
 serviceProviderContactDetails:
-  emails: [ "test@test.com" ]
+  emails: [ "test30@test.com","test31@test.com" ]
+  phones: [ "011-13422222222","022-13344444444" ]
+  chats: [ "test1234","test1235" ]
+  websites: [ "https://hw.com","https://hwcloud.com" ]
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: terraform
