@@ -3,7 +3,7 @@ version: 1.0
 # The category of the service.
 category: middleware
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: Kafka-cluster
+name: Kafka-cluster-autofill
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: 1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
@@ -30,7 +30,7 @@ serviceHostingType: self
 flavors:
   serviceFlavors:
     - name: 1-zookeeper-with-3-worker-nodes-normal
-      priority: 2
+      priority: 1
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users select 'pay_per_use' as the billing mode.
@@ -50,19 +50,25 @@ flavors:
                 resource_spec: SSD
                 resource_size: 40
                 size_measure_id: 17
-          licensePrice:
-            cost: 1.90
-            currency: CNY
-            period: hourly
-          markUpPrice:
-            cost: 1.60
-            currency: CNY
-            period: hourly
+          licensePrices:
+            - region: any
+              price:
+                cost: 1.90
+                currency: CNY
+                period: hourly
+          markUpPrices:
+            - region: any
+              price:
+                cost: 1.90
+                currency: CNY
+                period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 730
-          currency: CNY
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 730
+              currency: CNY
+              period: monthly
       # Properties for the service, which can be used by the deployment.
       properties:
         worker_nodes_count: 3
@@ -71,7 +77,7 @@ flavors:
         - High Availability
         - Maximum performance
     - name: 1-zookeeper-with-3-worker-nodes-performance
-      priority: 1
+      priority: 2
       # The pricing of the flavor.
       pricing:
         # Used to calculate charges when users select 'pay_per_use' as the billing mode.
@@ -90,20 +96,26 @@ flavors:
                 resource_type: hws.resource.type.volume
                 resource_spec: SSD
                 resource_size: 40
-                size_measure_id: 17
-          licensePrice:
-            cost: 3.20
-            currency: CNY
-            period: hourly
-          markUpPrice:
-            cost: 2.88
-            currency: CNY
-            period: hourly
+                size_measure_id: 15
+          licensePrices:
+            - region: any
+              price:
+                cost: 1.90
+                currency: CNY
+                period: hourly
+          markUpPrices:
+            - region: any
+              price:
+                cost: 1.90
+                currency: CNY
+                period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 980
-          currency: CNY
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 980
+              currency: CNY
+              period: monthly
       properties:
         worker_nodes_count: 3
         flavor_id: s6.large.4

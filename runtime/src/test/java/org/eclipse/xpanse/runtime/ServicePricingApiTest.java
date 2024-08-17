@@ -34,6 +34,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.billing.Price;
+import org.eclipse.xpanse.modules.models.billing.PriceWithRegion;
 import org.eclipse.xpanse.modules.models.billing.RatingMode;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.billing.enums.Currency;
@@ -340,8 +341,12 @@ class ServicePricingApiTest extends ApisTestCommon {
         price.setCost(BigDecimal.valueOf(365 * 24L));
         price.setCurrency(currency);
         price.setPeriod(pricingPeriod);
-        ratingMode.getResourceUsage().setLicensePrice(price);
-        ratingMode.getResourceUsage().setMarkUpPrice(price);
+        PriceWithRegion priceWithRegion = new PriceWithRegion();
+        priceWithRegion.setRegion("any");
+        priceWithRegion.setPrice(price);
+        List<PriceWithRegion> priceWithRegions = List.of(priceWithRegion);
+        ratingMode.getResourceUsage().setLicensePrices(priceWithRegions);
+        ratingMode.getResourceUsage().setMarkUpPrices(priceWithRegions);
         ServiceTemplateEntity serviceTemplate = serviceTemplateStorage.getServiceTemplateById(
                 templateId);
         ocl.getFlavors().getServiceFlavors().getFirst().setPricing(ratingMode);
@@ -410,8 +415,8 @@ class ServicePricingApiTest extends ApisTestCommon {
                 objectMapper.readValue(payPerUsePriceResponse.getContentAsString(),
                         FlavorPriceResult.class);
         assertEquals(HttpStatus.OK.value(), payPerUsePriceResponse.getStatus());
-        assertNull(flavorPriceResult1.getRecurringPrice());
-        assertNotNull(flavorPriceResult1.getOneTimePaymentPrice());
+        assertNotNull(flavorPriceResult1.getRecurringPrice());
+        assertNull(flavorPriceResult1.getOneTimePaymentPrice());
 
         // Setup
         changeFlavorPriceNotOneTime(templateId, ocl, Currency.CNY, PricingPeriod.YEARLY);
@@ -471,13 +476,13 @@ class ServicePricingApiTest extends ApisTestCommon {
         flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
         RatingMode ratingMode = ocl.getFlavors().getServiceFlavors().getFirst().getPricing();
         ratingMode.setResourceUsage(null);
-        ratingMode.setFixedPrice(null);
+        ratingMode.setFixedPrices(null);
         ocl.getFlavors().getServiceFlavors().getFirst().setPricing(ratingMode);
         serviceTemplate.setOcl(ocl);
         serviceTemplateStorage.storeAndFlush(serviceTemplate);
         expectedResult.setFlavorName(flavorName);
         expectedResult.setErrorMessage("BillingMode 'Fixed' can not be supported due to the "
-                + "'FixedPrice' is null.");
+                + "'FixedPrices' is null.");
         String result3 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse3 = getServicePriceByFlavor(templateId,

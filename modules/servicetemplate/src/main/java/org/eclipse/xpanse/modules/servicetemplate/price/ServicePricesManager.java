@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
-import org.eclipse.xpanse.modules.models.billing.Price;
+import org.eclipse.xpanse.modules.models.billing.PriceWithRegion;
 import org.eclipse.xpanse.modules.models.billing.RatingMode;
 import org.eclipse.xpanse.modules.models.billing.ResourceUsage;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Implement Interface to manage service prices.
@@ -173,11 +174,11 @@ public class ServicePricesManager {
                     + "the 'ResourceUsage' is null.";
             throw new ServicePriceCalculationFailed(errorMsg);
         }
-        Price fixedPrice = flavorPriceMode.getFixedPrice();
-        if (BillingMode.FIXED.equals(billingMode) && Objects.isNull(fixedPrice)) {
+        List<PriceWithRegion> fixedPrices = flavorPriceMode.getFixedPrices();
+        if (BillingMode.FIXED.equals(billingMode) && CollectionUtils.isEmpty(fixedPrices)) {
 
             String errorMsg = "BillingMode 'Fixed' can not be supported due to "
-                    + "the 'FixedPrice' is null.";
+                    + "the 'FixedPrices' is null.";
             throw new ServicePriceCalculationFailed(errorMsg);
         }
     }

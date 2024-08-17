@@ -27,9 +27,9 @@ public class ResourceUsage implements Serializable {
     @Schema(description = "The resources of the flavor of the manged service.")
     private List<Resource> resources;
 
-    @Schema(description = "The license price of the flavor of the manged service.")
-    private Price licensePrice;
+    @Schema(description = "The license prices of the flavor of the manged service.")
+    private List<PriceWithRegion> licensePrices;
 
-    @Schema(description = "The listed price of the flavor of the manged service.")
-    private Price markUpPrice;
+    @Schema(description = "The listed price list of the flavor of the manged service.")
+    private List<PriceWithRegion> markUpPrices;
 }

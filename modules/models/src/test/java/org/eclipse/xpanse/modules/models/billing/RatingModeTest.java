@@ -2,6 +2,7 @@ package org.eclipse.xpanse.modules.models.billing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,21 +17,21 @@ class RatingModeTest {
     @Mock
     private ResourceUsage mockResourceUsage;
     @Mock
-    private Price mockFixedPrice;
+    private List<PriceWithRegion> mockFixedPrices;
     private RatingMode ratingModeUnderTest;
 
     @BeforeEach
     void setUp() {
         ratingModeUnderTest = new RatingMode();
         ratingModeUnderTest.setResourceUsage(mockResourceUsage);
-        ratingModeUnderTest.setFixedPrice(mockFixedPrice);
+        ratingModeUnderTest.setFixedPrices(mockFixedPrices);
         ratingModeUnderTest.setIsPriceOnlyForManagementLayer(isPriceOnlyForManagementLayer);
     }
 
     @Test
     void testGetters() {
         assertThat(ratingModeUnderTest.getResourceUsage()).isEqualTo(mockResourceUsage);
-        assertThat(ratingModeUnderTest.getFixedPrice()).isEqualTo(mockFixedPrice);
+        assertThat(ratingModeUnderTest.getFixedPrices()).isEqualTo(mockFixedPrices);
         assertThat(ratingModeUnderTest.getIsPriceOnlyForManagementLayer()).isTrue();
     }
 
@@ -57,7 +58,7 @@ class RatingModeTest {
     @Test
     void testToString() {
         String result =
-                "RatingMode(fixedPrice=" + mockFixedPrice + ", resourceUsage=" + mockResourceUsage
+                "RatingMode(fixedPrices=" + mockFixedPrices + ", resourceUsage=" + mockResourceUsage
                         + ", isPriceOnlyForManagementLayer=" + isPriceOnlyForManagementLayer + ")";
         assertThat(ratingModeUnderTest.toString()).isEqualTo(result);
     }

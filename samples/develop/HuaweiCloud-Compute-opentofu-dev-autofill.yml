@@ -3,7 +3,7 @@ version: 1.0
 # The category of the service.
 category: compute
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: opentofu-ecs
+name: opentofu-ecs-autofill
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: 1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
@@ -20,6 +20,10 @@ cloudServiceProvider:
       area: Asia China
     - name: cn-north-4
       area: Asia China
+    - name: eu-west-0
+      area: Europe Pairs
+    - name: eu-west-101
+      area: Europe Dublin
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
   billingModes:
@@ -42,7 +46,7 @@ flavors:
               properties:
                 cloud_service_type: hws.service.type.ec2
                 resource_type: hws.resource.type.vm
-                resource_spec: s7.small.1.linux
+                resource_spec: s6.small.1.linux
             - deployResourceKind: volume
               count: 1
               properties:
@@ -59,23 +63,44 @@ flavors:
                 resource_spec: 19_bgp
                 resource_size: 5
                 size_measure_id: 15
-          licensePrice:
-            cost: 0.50
-            currency: CNY
-            period: hourly
-          markUpPrice:
-            cost: 0.43
-            currency: CNY
-            period: hourly
+          licensePrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+          markUpPrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 172
-          currency: CNY
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 172
+              currency: CNY
+              period: monthly
+          - region: eu-west-101
+            price:
+              cost: 20.00
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
-        flavor_id: s7.small.1
+        flavor_id: s6.small.1
       features:
         - High Availability
         - Maximum performance
@@ -108,19 +133,40 @@ flavors:
                 resource_spec: 19_bgp
                 resource_size: 5
                 size_measure_id: 15
-          licensePrice:
-            cost: 0.80
-            currency: CNY
-            period: hourly
-          markUpPrice:
-            cost: 0.72
-            currency: CNY
-            period: hourly
+          licensePrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+          markUpPrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 300
-          currency: CNY
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 280
+              currency: CNY
+              period: monthly
+          - region: eu-west-101
+            price:
+              cost: 28.50
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
@@ -157,19 +203,40 @@ flavors:
                 resource_spec: 19_bgp
                 resource_size: 5
                 size_measure_id: 15
-          licensePrice:
-            cost: 1.21
-            currency: CNY
-            period: hourly
-          markUpPrice:
-            cost: 1.10
-            currency: CNY
-            period: hourly
+          licensePrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+          markUpPrices:
+            - region: any
+              price:
+                cost: 0.50
+                currency: CNY
+                period: hourly
+            - region: eu-west-101
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrice:
-          cost: 360
-          currency: CNY
-          period: monthly
+        fixedPrices:
+          - region: any
+            price:
+              cost: 360
+              currency: CNY
+              period: monthly
+          - region: eu-west-101
+            price:
+              cost: 35.00
+              currency: USD
+              period: monthly
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
