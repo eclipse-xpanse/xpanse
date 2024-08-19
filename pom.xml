@@ -35,7 +35,7 @@
     <properties>
         <java.version>21</java.version>
         <spring-boot.version>3.3.2</spring-boot.version>
-        <spring.retry.version>2.0.7</spring.retry.version>
+        <spring.retry.version>2.0.8</spring.retry.version>
         <junit-jupiter.version>5.11.0</junit-jupiter.version>
         <lombok.version>1.18.34</lombok.version>
         <checkstyle-maven-plugin.version>3.4.0</checkstyle-maven-plugin.version>
