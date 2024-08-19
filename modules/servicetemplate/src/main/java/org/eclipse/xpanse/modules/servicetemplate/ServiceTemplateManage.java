@@ -89,7 +89,7 @@ public class ServiceTemplateManage {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
         iconUpdate(existingTemplate, ocl);
         checkParams(existingTemplate, ocl);
-        billingConfigValidator.validateServiceFlavors(ocl);
+        validateRegionsAndFlavors(ocl);
         validateServiceDeployment(ocl.getDeployment(), existingTemplate);
         existingTemplate.setOcl(ocl);
         setServiceRegistrationState(existingTemplate);
@@ -215,7 +215,7 @@ public class ServiceTemplateManage {
         }
         validateServiceVersion(ocl);
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
-        billingConfigValidator.validateServiceFlavors(ocl);
+        validateRegionsAndFlavors(ocl);
         validateServiceDeployment(ocl.getDeployment(), newTemplate);
         String userManageNamespace =
                 userServiceHelper.getCurrentUserManageNamespace();
@@ -223,6 +223,12 @@ public class ServiceTemplateManage {
         ServiceTemplateEntity storedServiceTemplate = templateStorage.storeAndFlush(newTemplate);
         serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
         return storedServiceTemplate;
+    }
+
+    private void validateRegionsAndFlavors(Ocl ocl) {
+        billingConfigValidator.validateServiceFlavors(ocl);
+        pluginManager.getOrchestratorPlugin(ocl.getCloudServiceProvider().getName())
+                .validateRegionsOfService(ocl);
     }
 
     private void validateServiceDeployment(Deployment deployment,

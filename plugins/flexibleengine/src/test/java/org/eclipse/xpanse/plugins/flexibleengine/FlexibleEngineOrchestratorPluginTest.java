@@ -1,6 +1,7 @@
 package org.eclipse.xpanse.plugins.flexibleengine;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -19,7 +20,11 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
@@ -44,23 +49,23 @@ class FlexibleEngineOrchestratorPluginTest {
     @Mock
     private FlexibleEngineResourceManager flexibleEngineResourceManager;
     @InjectMocks
-    private FlexibleEngineOrchestratorPlugin flexibleEngineOrchestratorPluginUnderTest;
+    private FlexibleEngineOrchestratorPlugin plugin;
 
     @Test
     void testGetResourceHandler() {
-        assertThat(flexibleEngineOrchestratorPluginUnderTest.resourceHandlers()
+        assertThat(plugin.resourceHandlers()
                 .get(DeployerKind.TERRAFORM)).isEqualTo(mockFlexibleEngineTerraformResourceHandler);
     }
 
     @Test
     void testGetCsp() {
-        assertThat(flexibleEngineOrchestratorPluginUnderTest.getCsp()).isEqualTo(
+        assertThat(plugin.getCsp()).isEqualTo(
                 Csp.FLEXIBLE_ENGINE);
     }
 
     @Test
     void testRequiredProperties() {
-        assertThat(flexibleEngineOrchestratorPluginUnderTest.requiredProperties()).isEqualTo(
+        assertThat(plugin.requiredProperties()).isEqualTo(
                 Collections.emptyList());
     }
 
@@ -68,8 +73,7 @@ class FlexibleEngineOrchestratorPluginTest {
     void testGetEnvVarKeysMappingMap() {
         // Setup
         // Run the test
-        final Map<String, String> result =
-                flexibleEngineOrchestratorPluginUnderTest.getEnvVarKeysMappingMap();
+        final Map<String, String> result = plugin.getEnvVarKeysMappingMap();
 
         // Verify the results
         assertTrue(result.isEmpty());
@@ -77,8 +81,7 @@ class FlexibleEngineOrchestratorPluginTest {
 
     @Test
     void testGetAvailableCredentialTypes() {
-        assertThat(
-                flexibleEngineOrchestratorPluginUnderTest.getAvailableCredentialTypes()).isEqualTo(
+        assertThat(plugin.getAvailableCredentialTypes()).isEqualTo(
                 List.of(CredentialType.VARIABLES));
     }
 
@@ -86,11 +89,36 @@ class FlexibleEngineOrchestratorPluginTest {
     void testGetCredentialDefinitions() {
         // Setup
         // Run the test
-        final List<AbstractCredentialInfo> result =
-                flexibleEngineOrchestratorPluginUnderTest.getCredentialDefinitions();
-
+        final List<AbstractCredentialInfo> result = plugin.getCredentialDefinitions();
         // Verify the results
         assertFalse(result.isEmpty());
+    }
+
+    @Test
+    void testAutoApproveServiceTemplateIsEnabled() {
+        assertThat(plugin.autoApproveServiceTemplateIsEnabled()).isFalse();
+    }
+
+    @Test
+    void testValidateRegionsOfService() {
+        // Setup
+        Ocl ocl = new Ocl();
+        Region region = new Region();
+        region.setName("eu-west-0");
+        region.setArea("area");
+        CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
+        cloudServiceProvider.setName(Csp.FLEXIBLE_ENGINE);
+        cloudServiceProvider.setRegions(List.of(region));
+        ocl.setCloudServiceProvider(cloudServiceProvider);
+        // Run the test
+        final boolean result = plugin.validateRegionsOfService(ocl);
+        // Verify the results
+        assertTrue(result);
+
+        region.setName("eu-west-error");
+        // Run the test
+        assertThatThrownBy(() -> plugin.validateRegionsOfService(ocl))
+                .isInstanceOf(UnavailableServiceRegionsException.class);
     }
 
     @Test
@@ -133,7 +161,7 @@ class FlexibleEngineOrchestratorPluginTest {
                 resourceMetricRequest1)).thenReturn(metrics);
 
         // Run the test
-        final List<Metric> result = flexibleEngineOrchestratorPluginUnderTest.getMetricsForResource(
+        final List<Metric> result = plugin.getMetricsForResource(
                 resourceMetricRequest);
 
         // Verify the results
@@ -166,7 +194,7 @@ class FlexibleEngineOrchestratorPluginTest {
                 resourceMetricRequest1)).thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<Metric> result = flexibleEngineOrchestratorPluginUnderTest.getMetricsForResource(
+        final List<Metric> result = plugin.getMetricsForResource(
                 resourceMetricRequest);
 
         // Verify the results
@@ -213,7 +241,7 @@ class FlexibleEngineOrchestratorPluginTest {
                 serviceMetricRequest1)).thenReturn(metrics);
 
         // Run the test
-        final List<Metric> result = flexibleEngineOrchestratorPluginUnderTest.getMetricsForService(
+        final List<Metric> result = plugin.getMetricsForService(
                 serviceMetricRequest);
 
         // Verify the results
@@ -246,7 +274,7 @@ class FlexibleEngineOrchestratorPluginTest {
                 serviceMetricRequest1)).thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<Metric> result = flexibleEngineOrchestratorPluginUnderTest.getMetricsForService(
+        final List<Metric> result = plugin.getMetricsForService(
                 serviceMetricRequest);
 
         // Verify the results
@@ -278,7 +306,7 @@ class FlexibleEngineOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                flexibleEngineOrchestratorPluginUnderTest.startService(serviceStateManageRequest);
+                plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -309,7 +337,7 @@ class FlexibleEngineOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                flexibleEngineOrchestratorPluginUnderTest.startService(serviceStateManageRequest);
+                plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -340,7 +368,7 @@ class FlexibleEngineOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                flexibleEngineOrchestratorPluginUnderTest.stopService(serviceStateManageRequest);
+                plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -371,7 +399,7 @@ class FlexibleEngineOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                flexibleEngineOrchestratorPluginUnderTest.stopService(serviceStateManageRequest);
+                plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -402,7 +430,7 @@ class FlexibleEngineOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                flexibleEngineOrchestratorPluginUnderTest.restartService(serviceStateManageRequest);
+                plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -433,7 +461,7 @@ class FlexibleEngineOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                flexibleEngineOrchestratorPluginUnderTest.restartService(serviceStateManageRequest);
+                plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();

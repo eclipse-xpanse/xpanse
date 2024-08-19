@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateStillInUseException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -161,7 +162,18 @@ public class RegistrationExceptionHandler {
     }
 
     /**
-     * Exception handler for InvalidServiceFlavorsException.
+     * Exception handler for UnavailableServiceRegionsException.
+     */
+    @ExceptionHandler({UnavailableServiceRegionsException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleUnavailableServiceRegionsException(
+            UnavailableServiceRegionsException ex) {
+        return getErrorResponse(ResultType.UNAVAILABLE_SERVICE_REGIONS, ex.getErrorReasons());
+    }
+
+    /**
+     * Exception handler for ServiceTemplateStillInUseException.
      */
     @ExceptionHandler({ServiceTemplateStillInUseException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -1,6 +1,7 @@
 package org.eclipse.xpanse.plugins.huaweicloud;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -19,7 +20,11 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
@@ -43,22 +48,22 @@ class HuaweiCloudOrchestratorPluginTest {
     private HuaweiCloudTerraformResourceHandler mockHuaweiCloudTerraformResourceHandler;
 
     @InjectMocks
-    private HuaweiCloudOrchestratorPlugin huaweiCloudOrchestratorPluginUnderTest;
+    private HuaweiCloudOrchestratorPlugin plugin;
 
     @Test
     void testGetResourceHandler() {
-        assertThat(huaweiCloudOrchestratorPluginUnderTest.resourceHandlers()
+        assertThat(plugin.resourceHandlers()
                 .get(DeployerKind.TERRAFORM)).isEqualTo(mockHuaweiCloudTerraformResourceHandler);
     }
 
     @Test
     void testGetCsp() {
-        assertThat(huaweiCloudOrchestratorPluginUnderTest.getCsp()).isEqualTo(Csp.HUAWEI_CLOUD);
+        assertThat(plugin.getCsp()).isEqualTo(Csp.HUAWEI_CLOUD);
     }
 
     @Test
     void testRequiredProperties() {
-        assertThat(huaweiCloudOrchestratorPluginUnderTest.requiredProperties()).isEqualTo(
+        assertThat(plugin.requiredProperties()).isEqualTo(
                 Collections.emptyList());
     }
 
@@ -67,7 +72,7 @@ class HuaweiCloudOrchestratorPluginTest {
         // Setup
         // Run the test
         final Map<String, String> result =
-                huaweiCloudOrchestratorPluginUnderTest.getEnvVarKeysMappingMap();
+                plugin.getEnvVarKeysMappingMap();
 
         // Verify the results
         assertTrue(result.isEmpty());
@@ -75,7 +80,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
     @Test
     void testGetAvailableCredentialTypes() {
-        assertThat(huaweiCloudOrchestratorPluginUnderTest.getAvailableCredentialTypes()).isEqualTo(
+        assertThat(plugin.getAvailableCredentialTypes()).isEqualTo(
                 List.of(CredentialType.VARIABLES));
     }
 
@@ -84,10 +89,37 @@ class HuaweiCloudOrchestratorPluginTest {
         // Setup
         // Run the test
         final List<AbstractCredentialInfo> result =
-                huaweiCloudOrchestratorPluginUnderTest.getCredentialDefinitions();
+                plugin.getCredentialDefinitions();
 
         // Verify the results
         assertFalse(result.isEmpty());
+    }
+
+    @Test
+    void testAutoApproveServiceTemplateIsEnabled() {
+        assertThat(plugin.autoApproveServiceTemplateIsEnabled()).isFalse();
+    }
+
+    @Test
+    void testValidateRegionsOfService() {
+        // Setup
+        Ocl ocl = new Ocl();
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setArea("area");
+        CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
+        cloudServiceProvider.setName(Csp.FLEXIBLE_ENGINE);
+        cloudServiceProvider.setRegions(List.of(region));
+        ocl.setCloudServiceProvider(cloudServiceProvider);
+        // Run the test
+        final boolean result = plugin.validateRegionsOfService(ocl);
+        // Verify the results
+        assertTrue(result);
+
+        region.setName("eu-west-error");
+        // Run the test
+        assertThatThrownBy(() -> plugin.validateRegionsOfService(ocl))
+                .isInstanceOf(UnavailableServiceRegionsException.class);
     }
 
     @Test
@@ -131,7 +163,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final List<Metric> result =
-                huaweiCloudOrchestratorPluginUnderTest.getMetricsForResource(resourceMetricRequest);
+                plugin.getMetricsForResource(resourceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -164,7 +196,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final List<Metric> result =
-                huaweiCloudOrchestratorPluginUnderTest.getMetricsForResource(resourceMetricRequest);
+                plugin.getMetricsForResource(resourceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -211,7 +243,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final List<Metric> result =
-                huaweiCloudOrchestratorPluginUnderTest.getMetricsForService(serviceMetricRequest);
+                plugin.getMetricsForService(serviceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -244,7 +276,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final List<Metric> result =
-                huaweiCloudOrchestratorPluginUnderTest.getMetricsForService(serviceMetricRequest);
+                plugin.getMetricsForService(serviceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -275,7 +307,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                huaweiCloudOrchestratorPluginUnderTest.startService(serviceStateManageRequest);
+                plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -306,7 +338,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                huaweiCloudOrchestratorPluginUnderTest.startService(serviceStateManageRequest);
+                plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -337,7 +369,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                huaweiCloudOrchestratorPluginUnderTest.stopService(serviceStateManageRequest);
+                plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -368,7 +400,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                huaweiCloudOrchestratorPluginUnderTest.stopService(serviceStateManageRequest);
+                plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -399,7 +431,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                huaweiCloudOrchestratorPluginUnderTest.restartService(serviceStateManageRequest);
+                plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -430,7 +462,7 @@ class HuaweiCloudOrchestratorPluginTest {
 
         // Run the test
         final boolean result =
-                huaweiCloudOrchestratorPluginUnderTest.restartService(serviceStateManageRequest);
+                plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OS_AUTH_URL;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.REGIO_CLOUD_AUTH_URL;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -23,6 +24,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -35,6 +37,7 @@ import org.eclipse.xpanse.plugins.openstack.common.manage.OpenstackResourceManag
 import org.eclipse.xpanse.plugins.openstack.common.manage.OpenstackServersManager;
 import org.eclipse.xpanse.plugins.openstack.common.price.OpenstackServicePriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerraformResourceHandler;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -113,6 +116,21 @@ class RegioCloudOrchestratorPluginTest {
     void testGetAvailableCredentialTypes() {
         assertThat(plugin.getAvailableCredentialTypes())
                 .isEqualTo(List.of(CredentialType.VARIABLES));
+    }
+
+    @Test
+    void testAutoApproveServiceTemplateIsEnabled() {
+        assertThat(plugin.autoApproveServiceTemplateIsEnabled()).isFalse();
+    }
+
+    @Test
+    void testValidateRegionsOfService() {
+        // Setup
+        Ocl ocl = Instancio.of(Ocl.class).create();
+        // Run the test
+        final boolean result = plugin.validateRegionsOfService(ocl);
+        // Verify the results
+        assertTrue(result);
     }
 
     @Test

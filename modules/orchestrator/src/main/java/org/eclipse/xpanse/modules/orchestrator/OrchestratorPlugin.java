@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.orchestrator;
 
 import java.util.List;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.orchestrator.audit.OperationalAudit;
 import org.eclipse.xpanse.modules.orchestrator.credential.AuthenticationCapabilities;
 import org.eclipse.xpanse.modules.orchestrator.deployment.ServiceResourceHandler;
@@ -44,4 +45,13 @@ public interface OrchestratorPlugin extends ServiceResourceHandler, Authenticati
      * @return true if auto approve service template is enabled.
      */
     boolean autoApproveServiceTemplateIsEnabled();
+
+
+    /**
+     * Validate regions of service.
+     *
+     * @param ocl Ocl object.
+     * @return true if all regions are valid.
+     */
+    boolean validateRegionsOfService(Ocl ocl);
 }

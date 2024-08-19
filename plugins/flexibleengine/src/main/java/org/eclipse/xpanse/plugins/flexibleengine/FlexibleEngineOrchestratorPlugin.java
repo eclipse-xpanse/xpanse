@@ -8,7 +8,11 @@ package org.eclipse.xpanse.plugins.flexibleengine;
 
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.ENDPOINT_SUFFIX;
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.IAM_ENDPOINT_PREFIX;
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.PROTOCOL_HTTPS;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +29,9 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -41,8 +47,11 @@ import org.eclipse.xpanse.plugins.flexibleengine.price.FlexibleEnginePriceCalcul
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.env.Environment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Plugin to deploy managed services on FlexibleEngine cloud.
@@ -51,8 +60,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
-    @Resource
-    private Environment environment;
+    private final RestTemplate restTemplate = new RestTemplate();
     @Resource
     private FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler;
     @Resource
@@ -105,6 +113,31 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public boolean autoApproveServiceTemplateIsEnabled() {
         return flexibleEngineAutoApproveServiceTemplateEnabled;
+    }
+
+    @Override
+    public boolean validateRegionsOfService(Ocl ocl) {
+        List<String> errors = new ArrayList<>();
+        ocl.getCloudServiceProvider().getRegions().forEach(region -> {
+            String errorMsg = String.format("Region with name %s is unavailable in "
+                    + "Csp %s.", region.getName(), getCsp().toValue());
+            try {
+                String iamEndpointForRegion =
+                        PROTOCOL_HTTPS + IAM_ENDPOINT_PREFIX + region.getName() + ENDPOINT_SUFFIX;
+                ResponseEntity<JsonNode>
+                        response = restTemplate.getForEntity(iamEndpointForRegion, JsonNode.class);
+                log.info("Request IAM endpoint for region {} get response with status {} body {}",
+                        region.getName(), response.getStatusCode().value(), response.getBody());
+            } catch (RestClientException e) {
+                log.error("Request IAM endpoint for region {} error. {}",
+                        region.getName(), e.getMessage());
+                errors.add(errorMsg);
+            }
+        });
+        if (CollectionUtils.isEmpty(errors)) {
+            return true;
+        }
+        throw new UnavailableServiceRegionsException(errors);
     }
 
     @Override
