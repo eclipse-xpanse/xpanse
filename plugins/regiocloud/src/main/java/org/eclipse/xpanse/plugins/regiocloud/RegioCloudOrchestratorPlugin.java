@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
@@ -93,6 +94,11 @@ public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public boolean autoApproveServiceTemplateIsEnabled() {
         return autoApproveServiceTemplateEnabled;
+    }
+
+    @Override
+    public boolean validateRegionsOfService(Ocl ocl) {
+        return true;
     }
 
     @Override

@@ -21,6 +21,4 @@ public class FlexibleEngineConstants {
     public static final String EIP_ENDPOINT_PREFIX = "eip.";
     public static final String EVS_ENDPOINT_PREFIX = "evs.";
     public static final String ENDPOINT_SUFFIX = ".prod-cloud-ocb.orange-business.com";
-    public static final String PROJECTS_PATH = "projects";
-
 }

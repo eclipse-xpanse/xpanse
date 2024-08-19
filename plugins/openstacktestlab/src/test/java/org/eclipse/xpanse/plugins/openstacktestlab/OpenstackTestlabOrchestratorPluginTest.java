@@ -13,6 +13,7 @@ import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.Opensta
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OS_AUTH_URL;
 import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -175,6 +176,16 @@ class OpenstackTestlabOrchestratorPluginTest {
     }
 
     @Test
+    void testValidateRegionsOfService() {
+        // Setup
+        Ocl ocl = Instancio.of(Ocl.class).create();
+        // Run the test
+        final boolean result = plugin.validateRegionsOfService(ocl);
+        // Verify the results
+        assertTrue(result);
+    }
+
+    @Test
     void testRequiredProperties() {
         assertThat(plugin.requiredProperties()).isEqualTo(List.of(OPENSTACK_TESTLAB_AUTH_URL));
     }
@@ -188,7 +199,6 @@ class OpenstackTestlabOrchestratorPluginTest {
         assertFalse(result.isEmpty());
         assertThat(result.get(OS_AUTH_URL)).isNotBlank();
     }
-
 
 
     @Test

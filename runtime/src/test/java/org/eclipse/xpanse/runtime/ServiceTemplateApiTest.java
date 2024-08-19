@@ -227,6 +227,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         testRegisterThrowsServiceTemplateAlreadyRegistered();
         testRegisterThrowsInvalidServiceVersionException();
         testRegisterThrowsInvalidServiceFlavorsException();
+        testRegisterThrowsUnavailableServiceRegionsException();
 
         testFetchThrowsRuntimeException();
         testListServiceTemplatesThrowsException();
@@ -613,6 +614,26 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
         assertEquals(response.getResultType(), ResultType.INVALID_SERVICE_FLAVORS);
         assertTrue(response.getDetails().containsAll(expectedDetails));
+    }
+
+    void testRegisterThrowsUnavailableServiceRegionsException() throws Exception {
+        // Setup
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Csp csp = Csp.HUAWEI_CLOUD;
+        String errorRegionName = "ErrorRegion";
+        ocl.getCloudServiceProvider().setName(csp);
+        ocl.getCloudServiceProvider().getRegions().getFirst().setName(errorRegionName);
+        String errorMsg = String.format("Region with name %s is unavailable in Csp %s.",
+                errorRegionName, ocl.getCloudServiceProvider().getName().toValue());
+        // Run the test
+        final MockHttpServletResponse registerResponse = register(ocl);
+        Response response =
+                objectMapper.readValue(registerResponse.getContentAsString(), Response.class);
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
+        assertEquals(response.getResultType(), ResultType.UNAVAILABLE_SERVICE_REGIONS);
+        assertEquals(response.getDetails(), Collections.singletonList(errorMsg));
     }
 
 

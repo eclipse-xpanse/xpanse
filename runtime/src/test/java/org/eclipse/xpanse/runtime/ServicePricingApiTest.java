@@ -41,6 +41,7 @@ import org.eclipse.xpanse.modules.models.billing.enums.Currency;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
@@ -331,6 +332,10 @@ class ServicePricingApiTest extends ApisTestCommon {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getCloudServiceProvider().setName(Csp.FLEXIBLE_ENGINE);
+        Region region = new Region();
+        region.setName("eu-west-0");
+        region.setArea("Europe");
+        ocl.getCloudServiceProvider().setRegions(List.of(region));
         testGetServicePricing(ocl);
     }
 
