@@ -73,4 +73,9 @@ public class ServiceConfigurationParameter implements Serializable {
     @Schema(description = "Whether the service configuration parameters are read-only")
     private Boolean isReadOnly;
 
+    @NotNull
+    @NotBlank
+    @Schema(description = "Service component which manages this configuration parameter.")
+    private String managedBy;
+
 }

@@ -132,52 +132,79 @@ serviceProviderContactDetails:
   phones: [ "011-13422222222","022-13344444444" ]
   chats: [ "test1234","test1235" ]
   websites: [ "https://hw.com","https://hwcloud.com" ]
-configurationParameters:
-  - name: kafka_cfg_message_max_bytes
-    kind: variable
-    dataType: number
-    description: Parameters used to configure the Kafka server or client to set the maximum number of bytes for Kafka messages.
-    initialValue: 1048576
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-    isReadOnly: false
-  - name: kafka_cfg_log_dirs
-    kind: variable
-    dataType: string
-    description: Parameters for the storage location of Kafka log data
-    initialValue: /var/lib/kafka/logs
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-    isReadOnly: false
-  - name: kafka_cfg_num_io_threads
-    kind: variable
-    dataType: number
-    description: Parameter used to set the number of I/O threads to handle kafka network requests
-    initialValue: 8
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-    isReadOnly: false
-  - name: kafka_log_flush_interval_messages
-    kind: variable
-    dataType: number
-    description: Kafka's log flush strategy, specifies the parameters that trigger a log flush operation after how many messages are written.
-    initialValue: 10000
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-    isReadOnly: false
-  - name: kafka_offsets_topic_replication_factor
-    kind: variable
-    dataType: number
-    description: Replication factor configuration parameters for the dedicated topic (offsets topic) used in the Kafka cluster to consume offset information for the consumer storage group
-    initialValue: 3
-    modificationImpact:
-      isDataLost: true
-      isServiceInterrupted: true
-    isReadOnly: false
+serviceConfigurationManage:
+  type: ansible
+  configManageScripts:
+    # Should be the name available in the deployer script
+    - configManager: kafka-broker
+      # Means should the configuration update run on each node of the specific component or just one.
+      runOnlyOnce: false
+      ansibleScriptConfig:
+        # Name of the file in the script
+        playbookName: "kafka-container-manage.yml"
+        # Path to activate virtualenv
+        virtualEnv: ""
+        # Version of the python
+        pythonVersion: 3.11
+        repoUrl: https://github.com/swaroopar/osc
+        branch: feature/testAnsible
+        # Full path of the requirements file in GIT repo.
+        requirementsFile: "requirements.txt"
+        # Install roles and collections
+        galaxyFile: ""
+        # Defines if we need a full inventory request.
+        ansibleInventoryRequired: false
+  configurationParameters:
+    - name: kafka_cfg_message_max_bytes
+      kind: variable
+      dataType: number
+      description: Parameters used to configure the Kafka server or client to set the maximum number of bytes for Kafka messages.
+      initialValue: 1048576
+      managedBy: 'kafka-broker'
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
+      isReadOnly: false
+    - name: kafka_cfg_log_dirs
+      kind: variable
+      dataType: string
+      description: Parameters for the storage location of Kafka log data
+      initialValue: /var/lib/kafka/logs
+      managedBy: 'kafka-broker'
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
+      isReadOnly: false
+    - name: kafka_cfg_num_io_threads
+      kind: variable
+      dataType: number
+      description: Parameter used to set the number of I/O threads to handle kafka network requests
+      initialValue: 8
+      managedBy: 'kafka-broker'
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
+      isReadOnly: false
+    - name: kafka_log_flush_interval_messages
+      kind: variable
+      dataType: number
+      description: Kafka's log flush strategy, specifies the parameters that trigger a log flush operation after how many messages are written.
+      initialValue: 10000
+      managedBy: 'kafka-broker'
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
+      isReadOnly: false
+    - name: kafka_offsets_topic_replication_factor
+      kind: variable
+      dataType: number
+      description: Replication factor configuration parameters for the dedicated topic (offsets topic) used in the Kafka cluster to consume offset information for the consumer storage group
+      initialValue: 3
+      managedBy: 'kafka-broker'
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
+      isReadOnly: false
 deployment:
   # kind, Supported values are terraform, opentofu.
   kind: terraform
