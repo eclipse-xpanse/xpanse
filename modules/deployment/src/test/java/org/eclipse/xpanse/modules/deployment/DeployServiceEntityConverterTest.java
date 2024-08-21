@@ -13,11 +13,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
-import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
-import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
-import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
+import org.eclipse.xpanse.modules.models.servicetemplate.*;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +55,7 @@ class DeployServiceEntityConverterTest {
         ocl.setBilling(new Billing());
         ocl.setServiceHostingType(ServiceHostingType.SELF);
         ocl.setServiceProviderContactDetails(new ServiceProviderContactDetails());
-        ocl.setConfigurationParameters(new ArrayList<>());
+        ocl.setServiceConfigurationManage(new ServiceConfigurationManage());
 
         serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(deployServiceEntity.getServiceTemplateId());

@@ -30,6 +30,7 @@ class ServiceConfigurationParameterTest {
     private static final String initialValue = "initialValue";
     private static final Map<String,Object> validatorMap  = Map.of("minLength","10");
     private static final SensitiveScope sensitiveScope = SensitiveScope.ONCE;
+    private static final String managedBy = "kafka-broker";
     private static ServiceConfigurationParameter serviceConfigurationParameter;
     private static AutoFill autoFill = null;
     private static ModificationImpact modificationImpact;
@@ -49,6 +50,7 @@ class ServiceConfigurationParameterTest {
         serviceConfigurationParameter.setAutoFill(autoFill);
         serviceConfigurationParameter.setModificationImpact(modificationImpact);
         serviceConfigurationParameter.setIsReadOnly(true);
+        serviceConfigurationParameter.setManagedBy(managedBy);
     }
 
     @Test
@@ -64,6 +66,7 @@ class ServiceConfigurationParameterTest {
         assertEquals(sensitiveScope, serviceConfigurationParameter.getSensitiveScope());
         assertEquals(modificationImpact, serviceConfigurationParameter.getModificationImpact());
         assertEquals(true, serviceConfigurationParameter.getIsReadOnly());
+        assertEquals(managedBy, serviceConfigurationParameter.getManagedBy());
     }
 
     @Test
@@ -155,6 +158,12 @@ class ServiceConfigurationParameterTest {
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setIsReadOnly(true);
+        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(configurationParameter1, configurationParameter2);
+        assertNotEquals(serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
+
+        configurationParameter1.setManagedBy(managedBy);
         assertEquals(serviceConfigurationParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
         assertEquals(serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
@@ -176,6 +185,7 @@ class ServiceConfigurationParameterTest {
                 ", autoFill=" + autoFill + "" +
                 ", modificationImpact=" + modificationImpact + "" +
                 ", isReadOnly=" + true + "" +
+                ", managedBy=" + managedBy + "" +
                 ")";
         assertEquals(expectedString, serviceConfigurationParameter.toString());
     }

@@ -10,6 +10,7 @@ import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -24,7 +25,9 @@ import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVaria
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -101,15 +104,23 @@ public class ServiceConfigurationManager {
         }
         ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
                 deployServiceEntity.getServiceTemplateId());
+        if (Objects.isNull(serviceTemplateEntity)) {
+            String errMsg = String.format("Service template with id %s not found.",
+                    deployServiceEntity.getServiceTemplateId());
+            log.error(errMsg);
+            throw new ServiceTemplateNotRegistered(errMsg);
+        }
+        ServiceConfigurationManage serviceConfigurationManage =
+                serviceTemplateEntity.getOcl().getServiceConfigurationManage();
+        if (Objects.nonNull(serviceConfigurationManage)) {
+            List<ServiceConfigurationParameter> configurationParameters = serviceConfigurationManage
+                    .getConfigurationParameters();
+            JsonObjectSchema jsonObjectSchema = serviceConfigurationVariablesJsonSchemaGenerator
+                    .buildServiceConfigurationJsonSchema(configurationParameters);
+            serviceConfigurationVariablesJsonSchemaValidator.validateServiceConfiguration(
+                    configurationParameters, serviceConfigurationUpdate.getConfiguration(),
+                    jsonObjectSchema);
+        }
 
-        List<ServiceConfigurationParameter> configurationParameters =
-                serviceTemplateEntity.getOcl().getConfigurationParameters();
-
-        JsonObjectSchema jsonObjectSchema = serviceConfigurationVariablesJsonSchemaGenerator
-                .buildServiceConfigurationJsonSchema(configurationParameters);
-
-        serviceConfigurationVariablesJsonSchemaValidator.validateServiceConfiguration(
-                configurationParameters, serviceConfigurationUpdate.getConfiguration(),
-                jsonObjectSchema);
     }
 }

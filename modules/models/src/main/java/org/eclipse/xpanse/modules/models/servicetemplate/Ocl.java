@@ -12,14 +12,12 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.validators.DeploymentScriptsConstraint;
-import org.hibernate.validator.constraints.UniqueElements;
 
 /**
  * Defines for OCLv2.
@@ -108,8 +106,6 @@ public class Ocl implements Serializable {
     @Schema(description = "End user license agreement content of the service.")
     private String eula;
 
-    @Valid
-    @UniqueElements
-    @Schema(description = "The collection of service configuration parameters.")
-    private List<ServiceConfigurationParameter> configurationParameters;
+    @Schema(description = "manage service configuration.")
+    private ServiceConfigurationManage serviceConfigurationManage;
 }
