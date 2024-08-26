@@ -17,6 +17,7 @@ cloudServiceProvider:
   name: flexibleEngine
   regions:
     - name: eu-west-0
+      site: default
       area: Western Europe
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
@@ -32,7 +33,8 @@ flavors:
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: default
             price:
               cost: 95.20
               currency: EUR
@@ -50,7 +52,8 @@ flavors:
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-         - region: any
+         - regionName: any
+           siteName: default
            price:
              cost: 126.48
              currency: EUR

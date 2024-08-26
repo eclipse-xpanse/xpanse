@@ -17,12 +17,16 @@ cloudServiceProvider:
   name: HuaweiCloud
   regions:
     - name: cn-southwest-2
+      site: Chinese Mainland
       area: Asia China
-    - name: cn-north-4
+    - name: cn-southwest-2
+      site: International
       area: Asia China
     - name: eu-west-0
+      site: International
       area: Europe Pairs
     - name: eu-west-101
+      site: Europe
       area: Europe Dublin
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)

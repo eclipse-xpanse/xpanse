@@ -34,9 +34,7 @@ import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
-import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudChinesePriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudGlobalPriceCalculator;
-import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudInternationalPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
 import org.junit.jupiter.api.Assertions;
@@ -49,14 +47,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {HuaweiCloudOrchestratorPlugin.class,
+@ContextConfiguration(classes = {HuaweiCloudOrchestratorPlugin.class, CredentialCenter.class,
         HuaweiCloudVmStateManager.class, HuaweiCloudServerManageRequestConverter.class,
         HuaweiCloudMetricsService.class, HuaweiCloudClient.class, HuaweiCloudMonitorConstants.class,
-        HuaweiCloudDataModelConverter.class, CredentialCenter.class, MonitorMetricsStore.class,
-        HuaweiCloudTerraformResourceHandler.class,
-        HuaweiCloudResourceManager.class, HuaweiCloudPriceCalculator.class,
-        HuaweiCloudChinesePriceCalculator.class, HuaweiCloudGlobalPriceCalculator.class,
-        HuaweiCloudInternationalPriceCalculator.class, HuaweiCloudRetryStrategy.class})
+        HuaweiCloudDataModelConverter.class, MonitorMetricsStore.class,
+        HuaweiCloudResourceManager.class, HuaweiCloudTerraformResourceHandler.class,
+        HuaweiCloudPriceCalculator.class, HuaweiCloudGlobalPriceCalculator.class,
+        HuaweiCloudRetryStrategy.class})
 class HuaweiCloudMonitorIntegrationTest {
 
     @RegisterExtension

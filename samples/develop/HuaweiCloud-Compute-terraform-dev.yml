@@ -17,12 +17,16 @@ cloudServiceProvider:
   name: HuaweiCloud
   regions:
     - name: cn-southwest-2
+      site: Chinese Mainland
       area: Asia China
-    - name: cn-north-4
+    - name: cn-southwest-2
+      site: International
       area: Asia China
     - name: eu-west-0
+      site: International
       area: Europe Pairs
     - name: eu-west-101
+      site: Europe
       area: Europe Dublin
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
@@ -64,35 +68,59 @@ flavors:
                 resource_size: 5
                 size_measure_id: 15
           licensePrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 0.50
                 currency: CNY
                 period: hourly
-            - region: eu-west-101
+            - regionName: any
+              siteName: International
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+            - regionName: eu-west-101
+              siteName: Europe
               price:
                 cost: 0.0015
                 currency: USD
                 period: hourly
           markUpPrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 0.50
                 currency: CNY
                 period: hourly
-            - region: eu-west-101
+            - regionName: any
+              siteName: International
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+            - regionName: any
+              siteName: Europe
               price:
                 cost: 0.0015
                 currency: USD
                 period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: Chinese Mainland
             price:
               cost: 172
               currency: CNY
               period: monthly
-          - region: eu-west-101
+          - regionName: any
+            siteName: International
+            price:
+              cost: 20.00
+              currency: USD
+              period: monthly
+          - regionName: any
+            siteName: Europe
             price:
               cost: 20.00
               currency: USD
@@ -134,35 +162,59 @@ flavors:
                 resource_size: 5
                 size_measure_id: 15
           licensePrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 0.50
                 currency: CNY
                 period: hourly
-            - region: eu-west-101
+            - regionName: any
+              siteName: International
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+            - regionName: eu-west-101
+              siteName: Europe
               price:
                 cost: 0.0015
                 currency: USD
                 period: hourly
           markUpPrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 0.50
                 currency: CNY
                 period: hourly
-            - region: eu-west-101
+            - regionName: any
+              siteName: International
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+            - regionName: any
+              siteName: Europe
               price:
                 cost: 0.0015
                 currency: USD
                 period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: Chinese Mainland
             price:
               cost: 280
               currency: CNY
               period: monthly
-          - region: eu-west-101
+          - regionName: any
+            siteName: International
+            price:
+              cost: 28.50
+              currency: USD
+              period: monthly
+          - regionName: any
+            siteName: Europe
             price:
               cost: 28.50
               currency: USD
@@ -204,35 +256,59 @@ flavors:
                 resource_size: 5
                 size_measure_id: 15
           licensePrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 0.50
                 currency: CNY
                 period: hourly
-            - region: eu-west-101
+            - regionName: any
+              siteName: International
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+            - regionName: eu-west-101
+              siteName: Europe
               price:
                 cost: 0.0015
                 currency: USD
                 period: hourly
           markUpPrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 0.50
                 currency: CNY
                 period: hourly
-            - region: eu-west-101
+            - regionName: any
+              siteName: International
+              price:
+                cost: 0.0015
+                currency: USD
+                period: hourly
+            - regionName: any
+              siteName: Europe
               price:
                 cost: 0.0015
                 currency: USD
                 period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: Chinese Mainland
             price:
               cost: 360
               currency: CNY
               period: monthly
-          - region: eu-west-101
+          - regionName: any
+            siteName: International
+            price:
+              cost: 35.00
+              currency: USD
+              period: monthly
+          - regionName: any
+            siteName: Europe
             price:
               cost: 35.00
               currency: USD

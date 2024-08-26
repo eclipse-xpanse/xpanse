@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
@@ -36,6 +37,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
+import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
@@ -66,7 +68,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     private HuaweiCloudPriceCalculator huaweiCloudPriceCalculator;
 
     @Value("${huaweicloud.auto.approve.service.template.enabled:false}")
-    private boolean huaweiCloudAutoApproveServiceTemplateEnabled;
+    private boolean autoApproveServiceTemplateEnabled;
 
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
@@ -105,19 +107,31 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public boolean autoApproveServiceTemplateIsEnabled() {
-        return huaweiCloudAutoApproveServiceTemplateEnabled;
+        return autoApproveServiceTemplateEnabled;
     }
 
+    @Override
+    public List<String> getSites() {
+        return List.of(HuaweiCloudConstants.INTERNATIONAL_SITE,
+                HuaweiCloudConstants.CHINESE_MAINLAND_SITE,
+                HuaweiCloudConstants.EUROPE_SITE);
+    }
 
     @Override
     public boolean validateRegionsOfService(Ocl ocl) {
         List<String> errors = new ArrayList<>();
-        ocl.getCloudServiceProvider().getRegions().forEach(region -> {
-            String errorMsg = String.format("Region with name %s is unavailable in "
-                    + "Csp %s.", region.getName(), getCsp().toValue());
+        List<Region> regions = ocl.getCloudServiceProvider().getRegions();
+        regions.forEach(region -> {
             try {
                 IamRegion.valueOf(region.getName());
             } catch (IllegalArgumentException e) {
+                String errorMsg = String.format("Region with name %s is unavailable in "
+                        + "Csp %s.", region.getName(), getCsp().toValue());
+                errors.add(errorMsg);
+            }
+            if (!getSites().contains(region.getSite())) {
+                String errorMsg = String.format("Region with site %s is unavailable in Csp %s. "
+                        + "Available sites %s", region.getName(), getCsp().toValue(), getSites());
                 errors.add(errorMsg);
             }
         });

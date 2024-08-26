@@ -25,12 +25,19 @@ public class PriceWithRegion implements Serializable {
     @NotNull
     @NotEmpty
     @NotBlank
-    @Schema(description = "The defined region. If the special name 'any' provided, "
+    @Schema(description = "The defined region name. If the special name 'any' provided, "
             + "this price for all unknown regions.")
-    private String region;
+    private String regionName;
 
     @NotNull
-    @Schema(description = "The price for the defined region.")
+    @NotEmpty
+    @NotBlank
+    @Schema(description = "The defined site name. If the special name 'default' provided, "
+            + "this price for all sites.")
+    private String siteName;
+
+    @NotNull
+    @Schema(description = "The price for the defined region and the defined site.")
     private Price price;
 
 

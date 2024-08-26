@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
- * REST interface methods for managing cloud resources.
+ * REST interface methods for service prices calculation.
  */
 @Slf4j
 @RestController
@@ -55,7 +55,7 @@ public class ServicePricingApi {
      */
     @Tag(name = "ServicePrices",
             description = "API to manage prices of the flavors of the service.")
-    @GetMapping(value = "/pricing/{templateId}/{region}/{billingMode}/{flavorName}",
+    @GetMapping(value = "/pricing/{templateId}/{regionName}/{siteName}/{billingMode}/{flavorName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the price of one specific flavor of the service.")
@@ -63,15 +63,17 @@ public class ServicePricingApi {
     public ResponseEntity<FlavorPriceResult> getServicePriceByFlavor(
             @Parameter(name = "templateId", description = "id of the service template")
             @PathVariable(name = "templateId") String templateId,
-            @Parameter(name = "region", description = "region name of the service")
-            @PathVariable(name = "region") String region,
+            @Parameter(name = "regionName", description = "region name of the service")
+            @PathVariable(name = "regionName") String regionName,
+            @Parameter(name = "siteName", description = "site name of the region belongs to")
+            @PathVariable(name = "siteName") String siteName,
             @Parameter(name = "billingMode", description = "mode of billing")
             @PathVariable("billingMode") BillingMode billingMode,
             @Parameter(name = "flavorName", description = "flavor name of the service")
             @PathVariable("flavorName") String flavorName) {
         try {
-            FlavorPriceResult flavorPriceResult = servicePricesManager
-                    .getServicePriceByFlavor(templateId, region, billingMode, flavorName);
+            FlavorPriceResult flavorPriceResult = servicePricesManager.getServicePriceByFlavor(
+                    templateId, regionName, siteName, billingMode, flavorName);
             return ResponseEntity.ok().cacheControl(getCacheControl()).body(flavorPriceResult);
         } catch (Exception ex) {
             FlavorPriceResult errorResult = new FlavorPriceResult();
@@ -91,7 +93,7 @@ public class ServicePricingApi {
      */
     @Tag(name = "ServicePrices",
             description = "API to manage prices of the flavors of the service.")
-    @GetMapping(value = "/pricing/service/{templateId}/{region}/{billingMode}",
+    @GetMapping(value = "/pricing/service/{templateId}/{regionName}/{siteName}/{billingMode}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the prices of all flavors of the service")
@@ -99,12 +101,14 @@ public class ServicePricingApi {
     public ResponseEntity<List<FlavorPriceResult>> getPricesByService(
             @Parameter(name = "templateId", description = "id of the service template")
             @PathVariable(name = "templateId") String templateId,
-            @Parameter(name = "region", description = "region name of the service")
-            @PathVariable(name = "region") String region,
+            @Parameter(name = "regionName", description = "region name of the service")
+            @PathVariable(name = "regionName") String regionName,
+            @Parameter(name = "siteName", description = "site name of the region belongs to")
+            @PathVariable(name = "siteName") String siteName,
             @Parameter(name = "billingMode", description = "mode of billing")
             @PathVariable("billingMode") BillingMode billingMode) {
-        List<FlavorPriceResult> allFlavorPriceResult =
-                servicePricesManager.getPricesByService(templateId, region, billingMode);
+        List<FlavorPriceResult> allFlavorPriceResult = servicePricesManager
+                .getPricesByService(templateId, regionName, siteName, billingMode);
         boolean findFailed = allFlavorPriceResult.stream()
                 .anyMatch(flavorPriceResult -> !flavorPriceResult.isSuccessful());
         if (findFailed) {

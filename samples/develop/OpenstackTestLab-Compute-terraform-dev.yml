@@ -17,8 +17,10 @@ cloudServiceProvider:
   name: OpenstackTestLab
   regions:
     - name: RegionOne
+      site: default
       area: Western Europe
     - name: RegionTwo
+      site: default
       area: Western Europe
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
@@ -35,7 +37,8 @@ flavors:
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionNme: any
+            siteName: default
             price:
               cost: 6.15
               currency: USD
@@ -53,7 +56,8 @@ flavors:
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: default
             price:
               cost: 23.75
               currency: USD
@@ -71,7 +75,8 @@ flavors:
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: default
             price:
               cost: 30.50
               currency: USD

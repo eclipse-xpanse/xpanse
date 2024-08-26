@@ -11,69 +11,54 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 
 /**
  * Test of Region.
  */
 class RegionTest {
 
-    private static final String name = "cn-north-1";
-    private static final String area = "Area";
-    private static Region region;
+    private final String name = "cn-north-1";
+    private final String site = "default";
+    private final String area = "Asia";
+    private Region region;
 
     @BeforeEach
     void setUp() {
         region = new Region();
         region.setName(name);
+        region.setSite(site);
+        region.setArea(area);
     }
 
     @Test
-    void testGetterAndSetter() {
+    void testGetters() {
         assertEquals(name, region.getName());
-        assertEquals("Others", region.getArea());
-
-        region.setArea(area);
-
+        assertEquals(site, region.getSite());
         assertEquals(area, region.getArea());
+
+        Region region1 = new Region();
+        assertEquals("Others", region1.getArea());
     }
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(region, region);
-        assertEquals(region.hashCode(), region.hashCode());
-
         Object obj = new Object();
         assertNotEquals(region, obj);
-        assertNotEquals(region, null);
         assertNotEquals(region.hashCode(), obj.hashCode());
 
         Region region1 = new Region();
-        Region region2 = new Region();
         assertNotEquals(region, region1);
-        assertNotEquals(region, region2);
-        assertEquals(region1, region2);
         assertNotEquals(region.hashCode(), region1.hashCode());
-        assertNotEquals(region.hashCode(), region2.hashCode());
-        assertEquals(region1.hashCode(), region2.hashCode());
 
-        region1.setName(name);
+        BeanUtils.copyProperties(region, region1);
         assertEquals(region, region1);
-        assertNotEquals(region1, region2);
         assertEquals(region.hashCode(), region1.hashCode());
-        assertNotEquals(region1.hashCode(), region2.hashCode());
-
-        region1.setArea(area);
-        assertNotEquals(region, region1);
-        assertNotEquals(region1, region2);
-        assertNotEquals(region.hashCode(), region1.hashCode());
-        assertNotEquals(region1.hashCode(), region2.hashCode());
     }
 
     @Test
     void testToString() {
-        String expectedString = "Region(" +
-                "name=" + name +
-                ", area=Others)";
+        String expectedString = "Region(name=" + name + ", site=" + site + ", area=" + area + ")";
         assertEquals(expectedString, region.toString());
     }
 

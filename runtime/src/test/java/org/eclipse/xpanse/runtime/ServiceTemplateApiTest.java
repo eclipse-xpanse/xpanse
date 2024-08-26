@@ -227,6 +227,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         testRegisterThrowsServiceTemplateAlreadyRegistered();
         testRegisterThrowsInvalidServiceVersionException();
         testRegisterThrowsInvalidServiceFlavorsException();
+        testRegisterThrowsInvalidBillingConfigException();
         testRegisterThrowsUnavailableServiceRegionsException();
 
         testFetchThrowsRuntimeException();
@@ -559,23 +560,19 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         deleteTemplate(serviceTemplate.getServiceTemplateId());
     }
 
-    void testRegisterThrowsInvalidServiceFlavorsException() throws Exception {
+    void testRegisterThrowsInvalidBillingConfigException() throws Exception {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        // set duplicate flavor name
-        String duplicatedFlavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
-        ocl.getFlavors().getServiceFlavors().getLast().setName(duplicatedFlavorName);
-        String errorMsg1 =
-                String.format("Service flavor with name %s is duplicated.", duplicatedFlavorName);
-
         ServiceFlavorWithPrice errorPriceFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
         // set duplicated region for markUpPrices
         PriceWithRegion duplicatedRegionMarkUpPrice =
                 errorPriceFlavor.getPricing().getResourceUsage().getMarkUpPrices().getFirst();
         errorPriceFlavor.getPricing().getResourceUsage().getMarkUpPrices().add(
                 duplicatedRegionMarkUpPrice);
-        String errorMsg2 = String.format("Duplicated region %s in markUpPrices for flavor %s.",
-                duplicatedRegionMarkUpPrice.getRegion(), errorPriceFlavor.getName());
+        String errorMsg1 = String.format("Duplicated items with regionName: %s and siteName: "
+                        + "%s in markUpPrices for the flavor with name: %s.",
+                duplicatedRegionMarkUpPrice.getRegionName(),
+                duplicatedRegionMarkUpPrice.getSiteName(), errorPriceFlavor.getName());
 
         // set duplicated region for licensePrices
         PriceWithRegion duplicatedRegionLicensePrice =
@@ -583,29 +580,54 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         .getFirst();
         errorPriceFlavor.getPricing().getResourceUsage().getLicensePrices().add(
                 duplicatedRegionLicensePrice);
-        String errorMsg3 = String.format("Duplicated region %s in licensePrices for flavor %s.",
-                duplicatedRegionLicensePrice.getRegion(), errorPriceFlavor.getName());
+        String errorMsg2 = String.format("Duplicated items with regionName: %s and siteName: "
+                        + "%s in licensePrices for the flavor with name: %s.",
+                duplicatedRegionLicensePrice.getRegionName(),
+                duplicatedRegionLicensePrice.getSiteName(), errorPriceFlavor.getName());
 
         // set duplicated region for fixedPrices
         PriceWithRegion duplicatedRegionFixedPrice =
                 errorPriceFlavor.getPricing().getFixedPrices().getLast();
         errorPriceFlavor.getPricing().getFixedPrices().add(duplicatedRegionFixedPrice);
-        String errorMsg5 = String.format("Duplicated region %s in fixedPrices for flavor %s.",
-                duplicatedRegionFixedPrice.getRegion(), errorPriceFlavor.getName());
+        String errorMsg4 = String.format("Duplicated items with regionName: %s and siteName: "
+                        + "%s in fixedPrices for the flavor with name: %s.",
+                duplicatedRegionFixedPrice.getRegionName(),
+                duplicatedRegionFixedPrice.getSiteName(), errorPriceFlavor.getName());
 
         // set null resourceUsage flavor
         ServiceFlavorWithPrice errorBillingFlavor = ocl.getFlavors().getServiceFlavors().getLast();
         errorBillingFlavor.getPricing().setResourceUsage(null);
-        String errorMsg4 = String.format("Service flavor %s has no 'resourceUsage' defined in "
+        String errorMsg3 = String.format("Service flavor %s has no 'resourceUsage' defined in "
                 + "'pricing' for the billing mode 'pay-per-use'.", errorBillingFlavor.getName());
 
         // set null fixedPrices flavor
         errorBillingFlavor.getPricing().setFixedPrices(null);
-        String errorMsg6 = String.format("Service flavor %s has no 'fixedPrices' defined in "
+        String errorMsg5 = String.format("Service flavor %s has no 'fixedPrices' defined in "
                 + "'pricing' for the billing mode 'fixed'.", errorBillingFlavor.getName());
 
         List<String> expectedDetails =
-                Arrays.asList(errorMsg1, errorMsg2, errorMsg3, errorMsg4, errorMsg5, errorMsg6);
+                Arrays.asList(errorMsg1, errorMsg2, errorMsg3, errorMsg4, errorMsg5);
+        // Run the test
+        final MockHttpServletResponse registerResponse = register(ocl);
+        Response response =
+                objectMapper.readValue(registerResponse.getContentAsString(), Response.class);
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
+        assertEquals(response.getResultType(), ResultType.INVALID_BILLING_CONFIG);
+        assertTrue(response.getDetails().containsAll(expectedDetails));
+    }
+
+
+    void testRegisterThrowsInvalidServiceFlavorsException() throws Exception {
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        // set duplicate flavor name
+        String duplicatedFlavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
+        ocl.getFlavors().getServiceFlavors().getLast().setName(duplicatedFlavorName);
+        String errorMsg =
+                String.format("Duplicate flavor with name %s in service.", duplicatedFlavorName);
+
+        List<String> expectedDetails = Collections.singletonList(errorMsg);
         // Run the test
         final MockHttpServletResponse registerResponse = register(ocl);
         Response response =

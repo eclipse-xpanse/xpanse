@@ -17,8 +17,10 @@ cloudServiceProvider:
   name: PlusServer
   regions:
     - name: RegionOne
+      site: default
       area: Western Europe
     - name: RegionTwo
+      site: default
       area: Western Europe
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
@@ -34,7 +36,8 @@ flavors:
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: default
             price:
               cost: 95.00
               currency: USD
@@ -53,7 +56,8 @@ flavors:
       pricing:
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: default
             price:
               cost: 95.00
               currency: USD

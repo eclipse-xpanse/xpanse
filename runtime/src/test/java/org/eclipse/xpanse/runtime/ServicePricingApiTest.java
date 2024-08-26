@@ -9,28 +9,16 @@ package org.eclipse.xpanse.runtime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsRequest;
-import com.huaweicloud.sdk.bss.v2.model.ListOnDemandResourceRatingsResponse;
-import com.huaweicloud.sdk.core.exception.ClientRequestException;
-import com.huaweicloud.sdk.core.invoker.SyncInvoker;
-import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsRequest;
-import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsResponse;
-import com.huaweicloud.sdk.iam.v3.model.ProjectResult;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.billing.Price;
@@ -43,13 +31,11 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.openstack4j.openstack.OSFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -60,25 +46,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 /**
  * Test for ServicePricingApi.
  */
-@SuppressWarnings("unchecked")
+@Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
 @AutoConfigureMockMvc
 class ServicePricingApiTest extends ApisTestCommon {
-
-    @BeforeEach
-    void setUp() {
-        if (mockOsFactory != null) {
-            mockOsFactory.close();
-        }
-        mockOsFactory = mockStatic(OSFactory.class);
-    }
-
-    @AfterEach
-    void tearDown() {
-        mockOsFactory.close();
-    }
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
@@ -87,8 +60,9 @@ class ServicePricingApiTest extends ApisTestCommon {
 
         testServicePricingApiWithHuaweiCloud();
         testServicePricingApiWithFlexibleEngine();
-        testServicePricingApiWithOpenstack();
+        testServicePricingApiWithOpenstackTestlab();
         testServicePricingApiWithPlusServer();
+        testServicePricingApiWithRegioCloud();
     }
 
     void testServicePricingApiWithHuaweiCloud() throws Exception {
@@ -97,234 +71,13 @@ class ServicePricingApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
         String regionName = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
-        ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
-        UUID templateId = serviceTemplateDetails.getServiceTemplateId();
-        MockHttpServletResponse fixedPriceResponse =
-                getServicePriceByFlavor(templateId, regionName, flavorName, BillingMode.FIXED);
-        assertEquals(HttpStatus.OK.value(), fixedPriceResponse.getStatus());
-        FlavorPriceResult flavorPriceResult =
-                objectMapper.readValue(fixedPriceResponse.getContentAsString(),
-                        FlavorPriceResult.class);
-        assertNotNull(flavorPriceResult.getRecurringPrice());
-        assertEquals(Currency.CNY, flavorPriceResult.getRecurringPrice().getCurrency());
-        assertEquals(BillingMode.FIXED, flavorPriceResult.getBillingMode());
-        assertNull(flavorPriceResult.getOneTimePaymentPrice());
-
-        // Setup
-        int flavorCount = ocl.getFlavors().getServiceFlavors().size();
-        MockHttpServletResponse serviceFixedPricesResponse =
-                getPricesByService(templateId, regionName, BillingMode.FIXED);
-
-        List<FlavorPriceResult> fixedPriceResultList =
-                objectMapper.readValue(serviceFixedPricesResponse.getContentAsString(),
-                        new TypeReference<>() {
-                        });
-        assertEquals(HttpStatus.OK.value(), serviceFixedPricesResponse.getStatus());
-        assertEquals(flavorCount, fixedPriceResultList.size());
-
-        addCredentialForHuaweiCloud();
-        mockSdkClientsForHuaweiCloud();
-        // mock ListProjectInvoker OK
-        mockListProjectInvoker();
-        // mock ListOnDemandResourceRatingsInvoker OK in BssintlClient
-        mockListOnDemandResourceRatingsInvokerWithBssintlClient();
-
-        // Test get prices by service with PAY_PER_USE
-        MockHttpServletResponse servicePayPerUsePricesResponse =
-                getPricesByService(templateId, regionName, BillingMode.PAY_PER_USE);
-        assertEquals(HttpStatus.OK.value(), servicePayPerUsePricesResponse.getStatus());
-
-        List<FlavorPriceResult> payPerUsePriceResultList =
-                objectMapper.readValue(servicePayPerUsePricesResponse.getContentAsString(),
-                        new TypeReference<>() {
-                        });
-        assertEquals(flavorCount, payPerUsePriceResultList.size());
-        assertTrue(payPerUsePriceResultList.stream().allMatch(price ->
-                price.getRecurringPrice().getCurrency().equals(Currency.USD)));
-
-        // Test get prices by flavor with PAY_PER_USE
-        changeFlavorPriceNotOneTime(templateId, ocl, Currency.USD, PricingPeriod.MONTHLY);
-        // mock ListProjectInvoker with Client failed.
-        MockHttpServletResponse flavorPayPerUsePricesResponse =
-                getServicePriceByFlavor(templateId, regionName, flavorName,
-                        BillingMode.PAY_PER_USE);
-        assertEquals(HttpStatus.OK.value(), flavorPayPerUsePricesResponse.getStatus());
-        FlavorPriceResult flavorPayPerUsePriceResult =
-                objectMapper.readValue(flavorPayPerUsePricesResponse.getContentAsString(),
-                        FlavorPriceResult.class);
-        assertNotNull(flavorPayPerUsePriceResult.getRecurringPrice());
-        assertEquals(Currency.USD, flavorPayPerUsePriceResult.getRecurringPrice().getCurrency());
-        assertEquals(BillingMode.PAY_PER_USE, flavorPayPerUsePriceResult.getBillingMode());
-        assertNull(flavorPayPerUsePriceResult.getOneTimePaymentPrice());
-        deleteServiceTemplate(templateId);
-    }
-
-    @Test
-    @WithJwt(file = "jwt_all_roles.json")
-    void testServicePricingApiWithHuaweiCloudBssClient() throws Exception {
-        // Setup
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
-        String regionName = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
-        ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
-        UUID templateId = serviceTemplateDetails.getServiceTemplateId();
-        int flavorCount = ocl.getFlavors().getServiceFlavors().size();
-        // Setup get price with pay per use
-        addCredentialForHuaweiCloud();
-        mockSdkClientsForHuaweiCloud();
-        // mock ListProjectInvoker OK
-        mockListProjectInvoker();
-        // Mock ListOnDemandResourceRatingsInvoker with BssintClient failed
-        mockListOnDemandResourceRatingsInvokerWithBssintlClientThrowException();
-        // Mock ListOnDemandResourceRatingsInvoker with BssClient OK
-        mockListOnDemandResourceRatingsInvokerWithBssClient();
-
-        // Test get prices by service with PAY_PER_USE
-        MockHttpServletResponse servicePayPerUsePricesResponse =
-                getPricesByService(templateId, regionName, BillingMode.PAY_PER_USE);
-        assertEquals(HttpStatus.OK.value(), servicePayPerUsePricesResponse.getStatus());
-
-        List<FlavorPriceResult> payPerUsePriceResultList =
-                objectMapper.readValue(servicePayPerUsePricesResponse.getContentAsString(),
-                        new TypeReference<>() {
-                        });
-        assertEquals(flavorCount, payPerUsePriceResultList.size());
-        assertTrue(payPerUsePriceResultList.stream().allMatch(price ->
-                price.getRecurringPrice().getCurrency().equals(Currency.CNY)));
-
-        // Test get prices by flavor with PAY_PER_USE
-        changeFlavorPriceNotOneTime(templateId, ocl, Currency.CNY, PricingPeriod.MONTHLY);
-        // mock ListProjectInvoker with Client failed.
-        MockHttpServletResponse flavorPayPerUsePricesResponse =
-                getServicePriceByFlavor(templateId, regionName, flavorName,
-                        BillingMode.PAY_PER_USE);
-        assertEquals(HttpStatus.OK.value(), flavorPayPerUsePricesResponse.getStatus());
-        FlavorPriceResult flavorPayPerUsePriceResult =
-                objectMapper.readValue(flavorPayPerUsePricesResponse.getContentAsString(),
-                        FlavorPriceResult.class);
-        assertNotNull(flavorPayPerUsePriceResult.getRecurringPrice());
-        assertEquals(Currency.CNY, flavorPayPerUsePriceResult.getRecurringPrice().getCurrency());
-        assertEquals(BillingMode.PAY_PER_USE, flavorPayPerUsePriceResult.getBillingMode());
-        assertNull(flavorPayPerUsePriceResult.getOneTimePaymentPrice());
-        deleteServiceTemplate(templateId);
-    }
-
-
-    @Test
-    @WithJwt(file = "jwt_all_roles.json")
-    void testServicePricingApiWithHuaweiCloudGlobalRestApi() throws Exception {
-        // Setup
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
-        String regionName = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
-        ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
-        UUID templateId = serviceTemplateDetails.getServiceTemplateId();
-        int flavorCount = ocl.getFlavors().getServiceFlavors().size();
-        // Setup get price with pay per use
-        addCredentialForHuaweiCloud();
-        mockListProjectInvokerWithClientThrowException();
-        // Test get prices by service with PAY_PER_USE
-        MockHttpServletResponse servicePayPerUsePricesResponse =
-                getPricesByService(templateId, regionName, BillingMode.PAY_PER_USE);
-        assertEquals(HttpStatus.OK.value(), servicePayPerUsePricesResponse.getStatus());
-
-        List<FlavorPriceResult> payPerUsePriceResultList =
-                objectMapper.readValue(servicePayPerUsePricesResponse.getContentAsString(),
-                        new TypeReference<>() {
-                        });
-        assertEquals(flavorCount, payPerUsePriceResultList.size());
-        assertTrue(payPerUsePriceResultList.stream().allMatch(price ->
-                price.getRecurringPrice().getCurrency().equals(Currency.USD)));
-
-        // Test get prices by flavor with PAY_PER_USE
-        changeFlavorPriceNotOneTime(templateId, ocl, Currency.USD, PricingPeriod.DAILY);
-        // mock ListProjectInvoker with Client failed.
-        MockHttpServletResponse flavorPayPerUsePricesResponse =
-                getServicePriceByFlavor(templateId, regionName, flavorName,
-                        BillingMode.PAY_PER_USE);
-        assertEquals(HttpStatus.OK.value(), flavorPayPerUsePricesResponse.getStatus());
-        FlavorPriceResult flavorPayPerUsePriceResult =
-                objectMapper.readValue(flavorPayPerUsePricesResponse.getContentAsString(),
-                        FlavorPriceResult.class);
-        assertNotNull(flavorPayPerUsePriceResult.getRecurringPrice());
-        assertEquals(Currency.USD, flavorPayPerUsePriceResult.getRecurringPrice().getCurrency());
-        assertEquals(BillingMode.PAY_PER_USE, flavorPayPerUsePriceResult.getBillingMode());
-        assertNull(flavorPayPerUsePriceResult.getOneTimePaymentPrice());
-        deleteServiceTemplate(templateId);
-    }
-
-
-    void mockListProjectInvoker() {
-        KeystoneListProjectsResponse listProjectsResponse = new KeystoneListProjectsResponse();
-        ProjectResult projectResult = new ProjectResult();
-        projectResult.setId("huawei_project_test_id");
-        listProjectsResponse.setProjects(List.of(projectResult));
-        SyncInvoker<KeystoneListProjectsRequest, KeystoneListProjectsResponse> mockInvoker =
-                mock(SyncInvoker.class);
-        when(mockIamClient.keystoneListProjectsInvoker(any())).thenReturn(mockInvoker);
-        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
-        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
-        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
-        when(mockInvoker.invoke()).thenReturn(listProjectsResponse);
-    }
-
-    void mockListProjectInvokerWithClientThrowException() {
-        ClientRequestException clientRequestException = new ClientRequestException(403, "CBC.0150",
-                "Access Denied", UUID.randomUUID().toString());
-
-        SyncInvoker<KeystoneListProjectsRequest, KeystoneListProjectsResponse> mockInvoker =
-                mock(SyncInvoker.class);
-        when(mockIamClient.keystoneListProjectsInvoker(any())).thenReturn(mockInvoker);
-        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
-        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
-        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
-        when(mockInvoker.invoke()).thenThrow(clientRequestException);
-    }
-
-    void mockListOnDemandResourceRatingsInvokerWithBssintlClient() {
-        com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsResponse
-                listOnDemandResourceRatingsResponse =
-                new com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsResponse();
-        listOnDemandResourceRatingsResponse.setAmount(BigDecimal.valueOf(10L));
-        listOnDemandResourceRatingsResponse.setCurrency(Currency.USD.toValue());
-        SyncInvoker<com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsRequest,
-                com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsResponse>
-                mockInvoker = mock(SyncInvoker.class);
-        when(mockBssintlClient.listOnDemandResourceRatingsInvoker(any())).thenReturn(mockInvoker);
-        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
-        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
-        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
-        when(mockInvoker.invoke()).thenReturn(listOnDemandResourceRatingsResponse);
-    }
-
-    private void mockListOnDemandResourceRatingsInvokerWithBssintlClientThrowException() {
-        ClientRequestException clientRequestException = new ClientRequestException(403, "CBC.0150"
-                , "Access Denied", UUID.randomUUID().toString());
-        SyncInvoker<com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsRequest,
-                com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsResponse>
-                mockInvoker = mock(SyncInvoker.class);
-        when(mockBssintlClient.listOnDemandResourceRatingsInvoker(any())).thenReturn(mockInvoker);
-        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
-        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
-        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
-        when(mockInvoker.invoke()).thenThrow(clientRequestException);
-    }
-
-
-    void mockListOnDemandResourceRatingsInvokerWithBssClient() {
-        ListOnDemandResourceRatingsResponse listOnDemandResourceRatingsResponse =
-                new ListOnDemandResourceRatingsResponse();
-        listOnDemandResourceRatingsResponse.setAmount(BigDecimal.valueOf(100L));
-        listOnDemandResourceRatingsResponse.setCurrency(Currency.CNY.toValue());
-        SyncInvoker<ListOnDemandResourceRatingsRequest, ListOnDemandResourceRatingsResponse>
-                mockInvoker = mock(SyncInvoker.class);
-        when(mockBssClient.listOnDemandResourceRatingsInvoker(any())).thenReturn(mockInvoker);
-        when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
-        when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
-        when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
-        when(mockInvoker.invoke()).thenReturn(listOnDemandResourceRatingsResponse);
+        testGetServicePricing(ocl, flavorName, regionName, HuaweiCloudConstants.INTERNATIONAL_SITE);
+        testGetServicePricing(ocl, flavorName, regionName, HuaweiCloudConstants.CHINESE_MAINLAND_SITE);
+        ocl.getFlavors().getServiceFlavors().getFirst().getPricing().getResourceUsage()
+                .getMarkUpPrices().forEach(priceWithRegion -> {
+                    priceWithRegion.getPrice().setPeriod(PricingPeriod.ONE_TIME);
+                });
+        testGetServicePricing(ocl, flavorName, regionName, HuaweiCloudConstants.EUROPE_SITE);
     }
 
     void testServicePricingApiWithFlexibleEngine() throws Exception {
@@ -334,56 +87,118 @@ class ServicePricingApiTest extends ApisTestCommon {
         ocl.getCloudServiceProvider().setName(Csp.FLEXIBLE_ENGINE);
         Region region = new Region();
         region.setName("eu-west-0");
+        region.setSite("default");
         region.setArea("Europe");
         ocl.getCloudServiceProvider().setRegions(List.of(region));
-        testGetServicePricing(ocl);
-    }
-
-    void changeFlavorPriceNotOneTime(UUID templateId, Ocl ocl, Currency currency,
-                                     PricingPeriod pricingPeriod) {
-        RatingMode ratingMode = ocl.getFlavors().getServiceFlavors().getFirst().getPricing();
-        Price price = new Price();
-        price.setCost(BigDecimal.valueOf(365 * 24L));
-        price.setCurrency(currency);
-        price.setPeriod(pricingPeriod);
         PriceWithRegion priceWithRegion = new PriceWithRegion();
-        priceWithRegion.setRegion("any");
+        priceWithRegion.setRegionName("any");
+        priceWithRegion.setSiteName("default");
+        Price price = new Price();
+        price.setCost(BigDecimal.valueOf(0.10));
+        price.setPeriod(PricingPeriod.HOURLY);
+        price.setCurrency(Currency.USD);
         priceWithRegion.setPrice(price);
-        List<PriceWithRegion> priceWithRegions = List.of(priceWithRegion);
-        ratingMode.getResourceUsage().setLicensePrices(priceWithRegions);
-        ratingMode.getResourceUsage().setMarkUpPrices(priceWithRegions);
-        ServiceTemplateEntity serviceTemplate = serviceTemplateStorage.getServiceTemplateById(
-                templateId);
-        ocl.getFlavors().getServiceFlavors().getFirst().setPricing(ratingMode);
-        serviceTemplate.setOcl(ocl);
-        serviceTemplateStorage.storeAndFlush(serviceTemplate);
+        List<PriceWithRegion> prices = List.of(priceWithRegion);
+        ocl.getFlavors().getServiceFlavors().forEach(flavorWithPrice -> {
+            flavorWithPrice.getPricing().setFixedPrices(prices);
+            flavorWithPrice.getPricing().getResourceUsage().setMarkUpPrices(prices);
+            flavorWithPrice.getPricing().getResourceUsage().setLicensePrices(prices);
+        });
+        String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
+        testGetServicePricing(ocl, flavorName, region.getName(), region.getSite());
     }
 
-    void testServicePricingApiWithOpenstack() throws Exception {
-        // Setup
+    void testServicePricingApiWithOpenstackTestlab() throws Exception {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getCloudServiceProvider().setName(Csp.OPENSTACK_TESTLAB);
-        testGetServicePricing(ocl);
+        Region region = new Region();
+        region.setName("RegionOne");
+        region.setSite("default");
+        region.setArea("Europe");
+        ocl.getCloudServiceProvider().setRegions(List.of(region));
+        PriceWithRegion priceWithRegion = new PriceWithRegion();
+        priceWithRegion.setRegionName("any");
+        priceWithRegion.setSiteName("default");
+        Price price = new Price();
+        price.setCost(BigDecimal.valueOf(0.10 * 24));
+        price.setPeriod(PricingPeriod.DAILY);
+        price.setCurrency(Currency.USD);
+        priceWithRegion.setPrice(price);
+        List<PriceWithRegion> prices = List.of(priceWithRegion);
+        ocl.getFlavors().getServiceFlavors().forEach(flavorWithPrice -> {
+            flavorWithPrice.getPricing().setFixedPrices(prices);
+            flavorWithPrice.getPricing().getResourceUsage().setMarkUpPrices(prices);
+            flavorWithPrice.getPricing().getResourceUsage().setLicensePrices(prices);
+        });
+
+        String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
+        testGetServicePricing(ocl, flavorName, region.getName(), region.getSite());
     }
 
     void testServicePricingApiWithPlusServer() throws Exception {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getCloudServiceProvider().setName(Csp.PLUS_SERVER);
-        testGetServicePricing(ocl);
+        Region region = new Region();
+        region.setName("RegionOne");
+        region.setSite("default");
+        region.setArea("Europe");
+        ocl.getCloudServiceProvider().setRegions(List.of(region));
+        PriceWithRegion priceWithRegion = new PriceWithRegion();
+        priceWithRegion.setRegionName("any");
+        priceWithRegion.setSiteName("default");
+        Price price = new Price();
+        price.setCost(BigDecimal.valueOf(0.10 * 24 * 30));
+        price.setPeriod(PricingPeriod.MONTHLY);
+        price.setCurrency(Currency.USD);
+        priceWithRegion.setPrice(price);
+        List<PriceWithRegion> prices = List.of(priceWithRegion);
+        ocl.getFlavors().getServiceFlavors().forEach(flavorWithPrice -> {
+            flavorWithPrice.getPricing().setFixedPrices(prices);
+            flavorWithPrice.getPricing().getResourceUsage().setMarkUpPrices(prices);
+            flavorWithPrice.getPricing().getResourceUsage().setLicensePrices(prices);
+        });
+        String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
+        testGetServicePricing(ocl, flavorName, region.getName(), region.getSite());
     }
 
-    private void testGetServicePricing(Ocl ocl) throws Exception {
-        // Setup
+    void testServicePricingApiWithRegioCloud() throws Exception {
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.getCloudServiceProvider().setName(Csp.REGIO_CLOUD);
+        Region region = new Region();
+        region.setName("RegionOne");
+        region.setSite("default");
+        region.setArea("Europe");
+        ocl.getCloudServiceProvider().setRegions(List.of(region));
+        PriceWithRegion priceWithRegion = new PriceWithRegion();
+        priceWithRegion.setRegionName("any");
+        priceWithRegion.setSiteName("default");
+        Price price = new Price();
+        price.setCost(BigDecimal.valueOf(0.10 * 24 * 365));
+        price.setPeriod(PricingPeriod.YEARLY);
+        price.setCurrency(Currency.USD);
+        priceWithRegion.setPrice(price);
+        List<PriceWithRegion> prices = List.of(priceWithRegion);
+        ocl.getFlavors().getServiceFlavors().forEach(flavorWithPrice -> {
+            flavorWithPrice.getPricing().setFixedPrices(prices);
+            flavorWithPrice.getPricing().getResourceUsage().setMarkUpPrices(prices);
+            flavorWithPrice.getPricing().getResourceUsage().setLicensePrices(prices);
+        });
         String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
-        String regionName = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
+        testGetServicePricing(ocl, flavorName, region.getName(), region.getSite());
+    }
+
+
+    private void testGetServicePricing(Ocl ocl, String flavorName, String regionName,
+                                       String siteName) throws Exception {
+        // Setup
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         UUID templateId = serviceTemplate.getServiceTemplateId();
-
         int flavorCount = ocl.getFlavors().getServiceFlavors().size();
         MockHttpServletResponse serviceFixedPricesResponse =
-                getPricesByService(templateId, regionName, BillingMode.FIXED);
+                getPricesByService(templateId, regionName, siteName, BillingMode.FIXED);
 
         List<FlavorPriceResult> fixedPriceResultList =
                 objectMapper.readValue(serviceFixedPricesResponse.getContentAsString(),
@@ -394,7 +209,7 @@ class ServicePricingApiTest extends ApisTestCommon {
 
 
         MockHttpServletResponse servicePayPerUsePricesResponse =
-                getPricesByService(templateId, regionName, BillingMode.PAY_PER_USE);
+                getPricesByService(templateId, regionName, siteName, BillingMode.PAY_PER_USE);
 
         List<FlavorPriceResult> payPerUsePriceResultList =
                 objectMapper.readValue(servicePayPerUsePricesResponse.getContentAsString(),
@@ -404,7 +219,8 @@ class ServicePricingApiTest extends ApisTestCommon {
         Assertions.assertEquals(flavorCount, payPerUsePriceResultList.size());
 
         MockHttpServletResponse fixedPriceResponse =
-                getServicePriceByFlavor(templateId, regionName, flavorName, BillingMode.FIXED);
+                getServicePriceByFlavor(templateId, regionName, siteName, flavorName,
+                        BillingMode.FIXED);
         FlavorPriceResult flavorPriceResult =
                 objectMapper.readValue(fixedPriceResponse.getContentAsString(),
                         FlavorPriceResult.class);
@@ -414,27 +230,13 @@ class ServicePricingApiTest extends ApisTestCommon {
 
         // Setup
         MockHttpServletResponse payPerUsePriceResponse =
-                getServicePriceByFlavor(templateId, regionName, flavorName,
+                getServicePriceByFlavor(templateId, regionName, siteName, flavorName,
                         BillingMode.PAY_PER_USE);
         FlavorPriceResult flavorPriceResult1 =
                 objectMapper.readValue(payPerUsePriceResponse.getContentAsString(),
                         FlavorPriceResult.class);
         assertEquals(HttpStatus.OK.value(), payPerUsePriceResponse.getStatus());
         assertNotNull(flavorPriceResult1.getRecurringPrice());
-        assertNull(flavorPriceResult1.getOneTimePaymentPrice());
-
-        // Setup
-        changeFlavorPriceNotOneTime(templateId, ocl, Currency.CNY, PricingPeriod.YEARLY);
-        MockHttpServletResponse payPerUsePriceResponse2 =
-                getServicePriceByFlavor(templateId, regionName, flavorName,
-                        BillingMode.PAY_PER_USE);
-        FlavorPriceResult flavorPriceResult2 =
-                objectMapper.readValue(payPerUsePriceResponse2.getContentAsString(),
-                        FlavorPriceResult.class);
-        assertEquals(HttpStatus.OK.value(), payPerUsePriceResponse2.getStatus());
-        assertNotNull(flavorPriceResult2.getRecurringPrice());
-        assertNull(flavorPriceResult2.getOneTimePaymentPrice());
-
         deleteServiceTemplate(templateId);
     }
 
@@ -442,6 +244,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         // Setup
         UUID uuid = UUID.randomUUID();
         String regionName = "region";
+        String siteName = "site";
         String flavorName = "flavor-error-test";
         BillingMode billingMode = BillingMode.FIXED;
 
@@ -454,7 +257,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         String result1 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse1 =
-                getServicePriceByFlavor(uuid, regionName, flavorName, billingMode);
+                getServicePriceByFlavor(uuid, regionName, siteName, flavorName, billingMode);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), priceResponse1.getStatus());
         assertEquals(result1, priceResponse1.getContentAsString());
@@ -470,7 +273,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         String result2 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse2 = getServicePriceByFlavor(templateId,
-                regionName, flavorName, billingMode);
+                regionName, siteName, flavorName, billingMode);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), priceResponse2.getStatus());
         assertEquals(result2, priceResponse2.getContentAsString());
@@ -491,7 +294,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         String result3 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse3 = getServicePriceByFlavor(templateId,
-                regionName, flavorName, billingMode);
+                regionName, siteName, flavorName, billingMode);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), priceResponse3.getStatus());
         assertEquals(result3, priceResponse3.getContentAsString());
@@ -503,7 +306,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         String result4 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse4 = getServicePriceByFlavor(templateId,
-                regionName, flavorName, billingMode);
+                regionName, siteName, flavorName, billingMode);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), priceResponse4.getStatus());
         assertEquals(result4, priceResponse4.getContentAsString());
@@ -518,7 +321,7 @@ class ServicePricingApiTest extends ApisTestCommon {
         String result5 = objectMapper.writeValueAsString(expectedResult);
         // Run the test
         final MockHttpServletResponse priceResponse5 = getServicePriceByFlavor(templateId,
-                regionName, flavorName, billingMode);
+                regionName, siteName, flavorName, billingMode);
 
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), priceResponse5.getStatus());
@@ -527,22 +330,23 @@ class ServicePricingApiTest extends ApisTestCommon {
         deleteServiceTemplate(templateId);
     }
 
-    private MockHttpServletResponse getServicePriceByFlavor(
-            UUID templateId, String region, String flavorName, BillingMode billingMode)
+    private MockHttpServletResponse getServicePriceByFlavor(UUID templateId, String regionName,
+                                                            String siteName, String flavorName,
+                                                            BillingMode billingMode)
             throws Exception {
         return mockMvc.perform(
-                        get("/xpanse/pricing/{templateId}/{region}/{billingMode}/{flavorName}",
-                                templateId, region, billingMode, flavorName)
+                        get("/xpanse/pricing/{templateId}/{regionName}/{siteName}/{billingMode}/{flavorName}",
+                                templateId, regionName, siteName, billingMode, flavorName)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
     }
 
     private MockHttpServletResponse getPricesByService(
-            UUID templateId, String region, BillingMode billingMode)
+            UUID templateId, String regionName, String siteName, BillingMode billingMode)
             throws Exception {
         return mockMvc.perform(
-                        get("/xpanse/pricing/service/{templateId}/{region}/{billingMode}",
-                                templateId, region, billingMode)
+                        get("/xpanse/pricing/service/{templateId}/{regionName}/{siteName}/{billingMode}",
+                                templateId, regionName, siteName, billingMode)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
     }

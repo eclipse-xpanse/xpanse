@@ -52,22 +52,23 @@ public class ServicePricesManager {
      * Get the price of one specific flavor of the service.
      *
      * @param templateId  service template id
-     * @param region      region name
+     * @param regionName  region name
+     * @param siteName    site name
      * @param billingMode billing mode
      * @param flavorName  flavor name
      * @return FlavorPriceResult
      */
     public FlavorPriceResult getServicePriceByFlavor(String templateId,
-                                                     String region,
+                                                     String regionName,
+                                                     String siteName,
                                                      BillingMode billingMode,
                                                      String flavorName) {
         ServiceTemplateEntity serviceTemplate = getServiceTemplate(templateId);
         RatingMode flavorPriceMode =
                 getServiceFlavorRatingMode(serviceTemplate, flavorName);
         validateFlavorPriceMode(flavorPriceMode, billingMode);
-        ServiceFlavorPriceRequest serviceFlavorPriceRequest =
-                getServiceFlavorPriceRequest(templateId, flavorName, flavorPriceMode, region,
-                        billingMode);
+        ServiceFlavorPriceRequest serviceFlavorPriceRequest = getServiceFlavorPriceRequest(
+                templateId, flavorName, flavorPriceMode, regionName, siteName, billingMode);
         Csp csp = serviceTemplate.getCsp();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
         FlavorPriceResult priceResult =
@@ -83,13 +84,13 @@ public class ServicePricesManager {
      * Get the price of all flavors of the service.
      *
      * @param templateId  service template id
-     * @param region      region name
+     * @param regionName  region name
+     * @param siteName    site name
      * @param billingMode billing mode
      * @return list of FlavorPriceResult
      */
-    public List<FlavorPriceResult> getPricesByService(String templateId,
-                                                      String region,
-                                                      BillingMode billingMode) {
+    public List<FlavorPriceResult> getPricesByService(String templateId, String regionName,
+                                                      String siteName, BillingMode billingMode) {
         ServiceTemplateEntity serviceTemplate = getServiceTemplate(templateId);
         List<ServiceFlavorWithPrice> flavors =
                 serviceTemplate.getOcl().getFlavors().getServiceFlavors();
@@ -99,7 +100,7 @@ public class ServicePricesManager {
         for (ServiceFlavorWithPrice flavor : flavors) {
             ServiceFlavorPriceRequest serviceFlavorPriceRequest =
                     getServiceFlavorPriceRequest(templateId, flavor.getName(), flavor.getPricing(),
-                            region, billingMode);
+                            regionName, siteName, billingMode);
             FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
             flavorPriceResult.setFlavorName(flavor.getName());
             flavorPriceResult.setBillingMode(billingMode);
@@ -125,13 +126,15 @@ public class ServicePricesManager {
     private ServiceFlavorPriceRequest getServiceFlavorPriceRequest(String serviceTemplateId,
                                                                    String flavorName,
                                                                    RatingMode flavorPriceMode,
-                                                                   String region,
+                                                                   String regionName,
+                                                                   String siteName,
                                                                    BillingMode billingMode) {
         ServiceFlavorPriceRequest serviceFlavorPriceRequest = new ServiceFlavorPriceRequest();
         serviceFlavorPriceRequest.setUserId(userServiceHelper.getCurrentUserId());
         serviceFlavorPriceRequest.setServiceTemplateId(serviceTemplateId);
         serviceFlavorPriceRequest.setFlavorName(flavorName);
-        serviceFlavorPriceRequest.setRegionName(region);
+        serviceFlavorPriceRequest.setRegionName(regionName);
+        serviceFlavorPriceRequest.setSiteName(siteName);
         serviceFlavorPriceRequest.setFlavorRatingMode(flavorPriceMode);
         serviceFlavorPriceRequest.setBillingMode(billingMode);
         return serviceFlavorPriceRequest;

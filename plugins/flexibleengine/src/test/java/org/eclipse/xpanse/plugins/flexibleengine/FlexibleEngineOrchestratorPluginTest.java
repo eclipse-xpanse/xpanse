@@ -2,6 +2,7 @@ package org.eclipse.xpanse.plugins.flexibleengine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -100,11 +101,22 @@ class FlexibleEngineOrchestratorPluginTest {
     }
 
     @Test
+    void testGetSites() {
+        // Setup
+        List<String> exceptedSites = List.of("default");
+        // Run the test
+        final List<String> result = plugin.getSites();
+        // Verify the results
+        assertEquals(exceptedSites, result);
+    }
+
+    @Test
     void testValidateRegionsOfService() {
         // Setup
         Ocl ocl = new Ocl();
         Region region = new Region();
         region.setName("eu-west-0");
+        region.setSite("default");
         region.setArea("area");
         CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
         cloudServiceProvider.setName(Csp.FLEXIBLE_ENGINE);
@@ -115,7 +127,14 @@ class FlexibleEngineOrchestratorPluginTest {
         // Verify the results
         assertTrue(result);
 
+        // Setup unavailable region name
         region.setName("eu-west-error");
+        // Run the test
+        assertThatThrownBy(() -> plugin.validateRegionsOfService(ocl))
+                .isInstanceOf(UnavailableServiceRegionsException.class);
+
+        // Setup unavailable site name
+        region.setSite("error-site");
         // Run the test
         assertThatThrownBy(() -> plugin.validateRegionsOfService(ocl))
                 .isInstanceOf(UnavailableServiceRegionsException.class);

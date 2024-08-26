@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -45,6 +46,7 @@ import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerr
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * OrchestratorPlugin implementation for the provider RegionCloud.
@@ -52,7 +54,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
-
+    private static final String DEFAULT_SITE = "default";
     @Resource
     private OpenstackTerraformResourceHandler terraformResourceHandler;
     @Resource
@@ -97,8 +99,24 @@ public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
+    public List<String> getSites() {
+        return List.of(DEFAULT_SITE);
+    }
+
+    @Override
     public boolean validateRegionsOfService(Ocl ocl) {
-        return true;
+        List<String> errors = new ArrayList<>();
+        ocl.getCloudServiceProvider().getRegions().forEach(region -> {
+            if (!getSites().contains(region.getSite())) {
+                String errorMsg = String.format("Region with site %s is unavailable in Csp %s. "
+                        + "Available sites %s", region.getName(), getCsp().toValue(), getSites());
+                errors.add(errorMsg);
+            }
+        });
+        if (CollectionUtils.isEmpty(errors)) {
+            return true;
+        }
+        throw new UnavailableServiceRegionsException(errors);
     }
 
     @Override

@@ -92,7 +92,7 @@ public class OpenApiGeneratorJarManage implements
             URL url = URI.create(clientDownLoadUrl).toURL();
             File cliJarFile = getCliFile();
             FileUtils.copyURLToFile(url, cliJarFile);
-            log.info("Downloading openapi generator client into path {} from URL{} successful.",
+            log.info("Downloading openapi generator client into path {} from URL {} successful.",
                     cliJarFile.getPath(), clientDownLoadUrl);
             return true;
         } catch (IOException ioException) {

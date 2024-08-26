@@ -17,9 +17,9 @@ class FlavorPriceResultRequestTest {
 
     private final String serviceTemplateId = UUID.randomUUID().toString();
     private final String flavorName = "flavorName";
-
-    private final String regionName = "regionName";
     private final String userId = "userId";
+    private final String regionName = "any";
+    private final String siteName = "default";
     @Mock
     private RatingMode mockRatingMode;
     @Mock
@@ -33,6 +33,7 @@ class FlavorPriceResultRequestTest {
         test.setFlavorName(flavorName);
         test.setUserId(userId);
         test.setRegionName(regionName);
+        test.setSiteName(siteName);
         test.setFlavorRatingMode(mockRatingMode);
         test.setBillingMode(mockBillingMode);
     }
@@ -41,7 +42,11 @@ class FlavorPriceResultRequestTest {
     void testGetters() {
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getRegionName()).isEqualTo(regionName);
+        assertThat(test.getSiteName()).isEqualTo(siteName);
+        assertThat(test.getFlavorRatingMode()).isEqualTo(mockRatingMode);
+        assertThat(test.getServiceTemplateId()).isEqualTo(serviceTemplateId);
         assertThat(test.getBillingMode()).isEqualTo(mockBillingMode);
+        assertThat(test.getFlavorName()).isEqualTo(flavorName);
     }
 
     @Test
@@ -67,7 +72,8 @@ class FlavorPriceResultRequestTest {
     void testToString() {
         String result = "ServiceFlavorPriceRequest(serviceTemplateId=" + serviceTemplateId
                 + ", flavorName=" + flavorName + ", userId=" + userId + ", regionName=" + regionName
-                + ", flavorRatingMode=" + mockRatingMode + ", billingMode=" + mockBillingMode + ")";
+                + ", siteName=" + siteName + ", flavorRatingMode=" + mockRatingMode
+                + ", billingMode=" + mockBillingMode + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }
