@@ -7,7 +7,13 @@
 package org.eclipse.xpanse.plugins.huaweicloud.price;
 
 import com.huaweicloud.sdk.bssintl.v2.model.ListOnDemandResourceRatingsResponse;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +27,14 @@ import org.eclipse.xpanse.modules.models.billing.enums.Currency;
 import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
+import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.price.model.ProductInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -42,9 +46,15 @@ public class HuaweiCloudGlobalPriceCalculator {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${huaweicloud.price.calculator.global.restapi.url:https://portal-intl.huaweicloud.com"
-            + "/api/cbc/global/rest/BSS/billing/ratingservice/v2/inquiry/resource}")
-    private String huaweiCloudPriceCalculatorGlobalRestApiUrl;
+    @Value("${huaweicloud.international.price.calculator.url}")
+    private String priceCalculatorRestApiUrlForInternational;
+
+    @Value("${huaweicloud.chinese.price.calculator.url}")
+    private String priceCalculatorRestApiUrlForChinese;
+
+    @Value("${huaweicloud.european.price.calculator.url}")
+    private String priceCalculatorRestApiUrlForEurope;
+
 
     /**
      * Get the price of the service with global rest api.
@@ -53,27 +63,64 @@ public class HuaweiCloudGlobalPriceCalculator {
      * @return Price in the international website.
      */
     public Price getPriceWithResourcesUsageByGlobalRestApi(ServiceFlavorPriceRequest request) {
+        String site = request.getSiteName();
+        String requestUrl = getPriceCalculatorUrlBySite(site);
+        log.info("Get the price calculator rest api url: {} in site: {}.", requestUrl, site);
+        Map<String, Object> requestBody = getPriceRequestByGlobalRestApi(request);
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
         try {
-            Map<String, Object> requestBody = getPriceRequestByGlobalRestApi(request);
-            HttpHeaders headers = new HttpHeaders();
-            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
-            log.info("Request Method: {} Url: {} Request Body: {}.", HttpMethod.POST,
-                    huaweiCloudPriceCalculatorGlobalRestApiUrl, requestBody);
+            log.info("Calling the rest api with request body:{}.", requestBody);
             ResponseEntity<ListOnDemandResourceRatingsResponse> responseEntity =
-                    restTemplate.exchange(huaweiCloudPriceCalculatorGlobalRestApiUrl,
-                            HttpMethod.POST, requestEntity,
-                            ListOnDemandResourceRatingsResponse.class
-                    );
-            log.info("Call the global rest api to calculate the price successfully. "
-                            + "Status Code: {}, Response Body: {}", responseEntity.getStatusCode(),
-                    responseEntity.getBody());
+                    restTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity,
+                            ListOnDemandResourceRatingsResponse.class);
+            log.info("Called the rest api in site: {} to calculate the price successfully. "
+                    + "Response Body: {}", site, responseEntity.getBody());
             return convertResourceRatingsResponseToRecurringPrice(responseEntity.getBody());
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            HttpStatusCode statusCode = e.getStatusCode();
-            String errorMessage = e.getResponseBodyAsString();
-            log.error("Call the global rest api to calculate the price failed. Error: "
-                    + "Status Code {}, Response Body: {}", statusCode, errorMessage);
-            throw new ClientApiCallFailedException(e.getMessage());
+        } catch (Exception e) {
+            String errorMessage = String.format(
+                    "Called the rest api in site: %s to calculate the price failed. Error: %s",
+                    site, e.getMessage());
+            log.error(errorMessage);
+            throw new ClientApiCallFailedException(errorMessage);
+        }
+    }
+
+
+    private String getPriceCalculatorUrlBySite(String site) {
+        String requestUrl;
+        if (StringUtils.equalsIgnoreCase(HuaweiCloudConstants.CHINESE_MAINLAND_SITE, site)) {
+            requestUrl = priceCalculatorRestApiUrlForChinese;
+        } else if (StringUtils.equalsIgnoreCase(HuaweiCloudConstants.EUROPE_SITE, site)) {
+            requestUrl = priceCalculatorRestApiUrlForEurope;
+        } else {
+            requestUrl = priceCalculatorRestApiUrlForInternational;
+        }
+        if (StringUtils.isBlank(requestUrl)) {
+            String errorMessage = String.format(
+                    "The price calculator rest api url for site: %s is empty.", site);
+            throw new ClientApiCallFailedException(errorMessage);
+        }
+        URLConnection urlConn = null;
+        try {
+            URL url = URI.create(requestUrl).toURL();
+            urlConn = url.openConnection();
+            urlConn.setConnectTimeout(5000);
+            urlConn.connect();
+            return url.toString();
+        } catch (MalformedURLException e) {
+            String errorMsg = String.format("The price calculator rest api url: %s for site: %s "
+                    + "is invalid.", requestUrl, site);
+            throw new ClientApiCallFailedException(errorMsg);
+        } catch (IOException e) {
+            String errorMsg = String.format("Failed to connect to the price calculator rest api "
+                    + "url:%s for site: %s. Error: %s", requestUrl, site, e.getMessage());
+            throw new ClientApiCallFailedException(errorMsg);
+        } finally {
+            if (Objects.nonNull(urlConn) && urlConn instanceof HttpURLConnection httpConn) {
+                httpConn.disconnect();
+            }
+
         }
     }
 
@@ -99,7 +146,10 @@ public class HuaweiCloudGlobalPriceCalculator {
         requestBody.put("periodType", 4);
         requestBody.put("periodNum", 1);
         requestBody.put("subscriptionNum", 1);
-        requestBody.put("siteCode", getSiteCodeByRegionName(region));
+        if (!StringUtils.equalsIgnoreCase(HuaweiCloudConstants.EUROPE_SITE,
+                request.getSiteName())) {
+            requestBody.put("siteCode", getSiteCodeByRegionName(region));
+        }
         List<Resource> resources = request.getFlavorRatingMode().getResourceUsage().getResources();
         ProductInfo[] productInfos = new ProductInfo[resources.size()];
         for (int i = 0; i < resources.size(); i++) {

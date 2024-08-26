@@ -9,7 +9,9 @@ import org.springframework.beans.BeanUtils;
 
 class PriceWithRegionTest {
 
-    private final String region = "any";
+    private final String regionName = "any";
+
+    private final String siteName = "default";
 
     @Mock
     private Price mockPrice;
@@ -20,13 +22,15 @@ class PriceWithRegionTest {
     void setUp() {
         test = new PriceWithRegion();
         test.setPrice(mockPrice);
-        test.setRegion(region);
+        test.setRegionName(regionName);
+        test.setSiteName(siteName);
     }
 
     @Test
     void testGetters() {
+        assertThat(test.getRegionName()).isEqualTo(regionName);
+        assertThat(test.getSiteName()).isEqualTo(siteName);
         assertThat(test.getPrice()).isEqualTo(mockPrice);
-        assertThat(test.getRegion()).isEqualTo(region);
     }
 
 
@@ -51,7 +55,8 @@ class PriceWithRegionTest {
 
     @Test
     void testToString() {
-        String result = "PriceWithRegion(region=" + region + ", price=" + mockPrice + ")";
+        String result = "PriceWithRegion(regionName=" + regionName + ", siteName=" + siteName
+                + ", price=" + mockPrice + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

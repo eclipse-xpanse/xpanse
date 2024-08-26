@@ -25,8 +25,15 @@ public class Region implements Serializable {
     @NotNull
     @NotBlank
     @NotEmpty
-    @Schema(description = "The name of the Region")
+    @Schema(description = "The name of the region")
     private String name;
+
+    @NotNull
+    @NotBlank
+    @NotEmpty
+    @Schema(description = "The site with the region belongs to, such as default, Chinese Mainland, "
+            + "International, ")
+    private String site = "default";
 
     @NotEmpty
     @NotBlank

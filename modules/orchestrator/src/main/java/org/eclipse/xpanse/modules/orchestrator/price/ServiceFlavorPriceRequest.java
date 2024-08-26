@@ -19,6 +19,7 @@ public class ServiceFlavorPriceRequest {
     private String flavorName;
     private String userId;
     private String regionName;
+    private String siteName;
     private RatingMode flavorRatingMode;
     private BillingMode billingMode;
 }

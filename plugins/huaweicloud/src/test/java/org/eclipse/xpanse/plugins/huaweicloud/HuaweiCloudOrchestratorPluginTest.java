@@ -2,6 +2,7 @@ package org.eclipse.xpanse.plugins.huaweicloud;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -28,14 +29,17 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableS
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
+import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class HuaweiCloudOrchestratorPluginTest {
@@ -49,6 +53,12 @@ class HuaweiCloudOrchestratorPluginTest {
 
     @InjectMocks
     private HuaweiCloudOrchestratorPlugin plugin;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(plugin,
+                "autoApproveServiceTemplateEnabled", false);
+    }
 
     @Test
     void testGetResourceHandler() {
@@ -101,14 +111,26 @@ class HuaweiCloudOrchestratorPluginTest {
     }
 
     @Test
+    void testGetSites() {
+        // Setup
+        List<String> exceptedSites = List.of(HuaweiCloudConstants.INTERNATIONAL_SITE,
+                HuaweiCloudConstants.CHINESE_MAINLAND_SITE,
+                HuaweiCloudConstants.EUROPE_SITE);
+        // Run the test
+        final List<String> result = plugin.getSites();
+        // Verify the results
+        assertEquals(exceptedSites, result);
+    }
+
+    @Test
     void testValidateRegionsOfService() {
         // Setup
         Ocl ocl = new Ocl();
         Region region = new Region();
         region.setName("eu-west-101");
-        region.setArea("area");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
-        cloudServiceProvider.setName(Csp.FLEXIBLE_ENGINE);
         cloudServiceProvider.setRegions(List.of(region));
         ocl.setCloudServiceProvider(cloudServiceProvider);
         // Run the test
@@ -116,7 +138,14 @@ class HuaweiCloudOrchestratorPluginTest {
         // Verify the results
         assertTrue(result);
 
+        // Setup unavailable region name
         region.setName("eu-west-error");
+        // Run the test
+        assertThatThrownBy(() -> plugin.validateRegionsOfService(ocl))
+                .isInstanceOf(UnavailableServiceRegionsException.class);
+
+        // Setup unavailable site name
+        region.setSite("error-site");
         // Run the test
         assertThatThrownBy(() -> plugin.validateRegionsOfService(ocl))
                 .isInstanceOf(UnavailableServiceRegionsException.class);

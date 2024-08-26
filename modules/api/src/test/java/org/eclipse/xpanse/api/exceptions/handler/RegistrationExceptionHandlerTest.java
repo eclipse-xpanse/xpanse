@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
+import org.eclipse.xpanse.modules.models.billing.exceptions.InvalidBillingConfigException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
@@ -24,6 +25,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.IdentityProviderManager;
@@ -180,6 +182,30 @@ class RegistrationExceptionHandlerTest {
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.resultType").value("Invalid Service Flavors"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testUnavailableServiceRegionsException() throws Exception {
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new UnavailableServiceRegionsException(List.of("test error")));
+
+        this.mockMvc.perform(
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Unavailable Service Regions"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testInvalidBillingConfigException() throws Exception {
+        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
+                new InvalidBillingConfigException(List.of("test error")));
+
+        this.mockMvc.perform(
+                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.resultType").value("Invalid Billing Config"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 }

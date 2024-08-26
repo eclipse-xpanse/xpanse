@@ -9,6 +9,7 @@ import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.g
 
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.billing.exceptions.InvalidBillingConfigException;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
@@ -170,6 +171,17 @@ public class RegistrationExceptionHandler {
     public Response handleUnavailableServiceRegionsException(
             UnavailableServiceRegionsException ex) {
         return getErrorResponse(ResultType.UNAVAILABLE_SERVICE_REGIONS, ex.getErrorReasons());
+    }
+
+    /**
+     * Exception handler for InvalidBillingConfigException.
+     */
+    @ExceptionHandler({InvalidBillingConfigException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleInvalidBillingConfigException(
+            InvalidBillingConfigException ex) {
+        return getErrorResponse(ResultType.INVALID_BILLING_CONFIG, ex.getErrorReasons());
     }
 
     /**

@@ -9,9 +9,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OPENSTACK_TESTLAB_AUTH_URL;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OS_AUTH_URL;
 import static org.instancio.Select.field;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,10 +55,13 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
@@ -80,6 +85,7 @@ import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerr
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,6 +94,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {OpenstackTestlabOrchestratorPlugin.class, ScsKeystoneManager.class,
@@ -133,6 +140,12 @@ class OpenstackTestlabOrchestratorPluginTest {
     @Resource
     private OpenstackTestlabOrchestratorPlugin plugin;
 
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(plugin,
+                "autoApproveServiceTemplateEnabled", false);
+    }
+
     @BeforeAll
     void setEnvVar() {
         System.setProperty(OPENSTACK_TESTLAB_AUTH_URL,
@@ -175,14 +188,38 @@ class OpenstackTestlabOrchestratorPluginTest {
         assertThat(plugin.autoApproveServiceTemplateIsEnabled()).isFalse();
     }
 
+
+    @Test
+    void testGetSites() {
+        // Setup
+        List<String> exceptedSites = List.of("default");
+        // Run the test
+        final List<String> result = plugin.getSites();
+        // Verify the results
+        assertEquals(exceptedSites, result);
+    }
+
     @Test
     void testValidateRegionsOfService() {
         // Setup
-        Ocl ocl = Instancio.of(Ocl.class).create();
+        Ocl ocl = new Ocl();
+        Region region = new Region();
+        region.setName("RegionOne");
+        region.setSite("default");
+        region.setArea("area");
+        CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
+        cloudServiceProvider.setRegions(List.of(region));
+        ocl.setCloudServiceProvider(cloudServiceProvider);
         // Run the test
         final boolean result = plugin.validateRegionsOfService(ocl);
         // Verify the results
         assertTrue(result);
+
+        // Setup unavailable site name
+        region.setSite("error-site");
+        // Run the test
+        assertThatThrownBy(() -> plugin.validateRegionsOfService(ocl))
+                .isInstanceOf(UnavailableServiceRegionsException.class);
     }
 
     @Test

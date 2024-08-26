@@ -116,11 +116,14 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
+    public List<String> getSites() {
+        return List.of(FlexibleEngineConstants.DEFAULT_SITE);
+    }
+
+    @Override
     public boolean validateRegionsOfService(Ocl ocl) {
         List<String> errors = new ArrayList<>();
         ocl.getCloudServiceProvider().getRegions().forEach(region -> {
-            String errorMsg = String.format("Region with name %s is unavailable in "
-                    + "Csp %s.", region.getName(), getCsp().toValue());
             try {
                 String iamEndpointForRegion =
                         PROTOCOL_HTTPS + IAM_ENDPOINT_PREFIX + region.getName() + ENDPOINT_SUFFIX;
@@ -131,6 +134,13 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
             } catch (RestClientException e) {
                 log.error("Request IAM endpoint for region {} error. {}",
                         region.getName(), e.getMessage());
+                String errorMsg = String.format("Region with name %s is unavailable in "
+                        + "Csp %s.", region.getName(), getCsp().toValue());
+                errors.add(errorMsg);
+            }
+            if (!getSites().contains(region.getSite())) {
+                String errorMsg = String.format("Region with site %s is unavailable in Csp %s. "
+                        + "Available sites %s", region.getName(), getCsp().toValue(), getSites());
                 errors.add(errorMsg);
             }
         });

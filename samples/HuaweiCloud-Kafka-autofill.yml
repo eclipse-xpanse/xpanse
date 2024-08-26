@@ -17,8 +17,10 @@ cloudServiceProvider:
   name: HuaweiCloud
   regions:
     - name: cn-southwest-2
+      site: Chinese Mainland
       area: Asia China
     - name: cn-north-4
+      site: Chinese Mainland
       area: Asia China
 billing:
   # The supported mode of billing (`Fixed`, `Pay per Use`)
@@ -51,20 +53,23 @@ flavors:
                 resource_size: 40
                 size_measure_id: 17
           licensePrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 1.90
                 currency: CNY
                 period: hourly
           markUpPrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 1.90
                 currency: CNY
                 period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: Chinese Mainland
             price:
               cost: 730
               currency: CNY
@@ -98,20 +103,23 @@ flavors:
                 resource_size: 40
                 size_measure_id: 15
           licensePrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 1.90
                 currency: CNY
                 period: hourly
           markUpPrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 1.90
                 currency: CNY
                 period: hourly
         # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
         fixedPrices:
-          - region: any
+          - regionName: any
+            siteName: Chinese Mainland
             price:
               cost: 980
               currency: CNY

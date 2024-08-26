@@ -1,8 +1,10 @@
 package org.eclipse.xpanse.plugins.regiocloud;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OS_AUTH_URL;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.REGIO_CLOUD_AUTH_URL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -24,8 +26,11 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -37,7 +42,6 @@ import org.eclipse.xpanse.plugins.openstack.common.manage.OpenstackResourceManag
 import org.eclipse.xpanse.plugins.openstack.common.manage.OpenstackServersManager;
 import org.eclipse.xpanse.plugins.openstack.common.price.OpenstackServicePriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerraformResourceHandler;
-import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -124,13 +128,36 @@ class RegioCloudOrchestratorPluginTest {
     }
 
     @Test
+    void testGetSites() {
+        // Setup
+        List<String> exceptedSites = List.of("default");
+        // Run the test
+        final List<String> result = plugin.getSites();
+        // Verify the results
+        assertEquals(exceptedSites, result);
+    }
+
+    @Test
     void testValidateRegionsOfService() {
         // Setup
-        Ocl ocl = Instancio.of(Ocl.class).create();
+        Ocl ocl = new Ocl();
+        Region region = new Region();
+        region.setName("RegionOne");
+        region.setSite("default");
+        region.setArea("area");
+        CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
+        cloudServiceProvider.setRegions(List.of(region));
+        ocl.setCloudServiceProvider(cloudServiceProvider);
         // Run the test
         final boolean result = plugin.validateRegionsOfService(ocl);
         // Verify the results
         assertTrue(result);
+
+        // Setup unavailable site name
+        region.setSite("error-site");
+        // Run the test
+        assertThatThrownBy(() -> plugin.validateRegionsOfService(ocl))
+                .isInstanceOf(UnavailableServiceRegionsException.class);
     }
 
     @Test

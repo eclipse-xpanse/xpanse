@@ -7,8 +7,10 @@
 package org.eclipse.xpanse.modules.servicetemplate;
 
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,9 +29,11 @@ import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJso
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
@@ -38,12 +42,12 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
-import org.eclipse.xpanse.modules.models.servicetemplate.validators.BillingConfigValidator;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.servicetemplate.price.BillingConfigValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
@@ -89,7 +93,9 @@ public class ServiceTemplateManage {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
         iconUpdate(existingTemplate, ocl);
         checkParams(existingTemplate, ocl);
-        validateRegionsAndFlavors(ocl);
+        validateRegions(ocl);
+        validateFlavors(ocl);
+        billingConfigValidator.validateBillingConfig(ocl);
         validateServiceDeployment(ocl.getDeployment(), existingTemplate);
         existingTemplate.setOcl(ocl);
         setServiceRegistrationState(existingTemplate);
@@ -124,11 +130,10 @@ public class ServiceTemplateManage {
 
     private void compare(String oldParams, String newParams, String type) {
         if (!newParams.toLowerCase(Locale.ROOT).equals(oldParams.toLowerCase(Locale.ROOT))) {
-            log.error("Update service failed, Value of {} cannot be changed with an update request",
-                    type);
-            throw new ServiceTemplateUpdateNotAllowed(String.format(
-                    "Update service failed, Value of %s be cannot changed with an update request",
-                    type));
+            String errorMsg = String.format("Update service failed, Value of %s cannot be "
+                    + "changed with an update request", type);
+            log.error(errorMsg);
+            throw new ServiceTemplateUpdateNotAllowed(errorMsg);
         }
     }
 
@@ -214,9 +219,11 @@ public class ServiceTemplateManage {
             throw new ServiceTemplateAlreadyRegistered(errorMsg);
         }
         validateServiceVersion(ocl);
-        ocl.setIcon(IconProcessorUtil.processImage(ocl));
-        validateRegionsAndFlavors(ocl);
+        validateRegions(ocl);
+        validateFlavors(ocl);
+        billingConfigValidator.validateBillingConfig(ocl);
         validateServiceDeployment(ocl.getDeployment(), newTemplate);
+        ocl.setIcon(IconProcessorUtil.processImage(ocl));
         String userManageNamespace =
                 userServiceHelper.getCurrentUserManageNamespace();
         newTemplate.setNamespace(userManageNamespace);
@@ -225,10 +232,26 @@ public class ServiceTemplateManage {
         return storedServiceTemplate;
     }
 
-    private void validateRegionsAndFlavors(Ocl ocl) {
-        billingConfigValidator.validateServiceFlavors(ocl);
-        pluginManager.getOrchestratorPlugin(ocl.getCloudServiceProvider().getName())
-                .validateRegionsOfService(ocl);
+    private void validateFlavors(Ocl ocl) {
+        List<String> errors = new ArrayList<>();
+        // Check if service flavor names are unique
+        Map<String, Long> nameCountMap = ocl.getFlavors().getServiceFlavors().stream()
+                .collect(Collectors.groupingBy(ServiceFlavor::getName, Collectors.counting()));
+        nameCountMap.entrySet().stream().filter(entry -> entry.getValue() > 1)
+                .forEach(entry -> {
+                    String message = String.format("Duplicate flavor with name %s in service.",
+                            entry.getKey());
+                    errors.add(message);
+                });
+        if (!CollectionUtils.isEmpty(errors)) {
+            throw new InvalidServiceFlavorsException(errors);
+        }
+    }
+
+    private void validateRegions(Ocl ocl) {
+        OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(
+                ocl.getCloudServiceProvider().getName());
+        plugin.validateRegionsOfService(ocl);
     }
 
     private void validateServiceDeployment(Deployment deployment,

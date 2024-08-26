@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
@@ -46,6 +47,7 @@ import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerr
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * OrchestratorPlugin implementation for the provider OpenstackTestlab.
@@ -53,7 +55,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
-
+    private static final String DEFAULT_SITE = "default";
     @Resource
     private OpenstackTerraformResourceHandler terraformResourceHandler;
     @Resource
@@ -100,8 +102,24 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
+    public List<String> getSites() {
+        return List.of(DEFAULT_SITE);
+    }
+
+    @Override
     public boolean validateRegionsOfService(Ocl ocl) {
-        return true;
+        List<String> errors = new ArrayList<>();
+        ocl.getCloudServiceProvider().getRegions().forEach(region -> {
+            if (!getSites().contains(region.getSite())) {
+                String errorMsg = String.format("Region with site %s is unavailable in Csp %s. "
+                        + "Available sites %s", region.getName(), getCsp().toValue(), getSites());
+                errors.add(errorMsg);
+            }
+        });
+        if (CollectionUtils.isEmpty(errors)) {
+            return true;
+        }
+        throw new UnavailableServiceRegionsException(errors);
     }
 
     @Override
@@ -114,21 +132,26 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT,
-                "The Name of the Tenant or Project to use.", true, false));
-        credentialVariables.add(new CredentialVariable(OpenstackCommonEnvironmentConstants.USERNAME,
-                "The Username to login with.", true, false));
-        credentialVariables.add(new CredentialVariable(OpenstackCommonEnvironmentConstants.PASSWORD,
-                "The Password to login with.", true, true));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT,
+                        "The Name of the Tenant or Project to use.", true, false));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackCommonEnvironmentConstants.USERNAME,
+                        "The Username to login with.", true, false));
+        credentialVariables.add(
+                new CredentialVariable(OpenstackCommonEnvironmentConstants.PASSWORD,
+                        "The Password to login with.", true, true));
         credentialVariables.add(
                 new CredentialVariable(OpenstackCommonEnvironmentConstants.USER_DOMAIN,
                         "The domain to which the openstack user is linked to.", true, false));
         credentialVariables.add(
                 new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT_DOMAIN,
-                        "The domain to which the openstack project is linked to.", true, false));
+                        "The domain to which the openstack project is linked to.", true,
+                        false));
         CredentialVariables httpAuth =
                 new CredentialVariables(getCsp(), CredentialType.VARIABLES, "USERNAME_PASSWORD",
-                        "Authenticate at the specified URL using an account and password.", null,
+                        "Authenticate at the specified URL using an account and password.",
+                        null,
                         credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(httpAuth);
@@ -152,8 +175,10 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
-        return resourceManager.getAvailabilityZonesOfRegion(getCsp(), userId, serviceId, region);
+    public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID
+            serviceId) {
+        return resourceManager.getAvailabilityZonesOfRegion(getCsp(), userId, serviceId,
+                region);
     }
 
 
@@ -167,7 +192,8 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
         List<Metric> metrics = new ArrayList<>();
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
             ResourceMetricsRequest resourceMetricRequest =
-                    new ResourceMetricsRequest(serviceMetricRequest.getServiceId(), deployResource,
+                    new ResourceMetricsRequest(serviceMetricRequest.getServiceId(),
+                            deployResource,
                             serviceMetricRequest.getMonitorResourceType(),
                             serviceMetricRequest.getFrom(), serviceMetricRequest.getTo(),
                             serviceMetricRequest.getGranularity(),

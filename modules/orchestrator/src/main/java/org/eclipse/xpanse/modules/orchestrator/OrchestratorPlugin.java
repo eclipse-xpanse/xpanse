@@ -48,6 +48,12 @@ public interface OrchestratorPlugin extends ServiceResourceHandler, Authenticati
 
 
     /**
+     * Get all sites of the cloud service provider.
+     */
+    List<String> getSites();
+
+
+    /**
      * Validate regions of service.
      *
      * @param ocl Ocl object.
