@@ -14,6 +14,7 @@ import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineCon
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.Resource;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -148,6 +149,11 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
             return true;
         }
         throw new UnavailableServiceRegionsException(errors);
+    }
+
+    @Override
+    public Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile) {
+        return flexibleEngineResourceManager.getComputeResourcesInServiceDeployment(scriptFile);
     }
 
     @Override

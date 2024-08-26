@@ -11,6 +11,7 @@ import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLA
 
 import com.huaweicloud.sdk.iam.v3.region.IamRegion;
 import jakarta.annotation.Resource;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -139,6 +140,11 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
             return true;
         }
         throw new UnavailableServiceRegionsException(errors);
+    }
+
+    @Override
+    public Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile) {
+        return huaweiCloudResourceManager.getComputeResourcesInServiceDeployment(scriptFile);
     }
 
     @Override

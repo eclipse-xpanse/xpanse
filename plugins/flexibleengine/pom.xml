@@ -128,6 +128,11 @@
             <artifactId>cache</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.bertramlabs.plugins</groupId>
+            <artifactId>hcl4j</artifactId>
+            <version>${hcl4j.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

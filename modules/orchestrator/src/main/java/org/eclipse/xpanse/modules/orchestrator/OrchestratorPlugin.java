@@ -6,7 +6,9 @@
 
 package org.eclipse.xpanse.modules.orchestrator;
 
+import java.io.File;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.orchestrator.audit.OperationalAudit;
@@ -60,4 +62,6 @@ public interface OrchestratorPlugin extends ServiceResourceHandler, Authenticati
      * @return true if all regions are valid.
      */
     boolean validateRegionsOfService(Ocl ocl);
+
+    Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile);
 }

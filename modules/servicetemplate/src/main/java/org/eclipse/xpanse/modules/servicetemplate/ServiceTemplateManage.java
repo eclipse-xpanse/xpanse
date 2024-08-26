@@ -51,6 +51,7 @@ import org.eclipse.xpanse.modules.servicetemplate.price.BillingConfigValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
+import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceConfigurationParameterValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.semver4j.Semver;
 import org.semver4j.SemverException;
@@ -81,6 +82,8 @@ public class ServiceTemplateManage {
     private BillingConfigValidator billingConfigValidator;
     @Resource
     private PluginManager pluginManager;
+    @Resource
+    private ServiceConfigurationParameterValidator serviceConfigurationParameterValidator;
 
     /**
      * Update service template using id and the ocl model.
@@ -96,6 +99,9 @@ public class ServiceTemplateManage {
         validateRegions(ocl);
         validateFlavors(ocl);
         billingConfigValidator.validateBillingConfig(ocl);
+        if (Objects.nonNull(ocl.getServiceConfigurationManage())) {
+            serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
+        }
         validateServiceDeployment(ocl.getDeployment(), existingTemplate);
         existingTemplate.setOcl(ocl);
         setServiceRegistrationState(existingTemplate);
@@ -222,6 +228,9 @@ public class ServiceTemplateManage {
         validateRegions(ocl);
         validateFlavors(ocl);
         billingConfigValidator.validateBillingConfig(ocl);
+        if (Objects.nonNull(ocl.getServiceConfigurationManage())) {
+            serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
+        }
         validateServiceDeployment(ocl.getDeployment(), newTemplate);
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
         String userManageNamespace =

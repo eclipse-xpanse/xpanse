@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine.manage;
 
+import com.bertramlabs.plugins.hcl4j.HCLParser;
+import com.bertramlabs.plugins.hcl4j.HCLParserException;
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
 import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
@@ -36,8 +38,13 @@ import com.huaweicloud.sdk.vpc.v2.model.SecurityGroupRule;
 import com.huaweicloud.sdk.vpc.v2.model.Subnet;
 import com.huaweicloud.sdk.vpc.v2.model.Vpc;
 import jakarta.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -45,11 +52,13 @@ import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedEx
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * FlexibleEngine Resource Manager.
@@ -58,6 +67,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlexibleEngineResourceManager {
 
+    public static final String RESOURCE = "resource";
+    public static final String FLEXIBLE_ENGINE_COMPUTE_INSTANCE
+            = "flexibleengine_compute_instance_v2";
     @Resource
     private CredentialCenter credentialCenter;
     @Resource
@@ -304,5 +316,36 @@ public class FlexibleEngineResourceManager {
                 credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
                         userId);
         return flexibleEngineClient.getCredential(credential);
+    }
+
+    /**
+     * get resources name for service deployment.
+     */
+    public Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile) {
+        Map<String, Object> results;
+        Map<String, String> resources = new HashMap<>();
+        try {
+            results = new HCLParser().parse(scriptFile, "UTF-8");
+            if (!CollectionUtils.isEmpty(results) && results.containsKey(RESOURCE)) {
+                Map<String, Object> resourceMap = (Map<String, Object>) results.get(RESOURCE);
+                if (!CollectionUtils.isEmpty(resourceMap)
+                        && resourceMap.containsKey(FLEXIBLE_ENGINE_COMPUTE_INSTANCE)) {
+                    Map<String, Object> resourceInfoMap =
+                            (Map<String, Object>) resourceMap.get(FLEXIBLE_ENGINE_COMPUTE_INSTANCE);
+                    if (!CollectionUtils.isEmpty(resourceInfoMap)) {
+                        Set<String> resourceNameSet = resourceInfoMap.keySet();
+                        resourceNameSet.forEach(resourceName -> {
+                            resources.put(resourceName, FLEXIBLE_ENGINE_COMPUTE_INSTANCE);
+                        });
+                    }
+                }
+            }
+        } catch (HCLParserException | IOException e) {
+            String error = String.format("Hcl4j parse terraform.tf file error, error %s .",
+                    e.getMessage());
+            log.error(error);
+            throw new TerraformScriptFormatInvalidException(List.of(error));
+        }
+        return resources;
     }
 }
