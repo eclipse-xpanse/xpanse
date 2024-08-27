@@ -101,7 +101,7 @@ flavors:
                 resource_type: hws.resource.type.volume
                 resource_spec: SSD
                 resource_size: 40
-                size_measure_id: 15
+                size_measure_id: 17
           licensePrices:
             - regionName: any
               siteName: Chinese Mainland
