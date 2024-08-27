@@ -12,6 +12,7 @@ import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.Opensta
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.REGIO_CLOUD_AUTH_URL;
 
 import jakarta.annotation.Resource;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -117,6 +118,11 @@ public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
             return true;
         }
         throw new UnavailableServiceRegionsException(errors);
+    }
+
+    @Override
+    public Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile) {
+        return resourceManager.getComputeResourcesInServiceDeployment(scriptFile);
     }
 
     @Override

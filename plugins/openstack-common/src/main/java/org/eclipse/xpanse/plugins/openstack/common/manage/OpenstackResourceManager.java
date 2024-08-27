@@ -5,20 +5,29 @@
 
 package org.eclipse.xpanse.plugins.openstack.common.manage;
 
+import com.bertramlabs.plugins.hcl4j.HCLParser;
+import com.bertramlabs.plugins.hcl4j.HCLParserException;
 import jakarta.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.plugins.openstack.common.auth.ProviderAuthInfoResolver;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Openstack Resource Manager.
@@ -26,7 +35,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class OpenstackResourceManager {
-
+    public static final String RESOURCE = "resource";
+    public static final String OPENSTACK_COMPUTE_INSTANCE = "openstack_compute_instance_v2";
     @Resource
     private ProviderAuthInfoResolver providerAuthInfoResolver;
 
@@ -188,5 +198,36 @@ public class OpenstackResourceManager {
     private OSClient.OSClientV3 getOsClient(Csp csp, String userId, UUID serviceId, String region) {
         return providerAuthInfoResolver.getAuthenticatedClientForCsp(csp, userId, serviceId)
                 .useRegion(region);
+    }
+
+    /**
+     * get resources name for service deployment.
+     */
+    public Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile) {
+        Map<String, Object> results;
+        Map<String, String> resources = new HashMap<>();
+        try {
+            results = new HCLParser().parse(scriptFile, "UTF-8");
+            if (!CollectionUtils.isEmpty(results) && results.containsKey(RESOURCE)) {
+                Map<String, Object> resourceMap = (Map<String, Object>) results.get(RESOURCE);
+                if (!CollectionUtils.isEmpty(resourceMap)
+                        && resourceMap.containsKey(OPENSTACK_COMPUTE_INSTANCE)) {
+                    Map<String, Object> resourceInfoMap =
+                            (Map<String, Object>) resourceMap.get(OPENSTACK_COMPUTE_INSTANCE);
+                    if (!CollectionUtils.isEmpty(resourceInfoMap)) {
+                        Set<String> resourceNameSet = resourceInfoMap.keySet();
+                        resourceNameSet.forEach(resourceName -> {
+                            resources.put(resourceName, OPENSTACK_COMPUTE_INSTANCE);
+                        });
+                    }
+                }
+            }
+        } catch (HCLParserException | IOException e) {
+            String error = String.format("Hcl4j parse terraform.tf file error, error %s .",
+                    e.getMessage());
+            log.error(error);
+            throw new TerraformScriptFormatInvalidException(List.of(error));
+        }
+        return resources;
     }
 }

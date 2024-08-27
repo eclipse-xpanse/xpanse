@@ -39,7 +39,7 @@ public class ScriptsGitRepoManage {
     @Retryable(retryFor = GitRepoCloneException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public void checkoutScripts(String workspace, ScriptsRepo scriptsRepo) {
+    public File[] checkoutScripts(String workspace, ScriptsRepo scriptsRepo) {
         File workspaceDirectory = new File(workspace);
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
         repositoryBuilder.findGitDir(workspaceDirectory);
@@ -64,10 +64,10 @@ public class ScriptsGitRepoManage {
         } else {
             log.info("Scripts repo is already cloned in the workspace.");
         }
-        folderContainsScripts(workspace, scriptsRepo);
+        return folderContainsScripts(workspace, scriptsRepo);
     }
 
-    private void folderContainsScripts(String workspace, ScriptsRepo scriptsRepo) {
+    private File[] folderContainsScripts(String workspace, ScriptsRepo scriptsRepo) {
         File directory = new File(workspace
                 + (Objects.nonNull(scriptsRepo.getScriptsPath())
                 ? File.separator + scriptsRepo.getScriptsPath()
@@ -82,5 +82,6 @@ public class ScriptsGitRepoManage {
                             ? scriptsRepo.getScriptsPath() : "root")
                             + "' folder.");
         }
+        return files;
     }
 }
