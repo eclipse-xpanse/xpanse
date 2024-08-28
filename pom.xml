@@ -67,7 +67,7 @@
         <maven.javadoc.plugin.version>3.10.0</maven.javadoc.plugin.version>
         <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
         <maven.dependency.plugin.version>3.8.0</maven.dependency.plugin.version>
-        <maven.surefire.plugin.version>3.4.0</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.5.0</maven.surefire.plugin.version>
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
         <openapi.generator.plugin.version>7.8.0</openapi.generator.plugin.version>
         <nimbusds.oidc.sdk.version>11.18</nimbusds.oidc.sdk.version>
