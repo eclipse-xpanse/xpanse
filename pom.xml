@@ -70,7 +70,7 @@
         <maven.surefire.plugin.version>3.5.0</maven.surefire.plugin.version>
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
         <openapi.generator.plugin.version>7.8.0</openapi.generator.plugin.version>
-        <nimbusds.oidc.sdk.version>11.18</nimbusds.oidc.sdk.version>
+        <nimbusds.oidc.sdk.version>11.19</nimbusds.oidc.sdk.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <json-schema-validator.version>1.5.1</json-schema-validator.version>
         <archunit.version>1.3.0</archunit.version>
