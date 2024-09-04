@@ -20,21 +20,21 @@ class AbstractCredentialInfoTest {
     @Test
     public void testConstructorAndGetters() {
         Csp csp = Csp.HUAWEI_CLOUD;
-        String UserId = "user";
+        String site = "International";
+        String userId = "userId";
         String name = "credential";
         String description = "Test credential";
         CredentialType type = CredentialType.VARIABLES;
         Integer timeToLive = 100000;
 
         AbstractCredentialInfo credentialInfo =
-                new AbstractCredentialInfoImpl(csp, UserId, name, description, type);
+                new AbstractCredentialInfoImpl(csp, site, type, name, description, userId);
 
         credentialInfo.setTimeToLive(timeToLive);
-        credentialInfo.setCsp(Csp.FLEXIBLE_ENGINE);
-        credentialInfo.setUserId("admin");
 
-        assertEquals(Csp.FLEXIBLE_ENGINE, credentialInfo.getCsp());
-        assertEquals("admin", credentialInfo.getUserId());
+        assertEquals(csp, credentialInfo.getCsp());
+        assertEquals(userId, credentialInfo.getUserId());
+        assertEquals(site, credentialInfo.getSite());
         assertEquals(name, credentialInfo.getName());
         assertEquals(description, credentialInfo.getDescription());
         assertEquals(type, credentialInfo.getType());
@@ -42,9 +42,9 @@ class AbstractCredentialInfoTest {
     }
 
     private static class AbstractCredentialInfoImpl extends AbstractCredentialInfo {
-        AbstractCredentialInfoImpl(Csp csp, String userId, String name, String description,
-                                   CredentialType type) {
-            super(csp, type, name, description, userId);
+        AbstractCredentialInfoImpl(Csp csp, String site, CredentialType type, String name,
+                                   String description, String userId) {
+            super(csp, site, type, name, description, userId);
         }
     }
 

@@ -64,11 +64,11 @@ public class OpenstackServiceMetricsManager {
         List<Metric> metrics = new ArrayList<>();
         String userId = request.getUserId();
         UUID serviceId = request.getServiceId();
-
+        String siteName = request.getRegion().getSite();
         String resourceId = request.getDeployResource().getResourceId();
         try {
             MonitorResourceType monitorResourceType = request.getMonitorResourceType();
-            providerAuthInfoResolver.getAuthenticatedClientForCsp(csp, userId, serviceId);
+            providerAuthInfoResolver.getAuthenticatedClientForCsp(csp, siteName, userId, serviceId);
             InstanceResource instanceResource =
                     this.resourcesService.getInstanceResourceInfoById(resourceId);
             if (Objects.nonNull(instanceResource)) {

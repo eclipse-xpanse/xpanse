@@ -25,11 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsCacheKey;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
-import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
-import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
@@ -57,8 +54,6 @@ public class HuaweiCloudMetricsService {
     @Resource
     private HuaweiCloudDataModelConverter huaweiCloudDataModelConverter;
     @Resource
-    private CredentialCenter credentialCenter;
-    @Resource
     private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
 
     /**
@@ -72,14 +67,15 @@ public class HuaweiCloudMetricsService {
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<Metric> getMetricsByResource(ResourceMetricsRequest resourceMetricRequest) {
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
-        String regionName = deployResource.getProperties().get("region");
+        String siteName = resourceMetricRequest.getRegion().getSite();
+        String regionName = resourceMetricRequest.getRegion().getName();
+        String userId = resourceMetricRequest.getUserId();
         List<Metric> metrics = new ArrayList<>();
         try {
-            AbstractCredentialInfo credential = credentialCenter.getCredential(
-                    Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, resourceMetricRequest.getUserId());
             MonitorResourceType monitorResourceType =
                     resourceMetricRequest.getMonitorResourceType();
-            ICredential icredential = huaweiCloudClient.getCredential(credential);
+            ICredential icredential =
+                    huaweiCloudClient.getBasicCredential(siteName, regionName, userId);
             CesClient client = huaweiCloudClient.getCesClient(icredential, regionName);
             Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
                     getTargetMetricsMap(deployResource, monitorResourceType, client);
@@ -121,12 +117,14 @@ public class HuaweiCloudMetricsService {
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<Metric> getMetricsByService(ServiceMetricsRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
-        String regionName = deployResources.getFirst().getProperties().get("region");
+
+        String siteName = serviceMetricRequest.getRegion().getSite();
+        String regionName = serviceMetricRequest.getRegion().getName();
+        String userId = serviceMetricRequest.getUserId();
         try {
-            AbstractCredentialInfo credential = credentialCenter.getCredential(
-                    Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, serviceMetricRequest.getUserId());
             MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();
-            ICredential icredential = huaweiCloudClient.getCredential(credential);
+            ICredential icredential =
+                    huaweiCloudClient.getBasicCredential(siteName, regionName, userId);
             CesClient client = huaweiCloudClient.getCesClient(icredential, regionName);
             Map<String, List<MetricInfoList>> deployResourceMetricInfoMap = new HashMap<>();
             for (DeployResource deployResource : deployResources) {

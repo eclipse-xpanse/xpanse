@@ -294,6 +294,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     private void addCredentialForHuaweiCloud() {
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(Csp.HUAWEI_CLOUD);
+        createCredential.setSite("Chinese Mainland");
         createCredential.setType(CredentialType.VARIABLES);
         createCredential.setName("AK_SK");
         createCredential.setDescription("description");

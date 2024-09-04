@@ -32,6 +32,12 @@ public abstract class AbstractCredentialInfo {
     @Schema(description = "The cloud service provider of the credential.")
     Csp csp;
 
+    @Setter
+    @NotNull
+    @NotBlank
+    @Schema(description = "The site which the credentials belong to.")
+    String site;
+
     /**
      * The type of the credential.
      */
@@ -77,9 +83,10 @@ public abstract class AbstractCredentialInfo {
     /**
      * The constructor.
      */
-    AbstractCredentialInfo(Csp csp, CredentialType type, String name, String description,
-                           String userId) {
+    AbstractCredentialInfo(Csp csp, String site, CredentialType type, String name,
+                           String description, String userId) {
         this.csp = csp;
+        this.site = site;
         this.type = type;
         this.name = name;
         this.description = description;
@@ -89,10 +96,10 @@ public abstract class AbstractCredentialInfo {
     /**
      * Get the unique key of AbstractCredentialInfo.
      *
-     * @return the unique key joined by csp, type and name
+     * @return the unique key joined by csp, site, type and name
      */
     @Hidden
     public String getUniqueKey() {
-        return this.csp.name() + "-" + this.type.name() + "-" + this.name;
+        return this.csp.name() + "-" + this.site + "-" + this.type.name() + "-" + this.name;
     }
 }

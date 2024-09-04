@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -47,10 +48,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class CredentialsConfigApi {
 
     private final CredentialCenter credentialCenter;
+    private final PluginManager pluginManager;
 
     @Autowired
-    public CredentialsConfigApi(CredentialCenter credentialCenter) {
+    public CredentialsConfigApi(CredentialCenter credentialCenter, PluginManager pluginManager) {
         this.credentialCenter = credentialCenter;
+        this.pluginManager = pluginManager;
     }
 
 
@@ -129,5 +132,24 @@ public class CredentialsConfigApi {
             return Arrays.stream(CredentialType.values()).toList();
         }
         return credentialCenter.listAvailableCredentialTypesByCsp(csp);
+    }
+
+
+    /**
+     * Get sites of the cloud service provider.
+     *
+     * @param csp cloud service provider.
+     * @return sites of the cloud service provider.
+     */
+    @Tag(name = "CredentialsConfiguration",
+            description = "APIs Viewing Cloud Credentials Configuration")
+    @GetMapping(value = "/csps/{cspName}/sites", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(description = "List the sites of the cloud service provider.")
+    @AuditApiRequest(methodName = "getCspFromRequestUri")
+    public List<String> getSitesOfCsp(
+            @Parameter(name = "cspName", description = "The cloud service provider")
+            @PathVariable(name = "cspName") Csp csp) {
+        return pluginManager.getOrchestratorPlugin(csp).getSites();
     }
 }

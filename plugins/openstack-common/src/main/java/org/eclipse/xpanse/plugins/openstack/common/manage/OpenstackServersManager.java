@@ -46,8 +46,9 @@ public class OpenstackServersManager {
         try {
             String userId = request.getUserId();
             UUID serviceId = request.getServiceId();
+            String site = request.getRegion().getSite();
             List<String> errorMessages = new ArrayList<>();
-            OSClient.OSClientV3 osClient = getOsClient(csp, userId, serviceId);
+            OSClient.OSClientV3 osClient = getOsClient(csp, site, userId, serviceId);
             for (DeployResourceEntity resource : request.getDeployResourceEntityList()) {
                 Server serverBeforeStart =
                         osClient.compute().servers().get(resource.getResourceId());
@@ -86,9 +87,10 @@ public class OpenstackServersManager {
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean stopService(Csp csp, ServiceStateManageRequest request) {
         try {
+            String site = request.getRegion().getSite();
             String userId = request.getUserId();
             UUID serviceId = request.getServiceId();
-            OSClient.OSClientV3 osClient = getOsClient(csp, userId, serviceId);
+            OSClient.OSClientV3 osClient = getOsClient(csp, site, userId, serviceId);
             List<String> errorMessages = new ArrayList<>();
             for (DeployResourceEntity resource : request.getDeployResourceEntityList()) {
                 Server serverBeforeStop =
@@ -127,9 +129,10 @@ public class OpenstackServersManager {
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean restartService(Csp csp, ServiceStateManageRequest request) {
         try {
+            String site = request.getRegion().getSite();
             String userId = request.getUserId();
             UUID serviceId = request.getServiceId();
-            OSClient.OSClientV3 osClient = getOsClient(csp, userId, serviceId);
+            OSClient.OSClientV3 osClient = getOsClient(csp, site, userId, serviceId);
             List<String> errorMessages = new ArrayList<>();
             for (DeployResourceEntity resource : request.getDeployResourceEntityList()) {
                 Server serverBeforeRestart =
@@ -161,8 +164,8 @@ public class OpenstackServersManager {
         }
     }
 
-    private OSClient.OSClientV3 getOsClient(Csp csp, String userId, UUID serviceId) {
-        return providerAuthInfoResolver.getAuthenticatedClientForCsp(csp, userId, serviceId);
+    private OSClient.OSClientV3 getOsClient(Csp csp, String site, String userId, UUID serviceId) {
+        return providerAuthInfoResolver.getAuthenticatedClientForCsp(csp, site, userId, serviceId);
     }
 }
 

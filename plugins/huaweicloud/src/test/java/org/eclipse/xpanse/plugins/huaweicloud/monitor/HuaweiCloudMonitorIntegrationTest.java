@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.HuaweiCloudOrchestratorPlugin;
@@ -78,37 +79,46 @@ class HuaweiCloudMonitorIntegrationTest {
     ResourceMetricsRequest setUpResourceMetricRequest(MonitorResourceType monitorResourceType,
                                                       Long from, Long to,
                                                       boolean onlyLastKnownMetric) {
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd");
         deployResource.setResourceName("name");
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "cn-southwest-2")));
-        return new ResourceMetricsRequest(UUID.randomUUID(), deployResource, monitorResourceType,
+        return new ResourceMetricsRequest(UUID.randomUUID(), region,deployResource,
+                monitorResourceType,
                 from, to, null, onlyLastKnownMetric, "userId");
     }
 
     void mockCesClient() {
-        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
+        when(this.credentialCenter.getCredential(any(), any(), any(), any())).thenReturn(
                 getCredentialDefinition());
         when(this.huaweiCloudClient.getCesClient(any(), any())).thenReturn(getCesClient());
-        when(this.huaweiCloudClient.getCredential(any())).thenReturn(getCredential());
+        when(this.huaweiCloudClient.getBasicCredential(any(), any(), any())).thenReturn(getCredential());
     }
 
 
     ServiceMetricsRequest setUpServiceMetricRequest(MonitorResourceType monitorResourceType,
                                                     Long from, Long to,
                                                     boolean onlyLastKnownMetric) {
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("ca0f0cf6-16ef-4e7e-bb39-419d7791d3fd");
         deployResource.setResourceName("name");
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "cn-southwest-2")));
-        return new ServiceMetricsRequest(UUID.randomUUID(), List.of(deployResource),
+        return new ServiceMetricsRequest(UUID.randomUUID(),region, List.of(deployResource),
                 monitorResourceType, from, to, null, onlyLastKnownMetric, "userId");
     }
 
     void mockAllRequestForService() {
-        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
+        when(this.credentialCenter.getCredential(any(), any(), any(), any())).thenReturn(
                 getCredentialDefinition());
         when(huaweiCloudClient.getCesClient(any(), any())).thenReturn(getCesClient());
     }

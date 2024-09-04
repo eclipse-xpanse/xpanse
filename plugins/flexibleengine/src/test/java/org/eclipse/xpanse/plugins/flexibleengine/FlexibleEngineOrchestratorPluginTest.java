@@ -150,7 +150,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
+                new ResourceMetricsRequest(serviceId, getRegion(), deployResource, MonitorResourceType.CPU, 0L,
                         0L, 0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -174,8 +174,8 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
-                        0L, 0, false, "userId");
+                new ResourceMetricsRequest(serviceId, getRegion(), deployResource1,
+                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByResource(
                 resourceMetricRequest1)).thenReturn(metrics);
 
@@ -197,7 +197,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
+                new ResourceMetricsRequest(serviceId, getRegion(), deployResource, MonitorResourceType.CPU, 0L,
                         0L, 0, false, "userId");
 
         // Configure FlexibleEngineMetricsService.getMetricsByResource(...).
@@ -207,7 +207,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                new ResourceMetricsRequest(serviceId, getRegion(), deployResource1, MonitorResourceType.CPU, 0L,
                         0L, 0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByResource(
                 resourceMetricRequest1)).thenReturn(Collections.emptyList());
@@ -230,7 +230,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                new ServiceMetricsRequest(serviceId, getRegion(), List.of(deployResource),
                         MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -254,7 +254,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource1),
+                new ServiceMetricsRequest(serviceId, getRegion(), List.of(deployResource1),
                         MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByService(
                 serviceMetricRequest1)).thenReturn(metrics);
@@ -277,7 +277,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                new ServiceMetricsRequest(serviceId, getRegion(), List.of(deployResource),
                         MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
 
         // Configure FlexibleEngineMetricsService.getMetricsByService(...).
@@ -287,7 +287,7 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource1),
+                new ServiceMetricsRequest(serviceId, getRegion(), List.of(deployResource1),
                         MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         when(mockFlexibleEngineMetricsService.getMetricsByService(
                 serviceMetricRequest1)).thenReturn(Collections.emptyList());
@@ -305,7 +305,7 @@ class FlexibleEngineOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity.setResourceId("resourceId");
@@ -315,7 +315,7 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -336,7 +336,7 @@ class FlexibleEngineOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity.setResourceId("resourceId");
@@ -346,7 +346,7 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -367,7 +367,7 @@ class FlexibleEngineOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity.setResourceId("resourceId");
@@ -377,7 +377,7 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -398,7 +398,7 @@ class FlexibleEngineOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity.setResourceId("resourceId");
@@ -408,7 +408,7 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -429,7 +429,7 @@ class FlexibleEngineOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity.setResourceId("resourceId");
@@ -439,7 +439,7 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -460,7 +460,7 @@ class FlexibleEngineOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity.setResourceId("resourceId");
@@ -470,7 +470,7 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -484,5 +484,13 @@ class FlexibleEngineOrchestratorPluginTest {
 
         // Verify the results
         assertThat(result).isTrue();
+    }
+
+    private Region getRegion() {
+        Region region = new Region();
+        region.setName("eu-west-0");
+        region.setSite("default");
+        region.setArea("Western Europe");
+        return region;
     }
 }

@@ -27,6 +27,7 @@ class CreateCredentialTest {
     private final String name = "credential";
     private final String userId = "userId";
     private final Csp csp = Csp.HUAWEI_CLOUD;
+    private final String site = "site";
     private final String description = "Test credential";
     private final CredentialType type = CredentialType.VARIABLES;
     private final Integer timeToLive = 36000;
@@ -40,6 +41,7 @@ class CreateCredentialTest {
         test.setName(name);
         test.setUserId(userId);
         test.setCsp(csp);
+        test.setSite(site);
         test.setDescription(description);
         test.setType(type);
         test.setVariables(variables);
@@ -51,6 +53,7 @@ class CreateCredentialTest {
         assertEquals(name, test.getName());
         assertEquals(userId, test.getUserId());
         assertEquals(csp, test.getCsp());
+        assertEquals(site, test.getSite());
         assertEquals(description, test.getDescription());
         assertEquals(type, test.getType());
         assertEquals(variables, test.getVariables());
@@ -81,6 +84,7 @@ class CreateCredentialTest {
         String expectedToString = "CreateCredential(name=" + name + ", "
                 + "userId=" + userId + ", "
                 + "csp=" + csp + ", "
+                + "site=" + site + ", "
                 + "description=" + description + ", "
                 + "type=" + type + ", "
                 + "variables=" + variables + ", "

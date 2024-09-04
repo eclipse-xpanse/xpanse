@@ -1,6 +1,8 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
@@ -9,12 +11,14 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.huaweicloud.HuaweiCloudOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.openstacktestlab.OpenstackTestlabOrchestratorPlugin;
@@ -49,6 +53,8 @@ class CredentialsConfigApiTest extends ApisTestCommon {
     private RegioCloudOrchestratorPlugin regioCloudPlugin;
     @Resource
     private CredentialCenter credentialsCenter;
+    @Resource
+    private PluginManager pluginManager;
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
@@ -231,7 +237,8 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp aliCloud = Csp.ALIBABA_CLOUD;
         Response aliCloudResult = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s", aliCloud.toValue())));
+                        String.format("Can't find suitable plugin for the Csp %s",
+                                aliCloud.toValue())));
         // Run the test
         final MockHttpServletResponse aliCloudResponse =
                 getCredentialCapabilities(aliCloud, variablesType);
@@ -265,6 +272,25 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         }
         credentialsCenter.getCredentialCapabilitiesValue(result);
         return result;
+    }
+
+    @Test
+    @WithJwt(file = "jwt_all_roles.json")
+    void testGetSitesOfCsp() throws Exception {
+        // SetUp
+        Csp csp = Csp.HUAWEI_CLOUD;
+        List<String> sites1 = pluginManager.getOrchestratorPlugin(csp).getSites();
+
+        // Run the test
+        final MockHttpServletResponse response1 = mockMvc.perform(
+                        get("/xpanse/csps/{cspName}/sites", csp.toValue())
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Verify the results
+        assertEquals(response1.getStatus(), HttpStatus.OK.value());
+        assertTrue(StringUtils.isNotEmpty(response1.getContentAsString()));
+        assertEquals(objectMapper.writeValueAsString(sites1), response1.getContentAsString());
     }
 
     @Test
@@ -341,7 +367,8 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp aliCloud = Csp.ALIBABA_CLOUD;
         Response aliCloudResult = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s", aliCloud.toValue())));
+                        String.format("Can't find suitable plugin for the Csp %s",
+                                aliCloud.toValue())));
         // Run the test
         final MockHttpServletResponse aliCloudResponse =
                 getCredentialOpenApi(aliCloud, variablesType);

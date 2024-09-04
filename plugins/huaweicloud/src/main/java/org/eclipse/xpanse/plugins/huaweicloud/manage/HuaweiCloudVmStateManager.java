@@ -23,11 +23,7 @@ import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse.StatusEnum;
 import jakarta.annotation.Resource;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.credential.CredentialCenter;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
-import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
-import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
@@ -41,8 +37,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class HuaweiCloudVmStateManager {
-    @Resource
-    private CredentialCenter credentialCenter;
     @Resource
     private HuaweiCloudClient huaweiCloudClient;
     @Resource
@@ -125,12 +119,12 @@ public class HuaweiCloudVmStateManager {
     }
 
     private EcsClient getEcsClient(ServiceStateManageRequest serviceStateManageRequest) {
-        AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES,
-                        serviceStateManageRequest.getUserId());
-        ICredential icredential = huaweiCloudClient.getCredential(credential);
-        return huaweiCloudClient.getEcsClient(icredential,
-                serviceStateManageRequest.getRegionName());
+        String siteName = serviceStateManageRequest.getRegion().getSite();
+        String regionName = serviceStateManageRequest.getRegion().getName();
+        String userId = serviceStateManageRequest.getUserId();
+        ICredential icredential =
+                huaweiCloudClient.getBasicCredential(siteName, regionName, userId);
+        return huaweiCloudClient.getEcsClient(icredential, regionName);
     }
 
     private boolean checkEcsExecResultByJobId(EcsClient ecsClient, String jobId) {

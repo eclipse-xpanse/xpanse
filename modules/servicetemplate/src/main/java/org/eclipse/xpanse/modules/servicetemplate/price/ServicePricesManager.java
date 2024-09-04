@@ -71,12 +71,7 @@ public class ServicePricesManager {
                 templateId, flavorName, flavorPriceMode, regionName, siteName, billingMode);
         Csp csp = serviceTemplate.getCsp();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-        FlavorPriceResult priceResult =
-                orchestratorPlugin.getServiceFlavorPrice(serviceFlavorPriceRequest);
-        priceResult.setFlavorName(flavorName);
-        priceResult.setBillingMode(billingMode);
-        priceResult.setSuccessful(true);
-        return priceResult;
+        return orchestratorPlugin.getServiceFlavorPrice(serviceFlavorPriceRequest);
     }
 
 
@@ -101,19 +96,17 @@ public class ServicePricesManager {
             ServiceFlavorPriceRequest serviceFlavorPriceRequest =
                     getServiceFlavorPriceRequest(templateId, flavor.getName(), flavor.getPricing(),
                             regionName, siteName, billingMode);
-            FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
-            flavorPriceResult.setFlavorName(flavor.getName());
-            flavorPriceResult.setBillingMode(billingMode);
-            flavorPriceResult.setSuccessful(true);
+            FlavorPriceResult flavorPriceResult;
             try {
                 validateFlavorPriceMode(flavor.getPricing(), billingMode);
-                FlavorPriceResult flavorPrice =
+                flavorPriceResult =
                         orchestratorPlugin.getServiceFlavorPrice(serviceFlavorPriceRequest);
-                flavorPriceResult.setRecurringPrice(flavorPrice.getRecurringPrice());
-                flavorPriceResult.setOneTimePaymentPrice(flavorPrice.getOneTimePaymentPrice());
             } catch (Exception e) {
                 log.error("Get price of service flavor {} failed. {}", flavor.getName(),
                         e.getMessage());
+                flavorPriceResult = new FlavorPriceResult();
+                flavorPriceResult.setFlavorName(flavor.getName());
+                flavorPriceResult.setBillingMode(billingMode);
                 flavorPriceResult.setSuccessful(false);
                 flavorPriceResult.setErrorMessage(e.getMessage());
             }

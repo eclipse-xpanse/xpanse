@@ -60,6 +60,9 @@ public class HuaweiCloudPriceCalculator {
         Price licensePrice = BillingCommonUtils.getSpecificPriceByRegionAndSite(
                 resourceUsage.getLicensePrices(), request.getRegionName(), request.getSiteName());
         BillingCommonUtils.addExtraPaymentPrice(flavorPriceResult, licensePrice);
+        flavorPriceResult.setBillingMode(request.getBillingMode());
+        flavorPriceResult.setFlavorName(request.getFlavorName());
+        flavorPriceResult.setSuccessful(true);
         return flavorPriceResult;
     }
 
@@ -74,6 +77,9 @@ public class HuaweiCloudPriceCalculator {
                 request.getSiteName());
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
         flavorPriceResult.setRecurringPrice(fixedPrice);
+        flavorPriceResult.setFlavorName(request.getFlavorName());
+        flavorPriceResult.setBillingMode(request.getBillingMode());
+        flavorPriceResult.setSuccessful(true);
         return flavorPriceResult;
     }
 

@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 
 /**
  * The model to query metrics for resource instance.
@@ -24,16 +25,14 @@ public class ServiceMetricsRequest extends MetricsRequest {
     @NotNull
     private final List<DeployResource> deployResources;
 
-    public ServiceMetricsRequest(
-            UUID serviceId,
-            List<DeployResource> deployResources,
-            MonitorResourceType monitorResourceType,
-            Long from,
-            Long to,
-            Integer period,
-            boolean onlyLastKnownMetric,
-            String userId) {
-        super(serviceId, monitorResourceType, from, to, period, onlyLastKnownMetric, userId);
+    /**
+     * Constructor to create ServiceMetricsRequest.
+     */
+    public ServiceMetricsRequest(UUID serviceId, Region region,
+                                 List<DeployResource> deployResources,
+                                 MonitorResourceType monitorType, Long from, Long to,
+                                 Integer period, boolean onlyLastKnownMetric, String userId) {
+        super(serviceId, region, monitorType, from, to, period, onlyLastKnownMetric, userId);
         this.deployResources = deployResources;
     }
 }

@@ -108,18 +108,18 @@ import org.springframework.test.util.ReflectionTestUtils;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestPropertySource(properties = {"OPENSTACK_TESTLAB_AUTH_URL=http://127.0.0.1/identity/v3"})
 class OpenstackTestlabOrchestratorPluginTest {
-    private static final Csp csp = Csp.OPENSTACK_TESTLAB;
-    private static final String userId = "userId";
-    private static final String region = "RegionOne";
-    private static final UUID uuid = UUID.randomUUID();
-    private static final String resourceId = "7b5b6ee6-cab4-4e72-be6e-854a67c6d381";
-
     @RegisterExtension
     static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig().dynamicPort().extensions(
                     new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
                             false, new ClasspathFileSource("src/test/resources/mappings"),
                             Collections.emptyList()))).build();
+    private final Csp csp = Csp.OPENSTACK_TESTLAB;
+    private final String userId = "userId";
+    private final String siteName = "default";
+    private final String regionName = "RegionOne";
+    private final UUID uuid = UUID.randomUUID();
+    private final String resourceId = "7b5b6ee6-cab4-4e72-be6e-854a67c6d381";
     @MockBean
     private CredentialCenter mockCredentialCenter;
     @MockBean
@@ -154,7 +154,7 @@ class OpenstackTestlabOrchestratorPluginTest {
 
     public ResourceMetricsRequest setupResourceRequest(Long from, Long to, Integer period,
                                                        boolean onlyLastKnownMetric) {
-        return new ResourceMetricsRequest(uuid,
+        return new ResourceMetricsRequest(uuid, getRegion(),
                 Instancio.of(DeployResource.class).set(field(DeployResource::getResourceKind),
                         DeployResourceKind.VM).set(field(DeployResource::getResourceId),
                         resourceId).create(),
@@ -163,7 +163,7 @@ class OpenstackTestlabOrchestratorPluginTest {
 
     public ServiceMetricsRequest setupServiceRequest(Long from, Long to, Integer period,
                                                      boolean onlyLastKnownMetric) {
-        return new ServiceMetricsRequest(uuid,
+        return new ServiceMetricsRequest(uuid, getRegion(),
                 List.of(Instancio.of(DeployResource.class)
                         .set(field(DeployResource::getResourceKind),
                                 DeployResourceKind.VM)
@@ -203,10 +203,7 @@ class OpenstackTestlabOrchestratorPluginTest {
     void testValidateRegionsOfService() {
         // Setup
         Ocl ocl = new Ocl();
-        Region region = new Region();
-        region.setName("RegionOne");
-        region.setSite("default");
-        region.setArea("area");
+        Region region = getRegion();
         CloudServiceProvider cloudServiceProvider = new CloudServiceProvider();
         cloudServiceProvider.setRegions(List.of(region));
         ocl.setCloudServiceProvider(cloudServiceProvider);
@@ -256,7 +253,7 @@ class OpenstackTestlabOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setServiceId(uuid);
         serviceStateManageRequest.setUserId(userId);
-        serviceStateManageRequest.setRegionName(region);
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(uuid);
         deployResourceEntity.setResourceId(resourceId);
@@ -294,7 +291,7 @@ class OpenstackTestlabOrchestratorPluginTest {
     }
 
     void mockGetAuthUrl() {
-        when(this.mockCredentialCenter.getCredential(any(), any(), any())).thenReturn(
+        when(this.mockCredentialCenter.getCredential(any(), any(), any(), any())).thenReturn(
                 getCredentialDefinition());
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
         DeployRequest deployRequest = new DeployRequest();
@@ -450,49 +447,49 @@ class OpenstackTestlabOrchestratorPluginTest {
         mockGetAuthUrl();
         // Run the test
         final List<String> vms = plugin.getExistingResourceNamesWithKind(
-                userId, region, DeployResourceKind.VM, null);
+                userId, siteName, regionName, DeployResourceKind.VM, null);
         // Verify the results
         assertThat(vms).isEqualTo(Collections.emptyList());
 
         // Run the test
         final List<String> vpcs = plugin.getExistingResourceNamesWithKind(
-                userId, region, DeployResourceKind.VPC, null);
+                userId, siteName, regionName, DeployResourceKind.VPC, null);
         // Verify the results
         assertThat(vpcs).isEqualTo(Collections.emptyList());
 
         // Run the test
         final List<String> subnets = plugin.getExistingResourceNamesWithKind(
-                userId, region, DeployResourceKind.SUBNET, null);
+                userId, siteName, regionName, DeployResourceKind.SUBNET, null);
         // Verify the results
         assertThat(subnets).isEqualTo(Collections.emptyList());
 
         // Run the test
         final List<String> securityGroupIds = plugin.getExistingResourceNamesWithKind(
-                userId, region, DeployResourceKind.SECURITY_GROUP, null);
+                userId, siteName, regionName, DeployResourceKind.SECURITY_GROUP, null);
         // Verify the results
         assertThat(securityGroupIds).isEqualTo(Collections.emptyList());
 
         // Run the test
         final List<String> securityGroupRules = plugin.getExistingResourceNamesWithKind(
-                userId, region, DeployResourceKind.SECURITY_GROUP_RULE, null);
+                userId, siteName, regionName, DeployResourceKind.SECURITY_GROUP_RULE, null);
         // Verify the results
         assertThat(securityGroupRules).isEqualTo(Collections.emptyList());
 
         // Run the test
         final List<String> volumes = plugin.getExistingResourceNamesWithKind(
-                userId, region, DeployResourceKind.VOLUME, null);
+                userId, siteName, regionName, DeployResourceKind.VOLUME, null);
         // Verify the results
         assertThat(volumes).isEqualTo(Collections.emptyList());
 
         // Run the test
         final List<String> keypairs = plugin.getExistingResourceNamesWithKind(
-                userId, region, DeployResourceKind.VOLUME, null);
+                userId, siteName, regionName, DeployResourceKind.VOLUME, null);
         // Verify the results
         assertThat(keypairs).isEqualTo(Collections.emptyList());
 
         // Run the test
         final List<String> publicIps = plugin.getExistingResourceNamesWithKind(
-                userId, region, DeployResourceKind.VOLUME, null);
+                userId, siteName, regionName, DeployResourceKind.VOLUME, null);
         // Verify the results
         assertThat(publicIps).isEqualTo(Collections.emptyList());
     }
@@ -502,13 +499,23 @@ class OpenstackTestlabOrchestratorPluginTest {
     void testGetAvailabilityZonesOfRegion() {
         mockGetAuthUrl();
         // Run the test
-        final List<String> result = plugin.getAvailabilityZonesOfRegion(userId, region, null);
+        final List<String> result =
+                plugin.getAvailabilityZonesOfRegion(userId, siteName, regionName, null);
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
 
         // Run the test
-        final List<String> result2 = plugin.getAvailabilityZonesOfRegion(userId, region, uuid);
+        final List<String> result2 =
+                plugin.getAvailabilityZonesOfRegion(userId, siteName, regionName, uuid);
         // Verify the results
         assertThat(result2).isEqualTo(Collections.emptyList());
+    }
+
+    private Region getRegion() {
+        Region region = new Region();
+        region.setName(regionName);
+        region.setSite(siteName);
+        region.setArea("area");
+        return region;
     }
 }

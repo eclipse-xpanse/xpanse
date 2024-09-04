@@ -79,9 +79,9 @@ public class ProviderAuthInfoResolver {
      * @return authenticated client
      */
     public OSClient.OSClientV3 getAuthenticatedClientForCsp(
-            Csp csp, String userId, UUID serviceId) {
+            Csp csp, String site, String userId, UUID serviceId) {
         String authUrl = getProviderAuthUrl(csp, serviceId);
-        AbstractCredentialInfo credential = getAuthCredential(csp, userId);
+        AbstractCredentialInfo credential = getAuthCredential(csp, site, userId);
         return switch (csp) {
             case PLUS_SERVER, REGIO_CLOUD ->
                     scsKeystoneManager.getAuthenticatedClient(authUrl, credential);
@@ -127,8 +127,8 @@ public class ProviderAuthInfoResolver {
      * @param userId user id
      * @return credential
      */
-    public AbstractCredentialInfo getAuthCredential(Csp csp, String userId) {
-        return credentialCenter.getCredential(csp, CredentialType.VARIABLES, userId);
+    public AbstractCredentialInfo getAuthCredential(Csp csp, String site, String userId) {
+        return credentialCenter.getCredential(csp, site, CredentialType.VARIABLES, userId);
     }
 
 

@@ -65,7 +65,6 @@ class FlavorPriceResultRequestTest {
         assertThat(test.canEqual(test1)).isTrue();
         assertThat(test).isEqualTo(test1);
         assertThat(test.hashCode()).isEqualTo(test1.hashCode());
-
     }
 
     @Test

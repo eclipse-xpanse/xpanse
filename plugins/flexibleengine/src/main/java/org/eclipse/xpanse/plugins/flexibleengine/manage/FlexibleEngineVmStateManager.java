@@ -128,12 +128,14 @@ public class FlexibleEngineVmStateManager {
     }
 
     private EcsClient getEcsClient(ServiceStateManageRequest serviceStateManageRequest) {
+        String siteName = serviceStateManageRequest.getRegion().getSite();
+        String regionName = serviceStateManageRequest.getRegion().getName();
         AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
+                credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, siteName,
+                        CredentialType.VARIABLES,
                         serviceStateManageRequest.getUserId());
         ICredential icredential = flexibleEngineClient.getCredential(credential);
-        return flexibleEngineClient.getEcsClient(icredential,
-                serviceStateManageRequest.getRegionName());
+        return flexibleEngineClient.getEcsClient(icredential, regionName);
     }
 
     private boolean checkEcsExecResultByJobId(EcsClient ecsClient, String jobId) {

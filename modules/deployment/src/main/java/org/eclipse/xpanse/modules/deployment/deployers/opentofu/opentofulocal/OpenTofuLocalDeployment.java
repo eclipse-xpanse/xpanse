@@ -284,10 +284,7 @@ public class OpenTofuLocalDeployment implements Deployer {
         // load availability zone variables also as input variables for OpenTofu executor.
         inputVariables.putAll(this.deployEnvironments.getAvailabilityZoneVariables(task));
         // load credential variables also as env variables for OpenTofu executor.
-        envVariables.putAll(this.deployEnvironments.getCredentialVariablesByHostingType(
-                task.getDeployRequest().getServiceHostingType(),
-                task.getOcl().getDeployment().getCredentialType(), task.getDeployRequest().getCsp(),
-                task.getDeployRequest().getUserId()));
+        envVariables.putAll(this.deployEnvironments.getCredentialVariables(task));
         envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(
                 task.getDeployRequest().getCsp()));
         return getExecutor(envVariables, inputVariables, workspace, task.getOcl().getDeployment());

@@ -66,7 +66,7 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     @Resource
     private OpenstackResourceManager resourceManager;
     @Resource
-    private OpenstackServicePriceCalculator pricingCalculator;
+    private OpenstackServicePriceCalculator priceCalculator;
     @Resource
     private ProviderAuthInfoResolver providerAuthInfoResolver;
     @Value("${openstacktestlab.auto.approve.service.template.enabled:false}")
@@ -154,11 +154,10 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
                 new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT_DOMAIN,
                         "The domain to which the openstack project is linked to.", true,
                         false));
-        CredentialVariables httpAuth =
-                new CredentialVariables(getCsp(), CredentialType.VARIABLES, "USERNAME_PASSWORD",
-                        "Authenticate at the specified URL using an account and password.",
-                        null,
-                        credentialVariables);
+        CredentialVariables httpAuth = new CredentialVariables(getCsp(), DEFAULT_SITE,
+                CredentialType.VARIABLES, "USERNAME_PASSWORD",
+                "Authenticate at the specified URL using an account and password.",
+                null, credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(httpAuth);
 
@@ -173,18 +172,18 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind, UUID serviceId) {
+    public List<String> getExistingResourceNamesWithKind(
+            String site, String region, String userId, DeployResourceKind kind, UUID serviceId) {
         return resourceManager.getExistingResourceNamesWithKind(
-                getCsp(), userId, serviceId, region, kind);
+                getCsp(), site, region, userId, kind, serviceId);
     }
 
     @Override
     @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID
-            serviceId) {
-        return resourceManager.getAvailabilityZonesOfRegion(getCsp(), userId, serviceId,
-                region);
+    public List<String> getAvailabilityZonesOfRegion(
+            String site, String region, String userId, UUID serviceId) {
+        return resourceManager.getAvailabilityZonesOfRegion(
+                getCsp(), site, region, userId, serviceId);
     }
 
 
@@ -199,6 +198,7 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
             ResourceMetricsRequest resourceMetricRequest =
                     new ResourceMetricsRequest(serviceMetricRequest.getServiceId(),
+                            serviceMetricRequest.getRegion(),
                             deployResource,
                             serviceMetricRequest.getMonitorResourceType(),
                             serviceMetricRequest.getFrom(), serviceMetricRequest.getTo(),
@@ -231,8 +231,8 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    @Cacheable(cacheNames = SERVICE_FLAVOR_PRICE_CACHE_NAME)
+    @Cacheable(cacheNames = SERVICE_FLAVOR_PRICE_CACHE_NAME, key = "#request")
     public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
-        return pricingCalculator.getServiceFlavorPrice(request);
+        return priceCalculator.getServiceFlavorPrice(request);
     }
 }

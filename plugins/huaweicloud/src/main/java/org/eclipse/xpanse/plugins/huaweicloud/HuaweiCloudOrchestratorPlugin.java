@@ -58,15 +58,15 @@ import org.springframework.util.CollectionUtils;
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Resource
-    private HuaweiCloudTerraformResourceHandler huaweiCloudTerraformResourceHandler;
+    private HuaweiCloudTerraformResourceHandler terraformResourceHandler;
     @Resource
-    private HuaweiCloudMetricsService huaweiCloudMetricsService;
+    private HuaweiCloudMetricsService metricsService;
     @Resource
-    private HuaweiCloudVmStateManager huaweiCloudVmStateManager;
+    private HuaweiCloudVmStateManager vmStateManager;
     @Resource
-    private HuaweiCloudResourceManager huaweiCloudResourceManager;
+    private HuaweiCloudResourceManager resourceManager;
     @Resource
-    private HuaweiCloudPriceCalculator huaweiCloudPriceCalculator;
+    private HuaweiCloudPriceCalculator priceCalculator;
 
     @Value("${huaweicloud.auto.approve.service.template.enabled:false}")
     private boolean autoApproveServiceTemplateEnabled;
@@ -74,21 +74,22 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
-        resourceHandlers.put(DeployerKind.TERRAFORM, huaweiCloudTerraformResourceHandler);
-        resourceHandlers.put(DeployerKind.OPEN_TOFU, huaweiCloudTerraformResourceHandler);
+        resourceHandlers.put(DeployerKind.TERRAFORM, terraformResourceHandler);
+        resourceHandlers.put(DeployerKind.OPEN_TOFU, terraformResourceHandler);
         return resourceHandlers;
     }
 
     @Override
-    public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind, UUID serviceId) {
-        return huaweiCloudResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
+    public List<String> getExistingResourceNamesWithKind(
+            String site, String region, String userId, DeployResourceKind kind, UUID serviceId) {
+        return resourceManager.getExistingResourceNamesWithKind(site, region, userId, kind);
     }
 
     @Override
     @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
-        return huaweiCloudResourceManager.getAvailabilityZonesOfRegion(userId, region);
+    public List<String> getAvailabilityZonesOfRegion(
+            String siteName, String regionName, String userId, UUID serviceId) {
+        return resourceManager.getAvailabilityZonesOfRegion(siteName, regionName, userId);
     }
 
     @Override
@@ -144,7 +145,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile) {
-        return huaweiCloudResourceManager.getComputeResourcesInServiceDeployment(scriptFile);
+        return resourceManager.getComputeResourcesInServiceDeployment(scriptFile);
     }
 
     @Override
@@ -162,8 +163,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
                         true));
         credentialVariables.add(new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
                 "The security key.", true));
-        CredentialVariables accessKey = new CredentialVariables(getCsp(), CredentialType.VARIABLES,
-                HuaweiCloudMonitorConstants.IAM,
+        CredentialVariables accessKey = new CredentialVariables(getCsp(), getSites().getFirst(),
+                CredentialType.VARIABLES, HuaweiCloudMonitorConstants.IAM,
                 "Using The access key and security key authentication.", null, credentialVariables);
 
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
@@ -186,7 +187,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForResource(ResourceMetricsRequest resourceMetricRequest) {
-        return huaweiCloudMetricsService.getMetricsByResource(resourceMetricRequest);
+        return metricsService.getMetricsByResource(resourceMetricRequest);
     }
 
     /**
@@ -197,22 +198,22 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
-        return huaweiCloudMetricsService.getMetricsByService(serviceMetricRequest);
+        return metricsService.getMetricsByService(serviceMetricRequest);
     }
 
     @Override
     public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
-        return huaweiCloudVmStateManager.startService(serviceStateManageRequest);
+        return vmStateManager.startService(serviceStateManageRequest);
     }
 
     @Override
     public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
-        return huaweiCloudVmStateManager.stopService(serviceStateManageRequest);
+        return vmStateManager.stopService(serviceStateManageRequest);
     }
 
     @Override
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
-        return huaweiCloudVmStateManager.restartService(serviceStateManageRequest);
+        return vmStateManager.restartService(serviceStateManageRequest);
     }
 
     @Override
@@ -222,8 +223,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
 
     @Override
-    @Cacheable(cacheNames = SERVICE_FLAVOR_PRICE_CACHE_NAME)
+    @Cacheable(cacheNames = SERVICE_FLAVOR_PRICE_CACHE_NAME, key = "#request")
     public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
-        return huaweiCloudPriceCalculator.getServiceFlavorPrice(request);
+        return priceCalculator.getServiceFlavorPrice(request);
     }
 }

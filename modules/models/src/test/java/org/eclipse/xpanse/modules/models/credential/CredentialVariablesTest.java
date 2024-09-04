@@ -19,12 +19,13 @@ import org.junit.jupiter.api.Test;
  */
 class CredentialVariablesTest {
 
-    private static final Csp csp = Csp.HUAWEI_CLOUD;
-    private static final String userId = "user";
-    private static final String name = "credential";
-    private static final String description = "Test credential";
-    private static final CredentialType type = CredentialType.VARIABLES;
-    private static final List<CredentialVariable> variables = Arrays.asList(
+    private final Csp csp = Csp.HUAWEI_CLOUD;
+    private final String site = "site";
+    private final String userId = "user";
+    private final String name = "credential";
+    private final String description = "Test credential";
+    private final CredentialType type = CredentialType.VARIABLES;
+    private final List<CredentialVariable> variables = Arrays.asList(
             new CredentialVariable("variable1", "description1", true, true),
             new CredentialVariable("variable2", "description2", false, false)
     );
@@ -32,9 +33,9 @@ class CredentialVariablesTest {
     @Test
     public void testConstructorAndGetters() {
         CredentialVariables credentialVariables =
-                new CredentialVariables(csp, type, name, description, userId, variables);
-
+                new CredentialVariables(csp, site, type, name, description, userId, variables);
         assertEquals(csp, credentialVariables.getCsp());
+        assertEquals(site, credentialVariables.getSite());
         assertEquals(userId, credentialVariables.getUserId());
         assertEquals(name, credentialVariables.getName());
         assertEquals(description, credentialVariables.getDescription());
@@ -46,6 +47,7 @@ class CredentialVariablesTest {
     public void testConstructorWithCreateCredential() {
         CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(csp);
+        createCredential.setSite(site);
         createCredential.setUserId(userId);
         createCredential.setName(name);
         createCredential.setDescription(description);
@@ -56,6 +58,7 @@ class CredentialVariablesTest {
         CredentialVariables credentialVariables = new CredentialVariables(createCredential);
 
         assertEquals(createCredential.getCsp(), credentialVariables.getCsp());
+        assertEquals(createCredential.getSite(), credentialVariables.getSite());
         assertEquals(createCredential.getUserId(), credentialVariables.getUserId());
         assertEquals(createCredential.getName(), credentialVariables.getName());
         assertEquals(createCredential.getDescription(), credentialVariables.getDescription());

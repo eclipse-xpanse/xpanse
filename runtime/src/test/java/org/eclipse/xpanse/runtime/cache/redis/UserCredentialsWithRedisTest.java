@@ -37,6 +37,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
 
     private final Csp csp = Csp.HUAWEI_CLOUD;
+    private final String site = "Chinese Mainland";
+    private final String credentialName = "AK_SK";
     private final CredentialType credentialType = CredentialType.VARIABLES;
     @Resource
     private UserCloudCredentialsApi userCloudCredentialsApi;
@@ -53,8 +55,9 @@ class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
     private CreateCredential getCreateCredential(Integer timeToLive) {
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(csp);
+        createCredential.setSite(site);
         createCredential.setType(credentialType);
-        createCredential.setName("AK_SK");
+        createCredential.setName(credentialName);
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
@@ -107,7 +110,7 @@ class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
 
     void testDeleteCredential() {
         // Setup
-        userCloudCredentialsApi.deleteUserCloudCredential(csp, credentialType, "AK_SK");
+        userCloudCredentialsApi.deleteUserCloudCredential(csp, site, credentialType, credentialName);
         // Verify the results
         List<AbstractCredentialInfo> credentialInfos =
                 userCloudCredentialsApi.getUserCloudCredentials(csp, credentialType);

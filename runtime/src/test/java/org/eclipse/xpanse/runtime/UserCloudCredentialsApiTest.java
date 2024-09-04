@@ -46,6 +46,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class UserCloudCredentialsApiTest extends ApisTestCommon {
 
     private final Csp csp = Csp.HUAWEI_CLOUD;
+    private final String site = "Chinese Mainland";
+    private final String credentialName = "AK_SK";
     private final CredentialType credentialType = CredentialType.VARIABLES;
 
     @Test
@@ -62,8 +64,9 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
     private CreateCredential getCreateCredential(boolean isSensitive) {
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(csp);
+        createCredential.setSite(site);
         createCredential.setType(credentialType);
-        createCredential.setName("AK_SK");
+        createCredential.setName(credentialName);
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
@@ -215,6 +218,7 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
         final MockHttpServletResponse deleteResponse =
                 mockMvc.perform(delete("/xpanse/user/credentials")
                                 .param("cspName", csp.toValue())
+                                .param("siteName", site)
                                 .param("type", credentialType.toValue())
                                 .param("name", "AK_SK")
                                 .accept(MediaType.APPLICATION_JSON))

@@ -8,6 +8,7 @@ package org.eclipse.xpanse.plugins.flexibleengine;
 
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.DEFAULT_SITE;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.ENDPOINT_SUFFIX;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.IAM_ENDPOINT_PREFIX;
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.PROTOCOL_HTTPS;
@@ -63,36 +64,37 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     private final RestTemplate restTemplate = new RestTemplate();
     @Resource
-    private FlexibleEngineTerraformResourceHandler flexibleEngineTerraformResourceHandler;
+    private FlexibleEngineTerraformResourceHandler terraformResourceHandler;
     @Resource
-    private FlexibleEngineMetricsService flexibleEngineMetricsService;
+    private FlexibleEngineMetricsService metricsService;
     @Resource
-    private FlexibleEngineVmStateManager flexibleEngineVmStateManagerService;
+    private FlexibleEngineVmStateManager vmStateManager;
     @Resource
-    private FlexibleEngineResourceManager flexibleEngineResourceManager;
+    private FlexibleEngineResourceManager resourceManager;
     @Resource
     private FlexibleEnginePriceCalculator pricingCalculator;
     @Value("${flexibleengine.auto.approve.service.template.enabled:false}")
-    private boolean flexibleEngineAutoApproveServiceTemplateEnabled;
+    private boolean autoApproveServiceTemplateEnabled;
 
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
         Map<DeployerKind, DeployResourceHandler> resourceHandlers = new HashMap<>();
-        resourceHandlers.put(DeployerKind.TERRAFORM, flexibleEngineTerraformResourceHandler);
-        resourceHandlers.put(DeployerKind.OPEN_TOFU, flexibleEngineTerraformResourceHandler);
+        resourceHandlers.put(DeployerKind.TERRAFORM, terraformResourceHandler);
+        resourceHandlers.put(DeployerKind.OPEN_TOFU, terraformResourceHandler);
         return resourceHandlers;
     }
 
     @Override
-    public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind, UUID serviceId) {
-        return flexibleEngineResourceManager.getExistingResourceNamesWithKind(userId, region, kind);
+    public List<String> getExistingResourceNamesWithKind(
+            String site, String region, String userId, DeployResourceKind kind, UUID serviceId) {
+        return resourceManager.getExistingResourceNamesWithKind(site, region, userId, kind);
     }
 
     @Override
     @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
-        return flexibleEngineResourceManager.getAvailabilityZonesOfRegion(userId, region);
+    public List<String> getAvailabilityZonesOfRegion(
+            String site, String region, String userId, UUID serviceId) {
+        return resourceManager.getAvailabilityZonesOfRegion(site, region, userId);
     }
 
     @Override
@@ -113,12 +115,12 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public boolean autoApproveServiceTemplateIsEnabled() {
-        return flexibleEngineAutoApproveServiceTemplateEnabled;
+        return autoApproveServiceTemplateEnabled;
     }
 
     @Override
     public List<String> getSites() {
-        return List.of(FlexibleEngineConstants.DEFAULT_SITE);
+        return List.of(DEFAULT_SITE);
     }
 
     @Override
@@ -153,7 +155,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile) {
-        return flexibleEngineResourceManager.getComputeResourcesInServiceDeployment(scriptFile);
+        return resourceManager.getComputeResourcesInServiceDeployment(scriptFile);
     }
 
     @Override
@@ -167,7 +169,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         CredentialVariables accessKey =
-                new CredentialVariables(getCsp(), CredentialType.VARIABLES, "AK_SK",
+                new CredentialVariables(getCsp(), DEFAULT_SITE, CredentialType.VARIABLES, "AK_SK",
                         "The access key and security key.", null, credentialVariables);
         credentialVariables.add(
                 new CredentialVariable(FlexibleEngineConstants.OS_ACCESS_KEY, "The access key.",
@@ -195,7 +197,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForResource(ResourceMetricsRequest resourceMetricRequest) {
-        return flexibleEngineMetricsService.getMetricsByResource(resourceMetricRequest);
+        return metricsService.getMetricsByResource(resourceMetricRequest);
     }
 
     /**
@@ -206,22 +208,22 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
      */
     @Override
     public List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest) {
-        return flexibleEngineMetricsService.getMetricsByService(serviceMetricRequest);
+        return metricsService.getMetricsByService(serviceMetricRequest);
     }
 
     @Override
     public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
-        return flexibleEngineVmStateManagerService.startService(serviceStateManageRequest);
+        return vmStateManager.startService(serviceStateManageRequest);
     }
 
     @Override
     public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
-        return flexibleEngineVmStateManagerService.stopService(serviceStateManageRequest);
+        return vmStateManager.stopService(serviceStateManageRequest);
     }
 
     @Override
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
-        return flexibleEngineVmStateManagerService.restartService(serviceStateManageRequest);
+        return vmStateManager.restartService(serviceStateManageRequest);
     }
 
     @Override
@@ -230,7 +232,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    @Cacheable(cacheNames = SERVICE_FLAVOR_PRICE_CACHE_NAME)
+    @Cacheable(cacheNames = SERVICE_FLAVOR_PRICE_CACHE_NAME, key = "#request")
     public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
         return pricingCalculator.getServiceFlavorPrice(request);
     }
