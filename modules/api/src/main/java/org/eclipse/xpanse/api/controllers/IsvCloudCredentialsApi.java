@@ -135,10 +135,12 @@ public class IsvCloudCredentialsApi {
     public void deleteIsvCloudCredential(
             @Parameter(name = "cspName", description = "The cloud service provider.")
             @RequestParam("cspName") Csp csp,
+            @Parameter(name = "siteName", description = "The site of the provider.")
+            @RequestParam(name = "siteName") String siteName,
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type") CredentialType type,
             @Parameter(name = "name", description = "The name of of credential.")
             @RequestParam(name = "name") String name) {
-        credentialCenter.deleteCredential(csp, type, name, null);
+        credentialCenter.deleteCredential(csp, siteName, type, name, null);
     }
 }

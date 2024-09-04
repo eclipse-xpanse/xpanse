@@ -60,17 +60,18 @@ import org.springframework.core.env.Environment;
 @ExtendWith(MockitoExtension.class)
 class DeployEnvironmentsTest {
 
-    private static final String userId = "userId";
-    private static final String regionName = "us-east-1";
-    private static final String areaName = "Asia China";
+    private final String userId = "userId";
+    private final String siteName = "Chinese Mainland";
+    private final String regionName = "cn-north-4";
+    private final String areaName = "Asia China";
 
-    private static DeployTask task;
-    private static DeployRequest deployRequest;
-    private static FlavorsWithPrice flavors;
-    private static DeployVariable deployVariable1;
-    private static DeployVariable deployVariable2;
-    private static DeployVariable deployVariable3;
-    private static DeployVariable deployVariable4;
+    private DeployTask task;
+    private DeployRequest deployRequest;
+    private FlavorsWithPrice flavors;
+    private DeployVariable deployVariable1;
+    private DeployVariable deployVariable2;
+    private DeployVariable deployVariable3;
+    private DeployVariable deployVariable4;
     @Mock
     private AesUtil aesUtil;
     @Mock
@@ -99,6 +100,7 @@ class DeployEnvironmentsTest {
         Region region = new Region();
         region.setName(regionName);
         region.setArea(areaName);
+        region.setSite(siteName);
         deployRequest.setRegion(region);
 
         Deployment deployment = new Deployment();
@@ -233,23 +235,21 @@ class DeployEnvironmentsTest {
         CredentialType credentialType = CredentialType.VARIABLES;
 
         AbstractCredentialInfo abstractCredentialInfo =
-                new CredentialVariables(csp, credentialType, "AK_SK", "description", userId,
-                        variables);
-        when(mockCredentialCenter.getCredential(csp, credentialType,
+                new CredentialVariables(csp, siteName, credentialType, "AK_SK", "description",
+                        userId, variables);
+        when(mockCredentialCenter.getCredential(csp, siteName, credentialType,
                 deployRequest.getUserId())).thenReturn(abstractCredentialInfo);
 
         Map<String, String> variablesActual =
-                deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(
-                        task.getDeployRequest().getServiceHostingType(),
-                        task.getOcl().getDeployment().getCredentialType(),
-                        task.getDeployRequest().getCsp(), task.getDeployRequest().getUserId());
+                deployEnvironmentsUnderTest.getCredentialVariables(task);
 
         assertEquals(2, variablesActual.size());
         for (CredentialVariable variable : variables) {
             assertTrue(variablesActual.containsKey(variable.getName()));
             assertEquals(variable.getValue(), variablesActual.get(variable.getName()));
         }
-        verify(mockCredentialCenter, times(1)).getCredential(csp, credentialType, userId);
+        verify(mockCredentialCenter, times(1)).getCredential(csp, siteName, credentialType,
+                userId);
 
     }
 
@@ -267,26 +267,22 @@ class DeployEnvironmentsTest {
 
         CredentialType credentialType = CredentialType.VARIABLES;
 
-        AbstractCredentialInfo abstractCredentialInfo =
-                new CredentialVariables(csp, credentialType, "AK_SK", "description", null,
-                        variables);
-        when(mockCredentialCenter.getCredential(csp, credentialType, null)).thenReturn(
+        AbstractCredentialInfo abstractCredentialInfo = new CredentialVariables(csp,
+                siteName, credentialType, "AK_SK", "description", null,
+                variables);
+        when(mockCredentialCenter.getCredential(csp, siteName, credentialType, null)).thenReturn(
                 abstractCredentialInfo);
 
         Map<String, String> variablesActual =
-                deployEnvironmentsUnderTest.getCredentialVariablesByHostingType(
-                        task.getDeployRequest().getServiceHostingType(),
-                        task.getOcl().getDeployment().getCredentialType(),
-                        task.getDeployRequest().getCsp(), task.getDeployRequest().getUserId());
+                deployEnvironmentsUnderTest.getCredentialVariables(task);
 
         assertEquals(2, variablesActual.size());
         for (CredentialVariable variable : variables) {
             assertTrue(variablesActual.containsKey(variable.getName()));
             assertEquals(variable.getValue(), variablesActual.get(variable.getName()));
         }
-        verify(mockCredentialCenter, times(1)).getCredential(csp, credentialType, null);
-
-
+        verify(mockCredentialCenter, times(1)).getCredential(csp, siteName, credentialType,
+                null);
     }
 
     @Test

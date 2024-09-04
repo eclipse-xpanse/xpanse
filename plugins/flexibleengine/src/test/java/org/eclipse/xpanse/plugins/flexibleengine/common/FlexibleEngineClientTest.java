@@ -1,5 +1,7 @@
 package org.eclipse.xpanse.plugins.flexibleengine.common;
 
+import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.DEFAULT_SITE;
+
 import com.huaweicloud.sdk.core.auth.ICredential;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +69,7 @@ class FlexibleEngineClientTest {
                 "The access key.", true, true, skValue);
         credentialVariables.add(sk);
         return new CredentialVariables(
-                Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK",
+                Csp.FLEXIBLE_ENGINE, DEFAULT_SITE, CredentialType.VARIABLES, "AK_SK",
                 "The access key and security key.",
                 "userId", credentialVariables);
     }

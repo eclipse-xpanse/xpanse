@@ -203,15 +203,17 @@ public class DeployService {
      * Get availability zones of region.
      *
      * @param csp        cloud service provider.
+     * @param siteName   the site of the region belongs to.
      * @param regionName region name.
      * @param serviceId  deployed service id.
      * @return List of availability zones.
      */
-    public List<String> getAvailabilityZonesOfRegion(Csp csp, String regionName, UUID serviceId) {
+    public List<String> getAvailabilityZonesOfRegion(Csp csp, String siteName, String regionName,
+                                                     UUID serviceId) {
         String currentUserId = this.userServiceHelper.getCurrentUserId();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-        return orchestratorPlugin.getAvailabilityZonesOfRegion(currentUserId, regionName,
-                serviceId);
+        return orchestratorPlugin.getAvailabilityZonesOfRegion(
+                siteName, regionName, currentUserId, serviceId);
     }
 
 

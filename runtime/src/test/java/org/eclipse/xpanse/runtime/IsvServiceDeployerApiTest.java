@@ -61,6 +61,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
     void addIsvCredential() throws Exception {
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(Csp.HUAWEI_CLOUD);
+        createCredential.setSite("Chinese Mainland");
         createCredential.setType(CredentialType.VARIABLES);
         createCredential.setName("AK_SK");
         createCredential.setDescription("description");
@@ -80,8 +81,11 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
 
     void deleteIsvCredential() throws Exception {
         mockMvc.perform(
-                delete("/xpanse/isv/credentials").param("cspName", Csp.HUAWEI_CLOUD.toValue())
-                        .param("type", CredentialType.VARIABLES.toValue()).param("name", "AK_SK")
+                delete("/xpanse/isv/credentials")
+                        .param("cspName", Csp.HUAWEI_CLOUD.toValue())
+                        .param("site", "Chinese Mainland")
+                        .param("type", CredentialType.VARIABLES.toValue())
+                        .param("name", "AK_SK")
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
     }
 

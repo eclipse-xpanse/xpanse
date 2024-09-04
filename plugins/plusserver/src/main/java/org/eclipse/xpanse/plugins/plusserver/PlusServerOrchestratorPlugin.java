@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.plugins.plusserver;
 
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OS_AUTH_URL;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.PLUS_SERVER_AUTH_URL;
 
@@ -62,7 +63,7 @@ public class PlusServerOrchestratorPlugin implements OrchestratorPlugin {
     @Resource
     private OpenstackResourceManager resourceManager;
     @Resource
-    private OpenstackServicePriceCalculator pricingCalculator;
+    private OpenstackServicePriceCalculator priceCalculator;
     @Resource
     private ProviderAuthInfoResolver providerAuthInfoResolver;
     @Value("${plusserver.auto.approve.service.template.enabled:false}")
@@ -147,7 +148,7 @@ public class PlusServerOrchestratorPlugin implements OrchestratorPlugin {
                 new CredentialVariable(OpenstackCommonEnvironmentConstants.DOMAIN,
                         "The domain of the PlusServer installation to be used.", true, false));
         CredentialVariables httpAuth = new CredentialVariables(
-                getCsp(), CredentialType.VARIABLES, "USERNAME_PASSWORD",
+                getCsp(), DEFAULT_SITE, CredentialType.VARIABLES, "USERNAME_PASSWORD",
                 "Authenticate at the specified URL using an account and password.",
                 null, credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
@@ -164,16 +165,18 @@ public class PlusServerOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind, UUID serviceId) {
+    public List<String> getExistingResourceNamesWithKind(
+            String site, String region, String userId, DeployResourceKind kind, UUID serviceId) {
         return resourceManager.getExistingResourceNamesWithKind(
-                getCsp(), userId, serviceId, region, kind);
+                getCsp(), site, region, userId, kind, serviceId);
     }
 
     @Override
     @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region, UUID serviceId) {
-        return resourceManager.getAvailabilityZonesOfRegion(getCsp(), userId, serviceId, region);
+    public List<String> getAvailabilityZonesOfRegion(
+            String site, String region, String userId, UUID serviceId) {
+        return resourceManager.getAvailabilityZonesOfRegion(
+                getCsp(), site, region, userId, serviceId);
     }
 
     @Override
@@ -207,8 +210,8 @@ public class PlusServerOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-
+    @Cacheable(cacheNames = SERVICE_FLAVOR_PRICE_CACHE_NAME, key = "#request")
     public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
-        return pricingCalculator.getServiceFlavorPrice(request);
+        return priceCalculator.getServiceFlavorPrice(request);
     }
 }

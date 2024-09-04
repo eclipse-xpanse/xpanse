@@ -356,8 +356,7 @@ public class ServiceStateManager {
         if (serviceHostingType == ServiceHostingType.SELF) {
             serviceStateManageRequest.setUserId(service.getUserId());
         }
-        serviceStateManageRequest.setRegionName(
-                vmResources.getFirst().getProperties().get("region"));
+        serviceStateManageRequest.setRegion(service.getDeployRequest().getRegion());
         return serviceStateManageRequest;
     }
 

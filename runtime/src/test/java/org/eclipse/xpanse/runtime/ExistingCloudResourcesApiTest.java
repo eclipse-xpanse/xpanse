@@ -102,7 +102,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Setup
         addCredentialForHuaweiCloud();
         Csp huawei = Csp.HUAWEI_CLOUD;
-        String huaweiRegion = "cn-southwest-2";
+        String site = "Chinese Mainland";
+        String region = "cn-southwest-2";
         ListVpcsResponse listVpcResponse = new ListVpcsResponse();
         listVpcResponse.setHttpStatusCode(200);
         listVpcResponse.setVpcs(List.of(new Vpc().withName("huawei_vpc_test")));
@@ -110,7 +111,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         List<String> huaweiVpcResult = List.of("huawei_vpc_test");
         // Run the test
         final MockHttpServletResponse huaweiVpcResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VPC, huawei, huaweiRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.VPC, huawei, site, region);
         // Verify the results
         assertThat(huaweiVpcResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(huaweiVpcResponse.getContentAsString()).isEqualTo(
@@ -124,7 +125,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         List<String> huaweiSubnetsResult = List.of("huawei_subnet_test");
         // Run the test
         final MockHttpServletResponse huaweiSubnetsResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.SUBNET, huawei, huaweiRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.SUBNET, huawei, site, region);
         // Verify the results
         assertThat(huaweiSubnetsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(huaweiSubnetsResponse.getContentAsString()).isEqualTo(
@@ -140,7 +141,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse huaweiSecurityGroupsResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP, huawei,
-                        huaweiRegion);
+                        site, region);
         // Verify the results
         assertThat(huaweiSecurityGroupsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(huaweiSecurityGroupsResponse.getContentAsString()).isEqualTo(
@@ -157,7 +158,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse huaweiSecurityGroupRulesResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP_RULE, huawei,
-                        huaweiRegion);
+                        site, region);
         // Verify the results
         assertThat(huaweiSecurityGroupRulesResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(huaweiSecurityGroupRulesResponse.getContentAsString()).isEqualTo(
@@ -173,7 +174,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse huaweiPublicIpsResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.PUBLIC_IP, huawei,
-                        huaweiRegion);
+                        site, region);
         // Verify the results
         assertThat(huaweiPublicIpsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(huaweiPublicIpsResponse.getContentAsString()).isEqualTo(
@@ -187,7 +188,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         List<String> huaweiVolumesResult = List.of("huawei_volume_test");
         // Run the test
         final MockHttpServletResponse huaweiVolumesResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, huawei, huaweiRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, huawei, site, region);
         // Verify the results
         assertThat(huaweiVolumesResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(huaweiVolumesResponse.getContentAsString()).isEqualTo(
@@ -202,7 +203,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         List<String> huaweiKeypairsResult = List.of("huawei_keypair_test");
         // Run the test
         final MockHttpServletResponse huaweiKeypairsResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, huawei, huaweiRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, huawei, site, region);
         // Verify the results
         assertThat(huaweiKeypairsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(huaweiKeypairsResponse.getContentAsString()).isEqualTo(
@@ -212,13 +213,13 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         List<String> huaweiVmResult = Collections.emptyList();
         // Run the test
         final MockHttpServletResponse huaweiVmResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VM, huawei, huaweiRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.VM, huawei, site, region);
         // Verify the results
         assertThat(huaweiVmResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(huaweiVmResponse.getContentAsString()).isEqualTo(
                 objectMapper.writeValueAsString(huaweiVmResult));
 
-        deleteCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.HUAWEI_CLOUD, site, CredentialType.VARIABLES, "AK_SK");
     }
 
     void mockListVpcsInvoker(ListVpcsResponse listVpcResponse) {
@@ -240,7 +241,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void mockListSecurityGroupsInvoker(ListSecurityGroupsResponse mockResponse) {
-        SyncInvoker<ListSecurityGroupsRequest, ListSecurityGroupsResponse> mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<ListSecurityGroupsRequest, ListSecurityGroupsResponse> mockInvoker =
+                mock(SyncInvoker.class);
         when(mockVpcClient.listSecurityGroupsInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -249,7 +251,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void mockListSecurityGroupRulesInvoker(ListSecurityGroupRulesResponse mockResponse) {
-        SyncInvoker<ListSecurityGroupRulesRequest, ListSecurityGroupRulesResponse> mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<ListSecurityGroupRulesRequest, ListSecurityGroupRulesResponse> mockInvoker =
+                mock(SyncInvoker.class);
         when(mockVpcClient.listSecurityGroupRulesInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -258,7 +261,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void mockListPublicIpsInvoker(ListPublicipsResponse mockResponse) {
-        SyncInvoker<ListPublicipsRequest, ListPublicipsResponse> mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<ListPublicipsRequest, ListPublicipsResponse> mockInvoker =
+                mock(SyncInvoker.class);
         when(mockEipClient.listPublicipsInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -276,7 +280,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void mockListKeypairsInvoker(NovaListKeypairsResponse mockResponse) {
-        SyncInvoker<NovaListKeypairsRequest, NovaListKeypairsResponse> mockInvoker = mock(SyncInvoker.class);
+        SyncInvoker<NovaListKeypairsRequest, NovaListKeypairsResponse> mockInvoker =
+                mock(SyncInvoker.class);
         when(mockEcsClient.novaListKeypairsInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
@@ -289,7 +294,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         addCredentialForFlexibleEngine();
         // Setup
         Csp flexibleEngine = Csp.FLEXIBLE_ENGINE;
-        String flexibleEngineRegion = "eu-west-0";
+        String site = "default";
+        String region = "eu-west-0";
         ListVpcsResponse listVpcResponse = new ListVpcsResponse();
         listVpcResponse.setHttpStatusCode(200);
         listVpcResponse.setVpcs(List.of(new Vpc().withName("flexibleEngine_vpc_test")));
@@ -298,7 +304,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse flexibleEngineVpcResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.VPC, flexibleEngine,
-                        flexibleEngineRegion);
+                        site, region);
         // Verify the results
         assertThat(flexibleEngineVpcResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(flexibleEngineVpcResponse.getContentAsString()).isEqualTo(
@@ -314,7 +320,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse flexibleEngineSubnetsResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.SUBNET, flexibleEngine,
-                        flexibleEngineRegion);
+                        site, region);
         // Verify the results
         assertThat(flexibleEngineSubnetsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(flexibleEngineSubnetsResponse.getContentAsString()).isEqualTo(
@@ -331,7 +337,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse flexibleEngineSecurityGroupsResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP, flexibleEngine,
-                        flexibleEngineRegion);
+                        site, region);
         // Verify the results
         assertThat(flexibleEngineSecurityGroupsResponse.getStatus()).isEqualTo(
                 HttpStatus.OK.value());
@@ -350,7 +356,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse flexibleEngineSecurityGroupRulesResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP_RULE,
-                        flexibleEngine, flexibleEngineRegion);
+                        flexibleEngine, site, region);
         // Verify the results
         assertThat(flexibleEngineSecurityGroupRulesResponse.getStatus()).isEqualTo(
                 HttpStatus.OK.value());
@@ -367,7 +373,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse flexibleEnginePublicIpsResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.PUBLIC_IP, flexibleEngine,
-                        flexibleEngineRegion);
+                        site, region);
         // Verify the results
         assertThat(flexibleEnginePublicIpsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(flexibleEnginePublicIpsResponse.getContentAsString()).isEqualTo(
@@ -383,7 +389,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse flexibleEngineVolumesResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, flexibleEngine,
-                        flexibleEngineRegion);
+                        site, region);
         // Verify the results
         assertThat(flexibleEngineVolumesResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(flexibleEngineVolumesResponse.getContentAsString()).isEqualTo(
@@ -399,7 +405,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse flexibleEngineKeypairsResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, flexibleEngine,
-                        flexibleEngineRegion);
+                        site, region);
         // Verify the results
         assertThat(flexibleEngineKeypairsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(flexibleEngineKeypairsResponse.getContentAsString()).isEqualTo(
@@ -410,13 +416,13 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse flexibleEngineVmResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.VM, flexibleEngine,
-                        flexibleEngineRegion);
+                        site, region);
         // Verify the results
         assertThat(flexibleEngineVmResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(flexibleEngineVmResponse.getContentAsString()).isEqualTo(
                 objectMapper.writeValueAsString(flexibleEngineVmResult));
 
-        deleteCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.FLEXIBLE_ENGINE, site,CredentialType.VARIABLES, "AK_SK");
     }
 
     void testGetExistingResourceNamesWithKindForCspBasedOpenstack() throws Exception {
@@ -426,46 +432,45 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
     }
 
     void testGetExistingResourceNamesWithKindThrowsException() throws Exception {
-        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.HUAWEI_CLOUD,
-                "cn-southwest-2");
-        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.FLEXIBLE_ENGINE,
-                "eu-west-0");
-        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.OPENSTACK_TESTLAB,
-                "RegionOne");
-        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.PLUS_SERVER,
-                "RegionOne");
-        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp.REGIO_CLOUD,
-                "RegionOne");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(
+                Csp.HUAWEI_CLOUD, "International", "cn-southwest-2");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(
+                Csp.FLEXIBLE_ENGINE, "default", "eu-west-0");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(
+                Csp.OPENSTACK_TESTLAB, "default", "RegionOne");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(
+                Csp.PLUS_SERVER, "default", "RegionOne");
+        getExistingResourceNamesWithKindThrowsClientApiCallFailedException(
+                Csp.REGIO_CLOUD, "default", "RegionOne");
     }
 
-    void getExistingResourceNamesWithKindThrowsClientApiCallFailedException(Csp csp, String region)
-            throws Exception {
-        final MockHttpServletResponse listVpcResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VPC, csp, region);
+    void getExistingResourceNamesWithKindThrowsClientApiCallFailedException(
+            Csp csp, String site, String region) throws Exception {
+        final MockHttpServletResponse listVpcResponse = getExistingResourceNamesWithKind(
+                DeployResourceKind.VPC, csp, site, region);
         Response vpcResponse =
                 objectMapper.readValue(listVpcResponse.getContentAsString(), Response.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listVpcResponse.getStatus());
         Assertions.assertEquals(vpcResponse.getResultType(), ResultType.BACKEND_FAILURE);
 
-        final MockHttpServletResponse listSubnetResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.SUBNET, csp, region);
+        final MockHttpServletResponse listSubnetResponse = getExistingResourceNamesWithKind(
+                DeployResourceKind.SUBNET, csp, site, region);
         Response subnetResponse =
                 objectMapper.readValue(listSubnetResponse.getContentAsString(), Response.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listSubnetResponse.getStatus());
         Assertions.assertEquals(subnetResponse.getResultType(), ResultType.BACKEND_FAILURE);
 
-        final MockHttpServletResponse listSecurityGroupResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP, csp, region);
-        Response securityGroupResponse =
-                objectMapper.readValue(listSecurityGroupResponse.getContentAsString(),
-                        Response.class);
+        final MockHttpServletResponse listSecurityGroupResponse = getExistingResourceNamesWithKind(
+                DeployResourceKind.SECURITY_GROUP, csp, site, region);
+        Response securityGroupResponse = objectMapper.readValue(
+                listSecurityGroupResponse.getContentAsString(), Response.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(),
                 listSecurityGroupResponse.getStatus());
         Assertions.assertEquals(securityGroupResponse.getResultType(), ResultType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listSecurityGroupRuleResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP_RULE, csp,
-                        region);
+                getExistingResourceNamesWithKind(
+                        DeployResourceKind.SECURITY_GROUP_RULE, csp, site, region);
         Response securityGroupRuleResponse =
                 objectMapper.readValue(listSecurityGroupRuleResponse.getContentAsString(),
                         Response.class);
@@ -475,21 +480,21 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 ResultType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listPublicIpResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.PUBLIC_IP, csp, region);
+                getExistingResourceNamesWithKind(DeployResourceKind.PUBLIC_IP, csp, site, region);
         Response publicIpResponse =
                 objectMapper.readValue(listPublicIpResponse.getContentAsString(), Response.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listPublicIpResponse.getStatus());
         Assertions.assertEquals(publicIpResponse.getResultType(), ResultType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listVolumeResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, csp, region);
+                getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, csp, site, region);
         Response volumeResponse =
                 objectMapper.readValue(listVolumeResponse.getContentAsString(), Response.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listVolumeResponse.getStatus());
         Assertions.assertEquals(volumeResponse.getResultType(), ResultType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listKeypairResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, csp, region);
+                getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, csp, site, region);
         Response keypairResponse =
                 objectMapper.readValue(listKeypairResponse.getContentAsString(), Response.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listKeypairResponse.getStatus());
@@ -500,7 +505,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Setup
         OSClient.OSClientV3 mockOsClient = getMockOsClientWithMockServices();
         addCredentialForOpenstack(csp);
-        String openstackRegion = "RegionOne";
+        String site = "default";
+        String region = "RegionOne";
         List<String> networksResult = List.of("network_test");
         File networksjonFile = new File("src/test/resources/openstack/network/networks.json");
         NeutronNetwork.Networks networksResponse =
@@ -509,7 +515,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 networksResponse.getList());
         // Run the test
         final MockHttpServletResponse openstackVpcResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VPC, csp, openstackRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.VPC, csp, site,
+                        region);
         // Verify the results
         assertThat(openstackVpcResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(openstackVpcResponse.getContentAsString()).isEqualTo(
@@ -523,7 +530,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 subnetsResponse.getList());
         // Run the test
         final MockHttpServletResponse openstackSubnetsResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.SUBNET, csp, openstackRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.SUBNET, csp, site, region);
         // Verify the results
         assertThat(openstackSubnetsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(openstackSubnetsResponse.getContentAsString()).isEqualTo(
@@ -538,8 +545,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 .list()).thenReturn(secGroupsResponse.getList());
         // Run the test
         final MockHttpServletResponse openstackSecurityGroupsResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP, csp,
-                        openstackRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP, csp, site,
+                        region);
         // Verify the results
         assertThat(openstackSecurityGroupsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(openstackSecurityGroupsResponse.getContentAsString()).isEqualTo(
@@ -556,7 +563,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse openstackSecurityGroupRulesResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.SECURITY_GROUP_RULE, csp,
-                        openstackRegion);
+                        site, region);
         // Verify the results
         assertThat(openstackSecurityGroupRulesResponse.getStatus()).isEqualTo(
                 HttpStatus.OK.value());
@@ -573,7 +580,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse openstackPublicIpsResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.PUBLIC_IP, csp,
-                        openstackRegion);
+                        site, region);
         // Verify the results
         assertThat(openstackPublicIpsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(openstackPublicIpsResponse.getContentAsString()).isEqualTo(
@@ -588,7 +595,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 volumesResponse.getList());
         // Run the test
         final MockHttpServletResponse openstackVolumesResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, csp, openstackRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, csp, site,
+                        region);
         // Verify the results
         assertThat(openstackVolumesResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(openstackVolumesResponse.getContentAsString()).isEqualTo(
@@ -602,7 +610,8 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 keypairsResponse.getList());
         // Run the test
         final MockHttpServletResponse openstackKeypairsResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, csp, openstackRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, csp, site,
+                        region);
         // Verify the results
         assertThat(openstackKeypairsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(openstackKeypairsResponse.getContentAsString()).isEqualTo("[]");
@@ -615,21 +624,23 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 serversResponse.getList());
         // Run the test
         final MockHttpServletResponse openstackVmResponse =
-                getExistingResourceNamesWithKind(DeployResourceKind.VM, csp, openstackRegion);
+                getExistingResourceNamesWithKind(DeployResourceKind.VM, csp, site, region);
         // Verify the results
         assertThat(openstackVmResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(openstackVmResponse.getContentAsString()).isEqualTo("[]");
 
-        deleteCredential(csp, CredentialType.VARIABLES, "USERNAME_PASSWORD");
+        deleteCredential(csp, site,CredentialType.VARIABLES, "USERNAME_PASSWORD");
     }
 
 
-    private MockHttpServletResponse getExistingResourceNamesWithKind(DeployResourceKind kind,
-                                                                     Csp csp, String region)
+    private MockHttpServletResponse getExistingResourceNamesWithKind(
+            DeployResourceKind kind, Csp csp, String siteName, String regionName)
             throws Exception {
-        return mockMvc.perform(
-                        get("/xpanse/csp/resources/{deployResourceKind}", kind).param("csp", csp.toValue())
-                                .param("region", region).accept(MediaType.APPLICATION_JSON)).andReturn()
-                .getResponse();
+        return mockMvc.perform(get("/xpanse/csp/resources/{deployResourceKind}", kind)
+                        .param("csp", csp.toValue())
+                        .param("siteName", siteName)
+                        .param("regionName", regionName)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
     }
 }

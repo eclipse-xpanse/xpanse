@@ -66,13 +66,14 @@ public class AbstractCredentialInfoDeserializer extends StdDeserializer<Abstract
         }
 
         try {
+            String site = safeGet(node, "site", JsonNode::asText);
             String name = safeGet(node, "name", JsonNode::asText);
             String description = safeGet(node, "description", JsonNode::asText);
             String userId = safeGet(node, "userId", JsonNode::asText);
             Integer timeToLive = safeGet(node, "timeToLive", JsonNode::asInt);
             List<CredentialVariable> variables =
                     deserializeCredentialVariables(node.get("variables"));
-            return new CredentialVariables(csp, type, name, description, userId, timeToLive,
+            return new CredentialVariables(csp, site, type, name, description, userId, timeToLive,
                     variables);
         } catch (Exception e) {
             log.error("IllegalArgumentException: {}", e.getMessage());

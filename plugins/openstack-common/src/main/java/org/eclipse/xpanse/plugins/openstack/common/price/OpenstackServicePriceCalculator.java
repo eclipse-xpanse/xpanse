@@ -49,6 +49,9 @@ public class OpenstackServicePriceCalculator {
         Price licensePrice = BillingCommonUtils.getSpecificPriceByRegionAndSite(
                 resourceUsage.getLicensePrices(), request.getRegionName(), request.getSiteName());
         BillingCommonUtils.addExtraPaymentPrice(flavorPriceResult, licensePrice);
+        flavorPriceResult.setFlavorName(request.getFlavorName());
+        flavorPriceResult.setBillingMode(request.getBillingMode());
+        flavorPriceResult.setSuccessful(true);
         return flavorPriceResult;
     }
 
@@ -59,6 +62,9 @@ public class OpenstackServicePriceCalculator {
                 request.getRegionName(), request.getSiteName());
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
         flavorPriceResult.setRecurringPrice(fixedPrice);
+        flavorPriceResult.setFlavorName(request.getFlavorName());
+        flavorPriceResult.setBillingMode(request.getBillingMode());
+        flavorPriceResult.setSuccessful(true);
         return flavorPriceResult;
     }
 }

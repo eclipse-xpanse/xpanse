@@ -284,6 +284,7 @@ public class ApisTestCommon {
     protected void addCredentialForHuaweiCloud() throws Exception {
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(Csp.HUAWEI_CLOUD);
+        createCredential.setSite("Chinese Mainland");
         createCredential.setType(CredentialType.VARIABLES);
         createCredential.setName("AK_SK");
         createCredential.setDescription("description");
@@ -301,6 +302,7 @@ public class ApisTestCommon {
     protected void addCredentialForFlexibleEngine() throws Exception {
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(Csp.FLEXIBLE_ENGINE);
+        createCredential.setSite("default");
         createCredential.setType(CredentialType.VARIABLES);
         createCredential.setName("AK_SK");
         createCredential.setDescription("description");
@@ -318,6 +320,7 @@ public class ApisTestCommon {
 
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(csp);
+        createCredential.setSite("default");
         createCredential.setType(CredentialType.VARIABLES);
         createCredential.setName("USERNAME_PASSWORD");
         createCredential.setDescription("description");
@@ -346,7 +349,7 @@ public class ApisTestCommon {
     }
 
     protected void addUserCredential(CreateCredential createCredential) throws Exception {
-       MockHttpServletResponse response = mockMvc.perform(post("/xpanse/user/credentials").content(
+        MockHttpServletResponse response = mockMvc.perform(post("/xpanse/user/credentials").content(
                                 objectMapper.writeValueAsString(createCredential))
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
@@ -425,10 +428,13 @@ public class ApisTestCommon {
         return deployRequest;
     }
 
-    protected void deleteCredential(Csp csp, CredentialType type, String name) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(delete("/xpanse/user/credentials").param(
-                "cspName", csp.toValue())
-                .param("type", type.toValue()).param("name", name)
+    protected void deleteCredential(Csp csp, String site, CredentialType type, String name)
+            throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(delete("/xpanse/user/credentials")
+                .param("cspName", csp.toValue())
+                .param("siteName", site)
+                .param("type", type.toValue())
+                .param("name", name)
                 .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
         assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());

@@ -63,8 +63,10 @@ public class ExistingCloudResourcesApi {
     public List<String> getExistingResourceNamesWithKind(
             @Parameter(name = "csp", description = "name of the cloud service provider")
             @RequestParam(name = "csp") Csp csp,
-            @Parameter(name = "region", description = "name of he region")
-            @RequestParam(name = "region") String region,
+            @Parameter(name = "siteName", description = "the site of the service belongs to")
+            @RequestParam(name = "siteName") String siteName,
+            @Parameter(name = "regionName", description = "name of the region")
+            @RequestParam(name = "regionName") String regionName,
             @Parameter(name = "deployResourceKind", description = "kind of the CloudResource")
             @PathVariable("deployResourceKind") DeployResourceKind deployResourceKind,
             @Parameter(name = "serviceId", description = "id of the deployed service")
@@ -72,7 +74,7 @@ public class ExistingCloudResourcesApi {
         UUID uuid = StringUtils.isBlank(serviceId) ? null : UUID.fromString(serviceId);
         String userId = userServiceHelper.getCurrentUserId();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-        return orchestratorPlugin.getExistingResourceNamesWithKind(userId, region,
+        return orchestratorPlugin.getExistingResourceNamesWithKind(siteName, regionName, userId,
                 deployResourceKind, uuid);
     }
 }

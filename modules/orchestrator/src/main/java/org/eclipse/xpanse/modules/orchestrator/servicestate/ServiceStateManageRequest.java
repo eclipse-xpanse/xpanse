@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 
 /**
  * Service management request class.
@@ -18,7 +19,7 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 public class ServiceStateManageRequest {
 
     private String userId;
-    private String regionName;
+    private Region region;
     private List<DeployResourceEntity> deployResourceEntityList;
     private UUID serviceId;
 

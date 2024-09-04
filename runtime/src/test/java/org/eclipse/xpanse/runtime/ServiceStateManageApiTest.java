@@ -46,6 +46,7 @@ import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceStateManagementTaskType;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
@@ -124,8 +125,11 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         assertThat(objectMapper.writeValueAsString(result)).isEqualTo(
                 response.getContentAsString());
 
+        Region region = new Region();
+        region.setName("cn-southwest-2");
+        region.setSite("Chinese Mainland");
         // Setup
-        DeployServiceEntity service1 = setUpWellDeployServiceEntity();
+        DeployServiceEntity service1 = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service1.setDeployResourceList(null);
         Response result1 = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 Collections.singletonList(String.format("Service with id %s has no vm resources.",
@@ -139,8 +143,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(result1));
 
         // Setup
-        DeployServiceEntity service2 = setUpWellDeployServiceEntity();
-        service2.setCsp(Csp.AWS);
+        DeployServiceEntity service2 = setUpWellDeployServiceEntity(Csp.AWS, region);
         Response result2 = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
                         String.format("Can't find suitable plugin for the Csp %s",
@@ -156,7 +159,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(result2));
 
         // Setup
-        DeployServiceEntity service3 = setUpWellDeployServiceEntity();
+        DeployServiceEntity service3 = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service3.setUserId("1");
         Response result3 = Response.errorResponse(ResultType.ACCESS_DENIED,
                 Collections.singletonList("No permissions to manage status of the service "
@@ -170,7 +173,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(result3));
 
         // Setup
-        DeployServiceEntity service4 = setUpWellDeployServiceEntity();
+        DeployServiceEntity service4 = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service4.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
         Response result4 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
                 Collections.singletonList(
@@ -185,7 +188,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(result4));
 
         // Setup
-        DeployServiceEntity service5 = setUpWellDeployServiceEntity();
+        DeployServiceEntity service5 = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service5.setServiceState(ServiceState.STARTING);
         when(mockDeployServiceStorage.findDeployServiceById(service5.getId())).thenReturn(service5);
         Response errorResult5 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
@@ -200,7 +203,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(errorResult5));
 
         // Setup
-        DeployServiceEntity service6 = setUpWellDeployServiceEntity();
+        DeployServiceEntity service6 = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service6.setServiceState(ServiceState.RUNNING);
         when(mockDeployServiceStorage.findDeployServiceById(service6.getId())).thenReturn(service6);
         Response errorResult6 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
@@ -215,7 +218,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(errorResult6));
 
         // Setup
-        DeployServiceEntity service7 = setUpWellDeployServiceEntity();
+        DeployServiceEntity service7 = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service7.setServiceState(ServiceState.STOPPING);
         Response errorResult7 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
                 Collections.singletonList(String.format(
@@ -229,7 +232,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         assertThat(response7.getContentAsString()).isEqualTo(
                 objectMapper.writeValueAsString(errorResult7));
 
-        DeployServiceEntity service8 = setUpWellDeployServiceEntity();
+        DeployServiceEntity service8 = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service8.setServiceState(ServiceState.STOPPED);
         when(mockDeployServiceStorage.findDeployServiceById(service8.getId())).thenReturn(service8);
         Response errorResult8 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
@@ -243,7 +246,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         assertThat(response8.getContentAsString()).isEqualTo(
                 objectMapper.writeValueAsString(errorResult8));
 
-        DeployServiceEntity service9 = setUpWellDeployServiceEntity();
+        DeployServiceEntity service9 = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service9.setServiceState(ServiceState.STOPPED);
         when(mockDeployServiceStorage.findDeployServiceById(service9.getId())).thenReturn(service9);
         Response errorResult9 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
@@ -279,13 +282,17 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
     void testServiceStateManageApisForHuaweiCloud() throws Exception {
         // Setup
-        DeployServiceEntity service = setUpWellDeployServiceEntity();
+        String site = "Chinese Mainland";
+        Region region = new Region();
+        region.setName("cn-southwest-2");
+        region.setSite(site);
+        DeployServiceEntity service = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service.setServiceState(ServiceState.STOPPED);
         when(mockDeployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
         when(huaweiCloudClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         addCredentialForHuaweiCloud();
         testServiceStateManageApisWithHuaweiCloudSdk(service);
-        deleteCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.HUAWEI_CLOUD, site, CredentialType.VARIABLES, "AK_SK");
     }
 
     void testServiceStateManageApisWithHuaweiCloudSdk(DeployServiceEntity service)
@@ -469,22 +476,27 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
     void testServiceStateManageApisForFlexibleEngine() throws Exception {
         // Setup
-        DeployServiceEntity service = setUpWellDeployServiceEntity();
-        service.setCsp(Csp.FLEXIBLE_ENGINE);
+        Region region = new Region();
+        region.setName("eu-west-0");
+        region.setSite("default");
+        DeployServiceEntity service = setUpWellDeployServiceEntity(Csp.FLEXIBLE_ENGINE, region);
         when(mockDeployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
         when(flexibleEngineClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         addCredentialForFlexibleEngine();
         testServiceStateManageApisWithHuaweiCloudSdk(service);
-        deleteCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.FLEXIBLE_ENGINE,"default", CredentialType.VARIABLES, "AK_SK");
     }
 
     void testServiceStateManageApisForOpenstack() throws Exception {
+        Region region = new Region();
+        region.setName("RegionOne");
+        region.setSite("default");
         addCredentialForOpenstack(Csp.OPENSTACK_TESTLAB);
-        DeployServiceEntity service = setUpWellDeployServiceEntity();
-        service.setCsp(Csp.OPENSTACK_TESTLAB);
+        DeployServiceEntity service = setUpWellDeployServiceEntity(Csp.OPENSTACK_TESTLAB, region);
         when(mockDeployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
         testServiceStateManageApisWithOpenstackSdk(service);
-        deleteCredential(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "USERNAME_PASSWORD");
+        deleteCredential(Csp.OPENSTACK_TESTLAB,"default", CredentialType.VARIABLES,
+                "USERNAME_PASSWORD");
     }
 
     void testServiceStateManageApisWithOpenstackSdk(DeployServiceEntity service) throws Exception {
@@ -604,11 +616,11 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     }
 
 
-    DeployServiceEntity setUpWellDeployServiceEntity() {
+    DeployServiceEntity setUpWellDeployServiceEntity(Csp csp, Region region) {
         UUID id = UUID.randomUUID();
         DeployServiceEntity deployedServiceEntity = new DeployServiceEntity();
         deployedServiceEntity.setId(id);
-        deployedServiceEntity.setCsp(Csp.HUAWEI_CLOUD);
+        deployedServiceEntity.setCsp(csp);
         deployedServiceEntity.setCategory(Category.COMPUTE);
         deployedServiceEntity.setName("test-service");
         deployedServiceEntity.setVersion("1.0");
@@ -616,6 +628,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         deployedServiceEntity.setFlavor("2vCPUs-4GB-normal");
         deployedServiceEntity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
         DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setRegion(region);
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
         deployRequest.setFlavor("2vCPUs-4GB-normal");
         deployRequest.setServiceRequestProperties(new HashMap<>());

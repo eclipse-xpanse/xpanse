@@ -42,6 +42,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class IsvCloudCredentialsApiTest extends ApisTestCommon {
 
     private final Csp csp = Csp.HUAWEI_CLOUD;
+    private final String site = "Chinese Mainland";
+    private final String credentialName = "AK_SK";
     private final CredentialType credentialType = CredentialType.VARIABLES;
 
     @Test
@@ -57,8 +59,9 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
     private CreateCredential getCreateCredential(boolean isSensitive) {
         final CreateCredential createCredential = new CreateCredential();
         createCredential.setCsp(csp);
+        createCredential.setSite(site);
         createCredential.setType(credentialType);
-        createCredential.setName("AK_SK");
+        createCredential.setName(credentialName);
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
@@ -174,8 +177,11 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse deleteResponse = mockMvc.perform(
-                delete("/xpanse/isv/credentials").param("cspName", csp.toValue())
-                        .param("type", credentialType.toValue()).param("name", "AK_SK")
+                delete("/xpanse/isv/credentials")
+                        .param("cspName", csp.toValue())
+                        .param("siteName", site)
+                        .param("type", credentialType.toValue())
+                        .param("name", credentialName)
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
 
         final MockHttpServletResponse queryResponse = mockMvc.perform(

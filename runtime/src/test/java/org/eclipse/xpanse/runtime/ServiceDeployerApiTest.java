@@ -193,8 +193,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     }
 
     void testGetAvailabilityZonesApiThrowsException() throws Exception {
-        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.HUAWEI_CLOUD, "cn-southwest");
-        getAvailabilityZonesThrowsClientApiCallFailedException(Csp.FLEXIBLE_ENGINE, "eu-west-0");
+        getAvailabilityZonesThrowsClientApiCallFailedException(
+                Csp.HUAWEI_CLOUD, "Chinese Mainland", "cn-southwest");
+        getAvailabilityZonesThrowsClientApiCallFailedException(
+                Csp.FLEXIBLE_ENGINE, "default", "eu-west-0");
     }
 
     void testGetAvailabilityZonesForHuaweiCloud() throws Exception {
@@ -210,14 +212,14 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         mockListAvailabilityZonesInvoker(response);
         // Run the test
         final MockHttpServletResponse listAzResponse =
-                getAvailabilityZones(Csp.HUAWEI_CLOUD, "cn-southwest-2");
+                getAvailabilityZones(Csp.HUAWEI_CLOUD, "Chinese Mainland", "cn-southwest-2");
         List<String> azs =
                 objectMapper.readValue(listAzResponse.getContentAsString(), new TypeReference<>() {
                 });
         assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
         assertEquals(2, azs.size());
         assertEquals("cn-southwest-2a", azs.getFirst());
-        deleteCredential(Csp.HUAWEI_CLOUD, CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.HUAWEI_CLOUD, "Chinese Mainland", CredentialType.VARIABLES, "AK_SK");
     }
 
     void mockListAvailabilityZonesInvoker(NovaListAvailabilityZonesResponse mockResponse) {
@@ -243,14 +245,14 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         mockListAvailabilityZonesInvoker(response);
         // Run the test
         final MockHttpServletResponse listAzResponse =
-                getAvailabilityZones(Csp.FLEXIBLE_ENGINE, "eu-west-0");
+                getAvailabilityZones(Csp.FLEXIBLE_ENGINE, "default", "eu-west-0");
         List<String> azs =
                 objectMapper.readValue(listAzResponse.getContentAsString(), new TypeReference<>() {
                 });
         assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
         assertEquals(2, azs.size());
         assertEquals("eu-west-0a", azs.getFirst());
-        deleteCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.FLEXIBLE_ENGINE, "default", CredentialType.VARIABLES, "AK_SK");
     }
 
     void testGetAvailabilityZonesForOpenstack() throws Exception {
@@ -264,30 +266,33 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 .list()).thenReturn(azResponse.getList());
         // Run the test
         final MockHttpServletResponse listAzResponse =
-                getAvailabilityZones(Csp.OPENSTACK_TESTLAB, "RegionOne");
+                getAvailabilityZones(Csp.OPENSTACK_TESTLAB, "default", "RegionOne");
         List<String> azNames =
                 objectMapper.readValue(listAzResponse.getContentAsString(), new TypeReference<>() {
                 });
         assertEquals(HttpStatus.OK.value(), listAzResponse.getStatus());
         assertEquals(1, azNames.size());
         assertEquals("nova", azNames.getFirst());
-        deleteCredential(Csp.OPENSTACK_TESTLAB, CredentialType.VARIABLES, "USERNAME_PASSWORD");
+        deleteCredential(Csp.OPENSTACK_TESTLAB, "default", CredentialType.VARIABLES,
+                "USERNAME_PASSWORD");
     }
 
-    void getAvailabilityZonesThrowsClientApiCallFailedException(Csp csp, String regionName)
-            throws Exception {
-        final MockHttpServletResponse listAzResponse = getAvailabilityZones(csp, regionName);
+    void getAvailabilityZonesThrowsClientApiCallFailedException(
+            Csp csp, String siteName, String regionName) throws Exception {
+        final MockHttpServletResponse listAzResponse =
+                getAvailabilityZones(csp, siteName, regionName);
         assertEquals(HttpStatus.BAD_REQUEST.value(), listAzResponse.getStatus());
         assertEquals(listAzResponse.getHeader("Cache-Control"), "no-cache");
     }
 
-    MockHttpServletResponse getAvailabilityZones(Csp csp, String regionName) throws Exception {
-        MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/csp/region/azs").param("cspName",
-                                        csp.toValue())
-                                .param("regionName", regionName).accept(MediaType.APPLICATION_JSON))
-                        .andReturn()
-                        .getResponse();
+    MockHttpServletResponse getAvailabilityZones(Csp csp, String siteName, String regionName)
+            throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(get("/xpanse/csp/region/azs")
+                        .param("cspName", csp.toValue())
+                        .param("siteName", siteName)
+                        .param("regionName", regionName)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
         return response;
     }

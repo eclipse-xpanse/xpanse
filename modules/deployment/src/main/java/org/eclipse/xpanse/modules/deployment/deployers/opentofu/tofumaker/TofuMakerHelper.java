@@ -89,12 +89,7 @@ public class TofuMakerHelper {
     public Map<String, String> getEnvironmentVariables(DeployTask deployTask) {
         Map<String, String> envVariables = new HashMap<>();
         envVariables.putAll(this.deployEnvironments.getEnvFromDeployTask(deployTask));
-        envVariables.putAll(
-                this.deployEnvironments.getCredentialVariablesByHostingType(
-                        deployTask.getDeployRequest().getServiceHostingType(),
-                        deployTask.getOcl().getDeployment().getCredentialType(),
-                        deployTask.getDeployRequest().getCsp(),
-                        deployTask.getDeployRequest().getUserId()));
+        envVariables.putAll(this.deployEnvironments.getCredentialVariables(deployTask));
         envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(
                 deployTask.getDeployRequest().getCsp()));
         return envVariables;

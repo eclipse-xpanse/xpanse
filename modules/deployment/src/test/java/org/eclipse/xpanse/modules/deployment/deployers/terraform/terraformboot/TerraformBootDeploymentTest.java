@@ -133,8 +133,7 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testDeploy() {
-        doReturn(new HashMap<>()).when(this.deployEnvironments)
-                .getCredentialVariablesByHostingType(any(), any(), any(), any());
+        doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any());
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
 
@@ -150,8 +149,7 @@ class TerraformBootDeploymentTest {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
 
-            doReturn(new HashMap<>()).when(this.deployEnvironments)
-                    .getCredentialVariablesByHostingType(any(), any(), any(), any());
+            doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any());
             deployTask.setTaskType(ServiceOrderType.MODIFY);
             deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
             DeployResult deployResult = terraformBootDeployment.modify(deployTask);

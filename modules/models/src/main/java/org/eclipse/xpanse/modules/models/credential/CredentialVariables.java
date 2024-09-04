@@ -32,9 +32,10 @@ public class CredentialVariables extends AbstractCredentialInfo {
     /**
      * The constructor without filed timeToLive.
      */
-    public CredentialVariables(Csp csp, CredentialType type, String name, String description,
-                               String userId, List<CredentialVariable> variables) {
-        super(csp, type, name, description, userId);
+    public CredentialVariables(Csp csp, String site, CredentialType type, String name,
+                               String description, String userId,
+                               List<CredentialVariable> variables) {
+        super(csp, site, type, name, description, userId);
         this.variables = variables;
     }
 
@@ -43,13 +44,14 @@ public class CredentialVariables extends AbstractCredentialInfo {
      */
     @JsonCreator
     public CredentialVariables(@JsonProperty("csp") Csp csp,
+                               @JsonProperty("site") String site,
                                @JsonProperty("type") CredentialType type,
                                @JsonProperty("name") String name,
                                @JsonProperty("description") String description,
                                @JsonProperty("userId") String userId,
                                @JsonProperty("timeToLive") Integer timeToLive,
                                @JsonProperty("variables") List<CredentialVariable> variables) {
-        super(csp, type, name, description, userId);
+        super(csp, site, type, name, description, userId);
         super.timeToLive = timeToLive;
         this.variables = variables;
     }
@@ -58,9 +60,9 @@ public class CredentialVariables extends AbstractCredentialInfo {
      * The constructor.
      */
     public CredentialVariables(CreateCredential createCredential) {
-        super(createCredential.getCsp(), createCredential.getType(),
-                createCredential.getName(), createCredential.getDescription(),
-                createCredential.getUserId());
+        super(createCredential.getCsp(), createCredential.getSite(),
+                createCredential.getType(), createCredential.getName(),
+                createCredential.getDescription(), createCredential.getUserId());
         super.timeToLive = createCredential.getTimeToLive();
         this.variables = createCredential.getVariables();
     }

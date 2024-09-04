@@ -76,9 +76,8 @@ public class FlexibleEngineMetricsService {
         String regionName = deployResource.getProperties().get("region");
         List<Metric> metrics = new ArrayList<>();
         try {
-            AbstractCredentialInfo credential =
-                    credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
-                            resourceMetricRequest.getUserId());
+            AbstractCredentialInfo credential = credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE,
+                    null, CredentialType.VARIABLES, resourceMetricRequest.getUserId());
             ICredential icredential = flexibleEngineClient.getCredential(credential);
             CesClient client = flexibleEngineClient.getCesClient(icredential, regionName);
 
@@ -125,9 +124,8 @@ public class FlexibleEngineMetricsService {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
         String regionName = deployResources.getFirst().getProperties().get("region");
         try {
-            AbstractCredentialInfo credential =
-                    credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
-                            serviceMetricRequest.getUserId());
+            AbstractCredentialInfo credential = credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE,
+                    null, CredentialType.VARIABLES, serviceMetricRequest.getUserId());
             ICredential icredential = flexibleEngineClient.getCredential(credential);
             CesClient client = flexibleEngineClient.getCesClient(icredential, regionName);
             MonitorResourceType monitorResourceType = serviceMetricRequest.getMonitorResourceType();

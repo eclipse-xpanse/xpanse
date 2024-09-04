@@ -50,10 +50,9 @@ public class CredentialCenter {
      * Constructor of CredentialCenter.
      */
     @Autowired
-    public CredentialCenter(
-            AesUtil aesUtil, PluginManager pluginManager,
-            CredentialsStore credentialsStore,
-            CredentialOpenApiGenerator credentialOpenApiGenerator) {
+    public CredentialCenter(AesUtil aesUtil, PluginManager pluginManager,
+                            CredentialsStore credentialsStore,
+                            CredentialOpenApiGenerator credentialOpenApiGenerator) {
         this.aesUtil = aesUtil;
         this.pluginManager = pluginManager;
         this.credentialsStore = credentialsStore;
@@ -79,8 +78,7 @@ public class CredentialCenter {
      * @param name The name of credential.
      * @return Returns list of credential capabilities.
      */
-    public List<AbstractCredentialInfo> listCredentialCapabilities(Csp csp,
-                                                                   CredentialType type,
+    public List<AbstractCredentialInfo> listCredentialCapabilities(Csp csp, CredentialType type,
                                                                    String name) {
         OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(csp);
         List<AbstractCredentialInfo> abstractCredentialInfoList = plugin.getCredentialDefinitions();
@@ -119,22 +117,26 @@ public class CredentialCenter {
      * @param userId The id of user who provided the credential info.
      * @return the credentials.
      */
-    public List<AbstractCredentialInfo> listCredentials(Csp csp, CredentialType type,
-                                                        String userId) {
+    public List<AbstractCredentialInfo> listCredentials(
+            Csp csp, CredentialType type, String userId) {
+        List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
         if (Objects.isNull(csp)) {
-            List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
             for (Csp key : pluginManager.getPluginsMap().keySet()) {
-                abstractCredentialInfos.addAll(listUserCredentials(key, type, userId));
+                pluginManager.getOrchestratorPlugin(key).getSites().forEach(site -> {
+                    abstractCredentialInfos.addAll(
+                            listUserCredentials(key, site, type, userId));
+                });
             }
-            return maskSensitiveValues(abstractCredentialInfos);
+        } else {
+            pluginManager.getOrchestratorPlugin(csp).getSites().forEach(site -> {
+                abstractCredentialInfos.addAll(listUserCredentials(csp, site, type, userId));
+            });
         }
-        List<AbstractCredentialInfo> userCredentialInfos = listUserCredentials(csp, type, userId);
-        return maskSensitiveValues(userCredentialInfos);
+        return maskSensitiveValues(abstractCredentialInfos);
     }
 
-
-    private List<AbstractCredentialInfo> listUserCredentials(Csp csp, CredentialType type,
-                                                             String userId) {
+    private List<AbstractCredentialInfo> listUserCredentials(
+            Csp csp, String site, CredentialType type, String userId) {
         List<AbstractCredentialInfo> userCredentials = new ArrayList<>();
         List<AbstractCredentialInfo> definedCredentialInfos =
                 pluginManager.getOrchestratorPlugin(csp).getCredentialDefinitions();
@@ -145,21 +147,29 @@ public class CredentialCenter {
                                 abstractCredentialInfo.getType())).toList();
             }
             definedCredentialInfos.forEach(credential -> {
-                CredentialCacheKey cacheKey = new CredentialCacheKey(credential.getCsp(),
-                        credential.getType(), credential.getName(), userId);
-                AbstractCredentialInfo credentialInfo = null;
-                try {
-                    credentialInfo = credentialsStore.getCredential(cacheKey);
-                    credentialsStore.updateCredentialCacheTimeToLive(cacheKey);
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                }
+                AbstractCredentialInfo credentialInfo = getCredentialFromCache(
+                        csp, site, credential.getType(), credential.getName(), userId);
                 if (Objects.nonNull(credentialInfo)) {
                     userCredentials.add(credentialInfo);
                 }
             });
         }
         return userCredentials;
+    }
+
+    private AbstractCredentialInfo getCredentialFromCache(
+            Csp csp, String site, CredentialType type, String credentialName, String userId) {
+        CredentialCacheKey cacheKey =
+                new CredentialCacheKey(csp, site, type, credentialName, userId);
+        AbstractCredentialInfo credentialInfo = null;
+        try {
+            credentialInfo = credentialsStore.getCredential(cacheKey);
+            credentialsStore.updateCredentialCacheTimeToLive(cacheKey);
+        } catch (Exception e) {
+            log.error("Get credential from cache by key {} failed. error:{}", cacheKey,
+                    e.getMessage());
+        }
+        return credentialInfo;
     }
 
     /**
@@ -180,8 +190,9 @@ public class CredentialCenter {
                     String.format("Not supported credential type Csp:%s, Type: %s.",
                             createCredential.getCsp(), createCredential.getType()));
         }
-        CredentialCacheKey cacheKey = new CredentialCacheKey(credential.getCsp(),
-                credential.getType(), credential.getName(), credential.getUserId());
+        CredentialCacheKey cacheKey =
+                new CredentialCacheKey(credential.getCsp(), credential.getSite(),
+                        credential.getType(), credential.getName(), credential.getUserId());
         credentialsStore.storeCredential(cacheKey, credential);
         credentialsStore.updateCredentialCacheTimeToLive(cacheKey);
     }
@@ -202,22 +213,27 @@ public class CredentialCenter {
                     String.format("Not supported credential type Csp:%s, Type: %s.",
                             updateCredential.getCsp(), updateCredential.getType()));
         }
-        CredentialCacheKey cacheKey = new CredentialCacheKey(credential.getCsp(),
-                credential.getType(), credential.getName(), credential.getUserId());
+        CredentialCacheKey cacheKey =
+                new CredentialCacheKey(credential.getCsp(), credential.getSite(),
+                        credential.getType(), credential.getName(), credential.getUserId());
         credentialsStore.storeCredential(cacheKey, credential);
         credentialsStore.updateCredentialCacheTimeToLive(cacheKey);
     }
 
+
     /**
-     * Delete credential for the @Csp with @userId.
+     * Delete credential info for the service.
      *
-     * @param csp    The cloud service provider.
-     * @param userId The user who provided the credential info.
+     * @param csp            cloud service provider
+     * @param siteName       site name
+     * @param credentialType credential type
+     * @param credentialName credential name
+     * @param userId         user id
      */
-    public void deleteCredential(Csp csp, CredentialType credentialType, String credentialName,
-                                 String userId) {
+    public void deleteCredential(Csp csp, String siteName, CredentialType credentialType,
+                                 String credentialName, String userId) {
         CredentialCacheKey cacheKey =
-                new CredentialCacheKey(csp, credentialType, credentialName, userId);
+                new CredentialCacheKey(csp, siteName, credentialType, credentialName, userId);
         credentialsStore.deleteCredential(cacheKey);
     }
 
@@ -226,14 +242,14 @@ public class CredentialCenter {
      * application. This method joins credential variables from all sources.
      *
      * @param csp            The cloud service provider.
+     * @param site           The site which the credential belongs to.
      * @param credentialType Type of the credential
      * @param userId         The user who provided the credential info.
      */
-    public AbstractCredentialInfo getCredential(Csp csp,
-                                                CredentialType credentialType,
-                                                String userId) {
-        List<AbstractCredentialInfo> credentialInfos = joinCredentialsFromAllSources(
-                csp, credentialType, userId);
+    public AbstractCredentialInfo getCredential(Csp csp, String site,
+                                                CredentialType credentialType, String userId) {
+        List<AbstractCredentialInfo> credentialInfos =
+                joinCredentialsFromAllSources(csp, site, credentialType, userId);
         if (credentialInfos.isEmpty()) {
             throw new CredentialsNotFoundException(
                     String.format("No credential information found for the given Csp:%s.",
@@ -288,10 +304,17 @@ public class CredentialCenter {
                         inputCredential.getName());
 
         if (CollectionUtils.isEmpty(credentialAbilities)) {
+            throw new CredentialCapabilityNotFound(String.format(
+                    "Defined credentials with type %s and name %s provided by "
+                            + "csp %s not found.", inputCredential.getType(),
+                    inputCredential.getName(), inputCredential.getCsp()));
+        }
+        // check the site of the input credential is valid.
+        OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(inputCredential.getCsp());
+        if (!plugin.getSites().contains(inputCredential.getSite())) {
             throw new CredentialCapabilityNotFound(
-                    String.format("Defined credentials with type %s and name %s provided by "
-                                    + "csp %s not found.", inputCredential.getType(),
-                            inputCredential.getName(), inputCredential.getCsp()));
+                    String.format("Site %s is not supported by csp %s.",
+                            inputCredential.getSite(), inputCredential.getCsp()));
         }
         // check all fields in the input credential are valid based on the defined credentials.
         for (AbstractCredentialInfo credentialAbility : credentialAbilities) {
@@ -300,10 +323,11 @@ public class CredentialCenter {
                 CredentialVariables inputVariables = new CredentialVariables(inputCredential);
                 CredentialVariables definedVariables = (CredentialVariables) credentialAbility;
                 Set<String> definedVariableNameSet =
-                        definedVariables.getVariables().stream()
-                                .map(CredentialVariable::getName).collect(Collectors.toSet());
-                Set<String> inputVariableNameSet = inputVariables.getVariables().stream()
-                        .map(CredentialVariable::getName).collect(Collectors.toSet());
+                        definedVariables.getVariables().stream().map(CredentialVariable::getName)
+                                .collect(Collectors.toSet());
+                Set<String> inputVariableNameSet =
+                        inputVariables.getVariables().stream().map(CredentialVariable::getName)
+                                .collect(Collectors.toSet());
                 if (!inputVariableNameSet.containsAll(definedVariableNameSet)) {
                     definedVariableNameSet.removeAll(inputVariableNameSet);
                     errorReasons.add(String.format("Missing variables with names %s.",
@@ -316,8 +340,8 @@ public class CredentialCenter {
                 for (CredentialVariable inputVariable : inputCredential.getVariables()) {
                     if (definedMandatoryVariableNameSet.contains(inputVariable.getName())
                             && StringUtils.isBlank(inputVariable.getValue())) {
-                        errorReasons.add(
-                                String.format("The value of mandatory variable with name %s"
+                        errorReasons.add(String.format(
+                                "The value of mandatory variable with name %s"
                                         + " could not be empty.", inputVariable.getName()));
                     }
                 }
@@ -363,28 +387,28 @@ public class CredentialCenter {
     private boolean allMandatoryCredentialVariableNotBlank(
             CredentialVariables credentialVariables) {
         return credentialVariables.getVariables().stream()
-                .filter(CredentialVariable::getIsMandatory)
-                .allMatch(credentialVariable -> StringUtils.isNotBlank(
-                        credentialVariable.getValue()));
+                .filter(CredentialVariable::getIsMandatory).allMatch(
+                        credentialVariable -> StringUtils.isNotBlank(
+                                credentialVariable.getValue()));
     }
 
     private void checkNullParamAndFillValueFromEnv(AbstractCredentialInfo abstractCredentialInfo) {
         if (abstractCredentialInfo.getType().equals(CredentialType.VARIABLES)) {
-            CredentialVariables credentialVariables =
-                    (CredentialVariables) abstractCredentialInfo;
+            CredentialVariables credentialVariables = (CredentialVariables) abstractCredentialInfo;
             for (CredentialVariable variable : credentialVariables.getVariables()) {
-                if (Objects.isNull(variable.getValue())
-                        || Objects.equals(variable.getValue(), "null")) {
+                if (Objects.isNull(variable.getValue()) || Objects.equals(variable.getValue(),
+                        "null")) {
                     variable.setValue(System.getenv(variable.getName()));
                 }
             }
         }
     }
 
-    private void addCredentialInfoFromEnv(Csp csp,
+    private void addCredentialInfoFromEnv(Csp csp, String site,
                                           List<AbstractCredentialInfo> abstractCredentialInfos) {
         AbstractCredentialInfo credentialInfoFromEnv = getCompleteCredentialDefinitionFromEnv(csp);
         if (Objects.nonNull(credentialInfoFromEnv)) {
+            credentialInfoFromEnv.setSite(site);
             abstractCredentialInfos.add(credentialInfoFromEnv);
         }
     }
@@ -396,8 +420,7 @@ public class CredentialCenter {
         }
         List<AbstractCredentialInfo> maskedCredentialInfos = new ArrayList<>();
         for (AbstractCredentialInfo abstractCredentialInfo : abstractCredentialInfos) {
-            CredentialVariables credentialVariables =
-                    (CredentialVariables) abstractCredentialInfo;
+            CredentialVariables credentialVariables = (CredentialVariables) abstractCredentialInfo;
             List<CredentialVariable> maskedCredentialVariableList = new ArrayList<>();
             for (CredentialVariable variable : credentialVariables.getVariables()) {
                 CredentialVariable maskedCredentialVariable =
@@ -409,13 +432,11 @@ public class CredentialCenter {
                 }
                 maskedCredentialVariableList.add(maskedCredentialVariable);
             }
-            AbstractCredentialInfo maskedAbstractCredentialInfo =
-                    new CredentialVariables(credentialVariables.getCsp(),
-                            credentialVariables.getType(),
-                            credentialVariables.getName(),
-                            credentialVariables.getDescription(),
-                            credentialVariables.getUserId(),
-                            maskedCredentialVariableList);
+            AbstractCredentialInfo maskedAbstractCredentialInfo = new CredentialVariables(
+                    credentialVariables.getCsp(), credentialVariables.getSite(),
+                    credentialVariables.getType(), credentialVariables.getName(),
+                    credentialVariables.getDescription(), credentialVariables.getUserId(),
+                    maskedCredentialVariableList);
             maskedAbstractCredentialInfo.setTimeToLive(credentialVariables.getTimeToLive());
             maskedCredentialInfos.add(maskedAbstractCredentialInfo);
         }
@@ -423,11 +444,11 @@ public class CredentialCenter {
     }
 
     private List<AbstractCredentialInfo> joinCredentialsFromAllSources(
-            Csp csp, CredentialType requestedCredentialType,
+            Csp csp, String site, CredentialType requestedCredentialType,
             String userId) {
         List<AbstractCredentialInfo> joinCredentials = new ArrayList<>();
         List<AbstractCredentialInfo> userCredentials =
-                listUserCredentials(csp, requestedCredentialType, userId);
+                listUserCredentials(csp, site, requestedCredentialType, userId);
         if (!CollectionUtils.isEmpty(userCredentials)) {
             for (AbstractCredentialInfo userCredential : userCredentials) {
                 if (Objects.nonNull(userCredential)) {
@@ -436,7 +457,7 @@ public class CredentialCenter {
                 }
             }
         } else {
-            addCredentialInfoFromEnv(csp, joinCredentials);
+            addCredentialInfoFromEnv(csp, site, joinCredentials);
         }
         return joinCredentials;
     }

@@ -31,9 +31,14 @@ public class CreateCredential {
     @Hidden
     private String userId;
 
-    @Schema(description = "The cloud service provider of the credential.")
     @NotNull
+    @Schema(description = "The cloud service provider of the credential.")
     private Csp csp;
+
+    @NotNull
+    @NotEmpty
+    @Schema(description = "The site to which the credentials belong to.")
+    private String site;
 
     @Schema(description = "The description of the credential")
     private String description;

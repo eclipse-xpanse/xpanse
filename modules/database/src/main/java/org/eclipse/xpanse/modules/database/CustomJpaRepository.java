@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.database;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
@@ -28,4 +29,6 @@ public interface CustomJpaRepository<T, ID> extends Repository<T, ID> {
     void delete(T entity);
 
     long count();
+
+    <S extends T> List<S> saveAll(Iterable<S> entities);
 }

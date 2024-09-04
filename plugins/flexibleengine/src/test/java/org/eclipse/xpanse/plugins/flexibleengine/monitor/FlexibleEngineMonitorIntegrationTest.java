@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineOrchestratorPlugin;
@@ -83,14 +84,13 @@ class FlexibleEngineMonitorIntegrationTest {
         deployResource.setResourceName("name");
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
-        return new ResourceMetricsRequest(UUID.randomUUID(), deployResource, monitorResourceType,
-                from, to, null,
-                onlyLastKnownMetric, "userId");
+        return new ResourceMetricsRequest(UUID.randomUUID(), getRegion(), deployResource,
+                monitorResourceType, from, to, null, onlyLastKnownMetric, "userId");
 
     }
 
     void mockClientHttpRequest() {
-        when(this.credentialCenter.getCredential(any(), any(), any())).thenReturn(
+        when(this.credentialCenter.getCredential(any(), any(), any(), any())).thenReturn(
                 getCredentialDefinition());
         when(this.client.getCesClient(any(), any())).thenReturn(getCesClient());
         when(this.client.getCredential(any())).thenReturn(getCredential());
@@ -105,9 +105,8 @@ class FlexibleEngineMonitorIntegrationTest {
         deployResource.setResourceName("name");
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("region", "eu-west-0")));
-        return new ServiceMetricsRequest(UUID.randomUUID(), List.of(deployResource),
-                monitorResourceType, from, to,
-                null, onlyLastKnownMetric, "userId");
+        return new ServiceMetricsRequest(UUID.randomUUID(), getRegion(), List.of(deployResource),
+                monitorResourceType, from, to, null, onlyLastKnownMetric, "userId");
     }
 
 
@@ -383,6 +382,14 @@ class FlexibleEngineMonitorIntegrationTest {
     private ICredential getCredential() {
         return new BasicCredentials().withAk(FlexibleEngineMonitorConstants.OS_ACCESS_KEY)
                 .withSk(FlexibleEngineMonitorConstants.OS_SECRET_KEY);
+    }
+
+    private Region getRegion() {
+        Region region = new Region();
+        region.setName("eu-west-0");
+        region.setSite("default");
+        region.setArea("Western Europe");
+        return region;
     }
 
 }

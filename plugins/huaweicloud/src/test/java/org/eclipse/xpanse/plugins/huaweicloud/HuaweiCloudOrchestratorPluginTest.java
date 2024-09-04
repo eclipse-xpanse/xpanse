@@ -155,14 +155,18 @@ class HuaweiCloudOrchestratorPluginTest {
     void testGetMetricsForResource() {
         // Setup
         final UUID serviceId = UUID.randomUUID();
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setResourceName("name");
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
-        final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
-                        0L, 0, false, "userId");
+        final ResourceMetricsRequest resourceMetricRequest = new ResourceMetricsRequest(
+                serviceId, region, deployResource, MonitorResourceType.CPU, 0L, 0L, 0, false,
+                "userId");
         final Metric metric = new Metric();
         metric.setName("name");
         metric.setDescription("description");
@@ -185,7 +189,8 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
+                new ResourceMetricsRequest(serviceId, region, deployResource1,
+                        MonitorResourceType.CPU, 0L,
                         0L, 0, false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByResource(resourceMetricRequest1)).thenReturn(
                 metrics);
@@ -202,14 +207,18 @@ class HuaweiCloudOrchestratorPluginTest {
     void testGetMetricsForResource_HuaweiCloudMetricsServiceReturnsNoItems() {
         // Setup
         final UUID serviceId = UUID.randomUUID();
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setResourceName("name");
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
-        final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, deployResource, MonitorResourceType.CPU, 0L,
-                        0L, 0, false, "userId");
+        final ResourceMetricsRequest resourceMetricRequest = new ResourceMetricsRequest(
+                serviceId, region, deployResource, MonitorResourceType.CPU,
+                0L, 0L, 0, false, "userId");
 
         // Configure HuaweiCloudMetricsService.getMetricsByResource(...).
         final DeployResource deployResource1 = new DeployResource();
@@ -217,9 +226,9 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setResourceName("name");
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
-        final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, deployResource1, MonitorResourceType.CPU, 0L,
-                        0L, 0, false, "userId");
+        final ResourceMetricsRequest resourceMetricRequest1 = new ResourceMetricsRequest(
+                serviceId, region, deployResource1, MonitorResourceType.CPU, 0L,
+                0L, 0, false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByResource(resourceMetricRequest1)).thenReturn(
                 Collections.emptyList());
 
@@ -235,13 +244,17 @@ class HuaweiCloudOrchestratorPluginTest {
     void testGetMetricsForService() {
         // Setup
         final UUID serviceId = UUID.randomUUID();
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setResourceName("name");
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                new ServiceMetricsRequest(serviceId, region, List.of(deployResource),
                         MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         final Metric metric = new Metric();
         metric.setName("name");
@@ -265,7 +278,7 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource1),
+                new ServiceMetricsRequest(serviceId, region, List.of(deployResource1),
                         MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByService(serviceMetricRequest1)).thenReturn(
                 metrics);
@@ -282,13 +295,17 @@ class HuaweiCloudOrchestratorPluginTest {
     void testGetMetricsForService_HuaweiCloudMetricsServiceReturnsNoItems() {
         // Setup
         final UUID serviceId = UUID.randomUUID();
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final DeployResource deployResource = new DeployResource();
         deployResource.setResourceId("resourceId");
         deployResource.setResourceName("name");
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource),
+                new ServiceMetricsRequest(serviceId, region, List.of(deployResource),
                         MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
 
         // Configure HuaweiCloudMetricsService.getMetricsByService(...).
@@ -298,7 +315,7 @@ class HuaweiCloudOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, List.of(deployResource1),
+                new ServiceMetricsRequest(serviceId, region, List.of(deployResource1),
                         MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
         when(mockHuaweiCloudMetricsService.getMetricsByService(serviceMetricRequest1)).thenReturn(
                 Collections.emptyList());
@@ -314,9 +331,13 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testStartService() {
         // Setup
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(region);
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity.setResourceId("resourceId");
@@ -326,7 +347,7 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(region);
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -345,9 +366,13 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testStartService_HuaweiCloudVmStateManagerReturnsTrue() {
         // Setup
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(region);
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity.setResourceId("resourceId");
@@ -357,7 +382,7 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(region);
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -376,9 +401,13 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testStopService() {
         // Setup
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(region);
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity.setResourceId("resourceId");
@@ -388,7 +417,7 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(region);
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -407,9 +436,13 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testStopService_HuaweiCloudVmStateManagerReturnsTrue() {
         // Setup
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(region);
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity.setResourceId("resourceId");
@@ -419,7 +452,7 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(region);
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -438,9 +471,13 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testRestartService() {
         // Setup
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(region);
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity.setResourceId("resourceId");
@@ -450,7 +487,7 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(region);
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -469,9 +506,13 @@ class HuaweiCloudOrchestratorPluginTest {
     @Test
     void testRestartService_HuaweiCloudVmStateManagerReturnsTrue() {
         // Setup
+        Region region = new Region();
+        region.setName("eu-west-101");
+        region.setSite("Europe");
+        region.setArea("Western Europe");
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(region);
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity.setResourceId("resourceId");
@@ -481,7 +522,7 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
-        serviceStateManageRequest1.setRegionName("regionName");
+        serviceStateManageRequest1.setRegion(region);
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
         deployResourceEntity1.setResourceId("resourceId");

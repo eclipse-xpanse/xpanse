@@ -55,7 +55,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 class RegioCloudOrchestratorPluginTest {
 
     private static final Csp csp = Csp.REGIO_CLOUD;
-
+    private final String userId = "userId";
+    private final String siteName = "default";
+    private final String regionName = "RegionOne";
+    private final UUID uuid = UUID.randomUUID();
     @Mock
     private OpenstackTerraformResourceHandler mockTerraformResourceHandler;
     @Mock
@@ -175,15 +178,12 @@ class RegioCloudOrchestratorPluginTest {
     @Test
     void testGetExistingResourceNamesWithKind() {
         // Setup
-        when(mockResourceManager.getExistingResourceNamesWithKind(csp, "userId",
-                UUID.fromString("254132ba-f126-479e-9f84-f46271cc3acf"), "region",
-                DeployResourceKind.VM)).thenReturn(List.of("value"));
+        when(mockResourceManager.getExistingResourceNamesWithKind(csp, siteName, regionName, userId,
+                DeployResourceKind.VM, uuid)).thenReturn(List.of("value"));
 
         // Run the test
-        final List<String> result =
-                plugin.getExistingResourceNamesWithKind("userId",
-                        "region", DeployResourceKind.VM,
-                        UUID.fromString("254132ba-f126-479e-9f84-f46271cc3acf"));
+        final List<String> result = plugin.getExistingResourceNamesWithKind(
+                siteName, regionName, userId, DeployResourceKind.VM, uuid);
 
         // Verify the results
         assertThat(result).isEqualTo(List.of("value"));
@@ -192,15 +192,12 @@ class RegioCloudOrchestratorPluginTest {
     @Test
     void testGetExistingResourceNamesWithKind_OpenstackResourceManagerReturnsNoItems() {
         // Setup
-        when(mockResourceManager.getExistingResourceNamesWithKind(csp, "userId",
-                UUID.fromString("254132ba-f126-479e-9f84-f46271cc3acf"), "region",
-                DeployResourceKind.VM)).thenReturn(Collections.emptyList());
+        when(mockResourceManager.getExistingResourceNamesWithKind(csp, siteName, regionName, userId,
+                DeployResourceKind.VM, uuid)).thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<String> result =
-                plugin.getExistingResourceNamesWithKind("userId",
-                        "region", DeployResourceKind.VM,
-                        UUID.fromString("254132ba-f126-479e-9f84-f46271cc3acf"));
+        final List<String> result = plugin.getExistingResourceNamesWithKind(
+                siteName, regionName, userId, DeployResourceKind.VM, uuid);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -209,14 +206,12 @@ class RegioCloudOrchestratorPluginTest {
     @Test
     void testGetAvailabilityZonesOfRegion() {
         // Setup
-        when(mockResourceManager.getAvailabilityZonesOfRegion(csp, "userId",
-                UUID.fromString("6f8f9ca6-85ff-42e2-9da0-0fe8defb8e6d"), "region"))
-                .thenReturn(List.of("value"));
+        when(mockResourceManager.getAvailabilityZonesOfRegion(
+                csp, siteName, regionName, userId, uuid)).thenReturn(List.of("value"));
 
         // Run the test
-        final List<String> result =
-                plugin.getAvailabilityZonesOfRegion("userId",
-                        "region", UUID.fromString("6f8f9ca6-85ff-42e2-9da0-0fe8defb8e6d"));
+        final List<String> result = plugin.getAvailabilityZonesOfRegion(
+                siteName, regionName, userId, uuid);
 
         // Verify the results
         assertThat(result).isEqualTo(List.of("value"));
@@ -225,14 +220,12 @@ class RegioCloudOrchestratorPluginTest {
     @Test
     void testGetAvailabilityZonesOfRegion_OpenstackResourceManagerReturnsNoItems() {
         // Setup
-        when(mockResourceManager.getAvailabilityZonesOfRegion(csp, "userId",
-                UUID.fromString("6f8f9ca6-85ff-42e2-9da0-0fe8defb8e6d"), "region"))
-                .thenReturn(Collections.emptyList());
+        when(mockResourceManager.getAvailabilityZonesOfRegion(
+                csp, siteName, regionName, userId, uuid)).thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<String> result =
-                plugin.getAvailabilityZonesOfRegion("userId",
-                        "region", UUID.fromString("6f8f9ca6-85ff-42e2-9da0-0fe8defb8e6d"));
+        final List<String> result = plugin.getAvailabilityZonesOfRegion(
+                siteName, regionName, userId, uuid);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -240,18 +233,16 @@ class RegioCloudOrchestratorPluginTest {
 
     @Test
     void testGetMetricsForResource() {
-        assertThat(plugin.getMetricsForResource(
-                new ResourceMetricsRequest(UUID.fromString("7066f16d-3da6-4851-81cf-2c0c3870e15b"),
-                        new DeployResource(), MonitorResourceType.CPU, 0L, 0L, 0, false,
-                        "userId"))).isEqualTo(Collections.emptyList());
+        assertThat(plugin.getMetricsForResource(new ResourceMetricsRequest(uuid, getRegion(),
+                new DeployResource(), MonitorResourceType.CPU, 0L, 0L, 0, false,
+                userId))).isEqualTo(Collections.emptyList());
     }
 
     @Test
     void testGetMetricsForService() {
-        assertThat(plugin.getMetricsForService(
-                new ServiceMetricsRequest(UUID.fromString("78846edd-512b-41f7-a858-e9bca10e0ef8"),
-                        List.of(new DeployResource()), MonitorResourceType.CPU, 0L, 0L, 0, false,
-                        "userId"))).isEqualTo(Collections.emptyList());
+        assertThat(plugin.getMetricsForService(new ServiceMetricsRequest(uuid, getRegion(),
+                List.of(new DeployResource()), MonitorResourceType.CPU, 0L, 0L, 0, false,
+                userId))).isEqualTo(Collections.emptyList());
     }
 
     @Test
@@ -259,7 +250,7 @@ class RegioCloudOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity.setResourceId("resourceId");
@@ -268,7 +259,7 @@ class RegioCloudOrchestratorPluginTest {
         // Configure OpenstackServersManager.startService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
-        request.setRegionName("regionName");
+        request.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -288,7 +279,7 @@ class RegioCloudOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity.setResourceId("resourceId");
@@ -297,7 +288,7 @@ class RegioCloudOrchestratorPluginTest {
         // Configure OpenstackServersManager.startService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
-        request.setRegionName("regionName");
+        request.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -317,7 +308,7 @@ class RegioCloudOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity.setResourceId("resourceId");
@@ -326,7 +317,7 @@ class RegioCloudOrchestratorPluginTest {
         // Configure OpenstackServersManager.stopService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
-        request.setRegionName("regionName");
+        request.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -346,7 +337,7 @@ class RegioCloudOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity.setResourceId("resourceId");
@@ -355,7 +346,7 @@ class RegioCloudOrchestratorPluginTest {
         // Configure OpenstackServersManager.stopService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
-        request.setRegionName("regionName");
+        request.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -375,7 +366,7 @@ class RegioCloudOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity.setResourceId("resourceId");
@@ -384,7 +375,7 @@ class RegioCloudOrchestratorPluginTest {
         // Configure OpenstackServersManager.restartService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
-        request.setRegionName("regionName");
+        request.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -404,7 +395,7 @@ class RegioCloudOrchestratorPluginTest {
         // Setup
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
-        serviceStateManageRequest.setRegionName("regionName");
+        serviceStateManageRequest.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
         deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity.setResourceId("resourceId");
@@ -413,7 +404,7 @@ class RegioCloudOrchestratorPluginTest {
         // Configure OpenstackServersManager.restartService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
-        request.setRegionName("regionName");
+        request.setRegion(getRegion());
         final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
         deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
         deployResourceEntity1.setResourceId("resourceId");
@@ -450,8 +441,9 @@ class RegioCloudOrchestratorPluginTest {
         final ServiceFlavorPriceRequest request = new ServiceFlavorPriceRequest();
         request.setServiceTemplateId("serviceTemplateId");
         request.setFlavorName("flavorName");
-        request.setUserId("userId");
-        request.setRegionName("regionName");
+        request.setUserId(userId);
+        request.setSiteName(siteName);
+        request.setRegionName(regionName);
         final RatingMode flavorRatingMode = new RatingMode();
         request.setFlavorRatingMode(flavorRatingMode);
 
@@ -474,8 +466,9 @@ class RegioCloudOrchestratorPluginTest {
         final ServiceFlavorPriceRequest request1 = new ServiceFlavorPriceRequest();
         request1.setServiceTemplateId("serviceTemplateId");
         request1.setFlavorName("flavorName");
-        request1.setUserId("userId");
-        request1.setRegionName("regionName");
+        request1.setUserId(userId);
+        request1.setSiteName(siteName);
+        request1.setRegionName(regionName);
         final RatingMode flavorRatingMode1 = new RatingMode();
         request1.setFlavorRatingMode(flavorRatingMode1);
         when(mockPricingCalculator.getServiceFlavorPrice(request1)).thenReturn(flavorPriceResult);
@@ -486,5 +479,13 @@ class RegioCloudOrchestratorPluginTest {
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
+    }
+
+    private Region getRegion() {
+        Region region = new Region();
+        region.setName(regionName);
+        region.setSite(siteName);
+        region.setArea("area");
+        return region;
     }
 }

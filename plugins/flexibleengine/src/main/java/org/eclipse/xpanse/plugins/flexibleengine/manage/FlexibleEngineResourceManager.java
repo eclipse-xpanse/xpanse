@@ -84,237 +84,237 @@ public class FlexibleEngineResourceManager {
     @Retryable(retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public List<String> getExistingResourceNamesWithKind(String userId, String region,
-                                                         DeployResourceKind kind) {
+    public List<String> getExistingResourceNamesWithKind(String siteName, String regionName,
+                                                         String userId, DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
-            return getVpcList(userId, region);
+            return getVpcList(siteName, regionName, userId);
         } else if (kind == DeployResourceKind.SUBNET) {
-            return getSubnetList(userId, region);
+            return getSubnetList(siteName, regionName, userId);
         } else if (kind == DeployResourceKind.SECURITY_GROUP) {
-            return getSecurityGroupsList(userId, region);
+            return getSecurityGroupsList(siteName, regionName, userId);
         } else if (kind == DeployResourceKind.SECURITY_GROUP_RULE) {
-            return getSecurityGroupRuleList(userId, region);
+            return getSecurityGroupRuleList(siteName, regionName, userId);
         } else if (kind == DeployResourceKind.PUBLIC_IP) {
-            return getPublicIpList(userId, region);
+            return getPublicIpList(siteName, regionName, userId);
         } else if (kind == DeployResourceKind.VOLUME) {
-            return getVolumeList(userId, region);
+            return getVolumeList(siteName, regionName, userId);
         } else if (kind == DeployResourceKind.KEYPAIR) {
-            return getKeyPairsList(userId, region);
+            return getKeyPairsList(siteName, regionName, userId);
         } else {
             return new ArrayList<>();
         }
     }
 
+
     /**
-     * List availability zones of region.
+     * Get available zones of the region.
      *
-     * @param userId user id
-     * @param region region
-     * @return availability zones
+     * @param siteName   siteName
+     * @param regionName regionName
+     * @param userId     userId
+     * @return List of available zones.
      */
     @Retryable(retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public List<String> getAvailabilityZonesOfRegion(String userId, String region) {
+    public List<String> getAvailabilityZonesOfRegion(String siteName, String regionName,
+                                                     String userId) {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
-            EcsClient ecsClient = getEcsClient(userId, region);
+            EcsClient ecsClient = getEcsClient(siteName, regionName, userId);
             NovaListAvailabilityZonesRequest request = new NovaListAvailabilityZonesRequest();
             NovaListAvailabilityZonesResponse response =
                     ecsClient.novaListAvailabilityZonesInvoker(request)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                            .backoffStrategy(flexibleEngineRetryStrategy)
-                            .invoke();
+                            .backoffStrategy(flexibleEngineRetryStrategy).invoke();
             if (response.getHttpStatusCode() == 200) {
-                availabilityZoneNames = response.getAvailabilityZoneInfo()
-                        .stream().map(NovaAvailabilityZone::getZoneName).toList();
+                availabilityZoneNames = response.getAvailabilityZoneInfo().stream()
+                        .map(NovaAvailabilityZone::getZoneName).toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listAvailabilityZones with region {} failed.", region);
+            log.error("FlexibleEngineClient listAvailabilityZones with region {} failed.",
+                    regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return availabilityZoneNames;
     }
 
-    private List<String> getVpcList(String userId, String region) {
+    private List<String> getVpcList(String siteName, String regionName, String userId) {
         List<String> vpcNames = new ArrayList<>();
         try {
-            VpcClient vpcClient = getVpcClient(userId, region);
+            VpcClient vpcClient = getVpcClient(siteName, regionName, userId);
             ListVpcsRequest request = new ListVpcsRequest();
             ListVpcsResponse response = vpcClient.listVpcsInvoker(request)
                     .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                     .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy)
-                    .invoke();
+                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
             if (response.getHttpStatusCode() == 200) {
                 vpcNames = response.getVpcs().stream().map(Vpc::getName).toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listVpcs with region {} failed.", region);
+            log.error("FlexibleEngineClient listVpcs with region {} failed.", regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return vpcNames;
     }
 
-    private List<String> getSubnetList(String userId, String region) {
+    private List<String> getSubnetList(String siteName, String regionName, String userId) {
         List<String> subnetNames = new ArrayList<>();
         try {
-            VpcClient vpcClient = getVpcClient(userId, region);
+            VpcClient vpcClient = getVpcClient(siteName, regionName, userId);
             ListSubnetsRequest request = new ListSubnetsRequest();
             ListSubnetsResponse response = vpcClient.listSubnetsInvoker(request)
                     .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                     .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy)
-                    .invoke();
+                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
             if (response.getHttpStatusCode() == 200) {
                 subnetNames = response.getSubnets().stream().map(Subnet::getName).toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listSubnets with region {} failed.", region);
+            log.error("FlexibleEngineClient listSubnets with region {} failed.", regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return subnetNames;
     }
 
-    private List<String> getSecurityGroupsList(String userId, String region) {
+    private List<String> getSecurityGroupsList(String siteName, String regionName, String userId) {
         List<String> securityGroupNames = new ArrayList<>();
         try {
-            VpcClient vpcClient = getVpcClient(userId, region);
+            VpcClient vpcClient = getVpcClient(siteName, regionName, userId);
             ListSecurityGroupsRequest request = new ListSecurityGroupsRequest();
             ListSecurityGroupsResponse response = vpcClient.listSecurityGroupsInvoker(request)
                     .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                     .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy)
-                    .invoke();
+                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
             if (response.getHttpStatusCode() == 200) {
-                securityGroupNames = response.getSecurityGroups()
-                        .stream().map(SecurityGroup::getName).toList();
+                securityGroupNames =
+                        response.getSecurityGroups().stream().map(SecurityGroup::getName).toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listSecurityGroups with region {} failed.", region);
+            log.error("FlexibleEngineClient listSecurityGroups with region {} failed.", regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupNames;
     }
 
-    private List<String> getSecurityGroupRuleList(String userId, String region) {
+    private List<String> getSecurityGroupRuleList(String siteName, String regionName,
+                                                  String userId) {
         List<String> securityGroupRuleIds = new ArrayList<>();
         try {
-            VpcClient vpcClient = getVpcClient(userId, region);
+            VpcClient vpcClient = getVpcClient(siteName, regionName, userId);
             ListSecurityGroupRulesRequest request = new ListSecurityGroupRulesRequest();
             ListSecurityGroupRulesResponse response =
                     vpcClient.listSecurityGroupRulesInvoker(request)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                            .backoffStrategy(flexibleEngineRetryStrategy)
-                            .invoke();
+                            .backoffStrategy(flexibleEngineRetryStrategy).invoke();
             if (response.getHttpStatusCode() == 200) {
-                securityGroupRuleIds = response.getSecurityGroupRules()
-                        .stream().map(SecurityGroupRule::getId).toList();
+                securityGroupRuleIds =
+                        response.getSecurityGroupRules().stream().map(SecurityGroupRule::getId)
+                                .toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listSecurityGroupRules with region {} failed.", region);
+            log.error("FlexibleEngineClient listSecurityGroupRules with region {} failed.",
+                    regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return securityGroupRuleIds;
     }
 
-    private List<String> getPublicIpList(String userId, String region) {
+    private List<String> getPublicIpList(String siteName, String regionName, String userId) {
         List<String> publicIpAddresses = new ArrayList<>();
         try {
-            EipClient eipClient = getEipClient(userId, region);
+            EipClient eipClient = getEipClient(siteName, regionName, userId);
             ListPublicipsRequest request = new ListPublicipsRequest();
             ListPublicipsResponse response = eipClient.listPublicipsInvoker(request)
                     .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                     .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy)
-                    .invoke();
+                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
             if (response.getHttpStatusCode() == 200) {
-                publicIpAddresses = response.getPublicips()
-                        .stream().map(PublicipShowResp::getPublicIpAddress).toList();
+                publicIpAddresses =
+                        response.getPublicips().stream().map(PublicipShowResp::getPublicIpAddress)
+                                .toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listPublicIps with region {} failed.", region);
+            log.error("FlexibleEngineClient listPublicIps with region {} failed.", regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return publicIpAddresses;
     }
 
-    private List<String> getVolumeList(String userId, String region) {
+    private List<String> getVolumeList(String siteName, String regionName, String userId) {
         List<String> volumeNames = new ArrayList<>();
         try {
-            EvsClient evsClient = getEvsClient(userId, region);
+            EvsClient evsClient = getEvsClient(siteName, regionName, userId);
             ListVolumesRequest request = new ListVolumesRequest();
             ListVolumesResponse response = evsClient.listVolumesInvoker(request)
                     .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                     .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy)
-                    .invoke();
+                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
             if (response.getHttpStatusCode() == 200) {
                 volumeNames = response.getVolumes().stream().map(VolumeDetail::getName).toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listVolumes with region {} failed.", region);
+            log.error("FlexibleEngineClient listVolumes with region {} failed.", regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return volumeNames;
     }
 
-    private List<String> getKeyPairsList(String userId, String region) {
+    private List<String> getKeyPairsList(String siteName, String regionName, String userId) {
         List<String> keyPairNames = new ArrayList<>();
         try {
-            EcsClient ecsClient = getEcsClient(userId, region);
+            EcsClient ecsClient = getEcsClient(siteName, regionName, userId);
             NovaListKeypairsRequest request = new NovaListKeypairsRequest();
             NovaListKeypairsResponse response = ecsClient.novaListKeypairsInvoker(request)
                     .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                     .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy)
-                    .invoke();
+                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
             if (response.getHttpStatusCode() == 200) {
-                keyPairNames = response.getKeypairs().stream()
-                        .map(NovaListKeypairsResult::getKeypair)
-                        .map(NovaSimpleKeypair::getName).toList();
+                keyPairNames =
+                        response.getKeypairs().stream().map(NovaListKeypairsResult::getKeypair)
+                                .map(NovaSimpleKeypair::getName).toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listKeyPairs with region {} failed.", region);
+            log.error("FlexibleEngineClient listKeyPairs with region {} failed.", regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
         }
         return keyPairNames;
     }
 
-    private EcsClient getEcsClient(String userId, String regionName) {
-        ICredential credential = getCredential(userId);
+    private EcsClient getEcsClient(String siteName, String regionName, String userId) {
+        ICredential credential = getCredential(siteName, userId);
         return flexibleEngineClient.getEcsClient(credential, regionName);
     }
 
-    private VpcClient getVpcClient(String userId, String regionName) {
-        ICredential credential = getCredential(userId);
+    private VpcClient getVpcClient(String siteName, String regionName, String userId) {
+        ICredential credential = getCredential(siteName, userId);
         return flexibleEngineClient.getVpcClient(credential, regionName);
     }
 
-    private EipClient getEipClient(String userId, String regionName) {
-        ICredential credential = getCredential(userId);
+    private EipClient getEipClient(String siteName, String regionName, String userId) {
+        ICredential credential = getCredential(siteName, userId);
         return flexibleEngineClient.getEipClient(credential, regionName);
     }
 
-    private EvsClient getEvsClient(String userId, String regionName) {
-        ICredential credential = getCredential(userId);
+    private EvsClient getEvsClient(String siteName, String regionName, String userId) {
+        ICredential credential = getCredential(siteName, userId);
         return flexibleEngineClient.getEvsClient(credential, regionName);
     }
 
-    private ICredential getCredential(String userId) {
+    private ICredential getCredential(String siteName, String userId) {
         AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, CredentialType.VARIABLES,
-                        userId);
+                credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, siteName,
+                        CredentialType.VARIABLES, userId);
         return flexibleEngineClient.getCredential(credential);
     }
 

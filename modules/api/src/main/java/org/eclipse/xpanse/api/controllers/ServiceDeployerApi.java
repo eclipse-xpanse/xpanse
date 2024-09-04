@@ -293,6 +293,8 @@ public class ServiceDeployerApi {
     public ResponseEntity<List<String>> getAvailabilityZones(
             @Parameter(name = "cspName", description = "name of the cloud service provider")
             @RequestParam(name = "cspName") Csp csp,
+            @Parameter(name = "siteName", description = "site of the region belongs to")
+            @RequestParam(name = "siteName") String siteName,
             @Parameter(name = "regionName", description = "name of the region")
             @RequestParam(name = "regionName") String regionName,
             @Parameter(name = "serviceId", description = "Id of the deployed service")
@@ -301,7 +303,8 @@ public class ServiceDeployerApi {
             UUID serviceUuid =
                     StringUtils.isNotEmpty(serviceId) ? UUID.fromString(serviceId) : null;
             List<String> availabilityZones =
-                    this.deployService.getAvailabilityZonesOfRegion(csp, regionName, serviceUuid);
+                    this.deployService.getAvailabilityZonesOfRegion(csp, siteName, regionName,
+                            serviceUuid);
             return ResponseEntity.ok().cacheControl(getCacheControl()).body(availabilityZones);
         } catch (Exception ex) {
             log.error("Error fetching availability zones", ex);

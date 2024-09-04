@@ -14,6 +14,7 @@ import com.huaweicloud.sdk.core.retry.backoff.BackoffStrategy;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
+import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.support.RetrySynchronizationManager;
@@ -108,8 +109,11 @@ public class HuaweiCloudRetryStrategy implements BackoffStrategy {
         int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
                 ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
         log.error(ex.getMessage() + System.lineSeparator() + "Retry count:" + retryCount);
-        if (ex instanceof ClientAuthenticationFailedException) {
-            throw new ClientAuthenticationFailedException(ex.getMessage());
+        if (ex instanceof ClientAuthenticationFailedException authEx) {
+            throw authEx;
+        }
+        if (ex instanceof CredentialsNotFoundException authEx) {
+            throw authEx;
         }
         ClientRequestException clientRequestException = getClientRequestException(ex);
         if (Objects.nonNull(clientRequestException)) {

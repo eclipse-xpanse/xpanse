@@ -226,24 +226,20 @@ public class DeployEnvironments {
     }
 
     /**
-     * Get credential variables By ServiceHostingType.
+     * Get credential variables by deploy task.
      *
-     * @param serviceHostingType serviceHostingType of the service.
-     * @param credentialType     credentialType used by the service.
-     * @param csp                CSP of the service.
-     * @param userId             ID of the user ordering the service.
+     * @param task deployment task.
      */
-    public Map<String, String> getCredentialVariablesByHostingType(
-            ServiceHostingType serviceHostingType,
-            CredentialType credentialType,
-            Csp csp,
-            String userId) {
+    public Map<String, String> getCredentialVariables(DeployTask task) {
+        ServiceHostingType serviceHostingType = task.getDeployRequest().getServiceHostingType();
+        CredentialType credentialType = task.getOcl().getDeployment().getCredentialType();
+        String site = task.getDeployRequest().getRegion().getSite();
+        Csp csp = task.getDeployRequest().getCsp();
+        String userId = serviceHostingType == ServiceHostingType.SELF
+                ? task.getDeployRequest().getUserId() : null;
         Map<String, String> variables = new HashMap<>();
         AbstractCredentialInfo abstractCredentialInfo =
-                this.credentialCenter.getCredential(
-                        csp,
-                        credentialType,
-                        serviceHostingType == ServiceHostingType.SELF ? userId : null);
+                this.credentialCenter.getCredential(csp, site, credentialType, userId);
         if (Objects.nonNull(abstractCredentialInfo)) {
             for (CredentialVariable variable
                     : ((CredentialVariables) abstractCredentialInfo).getVariables()) {

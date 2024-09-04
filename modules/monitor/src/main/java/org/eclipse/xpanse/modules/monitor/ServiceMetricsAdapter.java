@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupported
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -73,11 +74,11 @@ public class ServiceMetricsAdapter {
 
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
+        Region region = serviceEntity.getDeployRequest().getRegion();
         List<DeployResource> vmResources = EntityTransUtils.transToDeployResourceList(vmEntities);
-        ServiceMetricsRequest serviceMetricRequest =
-                getServiceMetricRequest(UUID.fromString(id), vmResources, monitorType, from, to,
-                        granularity, onlyLastKnownMetric, serviceEntity.getUserId());
-
+        ServiceMetricsRequest serviceMetricRequest = getServiceMetricRequest(
+                UUID.fromString(id), region, vmResources, monitorType, from, to,
+                granularity, onlyLastKnownMetric, serviceEntity.getUserId());
         return orchestratorPlugin.getMetricsForService(serviceMetricRequest);
     }
 
@@ -114,10 +115,10 @@ public class ServiceMetricsAdapter {
 
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
-        ResourceMetricsRequest resourceMetricRequest =
-                getResourceMetricRequest(resourceEntity.getDeployService().getId(), deployResource,
-                        monitorType, from, to, granularity, onlyLastKnownMetric,
-                        serviceEntity.getUserId());
+        Region region = serviceEntity.getDeployRequest().getRegion();
+        ResourceMetricsRequest resourceMetricRequest = getResourceMetricRequest(
+                resourceEntity.getDeployService().getId(), region, deployResource,
+                monitorType, from, to, granularity, onlyLastKnownMetric, serviceEntity.getUserId());
         return orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
     }
 
@@ -130,7 +131,7 @@ public class ServiceMetricsAdapter {
         return serviceEntity;
     }
 
-    private ResourceMetricsRequest getResourceMetricRequest(UUID serviceId,
+    private ResourceMetricsRequest getResourceMetricRequest(UUID serviceId, Region region,
                                                             DeployResource deployResource,
                                                             MonitorResourceType monitorType,
                                                             Long from, Long to, Integer granularity,
@@ -148,11 +149,12 @@ public class ServiceMetricsAdapter {
             }
         }
 
-        return new ResourceMetricsRequest(serviceId, deployResource, monitorType, from, to,
-                granularity, onlyLastKnownMetric, userId);
+        return new ResourceMetricsRequest(serviceId, region, deployResource, monitorType, from,
+                to, granularity, onlyLastKnownMetric, userId);
     }
 
     private ServiceMetricsRequest getServiceMetricRequest(UUID serviceId,
+                                                          Region region,
                                                           List<DeployResource> deployResources,
                                                           MonitorResourceType monitorType,
                                                           Long from, Long to, Integer granularity,
@@ -169,8 +171,8 @@ public class ServiceMetricsAdapter {
                 to = System.currentTimeMillis();
             }
         }
-        return new ServiceMetricsRequest(serviceId, deployResources, monitorType, from, to,
-                granularity, onlyLastKnownMetric, userId);
+        return new ServiceMetricsRequest(serviceId, region, deployResources, monitorType, from,
+                to, granularity, onlyLastKnownMetric, userId);
     }
 
     private void validateToAndFromValues(Long from, Long to) {
