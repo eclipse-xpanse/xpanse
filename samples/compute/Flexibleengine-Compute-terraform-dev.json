@@ -6,7 +6,8 @@
   "flavor": "2vCPUs-4GB-normal",
   "region": {
     "name": "eu-west-0",
-    "area": "Western Europe"
+    "area": "Western Europe",
+    "site": "default"
   },
   "customerServiceName": "default-terraform-ecs",
   "serviceHostingType": "self",

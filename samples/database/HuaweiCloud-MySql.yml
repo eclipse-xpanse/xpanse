@@ -126,7 +126,8 @@ flavors:
                 currency: CNY
                 period: hourly
           markUpPrices:
-            - region: any
+            - regionName: any
+              siteName: Chinese Mainland
               price:
                 cost: 1.90
                 currency: CNY

@@ -3,7 +3,7 @@ version: 1.0
 # The category of the service.
 category: compute
 # The Service provided by the ISV, the name will be shown on the console as a service.
-name: openstack-ecs
+name: terraform-ecs
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: 1.0.0
 # For the users may have more than one service, the @namespace can be used to separate the clusters.
@@ -14,7 +14,7 @@ icon: |
   data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACg0lEQVR4nO2dP24TURCHf65IxwFcADVHMSUHAKfCHTeIFIocgXAEXITUVrJNjsABYg6AJaBf9MRYeiAWBTn7dmbyfdLI1vqPZvx7M7OzK+tJAAAAAAAAAAAwATNJx5IuJW2S2KWkpcUWipk53ye1T9FEOa6cv3Wwsjf3ZLdVXCVTwrDPjhLAI+XhSNK2ypIwdOZ0ecxGFzG2kE5nji2k05ljC+l05thCOp05trs43Tu3IRBECNI0Q24knTmxGzJEOpEfThAEQdyVrCkyZCXpu6Q3fxwnQyYSZG2L4SOC+MiQuaS39lhDhtBD2uC9hwxBhjiYyHsm9V9M/YP3CPI7TOoNoYc4A0Gc4V2QFZO6L0HWTOq+BJkzqfsSZAgGQwRpA/fUnYEgzuCeujO8zyFD0NQRpA3eM2TFpO5LkDWTui9B5kzqvgQZgqaOIG1gMHQGggQU5My5Pbj/h0SlixhbSKczxxbS6cyxhXQ6c2whnc4c212cfizpueLRZRXks73npWLRIYgv0gpCyWpIyFWUOTYyxBk09QcqyAtJV5J+2D3y8nyhcaFkDfDuH39JO9V4pBVEB2ZGb/ZV0rnZrjo+VqakFeSQ097rSown1fGnlSilfI1BWkEO6SHf7LPv//Laub1W3jMGCPKfgnxAkPYl68q+f2dlas8zStY0ab2omvfOylTJDJr6hNeyTjnt9TcYLqx8laGQwdCBIFOQ9iyLy+8NCbmKMsdGhjiDHuIMBHEGJcsZIRtf5thCOp05tpBOZ45tv23e1raay8KRpC8Rt81bVldjtw42hNzck+3FKPZagZjZCuqT2kW0rVdlDi9NmE0Su5D0KqIYAAAAAAAAAACKz09haty1w+ee7QAAAABJRU5ErkJggg==
 # Reserved for CSP, HuaweiCloud,FlexibleEngine,OpenstackTestLab,PlusServer,RegioCloud and ...
 cloudServiceProvider:
-  name: OpenstackTestLab
+  name: PlusServer
   regions:
     - name: RegionOne
       site: default
@@ -31,26 +31,7 @@ serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
   serviceFlavors:
-    - name: 1vCPUs-1GB-normal
-      priority: 3
-      # The pricing of the flavor.
-      pricing:
-        # Used to calculate charges when users do not select 'pay_per_use' as the billing mode.
-        fixedPrices:
-          - regionNme: any
-            siteName: default
-            price:
-              cost: 6.15
-              currency: USD
-              period: monthly
-        isPriceOnlyForManagementLayer: false
-      # Properties for the service, which can be used by the deployment.
-      properties:
-        flavor_name: cirros128
-      features:
-        - High Availability
-        - Low performance
-    - name: 1vCPUs-2GB-normal
+    - name: 2vCPUs-4GB-normal
       priority: 2
       # The pricing of the flavor.
       pricing:
@@ -65,11 +46,11 @@ flavors:
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
-        flavor_name: cirros256
+        flavor_name: SCS-2V:4:20
       features:
         - High Availability
         - Medium Performance
-    - name: 1vCPUs-4GB-normal
+    - name: 4vCPUs-8GB-normal
       priority: 1
       # The pricing of the flavor.
       pricing:
@@ -84,7 +65,7 @@ flavors:
         isPriceOnlyForManagementLayer: false
       # Properties for the service, which can be used by the deployment.
       properties:
-        flavor_name: cirros512
+        flavor_name: SCS-4V:8:20
       features:
         - High Availability
         - Maximum Performance
@@ -142,9 +123,9 @@ deployment:
       description: The image name of the compute instance. If the value is empty, will use the default value to create compute instance.
       kind: variable
       dataType: string
-      example: "cirros-0.5.2-x86_64-disk"
+      example: "Ubuntu 20.04"
       mandatory: false
-      value: "cirros-0.5.2-x86_64-disk"
+      value: "Ubuntu 20.04"
       modificationImpact:
         isDataLost: false
         isServiceInterrupted: true
@@ -198,7 +179,7 @@ deployment:
     
     variable "image_name" {
       type        = string
-      default     = "cirros-0.5.2-x86_64-disk"
+      default     = "Ubuntu 20.04"
       description = "The image name of the compute instance."
     }
     

@@ -1,12 +1,13 @@
 {
   "serviceName": "K8S-cluster",
   "version": "1.0.0",
-  "csp": "FlexibleEngine",
+  "csp": "HuaweiCloud",
   "category": "container",
   "flavor": "1-master-with-3-worker-nodes-normal",
   "region": {
-    "name": "eu-west-0",
-    "area": "Western Europe"
+    "area": "Asia China",
+    "name": "cn-southwest-2",
+    "site": "Chinese Mainland"
   },
   "customerServiceName": "default-k8s",
   "serviceHostingType": "self",

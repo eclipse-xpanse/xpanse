@@ -145,6 +145,7 @@ public class ServiceTemplateManage {
 
     private ServiceTemplateEntity getNewServiceTemplateEntity(Ocl ocl) {
         ServiceTemplateEntity newTemplate = new ServiceTemplateEntity();
+        newTemplate.setId(UUID.randomUUID());
         newTemplate.setName(StringUtils.lowerCase(ocl.getName()));
         newTemplate.setVersion(getSemverVersion(ocl.getServiceVersion()).getVersion());
         newTemplate.setCsp(ocl.getCloudServiceProvider().getName());
