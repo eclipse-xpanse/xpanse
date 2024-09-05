@@ -29,11 +29,12 @@ import org.mockito.InjectMocks;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
- * Test for OpenApiUtilTest.
+ * Test for ServiceTemplateOpenApiGenerator.
  */
 @Slf4j
 class ServiceTemplateOpenApiGeneratorTest {
 
+    private static final String appVersion = "1.0.0";
     private final String ID = "488adf44-b48f-43fb-9b7f-61e79f40016a";
     private final UUID RANDOM_UUID = UUID.fromString(ID);
     private OpenApiGeneratorJarManage openApiGeneratorJarManage;
@@ -50,11 +51,13 @@ class ServiceTemplateOpenApiGeneratorTest {
         openApiGeneratorJarManage =
                 new OpenApiGeneratorJarManage(clientDownloadURL, openApiPath);
         PluginManager pluginManager = new PluginManager();
-        openApiGenerator = new ServiceTemplateOpenApiGenerator(
-                openApiUrlManage, openApiGeneratorJarManage, pluginManager);
+        openApiGenerator = new ServiceTemplateOpenApiGenerator(appVersion, null,
+                pluginManager, openApiUrlManage, openApiGeneratorJarManage);
     }
 
     void setConfiguration(Boolean webSecurityIsEnabled, Boolean roleProtectionIsEnabled) {
+
+        ReflectionTestUtils.setField(openApiGenerator, "appVersion", appVersion);
 
         ReflectionTestUtils.setField(openApiGenerator, "webSecurityIsEnabled",
                 webSecurityIsEnabled);
