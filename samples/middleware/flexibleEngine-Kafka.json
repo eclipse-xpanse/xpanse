@@ -1,12 +1,13 @@
 {
   "serviceName": "Kafka-cluster",
   "version": "1.0.0",
-  "csp": "HuaweiCloud",
+  "csp": "FlexibleEngine",
   "category": "middleware",
   "flavor": "1-zookeeper-with-3-worker-nodes-normal",
   "region": {
-    "area": "Asia China",
-    "name": "cn-southwest-2"
+    "name": "eu-west-0",
+    "area": "Western Europe",
+    "site": "default"
   },
   "customerServiceName": "default-kafka",
   "serviceHostingType": "self",

@@ -1,14 +1,15 @@
 {
-  "serviceName": "opentofu-ecs",
+  "serviceName": "terraform-ecs",
   "version": "1.0.0",
   "csp": "HuaweiCloud",
   "category": "compute",
   "flavor": "2vCPUs-4GB-normal",
   "region": {
     "area": "Asia China",
-    "name": "cn-southwest-2"
+    "name": "cn-southwest-2",
+    "site": "Chinese Mainland"
   },
-  "customerServiceName": "default-opentofu-ecs",
+  "customerServiceName": "default-terraform-ecs",
   "serviceHostingType": "self",
   "serviceRequestProperties": {}
 }

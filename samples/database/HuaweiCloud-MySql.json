@@ -6,7 +6,8 @@
   "flavor": "2vCPUs-4GB-general",
   "region": {
     "area": "Asia China",
-    "name": "cn-southwest-2"
+    "name": "cn-southwest-2",
+    "site": "Chinese Mainland"
   },
   "customerServiceName": "default-kafka",
   "serviceHostingType": "self",
