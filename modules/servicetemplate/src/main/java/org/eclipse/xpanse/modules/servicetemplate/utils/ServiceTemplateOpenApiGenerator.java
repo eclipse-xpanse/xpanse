@@ -41,8 +41,10 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.security.zitadel.ZitadelIdentityProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -63,6 +65,8 @@ public class ServiceTemplateOpenApiGenerator {
     private final OpenApiUrlManage openApiUrlManage;
     private final OpenApiGeneratorJarManage openApiGeneratorJarManage;
     private final PluginManager pluginManager;
+    private final ZitadelIdentityProviderService zitadelIdentityProviderService;
+    private final String appVersion;
     @Value("${enable.web.security:false}")
     private Boolean webSecurityIsEnabled;
     @Value("${enable.role.protection:false}")
@@ -70,17 +74,19 @@ public class ServiceTemplateOpenApiGenerator {
 
     /**
      * Constructor to instantiate ServiceTemplateOpenApiGenerator bean.
-     *
-     * @param openApiUrlManage          OpenApiUrlManage bean
-     * @param openApiGeneratorJarManage OpenApiGeneratorJarManage bean
      */
     @Autowired
-    public ServiceTemplateOpenApiGenerator(OpenApiUrlManage openApiUrlManage,
-                                           OpenApiGeneratorJarManage openApiGeneratorJarManage,
-                                           PluginManager pluginManager) {
+    public ServiceTemplateOpenApiGenerator(
+            @Value("${app.version:1.0.0}") String appVersion,
+            @Nullable ZitadelIdentityProviderService zitadelIdentityProviderService,
+            PluginManager pluginManager,
+            OpenApiUrlManage openApiUrlManage,
+            OpenApiGeneratorJarManage openApiGeneratorJarManage) {
+        this.appVersion = appVersion;
+        this.zitadelIdentityProviderService = zitadelIdentityProviderService;
+        this.pluginManager = pluginManager;
         this.openApiUrlManage = openApiUrlManage;
         this.openApiGeneratorJarManage = openApiGeneratorJarManage;
-        this.pluginManager = pluginManager;
     }
 
     /**
@@ -249,6 +255,10 @@ public class ServiceTemplateOpenApiGenerator {
         String regionNameExample = null;
         // list all values of names of all regions.
         String regionNamesStr = null;
+        // example value of site of region.
+        String regionSiteExample = null;
+        // list all values of sites of all regions.
+        String regionSitesStr = null;
         // example value of area of region.
         String regionAreaExample = null;
         // list all values of areas of all regions.
@@ -281,10 +291,15 @@ public class ServiceTemplateOpenApiGenerator {
             propertiesRequiredStr = objectMapper.writeValueAsString(
                     registerService.getJsonObjectSchema().getRequired());
             List<Region> regions = registerService.getOcl().getCloudServiceProvider().getRegions();
-            regionNameExample = regions.getFirst().getName();
+
+            Region regionExample = regions.getFirst();
+            regionNameExample = regionExample.getName();
             regionNamesStr =
                     mapper.writeValueAsString(regions.stream().map(Region::getName).toList());
-            regionAreaExample = regions.getFirst().getArea();
+            regionSiteExample = regionExample.getSite();
+            regionSitesStr =
+                    mapper.writeValueAsString(regions.stream().map(Region::getSite).toList());
+            regionAreaExample = regionExample.getArea();
             regionAreasStr =
                     mapper.writeValueAsString(regions.stream().map(Region::getArea).toList());
             List<ServiceFlavorWithPrice> flavors =
@@ -309,7 +324,7 @@ public class ServiceTemplateOpenApiGenerator {
                             "info": {
                                 "title": "OpenAPI definition",
                                 "version": "%s",
-                                "description": "OpenAPI for starting a task to deploy service using registered service template."
+                                "description": "OpenAPI for creating an order task to deploy new service using approved service template."
                             },
                             "servers": [
                                 {
@@ -330,7 +345,7 @@ public class ServiceTemplateOpenApiGenerator {
                                         "tags": [
                                             "Service"
                                         ],
-                                        "description": "Start a task to deploy service using registered service template.%s",
+                                        "description": "Create an order task to deploy new service using approved service template.%s",
                                         "operationId": "deploy",
                                         "requestBody": {
                                             "content": {
@@ -348,8 +363,7 @@ public class ServiceTemplateOpenApiGenerator {
                                                 "content": {
                                                     "application/json": {
                                                         "schema": {
-                                                            "type": "string",
-                                                            "format": "uuid"
+                                                            "$ref": "#/components/schemas/ServiceOrder"
                                                         }
                                                     }
                                                 }
@@ -359,7 +373,7 @@ public class ServiceTemplateOpenApiGenerator {
                                                 "content": {
                                                     "application/json": {
                                                         "schema": {
-                                                            "$ref": "#/components/schemas/Response"
+                                                            "$ref": "#/components/schemas/OrderFailedResponse"
                                                         }
                                                     }
                                                 }
@@ -369,7 +383,7 @@ public class ServiceTemplateOpenApiGenerator {
                                                 "content": {
                                                     "application/json": {
                                                         "schema": {
-                                                            "$ref": "#/components/schemas/Response"
+                                                            "$ref": "#/components/schemas/OrderFailedResponse"
                                                         }
                                                     }
                                                 }
@@ -379,7 +393,7 @@ public class ServiceTemplateOpenApiGenerator {
                                                 "content": {
                                                     "application/json": {
                                                         "schema": {
-                                                            "$ref": "#/components/schemas/Response"
+                                                            "$ref": "#/components/schemas/OrderFailedResponse"
                                                         }
                                                     }
                                                 }
@@ -389,7 +403,7 @@ public class ServiceTemplateOpenApiGenerator {
                                                 "content": {
                                                     "application/json": {
                                                         "schema": {
-                                                            "$ref": "#/components/schemas/Response"
+                                                            "$ref": "#/components/schemas/OrderFailedResponse"
                                                         }
                                                     }
                                                 }
@@ -399,7 +413,7 @@ public class ServiceTemplateOpenApiGenerator {
                                                 "content": {
                                                     "application/json": {
                                                         "schema": {
-                                                            "$ref": "#/components/schemas/Response"
+                                                            "$ref": "#/components/schemas/OrderFailedResponse"
                                                         }
                                                     }
                                                 }
@@ -409,7 +423,7 @@ public class ServiceTemplateOpenApiGenerator {
                                                 "content": {
                                                     "application/json": {
                                                         "schema": {
-                                                            "$ref": "#/components/schemas/Response"
+                                                            "$ref": "#/components/schemas/OrderFailedResponse"
                                                         }
                                                     }
                                                 }
@@ -420,23 +434,12 @@ public class ServiceTemplateOpenApiGenerator {
                             },
                             "components": {
                                 "schemas": {
-                                    "Response": {
-                                        "required": [
-                                            "details",
-                                            "resultType",
-                                            "success"
-                                        ],
+                                    "OrderFailedResponse": {
+                                        "required": ["details", "resultType", "success"],
                                         "type": "object",
                                         "properties": {
-                                            "details": {
-                                                "description": "Details of the errors occurred",
-                                                "items": {
-                                                    "description": "Details of the errors occurred",
-                                                    "type": "string"
-                                                },
-                                                "type": "array"
-                                            },
                                             "resultType": {
+                                                "type": "string",
                                                 "description": "The result code of response.",
                                                 "enum": [
                                                     "Success",
@@ -446,14 +449,13 @@ public class ServiceTemplateOpenApiGenerator {
                                                     "Unprocessable Entity",
                                                     "Response Not Valid",
                                                     "Credentials Not Found",
-                                                    "Credential Variables Not Complete",
                                                     "Flavor Invalid",
                                                     "Terraform Execution Failed",
                                                     "Plugin Not Found",
                                                     "Deployer Not Found",
                                                     "Unhandled Exception",
-                                                    "Service Template Not Registered",
-                                                    "Service Template Not Approved",
+                                                    "Unavailable Service Regions",
+                                                    "Service Deployment Not Found",
                                                     "Deployment Variable Invalid",
                                                     "Unauthorized",
                                                     "Access Denied",
@@ -462,19 +464,56 @@ public class ServiceTemplateOpenApiGenerator {
                                                     "Terraform Boot Request Failed",
                                                     "Tofu Maker Request Failed",
                                                     "Variable Validation Failed",
-                                                    "Policy Validation Failed",
+                                                    "Variable Schema Definition Invalid",
                                                     "Policy Evaluation Failed",
                                                     "Current Login User No Found",
-                                                    "Invalid Git Repo Details"
-                                                ],
-                                                "type": "string"
-                                            },
-                                            "success": {
-                                                "description": "Describes if the request is successful",
-                                                "type": "boolean"
-                                            }
-                                        }
-                                    },
+                                                    "Eula Not Accepted",
+                                                    "Service Flavor Downgrade Not Allowed",
+                                                    "Service Order Not Found",
+                                                    "Service Price Calculation Failed",
+                                                    "Invalid Git Repo Details",
+                                                    "File Locked",
+                                                    "Service Configuration Invalid"
+                                                  ]
+                                              },
+                                              "details": {
+                                                  "type": "array",
+                                                  "description": "Details of the errors occurred",
+                                                  "items": {
+                                                      "type": "string",
+                                                      "description": "Details of the errors occurred"
+                                                  }
+                                              },
+                                              "success": {
+                                                  "type": "boolean",
+                                                  "description": "Describes if the request is successful"
+                                              },
+                                              "serviceId": {
+                                                  "type": "string",
+                                                  "description": "The service id associated with the request."
+                                              },
+                                              "orderId": {
+                                                  "type": "string",
+                                                  "description": "The order id associated with the request."
+                                              }
+                                          }
+                                      },
+                                      "ServiceOrder": {
+                                          "required": ["orderId", "serviceId"],
+                                          "type": "object",
+                                          "properties": {
+                                              "orderId": {
+                                                  "type": "string",
+                                                  "description": "The id of the service order.",
+                                                  "format": "uuid"
+                                              },
+                                              "serviceId": {
+                                                  "type": "string",
+                                                  "description": "The id of the deployed service.",
+                                                  "format": "uuid"
+                                              }
+                                          }
+                                      },
                                     "DeployRequest": {
                                         "required": %s,
                                         "type": "object",
@@ -502,7 +541,8 @@ public class ServiceTemplateOpenApiGenerator {
                                             "region": {
                                                "required": [
                                                    "area",
-                                                   "name"
+                                                   "name",
+                                                   "site"
                                                ],
                                                "type": "object",
                                                "properties": {
@@ -510,6 +550,12 @@ public class ServiceTemplateOpenApiGenerator {
                                                        "example": "%s",
                                                        "type": "string",
                                                        "description": "The name of the Region",
+                                                       "enum": %s
+                                                   },
+                                                   "site": {
+                                                       "example": "%s",
+                                                       "type": "string",
+                                                       "description": "The site which the region belongs to, such as default, International, Chinese Mainland",
                                                        "enum": %s
                                                    },
                                                    "area": {
@@ -547,32 +593,16 @@ public class ServiceTemplateOpenApiGenerator {
                                             }%s                          \s
                                         }
                                     }                                                       \s
-                                },
-                                "securitySchemes": {
-                                    "OAuth2Flow": {
-                                        "type": "oauth2",
-                                        "flows": {
-                                            "authorizationCode": {
-                                                "authorizationUrl": "https://iam.xpanse.site/oauth/v2/authorize",
-                                                "tokenUrl": "https://iam.xpanse.site/oauth/v2/token",
-                                                "scopes": {
-                                                    "openid": "mandatory must be selected.",
-                                                    "profile": "mandatory must be selected.",
-                                                    "urn:zitadel:iam:org:project:roles": "mandatory must be selected.",
-                                                    "urn:zitadel:iam:user:metadata": "mandatory must be selected."
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                }%s                                     \s
                             }
                         }
-                        """, serviceVersion, serviceUrl, securityConfigList, requiredRolesDesc,
+                        """, appVersion, serviceUrl, securityConfigList, requiredRolesDesc,
                 createRequiredStr, category, categoryValuesStr, serviceName, serviceVersion,
-                regionNameExample, regionNamesStr, regionAreaExample, regionAreasStr,
+                regionNameExample, regionNamesStr, regionSiteExample, regionSitesStr,
+                regionAreaExample, regionAreasStr,
                 csp, cspValuesStr, flavorNameExample, flavorNamesStr,
                 serviceHostingType, serviceHostingTypesStr, propertiesRequiredStr,
-                propertiesStr, availabilityZonesSchemaStr);
+                propertiesStr, availabilityZonesSchemaStr, getSecuritySchemes());
     }
 
     private String getSecurityConfigList() {
@@ -599,6 +629,32 @@ public class ServiceTemplateOpenApiGenerator {
     private String getRequiredRolesDesc() {
         if (webSecurityIsEnabled && roleProtectionIsEnabled) {
             return "<br>Required role:<b> admin</b> or <b>user</b>";
+        }
+        return "";
+    }
+
+    private String getSecuritySchemes() {
+        if (Objects.nonNull(zitadelIdentityProviderService)) {
+            return """
+                    ,
+                    "securitySchemes": {
+                        "OAuth2Flow": {
+                            "type": "oauth2",
+                            "flows": {
+                                "authorizationCode": {
+                                    "authorizationUrl": "https://iam.xpanse.site/oauth/v2/authorize",
+                                    "tokenUrl": "https://iam.xpanse.site/oauth/v2/token",
+                                    "scopes": {
+                                        "openid": "mandatory must be selected.",
+                                        "profile": "mandatory must be selected.",
+                                        "urn:zitadel:iam:org:project:roles": "mandatory must be selected.",
+                                        "urn:zitadel:iam:user:metadata": "mandatory must be selected."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    """;
         }
         return "";
     }
