@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.modules.workflow.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.util.Objects;
 import javax.sql.DataSource;
@@ -126,9 +128,15 @@ public class ActivitiConfig {
         return Objects.requireNonNull(processEngine().getObject()).getDynamicBpmnService();
     }
 
+    /**
+     * Assembling the ObjectMapper object.
+     */
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return objectMapper;
     }
 
 }

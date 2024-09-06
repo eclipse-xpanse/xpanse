@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.database.serviceconfiguration.update;
 
+import java.util.List;
+
 /**
  * Interface for persist of ServiceConfigurationUpdateRequest.
  */
@@ -18,4 +20,15 @@ public interface ServiceConfigurationUpdateStorage {
      */
     ServiceConfigurationUpdateRequest storeAndFlush(
             ServiceConfigurationUpdateRequest serviceConfigurationUpdateRequest);
+
+    /**
+     * Batch add or update service configuration data to database.
+     */
+    <S extends ServiceConfigurationUpdateRequest> List<S> saveAll(Iterable<S> entities);
+
+    /**
+     * Method to list database entry based ServiceConfigurationUpdateRequest.
+     */
+    List<ServiceConfigurationUpdateRequest> listServiceConfigurationUpdateRequests(
+            ServiceConfigurationUpdateRequestQueryModel query);
 }
