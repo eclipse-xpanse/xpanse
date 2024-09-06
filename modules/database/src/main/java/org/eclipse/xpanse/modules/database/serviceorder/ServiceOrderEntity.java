@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.database.serviceorder;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -59,10 +60,12 @@ public class ServiceOrderEntity {
 
     @CreatedDate
     @Column(name = "STARTED_TIME")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     private OffsetDateTime startedTime;
 
     @LastModifiedDate
     @Column(name = "COMPLETED_TIME")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     private OffsetDateTime completedTime;
 
     @Column(name = "PREVIOUS_DEPLOY_REQUEST", columnDefinition = "json")

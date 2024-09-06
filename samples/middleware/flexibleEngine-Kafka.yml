@@ -74,10 +74,28 @@ serviceProviderContactDetails:
 serviceConfigurationManage:
   type: ansible
   configManageScripts:
-      # Should be the name available in the deployer script
+    # Should be the name available in the deployer script
     - configManager: kafka-broker
       # Means should the configuration update run on each node of the specific component or just one.
       runOnlyOnce: false
+      ansibleScriptConfig:
+        # Name of the file in the script
+        playbookName: "kafka-container-manage.yml"
+        # Path to activate virtualenv
+        virtualEnv: ""
+        # Version of the python
+        pythonVersion: 3.11
+        repoUrl: https://github.com/swaroopar/osc
+        branch: feature/testAnsible
+        # Full path of the requirements file in GIT repo.
+        requirementsFile: "requirements.txt"
+        # Install roles and collections
+        galaxyFile: ""
+        # Defines if we need a full inventory request.
+        ansibleInventoryRequired: false
+    - configManager: zookeeper
+      # Means should the configuration update run on each node of the specific component or just one.
+      runOnlyOnce: true
       ansibleScriptConfig:
         # Name of the file in the script
         playbookName: "kafka-container-manage.yml"
@@ -140,6 +158,29 @@ serviceConfigurationManage:
       description: Replication factor configuration parameters for the dedicated topic (offsets topic) used in the Kafka cluster to consume offset information for the consumer storage group
       initialValue: 3
       managedBy: 'kafka-broker'
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
+      isReadOnly: false
+    - name: zookeeper_global_outstanding_limit
+      kind: variable
+      dataType: number
+      description: Clients can submit requests faster than ZooKeeper can process them, especially if there are a lot of clients.
+      initialValue: 1000
+      managedBy: zookeeper
+      modificationImpact:
+        isDataLost: true
+        isServiceInterrupted: true
+      isReadOnly: false
+    - name: zookeeper_snap_count
+      kind: variable
+      dataType: number
+      description: Limits the number of concurrent connections (at the socket level) that a single client, identified by IP
+        address, may make to a single member of the ZooKeeper ensemble. This is used to prevent certain classes of
+        DoS attacks, including file descriptor exhaustion. The default is 60. Setting this to 0 entirely removes the
+        limit on concurrent connections.
+      initialValue: 1000
+      managedBy: zookeeper
       modificationImpact:
         isDataLost: true
         isServiceInterrupted: true

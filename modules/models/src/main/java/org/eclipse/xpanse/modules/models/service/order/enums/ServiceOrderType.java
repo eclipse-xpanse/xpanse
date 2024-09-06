@@ -18,6 +18,7 @@ public enum ServiceOrderType {
     REDEPLOY("redeploy"),
     MODIFY("modify"),
     DESTROY("destroy"),
+    SERVICE_CONFIGURATION_UPDATE("serviceConfigurationUpdate"),
     PURGE("purge");
 
     private final String type;
