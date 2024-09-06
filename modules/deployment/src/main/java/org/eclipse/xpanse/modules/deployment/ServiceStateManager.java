@@ -329,10 +329,13 @@ public class ServiceStateManager {
         }
         ServiceDeploymentState serviceDeploymentState = service.getServiceDeploymentState();
         if (!(serviceDeploymentState == ServiceDeploymentState.DEPLOY_SUCCESS
-                || serviceDeploymentState == ServiceDeploymentState.DESTROY_FAILED)) {
-            throw new InvalidServiceStateException(
-                    String.format("Service with id %s is %s.", service.getId(),
-                            serviceDeploymentState));
+                || serviceDeploymentState == ServiceDeploymentState.DESTROY_FAILED
+                || serviceDeploymentState == ServiceDeploymentState.MODIFICATION_SUCCESSFUL
+                || serviceDeploymentState == ServiceDeploymentState.MODIFICATION_FAILED)) {
+            String errorMsg = String.format("Service %s with deployment state %s is not supported"
+                    + " to manage status.", service.getId(), serviceDeploymentState);
+            log.error(errorMsg);
+            throw new InvalidServiceStateException(errorMsg);
         }
     }
 

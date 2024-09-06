@@ -175,10 +175,10 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Setup
         DeployServiceEntity service4 = setUpWellDeployServiceEntity(Csp.HUAWEI_CLOUD, region);
         service4.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
+        String errorMsg4 = String.format("Service %s with deployment state %s is not supported"
+                + " to manage status.", service4.getId(), service4.getServiceDeploymentState());
         Response result4 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
-                Collections.singletonList(
-                        String.format("Service with id %s is %s.", service4.getId(),
-                                service4.getServiceDeploymentState())));
+                Collections.singletonList(errorMsg4));
         when(mockDeployServiceStorage.findDeployServiceById(service4.getId())).thenReturn(service4);
         // run the test
         final MockHttpServletResponse response4 = startService(service4.getId());
@@ -484,7 +484,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         when(flexibleEngineClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         addCredentialForFlexibleEngine();
         testServiceStateManageApisWithHuaweiCloudSdk(service);
-        deleteCredential(Csp.FLEXIBLE_ENGINE,"default", CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.FLEXIBLE_ENGINE, "default", CredentialType.VARIABLES, "AK_SK");
     }
 
     void testServiceStateManageApisForOpenstack() throws Exception {
@@ -495,7 +495,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         DeployServiceEntity service = setUpWellDeployServiceEntity(Csp.OPENSTACK_TESTLAB, region);
         when(mockDeployServiceStorage.findDeployServiceById(service.getId())).thenReturn(service);
         testServiceStateManageApisWithOpenstackSdk(service);
-        deleteCredential(Csp.OPENSTACK_TESTLAB,"default", CredentialType.VARIABLES,
+        deleteCredential(Csp.OPENSTACK_TESTLAB, "default", CredentialType.VARIABLES,
                 "USERNAME_PASSWORD");
     }
 

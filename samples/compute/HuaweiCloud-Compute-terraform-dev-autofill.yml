@@ -38,7 +38,7 @@ serviceHostingType: self
 # The flavor of the service, the @category/@name/@version/@flavor can locate the specific service to be deployed.
 flavors:
   serviceFlavors:
-    - name: flavor-error-test
+    - name: 1vCPUs-1GB-normal
       priority: 3
       # The pricing of the flavor.
       pricing:
