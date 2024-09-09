@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
@@ -18,6 +19,7 @@ import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,8 @@ class DeployedServiceTest {
     private final String version = "1.0.0";
     private final Csp csp = Csp.HUAWEI_CLOUD;
     private final String flavor = "basic";
+    private final BillingMode billingMode = BillingMode.FIXED;
+    private final Region region = new Region();
     private final UUID serviceTemplateId = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f4");
     private final ServiceDeploymentState serviceDeploymentState =
             ServiceDeploymentState.DEPLOY_SUCCESS;
@@ -62,6 +66,8 @@ class DeployedServiceTest {
         deployedService.setVersion(version);
         deployedService.setCsp(csp);
         deployedService.setFlavor(flavor);
+        deployedService.setBillingMode(billingMode);
+        deployedService.setRegion(region);
         deployedService.setServiceTemplateId(serviceTemplateId);
         deployedService.setServiceDeploymentState(serviceDeploymentState);
         deployedService.setServiceState(SERVICE_STATE);
@@ -85,6 +91,8 @@ class DeployedServiceTest {
         assertEquals(version, deployedService.getVersion());
         assertEquals(csp, deployedService.getCsp());
         assertEquals(flavor, deployedService.getFlavor());
+        assertEquals(billingMode, deployedService.getBillingMode());
+        assertEquals(region, deployedService.getRegion());
         assertEquals(serviceTemplateId, deployedService.getServiceTemplateId());
         assertEquals(serviceDeploymentState, deployedService.getServiceDeploymentState());
         assertEquals(createTime, deployedService.getCreateTime());
@@ -119,9 +127,11 @@ class DeployedServiceTest {
     @Test
     void testToString() {
         String expectedString =
-                "DeployedService(" + "serviceId=" + uuid + ", category=" + category + ", name=" + name
-                        + ", customerServiceName=" + customerServiceName + ", version=" + version
-                        + ", csp=" + csp + ", flavor=" + flavor + ", serviceTemplateId="
+                "DeployedService(" + "serviceId=" + uuid + ", category=" + category + ", name=" +
+                        name + ", customerServiceName=" + customerServiceName + ", version=" +
+                        version + ", csp=" + csp + ", flavor=" + flavor + ", billingMode=" + billingMode +
+                        ", region=Region(name=" + region.getName() + ", site=" + region.getSite() +
+                        ", area=" + region.getArea() + "), serviceTemplateId="
                         + serviceTemplateId + ", userId=" + userId + ", serviceDeploymentState="
                         + serviceDeploymentState + ", serviceState=" + SERVICE_STATE
                         + ", serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR

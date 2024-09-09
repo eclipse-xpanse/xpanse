@@ -70,6 +70,8 @@ public class EntityTransUtils {
             deployedService.setServiceId(serviceEntity.getId());
             deployedService.setServiceHostingType(
                     serviceEntity.getDeployRequest().getServiceHostingType());
+            deployedService.setRegion(serviceEntity.getDeployRequest().getRegion());
+            deployedService.setBillingMode(serviceEntity.getDeployRequest().getBillingMode());
             return deployedService;
         }
         return null;
@@ -86,6 +88,8 @@ public class EntityTransUtils {
             DeployServiceEntity entity) {
         DeployedServiceDetails details = new DeployedServiceDetails();
         details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
+        details.setBillingMode(entity.getDeployRequest().getBillingMode());
+        details.setRegion(entity.getDeployRequest().getRegion());
         BeanUtils.copyProperties(entity, details);
         details.setServiceId(entity.getId());
         if (!CollectionUtils.isEmpty(entity.getDeployResourceList())) {
@@ -112,6 +116,8 @@ public class EntityTransUtils {
         details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
         BeanUtils.copyProperties(entity, details);
         details.setServiceId(entity.getId());
+        details.setBillingMode(entity.getDeployRequest().getBillingMode());
+        details.setRegion(entity.getDeployRequest().getRegion());
         if (!CollectionUtils.isEmpty(entity.getProperties())) {
             details.setDeployedServiceProperties(entity.getProperties());
         }
