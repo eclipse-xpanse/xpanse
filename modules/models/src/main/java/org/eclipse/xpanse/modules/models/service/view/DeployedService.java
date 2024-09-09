@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Data;
+import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
@@ -21,6 +22,7 @@ import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
 /**
@@ -39,6 +41,7 @@ public class DeployedService {
     @NotNull
     @Schema(description = "The catalog of the service")
     private Category category;
+
 
     /**
      * The name of the Service.
@@ -75,6 +78,20 @@ public class DeployedService {
      */
     @Schema(description = "The flavor of the service")
     private String flavor;
+
+    /**
+     * The billing mode of the Service.
+     */
+    @NotNull
+    @Schema(description = "The billing mode of the managed service.")
+    private BillingMode billingMode;
+
+    /**
+     * The region of the Service.
+     */
+    @NotNull
+    @Schema(description = "The region of the service.")
+    private Region region;
 
     /**
      * The id of the Service Template.
