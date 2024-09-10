@@ -6,7 +6,7 @@
 package org.eclipse.xpanse.modules.cache.credential;
 
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CREDENTIAL_CACHE_NAME;
-import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CREDENTIAL_CACHE_EXPIRE_TIME_IN_SECONDS;
 
 import jakarta.annotation.Nullable;
 import java.util.Objects;
@@ -92,16 +92,16 @@ public class CredentialsStore {
             return;
         }
         String redisKey = CREDENTIAL_CACHE_NAME + "::" + cacheKey;
-        long timeToLive = DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+        long timeToLive = DEFAULT_CREDENTIAL_CACHE_EXPIRE_TIME_IN_SECONDS;
         try {
             AbstractCredentialInfo credentialInfo =
                     credentialRedisTemplate.opsForValue().get(redisKey);
             if (Objects.nonNull(credentialInfo)) {
                 timeToLive = credentialInfo.getTimeToLive();
                 Boolean flag =
-                        credentialRedisTemplate.expire(redisKey, timeToLive, TimeUnit.MINUTES);
+                        credentialRedisTemplate.expire(redisKey, timeToLive, TimeUnit.SECONDS);
                 if (Boolean.TRUE.equals(flag)) {
-                    log.info("Updated expiration of the redis key:{} with the time:{} in minutes "
+                    log.info("Updated expiration of the redis key:{} with the time:{} in seconds "
                             + "successfully.", redisKey, timeToLive);
                 }
             }
