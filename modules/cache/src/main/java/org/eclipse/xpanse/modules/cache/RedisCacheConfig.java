@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.cache;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CACHE_PROVIDER_REDIS;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CREDENTIAL_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CREDENTIAL_CACHE_EXPIRE_TIME_IN_SECONDS;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.MONITOR_METRICS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
@@ -138,7 +139,7 @@ public class RedisCacheConfig {
 
     private RedisCacheConfiguration getCredentialCache() {
         return RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES))
+                .entryTtl(Duration.ofSeconds(DEFAULT_CREDENTIAL_CACHE_EXPIRE_TIME_IN_SECONDS))
                 .serializeKeysWith(getRedisKeySerializer())
                 .serializeValuesWith(getCredentialValueSerializer());
     }
