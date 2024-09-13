@@ -20,6 +20,7 @@ import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsAdapter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RequestMapping("/xpanse")
 @Secured({ROLE_ADMIN, ROLE_USER})
+@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServiceMetricsApi {
 
     private final ServiceMetricsAdapter serviceMetricsAdapter;

@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
+@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServiceConfigurationApi {
 
     @Resource

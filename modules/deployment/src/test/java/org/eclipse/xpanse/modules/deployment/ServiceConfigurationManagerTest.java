@@ -13,11 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+
+import java.time.OffsetDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateRequest;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateStorage;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
@@ -25,8 +30,11 @@ import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaValidator;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeRequest;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.AnsibleScriptConfig;
+import org.eclipse.xpanse.modules.models.servicetemplate.ConfigManageScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
@@ -38,6 +46,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
  * Test for ServiceConfigurationManager.
@@ -75,8 +85,10 @@ public class ServiceConfigurationManagerTest {
     @Mock
     private CustomRequestIdGenerator customRequestIdGenerator;
 
-    private  static Map<String, Object> CONFIGURATION = Collections.singletonMap("param1", "value1");
-
+    private static Map<String, Object> CONFIGURATION = Collections.singletonMap("param1", "value1");
+    private static final String SERVICE_ID = "123e4567-e89b-12d3-a456-426614174000";
+    private static final String RESOURCE_NAME = "resourceName";
+    private static final String CONFIG_MANAGER = "zookeeper";
 
     @BeforeEach
     void setUp() {
@@ -147,14 +159,23 @@ public class ServiceConfigurationManagerTest {
 
     @Test
     void testChangeServiceConfiguration_EmptyUpdate() {
-        // Arrange
         String serviceId = UUID.randomUUID().toString();
         ServiceConfigurationUpdate configurationUpdate = new ServiceConfigurationUpdate();
         configurationUpdate.setConfiguration(Collections.emptyMap());
-
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 serviceConfigurationManager.changeServiceConfiguration(serviceId, configurationUpdate));
         assertEquals("Parameter ServiceConfigurationUpdate is empty", exception.getMessage());
+    }
+
+    @Test
+    public void testGetPendingConfigurationChangeRequest_NoRequests() {
+        when(serviceConfigurationUpdateStorage.listServiceConfigurationUpdateRequests(any()))
+                .thenReturn(Collections.emptyList());
+
+        ResponseEntity<ServiceConfigurationChangeRequest> response = serviceConfigurationManager
+                .getPendingConfigurationChangeRequest(SERVICE_ID, RESOURCE_NAME);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNotNull(response.getBody());
     }
 }

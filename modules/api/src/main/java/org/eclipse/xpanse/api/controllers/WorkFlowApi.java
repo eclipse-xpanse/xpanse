@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
+@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class WorkFlowApi {
 
     @Resource

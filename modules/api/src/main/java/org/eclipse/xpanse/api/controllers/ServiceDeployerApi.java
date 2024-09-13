@@ -41,6 +41,7 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -68,6 +69,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
+@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServiceDeployerApi {
 
     @Value("${region.azs.cache.expire.time.in.minutes:60}")

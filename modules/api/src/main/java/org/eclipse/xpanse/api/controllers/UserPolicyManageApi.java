@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateReque
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.policy.UserPolicyManager;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -48,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
+@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class UserPolicyManageApi {
 
     @Resource

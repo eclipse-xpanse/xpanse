@@ -9,13 +9,17 @@ package org.eclipse.xpanse.modules.deployment;
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateRequest;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateRequestQueryModel;
@@ -24,6 +28,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
@@ -32,6 +37,8 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaValidator;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleHostInfo;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeRequest;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
@@ -42,6 +49,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationPar
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -51,6 +60,9 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 @Component
 public class ServiceConfigurationManager {
+
+    private static final String IP = "ip";
+    private static final String HOSTS = "hosts";
 
     @Resource
     private DeployServiceEntityHandler deployServiceEntityHandler;
@@ -241,4 +253,102 @@ public class ServiceConfigurationManager {
                 configurationParameters, serviceConfigurationUpdate.getConfiguration(),
                 jsonObjectSchema);
     }
+
+    /**
+     * Query pending configuration change request for agent.
+     */
+    public ResponseEntity<ServiceConfigurationChangeRequest>
+            getPendingConfigurationChangeRequest(String serviceId, String resourceName) {
+        ServiceConfigurationUpdateRequestQueryModel model =
+                new ServiceConfigurationUpdateRequestQueryModel(null, UUID.fromString(serviceId),
+                        resourceName, null, ServiceConfigurationStatus.PENDING);
+        List<ServiceConfigurationUpdateRequest> requests =
+                serviceConfigurationUpdateStorage.listServiceConfigurationUpdateRequests(model);
+        if (CollectionUtils.isEmpty(requests)) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(new ServiceConfigurationChangeRequest());
+        }
+        Optional<ServiceConfigurationUpdateRequest> latestRequest = requests.stream()
+                .filter(request -> request.getServiceOrderEntity() != null
+                        && request.getServiceOrderEntity().getStartedTime() != null)
+                .sorted(Comparator.comparing(request ->
+                        request.getServiceOrderEntity().getStartedTime())).findFirst();
+
+        if (latestRequest.isEmpty()) {
+            return  ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(new ServiceConfigurationChangeRequest());
+        }
+        ServiceConfigurationUpdateRequest request = latestRequest.get();
+        request.setStatus(ServiceConfigurationStatus.PROCESSING);
+        serviceConfigurationUpdateStorage.storeAndFlush(request);
+        ServiceConfigurationChangeRequest serviceConfigurationChangeRequest
+                = getChangeRequestForAgent(request);
+        return ResponseEntity.status(HttpStatus.OK).body(serviceConfigurationChangeRequest);
+    }
+
+    private ServiceConfigurationChangeRequest
+            getChangeRequestForAgent(ServiceConfigurationUpdateRequest request) {
+        ServiceConfigurationChangeRequest serviceConfigurationChangeRequest =
+                new ServiceConfigurationChangeRequest();
+        serviceConfigurationChangeRequest.setOrderId(request.getServiceOrderEntity().getOrderId());
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(request
+                        .getDeployServiceEntity().getServiceTemplateId());
+        if (Objects.isNull(serviceTemplateEntity)) {
+            String errMsg = String.format("Service template with id %s not found.",
+                    request.getDeployServiceEntity().getServiceTemplateId());
+            log.error(errMsg);
+            throw new ServiceTemplateNotRegistered(errMsg);
+        }
+        Optional<ConfigManageScript> configManageScriptOptional =
+                serviceTemplateEntity.getOcl().getServiceConfigurationManage()
+                        .getConfigManageScripts().stream()
+                        .filter(configManageScript -> {
+                            String configManager = request.getConfigManager();
+                            return configManager != null
+                                    && configManager.equals(configManageScript.getConfigManager());
+                        }).findFirst();
+
+        configManageScriptOptional.ifPresent(configManageScript ->
+                serviceConfigurationChangeRequest.setAnsibleScriptConfig(
+                configManageScript.getAnsibleScriptConfig()));
+        serviceConfigurationChangeRequest.setConfigParameters(request.getProperties());
+        serviceConfigurationChangeRequest.setAnsibleInventory(getAnsibleInventory(request
+                .getDeployServiceEntity().getId()));
+        return serviceConfigurationChangeRequest;
+    }
+
+    private Map<String, Object> getAnsibleInventory(UUID serviceId) {
+        List<DeployResource> deployResources = getDeployResources(serviceId, DeployResourceKind.VM);
+        Map<String, List<DeployResource>> deployResourceMap =
+                deployResources.stream()
+                        .collect(Collectors.groupingBy(DeployResource::getGroupName));
+        Map<String, Object> ansibleInventory = new HashMap<>();
+        deployResourceMap.forEach((groupName, deployResourceList) -> {
+            Map<String, AnsibleHostInfo> hosts = new HashMap<>();
+            deployResourceList.forEach(deployResource -> {
+                AnsibleHostInfo ansibleHostInfo = new AnsibleHostInfo();
+                ansibleHostInfo.setAnsibleHost(deployResource.getProperties().get(IP));
+                hosts.put(deployResource.getResourceName(), ansibleHostInfo);
+            });
+            Map<String, Map<String, AnsibleHostInfo>>  resourceMap = new HashMap<>();
+            resourceMap.put(HOSTS, hosts);
+            ansibleInventory.put(groupName, resourceMap);
+        });
+        return ansibleInventory;
+    }
+
+    private List<DeployResource> getDeployResources(UUID serviceId,
+                                                    DeployResourceKind resourceKind) {
+        DeployServiceEntity deployedService =
+                deployServiceEntityHandler.getDeployServiceEntity(serviceId);
+        Stream<DeployResourceEntity> resourceEntities =
+                deployedService.getDeployResourceList().stream();
+        if (Objects.nonNull(resourceKind)) {
+            resourceEntities = resourceEntities.filter(
+                    resourceEntity -> resourceEntity.getResourceKind().equals(resourceKind));
+        }
+        return EntityTransUtils.transToDeployResourceList(resourceEntities.toList());
+    }
+
 }
