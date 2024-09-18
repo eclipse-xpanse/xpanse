@@ -10,6 +10,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.controllers.ServiceCatalogApi;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
@@ -111,7 +112,11 @@ public class ServiceTemplateEntityConverter {
             BeanUtils.copyProperties(flavor, flavorBasic);
             return flavorBasic;
         }).toList();
-        serviceVo.setFlavors(flavorBasics);
+        EndUserFlavors endUserFlavors = new EndUserFlavors();
+        endUserFlavors.setServiceFlavors(flavorBasics);
+        endUserFlavors.setDowngradeAllowed(flavors.getIsDowngradeAllowed());
+        endUserFlavors.setModificationImpact(flavors.getModificationImpact());
+        serviceVo.setFlavors(endUserFlavors);
     }
 
 }

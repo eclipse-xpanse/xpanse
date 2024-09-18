@@ -24,6 +24,8 @@ import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
+import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -64,7 +66,8 @@ class ServiceCatalogApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceCatalogApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        waitUntilServiceTemplateFilesAreFullyGenerated(serviceTemplate.getServiceTemplateId().toString());
+        waitUntilServiceTemplateFilesAreFullyGenerated(
+                serviceTemplate.getServiceTemplateId().toString());
         testGetOrderableServiceDetailsThrowsException(serviceTemplate);
         testOpenApi(serviceTemplate);
         testListOrderableServices(serviceTemplate);
@@ -132,7 +135,14 @@ class ServiceCatalogApiTest extends ApisTestCommon {
                     BeanUtils.copyProperties(flavor, flavorBasic);
                     return flavorBasic;
                 }).toList();
-        userOrderableServiceVo.setFlavors(flavorBasics);
+        EndUserFlavors endUserFlavors = new EndUserFlavors();
+        endUserFlavors.setServiceFlavors(flavorBasics);
+        endUserFlavors.setDowngradeAllowed(true);
+        ModificationImpact modificationImpact = new ModificationImpact();
+        modificationImpact.setIsServiceInterrupted(true);
+        modificationImpact.setIsDataLost(true);
+        endUserFlavors.setModificationImpact(modificationImpact);
+        userOrderableServiceVo.setFlavors(endUserFlavors);
         userOrderableServiceVo.setServiceAvailabilityConfigs(serviceTemplateDetailVo.getDeployment()
                 .getServiceAvailabilityConfigs());
         userOrderableServiceVo.add(
@@ -252,6 +262,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
         String openApiDir = this.openApiGeneratorJarManage.getOpenApiWorkdir();
         File yamlFile = new File(openApiDir, serviceTemplateId);
         File htmlFile = new File(openApiDir, serviceTemplateId + ".html");
-        Awaitility.await().atMost(20, TimeUnit.SECONDS).until(() -> !yamlFile.exists() && htmlFile.exists());
+        Awaitility.await().atMost(20, TimeUnit.SECONDS)
+                .until(() -> !yamlFile.exists() && htmlFile.exists());
     }
 }
