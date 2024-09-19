@@ -109,11 +109,11 @@ class OpenTofuLocalDeploymentTest {
         OclLoader oclLoader = new OclLoader();
         ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
+        ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
 
         oclWithGitScripts = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
-        oclWithGitScripts.getDeployment().setKind(DeployerKind.OPEN_TOFU);
+        oclWithGitScripts.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any());
     }
 

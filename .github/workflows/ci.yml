@@ -23,6 +23,10 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
       - name: Set up OpenTofu
         uses: opentofu/setup-opentofu@v1
         with:

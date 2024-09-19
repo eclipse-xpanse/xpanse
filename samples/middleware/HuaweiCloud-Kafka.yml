@@ -255,8 +255,11 @@ serviceConfigurationManage:
         isServiceInterrupted: true
       isReadOnly: false
 deployment:
-  # kind, Supported values are terraform, opentofu.
-  kind: terraform
+  deployerTool:
+    # kind, Supported values are terraform, opentofu.
+    kind: terraform
+    # version, the required version of the deployer tool for the deployer scripts.
+    version: "=1.6.0"
   serviceAvailabilityConfigs:
     - displayName: Availability Zone
       varName: availability_zone

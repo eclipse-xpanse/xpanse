@@ -47,7 +47,7 @@ class OpenTofuLocalExecutorTest {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
+        ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         String script = ocl.getDeployment().getDeployer();
         File ws = new File(workspace + "/" + UUID.randomUUID());
         ws.mkdirs();

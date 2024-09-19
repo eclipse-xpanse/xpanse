@@ -19,13 +19,12 @@ import org.springframework.beans.BeanUtils;
  * Test of Deployment.
  */
 class DeploymentTest {
-
-    private final DeployerKind kind = DeployerKind.TERRAFORM;
     private final String deployer = "deployer";
+    private final CredentialType credentialType = CredentialType.API_KEY;
+    private DeployerTool deployerTool;
     private ScriptsRepo scriptsRepo;
     private List<DeployVariable> variables;
     private List<AvailabilityZoneConfig> availabilityZoneConfigs;
-    private final CredentialType credentialType = CredentialType.API_KEY;
     private Deployment test;
 
     @BeforeEach
@@ -46,9 +45,13 @@ class DeploymentTest {
         scriptsRepo.setBranch("branch");
         scriptsRepo.setScriptsPath("scriptsPath");
 
+        deployerTool = new DeployerTool();
+        deployerTool.setKind(DeployerKind.TERRAFORM);
+        deployerTool.setVersion("=1.6.1");
+
         test = new Deployment();
-        test.setKind(kind);
         test.setDeployer(deployer);
+        test.setDeployerTool(deployerTool);
         test.setVariables(variables);
         test.setCredentialType(credentialType);
         test.setServiceAvailabilityConfigs(availabilityZoneConfigs);
@@ -56,8 +59,8 @@ class DeploymentTest {
     }
 
     @Test
-    void testGetterAndSetter() {
-        assertEquals(kind, test.getKind());
+    void testGetters() {
+        assertEquals(deployerTool, test.getDeployerTool());
         assertEquals(deployer, test.getDeployer());
         assertEquals(variables, test.getVariables());
         assertEquals(credentialType, test.getCredentialType());
@@ -88,8 +91,7 @@ class DeploymentTest {
 
     @Test
     void testToString() {
-        String expectedString = "Deployment(" +
-                "kind=" + kind +
+        String expectedString = "Deployment(deployerTool=" + deployerTool +
                 ", variables=" + variables +
                 ", credentialType=" + credentialType +
                 ", serviceAvailabilityConfigs=" + availabilityZoneConfigs +

@@ -155,8 +155,11 @@ flavors:
 serviceProviderContactDetails:
   emails: [ "test@test.com" ]
 deployment:
-  # kind, Supported values are terraform, opentofu.
-  kind: terraform
+  deployerTool:
+    # kind, Supported values are terraform, opentofu.
+    kind: terraform
+    # version, the required version of the deployer tool for the deployer scripts.
+    version: "=1.6.0"
   serviceAvailabilityConfigs:
     - displayName: Primary AZ
       varName: primary_az

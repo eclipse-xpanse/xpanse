@@ -87,9 +87,9 @@ public class PolicyValidator {
         if (CollectionUtils.isEmpty(userPolicies) && CollectionUtils.isEmpty(servicePolicies)) {
             return;
         }
-        String planJson =
-                deployerKindManager.getDeployment(deployTask.getOcl().getDeployment().getKind())
-                        .getDeploymentPlanAsJson(deployTask);
+        String planJson = deployerKindManager.getDeployment(
+                        deployTask.getOcl().getDeployment().getDeployerTool().getKind())
+                .getDeploymentPlanAsJson(deployTask);
         if (StringUtils.isEmpty(planJson)) {
             return;
         }

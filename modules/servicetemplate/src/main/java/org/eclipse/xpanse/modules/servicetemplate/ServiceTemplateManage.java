@@ -419,10 +419,10 @@ public class ServiceTemplateManage {
 
 
     private void validateTerraformScript(Deployment deployment) {
-        if (deployment.getKind() == DeployerKind.TERRAFORM) {
+        DeployerKind deployerKind = deployment.getDeployerTool().getKind();
+        if (deployerKind == DeployerKind.TERRAFORM) {
             DeploymentScriptValidationResult tfValidationResult =
-                    this.deployerKindManager.getDeployment(deployment.getKind())
-                            .validate(deployment);
+                    this.deployerKindManager.getDeployment(deployerKind).validate(deployment);
             if (!tfValidationResult.isValid()) {
                 throw new TerraformScriptFormatInvalidException(
                         tfValidationResult.getDiagnostics().stream()
@@ -431,10 +431,9 @@ public class ServiceTemplateManage {
             }
         }
 
-        if (deployment.getKind() == DeployerKind.OPEN_TOFU) {
+        if (deployerKind == DeployerKind.OPEN_TOFU) {
             DeploymentScriptValidationResult tfValidationResult =
-                    this.deployerKindManager.getDeployment(deployment.getKind())
-                            .validate(deployment);
+                    this.deployerKindManager.getDeployment(deployerKind).validate(deployment);
             if (!tfValidationResult.isValid()) {
                 throw new OpenTofuScriptFormatInvalidException(
                         tfValidationResult.getDiagnostics().stream()

@@ -108,7 +108,7 @@ class TofuMakerDeploymentTest {
         OclLoader oclLoader = new OclLoader();
         ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
+        ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceId(serviceId);
