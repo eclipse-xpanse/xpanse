@@ -19,6 +19,7 @@ import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -86,10 +87,10 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
     void testTerraformBootWebhookApisThrowsException() throws Exception {
         // Setup
         UUID uuid = UUID.randomUUID();
+        ResultType expectedResultType = ResultType.SERVICE_DEPLOYMENT_NOT_FOUND;
+        String errorMsg = String.format("Service with id %s not found.", uuid);
+        List<String> expectedDetails = Collections.singletonList(errorMsg);
         TerraformResult deployResult = getTerraformResultByFile("deploy_success_callback.json");
-        Response deployCallbackResult = Response.errorResponse(
-                ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
         final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
                         post("/webhook/terraform-boot/deploy/{serviceId}", uuid)
@@ -99,8 +100,10 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(deployCallbackResult),
-                deployCallbackResponse.getContentAsString());
+        Response deployCallbackResult =
+                objectMapper.readValue(deployCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(deployCallbackResult.getResultType(), expectedResultType);
+        assertEquals(deployCallbackResult.getDetails(), expectedDetails);
 
         // Run the test
         final MockHttpServletResponse modifyCallbackResponse = mockMvc.perform(
@@ -111,14 +114,13 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), modifyCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(deployCallbackResult),
-                modifyCallbackResponse.getContentAsString());
+        Response modifyCallbackResult =
+                objectMapper.readValue(modifyCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(modifyCallbackResult.getResultType(), expectedResultType);
+        assertEquals(modifyCallbackResult.getDetails(), expectedDetails);
 
         // Setup
         TerraformResult destroyResult = getTerraformResultByFile("destroy_success_callback.json");
-        Response destroyCallbackResult = Response.errorResponse(
-                ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
         final MockHttpServletResponse destroyCallbackResponse = mockMvc.perform(
                         post("/webhook/terraform-boot/destroy/{serviceId}", uuid)
@@ -128,8 +130,10 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), destroyCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
-                destroyCallbackResponse.getContentAsString());
+        Response destroyCallbackResult = objectMapper.readValue(
+                destroyCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(destroyCallbackResult.getResultType(), expectedResultType);
+        assertEquals(destroyCallbackResult.getDetails(), expectedDetails);
 
         // Run the test
         final MockHttpServletResponse rollbackCallbackResponse = mockMvc.perform(
@@ -140,8 +144,10 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), rollbackCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
-                rollbackCallbackResponse.getContentAsString());
+        Response rollbackCallbackResult = objectMapper.readValue(
+                rollbackCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(rollbackCallbackResult.getResultType(), expectedResultType);
+        assertEquals(rollbackCallbackResult.getDetails(), expectedDetails);
 
 
         // Run the test
@@ -153,8 +159,10 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), purgeCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
-                purgeCallbackResponse.getContentAsString());
+        Response purgeCallbackResult =
+                objectMapper.readValue(purgeCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(purgeCallbackResult.getResultType(), expectedResultType);
+        assertEquals(purgeCallbackResult.getDetails(), expectedDetails);
     }
 
     void testTerraformBootWebhookApisWell() throws Exception {

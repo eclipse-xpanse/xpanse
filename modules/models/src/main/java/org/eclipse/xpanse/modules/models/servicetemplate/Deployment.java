@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.validation.annotation.Validated;
 
@@ -29,9 +28,10 @@ public class Deployment implements Serializable {
     @Serial
     private static final long serialVersionUID = 2566478948717883360L;
 
+    @Valid
     @NotNull
-    @Schema(description = "The type of the Deployer which will handle the service deployment")
-    private DeployerKind kind;
+    @Schema(description = "The deployer tool which will handle the service deployment.")
+    private DeployerTool deployerTool;
 
     @Valid
     @NotNull

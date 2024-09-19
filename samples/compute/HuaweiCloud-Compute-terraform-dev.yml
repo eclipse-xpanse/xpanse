@@ -347,8 +347,11 @@ eula: |
   9. Distribute, disseminate or send unsolicited email, bulk email or other messages, promotions, advertising or solicitations (such as "spam");
   10. Fraudulent offers of goods or services, or any advertising, promotional or other materials containing false, deceptive or misleading statements.
 deployment:
-  # kind, Supported values are terraform, opentofu.
-  kind: terraform
+  deployerTool:
+    # kind, Supported values are terraform, opentofu.
+    kind: terraform
+    # version, the required version of the deployer tool for the deployer scripts.
+    version: "=1.6.0"
   serviceAvailabilityConfigs:
     - displayName: Availability Zone
       varName: availability_zone

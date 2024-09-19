@@ -363,12 +363,12 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
+        ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         testDeployerWithOclAndPolicy(ocl);
 
         Ocl oclFromGit = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
-        oclFromGit.getDeployment().setKind(DeployerKind.OPEN_TOFU);
+        oclFromGit.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         testDeployerWithOclAndPolicy(oclFromGit);
     }
 

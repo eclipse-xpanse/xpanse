@@ -373,6 +373,26 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
         assertEquals(result.getResultType(), ResultType.UNPROCESSABLE_ENTITY);
         assertFalse(result.getDetails().isEmpty());
+
+        Ocl oclTest = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        oclTest.getDeployment().getDeployerTool().setVersion(null);
+        // Run the test
+        final MockHttpServletResponse response1 = register(oclTest);
+        Response result1 = objectMapper.readValue(response1.getContentAsString(), Response.class);
+        // Verify the results
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response1.getStatus());
+        assertEquals(result1.getResultType(), ResultType.UNPROCESSABLE_ENTITY);
+        assertFalse(result1.getDetails().isEmpty());
+
+        oclTest.getDeployment().getDeployerTool().setVersion("> v1.6.0");
+        // Run the test
+        final MockHttpServletResponse response2 = register(oclTest);
+        Response result2 = objectMapper.readValue(response2.getContentAsString(), Response.class);
+        // Verify the results
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response2.getStatus());
+        assertEquals(result2.getResultType(), ResultType.UNPROCESSABLE_ENTITY);
+        assertFalse(result2.getDetails().isEmpty());
     }
 
     void testRegisterThrowsPluginNotFoundException() throws Exception {

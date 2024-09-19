@@ -19,6 +19,7 @@ import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -87,10 +88,10 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
     void testOpenTofuBootWebhookApisThrowsException() throws Exception {
         // Setup
         UUID uuid = UUID.randomUUID();
+        ResultType expectedResultType = ResultType.SERVICE_DEPLOYMENT_NOT_FOUND;
+        String errorMsg = String.format("Service with id %s not found.", uuid);
+        List<String> expectedDetails = Collections.singletonList(errorMsg);
         OpenTofuResult deployResult = getOpenTofuResultByFile("deploy_success_callback.json");
-        Response deployCallbackResult = Response.errorResponse(
-                ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
         final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
                         post("/webhook/tofu-maker/deploy/{serviceId}", uuid)
@@ -100,8 +101,10 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(deployCallbackResult),
-                deployCallbackResponse.getContentAsString());
+        Response deployCallbackResult =
+                objectMapper.readValue(deployCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(deployCallbackResult.getResultType(), expectedResultType);
+        assertEquals(deployCallbackResult.getDetails(), expectedDetails);
 
         // Run the test
         final MockHttpServletResponse modifyCallbackResponse = mockMvc.perform(
@@ -112,15 +115,13 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), modifyCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(deployCallbackResult),
-                modifyCallbackResponse.getContentAsString());
-
+        Response modifyCallbackResult =
+                objectMapper.readValue(modifyCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(modifyCallbackResult.getResultType(), expectedResultType);
+        assertEquals(modifyCallbackResult.getDetails(), expectedDetails);
 
         // Setup
         OpenTofuResult destroyResult = getOpenTofuResultByFile("destroy_success_callback.json");
-        Response destroyCallbackResult = Response.errorResponse(
-                ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // Run the test
         final MockHttpServletResponse destroyCallbackResponse = mockMvc.perform(
                         post("/webhook/tofu-maker/destroy/{serviceId}", uuid)
@@ -130,8 +131,10 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), destroyCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
-                destroyCallbackResponse.getContentAsString());
+        Response destroyCallbackResult = objectMapper.readValue(
+                destroyCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(destroyCallbackResult.getResultType(), expectedResultType);
+        assertEquals(destroyCallbackResult.getDetails(), expectedDetails);
 
         // Run the test
         final MockHttpServletResponse rollbackCallbackResponse = mockMvc.perform(
@@ -142,8 +145,10 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), rollbackCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
-                rollbackCallbackResponse.getContentAsString());
+        Response rollbackCallbackResult = objectMapper.readValue(
+                rollbackCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(rollbackCallbackResult.getResultType(), expectedResultType);
+        assertEquals(rollbackCallbackResult.getDetails(), expectedDetails);
 
 
         // Run the test
@@ -155,8 +160,10 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), purgeCallbackResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(destroyCallbackResult),
-                purgeCallbackResponse.getContentAsString());
+        Response purgeCallbackResult =
+                objectMapper.readValue(purgeCallbackResponse.getContentAsString(), Response.class);
+        assertEquals(purgeCallbackResult.getResultType(), expectedResultType);
+        assertEquals(purgeCallbackResult.getDetails(), expectedDetails);
     }
 
     void testOpenTofuBootWebhookApisWell() throws Exception {
@@ -167,13 +174,13 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("OpenTofuMakerWebhookApiTest-1");
-        ocl.getDeployment().setKind(DeployerKind.OPEN_TOFU);
+        ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         testCallbackApiWithOcl(ocl);
 
         Ocl oclFromGit = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
         oclFromGit.setName("OpenTofuMakerWebhookApiTest-2");
-        oclFromGit.getDeployment().setKind(DeployerKind.OPEN_TOFU);
+        oclFromGit.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         testCallbackApiWithOcl(oclFromGit);
     }
 

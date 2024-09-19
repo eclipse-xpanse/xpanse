@@ -392,8 +392,8 @@ public class DeployService {
     private void deployService(DeployTask deployTask) {
         DeployResult deployResult;
         RuntimeException exception = null;
-        Deployer deployer =
-                deployerKindManager.getDeployment(deployTask.getOcl().getDeployment().getKind());
+        Deployer deployer = deployerKindManager.getDeployment(
+                deployTask.getOcl().getDeployment().getDeployerTool().getKind());
         ServiceOrderEntity orderTaskEntity =
                 serviceOrderManager.createServiceOrderTask(deployTask, null);
         DeployServiceEntity serviceEntity = storeNewDeployServiceEntity(deployTask);
@@ -428,8 +428,8 @@ public class DeployService {
                                  DeployServiceEntity deployServiceEntity) {
         DeployResult redeployResult;
         RuntimeException exception = null;
-        Deployer deployer =
-                deployerKindManager.getDeployment(redeployTask.getOcl().getDeployment().getKind());
+        Deployer deployer = deployerKindManager.getDeployment(
+                redeployTask.getOcl().getDeployment().getDeployerTool().getKind());
         ServiceOrderEntity orderTaskEntity =
                 serviceOrderManager.createServiceOrderTask(redeployTask, deployServiceEntity);
         try {
@@ -478,8 +478,8 @@ public class DeployService {
         DeployResult rollbackResult;
         RuntimeException exception = null;
         deployTask.setDeploymentScenario(DeploymentScenario.ROLLBACK);
-        Deployer deployer =
-                deployerKindManager.getDeployment(deployTask.getOcl().getDeployment().getKind());
+        Deployer deployer = deployerKindManager.getDeployment(
+                deployTask.getOcl().getDeployment().getDeployerTool().getKind());
         try {
             rollbackResult = deployer.destroy(deployTask);
         } catch (RuntimeException e) {
@@ -600,8 +600,8 @@ public class DeployService {
         RuntimeException exception = null;
         DeployResult modifyResult;
         MDC.put(SERVICE_ID, modifyTask.getServiceId().toString());
-        Deployer deployer =
-                deployerKindManager.getDeployment(modifyTask.getOcl().getDeployment().getKind());
+        Deployer deployer = deployerKindManager.getDeployment(
+                modifyTask.getOcl().getDeployment().getDeployerTool().getKind());
         ServiceOrderEntity orderTaskEntity =
                 serviceOrderManager.createServiceOrderTask(modifyTask, deployServiceEntity);
         try {
@@ -640,8 +640,8 @@ public class DeployService {
         MDC.put(SERVICE_ID, destroyTask.getServiceId().toString());
         ServiceOrderEntity orderTaskEntity =
                 serviceOrderManager.createServiceOrderTask(destroyTask, deployServiceEntity);
-        Deployer deployer =
-                deployerKindManager.getDeployment(destroyTask.getOcl().getDeployment().getKind());
+        Deployer deployer = deployerKindManager.getDeployment(
+                destroyTask.getOcl().getDeployment().getDeployerTool().getKind());
         try {
             if (DeploymentScenario.ROLLBACK != destroyTask.getDeploymentScenario()) {
                 deployServiceEntityHandler.updateServiceDeploymentStatus(deployServiceEntity,
@@ -684,7 +684,7 @@ public class DeployService {
                         purgeTask.getServiceId(), purgeTask.getOrderId());
                 purgeTask.setDeploymentScenario(DeploymentScenario.PURGE);
                 Deployer deployer = deployerKindManager.getDeployment(
-                        purgeTask.getOcl().getDeployment().getKind());
+                        purgeTask.getOcl().getDeployment().getDeployerTool().getKind());
                 deployServiceEntityHandler.updateServiceDeploymentStatus(deployServiceEntity,
                         ServiceDeploymentState.DESTROYING);
                 serviceOrderManager.startOrderProgress(purgeTask.getOrderId());

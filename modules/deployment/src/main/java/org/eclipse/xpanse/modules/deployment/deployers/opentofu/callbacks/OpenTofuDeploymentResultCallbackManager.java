@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
@@ -124,8 +125,10 @@ public class OpenTofuDeploymentResultCallbackManager {
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
                             deployServiceEntity.getServiceTemplateId());
-            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(),
-                    serviceTemplateEntity.getOcl().getDeployment().getKind()).handler(deployResult);
+            DeployerKind deployerKind = serviceTemplateEntity.getOcl().getDeployment()
+                    .getDeployerTool().getKind();
+            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(), deployerKind)
+                    .handler(deployResult);
         }
         return deployResultManager.updateDeployServiceEntityWithDeployResult(deployResult,
                 deployServiceEntity);
