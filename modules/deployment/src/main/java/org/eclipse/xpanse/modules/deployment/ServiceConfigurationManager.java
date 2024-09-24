@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.deployment;
 
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -49,6 +50,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationPar
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.hibernate.exception.LockTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -167,8 +169,6 @@ public class ServiceConfigurationManager {
                             ServiceConfigurationUpdateRequest request =
                                     getServiceConfigurationUpdateRequest(orderId, groupName,
                                             deployServiceEntity, properties);
-                            request.setResourceName(
-                                    deployResourceList.getFirst().getResourceName());
                             requests.add(request);
                         } else {
                             deployResourceList.forEach(deployResource -> {
@@ -257,40 +257,111 @@ public class ServiceConfigurationManager {
     /**
      * Query pending configuration change request for agent.
      */
+    @Transactional
     public ResponseEntity<ServiceConfigurationChangeRequest>
             getPendingConfigurationChangeRequest(String serviceId, String resourceName) {
+        try {
+            ServiceConfigurationUpdateRequest oldestRequest =
+                    getOldestServiceConfigurationChangeRequest(serviceId, resourceName);
+            if (Objects.isNull(oldestRequest)) {
+                return ResponseEntity
+                        .status(HttpStatus.NO_CONTENT)
+                        .body(new ServiceConfigurationChangeRequest());
+            }
+            List<DeployResource> deployResources =
+                    getDeployResources(UUID.fromString(serviceId), DeployResourceKind.VM);
+            if (Objects.isNull(oldestRequest.getResourceName())) {
+                validateConfigManager(serviceId, oldestRequest.getConfigManager(),
+                        resourceName, deployResources);
+            }
+            ServiceConfigurationUpdateRequest request =
+                    updateServiceConfigurationUpdateRequest(oldestRequest, resourceName);
+            if (Objects.isNull(request)) {
+                return ResponseEntity
+                        .status(HttpStatus.NO_CONTENT)
+                        .body(new ServiceConfigurationChangeRequest());
+            }
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(getServiceConfigurationChangeRequest(request, deployResources));
+        } catch (LockTimeoutException e) {
+            log.error("Update service configuration update request object timed out", e);
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(new ServiceConfigurationChangeRequest());
+        }
+    }
+
+    private ServiceConfigurationUpdateRequest updateServiceConfigurationUpdateRequest(
+            ServiceConfigurationUpdateRequest request, String resourceName) {
+        if (Objects.isNull(request.getResourceName())) {
+            request.setResourceName(resourceName);
+        }
+        request.setStatus(ServiceConfigurationStatus.PROCESSING);
+        return serviceConfigurationUpdateStorage.storeAndFlush(request);
+    }
+
+    private ServiceConfigurationUpdateRequest
+            getOldestServiceConfigurationChangeRequest(String serviceId, String resourceName) {
         ServiceConfigurationUpdateRequestQueryModel model =
                 new ServiceConfigurationUpdateRequestQueryModel(null, UUID.fromString(serviceId),
-                        resourceName, null, ServiceConfigurationStatus.PENDING);
+                        null, null, ServiceConfigurationStatus.PENDING);
         List<ServiceConfigurationUpdateRequest> requests =
                 serviceConfigurationUpdateStorage.listServiceConfigurationUpdateRequests(model);
         if (CollectionUtils.isEmpty(requests)) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                    .body(new ServiceConfigurationChangeRequest());
+            return null;
         }
-        Optional<ServiceConfigurationUpdateRequest> latestRequest = requests.stream()
+        Optional<ServiceConfigurationUpdateRequest> oldestRequestOptional = requests.stream()
+                .filter(request -> Objects.isNull(request.getResourceName())
+                        || resourceName.equals(request.getResourceName()))
                 .filter(request -> request.getServiceOrderEntity() != null
                         && request.getServiceOrderEntity().getStartedTime() != null)
-                .sorted(Comparator.comparing(request ->
-                        request.getServiceOrderEntity().getStartedTime())).findFirst();
+                .min(Comparator.comparing(request ->
+                        request.getServiceOrderEntity().getStartedTime()));
+        return oldestRequestOptional.orElse(null);
+    }
 
-        if (latestRequest.isEmpty()) {
-            return  ResponseEntity.status(HttpStatus.NO_CONTENT)
-                    .body(new ServiceConfigurationChangeRequest());
+    private void validateConfigManager(String serviceId, String configManager,
+                                       String resourceName, List<DeployResource> deployResources) {
+        Map<String, List<DeployResource>> resourceNameMap =
+                deployResources.stream()
+                        .collect(Collectors.groupingBy(DeployResource::getResourceName));
+        if (!resourceNameMap.containsKey(resourceName)) {
+            String errorMsg = String.format("The service with serviceId %s does not contain "
+                    + "a resource with resource_name %s", serviceId, resourceName);
+            log.error(errorMsg);
+            throw new ServiceConfigurationInvalidException(errorMsg);
         }
-        ServiceConfigurationUpdateRequest request = latestRequest.get();
-        request.setStatus(ServiceConfigurationStatus.PROCESSING);
-        serviceConfigurationUpdateStorage.storeAndFlush(request);
-        ServiceConfigurationChangeRequest serviceConfigurationChangeRequest
-                = getChangeRequestForAgent(request);
-        return ResponseEntity.status(HttpStatus.OK).body(serviceConfigurationChangeRequest);
+        deployResources.forEach(deployResource -> {
+            if (resourceName.equals(deployResource.getResourceName())) {
+                if (!configManager.equals(deployResource.getGroupName())) {
+                    String errorMsg = String.format("The service with serviceId %s does"
+                            + " not contain a group with group_name %s", serviceId, configManager);
+                    log.error(errorMsg);
+                    throw new ServiceConfigurationInvalidException(errorMsg);
+                }
+            }
+        });
     }
 
     private ServiceConfigurationChangeRequest
-            getChangeRequestForAgent(ServiceConfigurationUpdateRequest request) {
+            getServiceConfigurationChangeRequest(ServiceConfigurationUpdateRequest request,
+                                                 List<DeployResource> deployResources) {
         ServiceConfigurationChangeRequest serviceConfigurationChangeRequest =
                 new ServiceConfigurationChangeRequest();
         serviceConfigurationChangeRequest.setOrderId(request.getServiceOrderEntity().getOrderId());
+        Optional<ConfigManageScript> configManageScriptOptional = getConfigManageScript(request);
+        configManageScriptOptional.ifPresent(configManageScript ->
+                serviceConfigurationChangeRequest.setAnsibleScriptConfig(
+                        configManageScript.getAnsibleScriptConfig()));
+        serviceConfigurationChangeRequest.setConfigParameters(request.getProperties());
+        serviceConfigurationChangeRequest.setAnsibleInventory(getAnsibleInventory(deployResources));
+        return serviceConfigurationChangeRequest;
+    }
+
+
+    private Optional<ConfigManageScript>
+            getConfigManageScript(ServiceConfigurationUpdateRequest request) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(request
                         .getDeployServiceEntity().getServiceTemplateId());
@@ -308,18 +379,10 @@ public class ServiceConfigurationManager {
                             return configManager != null
                                     && configManager.equals(configManageScript.getConfigManager());
                         }).findFirst();
-
-        configManageScriptOptional.ifPresent(configManageScript ->
-                serviceConfigurationChangeRequest.setAnsibleScriptConfig(
-                configManageScript.getAnsibleScriptConfig()));
-        serviceConfigurationChangeRequest.setConfigParameters(request.getProperties());
-        serviceConfigurationChangeRequest.setAnsibleInventory(getAnsibleInventory(request
-                .getDeployServiceEntity().getId()));
-        return serviceConfigurationChangeRequest;
+        return configManageScriptOptional;
     }
 
-    private Map<String, Object> getAnsibleInventory(UUID serviceId) {
-        List<DeployResource> deployResources = getDeployResources(serviceId, DeployResourceKind.VM);
+    private Map<String, Object> getAnsibleInventory(List<DeployResource> deployResources) {
         Map<String, List<DeployResource>> deployResourceMap =
                 deployResources.stream()
                         .collect(Collectors.groupingBy(DeployResource::getGroupName));
@@ -331,7 +394,7 @@ public class ServiceConfigurationManager {
                 ansibleHostInfo.setAnsibleHost(deployResource.getProperties().get(IP));
                 hosts.put(deployResource.getResourceName(), ansibleHostInfo);
             });
-            Map<String, Map<String, AnsibleHostInfo>>  resourceMap = new HashMap<>();
+            Map<String, Map<String, AnsibleHostInfo>> resourceMap = new HashMap<>();
             resourceMap.put(HOSTS, hosts);
             ansibleInventory.put(groupName, resourceMap);
         });
