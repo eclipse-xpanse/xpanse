@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationUpdateRequestNotFoundException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,18 @@ public class ServiceConfigurationExceptionHandler {
     public Response handleServiceConfigurationInvalidException(
             ServiceConfigurationInvalidException ex) {
         return getErrorResponse(ResultType.INVALID_SERVICE_CONFIGURATION,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceConfigurationUpdateRequestNotFoundException.
+     */
+    @ExceptionHandler({ServiceConfigurationUpdateRequestNotFoundException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleServiceConfigurationUpdateRequestNotFoundException(
+            ServiceConfigurationUpdateRequestNotFoundException ex) {
+        return getErrorResponse(ResultType.SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 }

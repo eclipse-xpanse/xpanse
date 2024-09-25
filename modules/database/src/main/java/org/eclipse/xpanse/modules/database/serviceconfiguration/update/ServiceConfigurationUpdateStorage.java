@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.database.serviceconfiguration.update;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Interface for persist of ServiceConfigurationUpdateRequest.
@@ -31,4 +32,12 @@ public interface ServiceConfigurationUpdateStorage {
      */
     List<ServiceConfigurationUpdateRequest> listServiceConfigurationUpdateRequests(
             ServiceConfigurationUpdateRequestQueryModel query);
+
+    /**
+     * Query ServiceConfigurationUpdateRequest by id.
+     *
+     * @param changeId id of the update request.
+     * @return serviceConfigurationUpdateRequest.
+     */
+    ServiceConfigurationUpdateRequest findById(UUID changeId);
 }

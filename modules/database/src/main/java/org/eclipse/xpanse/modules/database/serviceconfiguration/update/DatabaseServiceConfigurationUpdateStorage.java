@@ -10,6 +10,7 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -78,5 +79,10 @@ public class DatabaseServiceConfigurationUpdateStorage
                             .getRestriction();
                 };
         return serviceConfigurationUpdateRepository.findAll(specification);
+    }
+
+    @Override
+    public ServiceConfigurationUpdateRequest findById(UUID changeId) {
+        return serviceConfigurationUpdateRepository.findById(changeId).orElse(null);
     }
 }
