@@ -74,7 +74,8 @@ public enum ResultType {
     SERVICE_PRICE_CALCULATION_FAILED("Service Price Calculation Failed"),
     INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details"),
     FILE_LOCKED("File Locked"),
-    INVALID_SERVICE_CONFIGURATION("Service Configuration Invalid");
+    INVALID_SERVICE_CONFIGURATION("Service Configuration Invalid"),
+    SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND("Service Configuration Update Request Not Found");
 
     private final String value;
 

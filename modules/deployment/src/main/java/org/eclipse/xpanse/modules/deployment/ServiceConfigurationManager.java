@@ -40,9 +40,11 @@ import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVaria
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleHostInfo;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeRequest;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationUpdateRequestNotFoundException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ConfigManageScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
@@ -412,6 +414,33 @@ public class ServiceConfigurationManager {
                     resourceEntity -> resourceEntity.getResourceKind().equals(resourceKind));
         }
         return EntityTransUtils.transToDeployResourceList(resourceEntities.toList());
+    }
+
+    /**
+     * Method to update service configuration update result.
+     *
+     * @param changeId id of the update request.
+     * @param result   result of the service configuration update request.
+     */
+    public void updateConfigurationChangeResult(String changeId,
+                                                ServiceConfigurationChangeResult result) {
+        ServiceConfigurationUpdateRequest request =
+                serviceConfigurationUpdateStorage.findById(UUID.fromString(changeId));
+        if (Objects.isNull(request)
+                || ServiceConfigurationStatus.PROCESSING.equals(request.getStatus())) {
+            String errorMsg = String.format(
+                    "Service Configuration update request with id %s , status %s not found",
+                    changeId, ServiceConfigurationStatus.PROCESSING);
+            log.error(errorMsg);
+            throw new ServiceConfigurationUpdateRequestNotFoundException(errorMsg);
+        }
+        if (result.getIsSuccessful()) {
+            request.setStatus(ServiceConfigurationStatus.SUCCESSFUL);
+        } else {
+            request.setStatus(ServiceConfigurationStatus.ERROR);
+            request.setResultMessage(result.getError());
+        }
+        serviceConfigurationUpdateStorage.storeAndFlush(request);
     }
 
 }
