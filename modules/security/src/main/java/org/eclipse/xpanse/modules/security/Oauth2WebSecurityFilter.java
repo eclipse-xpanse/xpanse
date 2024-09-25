@@ -90,7 +90,7 @@ public class Oauth2WebSecurityFilter {
             arc.requestMatchers(AntPathRequestMatcher.antMatcher("/favicon.ico")).permitAll();
             arc.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll();
             arc.requestMatchers(AntPathRequestMatcher.antMatcher("/openapi/**")).permitAll();
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/xpanse/agent/poll/**"))
+            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/xpanse/agent/**"))
                     .permitAll();
             arc.requestMatchers(mvcMatcherBuilder.pattern("/xpanse/**")).authenticated();
             arc.requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll();
