@@ -125,7 +125,7 @@ public class ServiceConfigurationManager {
             String errorMsg =
                     String.format("Change service configuration error, %s", e.getMessage());
             log.error(errorMsg);
-            throw new ServiceConfigurationInvalidException(errorMsg);
+            throw new ServiceConfigurationInvalidException(List.of(errorMsg));
         }
     }
 
@@ -245,7 +245,7 @@ public class ServiceConfigurationManager {
                     String.format("Service template %s has no service configuration manage",
                             serviceTemplateEntity.getId());
             log.error(errorMsg);
-            throw new ServiceConfigurationInvalidException(errorMsg);
+            throw new ServiceConfigurationInvalidException(List.of(errorMsg));
         }
         List<ServiceConfigurationParameter> configurationParameters = serviceConfigurationManage
                 .getConfigurationParameters();
@@ -332,7 +332,7 @@ public class ServiceConfigurationManager {
             String errorMsg = String.format("The service with serviceId %s does not contain "
                     + "a resource with resource_name %s", serviceId, resourceName);
             log.error(errorMsg);
-            throw new ServiceConfigurationInvalidException(errorMsg);
+            throw new ServiceConfigurationInvalidException(List.of(errorMsg));
         }
         deployResources.forEach(deployResource -> {
             if (resourceName.equals(deployResource.getResourceName())) {
@@ -340,7 +340,7 @@ public class ServiceConfigurationManager {
                     String errorMsg = String.format("The service with serviceId %s does"
                             + " not contain a group with group_name %s", serviceId, configManager);
                     log.error(errorMsg);
-                    throw new ServiceConfigurationInvalidException(errorMsg);
+                    throw new ServiceConfigurationInvalidException(List.of(errorMsg));
                 }
             }
         });

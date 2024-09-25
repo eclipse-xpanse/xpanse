@@ -63,12 +63,12 @@ public class ServiceConfigurationVariablesJsonSchemaValidator {
                 for (ValidationMessage validationMessage : validate) {
                     errors.add(validationMessage.getMessage().substring(3));
                 }
-                throw new ServiceConfigurationInvalidException(errors.toString());
+                throw new ServiceConfigurationInvalidException(errors);
             }
         } catch (JsonProcessingException e) {
             List<String> errors = new ArrayList<>();
             errors.add(e.getMessage());
-            throw new ServiceConfigurationInvalidException(errors.toString());
+            throw new ServiceConfigurationInvalidException(errors);
         }
     }
 
