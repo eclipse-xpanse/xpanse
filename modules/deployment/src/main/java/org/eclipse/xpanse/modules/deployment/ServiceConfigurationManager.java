@@ -428,7 +428,7 @@ public class ServiceConfigurationManager {
         ServiceConfigurationUpdateRequest request =
                 serviceConfigurationUpdateStorage.findById(UUID.fromString(changeId));
         if (Objects.isNull(request)
-                || ServiceConfigurationStatus.PROCESSING.equals(request.getStatus())) {
+                || !ServiceConfigurationStatus.PROCESSING.equals(request.getStatus())) {
             String errorMsg = String.format(
                     "Service Configuration update request with id %s , status %s not found",
                     changeId, ServiceConfigurationStatus.PROCESSING);
