@@ -75,7 +75,8 @@ public enum ResultType {
     INVALID_GIT_REPO_DETAILS("Invalid Git Repo Details"),
     FILE_LOCKED("File Locked"),
     INVALID_SERVICE_CONFIGURATION("Service Configuration Invalid"),
-    SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND("Service Configuration Update Request Not Found");
+    SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND("Service Configuration Update Request Not Found"),
+    SERVICE_CONFIGURATION_NOT_FOUND("Service Configuration Not Found");
 
     private final String value;
 

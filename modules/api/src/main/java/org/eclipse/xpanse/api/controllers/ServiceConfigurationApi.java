@@ -20,6 +20,7 @@ import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -51,6 +52,33 @@ public class ServiceConfigurationApi {
     @Resource
     private ServiceConfigurationManager serviceConfigurationManager;
 
+    /**
+     * Query the service's current configuration by id of the deployed service.
+     *
+     * @param serviceId id of the deployed service.
+     * @return ServiceConfigurationEntity.
+     */
+    @Tag(name = "ServiceConfiguration",
+            description = "APIs for managing service's configuration.")
+    @GetMapping(value = "/service/current/config/{serviceId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(description = "Query the service's current configuration by"
+            + " id of the deployed service.")
+    @AuditApiRequest(methodName = "getCspFromServiceId")
+    public ServiceConfigurationDetails getCurrentConfigurationOfService(
+            @Parameter(name = "serviceId", description = "The id of the deployed service")
+            @PathVariable("serviceId") String serviceId) {
+        return serviceConfigurationManager.getCurrentConfigurationOfService(serviceId);
+    }
+
+    /**
+     * Update the service's configuration to the registered service template.
+     *
+     * @param serviceId                  id of the deployed service
+     * @param serviceConfigurationUpdate serviceConfigurationUpdate.
+     * @return serviceOrder.
+     */
     @Tag(name = "ServiceConfiguration",
             description = "APIs for managing service's configuration.")
     @PutMapping(value = "/services/config/{serviceId}",

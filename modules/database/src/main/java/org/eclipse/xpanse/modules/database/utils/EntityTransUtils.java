@@ -13,6 +13,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
@@ -22,6 +23,7 @@ import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateMan
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
@@ -167,4 +169,17 @@ public class EntityTransUtils {
         return details;
     }
 
+    /**
+     * ServiceConfigurationEntity converted to ServiceConfigurationDetails.
+     *
+     * @param entity ServiceConfigurationEntity
+     * @return ServiceConfigurationDetails
+     */
+    public static ServiceConfigurationDetails
+            transToServiceConfigurationDetails(ServiceConfigurationEntity entity) {
+        ServiceConfigurationDetails details = new ServiceConfigurationDetails();
+        BeanUtils.copyProperties(entity, details);
+        details.setServiceId(entity.getId());
+        return details;
+    }
 }

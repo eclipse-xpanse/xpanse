@@ -40,7 +40,7 @@ public class ServiceConfigurationEntity {
     @MapsId
     @OneToOne
     @JoinColumn(name = "service_id")
-    @JsonIgnoreProperties({"serviceConfigurationEntity"})
+    @JsonIgnoreProperties({"deployResourceList", "serviceConfigurationEntity"})
     private DeployServiceEntity deployServiceEntity;
 
     @Column(columnDefinition = "json")
