@@ -154,7 +154,7 @@ public class ServiceConfigurationManagerTest {
 
         ServiceConfigurationInvalidException exception = assertThrows(ServiceConfigurationInvalidException.class,
                 () -> serviceConfigurationManager.changeServiceConfiguration(serviceId, configurationUpdate));
-        assertTrue(exception.getErrorReasons().contains("Change service configuration error, null"));
+        assertTrue(exception.getErrorReasons().contains("Invalid configuration"));
     }
 
     @Test

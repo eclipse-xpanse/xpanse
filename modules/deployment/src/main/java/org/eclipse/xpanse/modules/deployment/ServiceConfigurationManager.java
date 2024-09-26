@@ -123,9 +123,9 @@ public class ServiceConfigurationManager {
             return new ServiceOrder(orderId, UUID.fromString(serviceId));
         } catch (ServiceConfigurationInvalidException e) {
             String errorMsg =
-                    String.format("Change service configuration error, %s", e.getMessage());
+                    String.format("Change service configuration error, %s", e.getErrorReasons());
             log.error(errorMsg);
-            throw new ServiceConfigurationInvalidException(List.of(errorMsg));
+            throw e;
         }
     }
 
