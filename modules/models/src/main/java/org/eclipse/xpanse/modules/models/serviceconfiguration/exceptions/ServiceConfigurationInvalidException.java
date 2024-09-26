@@ -7,11 +7,13 @@ package org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions;
 
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Exception thrown when service configuration is invalid.
  */
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class ServiceConfigurationInvalidException extends RuntimeException {
 
