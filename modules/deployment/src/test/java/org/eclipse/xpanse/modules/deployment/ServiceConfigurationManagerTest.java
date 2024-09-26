@@ -176,6 +176,5 @@ public class ServiceConfigurationManagerTest {
                 .getPendingConfigurationChangeRequest(SERVICE_ID, RESOURCE_NAME);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertNotNull(response.getBody());
     }
 }

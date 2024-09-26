@@ -268,7 +268,7 @@ public class ServiceConfigurationManager {
             if (Objects.isNull(oldestRequest)) {
                 return ResponseEntity
                         .status(HttpStatus.NO_CONTENT)
-                        .body(new ServiceConfigurationChangeRequest());
+                        .body(null);
             }
             List<DeployResource> deployResources =
                     getDeployResources(UUID.fromString(serviceId), DeployResourceKind.VM);
@@ -281,7 +281,7 @@ public class ServiceConfigurationManager {
             if (Objects.isNull(request)) {
                 return ResponseEntity
                         .status(HttpStatus.NO_CONTENT)
-                        .body(new ServiceConfigurationChangeRequest());
+                        .body(null);
             }
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -290,7 +290,7 @@ public class ServiceConfigurationManager {
             log.error("Update service configuration update request object timed out", e);
             return ResponseEntity
                     .status(HttpStatus.NO_CONTENT)
-                    .body(new ServiceConfigurationChangeRequest());
+                    .body(null);
         }
     }
 
@@ -338,7 +338,8 @@ public class ServiceConfigurationManager {
             if (resourceName.equals(deployResource.getResourceName())) {
                 if (!configManager.equals(deployResource.getGroupName())) {
                     String errorMsg = String.format("The service with serviceId %s does"
-                            + " not contain a group with group_name %s", serviceId, configManager);
+                            + " not contain a group with resource_name %s "
+                            + "and  group_name %s", serviceId, resourceName, configManager);
                     log.error(errorMsg);
                     throw new ServiceConfigurationInvalidException(List.of(errorMsg));
                 }
@@ -351,7 +352,7 @@ public class ServiceConfigurationManager {
                                                  List<DeployResource> deployResources) {
         ServiceConfigurationChangeRequest serviceConfigurationChangeRequest =
                 new ServiceConfigurationChangeRequest();
-        serviceConfigurationChangeRequest.setOrderId(request.getServiceOrderEntity().getOrderId());
+        serviceConfigurationChangeRequest.setChangeId(request.getId());
         Optional<ConfigManageScript> configManageScriptOptional = getConfigManageScript(request);
         configManageScriptOptional.ifPresent(configManageScript ->
                 serviceConfigurationChangeRequest.setAnsibleScriptConfig(
