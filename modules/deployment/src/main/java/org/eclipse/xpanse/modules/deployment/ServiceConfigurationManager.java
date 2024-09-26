@@ -22,6 +22,8 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
+import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateRequest;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateRequestQueryModel;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateStorage;
@@ -41,9 +43,11 @@ import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVaria
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleHostInfo;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeRequest;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeResult;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationNotFoundException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationUpdateRequestNotFoundException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ConfigManageScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -75,6 +79,9 @@ public class ServiceConfigurationManager {
     private ServiceConfigurationUpdateStorage serviceConfigurationUpdateStorage;
 
     @Resource
+    private ServiceConfigurationStorage serviceConfigurationStorage;
+
+    @Resource
     private ServiceTemplateStorage serviceTemplateStorage;
 
     @Resource
@@ -93,6 +100,24 @@ public class ServiceConfigurationManager {
     @Resource
     private ServiceConfigurationVariablesJsonSchemaGenerator
             serviceConfigurationVariablesJsonSchemaGenerator;
+
+    /**
+     * Query the service's current configuration by id of the deployed service.
+     *
+     * @param serviceId id of the deployed service
+     * @return ServiceConfigurationEntity.
+     */
+    public ServiceConfigurationDetails getCurrentConfigurationOfService(String serviceId) {
+        ServiceConfigurationEntity entity = serviceConfigurationStorage
+                .findServiceConfigurationById(UUID.fromString(serviceId));
+        if (Objects.isNull(entity)) {
+            String errorMsg = String.format("Service Configuration with service id %s not found.",
+                    serviceId);
+            log.error(errorMsg);
+            throw new ServiceConfigurationNotFoundException(errorMsg);
+        }
+        return EntityTransUtils.transToServiceConfigurationDetails(entity);
+    }
 
     /**
      * update ServiceConfiguration.
