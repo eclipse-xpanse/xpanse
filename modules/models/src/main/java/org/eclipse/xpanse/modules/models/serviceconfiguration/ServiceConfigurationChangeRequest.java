@@ -16,7 +16,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AnsibleScriptConfig;
 @Data
 public class ServiceConfigurationChangeRequest {
 
-    private UUID orderId;
+    private UUID changeId;
     private Map<String, Object> configParameters;
     private AnsibleScriptConfig ansibleScriptConfig;
     private Map<String, Object> ansibleInventory;

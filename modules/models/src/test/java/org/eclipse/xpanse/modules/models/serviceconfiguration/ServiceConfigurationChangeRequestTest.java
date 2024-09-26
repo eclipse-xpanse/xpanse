@@ -12,24 +12,24 @@ import org.springframework.beans.BeanUtils;
 
 public class ServiceConfigurationChangeRequestTest {
 
-    public static final UUID ORDER_ID = UUID.randomUUID();
-    public static final Map<String, Object> configParameters = Map.of("orderId", ORDER_ID);
-    public static final Map<String, Object> ansibleInventory = Map.of("orderId", ORDER_ID);
+    public static final UUID CHANGE_ID = UUID.randomUUID();
+    public static final Map<String, Object> configParameters = Map.of("changeId", CHANGE_ID);
+    public static final Map<String, Object> ansibleInventory = Map.of("changeId", CHANGE_ID);
     public static final AnsibleScriptConfig ansibleScriptConfig= new AnsibleScriptConfig();
     private final ServiceConfigurationChangeRequest changeRequestForAgent = new ServiceConfigurationChangeRequest();
 
     @BeforeEach
     void setUp() {
-        changeRequestForAgent.setOrderId(ORDER_ID);
+        changeRequestForAgent.setChangeId(CHANGE_ID);
         changeRequestForAgent.setConfigParameters(configParameters);
         changeRequestForAgent.setAnsibleInventory(ansibleInventory);
         changeRequestForAgent.setAnsibleScriptConfig(ansibleScriptConfig);
-        changeRequestForAgent.setOrderId(ORDER_ID);
+        changeRequestForAgent.setChangeId(CHANGE_ID);
     }
 
     @Test
     void testGetters() {
-        assertEquals(ORDER_ID, changeRequestForAgent.getOrderId());
+        assertEquals(CHANGE_ID, changeRequestForAgent.getChangeId());
         assertEquals(configParameters, changeRequestForAgent.getConfigParameters());
         assertEquals(ansibleInventory, changeRequestForAgent.getAnsibleInventory());
         assertEquals(ansibleScriptConfig, changeRequestForAgent.getAnsibleScriptConfig());
@@ -57,7 +57,7 @@ public class ServiceConfigurationChangeRequestTest {
 
     @Test
     void testToString() {
-        String result = "ServiceConfigurationChangeRequest(orderId=" + ORDER_ID
+        String result = "ServiceConfigurationChangeRequest(changeId=" + CHANGE_ID
                 + ", configParameters=" + configParameters
                 + ", ansibleScriptConfig=" + ansibleScriptConfig
                 + ", ansibleInventory=" + ansibleInventory
