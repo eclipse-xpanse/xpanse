@@ -148,9 +148,9 @@ public class HuaweiCloudResourceManager {
                             (Map<String, Object>) resourceMap.get(HUAWEI_CLOUD_COMPUTE_INSTANCE);
                     if (!CollectionUtils.isEmpty(resourceInfoMap)) {
                         Set<String> resourceNameSet = resourceInfoMap.keySet();
-                        resourceNameSet.forEach(resourceName -> {
-                            resources.put(resourceName, HUAWEI_CLOUD_COMPUTE_INSTANCE);
-                        });
+                        resourceNameSet.forEach(
+                                resourceName -> resources.put(
+                                        resourceName, HUAWEI_CLOUD_COMPUTE_INSTANCE));
                     }
                 }
             }

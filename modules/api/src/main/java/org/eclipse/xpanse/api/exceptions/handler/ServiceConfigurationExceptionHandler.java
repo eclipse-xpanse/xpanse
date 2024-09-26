@@ -40,7 +40,7 @@ public class ServiceConfigurationExceptionHandler {
     public Response handleServiceConfigurationInvalidException(
             ServiceConfigurationInvalidException ex) {
         return getErrorResponse(ResultType.INVALID_SERVICE_CONFIGURATION,
-                Collections.singletonList(ex.getMessage()));
+                ex.getErrorReasons());
     }
 
     /**

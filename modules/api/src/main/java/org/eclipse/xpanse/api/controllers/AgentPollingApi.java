@@ -8,6 +8,10 @@ package org.eclipse.xpanse.api.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +54,18 @@ public class AgentPollingApi {
             description = "APIs for agent to poll pending configuration change requests.")
     @GetMapping(value = "/agent/poll/{serviceId}/{resourceName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get pending configuration change request for agents to poll.")
     @AuditApiRequest(enabled = false)
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "no pending configuration update requests",
+                    content = @Content),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "pending configuration update request details",
+                    content = @Content(schema = @Schema(
+                            implementation = ServiceConfigurationChangeRequest.class)))})
     public ResponseEntity<ServiceConfigurationChangeRequest> getPendingConfigurationChangeRequest(
             @Parameter(name = "serviceId",
                     description = "The id of the deployed service")

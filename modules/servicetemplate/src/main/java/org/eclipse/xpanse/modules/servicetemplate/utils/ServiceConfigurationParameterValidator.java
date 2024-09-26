@@ -64,14 +64,16 @@ public class ServiceConfigurationParameterValidator {
         List<String> errors = new ArrayList<>();
         configurationParameters.forEach(configurationParameter -> {
             if (!resourceMap.containsKey(configurationParameter.getManagedBy())) {
-                String errorMsg = String.format("service configuration parameter error, "
-                        + "managedBy %s validate failed", configurationParameter.getManagedBy());
+                String errorMsg = String.format(
+                        "managedBy field value %s of %s parameter is not valid",
+                        configurationParameter.getManagedBy(),
+                        configurationParameter.getName());
                 log.error(errorMsg);
                 errors.add(errorMsg);
             }
         });
         if (!CollectionUtils.isEmpty(errors)) {
-            throw new ServiceConfigurationInvalidException(errors.toString());
+            throw new ServiceConfigurationInvalidException(errors);
         }
     }
 
@@ -93,16 +95,16 @@ public class ServiceConfigurationParameterValidator {
         File ws = new File(workspace);
         if (!ws.exists() && !ws.mkdirs()) {
             throw new TerraformExecutorException(
-                    "Create workspace failed, File path not created: " + ws.getAbsolutePath());
+                    "workspace creation failed, File path not created: " + ws.getAbsolutePath());
         }
         String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
         try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(script);
-            log.info("Terraform script create success");
+            log.info("Terraform script creation successful");
             return new File(scriptPath);
         } catch (IOException ex) {
             log.error("create version file failed.", ex);
-            throw new TerraformExecutorException("create version file failed.", ex);
+            throw new TerraformExecutorException("version file creation failed.", ex);
         }
     }
 

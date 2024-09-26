@@ -148,13 +148,13 @@ public class ServiceConfigurationManagerTest {
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(deployServiceEntity);
         when(serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
 
-        doThrow(new ServiceConfigurationInvalidException("Invalid configuration"))
+        doThrow(new ServiceConfigurationInvalidException(List.of("Invalid configuration")))
                 .when(serviceConfigurationVariablesJsonSchemaValidator)
                 .validateServiceConfiguration(any(), any(), any());
 
         ServiceConfigurationInvalidException exception = assertThrows(ServiceConfigurationInvalidException.class,
                 () -> serviceConfigurationManager.changeServiceConfiguration(serviceId, configurationUpdate));
-        assertTrue(exception.getMessage().contains("Change service configuration error"));
+        assertTrue(exception.getErrorReasons().contains("Change service configuration error, null"));
     }
 
     @Test
