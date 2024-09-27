@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
@@ -45,6 +46,7 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurati
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdateRequestOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationNotFoundException;
@@ -157,13 +159,23 @@ public class ServiceConfigurationManager {
     /**
      * Query service configuration update request by queryModel.
      */
-    public List<ServiceConfigurationUpdateRequest> listServiceConfigurationUpdateRequest(
-            String orderId, String serviceId, String resourceName, String configManager,
-            ServiceConfigurationStatus status) {
+    public List<ServiceConfigurationUpdateRequestOrderDetails>
+            getAllServiceConfigurationUpdateRequests(String orderId, String serviceId,
+            String resourceName, String configManager, ServiceConfigurationStatus status) {
+        UUID uuidOrderId = StringUtils.isEmpty(orderId) ? null : UUID.fromString(orderId);
         ServiceConfigurationUpdateRequestQueryModel queryModel =
-                new ServiceConfigurationUpdateRequestQueryModel(UUID.fromString(orderId),
+                new ServiceConfigurationUpdateRequestQueryModel(uuidOrderId,
                         UUID.fromString(serviceId), resourceName, configManager, status);
-        return serviceConfigurationUpdateStorage.listServiceConfigurationUpdateRequests(queryModel);
+        List<ServiceConfigurationUpdateRequest> requests = serviceConfigurationUpdateStorage
+                .listServiceConfigurationUpdateRequests(queryModel);
+
+        if (CollectionUtils.isEmpty(requests)) {
+            String errorMsg = String.format("Service configuration update request "
+                    + "with service id %s not found, ", serviceId);
+            log.error(errorMsg);
+            throw new ServiceConfigurationUpdateRequestNotFoundException(errorMsg);
+        }
+        return EntityTransUtils.transToServiceConfigurationUpdateRequestOrderDetails(requests);
     }
 
 

@@ -17,11 +17,11 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
-import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdateRequestOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -102,16 +102,17 @@ public class ServiceConfigurationApi {
      */
     @Tag(name = "ServiceConfiguration",
             description = "APIs for managing service's configuration.")
-    @GetMapping(value = "/services/config/list",
+    @GetMapping(value = "/services/config/requests",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List service's configuration.")
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    public List<ServiceConfigurationUpdateRequest> listServiceConfigurationUpdateRequest(
+    public List<ServiceConfigurationUpdateRequestOrderDetails>
+            getAllServiceConfigurationUpdateRequests(
+            @Parameter(name = "serviceId", description = "Id of the deployed service")
+            @RequestParam(name = "serviceId") String serviceId,
             @Parameter(name = "orderId", description = "id of the service order")
             @RequestParam(name = "orderId", required = false) String orderId,
-            @Parameter(name = "serviceId", description = "Id of the deployed service")
-            @RequestParam(name = "serviceId", required = false) String serviceId,
             @Parameter(name = "resourceName", description = "name of the service resource")
             @RequestParam(name = "resourceName", required = false) String resourceName,
             @Parameter(name = "configManager",
@@ -119,7 +120,7 @@ public class ServiceConfigurationApi {
             @RequestParam(name = "configManager", required = false) String configManager,
             @Parameter(name = "status", description = "Status of the service configuration")
             @RequestParam(name = "status", required = false) ServiceConfigurationStatus status) {
-        return serviceConfigurationManager.listServiceConfigurationUpdateRequest(
+        return serviceConfigurationManager.getAllServiceConfigurationUpdateRequests(
                 orderId, serviceId, resourceName, configManager, status);
     }
 }

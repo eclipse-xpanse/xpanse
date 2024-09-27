@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdateRequestOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -104,21 +105,26 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(deployServiceEntity);
         ServiceOrder order  = changeServiceConfiguration(deployServiceEntity.getId());
         assertEquals(deployServiceEntity.getId(), order.getServiceId());
-        List<ServiceConfigurationUpdateRequest> requests =
+        List<ServiceConfigurationUpdateRequestOrderDetails> requests =
                 listServiceConfigurationUpdateRequests(order.getOrderId(), order.getServiceId());
         assertFalse(requests.isEmpty());
-        assertEquals(requests.size(), 4);
-        requests.forEach(request -> assertEquals(request.getServiceOrderEntity().getOrderId(), order.getOrderId()));
-        requests.forEach(request -> assertEquals(request.getDeployServiceEntity().getId(), order.getServiceId()));
-        requests.forEach(request -> assertEquals(request.getStatus(), ServiceConfigurationStatus.PENDING));
-        requests.forEach(request -> {
-            if(ZOOKEEPER.equals(request.getConfigManager())){
-                assertEquals(request.getProperties(),getZookeeperConfig());
+        assertEquals(requests.size(), 1);
+        requests.forEach(request -> assertEquals(request.getOrderId(), order.getOrderId()));
+        requests.forEach(
+                request -> request.getChangeRequests().forEach(
+                    requestDetails->
+                            assertEquals(requestDetails.getStatus(), ServiceConfigurationStatus.PENDING)
+                )
+        );
+        requests.forEach(request -> request.getChangeRequests().forEach(requestDetails->{
+            if(ZOOKEEPER.equals(requestDetails.getConfigManager())){
+                assertEquals(requestDetails.getProperties(),getZookeeperConfig());
             }
-            if(KAFKA_BROKER.equals(request.getConfigManager())){
-                assertEquals(request.getProperties(),getKafkaBrokerConfig());
+            if(KAFKA_BROKER.equals(requestDetails.getConfigManager())){
+                assertEquals(requestDetails.getProperties(),getKafkaBrokerConfig());
             }
-        });
+
+        }));
     }
 
     DeployServiceEntity test_register_and_deploy_service_well() throws Exception {
@@ -221,11 +227,11 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         }
     }
 
-    List<ServiceConfigurationUpdateRequest> listServiceConfigurationUpdateRequests(UUID orderId,UUID serviceId)
+    List<ServiceConfigurationUpdateRequestOrderDetails> listServiceConfigurationUpdateRequests(UUID orderId, UUID serviceId)
             throws Exception {
 
         final MockHttpServletResponse listResponse = mockMvc.perform(
-                        get("/xpanse/services/config/list")
+                        get("/xpanse/services/config/requests")
                                 .param("orderId", orderId.toString())
                                 .param("serviceId", serviceId.toString())
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -234,6 +240,6 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
         assertNotNull(listResponse.getHeader(HEADER_TRACKING_ID));
         return objectMapper.readValue(listResponse.getContentAsString(),
-                new TypeReference<List<ServiceConfigurationUpdateRequest>>() {});
+                new TypeReference<List<ServiceConfigurationUpdateRequestOrderDetails>>() {});
     }
 }
