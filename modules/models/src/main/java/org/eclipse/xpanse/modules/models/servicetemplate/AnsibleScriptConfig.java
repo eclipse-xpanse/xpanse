@@ -30,21 +30,22 @@ public class AnsibleScriptConfig implements Serializable {
     @NotBlank
     @NotEmpty
     @Schema(description = "name of the ansible playbook. "
-            + "Should be the fully qualified file name (including the directory path) in the repo."
-            + "Eg.,'playbook-name.yml'")
+            + "Should be the fully qualified file name (including the directory path) in the repo.",
+            example = "playbook-name.yml")
     private String playbookName;
 
     @NotNull
     @NotBlank
     @NotEmpty
-    @Schema(description = "Path where the virtualenv is created.")
+    @Schema(description = "Path where the virtualenv must be created.", example = "/tmp/virtualEnv")
     private String virtualEnv;
 
     @NotNull
     @NotBlank
     @NotEmpty
     @Schema(description = "Version of the python. This version of python "
-            + "must be available in node which is acting as the configManager.")
+            + "must be available in node which is acting as the configManager.",
+            example = "3.10")
     private float pythonVersion;
 
     @NotNull
@@ -69,8 +70,8 @@ public class AnsibleScriptConfig implements Serializable {
     @NotBlank
     @NotEmpty
     @Schema(description = "the python module requirements file in GIT repo. "
-            + "Should be the fully qualified file name (including the directory path). "
-            + "E.g modules/requirements.txt")
+            + "Should be the fully qualified file name (including the directory path). ",
+            example = "modules/requirements.txt")
     private String requirementsFile;
 
     @NotNull

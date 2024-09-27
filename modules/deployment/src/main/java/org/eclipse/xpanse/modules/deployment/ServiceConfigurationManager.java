@@ -148,9 +148,9 @@ public class ServiceConfigurationManager {
             return new ServiceOrder(orderId, UUID.fromString(serviceId));
         } catch (ServiceConfigurationInvalidException e) {
             String errorMsg =
-                    String.format("Change service configuration error, %s", e.getMessage());
+                    String.format("Change service configuration error, %s", e.getErrorReasons());
             log.error(errorMsg);
-            throw new ServiceConfigurationInvalidException(List.of(errorMsg));
+            throw e;
         }
     }
 
@@ -453,7 +453,7 @@ public class ServiceConfigurationManager {
         ServiceConfigurationUpdateRequest request =
                 serviceConfigurationUpdateStorage.findById(UUID.fromString(changeId));
         if (Objects.isNull(request)
-                || ServiceConfigurationStatus.PROCESSING.equals(request.getStatus())) {
+                || !ServiceConfigurationStatus.PROCESSING.equals(request.getStatus())) {
             String errorMsg = String.format(
                     "Service Configuration update request with id %s , status %s not found",
                     changeId, ServiceConfigurationStatus.PROCESSING);
