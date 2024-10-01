@@ -113,7 +113,7 @@ class TerraformLocalDeploymentTest {
 
         oclWithGitScripts = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
-        doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any());
+        doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
     }
 
     DeployTask getDeployTask(Ocl ocl, ServiceOrderType taskType) {

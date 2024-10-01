@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -75,12 +74,7 @@ public class TerraformBootHelper {
      * Builds a map of all variables that must be passed to terraform executor.
      */
     public Map<String, Object> getInputVariables(DeployTask deployTask, boolean isDeployRequest) {
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.putAll(this.deployEnvironments.getVariablesFromDeployTask(
-                deployTask, isDeployRequest));
-        inputVariables.putAll(this.deployEnvironments.getFlavorVariables(deployTask));
-        inputVariables.putAll(this.deployEnvironments.getAvailabilityZoneVariables(deployTask));
-        return inputVariables;
+        return this.deployEnvironments.getInputVariables(deployTask, isDeployRequest);
     }
 
     /**
@@ -88,12 +82,7 @@ public class TerraformBootHelper {
      * terraform executor.
      */
     public Map<String, String> getEnvironmentVariables(DeployTask deployTask) {
-        Map<String, String> envVariables = new HashMap<>();
-        envVariables.putAll(this.deployEnvironments.getEnvFromDeployTask(deployTask));
-        envVariables.putAll(this.deployEnvironments.getCredentialVariables(deployTask));
-        envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(
-                deployTask.getDeployRequest().getCsp()));
-        return envVariables;
+        return this.deployEnvironments.getEnvironmentVariables(deployTask);
     }
 
     /**

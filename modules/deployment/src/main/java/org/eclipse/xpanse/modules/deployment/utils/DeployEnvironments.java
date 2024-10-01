@@ -41,6 +41,7 @@ import org.springframework.util.CollectionUtils;
 public class DeployEnvironments {
 
     private static final String VAR_REGION = "region";
+    private static final String VAR_SERVICE_ID = "service_id";
 
     private final AesUtil aesUtil;
 
@@ -73,7 +74,7 @@ public class DeployEnvironments {
      *
      * @param task the context of the task.
      */
-    public Map<String, String> getEnvFromDeployTask(DeployTask task) {
+    private Map<String, String> getEnvFromDeployTask(DeployTask task) {
         return getEnv(
                 task.getOcl().getCloudServiceProvider().getName(),
                 task.getDeployRequest().getServiceRequestProperties(),
@@ -132,7 +133,7 @@ public class DeployEnvironments {
      *
      * @param task the DeployTask.
      */
-    public Map<String, String> getFlavorVariables(DeployTask task) {
+    private Map<String, String> getFlavorVariables(DeployTask task) {
         return getFlavorVariables(task.getOcl(), task.getDeployRequest().getFlavor());
     }
 
@@ -150,7 +151,7 @@ public class DeployEnvironments {
      *
      * @param task the DeployTask.
      */
-    public Map<String, String> getAvailabilityZoneVariables(DeployTask task) {
+    private Map<String, String> getAvailabilityZoneVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
         List<AvailabilityZoneConfig> availabilityZoneConfigs =
                 task.getOcl().getDeployment().getServiceAvailabilityConfigs();
@@ -170,11 +171,22 @@ public class DeployEnvironments {
     }
 
     /**
+     * Get availability zone variables.
+     *
+     * @param task the DeployTask.
+     */
+    private Map<String, String> getServiceIdVariables(DeployTask task) {
+        Map<String, String> variables = new HashMap<>();
+        variables.put(VAR_SERVICE_ID, task.getServiceId().toString());
+        return variables;
+    }
+
+    /**
      * Get deployment variables.
      *
      * @param task the DeployTask.
      */
-    public Map<String, Object> getVariablesFromDeployTask(DeployTask task,
+    private Map<String, Object> getVariablesFromDeployTask(DeployTask task,
                                                           boolean isDeployRequest) {
         Map<String, Object> variables = getVariables(
                 task.getDeployRequest().getServiceRequestProperties(),
@@ -230,7 +242,7 @@ public class DeployEnvironments {
      *
      * @param task deployment task.
      */
-    public Map<String, String> getCredentialVariables(DeployTask task) {
+    private Map<String, String> getCredentialVariables(DeployTask task) {
         ServiceHostingType serviceHostingType = task.getDeployRequest().getServiceHostingType();
         CredentialType credentialType = task.getOcl().getDeployment().getCredentialType();
         String site = task.getDeployRequest().getRegion().getSite();
@@ -254,7 +266,7 @@ public class DeployEnvironments {
      *
      * @param csp CSP for which the mandatory variables defined in its plugins must be returned.
      */
-    public Map<String, String> getPluginMandatoryVariables(Csp csp) {
+    private Map<String, String> getPluginMandatoryVariables(Csp csp) {
         Map<String, String> variables = new HashMap<>();
         this.pluginManager.getOrchestratorPlugin(csp)
                 .requiredProperties().forEach(variable -> variables.put(variable,
@@ -281,5 +293,30 @@ public class DeployEnvironments {
         allVariables.putAll(getEnv(csp, serviceRequestProperties, deployVariables));
         allVariables.putAll(getFlavorVariables(ocl, requestedFlavor));
         return allVariables;
+    }
+
+    /**
+     * Builds a map of all environment variables that must be passed to the deployer.
+     */
+    public Map<String, String> getEnvironmentVariables(DeployTask deployTask) {
+        Map<String, String> envVariables = new HashMap<>();
+        envVariables.putAll(getEnvFromDeployTask(deployTask));
+        envVariables.putAll(getCredentialVariables(deployTask));
+        envVariables.putAll(getPluginMandatoryVariables(
+                deployTask.getDeployRequest().getCsp()));
+        return envVariables;
+    }
+
+    /**
+     * Builds a map of all variables that must be passed to the deployer.
+     */
+    public Map<String, Object> getInputVariables(DeployTask deployTask, boolean isDeployRequest) {
+        Map<String, Object> inputVariables = new HashMap<>();
+        inputVariables.putAll(getVariablesFromDeployTask(
+                deployTask, isDeployRequest));
+        inputVariables.putAll(getFlavorVariables(deployTask));
+        inputVariables.putAll(getAvailabilityZoneVariables(deployTask));
+        inputVariables.putAll(getServiceIdVariables(deployTask));
+        return inputVariables;
     }
 }

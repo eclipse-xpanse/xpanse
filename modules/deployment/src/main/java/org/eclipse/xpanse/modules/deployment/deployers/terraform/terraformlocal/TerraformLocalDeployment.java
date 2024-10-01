@@ -274,17 +274,9 @@ public class TerraformLocalDeployment implements Deployer {
      */
     private TerraformLocalExecutor getExecutorForDeployTask(DeployTask task, String workspace,
                                                             boolean isDeployTask) {
-        Map<String, String> envVariables = this.deployEnvironments.getEnvFromDeployTask(task);
-        Map<String, Object> inputVariables =
-                this.deployEnvironments.getVariablesFromDeployTask(task, isDeployTask);
-        // load flavor variables also as input variables for terraform executor.
-        inputVariables.putAll(this.deployEnvironments.getFlavorVariables(task));
-        // load availability zone variables also as input variables for OpenTofu executor.
-        inputVariables.putAll(this.deployEnvironments.getAvailabilityZoneVariables(task));
-        // load credential variables also as env variables for terraform executor.
-        envVariables.putAll(this.deployEnvironments.getCredentialVariables(task));
-        envVariables.putAll(this.deployEnvironments.getPluginMandatoryVariables(
-                task.getDeployRequest().getCsp()));
+        Map<String, String> envVariables = this.deployEnvironments.getEnvironmentVariables(task);
+        Map<String, Object> inputVariables = this.deployEnvironments.getInputVariables(
+                task, isDeployTask);
         return getExecutor(envVariables, inputVariables, workspace, task.getOcl().getDeployment());
     }
 

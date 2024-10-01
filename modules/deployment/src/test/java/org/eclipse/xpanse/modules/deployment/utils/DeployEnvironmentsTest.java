@@ -63,7 +63,7 @@ class DeployEnvironmentsTest {
     private final String userId = "userId";
     private final String siteName = "Chinese Mainland";
     private final String regionName = "cn-north-4";
-    private final String areaName = "Asia China";
+    private final UUID serviceId = UUID.randomUUID();
 
     private DeployTask task;
     private DeployRequest deployRequest;
@@ -99,6 +99,7 @@ class DeployEnvironmentsTest {
         deployRequest.setCsp(Csp.HUAWEI_CLOUD);
         Region region = new Region();
         region.setName(regionName);
+        String areaName = "Asia China";
         region.setArea(areaName);
         region.setSite(siteName);
         deployRequest.setRegion(region);
@@ -146,6 +147,7 @@ class DeployEnvironmentsTest {
         task = new DeployTask();
         task.setDeployRequest(deployRequest);
         task.setOcl(ocl);
+        task.setServiceId(serviceId);
 
         deployEnvironmentsUnderTest =
                 new DeployEnvironments(mockCredentialCenter, aesUtil, pluginManager, environment);
@@ -158,12 +160,11 @@ class DeployEnvironmentsTest {
         expectedResult.put("example", null);
         expectedResult.put("key1", null);
         expectedResult.put("key2", "value2");
-
         task.getOcl().getCloudServiceProvider().setName(Csp.HUAWEI_CLOUD);
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(mockOrchestratorPlugin);
         when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD)
                 .getEnvVarKeysMappingMap()).thenReturn(Collections.emptyMap());
-        Map<String, String> result = deployEnvironmentsUnderTest.getEnvFromDeployTask(task);
+        Map<String, String> result = deployEnvironmentsUnderTest.getEnvironmentVariables(task);
         assertThat(result).isEqualTo(expectedResult);
 
         String osAuthUrl = "http://127.0.0.1";
@@ -173,15 +174,18 @@ class DeployEnvironmentsTest {
                 .getEnvVarKeysMappingMap()).thenReturn(
                 Map.of("OS_AUTH_URL", "OPENSTACK_TESTLAB_AUTH_URL"));
         when(environment.getProperty("OPENSTACK_TESTLAB_AUTH_URL")).thenReturn(osAuthUrl);
-        Map<String, String> result2 = deployEnvironmentsUnderTest.getEnvFromDeployTask(task);
+        Map<String, String> result2 = deployEnvironmentsUnderTest.getEnvironmentVariables(task);
         assertThat(result2).isEqualTo(expectedResult);
     }
 
     @Test
     void testGetFlavorVariables() {
-        Map<String, String> expectedResult = Map.ofEntries(Map.entry("key", "value"));
+        Map<String, String> expectedResult = Map.ofEntries(
+                Map.entry("region", "cn-north-4"),
+                Map.entry("key", "value"),
+                Map.entry("service_id", serviceId.toString()));
 
-        Map<String, String> result = deployEnvironmentsUnderTest.getFlavorVariables(task);
+        Map<String, Object> result = deployEnvironmentsUnderTest.getInputVariables(task, true);
 
         // Verify the results
         assertEquals(result, expectedResult);
@@ -196,7 +200,7 @@ class DeployEnvironmentsTest {
 
         // Verify the results
         assertThrows(FlavorInvalidException.class,
-                () -> deployEnvironmentsUnderTest.getFlavorVariables(task));
+                () -> deployEnvironmentsUnderTest.getInputVariables(task, true));
     }
 
     @Test
@@ -207,14 +211,16 @@ class DeployEnvironmentsTest {
         deployVariable3.setKind(DeployVariableKind.FIX_VARIABLE);
 
         Map<String, String> expectedResult = new HashMap<>();
-        expectedResult.put("name", "value");
+        expectedResult.put("example", null);
+        expectedResult.put("key", "value");
         expectedResult.put("key1", null);
         expectedResult.put("key2", "value2");
-        expectedResult.put("example", null);
+        expectedResult.put("name", "value");
         expectedResult.put("region", regionName);
+        expectedResult.put("service_id", serviceId.toString());
 
         final Map<String, Object> result =
-                deployEnvironmentsUnderTest.getVariablesFromDeployTask(task, true);
+                deployEnvironmentsUnderTest.getInputVariables(task, true);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -239,9 +245,11 @@ class DeployEnvironmentsTest {
                         userId, variables);
         when(mockCredentialCenter.getCredential(csp, siteName, credentialType,
                 deployRequest.getUserId())).thenReturn(abstractCredentialInfo);
-
+        when(pluginManager.getOrchestratorPlugin(any())).thenReturn(mockOrchestratorPlugin);
+        when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD)
+                .getEnvVarKeysMappingMap()).thenReturn(Collections.emptyMap());
         Map<String, String> variablesActual =
-                deployEnvironmentsUnderTest.getCredentialVariables(task);
+                deployEnvironmentsUnderTest.getEnvironmentVariables(task);
 
         assertEquals(2, variablesActual.size());
         for (CredentialVariable variable : variables) {
@@ -272,9 +280,11 @@ class DeployEnvironmentsTest {
                 variables);
         when(mockCredentialCenter.getCredential(csp, siteName, credentialType, null)).thenReturn(
                 abstractCredentialInfo);
-
+        when(pluginManager.getOrchestratorPlugin(any())).thenReturn(mockOrchestratorPlugin);
+        when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD)
+                .getEnvVarKeysMappingMap()).thenReturn(Collections.emptyMap());
         Map<String, String> variablesActual =
-                deployEnvironmentsUnderTest.getCredentialVariables(task);
+                deployEnvironmentsUnderTest.getEnvironmentVariables(task);
 
         assertEquals(2, variablesActual.size());
         for (CredentialVariable variable : variables) {
@@ -298,6 +308,12 @@ class DeployEnvironmentsTest {
         deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
         deployRequest.setVersion(ocl.getServiceVersion());
         deployRequest.setFlavor(ocl.getFlavors().getServiceFlavors().getFirst().getName());
+        Region region = new Region();
+        region.setName(regionName);
+        String areaName = "Asia China";
+        region.setArea(areaName);
+        region.setSite(siteName);
+        deployRequest.setRegion(region);
 
         Map<String, Object> property = new HashMap<>();
         property.put("secgroup_id", "1234567890");
@@ -310,12 +326,11 @@ class DeployEnvironmentsTest {
         xpanseDeployTask.setUserId("userId");
         xpanseDeployTask.setOcl(ocl);
         xpanseDeployTask.setDeployRequest(deployRequest);
-
         when(this.pluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(
                 mockOrchestratorPlugin);
         when(mockOrchestratorPlugin.requiredProperties()).thenReturn(List.of("OS_AUTH_URL"));
-        Map<String, String> variables = deployEnvironmentsUnderTest.getPluginMandatoryVariables(
-                xpanseDeployTask.getDeployRequest().getCsp());
+        Map<String, String> variables = deployEnvironmentsUnderTest.getEnvironmentVariables(
+                xpanseDeployTask);
 
         Assertions.assertNotNull(variables);
     }
