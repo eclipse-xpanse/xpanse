@@ -83,7 +83,7 @@
         <semver4j.version>5.4.0</semver4j.version>
         <springdoc.openapi.plugin.version>1.4</springdoc.openapi.plugin.version>
         <swagger.parser.version>2.1.22</swagger.parser.version>
-        <swagger.core.v3.version>2.2.24</swagger.core.v3.version>
+        <swagger.core.v3.version>2.2.25</swagger.core.v3.version>
         <hcl4j.version>0.9.2</hcl4j.version>
         <jackson.datatype.jsr310.version>2.18.0</jackson.datatype.jsr310.version>
     </properties>
