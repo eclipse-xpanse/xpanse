@@ -136,7 +136,7 @@ class TofuMakerDeploymentTest {
 
     @Test
     void testDeploy() {
-        doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any());
+        doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         DeployResult deployResult = openTofuMakerDeployment.deploy(deployTask);
@@ -150,7 +150,7 @@ class TofuMakerDeploymentTest {
                 TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
-            doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any());
+            doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
             deployTask.setTaskType(ServiceOrderType.MODIFY);
             deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
             DeployResult deployResult = openTofuMakerDeployment.modify(deployTask);

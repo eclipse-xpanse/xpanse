@@ -114,7 +114,7 @@ class OpenTofuLocalDeploymentTest {
         oclWithGitScripts = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
         oclWithGitScripts.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
-        doReturn(new HashMap<>()).when(this.deployEnvironments).getCredentialVariables(any());
+        doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
     }
 
     DeployTask getDeployTask(Ocl ocl, ServiceOrderType serviceOrderType) {
