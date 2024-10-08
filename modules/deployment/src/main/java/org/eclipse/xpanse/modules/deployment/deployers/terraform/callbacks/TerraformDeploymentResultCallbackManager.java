@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
+import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
@@ -25,6 +26,8 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.g
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.deployment.recreate.RecreateService;
+import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -54,6 +57,8 @@ public class TerraformDeploymentResultCallbackManager {
     @Resource
     private MigrationService migrationService;
     @Resource
+    private RecreateService recreateService;
+    @Resource
     private WorkflowUtils workflowUtils;
     @Resource
     private ServiceTemplateStorage serviceTemplateStorage;
@@ -81,6 +86,12 @@ public class TerraformDeploymentResultCallbackManager {
         if (Objects.nonNull(serviceMigrationEntity)) {
             workflowUtils.completeReceiveTask(serviceMigrationEntity.getMigrationId().toString(),
                     MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
+        }
+        ServiceRecreateEntity serviceRecreateEntity =
+                recreateService.getServiceRecreateEntityByNewServiceId(serviceId);
+        if (Objects.nonNull(serviceRecreateEntity)) {
+            workflowUtils.completeReceiveTask(serviceRecreateEntity.getRecreateId().toString(),
+                    RecreateConstants.RECREATE_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
         }
         updateServiceOrderEntity(deployResult);
     }
@@ -114,6 +125,12 @@ public class TerraformDeploymentResultCallbackManager {
         if (Objects.nonNull(serviceMigrationEntity)) {
             workflowUtils.completeReceiveTask(serviceMigrationEntity.getMigrationId().toString(),
                     MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
+        }
+        ServiceRecreateEntity serviceRecreateEntity =
+                recreateService.getServiceRecreateEntityByServiceId(serviceId);
+        if (Objects.nonNull(serviceRecreateEntity)) {
+            workflowUtils.completeReceiveTask(serviceRecreateEntity.getRecreateId().toString(),
+                    RecreateConstants.RECREATE_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
         }
         updateServiceOrderEntity(deployResult);
     }

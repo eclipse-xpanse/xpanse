@@ -15,6 +15,7 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
@@ -23,6 +24,7 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
+import org.eclipse.xpanse.modules.models.workflow.recreate.view.ServiceRecreateDetails;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -137,6 +139,19 @@ public class EntityTransUtils {
             ServiceMigrationEntity serviceMigrationEntity) {
         ServiceMigrationDetails details = new ServiceMigrationDetails();
         BeanUtils.copyProperties(serviceMigrationEntity, details);
+        return details;
+    }
+
+    /**
+     * ServiceRecreateEntity converted to ServiceRecreateDetails.
+     *
+     * @param serviceRecreateEntity ServiceRecreateEntity.
+     * @return ServiceRecreateDetails
+     */
+    public static ServiceRecreateDetails transToServiceRecreateDetails(
+            ServiceRecreateEntity serviceRecreateEntity) {
+        ServiceRecreateDetails details = new ServiceRecreateDetails();
+        BeanUtils.copyProperties(serviceRecreateEntity, details);
         return details;
     }
 
