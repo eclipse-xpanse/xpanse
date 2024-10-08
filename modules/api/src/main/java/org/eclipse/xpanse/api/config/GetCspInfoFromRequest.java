@@ -24,6 +24,8 @@ import org.eclipse.xpanse.modules.database.serviceorder.DatabaseServiceOrderStor
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
+import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
+import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateStorage;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.DatabaseServiceStateManagementTaskStorage;
 import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
@@ -58,6 +60,8 @@ public class GetCspInfoFromRequest {
     private DatabaseServiceStateManagementTaskStorage managementTaskStorage;
     @Resource
     private DatabaseServiceOrderStorage serviceOrderTaskStorage;
+    @Resource
+    private ServiceRecreateStorage serviceRecreateStorage;
 
     /**
      * Get Csp with the URL of Ocl.
@@ -132,6 +136,31 @@ public class GetCspInfoFromRequest {
                 DeployServiceEntity deployService =
                         deployServiceStorage.findDeployServiceById(
                                 serviceMigrationEntity.getOldServiceId());
+                return deployService.getCsp();
+            }
+        } catch (Exception e) {
+            log.error("Get csp with service migration id:{} failed.", id, e);
+        }
+        return null;
+    }
+
+    /**
+     * Get Csp with id of recreate.
+     *
+     * @param id id of service.
+     * @return csp.
+     */
+    public Csp getCspFromServiceRecreateId(String id) {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
+        try {
+            ServiceRecreateEntity serviceRecreateEntity =
+                    serviceRecreateStorage.findServiceRecreateById(UUID.fromString(id));
+            if (Objects.nonNull(serviceRecreateEntity)) {
+                DeployServiceEntity deployService =
+                        deployServiceStorage.findDeployServiceById(
+                                serviceRecreateEntity.getServiceId());
                 return deployService.getCsp();
             }
         } catch (Exception e) {
