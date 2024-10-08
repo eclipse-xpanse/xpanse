@@ -18,7 +18,7 @@ public class AnsibleScriptConfigTest {
 
     private final String playbookName = "kafka-container-manage.yml";
     private final String virtualEnv = "/workspace";
-    private final float pythonVersion = 3.11F;
+    private final String pythonVersion = "3.10";
     private final Boolean isPrepareAnsibleEnvironment = Boolean.TRUE;
     private final String repoUrl = "https://github.com/";
     private final String branch = "feature/testAnsible";
