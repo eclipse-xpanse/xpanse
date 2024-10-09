@@ -33,12 +33,12 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 
 /**
- * ServiceConfigurationUpdateRequest for persistence.
+ * ServiceConfigurationChangeDetailsEntity for persistence.
  */
-@Table(name = "SERVICE_CONFIGURATION_UPDATE_REQUEST")
+@Table(name = "SERVICE_CONFIGURATION_CHANGE_DETAILS")
 @Entity
 @Data
-public class ServiceConfigurationUpdateRequest implements Serializable {
+public class ServiceConfigurationChangeDetailsEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 8759112725757851274L;

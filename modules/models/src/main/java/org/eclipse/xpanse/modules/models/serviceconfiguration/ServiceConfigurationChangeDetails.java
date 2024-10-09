@@ -16,7 +16,7 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfi
  * service configuration change request details.
  */
 @Data
-public class ServiceConfigurationChangeRequestDetails {
+public class ServiceConfigurationChangeDetails {
 
     @NotNull
     @Schema(description = "ID of the change request created as part of the change order.")

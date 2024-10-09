@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateStorage;
+import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
@@ -57,7 +57,7 @@ public class ServiceConfigurationManagerTest {
     private DeployServiceEntityHandler deployServiceEntityHandler;
 
     @Mock
-    private ServiceConfigurationUpdateStorage serviceConfigurationUpdateStorage;
+    private ServiceConfigurationChangeDetailsStorage serviceConfigurationChangeDetailsStorage;
 
     @Mock
     private ServiceTemplateStorage serviceTemplateStorage;
@@ -164,7 +164,7 @@ public class ServiceConfigurationManagerTest {
 
     @Test
     public void testGetPendingConfigurationChangeRequest_NoRequests() {
-        when(serviceConfigurationUpdateStorage.listServiceConfigurationUpdateRequests(any()))
+        when(serviceConfigurationChangeDetailsStorage.listServiceConfigurationChangeDetails(any()))
                 .thenReturn(Collections.emptyList());
 
         ResponseEntity<ServiceConfigurationChangeRequest> response = serviceConfigurationManager

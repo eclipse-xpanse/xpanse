@@ -91,8 +91,7 @@ public class TofuMakerServiceDestroyer {
     }
 
     private OpenTofuAsyncDestroyFromScriptsRequest getDestroyFromScriptsRequest(DeployTask task,
-                                                                                String stateFile)
-            throws OpenTofuMakerRequestFailedException {
+             String stateFile) throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncDestroyFromScriptsRequest request =
                 new OpenTofuAsyncDestroyFromScriptsRequest();
         request.setRequestId(task.getOrderId());

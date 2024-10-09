@@ -93,4 +93,9 @@ public class ServiceOrderEntity {
     @Convert(converter = ObjectJsonConverter.class)
     private Map<String, String> previousDeployedResultProperties;
 
+    @Column(name = "NEW_CONFIG_REQUEST", columnDefinition = "json")
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private Map<String, Object> newConfigRequest;
+
 }
