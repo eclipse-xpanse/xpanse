@@ -85,6 +85,7 @@ public class PolicyValidator {
         List<ServicePolicy> servicePolicies = getServicePolicies(deployTask.getServiceTemplateId());
         List<UserPolicy> userPolicies = getUserPolicies(deployTask);
         if (CollectionUtils.isEmpty(userPolicies) && CollectionUtils.isEmpty(servicePolicies)) {
+            log.info("No service or user policies found.");
             return;
         }
         String planJson = deployerKindManager.getDeployment(

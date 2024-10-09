@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.api.config.AuditLogWriter;
 import org.eclipse.xpanse.api.config.GetCspInfoFromRequest;
+import org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
@@ -116,14 +117,14 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     void testServiceStateManageApisThrowExceptions() throws Exception {
         // Setup
         UUID uuid = UUID.randomUUID();
-        Response result = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+        Response result = CommonExceptionHandler.getErrorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 Collections.singletonList(String.format("Service with id %s not found.", uuid)));
         // run the test
         final MockHttpServletResponse response = startService(uuid);
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(objectMapper.writeValueAsString(result)).isEqualTo(
-                response.getContentAsString());
+        assertThat(response.getContentAsString()).isEqualTo(
+                objectMapper.writeValueAsString(result));
 
         Region region = new Region();
         region.setName("cn-southwest-2");

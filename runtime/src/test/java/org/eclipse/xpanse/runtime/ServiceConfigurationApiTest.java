@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.models.response.Response;
+import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -36,6 +37,7 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurati
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
@@ -153,6 +155,27 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         entity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
         entity.setServiceState(ServiceState.RUNNING);
         entity.setDeployResourceList(getDeployResources());
+
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setServiceName(ocl.getName());
+        deployRequest.setVersion(ocl.getServiceVersion());
+        deployRequest.setFlavor(ocl.getFlavors().getServiceFlavors().getFirst().getName());
+        Region region = ocl.getCloudServiceProvider().getRegions().getFirst();
+        deployRequest.setRegion(region);
+        deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
+        deployRequest.setCategory(ocl.getCategory());
+        deployRequest.setCustomerServiceName("test_deploy");
+        deployRequest.setServiceHostingType(ocl.getServiceHostingType());
+        Map<String, Object> serviceRequestProperties = new HashMap<>();
+        ocl.getDeployment().getVariables().forEach(
+                variable -> serviceRequestProperties.put(variable.getName(),
+                        variable.getExample()));
+        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
+        serviceRequestProperties.putAll(
+                ocl.getFlavors().getServiceFlavors().getFirst().getProperties());
+        serviceRequestProperties.put("region", region.getName());
+        deployRequest.setServiceRequestProperties(serviceRequestProperties);
+        entity.setDeployRequest(deployRequest);
         deployServiceStorage.storeAndFlush(entity);
         return entity;
     }
