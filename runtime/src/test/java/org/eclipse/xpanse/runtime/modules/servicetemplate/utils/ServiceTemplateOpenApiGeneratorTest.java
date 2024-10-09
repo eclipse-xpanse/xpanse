@@ -35,8 +35,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 class ServiceTemplateOpenApiGeneratorTest {
 
     private static final String appVersion = "1.0.0";
-    private final String ID = "488adf44-b48f-43fb-9b7f-61e79f40016a";
-    private final UUID RANDOM_UUID = UUID.fromString(ID);
+    private UUID serviceId;
     private OpenApiGeneratorJarManage openApiGeneratorJarManage;
     @InjectMocks
     private ServiceTemplateOpenApiGenerator openApiGenerator;
@@ -45,6 +44,7 @@ class ServiceTemplateOpenApiGeneratorTest {
     void init() {
         String openApiPath = "openapi/";
         Integer serverPort = 8080;
+        serviceId = UUID.randomUUID();
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(openApiPath, serverPort);
         String clientDownloadURL = "https://repo1.maven.org/maven2/org/"
                 + "openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar";
@@ -95,7 +95,7 @@ class ServiceTemplateOpenApiGeneratorTest {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         openApiGenerator.createServiceApi(serviceTemplateEntity);
         String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();
-        File htmlFile = new File(openApiWorkdir, ID + ".html");
+        File htmlFile = new File(openApiWorkdir, serviceTemplateEntity.getId() + ".html");
         Assertions.assertTrue(htmlFile.exists());
     }
 
@@ -107,9 +107,9 @@ class ServiceTemplateOpenApiGeneratorTest {
     }
 
     void deleteServiceApi() {
-        openApiGenerator.deleteServiceApi(ID);
+        openApiGenerator.deleteServiceApi(serviceId.toString());
         String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();
-        File htmlFile = new File(openApiWorkdir, ID + ".html");
+        File htmlFile = new File(openApiWorkdir, serviceId + ".html");
         Assertions.assertFalse(htmlFile.exists());
     }
 
@@ -126,7 +126,7 @@ class ServiceTemplateOpenApiGeneratorTest {
                 serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
                         ocl.getDeployment().getVariables());
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setId(RANDOM_UUID);
+        serviceTemplateEntity.setId(serviceId);
         serviceTemplateEntity.setName(ocl.getName());
         serviceTemplateEntity.setVersion(ocl.getServiceVersion());
         serviceTemplateEntity.setCsp(ocl.getCloudServiceProvider().getName());
