@@ -26,7 +26,6 @@ import java.util.Objects;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateRequest;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
@@ -34,7 +33,7 @@ import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdateRequestOrderDetails;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -105,8 +104,8 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(deployServiceEntity);
         ServiceOrder order  = changeServiceConfiguration(deployServiceEntity.getId());
         assertEquals(deployServiceEntity.getId(), order.getServiceId());
-        List<ServiceConfigurationUpdateRequestOrderDetails> requests =
-                listServiceConfigurationUpdateRequests(order.getOrderId(), order.getServiceId());
+        List<ServiceConfigurationChangeOrderDetails> requests =
+                listServiceConfigurationChangeDetails(order.getOrderId(), order.getServiceId());
         assertFalse(requests.isEmpty());
         assertEquals(requests.size(), 1);
         requests.forEach(request -> assertEquals(request.getOrderId(), order.getOrderId()));
@@ -227,7 +226,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         }
     }
 
-    List<ServiceConfigurationUpdateRequestOrderDetails> listServiceConfigurationUpdateRequests(UUID orderId, UUID serviceId)
+    List<ServiceConfigurationChangeOrderDetails> listServiceConfigurationChangeDetails(UUID orderId, UUID serviceId)
             throws Exception {
 
         final MockHttpServletResponse listResponse = mockMvc.perform(
@@ -240,6 +239,6 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
         assertNotNull(listResponse.getHeader(HEADER_TRACKING_ID));
         return objectMapper.readValue(listResponse.getContentAsString(),
-                new TypeReference<List<ServiceConfigurationUpdateRequestOrderDetails>>() {});
+                new TypeReference<List<ServiceConfigurationChangeOrderDetails>>() {});
     }
 }

@@ -8,8 +8,8 @@ package org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions;
 /**
  * Exception thrown when service configuration update request not found.
  */
-public class ServiceConfigurationUpdateRequestNotFoundException extends RuntimeException {
-    public ServiceConfigurationUpdateRequestNotFoundException(String message) {
+public class ServiceConfigurationChangeDetailsEntityNotFoundException extends RuntimeException {
+    public ServiceConfigurationChangeDetailsEntityNotFoundException(String message) {
         super(message);
     }
 }

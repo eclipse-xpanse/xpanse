@@ -23,32 +23,33 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @Transactional
-public class DatabaseServiceConfigurationUpdateStorage
-        implements ServiceConfigurationUpdateStorage {
+public class DatabaseServiceConfigurationChangeDetailsStorage
+        implements ServiceConfigurationChangeDetailsStorage {
 
-    private final ServiceConfigurationUpdateRepository serviceConfigurationUpdateRepository;
+    private final ServiceConfigurationChangeDetailsRepository repository;
 
     @Autowired
-    public DatabaseServiceConfigurationUpdateStorage(
-            ServiceConfigurationUpdateRepository serviceConfigurationUpdateRepository) {
-        this.serviceConfigurationUpdateRepository = serviceConfigurationUpdateRepository;
+    public DatabaseServiceConfigurationChangeDetailsStorage(
+            ServiceConfigurationChangeDetailsRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public ServiceConfigurationUpdateRequest storeAndFlush(
-            ServiceConfigurationUpdateRequest serviceConfigurationUpdateRequest) {
-        return serviceConfigurationUpdateRepository.saveAndFlush(serviceConfigurationUpdateRequest);
+    public ServiceConfigurationChangeDetailsEntity storeAndFlush(
+            ServiceConfigurationChangeDetailsEntity serviceConfigurationChangeDetailsEntity) {
+        return repository.saveAndFlush(serviceConfigurationChangeDetailsEntity);
     }
 
     @Override
-    public <S extends ServiceConfigurationUpdateRequest> List<S> saveAll(Iterable<S> entities) {
-        return serviceConfigurationUpdateRepository.saveAll(entities);
+    public <S extends ServiceConfigurationChangeDetailsEntity>
+            List<S> saveAll(Iterable<S> entities) {
+        return repository.saveAll(entities);
     }
 
     @Override
-    public List<ServiceConfigurationUpdateRequest> listServiceConfigurationUpdateRequests(
-            ServiceConfigurationUpdateRequestQueryModel requestQuery) {
-        Specification<ServiceConfigurationUpdateRequest> specification =
+    public List<ServiceConfigurationChangeDetailsEntity> listServiceConfigurationChangeDetails(
+            ServiceConfigurationChangeDetailsQueryModel requestQuery) {
+        Specification<ServiceConfigurationChangeDetailsEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(requestQuery.getOrderId())) {
@@ -78,11 +79,11 @@ public class DatabaseServiceConfigurationUpdateStorage
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
                 };
-        return serviceConfigurationUpdateRepository.findAll(specification);
+        return repository.findAll(specification);
     }
 
     @Override
-    public ServiceConfigurationUpdateRequest findById(UUID changeId) {
-        return serviceConfigurationUpdateRepository.findById(changeId).orElse(null);
+    public ServiceConfigurationChangeDetailsEntity findById(UUID changeId) {
+        return repository.findById(changeId).orElse(null);
     }
 }

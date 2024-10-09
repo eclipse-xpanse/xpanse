@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
-import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationUpdateRequest;
+import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
@@ -28,9 +28,9 @@ import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateMan
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeRequestDetails;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeDetails;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdateRequestOrderDetails;
 import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
 import org.eclipse.xpanse.modules.models.workflow.recreate.view.ServiceRecreateDetails;
 import org.springframework.beans.BeanUtils;
@@ -205,28 +205,31 @@ public class EntityTransUtils {
     }
 
     /**
-     * Collection of ServiceConfigurationUpdateRequest converted to
+     * Collection of ServiceConfigurationChangeDetailsEntity converted to
      * Collection of ServiceConfigurationUpdateRequestOrderDetails.
      *
-     * @param requests Collection of ServiceConfigurationUpdateRequest.
+     * @param requests Collection of ServiceConfigurationChangeDetailsEntity.
      * @return Collection of ServiceConfigurationUpdateRequestOrderDetails.
      */
-    public static List<ServiceConfigurationUpdateRequestOrderDetails>
-            transToServiceConfigurationUpdateRequestOrderDetails(
-            List<ServiceConfigurationUpdateRequest> requests) {
+    public static List<ServiceConfigurationChangeOrderDetails>
+            transToServiceConfigurationChangeOrderDetails(
+            List<ServiceConfigurationChangeDetailsEntity> requests) {
 
-        Map<UUID, List<ServiceConfigurationUpdateRequest>> orderDetailsMap = requests.stream()
+        Map<UUID, List<ServiceConfigurationChangeDetailsEntity>> orderDetailsMap = requests.stream()
                 .collect(Collectors.groupingBy(
                         request -> request.getServiceOrderEntity().getOrderId()));
-        List<ServiceConfigurationUpdateRequestOrderDetails> orderDetailsList = new ArrayList<>();
+        List<ServiceConfigurationChangeOrderDetails> orderDetailsList = new ArrayList<>();
         orderDetailsMap.forEach((orderId, requestList) -> {
-            ServiceConfigurationUpdateRequestOrderDetails orderDetails =
-                    new ServiceConfigurationUpdateRequestOrderDetails();
+            ServiceConfigurationChangeOrderDetails orderDetails =
+                    new ServiceConfigurationChangeOrderDetails();
             orderDetails.setOrderId(orderId);
-            List<ServiceConfigurationChangeRequestDetails> detailsList = new ArrayList<>();
+            ServiceOrderEntity orderEntity = requestList.getFirst().getServiceOrderEntity();
+            orderDetails.setConfigRequest(orderEntity.getNewConfigRequest());
+            orderDetails.setOrderStatus(orderEntity.getTaskStatus());
+            List<ServiceConfigurationChangeDetails> detailsList = new ArrayList<>();
             requestList.forEach(request -> {
-                ServiceConfigurationChangeRequestDetails details =
-                        new ServiceConfigurationChangeRequestDetails();
+                ServiceConfigurationChangeDetails details =
+                        new ServiceConfigurationChangeDetails();
                 details.setChangeId(request.getId());
                 details.setResourceName(request.getResourceName());
                 details.setConfigManager(request.getConfigManager());

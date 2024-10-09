@@ -19,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdateRequestOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -107,8 +107,8 @@ public class ServiceConfigurationApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List service's configuration.")
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    public List<ServiceConfigurationUpdateRequestOrderDetails>
-            getAllServiceConfigurationUpdateRequests(
+    public List<ServiceConfigurationChangeOrderDetails>
+            getAllServiceConfigurationChangeDetails(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
             @RequestParam(name = "serviceId") String serviceId,
             @Parameter(name = "orderId", description = "id of the service order")
@@ -120,7 +120,7 @@ public class ServiceConfigurationApi {
             @RequestParam(name = "configManager", required = false) String configManager,
             @Parameter(name = "status", description = "Status of the service configuration")
             @RequestParam(name = "status", required = false) ServiceConfigurationStatus status) {
-        return serviceConfigurationManager.getAllServiceConfigurationUpdateRequests(
+        return serviceConfigurationManager.getAllServiceConfigurationChangeDetails(
                 orderId, serviceId, resourceName, configManager, status);
     }
 }

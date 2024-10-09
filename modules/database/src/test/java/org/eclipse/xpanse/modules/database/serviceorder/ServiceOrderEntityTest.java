@@ -31,6 +31,7 @@ class ServiceOrderEntityTest {
     private final String userId = "userId";
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
+    private final Map<String, Object> newConfigRequest = Map.of();
 
     @Mock
     private DeployRequest mockPreviousDeployRequest;
@@ -61,6 +62,7 @@ class ServiceOrderEntityTest {
         test.setPreviousDeployedResources(mockPreviousDeployedResources);
         test.setPreviousDeployedResultProperties(mockPreviousDeployedResultProperties);
         test.setPreviousDeployedServiceProperties(mockPreviousDeployedServiceProperties);
+        test.setNewConfigRequest(newConfigRequest);
     }
 
     @Test
@@ -80,6 +82,7 @@ class ServiceOrderEntityTest {
                 .isEqualTo(mockPreviousDeployedResultProperties);
         assertThat(test.getPreviousDeployedServiceProperties())
                 .isEqualTo(mockPreviousDeployedServiceProperties);
+        assertThat(this.test.getNewConfigRequest()).isEqualTo(newConfigRequest);
     }
 
     @Test
@@ -112,6 +115,7 @@ class ServiceOrderEntityTest {
                 + ", previousDeployedResources=" + mockPreviousDeployedResources
                 + ", previousDeployedServiceProperties=" + mockPreviousDeployedServiceProperties
                 + ", previousDeployedResultProperties=" + mockPreviousDeployedResultProperties
+                + ", newConfigRequest=" + newConfigRequest
                 + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
