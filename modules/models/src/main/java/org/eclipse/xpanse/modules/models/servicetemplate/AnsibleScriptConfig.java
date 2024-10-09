@@ -46,7 +46,7 @@ public class AnsibleScriptConfig implements Serializable {
     @Schema(description = "Version of the python. This version of python "
             + "must be available in node which is acting as the configManager.",
             example = "3.10")
-    private float pythonVersion;
+    private String pythonVersion;
 
     @NotNull
     @Schema(description = "The agent will prepare the virtual environment if this true."
