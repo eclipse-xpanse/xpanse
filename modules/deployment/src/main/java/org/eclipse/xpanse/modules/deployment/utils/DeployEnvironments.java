@@ -42,6 +42,8 @@ public class DeployEnvironments {
 
     private static final String VAR_REGION = "region";
     private static final String VAR_SERVICE_ID = "service_id";
+    private static final String VAR_AGENT_VERSION = "agent_version";
+    private static final String VAR_XPANSE_API_ENDPOINT = "xpanse_api_endpoint";
 
     private final AesUtil aesUtil;
 
@@ -175,9 +177,15 @@ public class DeployEnvironments {
      *
      * @param task the DeployTask.
      */
-    private Map<String, String> getServiceIdVariables(DeployTask task) {
+    private Map<String, String> getAgentInstallationVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
-        variables.put(VAR_SERVICE_ID, task.getServiceId().toString());
+        if (Objects.nonNull(task.getOcl().getServiceConfigurationManage())) {
+            variables.put(VAR_SERVICE_ID, task.getServiceId().toString());
+            variables.put(VAR_AGENT_VERSION,
+                    task.getOcl().getServiceConfigurationManage().getAgentVersion());
+            variables.put(VAR_XPANSE_API_ENDPOINT,
+                    this.environment.getProperty("agent.api.end.point"));
+        }
         return variables;
     }
 
@@ -187,7 +195,7 @@ public class DeployEnvironments {
      * @param task the DeployTask.
      */
     private Map<String, Object> getVariablesFromDeployTask(DeployTask task,
-                                                          boolean isDeployRequest) {
+                                                           boolean isDeployRequest) {
         Map<String, Object> variables = getVariables(
                 task.getDeployRequest().getServiceRequestProperties(),
                 task.getOcl().getDeployment().getVariables(),
@@ -316,7 +324,7 @@ public class DeployEnvironments {
                 deployTask, isDeployRequest));
         inputVariables.putAll(getFlavorVariables(deployTask));
         inputVariables.putAll(getAvailabilityZoneVariables(deployTask));
-        inputVariables.putAll(getServiceIdVariables(deployTask));
+        inputVariables.putAll(getAgentInstallationVariables(deployTask));
         return inputVariables;
     }
 }
