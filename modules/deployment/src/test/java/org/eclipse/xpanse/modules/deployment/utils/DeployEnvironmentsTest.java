@@ -182,8 +182,7 @@ class DeployEnvironmentsTest {
     void testGetFlavorVariables() {
         Map<String, String> expectedResult = Map.ofEntries(
                 Map.entry("region", "cn-north-4"),
-                Map.entry("key", "value"),
-                Map.entry("service_id", serviceId.toString()));
+                Map.entry("key", "value"));
 
         Map<String, Object> result = deployEnvironmentsUnderTest.getInputVariables(task, true);
 
@@ -217,7 +216,6 @@ class DeployEnvironmentsTest {
         expectedResult.put("key2", "value2");
         expectedResult.put("name", "value");
         expectedResult.put("region", regionName);
-        expectedResult.put("service_id", serviceId.toString());
 
         final Map<String, Object> result =
                 deployEnvironmentsUnderTest.getInputVariables(task, true);

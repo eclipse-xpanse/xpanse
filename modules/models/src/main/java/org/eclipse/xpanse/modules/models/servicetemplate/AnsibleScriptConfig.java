@@ -51,7 +51,7 @@ public class AnsibleScriptConfig implements Serializable {
     @NotNull
     @Schema(description = "The agent will prepare the virtual environment if this true."
             + "Otherwise it is assumed that the environment is already prepared "
-            + "as part of the resource creation.")
+            + "as part of the resource creation or the VM base image build.")
     private Boolean isPrepareAnsibleEnvironment;
 
     @NotNull

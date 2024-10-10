@@ -33,6 +33,10 @@ public class ServiceConfigurationManage implements Serializable {
     @Schema(description = "the tool used to manage the service configuration.")
     private ConfigurationManagerTool type;
 
+    @NotNull
+    @Schema(description = "the version of the agent that will be used by service resources.")
+    private String agentVersion;
+
     @Size(min = 1)
     @UniqueElements
     @Schema(description = "The collection of the configuration manage script.")
