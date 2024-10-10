@@ -258,7 +258,7 @@ public class ServiceConfigurationManager {
                 new ServiceConfigurationChangeDetailsEntity();
         request.setId(UUID.randomUUID());
         ServiceOrderEntity serviceOrderEntity =
-                saveServiceOrder(orderId, entity.getId(), updateRequestMap);
+                saveServiceOrder(orderId, entity, updateRequestMap);
         request.setServiceOrderEntity(serviceOrderEntity);
         request.setDeployServiceEntity(entity);
         request.setConfigManager(groupName);
@@ -267,11 +267,11 @@ public class ServiceConfigurationManager {
         return request;
     }
 
-    private ServiceOrderEntity saveServiceOrder(UUID orderId, UUID serviceId,
+    private ServiceOrderEntity saveServiceOrder(UUID orderId, DeployServiceEntity entity,
             Map<String, Object> updateRequestMap) {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
         serviceOrderEntity.setOrderId(orderId);
-        serviceOrderEntity.setServiceId(serviceId);
+        serviceOrderEntity.setDeployServiceEntity(entity);
         serviceOrderEntity.setTaskType(ServiceOrderType.SERVICE_CONFIGURATION_UPDATE);
         serviceOrderEntity.setUserId(userServiceHelper.getCurrentUserId());
         serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);

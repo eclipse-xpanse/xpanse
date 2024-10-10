@@ -65,18 +65,26 @@ public class ServiceOrderManager {
         orderTask.setOrderId(deployTask.getOrderId());
         orderTask.setTaskType(deployTask.getTaskType());
         orderTask.setUserId(deployTask.getUserId());
-        orderTask.setServiceId(deployTask.getServiceId());
         orderTask.setNewDeployRequest(deployTask.getDeployRequest());
         orderTask.setTaskStatus(TaskStatus.CREATED);
         if (Objects.nonNull(previousDeployedService)) {
-            orderTask.setPreviousDeployRequest(previousDeployedService.getDeployRequest());
-            orderTask.setPreviousDeployedResources(
-                    EntityTransUtils.transToDeployResourceList(
-                            previousDeployedService.getDeployResourceList()));
-            orderTask.setPreviousDeployedResultProperties(
-                    new HashMap<>(previousDeployedService.getPrivateProperties()));
-            orderTask.setPreviousDeployedServiceProperties(
-                    new HashMap<>(previousDeployedService.getProperties()));
+            orderTask.setDeployServiceEntity(previousDeployedService);
+            if (Objects.nonNull(previousDeployedService.getDeployRequest())) {
+                orderTask.setPreviousDeployRequest(previousDeployedService.getDeployRequest());
+            }
+            if (!CollectionUtils.isEmpty(previousDeployedService.getDeployResourceList())) {
+                orderTask.setPreviousDeployedResources(
+                        EntityTransUtils.transToDeployResourceList(
+                                previousDeployedService.getDeployResourceList()));
+            }
+            if (!CollectionUtils.isEmpty(previousDeployedService.getPrivateProperties())) {
+                orderTask.setPreviousDeployedResultProperties(
+                        new HashMap<>(previousDeployedService.getPrivateProperties()));
+            }
+            if (!CollectionUtils.isEmpty(previousDeployedService.getProperties())) {
+                orderTask.setPreviousDeployedServiceProperties(
+                        new HashMap<>(previousDeployedService.getProperties()));
+            }
         }
         return serviceOrderStorage.storeAndFlush(orderTask);
     }
@@ -105,7 +113,7 @@ public class ServiceOrderManager {
             UUID serviceId, ServiceOrderType taskType, TaskStatus taskStatus) {
         validateDeployService(serviceId);
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setServiceId(serviceId);
+        query.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
         query.setTaskType(taskType);
         query.setTaskStatus(taskStatus);
         if (!userServiceHelper.currentUserHasRole(ROLE_ADMIN)) {
@@ -149,7 +157,7 @@ public class ServiceOrderManager {
     public void deleteOrdersByServiceId(UUID serviceId) {
         validateDeployService(serviceId);
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setServiceId(serviceId);
+        query.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
         if (!userServiceHelper.currentUserHasRole(ROLE_ADMIN)) {
             query.setUserId(userServiceHelper.getCurrentUserId());
         }
@@ -177,7 +185,7 @@ public class ServiceOrderManager {
      */
     public ServiceOrderDetails getLatestModificationOrder(UUID serviceId) {
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setServiceId(serviceId);
+        query.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
         query.setTaskType(ServiceOrderType.MODIFY);
         List<ServiceOrderEntity> orderEntities = serviceOrderStorage.queryEntities(query);
         if (!CollectionUtils.isEmpty(orderEntities)) {
@@ -221,8 +229,8 @@ public class ServiceOrderManager {
     private ServiceOrderEntity getServiceOrderEntity(UUID orderId) {
         ServiceOrderEntity orderEntity = serviceOrderStorage.getEntityById(orderId);
         if (Objects.nonNull(orderEntity)) {
-            DeployServiceEntity deployedService =
-                    deployServiceStorage.findDeployServiceById(orderEntity.getServiceId());
+            DeployServiceEntity deployedService = deployServiceStorage
+                    .findDeployServiceById(orderEntity.getDeployServiceEntity().getId());
             if (Objects.nonNull(deployedService)) {
                 if (isNotOwnerOrAdminUser(deployedService)) {
                     String errorMsg =
