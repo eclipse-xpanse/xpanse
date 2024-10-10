@@ -50,9 +50,9 @@ public class ServiceConfigurationChangeDetailsEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "ORDER_ID", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_service_configuration_deploy_service",
+            foreignKey = @ForeignKey(name = "fk_service_configuration_order",
                     foreignKeyDefinition = "FOREIGN KEY (ORDER_ID) "
-                            + "REFERENCES SERVICE_ORDER(ORDERID) ON DELETE CASCADE"))
+                            + "REFERENCES SERVICE_ORDER(ORDER_ID) ON DELETE CASCADE"))
     @Cascade(CascadeType.ALL)
     private ServiceOrderEntity serviceOrderEntity;
 
