@@ -64,7 +64,6 @@ class ServiceCatalogApiTest extends ApisTestCommon {
     void testServiceCatalogServices() throws Exception {
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("serviceCatalogApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         waitUntilServiceTemplateFilesAreFullyGenerated(
                 serviceTemplate.getServiceTemplateId().toString());

@@ -9,7 +9,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.STATE_FILE_NAME;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -25,18 +24,15 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.xpanse.modules.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
-import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
-import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -54,22 +50,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Test for OpenTofuDeployment.
  */
 @Slf4j
-@ExtendWith({SpringExtension.class})
-@ContextConfiguration(classes = {OpenTofuLocalDeployment.class, DeployEnvironments.class,
-        PluginManager.class, OpenTofuLocalConfig.class, DeployService.class,
-        TaskConfiguration.class, ResourceHandlerManager.class, ScriptsGitRepoManage.class})
+@ExtendWith({MockitoExtension.class})
 class OpenTofuLocalDeploymentTest {
 
     private final String errorDeployer = "error_deployer";
@@ -82,30 +74,31 @@ class OpenTofuLocalDeploymentTest {
               value = resource.random_id_2.new.id
             }
             """;
-    @Autowired
+    @InjectMocks
     OpenTofuLocalDeployment openTofuLocalDeployment;
-    @MockBean
+    @Mock
+    OpenTofuInstaller openTofuInstaller;
+    @Mock
     DeployResultFileUtils deployResultFileUtils;
-    @MockBean
+    @Mock
     DeployEnvironments deployEnvironments;
-    @MockBean
+    @Mock
     OpenTofuLocalConfig openTofuLocalConfig;
-    @MockBean
+    @Mock
     PluginManager pluginManager;
-    @MockBean
+    @Mock
     DeployService deployService;
-    @MockBean
+    @Mock
     Executor taskExecutor;
-    @MockBean
+    @Mock
     OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
-    @MockBean
+    @Mock
     DeployServiceEntityHandler deployServiceEntityHandler;
     private Ocl ocl;
     private Ocl oclWithGitScripts;
 
     @BeforeEach
     void setUp() throws Exception {
-        when(openTofuLocalConfig.getWorkspaceDirectory()).thenReturn("tofu-ws-test");
         OclLoader oclLoader = new OclLoader();
         ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
@@ -114,7 +107,6 @@ class OpenTofuLocalDeploymentTest {
         oclWithGitScripts = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
         oclWithGitScripts.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
-        doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
     }
 
     DeployTask getDeployTask(Ocl ocl, ServiceOrderType serviceOrderType) {
@@ -171,6 +163,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testDeploy() {
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         DeployResult deployResult = openTofuLocalDeployment.deploy(deployTask);
@@ -196,6 +189,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testModify() {
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.MODIFY);
         String tfState = getFileContent();
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
@@ -227,6 +221,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testDestroy() {
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         String tfState = getFileContent();
         DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
         deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
@@ -261,6 +256,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testDeploy_FailedCausedByOpenTofuExecutorException() {
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         ocl.getDeployment().setDeployer(invalidDeployer);
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         DeployResult deployResult = this.openTofuLocalDeployment.deploy(deployTask);
@@ -272,6 +268,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testModify_FailedCausedByOpenTofuExecutorException() {
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
                 TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
@@ -292,6 +289,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testDestroy_FailedCausedByOpenTofuExecutorException() {
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
                 TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
@@ -314,7 +312,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testGetDeployPlanAsJson() {
-
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         String deployPlanJson = openTofuLocalDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
@@ -331,7 +329,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
-
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         ocl.getDeployment().setDeployer(errorDeployer);
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         Assertions.assertThrows(OpenTofuExecutorException.class,
@@ -341,6 +339,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testValidate() {
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(new ArrayList<>());
@@ -364,6 +363,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testValidateFailed() {
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         ocl.getDeployment().setDeployer(invalidDeployer);
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
@@ -381,6 +381,7 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testValidate_ThrowsTerraformExecutorException() {
+        when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         ocl.getDeployment().setDeployer(errorDeployer);
         Assertions.assertThrows(OpenTofuExecutorException.class,
                 () -> openTofuLocalDeployment.validate(ocl.getDeployment()));

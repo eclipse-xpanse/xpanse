@@ -76,6 +76,7 @@ public class ArchitectureTests {
         ArchRule archRule = classes()
                 .that()
                 .haveSimpleNameContaining("Cache")
+                .and().haveSimpleNameNotContaining("DeployerTool")
                 .should()
                 .resideInAPackage("..cache..");
         archRule.check(classes);

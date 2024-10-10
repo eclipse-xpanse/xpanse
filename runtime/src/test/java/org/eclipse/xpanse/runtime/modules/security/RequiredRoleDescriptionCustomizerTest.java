@@ -41,7 +41,7 @@ class RequiredRoleDescriptionCustomizerTest {
                 new TerraformBootManager(), new TofuMakerManager(), new RedisCacheConfig());
 
         final HandlerMethod handlerMethod =
-                new HandlerMethod(adminServicesApi, "healthCheck", null);
+                new HandlerMethod(adminServicesApi, "healthCheck");
         final Operation expectedResult = new Operation();
         expectedResult.tags(List.of("value"));
         expectedResult.summary("summary");

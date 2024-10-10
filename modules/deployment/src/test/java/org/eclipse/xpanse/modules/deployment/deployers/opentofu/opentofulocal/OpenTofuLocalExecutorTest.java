@@ -46,7 +46,7 @@ class OpenTofuLocalExecutorTest {
     static void initWorkSpace() throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(
-                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         String script = ocl.getDeployment().getDeployer();
         File ws = new File(workspace + "/" + UUID.randomUUID());
@@ -59,8 +59,8 @@ class OpenTofuLocalExecutorTest {
 
     @BeforeEach
     void setUp() {
-        openTofuLocalExecutorUnderTest = new OpenTofuLocalExecutor(mockEnv, mockVariables,
-                workspace, null, deployResultFileUtilsTest);
+        openTofuLocalExecutorUnderTest = new OpenTofuLocalExecutor(
+                "tofu", mockEnv, mockVariables, workspace, null, deployResultFileUtilsTest);
     }
 
     @Test

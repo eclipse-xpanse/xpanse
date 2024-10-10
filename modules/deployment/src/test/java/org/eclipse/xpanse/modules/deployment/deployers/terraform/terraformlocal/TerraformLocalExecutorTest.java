@@ -69,7 +69,7 @@ class TerraformLocalExecutorTest {
 
     @BeforeEach
     void setUp() {
-        terraformLocalExecutorUnderTest = new TerraformLocalExecutor(
+        terraformLocalExecutorUnderTest = new TerraformLocalExecutor("terraform",
                 mockEnv, mockVariables, workspace, null, deployResultFileUtilsTest);
     }
 

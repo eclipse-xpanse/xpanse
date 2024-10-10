@@ -49,7 +49,7 @@ public class ServiceOrderManager {
     private UserServiceHelper userServiceHelper;
     @Resource
     private ServiceOrderStatusChangePolling serviceOrderStatusChangePolling;
-    @Resource
+    @Resource(name = "xpanseAsyncTaskExecutor")
     private Executor taskExecutor;
 
     /**
