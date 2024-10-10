@@ -527,22 +527,34 @@ public class ServiceConfigurationManager {
                         == ServiceConfigurationStatus.SUCCESSFUL
                         || changeDetails.getStatus() == ServiceConfigurationStatus.ERROR);
         if (isNeedUpdateServiceConfigurationChange) {
-            boolean isAllSuccessful = requests.stream()
-                    .allMatch(changeDetails -> request.getStatus()
-                            == ServiceConfigurationStatus.SUCCESSFUL);
             ServiceOrderEntity entity = request.getServiceOrderEntity();
-
-
             if (Objects.nonNull(entity)) {
+                boolean isAllSuccessful = requests.stream()
+                        .allMatch(changeDetails -> request.getStatus()
+                                == ServiceConfigurationStatus.SUCCESSFUL);
                 if (isAllSuccessful) {
-                    entity.setTaskStatus(TaskStatus.SUCCESSFUL);
+                    updateServiceOrderByResult(entity, TaskStatus.SUCCESSFUL);
+                    updateServiceConfiguration(request);
                 } else {
-                    entity.setTaskStatus(TaskStatus.FAILED);
+                    updateServiceOrderByResult(entity, TaskStatus.FAILED);
                 }
-                entity.setCompletedTime(OffsetDateTime.now());
-                serviceOrderStorage.storeAndFlush(entity);
             }
         }
+    }
+
+    private void updateServiceOrderByResult(ServiceOrderEntity entity, TaskStatus status) {
+        entity.setTaskStatus(status);
+        entity.setCompletedTime(OffsetDateTime.now());
+        serviceOrderStorage.storeAndFlush(entity);
+    }
+
+    private void updateServiceConfiguration(ServiceConfigurationChangeDetailsEntity request) {
+        ServiceConfigurationEntity serviceConfigurationEntity =
+                request.getDeployServiceEntity().getServiceConfigurationEntity();
+        Map<String, Object> config = request.getServiceOrderEntity().getNewConfigRequest();
+        serviceConfigurationEntity.setConfiguration(config);
+        serviceConfigurationEntity.setUpdatedTime(OffsetDateTime.now());
+        serviceConfigurationStorage.storeAndFlush(serviceConfigurationEntity);
     }
 
 
