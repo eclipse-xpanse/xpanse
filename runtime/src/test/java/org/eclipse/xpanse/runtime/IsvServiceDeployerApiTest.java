@@ -83,7 +83,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         mockMvc.perform(
                 delete("/xpanse/isv/credentials")
                         .param("cspName", Csp.HUAWEI_CLOUD.toValue())
-                        .param("site", "Chinese Mainland")
+                        .param("siteName", "Chinese Mainland")
                         .param("type", CredentialType.VARIABLES.toValue())
                         .param("name", "AK_SK")
                         .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
@@ -108,10 +108,10 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
                 deployedServiceDetails.getServiceDeploymentState());
         if (waitServiceDeploymentIsCompleted(serviceId)) {
             testListDeployedServicesOfIsv();
-            destroyService(serviceId);
+            // destroyService(serviceId);
         }
         if (waitServiceDeploymentIsCompleted(serviceId)) {
-            purgeService(serviceId);
+            // purgeService(serviceId);
         }
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
         deleteIsvCredential();

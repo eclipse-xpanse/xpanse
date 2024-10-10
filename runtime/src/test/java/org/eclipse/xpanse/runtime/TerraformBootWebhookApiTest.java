@@ -78,7 +78,7 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
     }
 
     @Test
-    @WithJwt(file = "jwt_all_roles.json")
+    @WithJwt(file = "jwt_all_roles-no-policies.json")
     void testTerraformBootWebhookApis() throws Exception {
         testTerraformBootWebhookApisThrowsException();
         testTerraformBootWebhookApisWell();
