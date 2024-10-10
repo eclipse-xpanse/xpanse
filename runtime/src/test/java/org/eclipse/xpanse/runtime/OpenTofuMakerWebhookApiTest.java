@@ -173,13 +173,11 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         addCredentialForHuaweiCloud();
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("OpenTofuMakerWebhookApiTest-1");
         ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         testCallbackApiWithOcl(ocl);
 
         Ocl oclFromGit = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
-        oclFromGit.setName("OpenTofuMakerWebhookApiTest-2");
         oclFromGit.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         testCallbackApiWithOcl(oclFromGit);
     }

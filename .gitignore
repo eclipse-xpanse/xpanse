@@ -17,3 +17,4 @@ xpanse_deploy_ws
 /openapi
 .mvn/wrapper/*.jar
 aes_sec
+terraform.log

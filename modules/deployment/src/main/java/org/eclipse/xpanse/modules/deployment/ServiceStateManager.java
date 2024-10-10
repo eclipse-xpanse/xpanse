@@ -35,7 +35,6 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -57,8 +56,7 @@ public class ServiceStateManager {
     private DatabaseServiceStateManagementTaskStorage taskStorage;
     @Resource
     private DatabaseDeployServiceStorage deployServiceStorage;
-    @Qualifier("xpanseAsyncTaskExecutor")
-    @Resource
+    @Resource(name = "xpanseAsyncTaskExecutor")
     private Executor taskExecutor;
 
     /**

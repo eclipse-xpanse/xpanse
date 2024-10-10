@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.models.billing.exceptions.ServicePriceCalculationFailed;
+import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ActivitiTaskNotFoundException;
@@ -257,5 +258,16 @@ public class DeploymentExceptionHandler {
     @ResponseBody
     public Response handleFileLockedException(FileLockedException ex) {
         return getErrorResponse(ResultType.FILE_LOCKED, Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for InvalidDeployerToolException.
+     */
+    @ExceptionHandler({InvalidDeployerToolException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleInvalidDeployerToolException(InvalidDeployerToolException ex) {
+        return getErrorResponse(ResultType.INVALID_DEPLOYER_TOOL,
+                Collections.singletonList(ex.getMessage()));
     }
 }

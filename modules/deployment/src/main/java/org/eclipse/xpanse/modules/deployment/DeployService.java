@@ -104,7 +104,7 @@ public class DeployService {
     private ServiceOrderManager serviceOrderManager;
     @Resource
     private ServiceDeploymentStatusChangePolling serviceDeploymentStatusChangePolling;
-    @Resource
+    @Resource(name = "xpanseAsyncTaskExecutor")
     private Executor taskExecutor;
 
 

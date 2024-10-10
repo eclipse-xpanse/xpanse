@@ -10,6 +10,8 @@ import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CACHE_PROVI
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CREDENTIAL_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CREDENTIAL_CACHE_EXPIRE_TIME_IN_SECONDS;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_DEPLOYER_VERSIONS_CACHE_EXPIRE_TIME_IN_HOURS;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEPLOYER_VERSIONS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.MONITOR_METRICS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
@@ -60,6 +62,9 @@ public class RedisCacheConfig {
     @Value("${service.monitor.metrics.cache.expire.time.in.minutes:60}")
     private long monitorMetricsCacheDuration;
 
+    @Value("${deployer.versions.cache.expire.time.in.hours:1}")
+    private long deployerVersionCacheDuration;
+
     @Value("${spring.data.redis.host}")
     private String redisHost;
 
@@ -83,6 +88,7 @@ public class RedisCacheConfig {
                 getServiceFlavorPriceCache());
         builder.withCacheConfiguration(CREDENTIAL_CACHE_NAME, getCredentialCache());
         builder.withCacheConfiguration(MONITOR_METRICS_CACHE_NAME, getMonitorMetricsCache());
+        builder.withCacheConfiguration(DEPLOYER_VERSIONS_CACHE_NAME, getDeployerVersionsCache());
         return builder.build();
     }
 
@@ -123,7 +129,8 @@ public class RedisCacheConfig {
     private RedisCacheConfiguration getRegionAzsCache() {
         long duration = regionAzsCacheDuration > 0 ? regionAzsCacheDuration
                 : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
-        return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(duration))
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(duration))
                 .serializeKeysWith(getRedisKeySerializer())
                 .serializeValuesWith(getRedisValueSerializer());
     }
@@ -149,6 +156,15 @@ public class RedisCacheConfig {
                 : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))
+                .serializeKeysWith(getRedisKeySerializer())
+                .serializeValuesWith(getRedisValueSerializer());
+    }
+
+    private RedisCacheConfiguration getDeployerVersionsCache() {
+        long duration = deployerVersionCacheDuration > 0 ? deployerVersionCacheDuration
+                :  DEFAULT_DEPLOYER_VERSIONS_CACHE_EXPIRE_TIME_IN_HOURS;
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofHours(duration))
                 .serializeKeysWith(getRedisKeySerializer())
                 .serializeValuesWith(getRedisValueSerializer());
     }
