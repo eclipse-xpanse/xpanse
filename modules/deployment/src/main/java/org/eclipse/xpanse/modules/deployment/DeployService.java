@@ -394,8 +394,8 @@ public class DeployService {
         RuntimeException exception = null;
         Deployer deployer = deployerKindManager.getDeployment(
                 deployTask.getOcl().getDeployment().getDeployerTool().getKind());
-        ServiceOrderEntity orderTaskEntity =
-                serviceOrderManager.createServiceOrderTask(deployTask, null);
+        ServiceOrderEntity orderTaskEntity = serviceOrderManager
+                .createServiceOrderTask(deployTask, getDeployServiceEntity(deployTask));
         DeployServiceEntity serviceEntity = storeNewDeployServiceEntity(deployTask);
         try {
             policyValidator.validateDeploymentWithPolicies(deployTask);
@@ -416,6 +416,12 @@ public class DeployService {
         if (Objects.nonNull(exception)) {
             throw exception;
         }
+    }
+
+    private DeployServiceEntity getDeployServiceEntity(DeployTask deployTask) {
+        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        deployServiceEntity.setId(deployTask.getServiceId());
+        return deployServiceEntity;
     }
 
     /**

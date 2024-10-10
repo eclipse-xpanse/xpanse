@@ -47,9 +47,9 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
         Specification<ServiceOrderEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
-                    if (Objects.nonNull(entity.getServiceId())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("serviceId"),
-                                entity.getServiceId()));
+                    if (Objects.nonNull(entity.getDeployServiceEntity())) {
+                        predicateList.add(criteriaBuilder.equal(root.get("deployServiceEntity"),
+                                entity.getDeployServiceEntity()));
                     }
                     if (Objects.nonNull(entity.getTaskType())) {
                         predicateList.add(criteriaBuilder.equal(root.get("taskType"),
