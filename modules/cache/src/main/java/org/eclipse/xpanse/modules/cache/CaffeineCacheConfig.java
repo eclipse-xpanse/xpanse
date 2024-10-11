@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.cache;
 
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CREDENTIAL_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEPLOYER_VERSIONS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.MONITOR_METRICS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
@@ -56,6 +57,7 @@ public class CaffeineCacheConfig {
                 getServiceFlavorPriceCache());
         cacheManager.registerCustomCache(CREDENTIAL_CACHE_NAME, getCredentialsCache());
         cacheManager.registerCustomCache(MONITOR_METRICS_CACHE_NAME, getMonitorMetricsCache());
+        cacheManager.registerCustomCache(DEPLOYER_VERSIONS_CACHE_NAME, getDeployerVersionsCache());
         return cacheManager;
     }
 
@@ -69,6 +71,10 @@ public class CaffeineCacheConfig {
         long duration = flavorPriceCacheDuration > 0 ? flavorPriceCacheDuration
                 : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return Caffeine.newBuilder().expireAfterWrite(duration, TimeUnit.MINUTES).build();
+    }
+
+    private Cache<Object, Object> getDeployerVersionsCache() {
+        return Caffeine.newBuilder().build();
     }
 
 

@@ -5,7 +5,10 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal;
 
+import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
+
 import jakarta.annotation.Nullable;
+import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,8 +43,6 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -55,34 +56,23 @@ public class TerraformLocalDeployment implements Deployer {
     public static final String SCRIPT_FILE_NAME = "resources.tf";
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
-    private final DeployEnvironments deployEnvironments;
-    private final TerraformLocalConfig terraformLocalConfig;
-    private final Executor taskExecutor;
-    private final TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
-    private final DeployServiceEntityHandler deployServiceEntityHandler;
-    private final ScriptsGitRepoManage scriptsGitRepoManage;
-    private final DeployResultFileUtils deployResultFileUtils;
 
-    /**
-     * Initializes the Terraform deployer.
-     */
-    @Autowired
-    public TerraformLocalDeployment(DeployEnvironments deployEnvironments,
-                                    TerraformLocalConfig terraformLocalConfig,
-                                    @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
-                                    TerraformDeploymentResultCallbackManager
-                                                terraformDeploymentResultCallbackManager,
-                                    DeployServiceEntityHandler deployServiceEntityHandler,
-                                    ScriptsGitRepoManage scriptsGitRepoManage,
-                                    DeployResultFileUtils deployResultFileUtils) {
-        this.deployEnvironments = deployEnvironments;
-        this.terraformLocalConfig = terraformLocalConfig;
-        this.taskExecutor = taskExecutor;
-        this.terraformDeploymentResultCallbackManager = terraformDeploymentResultCallbackManager;
-        this.deployServiceEntityHandler = deployServiceEntityHandler;
-        this.scriptsGitRepoManage = scriptsGitRepoManage;
-        this.deployResultFileUtils = deployResultFileUtils;
-    }
+    @Resource
+    private TerraformInstaller terraformInstaller;
+    @Resource
+    private DeployEnvironments deployEnvironments;
+    @Resource
+    private TerraformLocalConfig terraformLocalConfig;
+    @Resource(name = ASYNC_EXECUTOR_NAME)
+    private Executor taskExecutor;
+    @Resource
+    private TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+    @Resource
+    private DeployServiceEntityHandler deployServiceEntityHandler;
+    @Resource
+    private ScriptsGitRepoManage scriptsGitRepoManage;
+    @Resource
+    private DeployResultFileUtils deployResultFileUtils;
 
     /**
      * Deploy the DeployTask.
@@ -288,7 +278,9 @@ public class TerraformLocalDeployment implements Deployer {
                     terraformLocalConfig.getDebugLogLevel());
             envVariables.put(TF_DEBUG_FLAG, terraformLocalConfig.getDebugLogLevel());
         }
-        return new TerraformLocalExecutor(envVariables, inputVariables, workspace,
+        String executorPath = terraformInstaller.getExecutorPathThatMatchesRequiredVersion(
+                deployment.getDeployerTool().getVersion());
+        return new TerraformLocalExecutor(executorPath, envVariables, inputVariables, workspace,
                 getSubDirectory(deployment), deployResultFileUtils);
     }
 

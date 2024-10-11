@@ -30,7 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @SpringBootTest(classes = {XpanseApplication.class, CredentialsStore.class,
         ServletUriComponentsBuilder.class, OpenApiUrlManage.class, PluginManager.class},
         properties = {
-                "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker"})
+                "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,test"})
 class CredentialOpenApiGeneratorTest {
 
     @Autowired

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
 
 import jakarta.annotation.Resource;
@@ -49,7 +50,7 @@ public class ServiceOrderManager {
     private UserServiceHelper userServiceHelper;
     @Resource
     private ServiceOrderStatusChangePolling serviceOrderStatusChangePolling;
-    @Resource
+    @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
 
     /**

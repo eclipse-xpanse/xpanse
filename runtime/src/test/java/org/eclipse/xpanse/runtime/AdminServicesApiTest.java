@@ -38,8 +38,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"enable.redis.distributed.cache=false",
-        "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,opentelemetry"})
+@SpringBootTest(properties = "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,opentelemetry,test")
 @AutoConfigureMockMvc
 class AdminServicesApiTest extends ApisTestCommon {
 

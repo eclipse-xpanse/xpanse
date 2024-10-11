@@ -28,7 +28,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {XpanseApplication.class, WorkFlowApiTest.class, WorkflowUtils.class},
-        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
+        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class WorkFlowApiTest extends ApisTestCommon {
 

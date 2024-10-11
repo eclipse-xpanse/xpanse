@@ -10,6 +10,7 @@ import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CACHE_PROVI
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CREDENTIAL_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CREDENTIAL_CACHE_EXPIRE_TIME_IN_SECONDS;
+import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEPLOYER_VERSIONS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.MONITOR_METRICS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
@@ -83,6 +84,7 @@ public class RedisCacheConfig {
                 getServiceFlavorPriceCache());
         builder.withCacheConfiguration(CREDENTIAL_CACHE_NAME, getCredentialCache());
         builder.withCacheConfiguration(MONITOR_METRICS_CACHE_NAME, getMonitorMetricsCache());
+        builder.withCacheConfiguration(DEPLOYER_VERSIONS_CACHE_NAME, getDeployerVersionsCache());
         return builder.build();
     }
 
@@ -123,9 +125,10 @@ public class RedisCacheConfig {
     private RedisCacheConfiguration getRegionAzsCache() {
         long duration = regionAzsCacheDuration > 0 ? regionAzsCacheDuration
                 : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
-        return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(duration))
-                .serializeKeysWith(getRedisKeySerializer())
-                .serializeValuesWith(getRedisValueSerializer());
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(duration))
+                .serializeKeysWith(getStringRedisSerializer())
+                .serializeValuesWith(getJsonRedisSerializer());
     }
 
     private RedisCacheConfiguration getServiceFlavorPriceCache() {
@@ -133,14 +136,14 @@ public class RedisCacheConfig {
                 : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))
-                .serializeKeysWith(getRedisKeySerializer())
-                .serializeValuesWith(getRedisValueSerializer());
+                .serializeKeysWith(getStringRedisSerializer())
+                .serializeValuesWith(getJsonRedisSerializer());
     }
 
     private RedisCacheConfiguration getCredentialCache() {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofSeconds(DEFAULT_CREDENTIAL_CACHE_EXPIRE_TIME_IN_SECONDS))
-                .serializeKeysWith(getRedisKeySerializer())
+                .serializeKeysWith(getStringRedisSerializer())
                 .serializeValuesWith(getCredentialValueSerializer());
     }
 
@@ -149,8 +152,14 @@ public class RedisCacheConfig {
                 : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))
-                .serializeKeysWith(getRedisKeySerializer())
-                .serializeValuesWith(getRedisValueSerializer());
+                .serializeKeysWith(getStringRedisSerializer())
+                .serializeValuesWith(getJsonRedisSerializer());
+    }
+
+    private RedisCacheConfiguration getDeployerVersionsCache() {
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .serializeKeysWith(getStringRedisSerializer())
+                .serializeValuesWith(getJdkRedisSerializer());
     }
 
 
@@ -200,14 +209,21 @@ public class RedisCacheConfig {
     }
 
 
-    private RedisSerializationContext.SerializationPair<String> getRedisKeySerializer() {
+    private RedisSerializationContext.SerializationPair<String> getStringRedisSerializer() {
         return RedisSerializationContext.SerializationPair.fromSerializer(
                 new StringRedisSerializer());
     }
 
-    private RedisSerializationContext.SerializationPair<Object> getRedisValueSerializer() {
+    // Jackson2JsonRedisSerializer for Object.
+    private RedisSerializationContext.SerializationPair<Object> getJsonRedisSerializer() {
         return RedisSerializationContext.SerializationPair.fromSerializer(
                 new Jackson2JsonRedisSerializer<>(Object.class));
+    }
+
+    // JdkSerializationRedisSerializer for Set, Array, Map etc.
+    private RedisSerializationContext.SerializationPair<Object> getJdkRedisSerializer() {
+        return RedisSerializationContext.SerializationPair.fromSerializer(
+                new JdkSerializationRedisSerializer());
     }
 
     private RedisSerializationContext

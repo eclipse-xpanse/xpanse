@@ -9,7 +9,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.STATE_FILE_NAME;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -25,18 +24,14 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.xpanse.modules.async.TaskConfiguration;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
-import org.eclipse.xpanse.modules.deployment.ResourceHandlerManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
-import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -54,22 +49,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Test for TerraformDeployment.
  */
 @Slf4j
-@ExtendWith({SpringExtension.class})
-@ContextConfiguration(classes = {TerraformLocalDeployment.class, DeployEnvironments.class,
-        PluginManager.class, TerraformLocalConfig.class, DeployService.class,
-        TaskConfiguration.class, ResourceHandlerManager.class, ScriptsGitRepoManage.class})
+@ExtendWith({MockitoExtension.class})
 class TerraformLocalDeploymentTest {
 
     private final String errorDeployer = "error_deployer";
@@ -82,38 +73,35 @@ class TerraformLocalDeploymentTest {
               value = resource.random_id_2.new.id
             }
             """;
-    @Autowired
+    @InjectMocks
     TerraformLocalDeployment terraformLocalDeployment;
-    @MockBean
+    @Mock
     DeployResultFileUtils deployResultFileUtils;
-    @MockBean
+    @Mock
     DeployEnvironments deployEnvironments;
-    @MockBean
+    @Mock
     TerraformLocalConfig terraformLocalConfig;
-    @MockBean
+    @Mock
     PluginManager pluginManager;
-    @MockBean
+    @Mock
     DeployService deployService;
-    @MockBean
+    @Mock
     Executor taskExecutor;
-    @MockBean
-    TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
-    @MockBean
+    @Mock
     DeployServiceEntityHandler deployServiceEntityHandler;
+    @Mock
+    TerraformInstaller terraformInstaller;
 
     private Ocl ocl;
     private Ocl oclWithGitScripts;
 
     @BeforeEach
     void setUp() throws Exception {
-        when(terraformLocalConfig.getWorkspaceDirectory()).thenReturn("tf-ws-test");
         OclLoader oclLoader = new OclLoader();
         ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-
         oclWithGitScripts = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL());
-        doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
     }
 
     DeployTask getDeployTask(Ocl ocl, ServiceOrderType taskType) {
@@ -272,6 +260,7 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testDestroy_FailedCausedByTerraformExecutorException() {
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
         try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
                 TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
@@ -295,11 +284,11 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testGetDeployPlanAsJson() {
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         String deployPlanJson = terraformLocalDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
-
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DEPLOY);
             String deployPlanJson1 = terraformLocalDeployment.getDeploymentPlanAsJson(deployTask1);
@@ -311,6 +300,7 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
         ocl.getDeployment().setDeployer(errorDeployer);
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         Assertions.assertThrows(TerraformExecutorException.class,
@@ -319,6 +309,7 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testValidate() {
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(new ArrayList<>());
@@ -342,6 +333,7 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testValidateFailed() {
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
         ocl.getDeployment().setDeployer(invalidDeployer);
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
 
 import jakarta.annotation.Resource;
@@ -104,7 +105,7 @@ public class DeployService {
     private ServiceOrderManager serviceOrderManager;
     @Resource
     private ServiceDeploymentStatusChangePolling serviceDeploymentStatusChangePolling;
-    @Resource
+    @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
 
 

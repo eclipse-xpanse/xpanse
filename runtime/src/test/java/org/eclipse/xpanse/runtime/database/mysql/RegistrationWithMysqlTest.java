@@ -30,7 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql,test"})
 @AutoConfigureMockMvc
 class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
 

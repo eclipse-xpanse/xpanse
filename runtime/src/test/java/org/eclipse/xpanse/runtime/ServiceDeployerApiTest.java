@@ -91,12 +91,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {
-        "spring.profiles.active=oauth,zitadel,zitadel-testbed",
-        "http.request.retry.max.attempts=2",
-        "http.request.retry.delay.milliseconds=1000",
-        "OS_AUTH_URL=http://127.0.0.1/v3/identity"
-})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test",})
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest extends ApisTestCommon {
     @MockBean

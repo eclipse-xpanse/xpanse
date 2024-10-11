@@ -72,12 +72,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {
-        "spring.profiles.active=oauth,zitadel,zitadel-testbed",
-        "http.request.retry.max.attempts=5",
-        "http.request.retry.delay.milliseconds=1000",
-        "OS_AUTH_URL=http://127.0.0.1/v3/identity"
-})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceStateManageApiTest extends ApisTestCommon {
 

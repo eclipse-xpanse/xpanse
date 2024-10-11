@@ -31,7 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * Test for UserCloudCredentialsApi with Redis cache.
  */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed",
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test",
         "enable.redis.distributed.cache=true"})
 @AutoConfigureMockMvc
 class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {

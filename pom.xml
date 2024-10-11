@@ -81,6 +81,7 @@
         <java.uuid.generator.version>5.1.0</java.uuid.generator.version>
         <jgit.version>7.0.0.202409031743-r</jgit.version>
         <semver4j.version>5.4.0</semver4j.version>
+        <github-api.version>1.326</github-api.version>
         <springdoc.openapi.plugin.version>1.4</springdoc.openapi.plugin.version>
         <swagger.parser.version>2.1.22</swagger.parser.version>
         <swagger.core.v3.version>2.2.25</swagger.core.v3.version>
@@ -159,6 +160,11 @@
         </profile>
     </profiles>
     <dependencies>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
         <dependency>
             <groupId>org.jacoco</groupId>
             <artifactId>org.jacoco.core</artifactId>
