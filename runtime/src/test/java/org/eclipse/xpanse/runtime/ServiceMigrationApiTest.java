@@ -33,7 +33,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceMigrationApiTest extends ApisTestCommon {
 
@@ -43,7 +43,6 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         // prepare data
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("ServiceMigrationApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         addCredentialForHuaweiCloud();

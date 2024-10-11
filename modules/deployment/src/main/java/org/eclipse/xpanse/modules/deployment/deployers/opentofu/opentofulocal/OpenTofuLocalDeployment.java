@@ -6,7 +6,10 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
+import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
+
 import jakarta.annotation.Nullable;
+import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,8 +44,6 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -56,34 +57,23 @@ public class OpenTofuLocalDeployment implements Deployer {
     public static final String SCRIPT_FILE_NAME = "resources.tf";
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
-    private final DeployEnvironments deployEnvironments;
-    private final OpenTofuLocalConfig openTofuLocalConfig;
-    private final Executor taskExecutor;
-    private final OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
-    private final DeployServiceEntityHandler deployServiceEntityHandler;
-    private final ScriptsGitRepoManage scriptsGitRepoManage;
-    private final DeployResultFileUtils deployResultFileUtils;
 
-    /**
-     * Initializes the OpenTofu deployer.
-     */
-    @Autowired
-    public OpenTofuLocalDeployment(DeployEnvironments deployEnvironments,
-                                   OpenTofuLocalConfig openTofuLocalConfig,
-                                   @Qualifier("xpanseAsyncTaskExecutor") Executor taskExecutor,
-                                   OpenTofuDeploymentResultCallbackManager
-                                               openTofuDeploymentResultCallbackManager,
-                                   DeployServiceEntityHandler deployServiceEntityHandler,
-                                   ScriptsGitRepoManage scriptsGitRepoManage,
-                                   DeployResultFileUtils deployResultFileUtils) {
-        this.deployEnvironments = deployEnvironments;
-        this.openTofuLocalConfig = openTofuLocalConfig;
-        this.taskExecutor = taskExecutor;
-        this.openTofuDeploymentResultCallbackManager = openTofuDeploymentResultCallbackManager;
-        this.deployServiceEntityHandler = deployServiceEntityHandler;
-        this.scriptsGitRepoManage = scriptsGitRepoManage;
-        this.deployResultFileUtils = deployResultFileUtils;
-    }
+    @Resource
+    private OpenTofuInstaller openTofuInstaller;
+    @Resource
+    private DeployEnvironments deployEnvironments;
+    @Resource
+    private OpenTofuLocalConfig openTofuLocalConfig;
+    @Resource(name = ASYNC_EXECUTOR_NAME)
+    private Executor taskExecutor;
+    @Resource
+    private OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+    @Resource
+    private DeployServiceEntityHandler deployServiceEntityHandler;
+    @Resource
+    private ScriptsGitRepoManage scriptsGitRepoManage;
+    @Resource
+    private DeployResultFileUtils deployResultFileUtils;
 
     /**
      * Deploy the DeployTask.
@@ -290,7 +280,9 @@ public class OpenTofuLocalDeployment implements Deployer {
                     openTofuLocalConfig.getDebugLogLevel());
             envVariables.put(TF_DEBUG_FLAG, openTofuLocalConfig.getDebugLogLevel());
         }
-        return new OpenTofuLocalExecutor(envVariables, inputVariables, workspace,
+        String executorPath = openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(
+                deployment.getDeployerTool().getVersion());
+        return new OpenTofuLocalExecutor(executorPath, envVariables, inputVariables, workspace,
                 getSubDirectory(deployment), deployResultFileUtils);
     }
 

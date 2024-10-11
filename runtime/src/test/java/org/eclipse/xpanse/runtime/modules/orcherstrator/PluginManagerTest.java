@@ -24,8 +24,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {
-        "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,test"})
 @AutoConfigureMockMvc
 class PluginManagerTest {
 

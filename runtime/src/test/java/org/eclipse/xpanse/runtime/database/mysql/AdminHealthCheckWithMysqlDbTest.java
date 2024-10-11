@@ -35,8 +35,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Slf4j
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql",
-        "enable.redis.distributed.cache=false"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql,test"})
 @AutoConfigureMockMvc
 class AdminHealthCheckWithMysqlDbTest extends AbstractMysqlIntegrationTest {
 

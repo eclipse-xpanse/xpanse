@@ -37,7 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Transactional
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class CredentialsConfigApiTest extends ApisTestCommon {
 

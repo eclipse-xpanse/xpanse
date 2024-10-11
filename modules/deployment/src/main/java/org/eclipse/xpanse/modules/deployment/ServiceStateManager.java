@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
 
 import jakarta.annotation.Resource;
@@ -35,7 +36,6 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -57,8 +57,7 @@ public class ServiceStateManager {
     private DatabaseServiceStateManagementTaskStorage taskStorage;
     @Resource
     private DatabaseDeployServiceStorage deployServiceStorage;
-    @Qualifier("xpanseAsyncTaskExecutor")
-    @Resource
+    @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
 
     /**

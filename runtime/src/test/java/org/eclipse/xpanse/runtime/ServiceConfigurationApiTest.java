@@ -33,8 +33,8 @@ import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
@@ -56,9 +56,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 /**
  * Test for ServiceConfigurationApi.
  */
-@SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceConfigurationApiTest extends ApisTestCommon {
 

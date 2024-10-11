@@ -23,7 +23,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {"spring.profiles.active=generate-openapi-doc,noauth"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"spring.profiles.active=generate-openapi-doc,noauth,test"})
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 public class OpenApiFileValidationTest {
 

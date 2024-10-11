@@ -40,6 +40,7 @@ public class TerraformLocalExecutor {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
+    private final String executorPath;
     private final Map<String, String> env;
     private final Map<String, Object> variables;
     private final String workspace;
@@ -48,16 +49,19 @@ public class TerraformLocalExecutor {
     /**
      * Constructor for terraformExecutor.
      *
+     * @param executorPath          path of the terraform executor.
      * @param env                   environment for the terraform command line.
      * @param variables             variables for the terraform command line.
      * @param workspace             workspace for the terraform command line.
      * @param deployResultFileUtils file tool class.
      */
-    TerraformLocalExecutor(Map<String, String> env,
+    TerraformLocalExecutor(String executorPath,
+                           Map<String, String> env,
                            Map<String, Object> variables,
                            String workspace,
                            @Nullable String subDirectory,
                            DeployResultFileUtils deployResultFileUtils) {
+        this.executorPath = executorPath;
         this.env = env;
         this.variables = variables;
         this.workspace =
@@ -73,7 +77,7 @@ public class TerraformLocalExecutor {
      * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfInit() {
-        return execute("terraform init -no-color");
+        return execute(this.executorPath + " init -no-color");
     }
 
     /**
@@ -82,7 +86,8 @@ public class TerraformLocalExecutor {
      * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfPlan() {
-        return executeWithVariables(new StringBuilder("terraform plan -input=false -no-color "));
+        return executeWithVariables(
+                new StringBuilder(this.executorPath + " plan -input=false -no-color "));
     }
 
     /**
@@ -92,7 +97,7 @@ public class TerraformLocalExecutor {
      */
     public SystemCmdResult tfPlanWithOutput() {
         return executeWithVariables(new StringBuilder(
-                "terraform plan -input=false -no-color --out tfplan.binary"));
+                this.executorPath + " plan -input=false -no-color --out tfplan.binary"));
     }
 
     /**
@@ -101,8 +106,8 @@ public class TerraformLocalExecutor {
      * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfApply() {
-        return executeWithVariables(
-                new StringBuilder("terraform apply -auto-approve -input=false -no-color "));
+        return executeWithVariables(new StringBuilder(
+                this.executorPath + " apply -auto-approve -input=false -no-color "));
     }
 
     /**
@@ -111,8 +116,8 @@ public class TerraformLocalExecutor {
      * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfDestroy() {
-        return executeWithVariables(
-                new StringBuilder("terraform destroy -auto-approve -input=false -no-color "));
+        return executeWithVariables(new StringBuilder(
+                this.executorPath + " destroy -auto-approve -input=false -no-color "));
     }
 
     /**
@@ -190,7 +195,7 @@ public class TerraformLocalExecutor {
     }
 
     /**
-     * Reads the contents of the "terraform.tfstate" file from the terraform workspace.
+     * Reads the contents of the this.executorPath + ".tfstate" file from the terraform workspace.
      *
      * @return file contents as string.
      */
@@ -247,7 +252,7 @@ public class TerraformLocalExecutor {
             throw new TerraformExecutorException("TFExecutor.tfPlan failed.",
                     tfPlanResult.getCommandStdError());
         }
-        SystemCmdResult planJsonResult = execute("terraform show -json tfplan.binary");
+        SystemCmdResult planJsonResult = execute(this.executorPath + " show -json tfplan.binary");
         if (!planJsonResult.isCommandSuccessful()) {
             log.error("Reading Terraform plan as JSON failed.");
             throw new TerraformExecutorException("Reading Terraform plan as JSON failed.",
@@ -285,7 +290,7 @@ public class TerraformLocalExecutor {
             throw new TerraformExecutorException("TFExecutor.tfInit failed.",
                     initResult.getCommandStdError());
         }
-        SystemCmdResult systemCmdResult = execute("terraform validate -json -no-color");
+        SystemCmdResult systemCmdResult = execute(this.executorPath + " validate -json -no-color");
         try {
             return new ObjectMapper().readValue(systemCmdResult.getCommandStdOutput(),
                     DeploymentScriptValidationResult.class);

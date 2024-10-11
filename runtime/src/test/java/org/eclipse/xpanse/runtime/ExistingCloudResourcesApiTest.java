@@ -67,9 +67,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SuppressWarnings("unchecked")
 @Transactional
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed",
-        "http.request.retry.max.attempts=5",
-        "http.request.retry.delay.milliseconds=1000"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ExistingCloudResourcesApiTest extends ApisTestCommon {
 
@@ -422,7 +420,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         assertThat(flexibleEngineVmResponse.getContentAsString()).isEqualTo(
                 objectMapper.writeValueAsString(flexibleEngineVmResult));
 
-        deleteCredential(Csp.FLEXIBLE_ENGINE, site,CredentialType.VARIABLES, "AK_SK");
+        deleteCredential(Csp.FLEXIBLE_ENGINE, site, CredentialType.VARIABLES, "AK_SK");
     }
 
     void testGetExistingResourceNamesWithKindForCspBasedOpenstack() throws Exception {
@@ -629,7 +627,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         assertThat(openstackVmResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(openstackVmResponse.getContentAsString()).isEqualTo("[]");
 
-        deleteCredential(csp, site,CredentialType.VARIABLES, "USERNAME_PASSWORD");
+        deleteCredential(csp, site, CredentialType.VARIABLES, "USERNAME_PASSWORD");
     }
 
 

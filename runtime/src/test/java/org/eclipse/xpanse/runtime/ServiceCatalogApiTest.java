@@ -52,7 +52,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceCatalogApiTest extends ApisTestCommon {
 
@@ -64,7 +64,6 @@ class ServiceCatalogApiTest extends ApisTestCommon {
     void testServiceCatalogServices() throws Exception {
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("serviceCatalogApiTest-1");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         waitUntilServiceTemplateFilesAreFullyGenerated(
                 serviceTemplate.getServiceTemplateId().toString());

@@ -48,7 +48,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceOrderManageApiTest extends ApisTestCommon {
     @Test
@@ -57,7 +57,6 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("ServiceOrderManageApiTest");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         if (Objects.isNull(serviceTemplate)) {
             log.error("Register service template failed.");
