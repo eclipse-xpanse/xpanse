@@ -15,6 +15,26 @@ on:
           - Major Version
           - Minor Version
           - Patch Version
+      DEFAULT_TERRAFORM_VERSION:
+        type: string
+        description: Input the default version of Terraform to install
+        required: true
+        default: '1.6.0'
+      TERRAFORM_VERSIONS:
+        type: string
+        description: Input the multiple versions of Terraform to install
+        required: true
+        default: '1.6.0,1.7.0,1.8.0,1.9.0'
+      DEFAULT_OPENTOFU_VERSION:
+        type: string
+        description: Input the default version of OpenTofu to install
+        required: true
+        default: '1.6.0'
+      OPENTOFU_VERSIONS:
+        type: string
+        description: Input the multiple versions of OpenTofu to install
+        required: true
+        default: '1.6.0,1.7.0,1.8.0'
 
 env:
   BOT_USER_NAME: eclipse-xpanse-bot
@@ -105,6 +125,11 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.new_version.outputs.next-version }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
+          build-args: |
+            DEFAULT_TERRAFORM_VERSION=${{ github.event.inputs.DEFAULT_TERRAFORM_VERSION }}
+            TERRAFORM_VERSIONS=${{ github.event.inputs.TERRAFORM_VERSIONS }}
+            DEFAULT_OPENTOFU_VERSION=${{ github.event.inputs.DEFAULT_OPENTOFU_VERSION }}
+            OPENTOFU_VERSIONS=${{ github.event.inputs.OPENTOFU_VERSIONS }}
 
       - name: Push POM updates with release version
         uses: EndBug/add-and-commit@v9
