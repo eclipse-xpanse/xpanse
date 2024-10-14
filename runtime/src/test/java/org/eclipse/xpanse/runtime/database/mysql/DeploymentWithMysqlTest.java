@@ -183,7 +183,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         deployRequestBase.setServiceRequestProperties(serviceRequestProperties);
 
         List<AvailabilityZoneConfig> availabilityZoneConfigs =
-                serviceTemplate.getDeployment().getServiceAvailabilityConfigs();
+                serviceTemplate.getDeployment().getServiceAvailabilityConfig();
         Map<String, String> availabilityZones = new HashMap<>();
         availabilityZoneConfigs.forEach(availabilityZoneConfig ->
                 availabilityZones.put(availabilityZoneConfig.getVarName(),
@@ -283,7 +283,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     void testListServiceOrders(UUID serviceId) {
         List<ServiceOrderDetails> serviceOrders =
-                serviceOrderManageApi.listServiceOrders(serviceId.toString(), null, null);
+                serviceOrderManageApi.getAllOrdersByServiceId(serviceId.toString(), null, null);
         Assertions.assertNotNull(serviceOrders);
     }
 

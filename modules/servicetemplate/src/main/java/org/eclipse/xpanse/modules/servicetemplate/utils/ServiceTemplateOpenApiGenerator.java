@@ -313,7 +313,7 @@ public class ServiceTemplateOpenApiGenerator {
             serviceHostingTypesStr = mapper.writeValueAsString(getServiceHostingTypeValues());
             availabilityZonesSchemaStr = getSchemaOfAvailabilityZones(
                     registerService.getOcl().getDeployment()
-                            .getServiceAvailabilityConfigs(), mapper);
+                            .getServiceAvailabilityConfig(), mapper);
         } catch (JsonProcessingException e) {
             log.error("Failed to write value as string.", e);
         }

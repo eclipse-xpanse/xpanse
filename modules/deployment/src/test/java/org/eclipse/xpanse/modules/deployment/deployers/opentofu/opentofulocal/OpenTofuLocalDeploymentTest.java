@@ -142,7 +142,7 @@ class OpenTofuLocalDeploymentTest {
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
 
         Map<String, String> availabilityZones = new HashMap<>();
-        ocl.getDeployment().getServiceAvailabilityConfigs().forEach(
+        ocl.getDeployment().getServiceAvailabilityConfig().forEach(
                 availabilityZoneConfig -> availabilityZones.put(availabilityZoneConfig.getVarName(),
                         availabilityZoneConfig.getDisplayName()));
         deployRequest.setAvailabilityZones(availabilityZones);

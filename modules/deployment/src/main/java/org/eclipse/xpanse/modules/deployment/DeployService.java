@@ -303,7 +303,7 @@ public class DeployService {
 
         AvailabilityZonesRequestValidator.validateAvailabilityZones(
                 deployRequest.getAvailabilityZones(),
-                existingServiceTemplate.getOcl().getDeployment().getServiceAvailabilityConfigs());
+                existingServiceTemplate.getOcl().getDeployment().getServiceAvailabilityConfig());
         if (StringUtils.isEmpty(deployRequest.getCustomerServiceName())) {
             deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
         }

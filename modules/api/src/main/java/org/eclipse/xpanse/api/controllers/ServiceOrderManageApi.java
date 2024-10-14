@@ -65,7 +65,7 @@ public class ServiceOrderManageApi {
             MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    public List<ServiceOrderDetails> listServiceOrders(
+    public List<ServiceOrderDetails> getAllOrdersByServiceId(
             @Parameter(name = "serviceId", description = "Id of the service")
             @PathVariable(name = "serviceId") String serviceId,
             @Parameter(name = "taskType", description = "Task type of the service order.")
