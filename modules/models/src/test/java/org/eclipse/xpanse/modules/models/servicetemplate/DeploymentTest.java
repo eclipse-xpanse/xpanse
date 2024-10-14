@@ -24,7 +24,7 @@ class DeploymentTest {
     private DeployerTool deployerTool;
     private ScriptsRepo scriptsRepo;
     private List<DeployVariable> variables;
-    private List<AvailabilityZoneConfig> availabilityZoneConfigs;
+    private List<AvailabilityZoneConfig> availabilityZoneConfig;
     private Deployment test;
 
     @BeforeEach
@@ -38,7 +38,7 @@ class DeploymentTest {
         availabilityZoneConfig.setVarName("varName");
         availabilityZoneConfig.setMandatory(true);
         availabilityZoneConfig.setDescription("description");
-        availabilityZoneConfigs = List.of(availabilityZoneConfig);
+        this.availabilityZoneConfig = List.of(availabilityZoneConfig);
 
         scriptsRepo = new ScriptsRepo();
         scriptsRepo.setRepoUrl("repoUrl");
@@ -54,7 +54,7 @@ class DeploymentTest {
         test.setDeployerTool(deployerTool);
         test.setVariables(variables);
         test.setCredentialType(credentialType);
-        test.setServiceAvailabilityConfigs(availabilityZoneConfigs);
+        test.setServiceAvailabilityConfig(this.availabilityZoneConfig);
         test.setScriptsRepo(scriptsRepo);
     }
 
@@ -64,7 +64,7 @@ class DeploymentTest {
         assertEquals(deployer, test.getDeployer());
         assertEquals(variables, test.getVariables());
         assertEquals(credentialType, test.getCredentialType());
-        assertEquals(availabilityZoneConfigs, test.getServiceAvailabilityConfigs());
+        assertEquals(availabilityZoneConfig, test.getServiceAvailabilityConfig());
         assertEquals(scriptsRepo, test.getScriptsRepo());
     }
 
@@ -94,7 +94,7 @@ class DeploymentTest {
         String expectedString = "Deployment(deployerTool=" + deployerTool +
                 ", variables=" + variables +
                 ", credentialType=" + credentialType +
-                ", serviceAvailabilityConfigs=" + availabilityZoneConfigs +
+                ", serviceAvailabilityConfig=" + availabilityZoneConfig +
                 ", deployer=" + deployer +
                 ", scriptsRepo=" + scriptsRepo +
                 ")";

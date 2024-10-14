@@ -48,7 +48,7 @@ class UserOrderableServiceVoTest {
     @Mock
     private ServiceProviderContactDetails mockServiceProviderContactDetails;
     @Mock
-    private List<AvailabilityZoneConfig> mockServiceAvailabilityConfigs;
+    private List<AvailabilityZoneConfig> mockserviceAvailabilityConfig;
     private UserOrderableServiceVo test;
 
     @BeforeEach
@@ -67,7 +67,7 @@ class UserOrderableServiceVoTest {
         test.setBilling(mockBilling);
         test.setServiceHostingType(mockServiceHostingType);
         test.setServiceProviderContactDetails(mockServiceProviderContactDetails);
-        test.setServiceAvailabilityConfigs(mockServiceAvailabilityConfigs);
+        test.setServiceAvailabilityConfig(mockserviceAvailabilityConfig);
         test.setEula(eula);
     }
 
@@ -87,7 +87,7 @@ class UserOrderableServiceVoTest {
         assertThat(test.getServiceHostingType()).isEqualTo(mockServiceHostingType);
         assertThat(test.getServiceProviderContactDetails()).isEqualTo(
                 mockServiceProviderContactDetails);
-        assertThat(test.getServiceAvailabilityConfigs()).isEqualTo(mockServiceAvailabilityConfigs);
+        assertThat(test.getServiceAvailabilityConfig()).isEqualTo(mockserviceAvailabilityConfig);
         assertThat(test.getEula()).isEqualTo(eula);
     }
 
@@ -116,7 +116,7 @@ class UserOrderableServiceVoTest {
                 + ", flavors=" + mockFlavors + ", billing=" + mockBilling
                 + ", serviceHostingType=" + mockServiceHostingType
                 + ", serviceProviderContactDetails=" + mockServiceProviderContactDetails
-                + ", serviceAvailabilityConfigs=" + mockServiceAvailabilityConfigs
+                + ", serviceAvailabilityConfig=" + mockserviceAvailabilityConfig
                 + ", eula=" + eula + ")";
         assertEquals(expectedToString, test.toString());
     }

@@ -352,8 +352,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Region duplicateRegion = ocl.getCloudServiceProvider().getRegions().getFirst();
         ocl.getCloudServiceProvider().getRegions().add(duplicateRegion);
         AvailabilityZoneConfig duplicateAvailabilityZoneConfig =
-                ocl.getDeployment().getServiceAvailabilityConfigs().getFirst();
-        ocl.getDeployment().getServiceAvailabilityConfigs().add(duplicateAvailabilityZoneConfig);
+                ocl.getDeployment().getServiceAvailabilityConfig().getFirst();
+        ocl.getDeployment().getServiceAvailabilityConfig().add(duplicateAvailabilityZoneConfig);
         DeployVariable duplicateDeployVariable = ocl.getDeployment().getVariables().getFirst();
         ocl.getDeployment().getVariables().add(duplicateDeployVariable);
         ServiceFlavorWithPrice duplicateFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
@@ -434,7 +434,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
-        ocl.getDeployment().setServiceAvailabilityConfigs(null);
+        ocl.getDeployment().setServiceAvailabilityConfig(null);
         DeployVariable deployVariable = ocl.getDeployment().getVariables().getLast();
         DeployVariable deployVariableWithRepeatName = new DeployVariable();
         BeanUtils.copyProperties(deployVariable, deployVariableWithRepeatName);
@@ -459,12 +459,12 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl2 = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         AvailabilityZoneConfig availabilityZoneConfig =
-                ocl2.getDeployment().getServiceAvailabilityConfigs().getFirst();
+                ocl2.getDeployment().getServiceAvailabilityConfig().getFirst();
         AvailabilityZoneConfig availabilityZoneConfigWithRepeatName =
                 new AvailabilityZoneConfig();
         BeanUtils.copyProperties(availabilityZoneConfig, availabilityZoneConfigWithRepeatName);
         availabilityZoneConfigWithRepeatName.setDisplayName("newDisplayName");
-        ocl2.getDeployment().getServiceAvailabilityConfigs()
+        ocl2.getDeployment().getServiceAvailabilityConfig()
                 .add(availabilityZoneConfigWithRepeatName);
 
         String errorMessage2 = String.format(

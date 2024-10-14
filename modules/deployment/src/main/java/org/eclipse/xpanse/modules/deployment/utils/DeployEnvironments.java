@@ -156,7 +156,7 @@ public class DeployEnvironments {
     private Map<String, String> getAvailabilityZoneVariables(DeployTask task) {
         Map<String, String> variables = new HashMap<>();
         List<AvailabilityZoneConfig> availabilityZoneConfigs =
-                task.getOcl().getDeployment().getServiceAvailabilityConfigs();
+                task.getOcl().getDeployment().getServiceAvailabilityConfig();
 
         Map<String, String> inputAvailabilityZones = task.getDeployRequest().getAvailabilityZones();
 

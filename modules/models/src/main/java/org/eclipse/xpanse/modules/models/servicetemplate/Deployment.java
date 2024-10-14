@@ -49,7 +49,7 @@ public class Deployment implements Serializable {
     @UniqueElements
     @Schema(description = "The list of availability zone configuration of the service."
             + "The list elements must be unique.")
-    private List<AvailabilityZoneConfig> serviceAvailabilityConfigs;
+    private List<AvailabilityZoneConfig> serviceAvailabilityConfig;
 
     @Schema(description = "The real deployer, something like terraform scripts. "
             + "Either deployer or deployFromGitRepo must be provided.")
