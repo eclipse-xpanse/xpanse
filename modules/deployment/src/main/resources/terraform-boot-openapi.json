@@ -3,7 +3,7 @@
   "info": {
     "title": "Terraform-Boot API",
     "description": "RESTful Services to interact with Terraform-Boot runtime",
-    "version": "1.0.7-SNAPSHOT"
+    "version": "1.0.12-SNAPSHOT"
   },
   "servers": [
     {
@@ -65,8 +65,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -75,8 +75,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -136,8 +136,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -146,8 +146,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -207,8 +207,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -217,8 +217,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -278,8 +278,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -288,8 +288,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -342,8 +342,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -352,8 +352,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -413,8 +413,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -423,8 +423,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -484,8 +484,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -494,8 +494,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -548,8 +548,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -558,8 +558,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -619,8 +619,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -629,8 +629,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -690,8 +690,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -700,8 +700,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -761,8 +761,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -771,8 +771,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -825,8 +825,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -835,8 +835,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -896,8 +896,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -906,8 +906,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -967,8 +967,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -977,8 +977,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1051,8 +1051,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1061,8 +1061,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1133,8 +1133,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1143,8 +1143,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1215,8 +1215,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1225,8 +1225,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1290,8 +1290,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1300,8 +1300,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1372,8 +1372,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1382,8 +1382,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1426,8 +1426,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1436,8 +1436,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1469,7 +1469,7 @@
         }
       }
     },
-    "/terraform-boot/directory/validate/{module_directory}": {
+    "/terraform-boot/directory/validate/{module_directory}/{terraform_version}": {
       "get": {
         "tags": [
           "TerraformFromDirectory"
@@ -1485,6 +1485,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "terraform_version",
+            "in": "path",
+            "description": "version of Terraform to execute the module files.",
+            "required": true,
+            "schema": {
+              "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1498,8 +1508,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1508,8 +1518,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1569,8 +1579,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1579,8 +1589,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1633,8 +1643,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1643,8 +1653,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1708,8 +1718,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1718,8 +1728,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1790,8 +1800,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1800,8 +1810,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1847,7 +1857,8 @@
               "Unsupported Enum Value",
               "Service Unavailable",
               "Unauthorized",
-              "Invalid Git Repo Details"
+              "Invalid Git Repo Details",
+              "Invalid Terraform Tool"
             ]
           },
           "details": {
@@ -1868,6 +1879,7 @@
         "required": [
           "isPlanOnly",
           "scripts",
+          "terraformVersion",
           "variables"
         ],
         "type": "object",
@@ -1876,6 +1888,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -1913,16 +1930,26 @@
           "detail": {
             "type": "string"
           }
-        }
+        },
+        "description": "List of validation errors."
       },
       "TerraformValidationResult": {
+        "required": [
+          "valid"
+        ],
         "type": "object",
         "properties": {
           "valid": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Defines if the Terraform scripts is valid."
+          },
+          "terraformVersionUsed": {
+            "type": "string",
+            "description": "The version of the Terraform binary used to execute scripts."
           },
           "diagnostics": {
             "type": "array",
+            "description": "List of validation errors.",
             "items": {
               "$ref": "#/components/schemas/TerraformValidateDiagnostics"
             }
@@ -1932,6 +1959,7 @@
       "TerraformPlanWithScriptsRequest": {
         "required": [
           "scripts",
+          "terraformVersion",
           "variables"
         ],
         "type": "object",
@@ -1940,6 +1968,11 @@
             "type": "string",
             "description": "Id of the request.",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "variables": {
             "type": "object",
@@ -1976,6 +2009,10 @@
           "plan": {
             "type": "string",
             "description": "Terraform plan as a JSON string"
+          },
+          "terraformVersionUsed": {
+            "type": "string",
+            "description": "The version of the Terraform binary used to execute scripts."
           }
         }
       },
@@ -1983,6 +2020,7 @@
         "required": [
           "isPlanOnly",
           "scripts",
+          "terraformVersion",
           "tfState",
           "variables"
         ],
@@ -1992,6 +2030,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2060,6 +2103,10 @@
             },
             "description": "Data of all other files generated by the terraform execution.The map key contains the file name and value is the file contents as string."
           },
+          "terraformVersionUsed": {
+            "type": "string",
+            "description": "The version of the Terraform binary used to execute scripts."
+          },
           "commandSuccessful": {
             "type": "boolean"
           }
@@ -2069,6 +2116,7 @@
         "required": [
           "isPlanOnly",
           "scripts",
+          "terraformVersion",
           "tfState",
           "variables",
           "webhookConfig"
@@ -2079,6 +2127,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2147,6 +2200,7 @@
       "TerraformDestroyWithScriptsRequest": {
         "required": [
           "scripts",
+          "terraformVersion",
           "tfState",
           "variables"
         ],
@@ -2156,6 +2210,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "variables": {
             "type": "object",
@@ -2191,6 +2250,7 @@
         "required": [
           "isPlanOnly",
           "scripts",
+          "terraformVersion",
           "variables",
           "webhookConfig"
         ],
@@ -2200,6 +2260,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2238,6 +2303,7 @@
         "required": [
           "gitRepoDetails",
           "isPlanOnly",
+          "terraformVersion",
           "variables"
         ],
         "type": "object",
@@ -2246,6 +2312,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2296,6 +2367,7 @@
       },
       "TerraformPlanFromGitRepoRequest": {
         "required": [
+          "terraformVersion",
           "variables"
         ],
         "type": "object",
@@ -2304,6 +2376,11 @@
             "type": "string",
             "description": "Id of the request.",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "variables": {
             "type": "object",
@@ -2329,6 +2406,7 @@
       "TerraformModifyFromGitRepoRequest": {
         "required": [
           "isPlanOnly",
+          "terraformVersion",
           "tfState",
           "variables"
         ],
@@ -2338,6 +2416,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2371,6 +2454,7 @@
       "TerraformAsyncModifyFromGitRepoRequest": {
         "required": [
           "isPlanOnly",
+          "terraformVersion",
           "tfState",
           "variables",
           "webhookConfig"
@@ -2381,6 +2465,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2416,6 +2505,7 @@
       },
       "TerraformDestroyFromGitRepoRequest": {
         "required": [
+          "terraformVersion",
           "tfState",
           "variables"
         ],
@@ -2425,6 +2515,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "variables": {
             "type": "object",
@@ -2455,6 +2550,7 @@
         "required": [
           "gitRepoDetails",
           "isPlanOnly",
+          "terraformVersion",
           "variables",
           "webhookConfig"
         ],
@@ -2464,6 +2560,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2495,6 +2596,7 @@
       },
       "TerraformPlanFromDirectoryRequest": {
         "required": [
+          "terraformVersion",
           "variables"
         ],
         "type": "object",
@@ -2503,6 +2605,11 @@
             "type": "string",
             "description": "Id of the request.",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "variables": {
             "type": "object",
@@ -2525,6 +2632,7 @@
       "TerraformModifyFromDirectoryRequest": {
         "required": [
           "isPlanOnly",
+          "terraformVersion",
           "variables"
         ],
         "type": "object",
@@ -2533,6 +2641,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2559,6 +2672,7 @@
       "TerraformAsyncModifyFromDirectoryRequest": {
         "required": [
           "isPlanOnly",
+          "terraformVersion",
           "variables",
           "webhookConfig"
         ],
@@ -2568,6 +2682,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2597,6 +2716,7 @@
       "TerraformDeployFromDirectoryRequest": {
         "required": [
           "isPlanOnly",
+          "terraformVersion",
           "variables"
         ],
         "type": "object",
@@ -2605,6 +2725,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2631,6 +2756,7 @@
       "TerraformAsyncDeployFromDirectoryRequest": {
         "required": [
           "isPlanOnly",
+          "terraformVersion",
           "variables",
           "webhookConfig"
         ],
@@ -2640,6 +2766,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2685,6 +2816,7 @@
       "TerraformAsyncDestroyFromScriptsRequest": {
         "required": [
           "scripts",
+          "terraformVersion",
           "tfState",
           "variables",
           "webhookConfig"
@@ -2695,6 +2827,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "variables": {
             "type": "object",
@@ -2731,6 +2868,7 @@
       },
       "TerraformAsyncDestroyFromGitRepoRequest": {
         "required": [
+          "terraformVersion",
           "tfState",
           "variables",
           "webhookConfig"
@@ -2741,6 +2879,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "variables": {
             "type": "object",
@@ -2772,6 +2915,7 @@
       },
       "TerraformDestroyFromDirectoryRequest": {
         "required": [
+          "terraformVersion",
           "variables"
         ],
         "type": "object",
@@ -2780,6 +2924,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "variables": {
             "type": "object",
@@ -2801,6 +2950,7 @@
       },
       "TerraformAsyncDestroyFromDirectoryRequest": {
         "required": [
+          "terraformVersion",
           "variables",
           "webhookConfig"
         ],
@@ -2810,6 +2960,11 @@
             "type": "string",
             "description": "Id of the request",
             "format": "uuid"
+          },
+          "terraformVersion": {
+            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$",
+            "type": "string",
+            "description": "The required version of the terraform which will execute the scripts."
           },
           "variables": {
             "type": "object",

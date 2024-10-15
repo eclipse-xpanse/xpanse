@@ -147,7 +147,7 @@
                             <library>resttemplate</library>
                             <skip>${skipTerraformBootClientGeneration}</skip>
                             <supportingFilesToGenerate>
-                                ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,OAuth.java
+                                BaseApi.java,ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,OAuth.java
                             </supportingFilesToGenerate>
                             <configOptions>
                                 <generateClientAsBean>true</generateClientAsBean>
@@ -182,7 +182,7 @@
                             <library>resttemplate</library>
                             <skip>${skipTofuMakerClientGeneration}</skip>
                             <supportingFilesToGenerate>
-                                ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,OAuth.java
+                                BaseApi.java,ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,OAuth.java
                             </supportingFilesToGenerate>
                             <configOptions>
                                 <generateClientAsBean>true</generateClientAsBean>

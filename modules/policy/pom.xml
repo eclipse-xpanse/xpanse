@@ -84,7 +84,7 @@
                             <library>resttemplate</library>
                             <skip>${skipPolicyManClientGeneration}</skip>
                             <supportingFilesToGenerate>
-                                ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java
+                                BaseApi.java,ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java
                             </supportingFilesToGenerate>
                             <configOptions>
                                 <generateClientAsBean>true</generateClientAsBean>
