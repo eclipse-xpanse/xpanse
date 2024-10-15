@@ -30,8 +30,8 @@ public class OpenTelemetryCollectorHealthCheck {
     @Value("${otel.exporter.health.check.port:13133}")
     String healthCheckPort;
 
-    @Value("${otel.exporter.otlp.enabled:false}")
-    boolean isOtelExporterEnabled;
+    @Value("${otel.sdk.disabled:true}")
+    boolean isOtelExporterDisabled;
 
     /**
      * Method checks the status of opentelemetry collector.
@@ -41,7 +41,7 @@ public class OpenTelemetryCollectorHealthCheck {
      * @return BackendSystemStatus
      */
     public BackendSystemStatus getOpenTelemetryHealthStatus() {
-        if (isOtelExporterEnabled) {
+        if (!isOtelExporterDisabled) {
             RestClient restClient = RestClient.builder()
                     .baseUrl(getHealthCheckUrl())
                     .build();
