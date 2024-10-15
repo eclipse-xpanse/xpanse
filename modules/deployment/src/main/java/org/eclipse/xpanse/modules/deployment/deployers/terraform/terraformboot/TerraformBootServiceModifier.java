@@ -58,7 +58,6 @@ public class TerraformBootServiceModifier {
         result.setOrderId(deployTask.getOrderId());
         TerraformAsyncModifyFromScriptsRequest request =
                 getModifyFromScriptsRequest(deployTask, resourceState);
-        request.setRequestId(deployTask.getOrderId());
         try {
             terraformFromScriptsApi.asyncModifyWithScripts(request);
             return result;
@@ -81,7 +80,6 @@ public class TerraformBootServiceModifier {
         result.setOrderId(deployTask.getOrderId());
         TerraformAsyncModifyFromGitRepoRequest request =
                 getModifyFromGitRepoRequest(deployTask, resourceState);
-        request.setRequestId(deployTask.getOrderId());
         try {
             terraformFromGitRepoApi.asyncModifyFromGitRepo(request);
             return result;
@@ -97,6 +95,8 @@ public class TerraformBootServiceModifier {
             throws TerraformBootRequestFailedException {
         TerraformAsyncModifyFromScriptsRequest request =
                 new TerraformAsyncModifyFromScriptsRequest();
+        request.setRequestId(task.getOrderId());
+        request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
@@ -110,7 +110,8 @@ public class TerraformBootServiceModifier {
             throws TerraformBootRequestFailedException {
         TerraformAsyncModifyFromGitRepoRequest request =
                 new TerraformAsyncModifyFromGitRepoRequest();
-        request.setRequestId(task.getServiceId());
+        request.setRequestId(task.getOrderId());
+        request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));

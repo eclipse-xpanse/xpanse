@@ -54,6 +54,9 @@ public class DeployResult {
     @Schema(description = "The private properties of the service instance deployment.")
     private Map<String, String> privateProperties = new HashMap<>();
 
+    @Schema(description = "The version of deployer tool used to execute deployment scripts.")
+    private String deployerVersionUsed;
+
     @Hidden
     private String tfStateContent;
 

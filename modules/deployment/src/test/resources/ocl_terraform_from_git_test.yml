@@ -297,6 +297,6 @@ deployment:
         isDataLost: true
         isServiceInterrupted: true
   scriptsRepo:
-    repoUrl: https://github.com/baixinsui/xpanse-samples.git
+    repoUrl: https://github.com/eclipse-xpanse/xpanse-examples.git
     branch: main
-    scriptsPath: huaweicloud/test
+    scriptsPath: scripts/huaweicloud/others/test

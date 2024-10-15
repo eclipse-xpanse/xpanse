@@ -156,6 +156,7 @@ public class OpenTofuDeploymentResultCallbackManager {
         DeployResult deployResult = new DeployResult();
         deployResult.setOrderId(result.getRequestId());
         deployResult.setServiceId(serviceId);
+        deployResult.setDeployerVersionUsed(result.getOpenTofuVersionUsed());
         if (Boolean.FALSE.equals(result.getCommandSuccessful())) {
             deployResult.setIsTaskSuccessful(false);
             deployResult.setMessage(result.getCommandStdError());

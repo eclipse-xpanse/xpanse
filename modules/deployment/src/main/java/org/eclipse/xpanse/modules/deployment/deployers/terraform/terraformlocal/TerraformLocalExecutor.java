@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.systemcmd.SystemCmd;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
@@ -40,6 +41,7 @@ public class TerraformLocalExecutor {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
+    @Getter
     private final String executorPath;
     private final Map<String, String> env;
     private final Map<String, Object> variables;

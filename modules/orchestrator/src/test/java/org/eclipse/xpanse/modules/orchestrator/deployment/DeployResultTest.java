@@ -38,6 +38,8 @@ class DeployResultTest {
 
     private final String tfStateContent = "tfStateContent";
 
+    private final String deployerVersionUsed = "1.6.0";
+
     @Mock
     private List<DeployResource> resources;
     private DeployResult test;
@@ -54,6 +56,7 @@ class DeployResultTest {
         test.setMessage(message);
         test.setState(state);
         test.setTfStateContent(tfStateContent);
+        test.setDeployerVersionUsed(deployerVersionUsed);
     }
 
     @Test
@@ -67,6 +70,7 @@ class DeployResultTest {
         assertEquals(privateProperties, test.getPrivateProperties());
         assertEquals(state, test.getState());
         assertEquals(tfStateContent, test.getTfStateContent());
+        assertEquals(deployerVersionUsed, test.getDeployerVersionUsed());
     }
 
     @Test
@@ -94,6 +98,7 @@ class DeployResultTest {
                 + ", resources=" + resources
                 + ", properties=" + properties
                 + ", privateProperties=" + privateProperties
+                + ", deployerVersionUsed=" + deployerVersionUsed
                 + ", tfStateContent=" + tfStateContent
                 + ")";
         assertEquals(expectedToString, test.toString());

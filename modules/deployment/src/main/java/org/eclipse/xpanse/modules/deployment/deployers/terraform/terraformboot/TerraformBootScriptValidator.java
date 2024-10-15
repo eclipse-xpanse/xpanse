@@ -65,6 +65,8 @@ public class TerraformBootScriptValidator {
                 deploymentScriptValidationResult =
                         objectMapper.readValue(objectMapper.writeValueAsString(validate),
                                 DeploymentScriptValidationResult.class);
+                deploymentScriptValidationResult.setDeployerVersionUsed(
+                        deployment.getDeployerTool().getVersion());
             } catch (JsonProcessingException e) {
                 log.error("JsonProcessingException", e);
             }
@@ -103,6 +105,7 @@ public class TerraformBootScriptValidator {
             Deployment deployment) {
         TerraformDeployWithScriptsRequest request = new TerraformDeployWithScriptsRequest();
         request.setRequestId(getRequestId());
+        request.setTerraformVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setScripts(getFilesByOcl(deployment));
         return request;
@@ -112,6 +115,7 @@ public class TerraformBootScriptValidator {
             Deployment deployment) {
         TerraformDeployFromGitRepoRequest request = new TerraformDeployFromGitRepoRequest();
         request.setRequestId(getRequestId());
+        request.setTerraformVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(

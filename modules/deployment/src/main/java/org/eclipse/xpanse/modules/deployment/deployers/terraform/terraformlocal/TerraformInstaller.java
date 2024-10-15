@@ -76,6 +76,18 @@ public class TerraformInstaller {
         return matchedVersionExecutorPath;
     }
 
+
+    /**
+     * Get exact version of terraform by executor path.
+     *
+     * @param executorPath executor path
+     * @return version of terraform
+     */
+    public String getExactVersionOfTerraform(String executorPath) {
+        return deployerToolUtils.getExactVersionOfExecutor(executorPath,
+                TERRAFORM_VERSION_OUTPUT_PATTERN);
+    }
+
     private String installTerraformByRequiredVersion(String requiredOperator,
                                                      String requiredNumber) {
         String bestVersionNumber = deployerToolUtils.getBestAvailableVersionMatchingRequiredVersion(
@@ -84,8 +96,7 @@ public class TerraformInstaller {
                 deployerToolUtils.installDeployerToolWithVersion(TERRAFORM_EXECUTOR_NAME_PREFIX,
                         bestVersionNumber, TERRAFORM_BINARY_DOWNLOAD_URL_FORMAT,
                         this.terraformDownloadBaseUrl, this.terraformInstallDir);
-        if (deployerToolUtils.checkIfExecutorVersionIsValid(installedExecutorFile,
-                TERRAFORM_VERSION_OUTPUT_PATTERN, requiredOperator, requiredNumber)) {
+        if (deployerToolUtils.checkIfExecutorCanBeExecuted(installedExecutorFile)) {
             log.info("Terraform with version {}  installed successfully.", installedExecutorFile);
             return installedExecutorFile.getAbsolutePath();
         }

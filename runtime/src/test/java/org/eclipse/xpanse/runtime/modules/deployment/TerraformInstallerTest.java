@@ -35,7 +35,7 @@ class TerraformInstallerTest extends AbstractRedisIntegrationTest {
                 deployerToolUtils.getOperatorAndNumberFromRequiredVersion(requiredVersion1);
         String terraformPath1 =
                 installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion1);
-        assertTrue(deployerToolUtils.checkIfExecutorVersionIsValid(new File(terraformPath1),
+        assertTrue(deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(new File(terraformPath1),
                 TERRAFORM_VERSION_OUTPUT_PATTERN, operatorAndNumber1[0], operatorAndNumber1[1]));
 
         String requiredVersion2 = "= 1.6.0";
@@ -43,7 +43,7 @@ class TerraformInstallerTest extends AbstractRedisIntegrationTest {
                 requiredVersion2);
         String terraformPath2 =
                 installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion2);
-        assertTrue(deployerToolUtils.checkIfExecutorVersionIsValid(new File(terraformPath2),
+        assertTrue(deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(new File(terraformPath2),
                 TERRAFORM_VERSION_OUTPUT_PATTERN, operatorAndNumber2[0], operatorAndNumber2[1]));
 
         String requiredVersion3 = ">= v1.8.0";
@@ -51,7 +51,7 @@ class TerraformInstallerTest extends AbstractRedisIntegrationTest {
                 requiredVersion3);
         String terraformPath3 =
                 installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion3);
-        assertTrue(deployerToolUtils.checkIfExecutorVersionIsValid(new File(terraformPath3),
+        assertTrue(deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(new File(terraformPath3),
                 TERRAFORM_VERSION_OUTPUT_PATTERN, operatorAndNumber3[0], operatorAndNumber3[1]));
 
         String requiredVersion4 = ">= 100.0.0";

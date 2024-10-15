@@ -77,6 +77,18 @@ public class OpenTofuInstaller {
         return matchedVersionExecutorPath;
     }
 
+
+    /**
+     * Get exact version of OpenTofu by the executor path.
+     *
+     * @param executorPath executor path
+     * @return version number of OpenTofu
+     */
+    public String getExactVersionOfOpenTofu(String executorPath) {
+        return deployerToolUtils.getExactVersionOfExecutor(executorPath,
+                OPEN_TOFU_VERSION_OUTPUT_PATTERN);
+    }
+
     private String installOpenTofuByRequiredVersion(String requiredOperator,
                                                     String requiredNumber) {
         String bestVersionNumber = deployerToolUtils.getBestAvailableVersionMatchingRequiredVersion(
@@ -85,8 +97,7 @@ public class OpenTofuInstaller {
                 deployerToolUtils.installDeployerToolWithVersion(OPEN_TOFU_EXECUTOR_NAME_PREFIX,
                         bestVersionNumber, OPEN_TOFU_BINARY_DOWNLOAD_URL_FORMAT,
                         this.openTofuDownloadBaseUrl, this.openTofuInstallDir);
-        if (deployerToolUtils.checkIfExecutorVersionIsValid(installedExecutorFile,
-                OPEN_TOFU_VERSION_OUTPUT_PATTERN, requiredOperator, requiredNumber)) {
+        if (deployerToolUtils.checkIfExecutorCanBeExecuted(installedExecutorFile)) {
             log.info("OpenTofu with version {}  installed successfully.", installedExecutorFile);
             return installedExecutorFile.getAbsolutePath();
         }
