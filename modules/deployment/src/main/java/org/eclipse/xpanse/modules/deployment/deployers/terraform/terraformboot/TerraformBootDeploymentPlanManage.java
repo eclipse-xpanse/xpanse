@@ -53,6 +53,7 @@ public class TerraformBootDeploymentPlanManage {
     private TerraformPlanWithScriptsRequest getPlanWithScriptsRequest(DeployTask task) {
         TerraformPlanWithScriptsRequest request = new TerraformPlanWithScriptsRequest();
         request.setRequestId(task.getOrderId());
+        request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
@@ -62,6 +63,7 @@ public class TerraformBootDeploymentPlanManage {
     private TerraformPlanFromGitRepoRequest getPlanFromGitRepoRequest(DeployTask task) {
         TerraformPlanFromGitRepoRequest request = new TerraformPlanFromGitRepoRequest();
         request.setRequestId(task.getOrderId());
+        request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
         request.setGitRepoDetails(

@@ -55,7 +55,6 @@ public class TofuMakerServiceModifier {
         DeployResult result = new DeployResult();
         OpenTofuAsyncModifyFromScriptsRequest request =
                 getModifyFromScriptsRequest(deployTask, resourceState);
-        request.setRequestId(deployTask.getOrderId());
         try {
             openTofuFromScriptsApi.asyncModifyWithScripts(request);
             result.setOrderId(deployTask.getOrderId());
@@ -78,7 +77,6 @@ public class TofuMakerServiceModifier {
         DeployResult result = new DeployResult();
         OpenTofuAsyncModifyFromGitRepoRequest request =
                 getModifyFromGitRepoRequest(deployTask, resourceState);
-        request.setRequestId(deployTask.getOrderId());
         try {
             openTofuFromGitRepoApi.asyncModifyFromGitRepo(request);
             result.setOrderId(deployTask.getOrderId());
@@ -96,6 +94,8 @@ public class TofuMakerServiceModifier {
             throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncModifyFromScriptsRequest request =
                 new OpenTofuAsyncModifyFromScriptsRequest();
+        request.setRequestId(task.getOrderId());
+        request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setScripts(tofuMakerHelper.getFiles(task));
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
@@ -109,6 +109,8 @@ public class TofuMakerServiceModifier {
             throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncModifyFromGitRepoRequest request =
                 new OpenTofuAsyncModifyFromGitRepoRequest();
+        request.setRequestId(task.getOrderId());
+        request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));

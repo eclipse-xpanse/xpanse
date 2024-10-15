@@ -80,6 +80,7 @@ public class TerraformBootServiceDeployer {
         TerraformAsyncDeployFromScriptsRequest request =
                 new TerraformAsyncDeployFromScriptsRequest();
         request.setRequestId(task.getOrderId());
+        request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
@@ -92,6 +93,7 @@ public class TerraformBootServiceDeployer {
         TerraformAsyncDeployFromGitRepoRequest request =
                 new TerraformAsyncDeployFromGitRepoRequest();
         request.setRequestId(task.getOrderId());
+        request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));

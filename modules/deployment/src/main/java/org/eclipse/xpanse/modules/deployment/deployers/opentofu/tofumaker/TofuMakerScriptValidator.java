@@ -102,6 +102,7 @@ public class TofuMakerScriptValidator {
     private OpenTofuDeployWithScriptsRequest getValidateScriptsInOclRequest(Deployment deployment) {
         OpenTofuDeployWithScriptsRequest request = new OpenTofuDeployWithScriptsRequest();
         request.setRequestId(getRequestId());
+        request.setOpenTofuVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setScripts(getFilesByOcl(deployment));
         return request;
@@ -111,6 +112,7 @@ public class TofuMakerScriptValidator {
             Deployment deployment) {
         OpenTofuDeployFromGitRepoRequest request = new OpenTofuDeployFromGitRepoRequest();
         request.setRequestId(getRequestId());
+        request.setOpenTofuVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
                 tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(

@@ -80,6 +80,7 @@ public class TofuMakerServiceDeployer {
         OpenTofuAsyncDeployFromScriptsRequest request =
                 new OpenTofuAsyncDeployFromScriptsRequest();
         request.setRequestId(task.getOrderId());
+        request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setScripts(tofuMakerHelper.getFiles(task));
         request.setVariables(tofuMakerHelper.getInputVariables(task, true));
@@ -92,6 +93,7 @@ public class TofuMakerServiceDeployer {
         OpenTofuAsyncDeployFromGitRepoRequest request =
                 new OpenTofuAsyncDeployFromGitRepoRequest();
         request.setRequestId(task.getOrderId());
+        request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setVariables(tofuMakerHelper.getInputVariables(task, true));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));

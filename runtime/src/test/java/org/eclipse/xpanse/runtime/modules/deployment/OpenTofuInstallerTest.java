@@ -33,7 +33,7 @@ class OpenTofuInstallerTest {
                 requiredVersion1);
         String terraformPath1 =
                 installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion1);
-        assertTrue(deployerToolUtils.checkIfExecutorVersionIsValid(new File(terraformPath1),
+        assertTrue(deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(new File(terraformPath1),
                 OPEN_TOFU_VERSION_OUTPUT_PATTERN, operatorAndNumber1[0], operatorAndNumber1[1]));
 
         String requiredVersion2 = "= 1.6.0";
@@ -41,7 +41,7 @@ class OpenTofuInstallerTest {
                 deployerToolUtils.getOperatorAndNumberFromRequiredVersion(requiredVersion2);
         String terraformPath2 =
                 installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion2);
-        assertTrue(deployerToolUtils.checkIfExecutorVersionIsValid(new File(terraformPath2),
+        assertTrue(deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(new File(terraformPath2),
                 OPEN_TOFU_VERSION_OUTPUT_PATTERN, operatorAndNumber2[0], operatorAndNumber2[1]));
 
         String requiredVersion3 = ">= v1.8.0";
@@ -49,7 +49,7 @@ class OpenTofuInstallerTest {
                 requiredVersion3);
         String terraformPath3 =
                 installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion3);
-        assertTrue(deployerToolUtils.checkIfExecutorVersionIsValid(new File(terraformPath3),
+        assertTrue(deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(new File(terraformPath3),
                 OPEN_TOFU_VERSION_OUTPUT_PATTERN, operatorAndNumber3[0], operatorAndNumber3[1]));
 
         String requiredVersion4 = ">= 100.0.0";

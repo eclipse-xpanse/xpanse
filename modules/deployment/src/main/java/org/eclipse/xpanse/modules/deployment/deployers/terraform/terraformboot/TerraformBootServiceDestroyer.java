@@ -96,6 +96,7 @@ public class TerraformBootServiceDestroyer {
         TerraformAsyncDestroyFromScriptsRequest request =
                 new TerraformAsyncDestroyFromScriptsRequest();
         request.setRequestId(task.getOrderId());
+        request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setScripts(terraformBootHelper.getFiles(task));
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
@@ -110,6 +111,7 @@ public class TerraformBootServiceDestroyer {
         TerraformAsyncDestroyFromGitRepoRequest request =
                 new TerraformAsyncDestroyFromGitRepoRequest();
         request.setRequestId(task.getOrderId());
+        request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));

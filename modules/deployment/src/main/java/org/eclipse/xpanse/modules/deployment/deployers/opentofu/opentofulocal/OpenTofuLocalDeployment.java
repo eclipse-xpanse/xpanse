@@ -156,6 +156,8 @@ public class OpenTofuLocalDeployment implements Deployer {
                 openTofuResult.setCommandStdError(tfEx.getMessage());
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
+            openTofuResult.setOpenTofuVersionUsed(
+                    openTofuInstaller.getExactVersionOfOpenTofu(executor.getExecutorPath()));
             Map<String, String> importantFilesContent = executor.getImportantFilesContent();
             openTofuResult.setImportantFileContentMap(importantFilesContent);
             openTofuDeploymentResultCallbackManager.deployCallback(task.getServiceId(),
@@ -181,6 +183,8 @@ public class OpenTofuLocalDeployment implements Deployer {
                 openTofuResult.setCommandStdError(tfEx.getMessage());
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
+            openTofuResult.setOpenTofuVersionUsed(
+                    openTofuInstaller.getExactVersionOfOpenTofu(executor.getExecutorPath()));
             Map<String, String> importantFilesContent = executor.getImportantFilesContent();
             openTofuResult.setImportantFileContentMap(importantFilesContent);
             openTofuDeploymentResultCallbackManager.destroyCallback(task.getServiceId(),
@@ -207,6 +211,8 @@ public class OpenTofuLocalDeployment implements Deployer {
                 openTofuResult.setCommandStdError(tfEx.getMessage());
             }
             openTofuResult.setTerraformState(executor.getTerraformState());
+            openTofuResult.setOpenTofuVersionUsed(
+                    openTofuInstaller.getExactVersionOfOpenTofu(executor.getExecutorPath()));
             Map<String, String> importantFilesContent = executor.getImportantFilesContent();
             openTofuResult.setImportantFileContentMap(importantFilesContent);
             openTofuDeploymentResultCallbackManager.modifyCallback(task.getServiceId(),
@@ -405,7 +411,10 @@ public class OpenTofuLocalDeployment implements Deployer {
         }
         OpenTofuLocalExecutor executor =
                 getExecutor(new HashMap<>(), new HashMap<>(), workspace, deployment);
-        return executor.tfValidate();
+        DeploymentScriptValidationResult validationResult = executor.tfValidate();
+        validationResult.setDeployerVersionUsed(
+                openTofuInstaller.getExactVersionOfOpenTofu(executor.getExecutorPath()));
+        return validationResult;
     }
 
     @Nullable

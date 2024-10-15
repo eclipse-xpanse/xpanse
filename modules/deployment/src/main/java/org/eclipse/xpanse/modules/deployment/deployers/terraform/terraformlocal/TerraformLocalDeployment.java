@@ -155,6 +155,8 @@ public class TerraformLocalDeployment implements Deployer {
                 terraformResult.setCommandStdError(tfEx.getMessage());
             }
             terraformResult.setTerraformState(executor.getTerraformState());
+            terraformResult.setTerraformVersionUsed(
+                    terraformInstaller.getExactVersionOfTerraform(executor.getExecutorPath()));
             Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
             terraformResult.setImportantFileContentMap(importantFileContentMap);
             terraformDeploymentResultCallbackManager.deployCallback(task.getServiceId(),
@@ -180,6 +182,8 @@ public class TerraformLocalDeployment implements Deployer {
                 terraformResult.setCommandStdError(tfEx.getMessage());
             }
             terraformResult.setTerraformState(executor.getTerraformState());
+            terraformResult.setTerraformVersionUsed(
+                    terraformInstaller.getExactVersionOfTerraform(executor.getExecutorPath()));
             Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
             terraformResult.setImportantFileContentMap(importantFileContentMap);
             terraformDeploymentResultCallbackManager.destroyCallback(task.getServiceId(),
@@ -206,6 +210,8 @@ public class TerraformLocalDeployment implements Deployer {
                 terraformResult.setCommandStdError(tfEx.getMessage());
             }
             terraformResult.setTerraformState(executor.getTerraformState());
+            terraformResult.setTerraformVersionUsed(
+                    terraformInstaller.getExactVersionOfTerraform(executor.getExecutorPath()));
             Map<String, String> importantFileContentMap = executor.getImportantFilesContent();
             terraformResult.setImportantFileContentMap(importantFileContentMap);
             terraformDeploymentResultCallbackManager.modifyCallback(task.getServiceId(),
@@ -403,7 +409,10 @@ public class TerraformLocalDeployment implements Deployer {
         }
         TerraformLocalExecutor executor =
                 getExecutor(new HashMap<>(), new HashMap<>(), workspace, deployment);
-        return executor.tfValidate();
+        DeploymentScriptValidationResult validationResult = executor.tfValidate();
+        validationResult.setDeployerVersionUsed(
+                terraformInstaller.getExactVersionOfTerraform(executor.getExecutorPath()));
+        return validationResult;
     }
 
     @Nullable

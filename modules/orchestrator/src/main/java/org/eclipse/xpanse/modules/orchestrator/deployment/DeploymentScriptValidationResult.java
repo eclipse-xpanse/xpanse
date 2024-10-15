@@ -17,5 +17,6 @@ import lombok.Data;
 public class DeploymentScriptValidationResult {
 
     private boolean valid;
+    private String deployerVersionUsed;
     private List<DeployValidateDiagnostics> diagnostics;
 }

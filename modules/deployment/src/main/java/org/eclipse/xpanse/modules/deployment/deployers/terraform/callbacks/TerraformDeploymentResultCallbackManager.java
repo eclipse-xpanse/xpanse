@@ -156,6 +156,7 @@ public class TerraformDeploymentResultCallbackManager {
         DeployResult deployResult = new DeployResult();
         deployResult.setOrderId(result.getRequestId());
         deployResult.setServiceId(serviceId);
+        deployResult.setDeployerVersionUsed(result.getTerraformVersionUsed());
         if (Boolean.FALSE.equals(result.getCommandSuccessful())) {
             deployResult.setIsTaskSuccessful(false);
             deployResult.setMessage(result.getCommandStdError());
