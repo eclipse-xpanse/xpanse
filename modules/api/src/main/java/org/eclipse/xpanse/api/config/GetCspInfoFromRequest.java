@@ -26,8 +26,6 @@ import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicySt
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateStorage;
-import org.eclipse.xpanse.modules.database.servicestatemanagement.DatabaseServiceStateManagementTaskStorage;
-import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
@@ -57,7 +55,7 @@ public class GetCspInfoFromRequest {
     @Resource
     private DatabaseServiceMigrationStorage serviceMigrationStorage;
     @Resource
-    private DatabaseServiceStateManagementTaskStorage managementTaskStorage;
+    private DatabaseServiceOrderStorage serviceOrderStorage;
     @Resource
     private DatabaseServiceOrderStorage serviceOrderTaskStorage;
     @Resource
@@ -244,8 +242,8 @@ public class GetCspInfoFromRequest {
      */
     public Csp getCspFromManagementTaskId(String managementTaskId) {
         try {
-            ServiceStateManagementTaskEntity task =
-                    managementTaskStorage.getTaskById(UUID.fromString(managementTaskId));
+            ServiceOrderEntity task =
+                    serviceOrderStorage.getEntityById(UUID.fromString(managementTaskId));
             if (Objects.nonNull(task) && Objects.nonNull(task.getServiceId())) {
                 DeployServiceEntity deployService =
                         deployServiceStorage.findDeployServiceById(task.getServiceId());

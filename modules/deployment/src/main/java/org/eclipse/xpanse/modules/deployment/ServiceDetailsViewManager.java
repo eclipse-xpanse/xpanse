@@ -149,13 +149,7 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        DeployedServiceDetails deployedServiceDetails =
-                EntityTransUtils.transToDeployedServiceDetails(deployServiceEntity);
-        deployedServiceDetails.setLatestRunningManagementTask(
-                serviceStateManager.getLatestRunningManagementTask(deployServiceEntity.getId()));
-        deployedServiceDetails.setLatestModificationAudit(
-                serviceOrderManager.getLatestModificationOrder(deployServiceEntity.getId()));
-        return deployedServiceDetails;
+        return EntityTransUtils.transToDeployedServiceDetails(deployServiceEntity);
     }
 
     /**
@@ -181,13 +175,7 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        VendorHostedDeployedServiceDetails deployedServiceDetails =
-                EntityTransUtils.transToVendorHostedServiceDetails(deployServiceEntity);
-        deployedServiceDetails.setLatestRunningManagementTask(
-                serviceStateManager.getLatestRunningManagementTask(deployServiceEntity.getId()));
-        deployedServiceDetails.setLatestModificationAudit(
-                serviceOrderManager.getLatestModificationOrder(deployServiceEntity.getId()));
-        return deployedServiceDetails;
+        return EntityTransUtils.transToVendorHostedServiceDetails(deployServiceEntity);
     }
 
 

@@ -691,7 +691,6 @@ public class DeployService {
                 purgeResult = deployer.destroy(purgeTask);
             } else {
                 deployServiceStorage.deleteDeployService(deployServiceEntity);
-                serviceStateManager.deleteManagementTasksByServiceId(purgeTask.getServiceId());
                 purgeResult = new DeployResult();
                 purgeResult.setOrderId(purgeTask.getOrderId());
                 purgeResult.setServiceId(purgeTask.getServiceId());

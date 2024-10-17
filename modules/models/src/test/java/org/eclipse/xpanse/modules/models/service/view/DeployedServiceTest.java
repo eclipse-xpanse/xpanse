@@ -16,8 +16,6 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
-import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -49,10 +47,6 @@ class DeployedServiceTest {
     private final OffsetDateTime LAST_STARTED_AT = OffsetDateTime.now();
     private final OffsetDateTime LAST_STOPPED_AT = OffsetDateTime.now();
     private final ServiceLockConfig LOCK_CONFIG = new ServiceLockConfig();
-    private final ServiceStateManagementTaskDetails SERVICE_STATE_MANAGEMENT_TASK_DETAILS =
-            new ServiceStateManagementTaskDetails();
-    private final ServiceOrderDetails SERVICE_MODIFICATION_AUDIT_DETAILS =
-            new ServiceOrderDetails();
     private DeployedService deployedService;
 
     @BeforeEach
@@ -77,8 +71,6 @@ class DeployedServiceTest {
         deployedService.setLastStartedAt(LAST_STARTED_AT);
         deployedService.setLastStoppedAt(LAST_STOPPED_AT);
         deployedService.setLockConfig(LOCK_CONFIG);
-        deployedService.setLatestRunningManagementTask(SERVICE_STATE_MANAGEMENT_TASK_DETAILS);
-        deployedService.setLatestModificationAudit(SERVICE_MODIFICATION_AUDIT_DETAILS);
     }
 
     @Test
@@ -102,10 +94,6 @@ class DeployedServiceTest {
         assertEquals(SERVICE_STATE, deployedService.getServiceState());
         assertEquals(ServiceHostingType.SERVICE_VENDOR, deployedService.getServiceHostingType());
         assertEquals(LOCK_CONFIG, deployedService.getLockConfig());
-        assertEquals(SERVICE_STATE_MANAGEMENT_TASK_DETAILS,
-                deployedService.getLatestRunningManagementTask());
-        assertEquals(SERVICE_MODIFICATION_AUDIT_DETAILS,
-                deployedService.getLatestModificationAudit());
     }
 
     @Test
@@ -138,8 +126,6 @@ class DeployedServiceTest {
                         + ", createTime=" + createTime + ", lastModifiedTime=" + lastModifiedTime
                         + ", lastStartedAt=" + LAST_STARTED_AT + ", lastStoppedAt="
                         + LAST_STOPPED_AT + ", lockConfig=" + LOCK_CONFIG
-                        + ", latestRunningManagementTask=" + SERVICE_STATE_MANAGEMENT_TASK_DETAILS
-                        + ", latestModificationAudit=" + SERVICE_MODIFICATION_AUDIT_DETAILS
                         + ")";
         assertEquals(expectedString, deployedService.toString());
     }
