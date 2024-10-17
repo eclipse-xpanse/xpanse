@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
@@ -76,7 +77,7 @@ public class ServiceConfigurationManager {
     private static final String HOSTS = "hosts";
 
     @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
+    private DeployServiceStorage deployServiceStorage;
 
     @Resource
     private ServiceConfigurationChangeDetailsStorage serviceConfigurationChangeDetailsStorage;
@@ -134,8 +135,8 @@ public class ServiceConfigurationManager {
             throw new IllegalArgumentException("Parameter ServiceConfigurationUpdate is empty");
         }
         try {
-            DeployServiceEntity deployServiceEntity =
-                    deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(serviceId));
+            DeployServiceEntity deployServiceEntity = deployServiceStorage
+                    .getReferenceById(UUID.fromString(serviceId));
             ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage
                     .getServiceTemplateById(deployServiceEntity.getServiceTemplateId());
             if (Objects.isNull(serviceTemplateEntity)) {
@@ -258,7 +259,7 @@ public class ServiceConfigurationManager {
                 new ServiceConfigurationChangeDetailsEntity();
         request.setId(UUID.randomUUID());
         ServiceOrderEntity serviceOrderEntity =
-                saveServiceOrder(orderId, entity.getId(), updateRequestMap);
+                saveServiceOrder(orderId, entity, updateRequestMap);
         request.setServiceOrderEntity(serviceOrderEntity);
         request.setDeployServiceEntity(entity);
         request.setConfigManager(groupName);
@@ -267,11 +268,11 @@ public class ServiceConfigurationManager {
         return request;
     }
 
-    private ServiceOrderEntity saveServiceOrder(UUID orderId, UUID serviceId,
+    private ServiceOrderEntity saveServiceOrder(UUID orderId, DeployServiceEntity entity,
             Map<String, Object> updateRequestMap) {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
         serviceOrderEntity.setOrderId(orderId);
-        serviceOrderEntity.setServiceId(serviceId);
+        serviceOrderEntity.setDeployServiceEntity(entity);
         serviceOrderEntity.setTaskType(ServiceOrderType.SERVICE_CONFIGURATION_UPDATE);
         serviceOrderEntity.setUserId(userServiceHelper.getCurrentUserId());
         serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
@@ -467,7 +468,7 @@ public class ServiceConfigurationManager {
     private List<DeployResource> getDeployResources(UUID serviceId,
                                                     DeployResourceKind resourceKind) {
         DeployServiceEntity deployedService =
-                deployServiceEntityHandler.getDeployServiceEntity(serviceId);
+                deployServiceStorage.getReferenceById(serviceId);
         Stream<DeployResourceEntity> resourceEntities =
                 deployedService.getDeployResourceList().stream();
         if (Objects.nonNull(resourceKind)) {

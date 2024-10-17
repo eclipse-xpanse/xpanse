@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -52,6 +53,9 @@ public class ServiceConfigurationManagerTest {
 
     @InjectMocks
     private ServiceConfigurationManager serviceConfigurationManager;
+
+    @Mock
+    private DeployServiceStorage deployServiceStorage;
 
     @Mock
     private DeployServiceEntityHandler deployServiceEntityHandler;
@@ -103,7 +107,7 @@ public class ServiceConfigurationManagerTest {
         Ocl ocl = new Ocl();
         ocl.setServiceConfigurationManage(new ServiceConfigurationManage());
         serviceTemplateEntity.setOcl(ocl);
-        when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(deployServiceEntity);
+        when(deployServiceStorage.getReferenceById(any())).thenReturn(deployServiceEntity);
         when(serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
         ServiceOrder
                 serviceOrder = serviceConfigurationManager.changeServiceConfiguration(serviceId, configurationUpdate);
@@ -118,7 +122,7 @@ public class ServiceConfigurationManagerTest {
         ServiceConfigurationUpdate configurationUpdate = new ServiceConfigurationUpdate();
         configurationUpdate.setConfiguration(CONFIGURATION);
 
-        when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(new DeployServiceEntity());
+        when(deployServiceStorage.getReferenceById(any())).thenReturn(new DeployServiceEntity());
         when(serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(null);
         ServiceTemplateNotRegistered exception = assertThrows(ServiceTemplateNotRegistered.class, () ->
                 serviceConfigurationManager.changeServiceConfiguration(serviceId, configurationUpdate));
@@ -139,8 +143,7 @@ public class ServiceConfigurationManagerTest {
         Ocl ocl = new Ocl();
         ocl.setServiceConfigurationManage(new ServiceConfigurationManage());
         serviceTemplateEntity.setOcl(ocl);
-
-        when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(deployServiceEntity);
+        when(deployServiceStorage.getReferenceById(any())).thenReturn(deployServiceEntity);
         when(serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(serviceTemplateEntity);
 
         doThrow(new ServiceConfigurationInvalidException(List.of("Invalid configuration")))

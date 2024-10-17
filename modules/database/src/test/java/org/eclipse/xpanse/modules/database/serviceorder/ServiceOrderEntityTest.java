@@ -8,6 +8,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -25,7 +26,6 @@ class ServiceOrderEntityTest {
             ZoneOffset.UTC);
     private final OffsetDateTime completedTime = OffsetDateTime.of(LocalDateTime.now(),
             ZoneOffset.UTC);
-    private final UUID serviceId = UUID.fromString("168b2be0-3535-4042-b53c-23cabd874a51");
     private final UUID orderId = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab61");
     private final String errorMsg = "error message";
     private final String userId = "userId";
@@ -43,6 +43,8 @@ class ServiceOrderEntityTest {
     private Map<String, String> mockPreviousDeployedResultProperties;
     @Mock
     private Map<String, String> mockPreviousDeployedServiceProperties;
+    @Mock
+    private DeployServiceEntity deployServiceEntity;
 
     private ServiceOrderEntity test;
 
@@ -50,7 +52,7 @@ class ServiceOrderEntityTest {
     void setUp() {
         test = new ServiceOrderEntity();
         test.setOrderId(orderId);
-        test.setServiceId(serviceId);
+        test.setDeployServiceEntity(deployServiceEntity);
         test.setTaskType(taskType);
         test.setUserId(userId);
         test.setStartedTime(startedTime);
@@ -68,7 +70,7 @@ class ServiceOrderEntityTest {
     @Test
     void testGetters() {
         assertThat(test.getOrderId()).isEqualTo(orderId);
-        assertThat(test.getServiceId()).isEqualTo(serviceId);
+        assertThat(test.getDeployServiceEntity()).isEqualTo(deployServiceEntity);
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
@@ -103,7 +105,7 @@ class ServiceOrderEntityTest {
     @Test
     void testToString() {
         String result = "ServiceOrderEntity(orderId=" + orderId
-                + ", serviceId=" + serviceId
+                + ", deployServiceEntity=" + deployServiceEntity
                 + ", taskType=" + taskType
                 + ", userId=" + userId
                 + ", taskStatus=" + taskStatus

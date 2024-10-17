@@ -13,18 +13,26 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
+import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -35,14 +43,20 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Table(name = "SERVICE_ORDER")
 @Entity
 @Data
-public class ServiceOrderEntity {
+public class ServiceOrderEntity implements Serializable {
+
+
+    @Serial
+    private static final long serialVersionUID = 8759112775257851274L;
 
     @Id
     @Column(name = "ORDER_ID", nullable = false)
     private UUID orderId;
 
-    @Column(name = "SERVICE_ID", nullable = false)
-    private UUID serviceId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SERVICE_ID", nullable = false)
+    @Cascade(CascadeType.ALL)
+    private DeployServiceEntity deployServiceEntity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "TASK_TYPE", nullable = false)

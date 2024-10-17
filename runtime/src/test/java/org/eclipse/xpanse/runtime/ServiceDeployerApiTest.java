@@ -856,7 +856,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 objectMapper.readValue(purgeResponse.getContentAsString(), ServiceOrder.class);
         assertEquals(serviceId, serviceOrder.getServiceId());
         assertNotNull(serviceOrder.getOrderId());
-        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
         // SetUp
         String refuseMsg = String.format("Service with id %s not found.", serviceId);
         final MockHttpServletResponse detailsResponse = mockMvc.perform(

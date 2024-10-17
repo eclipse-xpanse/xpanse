@@ -41,7 +41,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Slf4j
 @Component
 public class ServiceOrderManager {
-
     @Resource
     private ServiceOrderStorage serviceOrderStorage;
     @Resource
@@ -66,7 +65,8 @@ public class ServiceOrderManager {
         orderTask.setOrderId(deployTask.getOrderId());
         orderTask.setTaskType(deployTask.getTaskType());
         orderTask.setUserId(deployTask.getUserId());
-        orderTask.setServiceId(deployTask.getServiceId());
+        orderTask.setDeployServiceEntity(deployServiceStorage
+                .getReferenceById(deployTask.getServiceId()));
         orderTask.setNewDeployRequest(deployTask.getDeployRequest());
         orderTask.setTaskStatus(TaskStatus.CREATED);
         if (Objects.nonNull(previousDeployedService)) {
@@ -106,7 +106,7 @@ public class ServiceOrderManager {
             UUID serviceId, ServiceOrderType taskType, TaskStatus taskStatus) {
         validateDeployService(serviceId);
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setServiceId(serviceId);
+        query.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
         query.setTaskType(taskType);
         query.setTaskStatus(taskStatus);
         if (!userServiceHelper.currentUserHasRole(ROLE_ADMIN)) {
@@ -150,7 +150,7 @@ public class ServiceOrderManager {
     public void deleteOrdersByServiceId(UUID serviceId) {
         validateDeployService(serviceId);
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setServiceId(serviceId);
+        query.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
         if (!userServiceHelper.currentUserHasRole(ROLE_ADMIN)) {
             query.setUserId(userServiceHelper.getCurrentUserId());
         }
@@ -178,7 +178,7 @@ public class ServiceOrderManager {
      */
     public ServiceOrderDetails getLatestModificationOrder(UUID serviceId) {
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setServiceId(serviceId);
+        query.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
         query.setTaskType(ServiceOrderType.MODIFY);
         List<ServiceOrderEntity> orderEntities = serviceOrderStorage.queryEntities(query);
         if (!CollectionUtils.isEmpty(orderEntities)) {
@@ -222,8 +222,7 @@ public class ServiceOrderManager {
     private ServiceOrderEntity getServiceOrderEntity(UUID orderId) {
         ServiceOrderEntity orderEntity = serviceOrderStorage.getEntityById(orderId);
         if (Objects.nonNull(orderEntity)) {
-            DeployServiceEntity deployedService =
-                    deployServiceStorage.findDeployServiceById(orderEntity.getServiceId());
+            DeployServiceEntity deployedService = orderEntity.getDeployServiceEntity();
             if (Objects.nonNull(deployedService)) {
                 if (isNotOwnerOrAdminUser(deployedService)) {
                     String errorMsg =
@@ -234,7 +233,6 @@ public class ServiceOrderManager {
         }
         return orderEntity;
     }
-
 
     private boolean isNotOwnerOrAdminUser(DeployServiceEntity deployServiceEntity) {
         boolean isOwner = userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
