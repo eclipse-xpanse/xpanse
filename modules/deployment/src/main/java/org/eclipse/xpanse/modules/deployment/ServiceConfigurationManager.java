@@ -502,6 +502,7 @@ public class ServiceConfigurationManager {
             request.setStatus(ServiceConfigurationStatus.ERROR);
             request.setResultMessage(result.getError());
         }
+        request.setTasks(result.getTasks());
         serviceConfigurationChangeDetailsStorage.storeAndFlush(request);
         updateServiceConfigurationChangeResult(request);
     }

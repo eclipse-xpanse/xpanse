@@ -87,7 +87,7 @@ public class AgentPollingApi {
             description = "APIs for agent to poll pending configuration change requests.")
     @PutMapping(value = "/agent/update/status/{changeId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Update configuration change result for agents.")
     @AuditApiRequest(enabled = false)
     public void updateConfigurationChangeResult(
