@@ -9,6 +9,8 @@ package org.eclipse.xpanse.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
@@ -32,11 +34,15 @@ import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesEvaluationApi;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalCmdList;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -51,6 +57,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceOrderManageApiTest extends ApisTestCommon {
+
+    @MockBean
+    private PoliciesEvaluationApi mockPoliciesEvaluationApi;
     @Test
     @WithJwt(file = "jwt_csp_isv_user.json")
     void testServiceOrderManageApis() throws Exception {
@@ -70,6 +79,7 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
     }
 
     void testServiceOrderManageApisWell(ServiceTemplateDetailVo serviceTemplate) throws Exception {
+        mockPolicyEvaluationResult(true);
         ServiceOrder serviceOrder = deployService(serviceTemplate);
         UUID orderId = serviceOrder.getOrderId();
         UUID serviceId = serviceOrder.getServiceId();
@@ -106,12 +116,14 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
 
         assertThat(serviceOrders.getFirst()).isEqualTo(orderDetails);
 
+        deleteDeployedService(serviceId);
+
         MockHttpServletResponse deleteOrderResponse = deleteOrderByOrderId(orderId);
-        assertThat(deleteOrderResponse.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(deleteOrderResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         MockHttpServletResponse deleteServiceOrdersResponse = deleteOrdersByServiceId(serviceId);
         assertThat(deleteServiceOrdersResponse.getStatus()).isEqualTo(
-                HttpStatus.NO_CONTENT.value());
+                HttpStatus.BAD_REQUEST.value());
 
         MockHttpServletResponse getOrderDetailsResponse = getOrderDetailsByOrderId(orderId);
         assertThat(getOrderDetailsResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -119,13 +131,16 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         MockHttpServletResponse listServiceOrdersResponse =
                 listServiceOrders(serviceId, ServiceOrderType.DEPLOY, TaskStatus.SUCCESSFUL);
 
-        assertThat(listServiceOrdersResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        List<ServiceOrderDetails> listServiceOrders = objectMapper.readValue(
-                listServiceOrdersResponse.getContentAsString(), new TypeReference<>() {
-                });
-        assertThat(listServiceOrders).isEmpty();
+        assertThat(listServiceOrdersResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
 
-        deleteDeployedService(serviceId);
+    void mockPolicyEvaluationResult(boolean isSuccessful) {
+        final EvalResult evalResult = new EvalResult();
+        evalResult.setIsSuccessful(isSuccessful);
+        evalResult.setPolicy("policy");
+        // Configure PoliciesEvaluationApi.evaluatePoliciesPost(...).
+        when(mockPoliciesEvaluationApi.evaluatePoliciesPost(any(EvalCmdList.class))).thenReturn(
+                evalResult);
     }
 
     void testServiceOrderManageApisThrowsException(ServiceTemplateDetailVo serviceTemplate)

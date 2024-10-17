@@ -187,6 +187,7 @@ public class EntityTransUtils {
             ServiceOrderEntity entity) {
         ServiceOrderDetails details = new ServiceOrderDetails();
         BeanUtils.copyProperties(entity, details);
+        details.setServiceId(entity.getDeployServiceEntity().getId());
         return details;
     }
 

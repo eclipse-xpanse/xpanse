@@ -395,9 +395,9 @@ public class DeployService {
         RuntimeException exception = null;
         Deployer deployer = deployerKindManager.getDeployment(
                 deployTask.getOcl().getDeployment().getDeployerTool().getKind());
+        DeployServiceEntity serviceEntity = storeNewDeployServiceEntity(deployTask);
         ServiceOrderEntity orderTaskEntity =
                 serviceOrderManager.createServiceOrderTask(deployTask, null);
-        DeployServiceEntity serviceEntity = storeNewDeployServiceEntity(deployTask);
         try {
             policyValidator.validateDeploymentWithPolicies(deployTask);
             serviceOrderManager.startOrderProgress(deployTask.getOrderId());
@@ -677,8 +677,6 @@ public class DeployService {
         RuntimeException exception = null;
         MDC.put(SERVICE_ID, purgeTask.getServiceId().toString());
         DeployResult purgeResult;
-        ServiceOrderEntity orderTaskEntity =
-                serviceOrderManager.createServiceOrderTask(purgeTask, deployServiceEntity);
         try {
             if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
                 log.info("Resources of service {} need to clear with order task {}",
@@ -702,8 +700,10 @@ public class DeployService {
             exception = e;
             purgeResult = getFailedDeployResult(purgeTask, e);
         }
-        deployResultManager.updateServiceOrderTaskWithDeployResult(purgeResult, orderTaskEntity);
         if (Objects.nonNull(exception)) {
+            ServiceOrderEntity orderEntity =
+                    serviceOrderManager.createServiceOrderTask(purgeTask, deployServiceEntity);
+            deployResultManager.updateServiceOrderTaskWithDeployResult(purgeResult, orderEntity);
             deployResultManager.updateDeployServiceEntityWithDeployResult(purgeResult,
                     deployServiceEntity);
             throw exception;

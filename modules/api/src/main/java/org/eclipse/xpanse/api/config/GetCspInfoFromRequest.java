@@ -269,9 +269,9 @@ public class GetCspInfoFromRequest {
         try {
             ServiceOrderEntity order =
                     serviceOrderTaskStorage.getEntityById(UUID.fromString(orderId));
-            if (Objects.nonNull(order) && Objects.nonNull(order.getServiceId())) {
-                DeployServiceEntity deployService =
-                        deployServiceStorage.findDeployServiceById(order.getServiceId());
+            if (Objects.nonNull(order) && Objects.nonNull(order.getDeployServiceEntity().getId())) {
+                DeployServiceEntity deployService = deployServiceStorage
+                        .findDeployServiceById(order.getDeployServiceEntity().getId());
                 return deployService.getCsp();
             }
         } catch (Exception e) {

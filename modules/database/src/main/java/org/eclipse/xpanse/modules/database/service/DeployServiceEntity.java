@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
@@ -136,6 +137,11 @@ public class DeployServiceEntity extends CreateModifiedTime {
     @Cascade({CascadeType.ALL})
     @ToString.Exclude
     private ServiceConfigurationEntity serviceConfigurationEntity;
+
+    @OneToMany(mappedBy = "deployServiceEntity", orphanRemoval = true)
+    @Cascade({CascadeType.ALL})
+    @ToString.Exclude
+    private List<ServiceOrderEntity> serviceOrderList;
 
     /**
      * The properties of the deployed service.
