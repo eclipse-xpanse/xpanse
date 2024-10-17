@@ -21,12 +21,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleTaskResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -79,4 +81,8 @@ public class ServiceConfigurationChangeDetailsEntity implements Serializable {
     @Column(name = "STATUS")
     private ServiceConfigurationStatus status;
 
+    @Column(name = "TASK_RESULT ", columnDefinition = "json")
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private List<AnsibleTaskResult> tasks;
 }

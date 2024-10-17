@@ -7,11 +7,15 @@
 package org.eclipse.xpanse.modules.database.serviceconfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleTaskResult;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +33,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
     final String resultMessage = "resultMessage";
     final Map<String, Object> properties = Map.of("k1", "v1" , "k2", "v2");
     final ServiceConfigurationStatus status = ServiceConfigurationStatus.PENDING;
+    final List<AnsibleTaskResult> tasks = List.of();
     @Mock
     private DeployServiceEntity deployServiceEntity;
     @Mock
@@ -47,6 +52,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
         test.setResultMessage(resultMessage);
         test.setStatus(status);
         test.setProperties(properties);
+        test.setTasks(tasks);
     }
 
     @Test
@@ -59,6 +65,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
         assertThat(test.getResultMessage()).isEqualTo(resultMessage);
         assertThat(test.getStatus()).isEqualTo(status);
         assertThat(test.getProperties()).isEqualTo(properties);
+        assertThat(test.getTasks()).isEqualTo(tasks);
     }
 
     @Test
@@ -88,8 +95,10 @@ public class ServiceConfigurationChangeDetailsEntityTest {
                         + "configManager=%s, "
                         + "resultMessage=%s, "
                         + "properties=%s, "
-                        + "status=%s)", id, serviceOrderEntity, deployServiceEntity, resourceName, configManager,
-                resultMessage, properties, status);
+                        + "status=%s, "
+                        + "tasks=%s)", id, serviceOrderEntity,
+                deployServiceEntity, resourceName, configManager,
+                resultMessage, properties, status, tasks);
 
         assertThat(test.toString()).isEqualTo(result);
     }
