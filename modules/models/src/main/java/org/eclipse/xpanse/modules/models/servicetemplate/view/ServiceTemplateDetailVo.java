@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
@@ -127,4 +128,7 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
 
     @Schema(description = "End user license agreement content of the service.")
     private String eula;
+
+    @Schema(description = "manage service configuration.")
+    private ServiceConfigurationManage serviceConfigurationManage;
 }
