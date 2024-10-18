@@ -49,7 +49,6 @@ public class TerraformBootServiceDeployer {
         try {
             terraformFromScriptsApi.asyncDeployWithScripts(request);
             result.setOrderId(deployTask.getOrderId());
-            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
@@ -67,7 +66,6 @@ public class TerraformBootServiceDeployer {
         try {
             terraformFromGitRepoApi.asyncDeployFromGitRepo(request);
             result.setOrderId(deployTask.getOrderId());
-            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot deploy service failed. service id: {} , error:{} ",

@@ -6,7 +6,6 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
 import java.util.Objects;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -71,14 +70,6 @@ public class TerraformBootDeployment implements Deployer {
             return terraformBootServiceDestroyer.destroyFromScripts(deployTask);
         }
         return terraformBootServiceDestroyer.destroyFromGitRepo(deployTask);
-    }
-
-    /**
-     * delete workspace,No implementation required.
-     */
-    @Override
-    public void deleteTaskWorkspace(UUID taskId) {
-        // No workspace created from xpanse.
     }
 
     /**

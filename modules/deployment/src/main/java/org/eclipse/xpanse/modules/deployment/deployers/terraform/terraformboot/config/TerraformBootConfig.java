@@ -21,19 +21,7 @@ public class TerraformBootConfig {
     @Value("${terraform-boot.webhook.endpoint}")
     private String clientBaseUri;
 
-    @Value("${webhook.terraform-boot.deployCallbackUri}")
-    private String deployCallbackUri;
-
-    @Value("${webhook.terraform-boot.modifyCallbackUri}")
-    private String modifyCallbackUri;
-
-    @Value("${webhook.terraform-boot.destroyCallbackUri}")
-    private String destroyCallbackUri;
-
-    @Value("${webhook.terraform-boot.rollbackCallbackUri}")
-    private String rollbackCallbackUri;
-
-    @Value("${webhook.terraform-boot.purgeCallbackUri}")
-    private String purgeCallbackUri;
+    @Value("${webhook.terraform-boot.orderCallbackUri}")
+    private String orderCallbackUri;
 
 }

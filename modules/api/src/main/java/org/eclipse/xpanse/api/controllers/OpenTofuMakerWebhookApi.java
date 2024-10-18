@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -48,92 +47,15 @@ public class OpenTofuMakerWebhookApi {
      * Webhook methods to receive openTofu execution result.
      */
     @Tag(name = "Webhook", description = "Webhook APIs")
-    @Operation(description = "Process the execution result after openTofu executes the command "
-            + "line.")
-    @PostMapping(value = "${webhook.tofu-maker.deployCallbackUri}/{serviceId}",
+    @Operation(description = "Process the execution result of the order task from tofu-maker")
+    @PostMapping(value = "${webhook.tofu-maker.orderCallbackUri}/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(enabled = false)
-    public void deployCallback(
-            @Parameter(name = "serviceId", description = "id of the service instance")
-            @PathVariable("serviceId") String serviceId,
+    public void orderCallback(
+            @Parameter(name = "orderId", description = "Id of the order.")
+            @PathVariable("orderId") String orderId,
             @Valid @RequestBody OpenTofuResult result) {
-
-        openTofuDeploymentResultCallbackManager.deployCallback(UUID.fromString(serviceId), result);
+        openTofuDeploymentResultCallbackManager.orderCallback(UUID.fromString(orderId), result);
     }
-
-    /**
-     * Webhook methods to receive openTofu execution result.
-     */
-    @Tag(name = "Webhook", description = "Webhook APIs")
-    @Operation(description = "Process the execution result after openTofu executes the command "
-            + "line.")
-    @PostMapping(value = "${webhook.tofu-maker.modifyCallbackUri}/{serviceId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(enabled = false)
-    public void modifyCallback(
-            @Parameter(name = "serviceId", description = "id of the service instance")
-            @PathVariable("serviceId") String serviceId,
-            @Valid @RequestBody OpenTofuResult result) {
-        openTofuDeploymentResultCallbackManager.modifyCallback(UUID.fromString(serviceId), result);
-    }
-
-    /**
-     * Webhook methods to receive openTofu execution result.
-     */
-    @Tag(name = "Webhook", description = "Webhook APIs")
-    @Operation(description = "Process the execution result after openTofu executes the command "
-            + "line.")
-    @PostMapping(value = "${webhook.tofu-maker.destroyCallbackUri}/{serviceId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(enabled = false)
-    public void destroyCallback(
-            @Parameter(name = "serviceId", description = "id of the service instance")
-            @PathVariable("serviceId") String serviceId,
-            @Valid @RequestBody OpenTofuResult result) {
-
-        openTofuDeploymentResultCallbackManager.destroyCallback(UUID.fromString(serviceId), result,
-                DeploymentScenario.DESTROY);
-    }
-
-
-    /**
-     * Webhook methods to receive openTofu execution result.
-     */
-    @Tag(name = "Webhook", description = "Webhook APIs")
-    @Operation(description = "Process the execution result after openTofu executes the command "
-            + "line to rollback service deployment.")
-    @PostMapping(value = "${webhook.tofu-maker.rollbackCallbackUri}/{serviceId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(enabled = false)
-    public void rollbackCallback(
-            @Parameter(name = "serviceId", description = "id of the service instance")
-            @PathVariable("serviceId") String serviceId,
-            @Valid @RequestBody OpenTofuResult result) {
-        openTofuDeploymentResultCallbackManager.destroyCallback(UUID.fromString(serviceId), result,
-                DeploymentScenario.ROLLBACK);
-    }
-
-
-    /**
-     * Webhook methods to receive openTofu execution result.
-     */
-    @Tag(name = "Webhook", description = "Webhook APIs")
-    @Operation(description = "Process the execution result after openTofu executes the command "
-            + "line to purge service.")
-    @PostMapping(value = "${webhook.tofu-maker.purgeCallbackUri}/{serviceId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(enabled = false)
-    public void purgeCallback(
-            @Parameter(name = "serviceId", description = "id of the service instance")
-            @PathVariable("serviceId") String serviceId,
-            @Valid @RequestBody OpenTofuResult result) {
-        openTofuDeploymentResultCallbackManager.destroyCallback(UUID.fromString(serviceId), result,
-                DeploymentScenario.PURGE);
-    }
-
 }

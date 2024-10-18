@@ -58,6 +58,15 @@ public class ServiceOrderEntity implements Serializable {
     @Cascade(CascadeType.ALL)
     private DeployServiceEntity deployServiceEntity;
 
+    @Column(name = "PARENT_ORDER_ID")
+    private UUID parentOrderId;
+
+    @Column(name = "WORKFLOW_ID")
+    private UUID workflowId;
+
+    @Column(name = "ORIGINAL_SERVICE_ID")
+    private UUID originalServerId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "TASK_TYPE", nullable = false)
     private ServiceOrderType taskType;

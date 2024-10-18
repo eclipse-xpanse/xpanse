@@ -273,7 +273,7 @@ public class ServiceConfigurationManager {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
         serviceOrderEntity.setOrderId(orderId);
         serviceOrderEntity.setDeployServiceEntity(entity);
-        serviceOrderEntity.setTaskType(ServiceOrderType.SERVICE_CONFIGURATION_UPDATE);
+        serviceOrderEntity.setTaskType(ServiceOrderType.CONFIG_CHANGE);
         serviceOrderEntity.setUserId(userServiceHelper.getCurrentUserId());
         serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
         serviceOrderEntity.setStartedTime(OffsetDateTime.now());

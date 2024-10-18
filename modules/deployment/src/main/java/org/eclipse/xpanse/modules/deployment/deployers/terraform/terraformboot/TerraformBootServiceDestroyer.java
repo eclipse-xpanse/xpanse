@@ -59,7 +59,6 @@ public class TerraformBootServiceDestroyer {
         try {
             terraformFromScriptsApi.asyncDestroyWithScripts(request);
             result.setOrderId(deployTask.getOrderId());
-            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot destroy service failed. service id: {} , error:{} ",
@@ -81,7 +80,6 @@ public class TerraformBootServiceDestroyer {
         try {
             terraformFromGitRepoApi.asyncDestroyFromGitRepo(request);
             result.setOrderId(deployTask.getOrderId());
-            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
