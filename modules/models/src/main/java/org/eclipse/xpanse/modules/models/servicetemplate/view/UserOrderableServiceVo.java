@@ -22,8 +22,10 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.hateoas.RepresentationModel;
 
 /**
@@ -96,4 +98,8 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
 
     @Schema(description = "End user license agreement content of the service.")
     private String eula;
+
+    @UniqueElements
+    @Schema(description = "The collection of service configuration parameters.")
+    private List<ServiceConfigurationParameter> configurationParameters;
 }

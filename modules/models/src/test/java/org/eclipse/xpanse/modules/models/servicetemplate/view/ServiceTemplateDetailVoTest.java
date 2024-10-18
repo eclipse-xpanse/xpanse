@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -49,6 +50,7 @@ class ServiceTemplateDetailVoTest {
     private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private static final ServiceRegistrationState serviceRegistrationState =
             ServiceRegistrationState.APPROVED;
+    private static final ServiceConfigurationManage serviceConfigurationManage = new ServiceConfigurationManage();
     private final String reviewComment = "reviewComment";
     @Mock
     private ServiceProviderContactDetails serviceProviderContactDetails;
@@ -98,6 +100,7 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
         serviceTemplateDetailVo.setEula(eula);
+        serviceTemplateDetailVo.setServiceConfigurationManage(serviceConfigurationManage);
     }
 
     @Test
@@ -124,6 +127,7 @@ class ServiceTemplateDetailVoTest {
         assertEquals(serviceProviderContactDetails,
                 serviceTemplateDetailVo.getServiceProviderContactDetails());
         assertEquals(eula, serviceTemplateDetailVo.getEula());
+        assertEquals(serviceConfigurationManage, serviceTemplateDetailVo.getServiceConfigurationManage());
     }
 
     @Test
@@ -153,7 +157,8 @@ class ServiceTemplateDetailVoTest {
                         + "createTime=" + createTime + ", " + "lastModifiedTime=" + lastModifiedTime
                         + ", " + "serviceRegistrationState=" + serviceRegistrationState + ", "
                         + "reviewComment=" + reviewComment + ", " + "serviceProviderContactDetails="
-                        + serviceProviderContactDetails + ", " + "eula=" + eula + ")";
+                        + serviceProviderContactDetails + ", " + "eula=" + eula + ", "
+                        + "serviceConfigurationManage=" + serviceConfigurationManage +")";
 
         assertEquals(expectedToString, serviceTemplateDetailVo.toString());
     }

@@ -12,6 +12,7 @@ import org.eclipse.xpanse.api.controllers.ServiceCatalogApi;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
@@ -60,6 +61,8 @@ public class ServiceTemplateEntityConverter {
             serviceTemplateDetailVo.setServiceProviderContactDetails(
                     serviceTemplateEntity.getOcl().getServiceProviderContactDetails());
             serviceTemplateDetailVo.setEula(serviceTemplateEntity.getOcl().getEula());
+            serviceTemplateDetailVo.setServiceConfigurationManage(serviceTemplateEntity
+                    .getOcl().getServiceConfigurationManage());
             return serviceTemplateDetailVo;
         }
         return null;
@@ -100,6 +103,12 @@ public class ServiceTemplateEntityConverter {
             userOrderableServiceVo.setServiceAvailabilityConfig(
                     serviceTemplateEntity.getOcl().getDeployment().getServiceAvailabilityConfig());
             userOrderableServiceVo.setEula(serviceTemplateEntity.getOcl().getEula());
+            ServiceConfigurationManage serviceConfigurationManage =
+                    serviceTemplateEntity.getOcl().getServiceConfigurationManage();
+            if (Objects.nonNull(serviceConfigurationManage)) {
+                userOrderableServiceVo.setConfigurationParameters(
+                        serviceConfigurationManage.getConfigurationParameters());
+            }
             return userOrderableServiceVo;
         }
         return null;
