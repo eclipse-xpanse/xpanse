@@ -20,6 +20,12 @@ class ServiceOrderTypeTest {
                 ServiceOrderType.DESTROY);
         assertThat(ServiceOrderType.getByValue("purge")).isEqualTo(
                 ServiceOrderType.PURGE);
+        assertThat(ServiceOrderType.getByValue("serviceStart")).isEqualTo(
+                ServiceOrderType.SERVICE_START);
+        assertThat(ServiceOrderType.getByValue("serviceStop")).isEqualTo(
+                ServiceOrderType.SERVICE_STOP);
+        assertThat(ServiceOrderType.getByValue("serviceRestart")).isEqualTo(
+                ServiceOrderType.SERVICE_RESTART);
         assertThrows(UnsupportedEnumValueException.class,
                 () -> ServiceOrderType.getByValue("unknown"));
 
@@ -32,6 +38,9 @@ class ServiceOrderTypeTest {
         assertThat(ServiceOrderType.REDEPLOY.toValue()).isEqualTo("redeploy");
         assertThat(ServiceOrderType.DESTROY.toValue()).isEqualTo("destroy");
         assertThat(ServiceOrderType.PURGE.toValue()).isEqualTo("purge");
+        assertThat(ServiceOrderType.SERVICE_START.toValue()).isEqualTo("serviceStart");
+        assertThat(ServiceOrderType.SERVICE_STOP.toValue()).isEqualTo("serviceStop");
+        assertThat(ServiceOrderType.SERVICE_RESTART.toValue()).isEqualTo("serviceRestart");
         assertThrows(UnsupportedEnumValueException.class,
                 () -> ServiceOrderType.getByValue("unknown"));
     }

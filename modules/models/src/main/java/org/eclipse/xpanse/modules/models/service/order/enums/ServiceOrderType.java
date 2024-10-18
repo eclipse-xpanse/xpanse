@@ -19,7 +19,10 @@ public enum ServiceOrderType {
     MODIFY("modify"),
     DESTROY("destroy"),
     SERVICE_CONFIGURATION_UPDATE("serviceConfigurationUpdate"),
-    PURGE("purge");
+    PURGE("purge"),
+    SERVICE_START("serviceStart"),
+    SERVICE_STOP("serviceStop"),
+    SERVICE_RESTART("serviceRestart");
 
     private final String type;
 
