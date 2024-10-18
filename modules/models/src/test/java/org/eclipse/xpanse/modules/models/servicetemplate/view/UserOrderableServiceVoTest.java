@@ -13,6 +13,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,7 @@ class UserOrderableServiceVoTest {
     private final UUID id = UUID.randomUUID();
     private final String name = "name";
     private final String version = "version";
+    private final List<ServiceConfigurationParameter> configurationParameters = List.of();
     @Mock
     private Category mockCategory;
     @Mock
@@ -69,6 +71,7 @@ class UserOrderableServiceVoTest {
         test.setServiceProviderContactDetails(mockServiceProviderContactDetails);
         test.setServiceAvailabilityConfig(mockserviceAvailabilityConfig);
         test.setEula(eula);
+        test.setConfigurationParameters(configurationParameters);
     }
 
     @Test
@@ -89,6 +92,7 @@ class UserOrderableServiceVoTest {
                 mockServiceProviderContactDetails);
         assertThat(test.getServiceAvailabilityConfig()).isEqualTo(mockserviceAvailabilityConfig);
         assertThat(test.getEula()).isEqualTo(eula);
+        assertThat(test.getConfigurationParameters()).isEqualTo(configurationParameters);
     }
 
 
@@ -117,7 +121,8 @@ class UserOrderableServiceVoTest {
                 + ", serviceHostingType=" + mockServiceHostingType
                 + ", serviceProviderContactDetails=" + mockServiceProviderContactDetails
                 + ", serviceAvailabilityConfig=" + mockserviceAvailabilityConfig
-                + ", eula=" + eula + ")";
+                + ", eula=" + eula
+                + ", configurationParameters=" + configurationParameters + ")";
         assertEquals(expectedToString, test.toString());
     }
 }
