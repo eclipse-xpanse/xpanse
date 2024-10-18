@@ -59,7 +59,6 @@ public class TofuMakerServiceDestroyer {
         try {
             openTofuFromScriptsApi.asyncDestroyWithScripts(request);
             result.setOrderId(deployTask.getOrderId());
-            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker destroy service failed. service id: {} , error:{} ",
@@ -81,7 +80,6 @@ public class TofuMakerServiceDestroyer {
         try {
             openTofuFromGitRepoApi.asyncDestroyFromGitRepo(request);
             result.setOrderId(deployTask.getOrderId());
-            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker deploy service failed. service id: {} , error:{} ",

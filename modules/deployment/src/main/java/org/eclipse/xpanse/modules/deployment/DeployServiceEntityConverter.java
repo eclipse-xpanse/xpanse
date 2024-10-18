@@ -50,7 +50,6 @@ public class DeployServiceEntityConverter {
         deployTask.setOcl(serviceTemplateEntity.getOcl());
         deployTask.setServiceTemplateId(serviceTemplateEntity.getId());
         return deployTask;
-
     }
 
     /**

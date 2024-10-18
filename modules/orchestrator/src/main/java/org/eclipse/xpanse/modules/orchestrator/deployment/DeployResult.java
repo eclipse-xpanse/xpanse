@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 
 /**
  * The result of the deployment.
@@ -28,16 +27,8 @@ public class DeployResult {
     private UUID orderId;
 
     @NotNull
-    @Schema(description = "The id of the managed service instance.")
-    private UUID serviceId;
-
-    @NotNull
     @Schema(description = "True if the deployer task is successful.")
     private Boolean isTaskSuccessful;
-
-    @NotNull
-    @Schema(description = "The state of the deployer task.")
-    private DeployerTaskStatus state;
 
     @Schema(description = "The message of the service order task.")
     private String message;

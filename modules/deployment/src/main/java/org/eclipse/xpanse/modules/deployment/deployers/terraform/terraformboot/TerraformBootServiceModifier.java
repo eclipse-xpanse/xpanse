@@ -54,7 +54,6 @@ public class TerraformBootServiceModifier {
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
-        result.setServiceId(deployTask.getServiceId());
         result.setOrderId(deployTask.getOrderId());
         TerraformAsyncModifyFromScriptsRequest request =
                 getModifyFromScriptsRequest(deployTask, resourceState);
@@ -76,7 +75,6 @@ public class TerraformBootServiceModifier {
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
         DeployResult result = new DeployResult();
-        result.setServiceId(deployTask.getServiceId());
         result.setOrderId(deployTask.getOrderId());
         TerraformAsyncModifyFromGitRepoRequest request =
                 getModifyFromGitRepoRequest(deployTask, resourceState);

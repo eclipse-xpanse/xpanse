@@ -35,7 +35,6 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -135,8 +134,6 @@ class TerraformBootDeploymentTest {
     void testDeploy() {
         doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
-        deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
-
         DeployResult deployResult = terraformBootDeployment.deploy(deployTask);
 
         Assertions.assertNotNull(deployResult);
@@ -151,7 +148,6 @@ class TerraformBootDeploymentTest {
 
             doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
             deployTask.setTaskType(ServiceOrderType.MODIFY);
-            deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
             DeployResult deployResult = terraformBootDeployment.modify(deployTask);
 
             Assertions.assertNotNull(deployResult);
@@ -165,8 +161,6 @@ class TerraformBootDeploymentTest {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
             deployTask.setTaskType(ServiceOrderType.DESTROY);
-            deployTask.setDeploymentScenario(DeploymentScenario.DESTROY);
-
             DeployResult destroyResult = this.terraformBootDeployment.destroy(deployTask);
 
             Assertions.assertNotNull(destroyResult);
@@ -178,8 +172,6 @@ class TerraformBootDeploymentTest {
     void testDeploy_ThrowsRestClientException() {
         ocl.getDeployment().setDeployer(errorDeployer);
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
-        deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
-
         Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
                 .asyncDeployWithScripts(any());
 
@@ -199,8 +191,6 @@ class TerraformBootDeploymentTest {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
             deployTask.setTaskType(ServiceOrderType.MODIFY);
-            deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
-
             Assertions.assertThrows(TerraformBootRequestFailedException.class,
                     () -> this.terraformBootDeployment.destroy(deployTask));
 

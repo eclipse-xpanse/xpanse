@@ -24,6 +24,11 @@ public class DeployTask {
     private UUID orderId;
 
     /**
+     * The id of the parent order task.
+     */
+    private UUID parentOrderId;
+
+    /**
      * The type of the order task.
      */
     private ServiceOrderType taskType;
@@ -37,6 +42,16 @@ public class DeployTask {
      * The id of the service.
      */
     private UUID serviceId;
+
+    /**
+     * The id of the original service.
+     */
+    private UUID originalServerId;
+
+    /**
+     * The id of the workflow instance of service migration or service redeployment.
+     */
+    private UUID workflowId;
 
     /**
      * Namespace of the user who registered service template.
@@ -57,10 +72,4 @@ public class DeployTask {
      * The id of the service template.
      */
     private UUID serviceTemplateId;
-
-    /**
-     * The scenario of the deployment task.
-     */
-    private DeploymentScenario deploymentScenario;
-
 }

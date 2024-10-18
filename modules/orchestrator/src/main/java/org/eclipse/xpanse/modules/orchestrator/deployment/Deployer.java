@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
-import java.util.UUID;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 
@@ -32,8 +31,6 @@ public interface Deployer {
      * @return result of modify task.
      */
     DeployResult modify(DeployTask task);
-
-    void deleteTaskWorkspace(UUID taskId);
 
     DeployerKind getDeployerKind();
 

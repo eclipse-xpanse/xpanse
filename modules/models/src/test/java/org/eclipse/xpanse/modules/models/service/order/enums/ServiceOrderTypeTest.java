@@ -14,12 +14,18 @@ class ServiceOrderTypeTest {
                 ServiceOrderType.DEPLOY);
         assertThat(ServiceOrderType.getByValue("modify")).isEqualTo(
                 ServiceOrderType.MODIFY);
-        assertThat(ServiceOrderType.getByValue("redeploy")).isEqualTo(
-                ServiceOrderType.REDEPLOY);
+        assertThat(ServiceOrderType.getByValue("retry")).isEqualTo(
+                ServiceOrderType.RETRY);
         assertThat(ServiceOrderType.getByValue("destroy")).isEqualTo(
                 ServiceOrderType.DESTROY);
         assertThat(ServiceOrderType.getByValue("purge")).isEqualTo(
                 ServiceOrderType.PURGE);
+        assertThat(ServiceOrderType.getByValue("lockChange")).isEqualTo(
+                ServiceOrderType.LOCK_CHANGE);
+        assertThat(ServiceOrderType.getByValue("ConfigChange")).isEqualTo(
+                ServiceOrderType.CONFIG_CHANGE);
+        assertThat(ServiceOrderType.getByValue("rollback")).isEqualTo(
+                ServiceOrderType.ROLLBACK);
         assertThrows(UnsupportedEnumValueException.class,
                 () -> ServiceOrderType.getByValue("unknown"));
 
@@ -29,9 +35,12 @@ class ServiceOrderTypeTest {
     void testToValue() {
         assertThat(ServiceOrderType.DEPLOY.toValue()).isEqualTo("deploy");
         assertThat(ServiceOrderType.MODIFY.toValue()).isEqualTo("modify");
-        assertThat(ServiceOrderType.REDEPLOY.toValue()).isEqualTo("redeploy");
+        assertThat(ServiceOrderType.RETRY.toValue()).isEqualTo("retry");
         assertThat(ServiceOrderType.DESTROY.toValue()).isEqualTo("destroy");
         assertThat(ServiceOrderType.PURGE.toValue()).isEqualTo("purge");
+        assertThat(ServiceOrderType.LOCK_CHANGE.toValue()).isEqualTo("lockChange");
+        assertThat(ServiceOrderType.CONFIG_CHANGE.toValue()).isEqualTo("configChange");
+        assertThat(ServiceOrderType.ROLLBACK.toValue()).isEqualTo("rollback");
         assertThrows(UnsupportedEnumValueException.class,
                 () -> ServiceOrderType.getByValue("unknown"));
     }

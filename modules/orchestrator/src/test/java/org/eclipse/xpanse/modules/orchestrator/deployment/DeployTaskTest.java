@@ -18,50 +18,45 @@ import org.springframework.beans.BeanUtils;
 @ExtendWith(MockitoExtension.class)
 class DeployTaskTest {
 
-    private final UUID orderId = UUID.fromString("5956ede6-d19b-4f43-ad99-4a187eafefad");
-
-    private final UUID serviceId = UUID.fromString("5956ede6-d19b-4f43-ad99-4a187eafefad");
-
-    private final UUID serviceTemplateId = UUID.fromString("5956ede6-d19b-4f43-ad99-4a187eafefad");
-
+    private final UUID uuid = UUID.fromString("5956ede6-d19b-4f43-ad99-4a187eafefad");
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
-
     private final String userId = "userId";
-
     private final String namespace = "namespace";
     @Mock
     private DeployRequest mockDeployRequest;
     @Mock
     private Ocl mockOcl;
-    @Mock
-    private DeploymentScenario mockDeploymentScenario;
     private DeployTask test;
 
     @BeforeEach
     void setUp() {
         test = new DeployTask();
-        test.setOrderId(orderId);
-        test.setServiceId(serviceId);
+        test.setOrderId(uuid);
+        test.setParentOrderId(uuid);
+        test.setServiceId(uuid);
+        test.setOriginalServerId(uuid);
+        test.setWorkflowId(uuid);
         test.setTaskType(taskType);
         test.setUserId(userId);
         test.setNamespace(namespace);
         test.setDeployRequest(mockDeployRequest);
         test.setOcl(mockOcl);
-        test.setServiceTemplateId(serviceTemplateId);
-        test.setDeploymentScenario(mockDeploymentScenario);
+        test.setServiceTemplateId(uuid);
     }
 
     @Test
     void testGetters() {
-        assertThat(test.getOrderId()).isEqualTo(orderId);
-        assertThat(test.getServiceId()).isEqualTo(serviceId);
+        assertThat(test.getOrderId()).isEqualTo(uuid);
+        assertThat(test.getParentOrderId()).isEqualTo(uuid);
+        assertThat(test.getServiceId()).isEqualTo(uuid);
+        assertThat(test.getOriginalServerId()).isEqualTo(uuid);
+        assertThat(test.getWorkflowId()).isEqualTo(uuid);
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getNamespace()).isEqualTo(namespace);
         assertThat(test.getDeployRequest()).isEqualTo(mockDeployRequest);
         assertThat(test.getOcl()).isEqualTo(mockOcl);
-        assertThat(test.getServiceTemplateId()).isEqualTo(serviceTemplateId);
-        assertThat(test.getDeploymentScenario()).isEqualTo(mockDeploymentScenario);
+        assertThat(test.getServiceTemplateId()).isEqualTo(uuid);
     }
 
     @Test
@@ -81,15 +76,17 @@ class DeployTaskTest {
 
     @Test
     void testToString() {
-        String exceptedString = "DeployTask(orderId=" + orderId + ", "
-                + "taskType=" + taskType + ", "
-                + "userId=" + userId + ", "
-                + "serviceId=" + serviceId + ", "
-                + "namespace=" + namespace + ", "
-                + "deployRequest=" + mockDeployRequest + ", "
-                + "ocl=" + mockOcl + ", "
-                + "serviceTemplateId=" + serviceTemplateId + ", "
-                + "deploymentScenario=" + mockDeploymentScenario + ")";
+        String exceptedString = "DeployTask(orderId=" + uuid
+                + ", parentOrderId=" + uuid
+                + ", taskType=" + taskType
+                + ", userId=" + userId
+                + ", serviceId=" + uuid
+                + ", originalServerId=" + uuid
+                + ", workflowId=" + uuid
+                + ", namespace=" + namespace
+                + ", deployRequest=" + mockDeployRequest
+                + ", ocl=" + mockOcl
+                + ", serviceTemplateId=" + uuid + ")";
         assertEquals(exceptedString, test.toString());
     }
 }

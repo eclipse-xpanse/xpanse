@@ -49,7 +49,6 @@ public class TofuMakerServiceDeployer {
         try {
             openTofuFromScriptsApi.asyncDeployWithScripts(request);
             result.setOrderId(deployTask.getOrderId());
-            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker deploy service failed. service id: {} , error:{} ",
@@ -67,7 +66,6 @@ public class TofuMakerServiceDeployer {
         try {
             openTofuFromGitRepoApi.asyncDeployFromGitRepo(request);
             result.setOrderId(deployTask.getOrderId());
-            result.setServiceId(deployTask.getServiceId());
             return result;
         } catch (RestClientException e) {
             log.error("tofu-maker deploy service failed. service id: {} , error:{} ",
