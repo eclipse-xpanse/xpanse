@@ -21,10 +21,8 @@ import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceCo
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
-import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
-import org.eclipse.xpanse.modules.models.service.statemanagement.ServiceStateManagementTaskDetails;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
@@ -94,8 +92,7 @@ public class EntityTransUtils {
      * @param entity DeployServiceEntity.
      * @return DeployedServiceDetails
      */
-    public static DeployedServiceDetails transToDeployedServiceDetails(
-            DeployServiceEntity entity) {
+    public static DeployedServiceDetails transToDeployedServiceDetails(DeployServiceEntity entity) {
         DeployedServiceDetails details = new DeployedServiceDetails();
         details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
         details.setBillingMode(entity.getDeployRequest().getBillingMode());
@@ -164,27 +161,12 @@ public class EntityTransUtils {
     }
 
     /**
-     * ServiceStateManagementTaskEntity converted to ServiceStateManagementTaskDetails.
-     *
-     * @param entity ServiceStateManagementTaskEntity
-     * @return ServiceStateManagementTaskDeTails
-     */
-    public static ServiceStateManagementTaskDetails transToServiceStateManagementTaskDetails(
-            ServiceStateManagementTaskEntity entity) {
-        ServiceStateManagementTaskDetails details = new ServiceStateManagementTaskDetails();
-        BeanUtils.copyProperties(entity, details);
-        return details;
-    }
-
-
-    /**
      * ServiceOrderEntity converted to ServiceOrderDetails.
      *
      * @param entity ServiceOrderEntity
      * @return ServiceOrderDetails
      */
-    public static ServiceOrderDetails transToServiceOrderDetails(
-            ServiceOrderEntity entity) {
+    public static ServiceOrderDetails transToServiceOrderDetails(ServiceOrderEntity entity) {
         ServiceOrderDetails details = new ServiceOrderDetails();
         BeanUtils.copyProperties(entity, details);
         details.setServiceId(entity.getDeployServiceEntity().getId());
@@ -197,8 +179,8 @@ public class EntityTransUtils {
      * @param entity ServiceConfigurationEntity
      * @return ServiceConfigurationDetails
      */
-    public static ServiceConfigurationDetails
-            transToServiceConfigurationDetails(ServiceConfigurationEntity entity) {
+    public static ServiceConfigurationDetails transToServiceConfigurationDetails(
+            ServiceConfigurationEntity entity) {
         ServiceConfigurationDetails details = new ServiceConfigurationDetails();
         BeanUtils.copyProperties(entity, details);
         details.setServiceId(entity.getId());

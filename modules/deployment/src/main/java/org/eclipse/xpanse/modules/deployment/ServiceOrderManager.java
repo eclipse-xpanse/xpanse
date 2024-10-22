@@ -74,10 +74,15 @@ public class ServiceOrderManager {
             orderTask.setPreviousDeployedResources(
                     EntityTransUtils.transToDeployResourceList(
                             previousDeployedService.getDeployResourceList()));
-            orderTask.setPreviousDeployedResultProperties(
-                    new HashMap<>(previousDeployedService.getPrivateProperties()));
-            orderTask.setPreviousDeployedServiceProperties(
-                    new HashMap<>(previousDeployedService.getProperties()));
+            if (Objects.nonNull(previousDeployedService.getPrivateProperties())) {
+                orderTask.setPreviousDeployedResultProperties(
+                        new HashMap<>(previousDeployedService.getPrivateProperties()));
+            }
+            if (Objects.nonNull(previousDeployedService.getProperties())) {
+                orderTask.setPreviousDeployedServiceProperties(
+                        new HashMap<>(previousDeployedService.getProperties()));
+            }
+
         }
         return serviceOrderStorage.storeAndFlush(orderTask);
     }
