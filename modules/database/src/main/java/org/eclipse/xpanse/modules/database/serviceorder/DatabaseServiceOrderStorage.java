@@ -37,8 +37,8 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
 
     @Override
     public ServiceOrderEntity storeAndFlush(
-            ServiceOrderEntity managementTaskEntity) {
-        return repository.saveAndFlush(managementTaskEntity);
+            ServiceOrderEntity serviceOrderEntity) {
+        return repository.saveAndFlush(serviceOrderEntity);
     }
 
     @Override

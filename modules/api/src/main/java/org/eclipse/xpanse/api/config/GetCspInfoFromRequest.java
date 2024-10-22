@@ -26,8 +26,6 @@ import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicySt
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateStorage;
-import org.eclipse.xpanse.modules.database.servicestatemanagement.DatabaseServiceStateManagementTaskStorage;
-import org.eclipse.xpanse.modules.database.servicestatemanagement.ServiceStateManagementTaskEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
@@ -56,8 +54,6 @@ public class GetCspInfoFromRequest {
     private TaskService taskService;
     @Resource
     private DatabaseServiceMigrationStorage serviceMigrationStorage;
-    @Resource
-    private DatabaseServiceStateManagementTaskStorage managementTaskStorage;
     @Resource
     private DatabaseServiceOrderStorage serviceOrderTaskStorage;
     @Resource
@@ -235,29 +231,6 @@ public class GetCspInfoFromRequest {
         }
         return null;
     }
-
-    /**
-     * Get Csp with id of service state management task.
-     *
-     * @param managementTaskId id of service state management task.
-     * @return csp.
-     */
-    public Csp getCspFromManagementTaskId(String managementTaskId) {
-        try {
-            ServiceStateManagementTaskEntity task =
-                    managementTaskStorage.getTaskById(UUID.fromString(managementTaskId));
-            if (Objects.nonNull(task) && Objects.nonNull(task.getServiceId())) {
-                DeployServiceEntity deployService =
-                        deployServiceStorage.findDeployServiceById(task.getServiceId());
-                return deployService.getCsp();
-            }
-        } catch (Exception e) {
-            log.error("Get csp with service state management task id:{} failed.",
-                    managementTaskId, e);
-        }
-        return null;
-    }
-
 
     /**
      * Get Csp with id of the service order.
