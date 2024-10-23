@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
@@ -44,6 +45,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLocked
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceModifyParamsNotFoundException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -83,6 +85,8 @@ public class DeployService {
     private ServiceTemplateStorage serviceTemplateStorage;
     @Resource
     private DeployServiceStorage deployServiceStorage;
+    @Resource
+    private ServiceOrderStorage serviceOrderStorage;
     @Resource
     private ServiceDeployVariablesJsonSchemaValidator serviceDeployVariablesJsonSchemaValidator;
     @Resource
@@ -443,7 +447,7 @@ public class DeployService {
      * @param serviceId deployed service id.
      * @param config    serviceLockConfig.
      */
-    public void changeServiceLockConfig(UUID serviceId, ServiceLockConfig config) {
+    public ServiceOrder changeServiceLockConfig(UUID serviceId, ServiceLockConfig config) {
         DeployServiceEntity deployServiceEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(serviceId);
         boolean currentUserIsOwner =
@@ -452,8 +456,21 @@ public class DeployService {
             throw new AccessDeniedException("No permissions to change lock config of services "
                     + "belonging to other users.");
         }
+        DeployTask deployTask = new DeployTask();
+        deployTask.setUserId(deployServiceEntity.getUserId());
+        deployTask.setServiceId(serviceId);
+        deployTask.setOrderId(UUID.randomUUID());
+        deployTask.setTaskType(ServiceOrderType.LOCK_CHANGE);
+        deployTask.setServiceLockConfig(config);
+        ServiceOrderEntity serviceOrder =
+                serviceOrderManager.storeNewServiceOrderEntity(deployTask, deployServiceEntity);
+        serviceOrder.setStartedTime(OffsetDateTime.now());
         deployServiceEntity.setLockConfig(config);
         deployServiceStorage.storeAndFlush(deployServiceEntity);
+        serviceOrder.setCompletedTime(OffsetDateTime.now());
+        serviceOrder.setTaskStatus(TaskStatus.SUCCESSFUL);
+        serviceOrderStorage.storeAndFlush(serviceOrder);
+        return new ServiceOrder(serviceOrder.getOrderId(), serviceId);
     }
 
     /**

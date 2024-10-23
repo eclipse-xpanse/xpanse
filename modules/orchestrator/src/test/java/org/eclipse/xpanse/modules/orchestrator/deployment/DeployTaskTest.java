@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.UUID;
+import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -25,6 +26,8 @@ class DeployTaskTest {
     @Mock
     private DeployRequest mockDeployRequest;
     @Mock
+    private ServiceLockConfig mockServiceLockConfig;
+    @Mock
     private Ocl mockOcl;
     private DeployTask test;
 
@@ -42,6 +45,7 @@ class DeployTaskTest {
         test.setDeployRequest(mockDeployRequest);
         test.setOcl(mockOcl);
         test.setServiceTemplateId(uuid);
+        test.setServiceLockConfig(mockServiceLockConfig);
     }
 
     @Test
@@ -57,6 +61,7 @@ class DeployTaskTest {
         assertThat(test.getDeployRequest()).isEqualTo(mockDeployRequest);
         assertThat(test.getOcl()).isEqualTo(mockOcl);
         assertThat(test.getServiceTemplateId()).isEqualTo(uuid);
+        assertThat(test.getServiceLockConfig()).isEqualTo(mockServiceLockConfig);
     }
 
     @Test
@@ -85,6 +90,7 @@ class DeployTaskTest {
                 + ", workflowId=" + uuid
                 + ", namespace=" + namespace
                 + ", deployRequest=" + mockDeployRequest
+                + ", serviceLockConfig=" + mockServiceLockConfig
                 + ", ocl=" + mockOcl
                 + ", serviceTemplateId=" + uuid + ")";
         assertEquals(exceptedString, test.toString());

@@ -235,13 +235,14 @@ public class ServiceDeployerApi {
     @Operation(description = "Change the lock config of the service.")
     @PutMapping(value = "/services/changelock/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    public void changeServiceLockConfig(
+    public ServiceOrder changeServiceLockConfig(
             @Parameter(name = "serviceId", description = "Id of the service")
             @PathVariable("serviceId") String serviceId,
             @Valid @RequestBody ServiceLockConfig serviceLockConfig) {
-        this.deployService.changeServiceLockConfig(UUID.fromString(serviceId), serviceLockConfig);
+        return this.deployService.changeServiceLockConfig(
+                UUID.fromString(serviceId), serviceLockConfig);
     }
 
     /**
