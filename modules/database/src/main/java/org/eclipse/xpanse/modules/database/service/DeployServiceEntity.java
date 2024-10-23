@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.database.service;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -39,8 +40,6 @@ import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -121,6 +120,7 @@ public class DeployServiceEntity extends CreateModifiedTime {
     /**
      * The id of the Service Template.
      */
+    @Column(name = "SERVICE_TEMPLATE_ID", nullable = false)
     private UUID serviceTemplateId;
 
     @Column(columnDefinition = "json")
@@ -128,18 +128,15 @@ public class DeployServiceEntity extends CreateModifiedTime {
     @Convert(converter = ObjectJsonConverter.class)
     private DeployRequest deployRequest;
 
-    @OneToMany(mappedBy = "deployService", orphanRemoval = true)
-    @Cascade({CascadeType.ALL})
+    @OneToMany(mappedBy = "deployService", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<DeployResourceEntity> deployResourceList;
 
-    @OneToOne(mappedBy = "deployServiceEntity", orphanRemoval = true)
-    @Cascade({CascadeType.ALL})
+    @OneToOne(mappedBy = "deployServiceEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private ServiceConfigurationEntity serviceConfigurationEntity;
 
-    @OneToMany(mappedBy = "deployServiceEntity", orphanRemoval = true)
-    @Cascade({CascadeType.ALL})
+    @OneToMany(mappedBy = "deployServiceEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<ServiceOrderEntity> serviceOrderList;
 

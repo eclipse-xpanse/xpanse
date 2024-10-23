@@ -53,50 +53,50 @@ public class ServiceOrderManager {
     private Executor taskExecutor;
 
     /**
-     * Create service order task.
+     * Create service order entity and store into the database.
      *
-     * @param deployTask              deploy task
-     * @param previousDeployedService previous deployed service entity
-     * @return DB entity of the service order
+     * @param task                task to be created
+     * @param deployServiceEntity deploy service entity
      */
-    public ServiceOrderEntity createServiceOrderTask(
-            DeployTask deployTask, DeployServiceEntity previousDeployedService) {
+    public ServiceOrderEntity storeNewServiceOrderEntity(DeployTask task,
+                                                         DeployServiceEntity deployServiceEntity) {
         ServiceOrderEntity orderTask = new ServiceOrderEntity();
-        orderTask.setOrderId(deployTask.getOrderId());
-        orderTask.setTaskType(deployTask.getTaskType());
-        orderTask.setUserId(deployTask.getUserId());
-        orderTask.setDeployServiceEntity(deployServiceStorage
-                .getReferenceById(deployTask.getServiceId()));
-        orderTask.setNewDeployRequest(deployTask.getDeployRequest());
+        orderTask.setOrderId(task.getOrderId());
+        orderTask.setParentOrderId(task.getParentOrderId());
+        orderTask.setTaskType(task.getTaskType());
+        orderTask.setUserId(task.getUserId());
+        orderTask.setDeployServiceEntity(deployServiceEntity);
+        orderTask.setOriginalServerId(task.getServiceId());
+        orderTask.setWorkflowId(task.getWorkflowId());
+        orderTask.setNewDeployRequest(task.getDeployRequest());
         orderTask.setTaskStatus(TaskStatus.CREATED);
-        if (Objects.nonNull(previousDeployedService)) {
-            orderTask.setPreviousDeployRequest(previousDeployedService.getDeployRequest());
+        if (Objects.nonNull(deployServiceEntity)) {
+            orderTask.setPreviousDeployRequest(deployServiceEntity.getDeployRequest());
             orderTask.setPreviousDeployedResources(
                     EntityTransUtils.transToDeployResourceList(
-                            previousDeployedService.getDeployResourceList()));
-            if (Objects.nonNull(previousDeployedService.getPrivateProperties())) {
-                orderTask.setPreviousDeployedResultProperties(
-                        new HashMap<>(previousDeployedService.getPrivateProperties()));
+                            deployServiceEntity.getDeployResourceList()));
+            if (!CollectionUtils.isEmpty(deployServiceEntity.getPrivateProperties())) {
+                deployServiceEntity.setPrivateProperties(
+                        new HashMap<>(deployServiceEntity.getPrivateProperties()));
             }
-            if (Objects.nonNull(previousDeployedService.getProperties())) {
+            if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
                 orderTask.setPreviousDeployedServiceProperties(
-                        new HashMap<>(previousDeployedService.getProperties()));
+                        new HashMap<>(deployServiceEntity.getProperties()));
             }
-
         }
         return serviceOrderStorage.storeAndFlush(orderTask);
     }
 
     /**
-     * Start order progress by id.
+     * Start order progress.
      *
-     * @param orderId id of the order
+     * @param serviceOrder entity.
+     * @return service order entity.
      */
-    public void startOrderProgress(UUID orderId) {
-        ServiceOrderEntity orderTask = serviceOrderStorage.getEntityById(orderId);
-        orderTask.setTaskStatus(TaskStatus.IN_PROGRESS);
-        orderTask.setStartedTime(OffsetDateTime.now());
-        serviceOrderStorage.storeAndFlush(orderTask);
+    public ServiceOrderEntity startOrderProgress(ServiceOrderEntity serviceOrder) {
+        serviceOrder.setTaskStatus(TaskStatus.IN_PROGRESS);
+        serviceOrder.setStartedTime(OffsetDateTime.now());
+        return serviceOrderStorage.storeAndFlush(serviceOrder);
     }
 
 
@@ -173,24 +173,6 @@ public class ServiceOrderManager {
     public ServiceOrderDetails getOrderDetailsByOrderId(UUID orderId) {
         ServiceOrderEntity orderEntity = getServiceOrderEntity(orderId);
         return EntityTransUtils.transToServiceOrderDetails(orderEntity);
-    }
-
-    /**
-     * Get the latest service order with the service id.
-     *
-     * @param serviceId service id.
-     * @return service order details.
-     */
-    public ServiceOrderDetails getLatestModificationOrder(UUID serviceId) {
-        ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
-        query.setTaskType(ServiceOrderType.MODIFY);
-        List<ServiceOrderEntity> orderEntities = serviceOrderStorage.queryEntities(query);
-        if (!CollectionUtils.isEmpty(orderEntities)) {
-            return EntityTransUtils.transToServiceOrderDetails(
-                    orderEntities.getFirst());
-        }
-        return null;
     }
 
     /**

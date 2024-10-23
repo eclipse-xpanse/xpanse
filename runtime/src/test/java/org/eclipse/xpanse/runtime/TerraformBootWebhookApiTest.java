@@ -56,7 +56,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,test"})
+@SpringBootTest(properties = {
+        "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,test"})
 @AutoConfigureMockMvc
 public class TerraformBootWebhookApiTest extends ApisTestCommon {
     @MockBean
@@ -86,82 +87,19 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
     void testTerraformBootWebhookApisThrowsException() throws Exception {
         // Setup
         UUID uuid = UUID.randomUUID();
-        ResultType expectedResultType = ResultType.SERVICE_DEPLOYMENT_NOT_FOUND;
-        String errorMsg = String.format("Service with id %s not found.", uuid);
+        ResultType expectedResultType = ResultType.SERVICE_ORDER_NOT_FOUND;
+        String errorMsg = String.format("Service order with id %s not found.", uuid);
         List<String> expectedDetails = Collections.singletonList(errorMsg);
         TerraformResult deployResult = getTerraformResultByFile("deploy_success_callback.json");
+        deployResult.setRequestId(uuid);
         // Run the test
-        final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/deploy/{serviceId}", uuid)
-                                .content(objectMapper.writeValueAsString(deployResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse deployCallbackResponse = orderCallback(uuid, deployResult);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployCallbackResponse.getStatus());
         Response deployCallbackResult =
                 objectMapper.readValue(deployCallbackResponse.getContentAsString(), Response.class);
         assertEquals(deployCallbackResult.getResultType(), expectedResultType);
         assertEquals(deployCallbackResult.getDetails(), expectedDetails);
-
-        // Run the test
-        final MockHttpServletResponse modifyCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/modify/{serviceId}", uuid)
-                                .content(objectMapper.writeValueAsString(deployResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-        // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), modifyCallbackResponse.getStatus());
-        Response modifyCallbackResult =
-                objectMapper.readValue(modifyCallbackResponse.getContentAsString(), Response.class);
-        assertEquals(modifyCallbackResult.getResultType(), expectedResultType);
-        assertEquals(modifyCallbackResult.getDetails(), expectedDetails);
-
-        // Setup
-        TerraformResult destroyResult = getTerraformResultByFile("destroy_success_callback.json");
-        // Run the test
-        final MockHttpServletResponse destroyCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/destroy/{serviceId}", uuid)
-                                .content(objectMapper.writeValueAsString(destroyResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-        // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), destroyCallbackResponse.getStatus());
-        Response destroyCallbackResult = objectMapper.readValue(
-                destroyCallbackResponse.getContentAsString(), Response.class);
-        assertEquals(destroyCallbackResult.getResultType(), expectedResultType);
-        assertEquals(destroyCallbackResult.getDetails(), expectedDetails);
-
-        // Run the test
-        final MockHttpServletResponse rollbackCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/rollback/{serviceId}", uuid)
-                                .content(objectMapper.writeValueAsString(destroyResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-        // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), rollbackCallbackResponse.getStatus());
-        Response rollbackCallbackResult = objectMapper.readValue(
-                rollbackCallbackResponse.getContentAsString(), Response.class);
-        assertEquals(rollbackCallbackResult.getResultType(), expectedResultType);
-        assertEquals(rollbackCallbackResult.getDetails(), expectedDetails);
-
-
-        // Run the test
-        final MockHttpServletResponse purgeCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/purge/{serviceId}", uuid)
-                                .content(objectMapper.writeValueAsString(destroyResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-        // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), purgeCallbackResponse.getStatus());
-        Response purgeCallbackResult =
-                objectMapper.readValue(purgeCallbackResponse.getContentAsString(), Response.class);
-        assertEquals(purgeCallbackResult.getResultType(), expectedResultType);
-        assertEquals(purgeCallbackResult.getDetails(), expectedDetails);
     }
 
     void testTerraformBootWebhookApisWell() throws Exception {
@@ -181,7 +119,7 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
     }
 
     void testCallbackApiWithOcl(Ocl ocl) throws Exception {
-// Setup
+        // Setup
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         if (Objects.isNull(serviceTemplate)) {
             log.error("Failed to register service template.");
@@ -208,13 +146,7 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
         TerraformResult deployResult = getTerraformResultByFile("deploy_success_callback.json");
         deployResult.setRequestId(orderId);
         // Run the test
-        final MockHttpServletResponse deployCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/deploy/{serviceId}",
-                                serviceId)
-                                .content(objectMapper.writeValueAsString(deployResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse deployCallbackResponse = orderCallback(orderId, deployResult);
         // Verify the results
         assertThat(deployCallbackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
@@ -237,13 +169,8 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
         assertThat(modifyServiceId).isEqualTo(serviceId);
         deployResult.setRequestId(modifyOrderId);
         // Run the test
-        final MockHttpServletResponse modifyCallbackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/modify/{serviceId}",
-                                serviceId)
-                                .content(objectMapper.writeValueAsString(deployResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse modifyCallbackResponse = orderCallback(modifyOrderId,
+                deployResult);
         // Verify the results
         assertThat(modifyCallbackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
@@ -264,24 +191,14 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
         TerraformResult destroyResult = getTerraformResultByFile("destroy_success_callback.json");
         destroyResult.setRequestId(destroyOrderId);
         // Run the test
-        final MockHttpServletResponse destroyCallBackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/destroy/{serviceId}",
-                                serviceId)
-                                .content(objectMapper.writeValueAsString(destroyResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse destroyCallBackResponse = orderCallback(destroyOrderId,
+                destroyResult);
         // Verify the results
         assertThat(destroyCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         // Run the test
-        final MockHttpServletResponse rollbackCallBackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/rollback/{serviceId}",
-                                serviceId)
-                                .content(objectMapper.writeValueAsString(destroyResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse rollbackCallBackResponse = orderCallback(orderId,
+                destroyResult);
         // Verify the results
         assertThat(rollbackCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
@@ -301,13 +218,8 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
         destroyResult.setRequestId(purgeOrderId);
 
         // Run the test
-        final MockHttpServletResponse purgeCallBackResponse = mockMvc.perform(
-                        post("/webhook/terraform-boot/purge/{serviceId}",
-                                serviceId)
-                                .content(objectMapper.writeValueAsString(destroyResult))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse purgeCallBackResponse = orderCallback(purgeOrderId,
+                destroyResult);
         // Verify the results
         assertThat(purgeCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
@@ -320,5 +232,15 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
         // Read the JSON content
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(resource.getInputStream(), TerraformResult.class);
+    }
+
+    MockHttpServletResponse orderCallback(UUID orderId, TerraformResult deployResult)
+            throws Exception {
+        return mockMvc.perform(
+                        post("/webhook/terraform-boot/order/{orderId}", orderId)
+                                .content(objectMapper.writeValueAsString(deployResult))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
     }
 }

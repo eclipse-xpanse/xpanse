@@ -26,7 +26,7 @@ class ServiceOrderEntityTest {
             ZoneOffset.UTC);
     private final OffsetDateTime completedTime = OffsetDateTime.of(LocalDateTime.now(),
             ZoneOffset.UTC);
-    private final UUID orderId = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab61");
+    private final UUID uuid = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab61");
     private final String errorMsg = "error message";
     private final String userId = "userId";
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
@@ -51,8 +51,11 @@ class ServiceOrderEntityTest {
     @BeforeEach
     void setUp() {
         test = new ServiceOrderEntity();
-        test.setOrderId(orderId);
+        test.setOrderId(uuid);
+        test.setParentOrderId(uuid);
+        test.setWorkflowId(uuid);
         test.setDeployServiceEntity(deployServiceEntity);
+        test.setOriginalServerId(uuid);
         test.setTaskType(taskType);
         test.setUserId(userId);
         test.setStartedTime(startedTime);
@@ -69,8 +72,11 @@ class ServiceOrderEntityTest {
 
     @Test
     void testGetters() {
-        assertThat(test.getOrderId()).isEqualTo(orderId);
+        assertThat(test.getOrderId()).isEqualTo(uuid);
+        assertThat(test.getParentOrderId()).isEqualTo(uuid);
         assertThat(test.getDeployServiceEntity()).isEqualTo(deployServiceEntity);
+        assertThat(test.getOriginalServerId()).isEqualTo(uuid);
+        assertThat(test.getWorkflowId()).isEqualTo(uuid);
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
@@ -104,8 +110,11 @@ class ServiceOrderEntityTest {
 
     @Test
     void testToString() {
-        String result = "ServiceOrderEntity(orderId=" + orderId
+        String result = "ServiceOrderEntity(orderId=" + uuid
                 + ", deployServiceEntity=" + deployServiceEntity
+                + ", parentOrderId=" + uuid
+                + ", workflowId=" + uuid
+                + ", originalServerId=" + uuid
                 + ", taskType=" + taskType
                 + ", userId=" + userId
                 + ", taskStatus=" + taskStatus

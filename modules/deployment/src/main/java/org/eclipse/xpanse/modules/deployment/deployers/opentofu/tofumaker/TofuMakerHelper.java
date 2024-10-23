@@ -20,7 +20,6 @@ import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -90,8 +89,8 @@ public class TofuMakerHelper {
     public WebhookConfig getWebhookConfigWithTask(DeployTask deployTask) {
         WebhookConfig webhookConfig = new WebhookConfig();
         String callbackUrl = getClientRequestBaseUrl(port)
-                + getDeployerTaskCallbackUrl(deployTask.getDeploymentScenario());
-        webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getServiceId());
+                + tofuMakerConfig.getOrderCallbackUri();
+        webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getOrderId());
         webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
         return webhookConfig;
     }
@@ -110,16 +109,5 @@ public class TofuMakerHelper {
             log.error(ResultType.TOFU_MAKER_REQUEST_FAILED.toValue());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
-    }
-
-    private String getDeployerTaskCallbackUrl(DeploymentScenario deploymentScenario) {
-        return switch (deploymentScenario) {
-            case DEPLOY -> tofuMakerConfig.getDeployCallbackUri();
-            case MODIFY -> tofuMakerConfig.getModifyCallbackUri();
-            case DESTROY -> tofuMakerConfig.getDestroyCallbackUri();
-            case ROLLBACK -> tofuMakerConfig.getRollbackCallbackUri();
-            case PURGE -> tofuMakerConfig.getPurgeCallbackUri();
-
-        };
     }
 }

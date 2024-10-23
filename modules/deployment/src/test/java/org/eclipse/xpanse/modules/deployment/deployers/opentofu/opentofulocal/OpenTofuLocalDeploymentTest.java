@@ -8,10 +8,10 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.STATE_FILE_NAME;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -34,7 +34,6 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResource
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.enums.DeployerTaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
@@ -44,7 +43,6 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -165,22 +163,19 @@ class OpenTofuLocalDeploymentTest {
     void testDeploy() {
         when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
-        deployTask.setDeploymentScenario(DeploymentScenario.DEPLOY);
         DeployResult deployResult = openTofuLocalDeployment.deploy(deployTask);
         String tfState = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
-        Assertions.assertNotNull(deployResult);
-        Assertions.assertNotNull(deployResult.getPrivateProperties());
+        assertNotNull(deployResult);
+        assertNotNull(deployResult.getPrivateProperties());
         Assertions.assertNull(tfState);
-        Assertions.assertNull(deployResult.getState());
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DEPLOY);
             DeployResult deployResult1 = openTofuLocalDeployment.deploy(deployTask1);
-            Assertions.assertNotNull(deployResult1);
-            Assertions.assertNotNull(deployResult1.getPrivateProperties());
+            assertNotNull(deployResult1);
+            assertNotNull(deployResult1.getPrivateProperties());
             String tfState1 = deployResult1.getPrivateProperties().get(STATE_FILE_NAME);
             Assertions.assertNull(tfState1);
-            Assertions.assertNull(deployResult1.getState());
         } catch (Exception e) {
             log.error("testDeploy throw unexpected exception.", e);
         }
@@ -196,23 +191,18 @@ class OpenTofuLocalDeploymentTest {
         deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
                 deployServiceEntity);
-
-        deployTask.setDeploymentScenario(DeploymentScenario.MODIFY);
-
         DeployResult deployResult = openTofuLocalDeployment.modify(deployTask);
-        Assertions.assertNotNull(deployResult);
-        Assertions.assertNotNull(deployResult.getPrivateProperties());
-        Assertions.assertNull(deployResult.getState());
+        assertNotNull(deployResult);
+        assertNotNull(deployResult.getPrivateProperties());
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.MODIFY);
             DeployResult deployResult1 =
                     openTofuLocalDeployment.modify(deployTask1);
-            Assertions.assertNotNull(deployResult1);
-            Assertions.assertNotNull(deployResult1.getPrivateProperties());
+            assertNotNull(deployResult1);
+            assertNotNull(deployResult1.getPrivateProperties());
             String tfState1 = deployResult1.getPrivateProperties().get(STATE_FILE_NAME);
             Assertions.assertNull(tfState1);
-            Assertions.assertNull(deployResult1.getState());
         } catch (Exception e) {
             log.error("testDeploy throw unexpected exception.", e);
         }
@@ -230,28 +220,18 @@ class OpenTofuLocalDeploymentTest {
 
 
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
-        deployTask.setDeploymentScenario(DeploymentScenario.DESTROY);
         DeployResult destroyResult = openTofuLocalDeployment.destroy(deployTask);
-        Assertions.assertNotNull(destroyResult);
-        Assertions.assertNotNull(destroyResult.getPrivateProperties());
+        assertNotNull(destroyResult);
+        assertNotNull(destroyResult.getPrivateProperties());
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DESTROY);
-            deployTask1.setDeploymentScenario(DeploymentScenario.DESTROY);
             DeployResult destroyResult1 = openTofuLocalDeployment.destroy(deployTask1);
-            Assertions.assertNotNull(destroyResult1);
-            Assertions.assertNotNull(destroyResult1.getPrivateProperties());
+            assertNotNull(destroyResult1);
+            assertNotNull(destroyResult1.getPrivateProperties());
         } catch (Exception e) {
             log.error("testDestroy throw unexpected exception.", e);
         }
-    }
-
-    @Test
-    void testDeleteTaskWorkspace() {
-        String workspacePath = System.getProperty("java.io.tmpdir") + File.separator
-                + openTofuLocalConfig.getWorkspaceDirectory() + File.separator + UUID.randomUUID();
-        this.openTofuLocalDeployment.deleteTaskWorkspace(UUID.randomUUID());
-        Assertions.assertFalse(new File(workspacePath).exists());
     }
 
     @Test
@@ -260,10 +240,7 @@ class OpenTofuLocalDeploymentTest {
         ocl.getDeployment().setDeployer(invalidDeployer);
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         DeployResult deployResult = this.openTofuLocalDeployment.deploy(deployTask);
-        Assertions.assertNull(deployResult.getState());
-        Assertions.assertNotEquals(DeployerTaskStatus.DEPLOY_SUCCESS.toValue(),
-                deployResult.getMessage());
-
+        assertNotNull(deployResult);
     }
 
     @Test
@@ -281,9 +258,7 @@ class OpenTofuLocalDeploymentTest {
             ocl.getDeployment().setDeployer(errorDeployer);
             DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.MODIFY);
             DeployResult deployResult = this.openTofuLocalDeployment.modify(deployTask);
-            Assertions.assertNull(deployResult.getState());
-            Assertions.assertNotEquals(DeployerTaskStatus.MODIFICATION_SUCCESSFUL.toValue(),
-                    deployResult.getMessage());
+            assertNotNull(deployResult);
         }
     }
 
@@ -298,9 +273,6 @@ class OpenTofuLocalDeploymentTest {
             DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
             DeployResult deployResult = this.openTofuLocalDeployment.destroy(deployTask);
             Assertions.assertTrue(deployResult.getProperties().isEmpty());
-            Assertions.assertNull(deployResult.getState());
-            Assertions.assertNotEquals(DeployerTaskStatus.DESTROY_FAILED.toValue(),
-                    deployResult.getMessage());
         }
     }
 
@@ -312,15 +284,16 @@ class OpenTofuLocalDeploymentTest {
 
     @Test
     void testGetDeployPlanAsJson() {
+        when(openTofuLocalConfig.getWorkspaceDirectory()).thenReturn("ws-test");
         when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         String deployPlanJson = openTofuLocalDeployment.getDeploymentPlanAsJson(deployTask);
-        Assertions.assertNotNull(deployPlanJson);
+        assertNotNull(deployPlanJson);
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DEPLOY);
             String deployPlanJson1 = openTofuLocalDeployment.getDeploymentPlanAsJson(deployTask1);
-            Assertions.assertNotNull(deployPlanJson1);
+            assertNotNull(deployPlanJson1);
         } catch (Exception e) {
             log.error("testGetDeployPlanAsJson throw unexpected exception.", e);
         }

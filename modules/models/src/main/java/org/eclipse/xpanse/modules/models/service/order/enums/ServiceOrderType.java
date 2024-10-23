@@ -15,10 +15,12 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  */
 public enum ServiceOrderType {
     DEPLOY("deploy"),
-    REDEPLOY("redeploy"),
+    RETRY("retry"),
+    ROLLBACK("rollback"),
     MODIFY("modify"),
     DESTROY("destroy"),
-    SERVICE_CONFIGURATION_UPDATE("serviceConfigurationUpdate"),
+    LOCK_CHANGE("lockChange"),
+    CONFIG_CHANGE("configChange"),
     PURGE("purge"),
     SERVICE_START("serviceStart"),
     SERVICE_STOP("serviceStop"),

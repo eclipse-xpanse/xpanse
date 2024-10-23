@@ -123,9 +123,4 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
     public void deleteDeployService(DeployServiceEntity deployServiceEntity) {
         this.deployServiceRepository.delete(deployServiceEntity);
     }
-
-    @Override
-    public DeployServiceEntity getReferenceById(UUID id) {
-        return this.deployServiceRepository.getReferenceById(id);
-    }
 }

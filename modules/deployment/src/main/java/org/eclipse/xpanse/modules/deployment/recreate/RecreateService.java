@@ -87,7 +87,7 @@ public class RecreateService {
      * @param taskId oldServiceId.
      * @return ServiceRecreateEntity.
      */
-    public ServiceRecreateEntity getServiceRecreateEntityByServiceId(UUID taskId) {
+    public ServiceRecreateEntity getServiceRecreateEntityByOldServiceId(UUID taskId) {
         ServiceRecreateQueryModel query = new ServiceRecreateQueryModel();
         query.setServiceId(taskId);
         List<ServiceRecreateEntity> serviceRecreateEntities =

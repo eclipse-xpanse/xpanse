@@ -31,8 +31,6 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -55,8 +53,16 @@ public class ServiceOrderEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SERVICE_ID", nullable = false)
-    @Cascade(CascadeType.ALL)
     private DeployServiceEntity deployServiceEntity;
+
+    @Column(name = "PARENT_ORDER_ID")
+    private UUID parentOrderId;
+
+    @Column(name = "WORKFLOW_ID")
+    private UUID workflowId;
+
+    @Column(name = "ORIGINAL_SERVICE_ID")
+    private UUID originalServerId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "TASK_TYPE", nullable = false)
