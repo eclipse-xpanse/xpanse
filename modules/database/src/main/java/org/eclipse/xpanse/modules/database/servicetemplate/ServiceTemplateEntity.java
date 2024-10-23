@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.database.servicetemplate;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -31,8 +32,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactD
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 
 /**
@@ -94,8 +93,7 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Convert(converter = ObjectJsonConverter.class)
     private JsonObjectSchema jsonObjectSchema;
 
-    @OneToMany(mappedBy = "serviceTemplate", orphanRemoval = true)
-    @Cascade({CascadeType.ALL})
+    @OneToMany(mappedBy = "serviceTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<ServicePolicyEntity> servicePolicyList;
 

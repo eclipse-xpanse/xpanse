@@ -16,7 +16,6 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.DatabaseServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
@@ -53,8 +52,6 @@ public class ServiceStateManager {
     private UserServiceHelper userServiceHelper;
     @Resource
     private DatabaseServiceOrderStorage serviceOrderStorage;
-    @Resource
-    private DatabaseDeployServiceStorage deployServiceStorage;
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
     @Resource
@@ -72,7 +69,7 @@ public class ServiceStateManager {
         DeployServiceEntity service = getDeployedServiceAndValidateState(id, orderId, taskType);
         OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(service.getCsp());
         ServiceStateManageRequest startRequest = getServiceManagerRequest(service, orderId);
-        ServiceOrderEntity serviceOrderEntity = createNewManagementTask(id, orderId, taskType);
+        ServiceOrderEntity serviceOrderEntity = createNewManagementTask(orderId, taskType, service);
         taskExecutor.execute(
                 () -> asyncStartService(serviceOrderEntity, plugin, startRequest, service));
         ServiceOrder serviceOrder = new ServiceOrder();
@@ -82,21 +79,19 @@ public class ServiceStateManager {
     }
 
     private ServiceOrderEntity createNewManagementTask(
-            UUID serviceId, UUID orderId, ServiceOrderType taskType) {
+            UUID orderId, ServiceOrderType taskType, DeployServiceEntity service) {
         DeployTask deployTask = new DeployTask();
         deployTask.setOrderId(orderId);
-        deployTask.setServiceId(serviceId);
+        deployTask.setServiceId(service.getId());
         deployTask.setTaskType(taskType);
         deployTask.setUserId(getUserId());
-        return serviceOrderManager.createServiceOrderTask(deployTask, null);
+        return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service);
     }
 
     private void asyncStartService(ServiceOrderEntity serviceOrderTaskEntity,
                                    OrchestratorPlugin plugin, ServiceStateManageRequest request,
                                    DeployServiceEntity service) {
-        serviceOrderTaskEntity.setTaskStatus(TaskStatus.IN_PROGRESS);
-        serviceOrderTaskEntity.setStartedTime(OffsetDateTime.now());
-        serviceOrderStorage.storeAndFlush(serviceOrderTaskEntity);
+        serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.STARTING);
         serviceHandler.storeAndFlush(service);
         boolean result = false;
@@ -130,7 +125,7 @@ public class ServiceStateManager {
         DeployServiceEntity service = getDeployedServiceAndValidateState(id, orderId, taskType);
         OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(service.getCsp());
         ServiceStateManageRequest stopRequest = getServiceManagerRequest(service, orderId);
-        ServiceOrderEntity serviceOrderEntity = createNewManagementTask(id, orderId, taskType);
+        ServiceOrderEntity serviceOrderEntity = createNewManagementTask(orderId, taskType, service);
         taskExecutor.execute(
                 () -> asyncStopService(serviceOrderEntity, plugin, stopRequest, service));
         ServiceOrder serviceOrder = new ServiceOrder();
@@ -143,8 +138,7 @@ public class ServiceStateManager {
                                   OrchestratorPlugin plugin, ServiceStateManageRequest request,
                                   DeployServiceEntity service) {
         serviceOrderTaskEntity.setTaskStatus(TaskStatus.IN_PROGRESS);
-        serviceOrderTaskEntity.setStartedTime(OffsetDateTime.now());
-        serviceOrderStorage.storeAndFlush(serviceOrderTaskEntity);
+        serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.STOPPING);
         serviceHandler.storeAndFlush(service);
         boolean result = false;
@@ -178,7 +172,7 @@ public class ServiceStateManager {
         DeployServiceEntity service = getDeployedServiceAndValidateState(id, orderId, taskType);
         OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(service.getCsp());
         ServiceStateManageRequest restartRequest = getServiceManagerRequest(service, orderId);
-        ServiceOrderEntity serviceOrderEntity = createNewManagementTask(id, orderId, taskType);
+        ServiceOrderEntity serviceOrderEntity = createNewManagementTask(orderId, taskType, service);
         taskExecutor.execute(
                 () -> asyncRestartService(serviceOrderEntity, plugin, restartRequest, service));
         ServiceOrder serviceOrder = new ServiceOrder();
@@ -190,9 +184,7 @@ public class ServiceStateManager {
     private void asyncRestartService(ServiceOrderEntity serviceOrderTaskEntity,
                                      OrchestratorPlugin plugin, ServiceStateManageRequest request,
                                      DeployServiceEntity service) {
-        serviceOrderTaskEntity.setTaskStatus(TaskStatus.IN_PROGRESS);
-        serviceOrderTaskEntity.setStartedTime(OffsetDateTime.now());
-        serviceOrderStorage.storeAndFlush(serviceOrderTaskEntity);
+        serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.RESTARTING);
         serviceHandler.storeAndFlush(service);
         boolean result = false;

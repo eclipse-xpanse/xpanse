@@ -16,9 +16,13 @@ class ServiceOrderTypeEnumConverterTest {
     void testConvert() {
         assertThat(converterTest.convert("deploy")).isEqualTo(ServiceOrderType.DEPLOY);
         assertThat(converterTest.convert("modify")).isEqualTo(ServiceOrderType.MODIFY);
-        assertThat(converterTest.convert("redeploy")).isEqualTo(ServiceOrderType.REDEPLOY);
+        assertThat(converterTest.convert("retry")).isEqualTo(ServiceOrderType.RETRY);
         assertThat(converterTest.convert("destroy")).isEqualTo(ServiceOrderType.DESTROY);
         assertThat(converterTest.convert("purge")).isEqualTo(ServiceOrderType.PURGE);
+        assertThat(converterTest.convert("rollback")).isEqualTo(ServiceOrderType.ROLLBACK);
+        assertThat(converterTest.convert("lockChange")).isEqualTo(ServiceOrderType.LOCK_CHANGE);
+        assertThat(converterTest.convert("configChange"))
+                .isEqualTo(ServiceOrderType.CONFIG_CHANGE);
         assertThrows(UnsupportedEnumValueException.class, () -> converterTest.convert("unknown"));
     }
 }

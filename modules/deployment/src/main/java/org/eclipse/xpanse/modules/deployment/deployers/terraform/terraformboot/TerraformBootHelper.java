@@ -20,7 +20,6 @@ import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScenario;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -90,9 +89,9 @@ public class TerraformBootHelper {
      */
     public WebhookConfig getWebhookConfigWithTask(DeployTask deployTask) {
         WebhookConfig webhookConfig = new WebhookConfig();
-        String callbackUrl = getClientRequestBaseUrl(port)
-                + getDeployerTaskCallbackUrl(deployTask.getDeploymentScenario());
-        webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getServiceId());
+        String callbackUrl =
+                getClientRequestBaseUrl(port) + terraformBootConfig.getOrderCallbackUri();
+        webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getOrderId());
         webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
         return webhookConfig;
     }
@@ -112,14 +111,4 @@ public class TerraformBootHelper {
         }
     }
 
-    private String getDeployerTaskCallbackUrl(DeploymentScenario deploymentScenario) {
-        return switch (deploymentScenario) {
-            case DEPLOY -> terraformBootConfig.getDeployCallbackUri();
-            case MODIFY -> terraformBootConfig.getModifyCallbackUri();
-            case DESTROY -> terraformBootConfig.getDestroyCallbackUri();
-            case ROLLBACK -> terraformBootConfig.getRollbackCallbackUri();
-            case PURGE -> terraformBootConfig.getPurgeCallbackUri();
-
-        };
-    }
 }

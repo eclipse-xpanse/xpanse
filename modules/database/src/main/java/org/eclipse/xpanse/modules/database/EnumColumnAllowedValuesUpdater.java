@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.enumcolumn.EnumColumnConstraintManage;
@@ -49,7 +50,7 @@ public class EnumColumnAllowedValuesUpdater implements
      * Update the values of all enum columns in all tables.
      */
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
         DatabaseType activeDatabaseType = DatabaseType.getByValue(dataSourceName);
         Map<Class<?>, String> map = getTableNamesMap();
         for (Map.Entry<Class<?>, String> entry : map.entrySet()) {

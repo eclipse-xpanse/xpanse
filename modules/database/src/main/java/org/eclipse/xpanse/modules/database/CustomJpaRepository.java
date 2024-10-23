@@ -31,6 +31,4 @@ public interface CustomJpaRepository<T, ID> extends Repository<T, ID> {
     long count();
 
     <S extends T> List<S> saveAll(Iterable<S> entities);
-
-    <S extends T> S getReferenceById(ID id);
 }

@@ -10,8 +10,6 @@ import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.HEADER_TRACK
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -25,19 +23,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
-import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
@@ -47,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -91,43 +82,42 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
     public static final String KAFKA_BROKER = "kafka-broker";
     public static final String USER_ID = "userId";
 
-    @MockBean
-    DeployServiceEntityHandler deployServiceEntityHandler;
-
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void test_change_service_configuration_success() throws Exception {
-        DeployServiceEntity deployServiceEntity = test_register_and_deploy_service_well();
-        test_change_service_configuration_well(deployServiceEntity);
+        ServiceOrder  deployOrder = test_register_and_deploy_service();
+        if (Objects.nonNull(deployOrder) && waitServiceDeploymentIsCompleted(deployOrder.getServiceId())){
+            test_change_service_configuration_well(deployOrder.getServiceId());
+        }
     }
 
-    private void test_change_service_configuration_well(DeployServiceEntity deployServiceEntity) throws Exception {
-        when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(deployServiceEntity);
-        ServiceOrder order  = changeServiceConfiguration(deployServiceEntity.getId());
-        assertEquals(deployServiceEntity.getId(), order.getServiceId());
-        List<ServiceConfigurationChangeOrderDetails> requests =
-                listServiceConfigurationChangeDetails(order.getOrderId(), order.getServiceId());
-        assertFalse(requests.isEmpty());
-        assertEquals(requests.size(), 1);
-        requests.forEach(request -> assertEquals(request.getOrderId(), order.getOrderId()));
-        requests.forEach(
-                request -> request.getChangeRequests().forEach(
-                    requestDetails->
-                            assertEquals(requestDetails.getStatus(), ServiceConfigurationStatus.PENDING)
-                )
-        );
-        requests.forEach(request -> request.getChangeRequests().forEach(requestDetails->{
-            if(ZOOKEEPER.equals(requestDetails.getConfigManager())){
-                assertEquals(requestDetails.getProperties(),getZookeeperConfig());
-            }
-            if(KAFKA_BROKER.equals(requestDetails.getConfigManager())){
-                assertEquals(requestDetails.getProperties(),getKafkaBrokerConfig());
-            }
+    private void test_change_service_configuration_well(UUID serviceId) throws Exception {
+        ServiceOrder order  = changeServiceConfiguration(serviceId);
+        if (Objects.nonNull(order) && waitServiceOrderIsCompleted(order.getOrderId()) ) {
+            List<ServiceConfigurationChangeOrderDetails> requests =
+                    listServiceConfigurationChangeDetails(order.getOrderId(), order.getServiceId());
+            assertFalse(requests.isEmpty());
+            assertEquals(requests.size(), 1);
+            requests.forEach(request -> assertEquals(request.getOrderId(), order.getOrderId()));
+            requests.forEach(
+                    request -> request.getChangeRequests().forEach(
+                            requestDetails->
+                                    assertEquals(requestDetails.getStatus(), ServiceConfigurationStatus.PENDING)
+                    )
+            );
+            requests.forEach(request -> request.getChangeRequests().forEach(requestDetails->{
+                if(ZOOKEEPER.equals(requestDetails.getConfigManager())){
+                    assertEquals(requestDetails.getProperties(),getZookeeperConfig());
+                }
+                if(KAFKA_BROKER.equals(requestDetails.getConfigManager())){
+                    assertEquals(requestDetails.getProperties(),getKafkaBrokerConfig());
+                }
 
-        }));
-    }
+            }));
+        }
+        }
 
-    DeployServiceEntity test_register_and_deploy_service_well() throws Exception {
+    ServiceOrder test_register_and_deploy_service() throws Exception {
         // Setup
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_kafka_test.yml").toURL());
@@ -137,48 +127,8 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
             return null;
         }
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
-
-        return saveDeployServiceEntity(ocl,serviceTemplate.getServiceTemplateId());
+       return deployService(serviceTemplate);
     }
-
-    DeployServiceEntity saveDeployServiceEntity(Ocl ocl, UUID serviceTemplateId){
-        DeployServiceEntity entity = new DeployServiceEntity();
-        entity.setId(UUID.randomUUID());
-        entity.setCsp(ocl.getCloudServiceProvider().getName());
-        entity.setUserId(USER_ID);
-        entity.setCategory(ocl.getCategory());
-        entity.setName(ocl.getName());
-        entity.setCustomerServiceName(ocl.getName());
-        entity.setVersion(ocl.getVersion());
-        entity.setServiceTemplateId(serviceTemplateId);
-        entity.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
-        entity.setServiceState(ServiceState.RUNNING);
-        entity.setDeployResourceList(getDeployResources());
-
-        DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setServiceName(ocl.getName());
-        deployRequest.setVersion(ocl.getServiceVersion());
-        deployRequest.setFlavor(ocl.getFlavors().getServiceFlavors().getFirst().getName());
-        Region region = ocl.getCloudServiceProvider().getRegions().getFirst();
-        deployRequest.setRegion(region);
-        deployRequest.setCsp(ocl.getCloudServiceProvider().getName());
-        deployRequest.setCategory(ocl.getCategory());
-        deployRequest.setCustomerServiceName("test_deploy");
-        deployRequest.setServiceHostingType(ocl.getServiceHostingType());
-        Map<String, Object> serviceRequestProperties = new HashMap<>();
-        ocl.getDeployment().getVariables().forEach(
-                variable -> serviceRequestProperties.put(variable.getName(),
-                        variable.getExample()));
-        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
-        serviceRequestProperties.putAll(
-                ocl.getFlavors().getServiceFlavors().getFirst().getProperties());
-        serviceRequestProperties.put("region", region.getName());
-        deployRequest.setServiceRequestProperties(serviceRequestProperties);
-        entity.setDeployRequest(deployRequest);
-        deployServiceStorage.storeAndFlush(entity);
-        return entity;
-    }
-
     Map<String, Object> getZookeeperConfig() {
         Map<String, Object> configuration = new HashMap<>();
         configuration.put(ZOOKEEPER_SNAP_COUNT, ZOOKEEPER_SNAP_COUNT_VALUE);

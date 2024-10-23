@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.stream.Stream;
@@ -44,6 +43,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -57,7 +57,8 @@ public class OpenTofuLocalDeployment implements Deployer {
     public static final String SCRIPT_FILE_NAME = "resources.tf";
     public static final String STATE_FILE_NAME = "terraform.tfstate";
     public static final String TF_DEBUG_FLAG = "TF_LOG";
-
+    @Value("${clean.workspace.after.deployment.enabled:true}")
+    private boolean cleanWorkspaceAfterDeploymentEnabled;
     @Resource
     private OpenTofuInstaller openTofuInstaller;
     @Resource
@@ -83,7 +84,6 @@ public class OpenTofuLocalDeployment implements Deployer {
     @Override
     public DeployResult deploy(DeployTask task) {
         DeployResult deployResult = new DeployResult();
-        deployResult.setServiceId(task.getServiceId());
         deployResult.setOrderId(task.getOrderId());
         asyncExecDeploy(task);
         return deployResult;
@@ -107,7 +107,6 @@ public class OpenTofuLocalDeployment implements Deployer {
             throw new ServiceNotDeployedException(errorMsg);
         }
         DeployResult destroyResult = new DeployResult();
-        destroyResult.setServiceId(task.getServiceId());
         destroyResult.setOrderId(task.getOrderId());
         asyncExecDestroy(task, resourceState);
         return destroyResult;
@@ -132,16 +131,13 @@ public class OpenTofuLocalDeployment implements Deployer {
         }
         DeployResult modifyResult = new DeployResult();
         modifyResult.setOrderId(task.getOrderId());
-        modifyResult.setServiceId(task.getServiceId());
         asyncExecModify(task, resourceState);
         return modifyResult;
     }
 
     private void asyncExecDeploy(DeployTask task) {
-        String workspace = getWorkspacePath(task.getServiceId());
-        // Create the workspace.
-        buildWorkspace(workspace);
-        prepareDeployWorkspaceWithScripts(task, workspace);
+        String workspace = createWorkspaceForTask(task.getOrderId());
+        prepareDeploymentScripts(workspace, task.getOcl().getDeployment(), null);
         OpenTofuLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
@@ -160,15 +156,17 @@ public class OpenTofuLocalDeployment implements Deployer {
                     openTofuInstaller.getExactVersionOfOpenTofu(executor.getExecutorPath()));
             Map<String, String> importantFilesContent = executor.getImportantFilesContent();
             openTofuResult.setImportantFileContentMap(importantFilesContent);
-            openTofuDeploymentResultCallbackManager.deployCallback(task.getServiceId(),
+            openTofuDeploymentResultCallbackManager.orderCallback(task.getOrderId(),
                     openTofuResult);
-            deleteStoredFiles(workspace, importantFilesContent.keySet());
+            if (cleanWorkspaceAfterDeploymentEnabled) {
+                deleteWorkspace(workspace);
+            }
         });
     }
 
     private void asyncExecDestroy(DeployTask task, String tfState) {
-        String workspace = getWorkspacePath(task.getServiceId());
-        prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
+        String workspace = createWorkspaceForTask(task.getOrderId());
+        prepareDeploymentScripts(workspace, task.getOcl().getDeployment(), tfState);
         OpenTofuLocalExecutor executor = getExecutorForDeployTask(task, workspace, false);
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(() -> {
@@ -187,16 +185,17 @@ public class OpenTofuLocalDeployment implements Deployer {
                     openTofuInstaller.getExactVersionOfOpenTofu(executor.getExecutorPath()));
             Map<String, String> importantFilesContent = executor.getImportantFilesContent();
             openTofuResult.setImportantFileContentMap(importantFilesContent);
-            openTofuDeploymentResultCallbackManager.destroyCallback(task.getServiceId(),
-                    openTofuResult, task.getDeploymentScenario());
-            deleteStoredFiles(workspace, importantFilesContent.keySet());
+            openTofuDeploymentResultCallbackManager.orderCallback(task.getOrderId(),
+                    openTofuResult);
+            if (cleanWorkspaceAfterDeploymentEnabled) {
+                deleteWorkspace(workspace);
+            }
         });
     }
 
     private void asyncExecModify(DeployTask task, String tfState) {
-        String workspace = getWorkspacePath(task.getServiceId());
-        prepareDestroyWorkspaceWithScripts(task, workspace, tfState);
-        prepareDeployWorkspaceWithScripts(task, workspace);
+        String workspace = createWorkspaceForTask(task.getOrderId());
+        prepareDeploymentScripts(workspace, task.getOcl().getDeployment(), tfState);
         OpenTofuLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
         // Execute the terraform command asynchronously.
         taskExecutor.execute(() -> {
@@ -215,27 +214,49 @@ public class OpenTofuLocalDeployment implements Deployer {
                     openTofuInstaller.getExactVersionOfOpenTofu(executor.getExecutorPath()));
             Map<String, String> importantFilesContent = executor.getImportantFilesContent();
             openTofuResult.setImportantFileContentMap(importantFilesContent);
-            openTofuDeploymentResultCallbackManager.modifyCallback(task.getServiceId(),
+            openTofuDeploymentResultCallbackManager.orderCallback(task.getOrderId(),
                     openTofuResult);
-            deleteStoredFiles(workspace, importantFilesContent.keySet());
+            if (cleanWorkspaceAfterDeploymentEnabled) {
+                deleteWorkspace(workspace);
+            }
         });
     }
 
     @Override
     public String getDeploymentPlanAsJson(DeployTask task) {
-        String workspace = getWorkspacePath(task.getServiceId());
-        // Create the workspace.
-        buildWorkspace(workspace);
-        prepareDeployWorkspaceWithScripts(task, workspace);
+        String workspace = createWorkspaceForTask(task.getOrderId());
+        prepareDeploymentScripts(workspace, task.getOcl().getDeployment(), null);
         // Execute the openTofu command.
         OpenTofuLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
         return executor.getOpenTofuPlanAsJson();
     }
 
-    @Override
-    public void deleteTaskWorkspace(UUID taskId) {
-        String workspace = getWorkspacePath(taskId);
-        deleteWorkspace(workspace);
+
+    private String createWorkspaceForTask(UUID orderId) {
+        String workspace = openTofuLocalConfig.getWorkspaceDirectory() + File.separator + orderId;
+        File ws = new File(System.getProperty("java.io.tmpdir"), workspace);
+        if (!ws.exists() && !ws.mkdirs()) {
+            throw new OpenTofuExecutorException(
+                    "Create workspace failed, File path not created: " + ws.getAbsolutePath());
+        }
+        return ws.getAbsolutePath();
+    }
+
+
+    private void prepareDeploymentScripts(String workspace, Deployment deployment, String tfState) {
+        if (Objects.nonNull(deployment.getDeployer())) {
+            createScriptFile(workspace, deployment.getDeployer());
+            if (StringUtils.isNotBlank(tfState)) {
+                createServiceStateFile(workspace, tfState);
+            }
+        } else if (Objects.nonNull(deployment.getScriptsRepo())) {
+            scriptsGitRepoManage.checkoutScripts(workspace, deployment.getScriptsRepo());
+            String scriptPath =
+                    workspace + File.separator + deployment.getScriptsRepo().getScriptsPath();
+            if (StringUtils.isNotBlank(tfState)) {
+                createServiceStateFile(scriptPath, tfState);
+            }
+        }
     }
 
     /**
@@ -248,19 +269,6 @@ public class OpenTofuLocalDeployment implements Deployer {
         } catch (Exception e) {
             log.error("Delete workspace:{} error.", workspace, e);
         }
-    }
-
-
-    private void deleteStoredFiles(String workspace, Set<String> fileNames) {
-        fileNames.forEach(fileName -> {
-            try {
-                String path = workspace + File.separator + fileName;
-                File file = new File(path);
-                Files.deleteIfExists(file.toPath());
-            } catch (IOException e) {
-                log.error("Delete file with name:{} error.", fileName, e);
-            }
-        });
     }
 
     /**
@@ -292,99 +300,26 @@ public class OpenTofuLocalDeployment implements Deployer {
                 getSubDirectory(deployment), deployResultFileUtils);
     }
 
-    private void prepareDeployWorkspaceWithScripts(DeployTask deployTask, String workspace) {
-        if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            createScriptFile(workspace,
-                    deployTask.getOcl().getDeployment().getDeployer());
-        }
-        if (Objects.nonNull(deployTask.getOcl().getDeployment().getScriptsRepo())) {
-            scriptsGitRepoManage.checkoutScripts(workspace,
-                    deployTask.getOcl().getDeployment().getScriptsRepo());
-        }
-    }
-
-    private void prepareDestroyWorkspaceWithScripts(DeployTask deployTask, String workspace,
-                                                    String tfState) {
-        log.info("start create open tofu destroy workspace and script");
-        File parentPath = new File(workspace);
-        if (!parentPath.exists() || !parentPath.isDirectory()) {
-            parentPath.mkdirs();
-        }
-        if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
-            createDestroyScriptFile(workspace, tfState);
-        } else if (Objects.nonNull(deployTask.getOcl().getDeployment().getScriptsRepo())) {
-            scriptsGitRepoManage.checkoutScripts(workspace,
-                    deployTask.getOcl().getDeployment().getScriptsRepo());
-            String scriptPath = workspace + File.separator + deployTask.getOcl().getDeployment()
-                    .getScriptsRepo().getScriptsPath() + File.separator + STATE_FILE_NAME;
-            try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
-                scriptWriter.write(tfState);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
-     * Create OpenTofu script.
-     *
-     * @param workspace the workspace for OpenTofu.
-     * @param script    OpenTofu scripts of the task.
-     */
-    private void createScriptFile(String workspace, String script) {
-        log.info("start create OpenTofu script");
-        String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
+    private void createScriptFile(String path, String scriptContext) {
+        String scriptPath = path + File.separator + SCRIPT_FILE_NAME;
         try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            scriptWriter.write(script);
-            log.info("OpenTofu script create success");
+            scriptWriter.write(scriptContext);
+            log.info("Create script file success.");
         } catch (IOException ex) {
-            log.error("create version file failed.", ex);
-            throw new OpenTofuExecutorException("create version file failed.", ex);
+            log.error("Create script file success.", ex);
+            throw new OpenTofuExecutorException("Create script file success.", ex);
         }
     }
 
-    /**
-     * Create OpenTofu workspace and script.
-     *
-     * @param workspace the workspace for OpenTofu.
-     * @param tfState   OpenTofu file tfstate of the task.
-     */
-    private void createDestroyScriptFile(String workspace, String tfState) {
-        String scriptPath = workspace + File.separator + STATE_FILE_NAME;
-        try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            scriptWriter.write(tfState);
-            log.info("Create OpenTofu destroy workspace and script success.");
+    private void createServiceStateFile(String path, String tfStateContext) {
+        String tfStateFileName = path + File.separator + STATE_FILE_NAME;
+        try (FileWriter scriptWriter = new FileWriter(tfStateFileName)) {
+            scriptWriter.write(tfStateContext);
+            log.info("Create service state file success.");
         } catch (IOException e) {
-            log.error("Create OpenTofu destroy workspace and script failed.", e);
-            throw new OpenTofuExecutorException(
-                    "Create OpenTofu destroy workspace and script failed.", e);
+            log.error("Create service state file failed.", e);
+            throw new OpenTofuExecutorException("Create service state file failed.", e);
         }
-
-    }
-
-    /**
-     * Build workspace of the `OpenTofu`.
-     *
-     * @param workspace The workspace of the task.
-     */
-    private void buildWorkspace(String workspace) {
-        log.info("start creating workspace");
-        File ws = new File(workspace);
-        if (!ws.exists() && !ws.mkdirs()) {
-            throw new OpenTofuExecutorException(
-                    "Create workspace failed, File path not created: " + ws.getAbsolutePath());
-        }
-        log.info("workspace create success,Working directory is " + ws.getAbsolutePath());
-    }
-
-    /**
-     * Get the workspace path for OpenTofu.
-     *
-     * @param taskId The id of the task.
-     */
-    private String getWorkspacePath(UUID taskId) {
-        return System.getProperty("java.io.tmpdir") + File.separator
-                + openTofuLocalConfig.getWorkspaceDirectory() + File.separator + taskId;
     }
 
 
@@ -401,14 +336,8 @@ public class OpenTofuLocalDeployment implements Deployer {
      */
     @Override
     public DeploymentScriptValidationResult validate(Deployment deployment) {
-        String workspace = getWorkspacePath(UUID.randomUUID());
-        // Create the workspace.
-        buildWorkspace(workspace);
-        if (Objects.nonNull(deployment.getDeployer())) {
-            createScriptFile(workspace, deployment.getDeployer());
-        } else {
-            scriptsGitRepoManage.checkoutScripts(workspace, deployment.getScriptsRepo());
-        }
+        String workspace = createWorkspaceForTask(UUID.randomUUID());
+        prepareDeploymentScripts(workspace, deployment, null);
         OpenTofuLocalExecutor executor =
                 getExecutor(new HashMap<>(), new HashMap<>(), workspace, deployment);
         DeploymentScriptValidationResult validationResult = executor.tfValidate();

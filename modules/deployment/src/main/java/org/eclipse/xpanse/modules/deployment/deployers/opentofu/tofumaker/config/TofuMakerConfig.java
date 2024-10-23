@@ -21,19 +21,6 @@ public class TofuMakerConfig {
     @Value("${tofu-maker.webhook.endpoint}")
     private String clientBaseUri;
 
-    @Value("${webhook.tofu-maker.deployCallbackUri}")
-    private String deployCallbackUri;
-
-    @Value("${webhook.tofu-maker.modifyCallbackUri}")
-    private String modifyCallbackUri;
-
-    @Value("${webhook.tofu-maker.destroyCallbackUri}")
-    private String destroyCallbackUri;
-
-    @Value("${webhook.tofu-maker.rollbackCallbackUri}")
-    private String rollbackCallbackUri;
-
-    @Value("${webhook.tofu-maker.purgeCallbackUri}")
-    private String purgeCallbackUri;
-
+    @Value("${webhook.tofu-maker.orderCallbackUri}")
+    private String orderCallbackUri;
 }
