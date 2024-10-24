@@ -60,19 +60,24 @@ public class ServiceOrderManager {
      */
     public ServiceOrderEntity storeNewServiceOrderEntity(DeployTask task,
                                                          DeployServiceEntity deployServiceEntity) {
-        ServiceOrderEntity orderTask = new ServiceOrderEntity();
-        orderTask.setOrderId(task.getOrderId());
-        orderTask.setParentOrderId(task.getParentOrderId());
-        orderTask.setTaskType(task.getTaskType());
-        orderTask.setUserId(task.getUserId());
-        orderTask.setDeployServiceEntity(deployServiceEntity);
-        orderTask.setOriginalServerId(task.getServiceId());
-        orderTask.setWorkflowId(task.getWorkflowId());
-        orderTask.setNewDeployRequest(task.getDeployRequest());
-        orderTask.setTaskStatus(TaskStatus.CREATED);
-        if (Objects.nonNull(deployServiceEntity)) {
-            orderTask.setPreviousDeployRequest(deployServiceEntity.getDeployRequest());
-            orderTask.setPreviousDeployedResources(
+        ServiceOrderEntity serviceOrder = new ServiceOrderEntity();
+        serviceOrder.setOrderId(task.getOrderId());
+        serviceOrder.setParentOrderId(task.getParentOrderId());
+        serviceOrder.setTaskType(task.getTaskType());
+        serviceOrder.setUserId(task.getUserId());
+        serviceOrder.setDeployServiceEntity(deployServiceEntity);
+        serviceOrder.setOriginalServerId(task.getServiceId());
+        serviceOrder.setWorkflowId(task.getWorkflowId());
+        serviceOrder.setNewDeployRequest(task.getDeployRequest());
+        serviceOrder.setTaskStatus(TaskStatus.CREATED);
+        if (Objects.nonNull(task.getServiceLockConfig())) {
+            serviceOrder.setPreviousLockConfig(deployServiceEntity.getLockConfig());
+            serviceOrder.setNewLockConfig(task.getServiceLockConfig());
+        }
+        if (Objects.nonNull(task.getDeployRequest())) {
+            serviceOrder.setNewDeployRequest(task.getDeployRequest());
+            serviceOrder.setPreviousDeployRequest(deployServiceEntity.getDeployRequest());
+            serviceOrder.setPreviousDeployedResources(
                     EntityTransUtils.transToDeployResourceList(
                             deployServiceEntity.getDeployResourceList()));
             if (!CollectionUtils.isEmpty(deployServiceEntity.getPrivateProperties())) {
@@ -80,11 +85,11 @@ public class ServiceOrderManager {
                         new HashMap<>(deployServiceEntity.getPrivateProperties()));
             }
             if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
-                orderTask.setPreviousDeployedServiceProperties(
+                serviceOrder.setPreviousDeployedServiceProperties(
                         new HashMap<>(deployServiceEntity.getProperties()));
             }
         }
-        return serviceOrderStorage.storeAndFlush(orderTask);
+        return serviceOrderStorage.storeAndFlush(serviceOrder);
     }
 
     /**

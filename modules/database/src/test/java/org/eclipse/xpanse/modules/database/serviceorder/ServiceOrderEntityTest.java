@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -32,7 +33,6 @@ class ServiceOrderEntityTest {
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
     private final Map<String, Object> newConfigRequest = Map.of();
-
     @Mock
     private DeployRequest mockPreviousDeployRequest;
     @Mock
@@ -44,8 +44,11 @@ class ServiceOrderEntityTest {
     @Mock
     private Map<String, String> mockPreviousDeployedServiceProperties;
     @Mock
+    private ServiceLockConfig mockPreviousLockConfig;
+    @Mock
+    private ServiceLockConfig mockNewLockConfig;
+    @Mock
     private DeployServiceEntity deployServiceEntity;
-
     private ServiceOrderEntity test;
 
     @BeforeEach
@@ -64,6 +67,8 @@ class ServiceOrderEntityTest {
         test.setTaskStatus(taskStatus);
         test.setPreviousDeployRequest(mockPreviousDeployRequest);
         test.setNewDeployRequest(mockNewDeployRequest);
+        test.setPreviousLockConfig(mockPreviousLockConfig);
+        test.setNewLockConfig(mockNewLockConfig);
         test.setPreviousDeployedResources(mockPreviousDeployedResources);
         test.setPreviousDeployedResultProperties(mockPreviousDeployedResultProperties);
         test.setPreviousDeployedServiceProperties(mockPreviousDeployedServiceProperties);
@@ -90,6 +95,8 @@ class ServiceOrderEntityTest {
                 .isEqualTo(mockPreviousDeployedResultProperties);
         assertThat(test.getPreviousDeployedServiceProperties())
                 .isEqualTo(mockPreviousDeployedServiceProperties);
+        assertThat(test.getPreviousLockConfig()).isEqualTo(mockPreviousLockConfig);
+        assertThat(test.getNewLockConfig()).isEqualTo(mockNewLockConfig);
         assertThat(this.test.getNewConfigRequest()).isEqualTo(newConfigRequest);
     }
 
@@ -127,6 +134,8 @@ class ServiceOrderEntityTest {
                 + ", previousDeployedServiceProperties=" + mockPreviousDeployedServiceProperties
                 + ", previousDeployedResultProperties=" + mockPreviousDeployedResultProperties
                 + ", newConfigRequest=" + newConfigRequest
+                + ", previousLockConfig=" + mockPreviousLockConfig
+                + ", newLockConfig=" + mockNewLockConfig
                 + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

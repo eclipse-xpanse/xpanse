@@ -27,6 +27,7 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -117,5 +118,15 @@ public class ServiceOrderEntity implements Serializable {
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private Map<String, Object> newConfigRequest;
+
+    @Column(name = "PREVIOUS_LOCK_CONFIG", columnDefinition = "json")
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private ServiceLockConfig previousLockConfig;
+
+    @Column(name = "NEW_LOCK_CONFIG", columnDefinition = "json")
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private ServiceLockConfig newLockConfig;
 
 }
