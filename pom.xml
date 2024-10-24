@@ -40,7 +40,7 @@
         <lombok.version>1.18.34</lombok.version>
         <checkstyle-maven-plugin.version>3.5.0</checkstyle-maven-plugin.version>
         <logbook.version>3.9.0</logbook.version>
-        <wiremock.version>3.9.1</wiremock.version>
+        <wiremock.version>3.9.2</wiremock.version>
         <instancio.version>5.0.2</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
         <jacoco.version>0.8.12</jacoco.version>
