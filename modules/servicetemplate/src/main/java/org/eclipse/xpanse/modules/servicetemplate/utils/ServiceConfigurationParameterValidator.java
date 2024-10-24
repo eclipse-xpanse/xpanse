@@ -53,23 +53,28 @@ public class ServiceConfigurationParameterValidator {
     public void validateServiceConfigurationParameters(Ocl ocl) {
         OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(
                 ocl.getCloudServiceProvider().getName());
-        File scriptFile = prepareDeployWorkspaceWithScripts(ocl);
-        Map<String, String> resourceMap = plugin.getComputeResourcesInServiceDeployment(scriptFile);
+        List<File> scriptFiles = prepareDeployWorkspaceWithScripts(ocl);
         List<ServiceConfigurationParameter> configurationParameters =
                 ocl.getServiceConfigurationManage().getConfigurationParameters();
-        if (CollectionUtils.isEmpty(resourceMap)
+        if (CollectionUtils.isEmpty(scriptFiles)
                 || CollectionUtils.isEmpty(configurationParameters)) {
             return;
         }
         List<String> errors = new ArrayList<>();
-        configurationParameters.forEach(configurationParameter -> {
-            if (!resourceMap.containsKey(configurationParameter.getManagedBy())) {
-                String errorMsg = String.format(
-                        "managedBy field value %s of %s parameter is not valid",
-                        configurationParameter.getManagedBy(),
-                        configurationParameter.getName());
-                log.error(errorMsg);
-                errors.add(errorMsg);
+        scriptFiles.forEach(scriptFile -> {
+            Map<String, String> resourceMap =
+                    plugin.getComputeResourcesInServiceDeployment(scriptFile);
+            if (!CollectionUtils.isEmpty(resourceMap)) {
+                configurationParameters.forEach(configurationParameter -> {
+                    if (!resourceMap.containsKey(configurationParameter.getManagedBy())) {
+                        String errorMsg = String.format(
+                                "managedBy field value %s of %s parameter is not valid",
+                                configurationParameter.getManagedBy(),
+                                configurationParameter.getName());
+                        log.error(errorMsg);
+                        errors.add(errorMsg);
+                    }
+                });
             }
         });
         if (!CollectionUtils.isEmpty(errors)) {
@@ -77,7 +82,7 @@ public class ServiceConfigurationParameterValidator {
         }
     }
 
-    private File prepareDeployWorkspaceWithScripts(Ocl ocl) {
+    private List<File> prepareDeployWorkspaceWithScripts(Ocl ocl) {
         String workspace = getWorkspacePath(UUID.randomUUID());
         if (Objects.nonNull(ocl.getDeployment().getScriptsRepo())) {
             File[] files = scriptsGitRepoManage
@@ -85,9 +90,9 @@ public class ServiceConfigurationParameterValidator {
             return Arrays.stream(files)
                     .filter(file -> file.getName().endsWith(".tf"))
                     .filter(file -> !CSP_SCRIPT_FILE_NAME.equals(file.getName()))
-                    .toList().getFirst();
+                    .toList();
         } else {
-            return createScriptFile(workspace, ocl.getDeployment().getDeployer());
+            return List.of(createScriptFile(workspace, ocl.getDeployment().getDeployer()));
         }
     }
 
