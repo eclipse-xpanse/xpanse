@@ -136,7 +136,7 @@ public class DeployServiceEntity extends CreateModifiedTime {
     @ToString.Exclude
     private ServiceConfigurationEntity serviceConfigurationEntity;
 
-    @OneToMany(mappedBy = "deployServiceEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "deployServiceEntity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
     private List<ServiceOrderEntity> serviceOrderList;
 
