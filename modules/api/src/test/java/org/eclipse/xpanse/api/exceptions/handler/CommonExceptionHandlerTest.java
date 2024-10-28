@@ -156,8 +156,8 @@ class CommonExceptionHandlerTest {
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.resultType").value("Unprocessable Entity")).andExpect(
                         jsonPath("$.details[0]").value(
-                                "Failed to convert value of type " + "'java.lang.String' to required type "
-                                        + "'org.eclipse.xpanse.modules.models.common.enums.Csp'"));
+                                "Method parameter 'null': Failed to convert value of type" +
+                                        " 'java.lang.String' to required type 'org.eclipse.xpanse.modules.models.common.enums.Csp'"));
     }
 
 }
