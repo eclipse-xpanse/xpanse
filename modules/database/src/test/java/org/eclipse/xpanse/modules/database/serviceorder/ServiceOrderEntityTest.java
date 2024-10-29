@@ -32,7 +32,6 @@ class ServiceOrderEntityTest {
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
     private final Map<String, Object> newConfigRequest = Map.of();
-
     @Mock
     private DeployRequest mockPreviousDeployRequest;
     @Mock
@@ -44,8 +43,9 @@ class ServiceOrderEntityTest {
     @Mock
     private Map<String, String> mockPreviousDeployedServiceProperties;
     @Mock
+    private Object mockRequest;
+    @Mock
     private DeployServiceEntity deployServiceEntity;
-
     private ServiceOrderEntity test;
 
     @BeforeEach
@@ -64,6 +64,7 @@ class ServiceOrderEntityTest {
         test.setTaskStatus(taskStatus);
         test.setPreviousDeployRequest(mockPreviousDeployRequest);
         test.setNewDeployRequest(mockNewDeployRequest);
+        test.setRequestBody(mockRequest);
         test.setPreviousDeployedResources(mockPreviousDeployedResources);
         test.setPreviousDeployedResultProperties(mockPreviousDeployedResultProperties);
         test.setPreviousDeployedServiceProperties(mockPreviousDeployedServiceProperties);
@@ -90,6 +91,7 @@ class ServiceOrderEntityTest {
                 .isEqualTo(mockPreviousDeployedResultProperties);
         assertThat(test.getPreviousDeployedServiceProperties())
                 .isEqualTo(mockPreviousDeployedServiceProperties);
+        assertThat(test.getRequestBody()).isEqualTo(mockRequest);
         assertThat(this.test.getNewConfigRequest()).isEqualTo(newConfigRequest);
     }
 
@@ -127,6 +129,7 @@ class ServiceOrderEntityTest {
                 + ", previousDeployedServiceProperties=" + mockPreviousDeployedServiceProperties
                 + ", previousDeployedResultProperties=" + mockPreviousDeployedResultProperties
                 + ", newConfigRequest=" + newConfigRequest
+                + ", requestBody=" + mockRequest
                 + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

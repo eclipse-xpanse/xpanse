@@ -25,6 +25,8 @@ class DeployTaskTest {
     @Mock
     private DeployRequest mockDeployRequest;
     @Mock
+    private Object mockRequest;
+    @Mock
     private Ocl mockOcl;
     private DeployTask test;
 
@@ -40,6 +42,7 @@ class DeployTaskTest {
         test.setUserId(userId);
         test.setNamespace(namespace);
         test.setDeployRequest(mockDeployRequest);
+        test.setRequest(mockRequest);
         test.setOcl(mockOcl);
         test.setServiceTemplateId(uuid);
     }
@@ -54,9 +57,10 @@ class DeployTaskTest {
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getNamespace()).isEqualTo(namespace);
-        assertThat(test.getDeployRequest()).isEqualTo(mockDeployRequest);
         assertThat(test.getOcl()).isEqualTo(mockOcl);
         assertThat(test.getServiceTemplateId()).isEqualTo(uuid);
+        assertThat(test.getDeployRequest()).isEqualTo(mockDeployRequest);
+        assertThat(test.getRequest()).isEqualTo(mockRequest);
     }
 
     @Test
@@ -85,6 +89,7 @@ class DeployTaskTest {
                 + ", workflowId=" + uuid
                 + ", namespace=" + namespace
                 + ", deployRequest=" + mockDeployRequest
+                + ", request=" + mockRequest
                 + ", ocl=" + mockOcl
                 + ", serviceTemplateId=" + uuid + ")";
         assertEquals(exceptedString, test.toString());

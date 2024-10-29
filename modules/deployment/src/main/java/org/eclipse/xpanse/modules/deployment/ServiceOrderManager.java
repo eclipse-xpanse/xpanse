@@ -70,6 +70,7 @@ public class ServiceOrderManager {
         orderTask.setWorkflowId(task.getWorkflowId());
         orderTask.setNewDeployRequest(task.getDeployRequest());
         orderTask.setTaskStatus(TaskStatus.CREATED);
+        orderTask.setRequestBody(task.getRequest());
         if (Objects.nonNull(deployServiceEntity)) {
             orderTask.setPreviousDeployRequest(deployServiceEntity.getDeployRequest());
             orderTask.setPreviousDeployedResources(

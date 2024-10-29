@@ -12,10 +12,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
@@ -36,15 +38,20 @@ public class DeployServiceEntityConverter {
     /**
      * Method to create a DeployTask from DeployServiceEntity.
      *
+     * @param orderType           ServiceOrderType.
      * @param deployServiceEntity DeployServiceEntity object.
      * @return DeployTask object.
      */
-    public DeployTask getDeployTaskByStoredService(DeployServiceEntity deployServiceEntity) {
+    public DeployTask getDeployTaskByStoredService(ServiceOrderType orderType,
+                                                   DeployServiceEntity deployServiceEntity) {
         // Set Ocl and CreateRequest
         DeployTask deployTask = new DeployTask();
+        deployTask.setOrderId(UUID.randomUUID());
+        deployTask.setTaskType(orderType);
         deployTask.setServiceId(deployServiceEntity.getId());
         deployTask.setUserId(deployServiceEntity.getUserId());
         deployTask.setDeployRequest(deployServiceEntity.getDeployRequest());
+        deployTask.setNamespace(deployServiceEntity.getNamespace());
         ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
                 deployServiceEntity.getServiceTemplateId());
         deployTask.setOcl(serviceTemplateEntity.getOcl());
@@ -70,7 +77,8 @@ public class DeployServiceEntityConverter {
 
     private Map<String, Object> getServiceConfiguration(DeployServiceEntity deployServiceEntity) {
         Map<String, Object> configuration = new HashMap<>();
-        DeployTask deployTask = getDeployTaskByStoredService(deployServiceEntity);
+        DeployTask deployTask = getDeployTaskByStoredService(ServiceOrderType.DEPLOY,
+                deployServiceEntity);
         ServiceConfigurationManage serviceConfigurationManage =
                 deployTask.getOcl().getServiceConfigurationManage();
         if (Objects.nonNull(serviceConfigurationManage)) {
@@ -78,13 +86,13 @@ public class DeployServiceEntityConverter {
                     serviceConfigurationManage.getConfigurationParameters();
             List<ServiceFlavorWithPrice> serviceFlavors =
                     deployTask.getOcl().getFlavors().getServiceFlavors();
-            if (!CollectionUtils.isEmpty(configurationParameters) && !CollectionUtils.isEmpty(
-                    serviceFlavors)) {
-                Map<String, String> properties =
-                        serviceFlavors.stream()
-                                .filter(serviceFlavorWithPrice -> deployTask.getDeployRequest()
-                                        .getFlavor().equals(serviceFlavorWithPrice.getName()))
-                                .findFirst().get().getProperties();
+            if (!CollectionUtils.isEmpty(configurationParameters)
+                    && !CollectionUtils.isEmpty(serviceFlavors)) {
+                Map<String, String> properties = serviceFlavors.stream().filter(
+                                serviceFlavorWithPrice -> deployTask.getDeployRequest().getFlavor()
+                                        .equals(serviceFlavorWithPrice.getName()))
+                        .findFirst().map(ServiceFlavorWithPrice::getProperties)
+                        .orElse(new HashMap<>());
                 configurationParameters.forEach(config -> {
                     String name = config.getName();
                     if (!properties.isEmpty() && properties.containsKey(name)) {

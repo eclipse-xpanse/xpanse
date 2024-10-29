@@ -15,11 +15,15 @@ import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
+import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
+import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.servicelock.ServiceLockConfigService;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
@@ -50,7 +54,8 @@ import org.springframework.web.context.WebApplicationContext;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ServiceDeployerApi.class, DeployService.class, WorkflowUtils.class,
         DeploymentExceptionHandler.class, UserServiceHelper.class, IdentityProviderManager.class,
-        CspPluginValidator.class, PluginManager.class})
+        ServiceLockConfigService.class, ServiceOrderManager.class, CspPluginValidator.class,
+        DeployServiceEntityConverter.class, PluginManager.class})
 @WebMvcTest
 class DeploymentExceptionHandlerTest {
     private MockMvc mockMvc;
@@ -72,6 +77,12 @@ class DeploymentExceptionHandlerTest {
     private CspPluginValidator cspPluginValidator;
     @MockBean
     private OrchestratorPlugin orchestratorPlugin;
+    @MockBean
+    private ServiceOrderManager serviceOrderManager;
+    @MockBean
+    private ServiceOrderStorage serviceOrderStorage;
+    @MockBean
+    private DeployServiceEntityConverter deployServiceEntityConverter;
 
     @BeforeEach
     public void setup() {

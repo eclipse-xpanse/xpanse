@@ -27,6 +27,7 @@ import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.api.config.OrderFailedApiResponses;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
+import org.eclipse.xpanse.modules.deployment.servicelock.ServiceLockConfigService;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
@@ -76,6 +77,8 @@ public class ServiceDeployerApi {
     private long duration;
     @Resource
     private DeployService deployService;
+    @Resource
+    private ServiceLockConfigService lockConfigService;
     @Resource
     private ServiceDetailsViewManager serviceDetailsViewManager;
 
@@ -235,13 +238,14 @@ public class ServiceDeployerApi {
     @Operation(description = "Change the lock config of the service.")
     @PutMapping(value = "/services/changelock/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    public void changeServiceLockConfig(
+    public ServiceOrder changeServiceLockConfig(
             @Parameter(name = "serviceId", description = "Id of the service")
             @PathVariable("serviceId") String serviceId,
             @Valid @RequestBody ServiceLockConfig serviceLockConfig) {
-        this.deployService.changeServiceLockConfig(UUID.fromString(serviceId), serviceLockConfig);
+        return this.lockConfigService.changeServiceLockConfig(UUID.fromString(serviceId),
+                serviceLockConfig);
     }
 
     /**
