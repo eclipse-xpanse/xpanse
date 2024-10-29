@@ -86,7 +86,7 @@
         <swagger.parser.version>2.1.23</swagger.parser.version>
         <swagger.core.v3.version>2.2.25</swagger.core.v3.version>
         <hcl4j.version>0.9.4</hcl4j.version>
-        <jackson.datatype.jsr310.version>2.18.0</jackson.datatype.jsr310.version>
+        <jackson.datatype.jsr310.version>2.18.1</jackson.datatype.jsr310.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
