@@ -59,9 +59,14 @@ public class DeployTask {
     private String namespace;
 
     /**
-     * The Ocl object of the deployment task.
+     * The deployment request.
      */
     private DeployRequest deployRequest;
+
+    /**
+     * The order request of the order task.
+     */
+    private Object request;
 
     /**
      * The Ocl object of the deployment task.

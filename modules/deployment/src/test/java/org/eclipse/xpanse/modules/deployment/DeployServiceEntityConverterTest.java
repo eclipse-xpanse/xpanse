@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
@@ -13,7 +12,13 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.servicetemplate.*;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
+import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,9 +73,11 @@ class DeployServiceEntityConverterTest {
 
     @Test
     void testGetDeployTaskByStoredService() {
-        DeployTask deployTask = converter.getDeployTaskByStoredService(deployServiceEntity);
+        DeployTask deployTask = converter.getDeployTaskByStoredService(
+                ServiceOrderType.DEPLOY, deployServiceEntity);
 
         assertNotNull(deployTask);
+        assertEquals(ServiceOrderType.DEPLOY, deployTask.getTaskType());
         assertEquals(deployServiceEntity.getId(), deployTask.getServiceId());
         assertEquals(deployServiceEntity.getDeployRequest(), deployTask.getDeployRequest());
         assertEquals(serviceTemplateEntity.getOcl(), deployTask.getOcl());

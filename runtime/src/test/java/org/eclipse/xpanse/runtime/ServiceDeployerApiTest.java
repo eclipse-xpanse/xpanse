@@ -37,6 +37,7 @@ import java.util.Objects;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -51,8 +52,10 @@ import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
@@ -781,7 +784,14 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     void testChangeLockConfig(UUID serviceId, ServiceLockConfig lockConfig) throws Exception {
         // Run the test
         final MockHttpServletResponse changeLockResponse = changeLockConfig(serviceId, lockConfig);
-        assertEquals(HttpStatus.NO_CONTENT.value(), changeLockResponse.getStatus());
+        assertEquals(HttpStatus.OK.value(), changeLockResponse.getStatus());
+        ServiceOrder serviceOrder =
+                objectMapper.readValue(changeLockResponse.getContentAsString(), ServiceOrder.class);
+        assertEquals(serviceId, serviceOrder.getServiceId());
+        ServiceOrderEntity serviceOrderEntity =
+                serviceOrderStorage.getEntityById(serviceOrder.getOrderId());
+        assertEquals(serviceOrderEntity.getTaskType(), ServiceOrderType.LOCK_CHANGE);
+        assertEquals(serviceOrderEntity.getTaskStatus(), TaskStatus.SUCCESSFUL);
     }
 
 

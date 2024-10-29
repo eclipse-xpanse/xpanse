@@ -118,4 +118,9 @@ public class ServiceOrderEntity implements Serializable {
     @Convert(converter = ObjectJsonConverter.class)
     private Map<String, Object> newConfigRequest;
 
+    @Column(name = "REQUEST_BODY", columnDefinition = "json")
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private Object requestBody;
+
 }

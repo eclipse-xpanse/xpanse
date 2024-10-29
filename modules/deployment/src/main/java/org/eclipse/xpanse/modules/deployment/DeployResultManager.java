@@ -112,8 +112,8 @@ public class DeployResultManager {
                 updateDeployServiceEntityWithDeployResult(deployResult, taskType);
         // When the task failed and task type is deploy or retry, start a new order to rollback.
         if (isFailedDeployTask(deployResult.getIsTaskSuccessful(), taskType)) {
-            DeployTask rollbackTask =
-                    deployServiceEntityConverter.getDeployTaskByStoredService(updatedServiceEntity);
+            DeployTask rollbackTask = deployServiceEntityConverter.getDeployTaskByStoredService(
+                            ServiceOrderType.ROLLBACK, updatedServiceEntity);
             rollbackTask.setParentOrderId(orderId);
             rollbackOnDeploymentFailure(rollbackTask, updatedServiceEntity);
         }

@@ -121,7 +121,6 @@ class TerraformBootDeploymentTest {
         deployRequest.setCategory(ocl.getCategory());
         deployRequest.setCustomerServiceName("test_deploy");
         deployRequest.setServiceRequestProperties(Map.ofEntries(Map.entry("key", "value")));
-
         deployTask = new DeployTask();
         deployTask.setServiceId(serviceId);
         deployTask.setOrderId(orderId);

@@ -308,6 +308,7 @@ public class DeployService {
         deployTask.setServiceId(deployRequest.getServiceId());
         deployTask.setUserId(deployRequest.getUserId());
         deployTask.setDeployRequest(deployRequest);
+        deployTask.setRequest(deployRequest);
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
         deployTask.setNamespace(existingServiceTemplate.getNamespace());
         deployTask.setOcl(existingServiceTemplate.getOcl());
@@ -437,24 +438,6 @@ public class DeployService {
         }
     }
 
-    /**
-     * Method to change lock config of service.
-     *
-     * @param serviceId deployed service id.
-     * @param config    serviceLockConfig.
-     */
-    public void changeServiceLockConfig(UUID serviceId, ServiceLockConfig config) {
-        DeployServiceEntity deployServiceEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(serviceId);
-        boolean currentUserIsOwner =
-                this.userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException("No permissions to change lock config of services "
-                    + "belonging to other users.");
-        }
-        deployServiceEntity.setLockConfig(config);
-        deployServiceStorage.storeAndFlush(deployServiceEntity);
-    }
 
     /**
      * Get modify task by stored deploy service entity.
@@ -506,15 +489,10 @@ public class DeployService {
                     modifyRequest.getServiceRequestProperties());
         }
         validateDeployRequestWithServiceTemplate(existingServiceTemplate, newDeployRequest);
-        DeployTask modifyTask = new DeployTask();
-        modifyTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
-        modifyTask.setTaskType(ServiceOrderType.MODIFY);
-        modifyTask.setServiceId(deployServiceEntity.getId());
-        modifyTask.setUserId(modifyRequest.getUserId());
-        modifyTask.setServiceTemplateId(deployServiceEntity.getServiceTemplateId());
-        modifyTask.setNamespace(deployServiceEntity.getNamespace());
+        DeployTask modifyTask = deployServiceEntityConverter.getDeployTaskByStoredService(
+                ServiceOrderType.MODIFY, deployServiceEntity);
         modifyTask.setDeployRequest(newDeployRequest);
-        modifyTask.setOcl(existingServiceTemplate.getOcl());
+        modifyTask.setRequest(modifyRequest);
         return modifyTask;
     }
 
@@ -662,10 +640,8 @@ public class DeployService {
         UUID serviceId = UUID.fromString(id);
         DeployServiceEntity deployServiceEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(serviceId);
-        DeployTask destroyTask =
-                deployServiceEntityConverter.getDeployTaskByStoredService(deployServiceEntity);
-        destroyTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
-        destroyTask.setTaskType(ServiceOrderType.DESTROY);
+        DeployTask destroyTask = deployServiceEntityConverter.getDeployTaskByStoredService(
+                ServiceOrderType.DESTROY, deployServiceEntity);
         destroy(destroyTask, deployServiceEntity);
     }
 
@@ -690,11 +666,8 @@ public class DeployService {
                     String.format("Service %s with the state %s is not allowed to destroy.",
                             deployServiceEntity.getId(), state));
         }
-        DeployTask destroyTask =
-                deployServiceEntityConverter.getDeployTaskByStoredService(deployServiceEntity);
-        destroyTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
-        destroyTask.setTaskType(ServiceOrderType.DESTROY);
-        return destroyTask;
+        return deployServiceEntityConverter.getDeployTaskByStoredService(
+                ServiceOrderType.DESTROY, deployServiceEntity);
     }
 
     /**
@@ -715,11 +688,8 @@ public class DeployService {
                     String.format("Service %s with the state %s is not allowed to purge.",
                             deployServiceEntity.getId(), state));
         }
-        DeployTask purgeTask =
-                deployServiceEntityConverter.getDeployTaskByStoredService(deployServiceEntity);
-        purgeTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
-        purgeTask.setTaskType(ServiceOrderType.PURGE);
-        return purgeTask;
+        return deployServiceEntityConverter.getDeployTaskByStoredService(
+                ServiceOrderType.PURGE, deployServiceEntity);
     }
 
 
@@ -740,11 +710,8 @@ public class DeployService {
                     String.format("Service %s with the state %s is not allowed to redeploy.",
                             deployServiceEntity.getId(), state));
         }
-        DeployTask redeployTask =
-                deployServiceEntityConverter.getDeployTaskByStoredService(deployServiceEntity);
-        redeployTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
-        redeployTask.setTaskType(ServiceOrderType.RETRY);
-        return redeployTask;
+        return deployServiceEntityConverter.getDeployTaskByStoredService(
+                ServiceOrderType.RETRY, deployServiceEntity);
     }
 
 
