@@ -14,8 +14,8 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -45,7 +45,7 @@ public class ProviderAuthInfoResolver {
     @Resource
     private DeployEnvironments deployEnvironments;
     @Resource
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     private Environment environment;
     @Resource
@@ -140,16 +140,16 @@ public class ProviderAuthInfoResolver {
      * @return auth url
      */
     private String getAuthUrlFromDeploymentVariables(Csp csp, UUID serviceId) {
-        DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(
-                serviceId);
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
         ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
-                deployServiceEntity.getServiceTemplateId());
+                serviceDeploymentEntity.getServiceTemplateId());
         Map<String, Object> serviceRequestVariables =
                 this.deployEnvironments.getAllDeploymentVariablesForService(
-                        deployServiceEntity.getDeployRequest().getServiceRequestProperties(),
+                        serviceDeploymentEntity.getDeployRequest().getServiceRequestProperties(),
                         serviceTemplateEntity.getOcl().getDeployment()
                                 .getVariables(),
-                        deployServiceEntity.getFlavor(),
+                        serviceDeploymentEntity.getFlavor(),
                         serviceTemplateEntity.getOcl()
                 );
         Object defaultAuthUrl =

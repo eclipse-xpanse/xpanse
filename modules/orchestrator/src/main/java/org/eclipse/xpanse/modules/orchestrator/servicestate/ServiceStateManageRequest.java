@@ -9,7 +9,7 @@ package org.eclipse.xpanse.modules.orchestrator.servicestate;
 import java.util.List;
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 
 /**
@@ -20,7 +20,7 @@ public class ServiceStateManageRequest {
 
     private String userId;
     private Region region;
-    private List<DeployResourceEntity> deployResourceEntityList;
+    private List<ServiceResourceEntity> serviceResourceEntityList;
     private UUID serviceId;
 
 }

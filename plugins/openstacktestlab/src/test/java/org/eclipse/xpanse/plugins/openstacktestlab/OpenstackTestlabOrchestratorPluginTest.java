@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
+import org.eclipse.xpanse.modules.database.service.DatabaseServiceDeploymentStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -131,7 +131,7 @@ class OpenstackTestlabOrchestratorPluginTest {
     @MockBean
     private OpenstackServicePriceCalculator mockPriceCalculator;
     @MockBean
-    private DatabaseDeployServiceStorage databaseDeployServiceStorage;
+    private DatabaseServiceDeploymentStorage databaseServiceDeploymentStorage;
     @MockBean
     private ServiceTemplateStorage serviceTemplateStorage;
     @MockBean
@@ -254,10 +254,10 @@ class OpenstackTestlabOrchestratorPluginTest {
         serviceStateManageRequest.setServiceId(uuid);
         serviceStateManageRequest.setUserId(userId);
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(uuid);
-        deployResourceEntity.setResourceId(resourceId);
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(uuid);
+        serviceResourceEntity.setResourceId(resourceId);
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
         return serviceStateManageRequest;
     }
 
@@ -293,10 +293,10 @@ class OpenstackTestlabOrchestratorPluginTest {
     void mockGetAuthUrl() {
         when(this.mockCredentialCenter.getCredential(any(), any(), any(), any())).thenReturn(
                 getCredentialDefinition());
-        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
+        ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
         DeployRequest deployRequest = new DeployRequest();
-        deployServiceEntity.setDeployRequest(deployRequest);
-        deployServiceEntity.setServiceTemplateId(UUID.randomUUID());
+        serviceDeploymentEntity.setDeployRequest(deployRequest);
+        serviceDeploymentEntity.setServiceTemplateId(UUID.randomUUID());
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         Ocl ocl = new Ocl();
         Deployment deployment = new Deployment();
@@ -304,8 +304,8 @@ class OpenstackTestlabOrchestratorPluginTest {
         deployment.setVariables(variables);
         ocl.setDeployment(deployment);
         serviceTemplateEntity.setOcl(ocl);
-        when(this.databaseDeployServiceStorage.findDeployServiceById(any())).thenReturn(
-                deployServiceEntity);
+        when(this.databaseServiceDeploymentStorage.findServiceDeploymentById(any())).thenReturn(
+                serviceDeploymentEntity);
         when(this.serviceTemplateStorage.getServiceTemplateById(any())).thenReturn(
                 serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(

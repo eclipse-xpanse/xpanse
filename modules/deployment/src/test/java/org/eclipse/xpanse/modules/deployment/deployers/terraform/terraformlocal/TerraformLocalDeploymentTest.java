@@ -23,7 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
@@ -180,10 +180,10 @@ class TerraformLocalDeploymentTest {
     @Test
     void testModify() {
         String tfState = getFileContent();
-        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
+        ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
+        serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
-                deployServiceEntity);
+                serviceDeploymentEntity);
 
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.MODIFY);
         DeployResult deployResult = terraformLocalDeployment.modify(deployTask);
@@ -206,10 +206,10 @@ class TerraformLocalDeploymentTest {
     @Test
     void testDestroy() {
         String tfState = getFileContent();
-        DeployServiceEntity deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
+        ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
+        serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
         when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
-                deployServiceEntity);
+                serviceDeploymentEntity);
 
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
         DeployResult destroyResult = terraformLocalDeployment.destroy(deployTask);

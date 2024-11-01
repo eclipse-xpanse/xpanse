@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
@@ -131,19 +131,19 @@ public class ServiceConfigurationManager {
     public ServiceOrder changeServiceConfiguration(String serviceId,
                                                    ServiceConfigurationUpdate configurationUpdate) {
         try {
-            DeployServiceEntity deployServiceEntity =
+            ServiceDeploymentEntity serviceDeploymentEntity =
                     deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(serviceId));
             ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage
-                    .getServiceTemplateById(deployServiceEntity.getServiceTemplateId());
+                    .getServiceTemplateById(serviceDeploymentEntity.getServiceTemplateId());
             if (Objects.isNull(serviceTemplateEntity)) {
                 String errMsg = String.format("Service template with id %s not found.",
-                        deployServiceEntity.getServiceTemplateId());
+                        serviceDeploymentEntity.getServiceTemplateId());
                 log.error(errMsg);
                 throw new ServiceTemplateNotRegistered(errMsg);
             }
             validate(serviceTemplateEntity, configurationUpdate);
             UUID orderId = CustomRequestIdGenerator.generateOrderId();
-            addServiceConfigurationChangeDetails(orderId, serviceId, deployServiceEntity,
+            addServiceConfigurationChangeDetails(orderId, serviceId, serviceDeploymentEntity,
                     serviceTemplateEntity.getOcl(), configurationUpdate.getConfiguration());
             return new ServiceOrder(orderId, UUID.fromString(serviceId));
         } catch (ServiceConfigurationInvalidException e) {
@@ -179,7 +179,7 @@ public class ServiceConfigurationManager {
 
 
     private void addServiceConfigurationChangeDetails(UUID orderId, String serviceId,
-                                                      DeployServiceEntity deployServiceEntity,
+                                                      ServiceDeploymentEntity serviceDeployment,
                                                       Ocl ocl,
                                                       Map<String, Object> updateRequestMap) {
 
@@ -206,13 +206,13 @@ public class ServiceConfigurationManager {
                             if (configManageScript.getRunOnlyOnce()) {
                                 ServiceConfigurationChangeDetailsEntity request =
                                         getServiceConfigurationChangeDetails(orderId, groupName,
-                                                deployServiceEntity, properties, updateRequestMap);
+                                                serviceDeployment, properties, updateRequestMap);
                                 requests.add(request);
                             } else {
                                 deployResourceList.forEach(deployResource -> {
                                     ServiceConfigurationChangeDetailsEntity request =
                                             getServiceConfigurationChangeDetails(orderId, groupName,
-                                                    deployServiceEntity, properties,
+                                                    serviceDeployment, properties,
                                                     updateRequestMap);
                                     request.setResourceName(deployResource.getResourceName());
                                     requests.add(request);
@@ -248,7 +248,7 @@ public class ServiceConfigurationManager {
     }
 
     private ServiceConfigurationChangeDetailsEntity getServiceConfigurationChangeDetails(
-            UUID orderId, String groupName, DeployServiceEntity entity,
+            UUID orderId, String groupName, ServiceDeploymentEntity entity,
             Map<String, Object> properties, Map<String, Object> updateRequestMap) {
 
         ServiceConfigurationChangeDetailsEntity request =
@@ -257,14 +257,14 @@ public class ServiceConfigurationManager {
         ServiceOrderEntity serviceOrderEntity =
                 saveServiceOrder(orderId, entity, updateRequestMap);
         request.setServiceOrderEntity(serviceOrderEntity);
-        request.setDeployServiceEntity(entity);
+        request.setServiceDeploymentEntity(entity);
         request.setConfigManager(groupName);
         request.setProperties(properties);
         request.setStatus(ServiceConfigurationStatus.PENDING);
         return request;
     }
 
-    private ServiceOrderEntity saveServiceOrder(UUID orderId, DeployServiceEntity entity,
+    private ServiceOrderEntity saveServiceOrder(UUID orderId, ServiceDeploymentEntity entity,
                                                 Map<String, Object> updateRequestMap) {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
         serviceOrderEntity.setOrderId(orderId);
@@ -273,7 +273,7 @@ public class ServiceConfigurationManager {
         } else {
             entity.setServiceOrderList(List.of(serviceOrderEntity));
         }
-        serviceOrderEntity.setDeployServiceEntity(entity);
+        serviceOrderEntity.setServiceDeploymentEntity(entity);
         serviceOrderEntity.setTaskType(ServiceOrderType.CONFIG_CHANGE);
         serviceOrderEntity.setUserId(userServiceHelper.getCurrentUserId());
         serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
@@ -428,10 +428,10 @@ public class ServiceConfigurationManager {
             ServiceConfigurationChangeDetailsEntity request) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(request
-                        .getDeployServiceEntity().getServiceTemplateId());
+                        .getServiceDeploymentEntity().getServiceTemplateId());
         if (Objects.isNull(serviceTemplateEntity)) {
             String errMsg = String.format("Service template with id %s not found.",
-                    request.getDeployServiceEntity().getServiceTemplateId());
+                    request.getServiceDeploymentEntity().getServiceTemplateId());
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
@@ -467,9 +467,9 @@ public class ServiceConfigurationManager {
 
     private List<DeployResource> getDeployResources(UUID serviceId,
                                                     DeployResourceKind resourceKind) {
-        DeployServiceEntity deployedService =
+        ServiceDeploymentEntity deployedService =
                 deployServiceEntityHandler.getDeployServiceEntity(serviceId);
-        Stream<DeployResourceEntity> resourceEntities =
+        Stream<ServiceResourceEntity> resourceEntities =
                 deployedService.getDeployResourceList().stream();
         if (Objects.nonNull(resourceKind)) {
             resourceEntities = resourceEntities.filter(
@@ -512,15 +512,15 @@ public class ServiceConfigurationManager {
         ServiceConfigurationChangeDetailsQueryModel model =
                 new ServiceConfigurationChangeDetailsQueryModel(
                         request.getServiceOrderEntity().getOrderId(),
-                        request.getDeployServiceEntity().getId(),
+                        request.getServiceDeploymentEntity().getId(),
                         null, null, null);
         List<ServiceConfigurationChangeDetailsEntity> requests =
                 serviceConfigurationChangeDetailsStorage
                         .listServiceConfigurationChangeDetails(model);
 
         if (CollectionUtils.isEmpty(requests)) {
-            String errorMsg = String.format("Service configuration change details "
-                    + "with service id %s not found, ", request.getDeployServiceEntity().getId());
+            String errorMsg = String.format("Service configuration change details with service "
+                    + "id %s not found, ", request.getServiceDeploymentEntity().getId());
             log.error(errorMsg);
             throw new ServiceConfigurationChangeDetailsEntityNotFoundException(errorMsg);
         }
@@ -552,7 +552,7 @@ public class ServiceConfigurationManager {
 
     private void updateServiceConfiguration(ServiceConfigurationChangeDetailsEntity request) {
         ServiceConfigurationEntity serviceConfigurationEntity =
-                request.getDeployServiceEntity().getServiceConfigurationEntity();
+                request.getServiceDeploymentEntity().getServiceConfigurationEntity();
         Map<String, Object> config = request.getServiceOrderEntity().getNewConfigRequest();
         serviceConfigurationEntity.setConfiguration(config);
         serviceConfigurationEntity.setUpdatedTime(OffsetDateTime.now());

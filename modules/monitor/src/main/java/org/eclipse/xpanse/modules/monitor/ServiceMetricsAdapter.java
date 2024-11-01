@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceStorage;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
@@ -43,9 +43,9 @@ public class ServiceMetricsAdapter {
 
     private static final long FIVE_MINUTES_MILLISECONDS = 5 * 60 * 1000;
     @Resource
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
-    private DeployResourceStorage deployResourceStorage;
+    private ServiceResourceStorage serviceResourceStorage;
     @Resource
     private PluginManager pluginManager;
     @Resource
@@ -58,8 +58,8 @@ public class ServiceMetricsAdapter {
                                               Long to, Integer granularity,
                                               boolean onlyLastKnownMetric) {
         validateToAndFromValues(from, to);
-        DeployServiceEntity serviceEntity = findDeployServiceEntity(UUID.fromString(id));
-        List<DeployResourceEntity> vmEntities = serviceEntity.getDeployResourceList().stream()
+        ServiceDeploymentEntity serviceEntity = findDeployServiceEntity(UUID.fromString(id));
+        List<ServiceResourceEntity> vmEntities = serviceEntity.getDeployResourceList().stream()
                 .filter(entity -> entity.getResourceKind().equals(DeployResourceKind.VM)).toList();
         if (CollectionUtils.isEmpty(vmEntities)) {
             throw new ResourceNotFoundException("No resource found in the service.");
@@ -90,8 +90,8 @@ public class ServiceMetricsAdapter {
                                                Long from, Long to, Integer granularity,
                                                boolean onlyLastKnownMetric) {
         validateToAndFromValues(from, to);
-        DeployResourceEntity resourceEntity =
-                deployResourceStorage.findDeployResourceByResourceId(id);
+        ServiceResourceEntity resourceEntity =
+                serviceResourceStorage.findServiceResourceByResourceId(id);
         if (Objects.isNull(resourceEntity)) {
             throw new ResourceNotFoundException("Resource not found.");
         }
@@ -103,8 +103,8 @@ public class ServiceMetricsAdapter {
         }
         DeployResource deployResource = new DeployResource();
         BeanUtils.copyProperties(resourceEntity, deployResource);
-        DeployServiceEntity serviceEntity =
-                findDeployServiceEntity(resourceEntity.getDeployService().getId());
+        ServiceDeploymentEntity serviceEntity =
+                findDeployServiceEntity(resourceEntity.getServiceDeploymentEntity().getId());
 
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(serviceEntity.getUserId());
@@ -117,14 +117,15 @@ public class ServiceMetricsAdapter {
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
         Region region = serviceEntity.getDeployRequest().getRegion();
         ResourceMetricsRequest resourceMetricRequest = getResourceMetricRequest(
-                resourceEntity.getDeployService().getId(), region, deployResource,
+                resourceEntity.getServiceDeploymentEntity().getId(), region, deployResource,
                 monitorType, from, to, granularity, onlyLastKnownMetric, serviceEntity.getUserId());
         return orchestratorPlugin.getMetricsForResource(resourceMetricRequest);
     }
 
 
-    private DeployServiceEntity findDeployServiceEntity(UUID id) {
-        DeployServiceEntity serviceEntity = deployServiceStorage.findDeployServiceById(id);
+    private ServiceDeploymentEntity findDeployServiceEntity(UUID id) {
+        ServiceDeploymentEntity serviceEntity =
+                serviceDeploymentStorage.findServiceDeploymentById(id);
         if (Objects.isNull(serviceEntity)) {
             throw new ServiceNotDeployedException("Service not found.");
         }

@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -338,20 +338,20 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(region);
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.startService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(region);
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockHuaweiCloudVmStateManager.startService(serviceStateManageRequest1)).thenReturn(
                 false);
 
@@ -373,20 +373,20 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(region);
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.startService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(region);
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockHuaweiCloudVmStateManager.startService(serviceStateManageRequest1)).thenReturn(
                 true);
 
@@ -408,20 +408,20 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(region);
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.stopService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(region);
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockHuaweiCloudVmStateManager.stopService(serviceStateManageRequest1)).thenReturn(
                 false);
 
@@ -443,20 +443,20 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(region);
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.stopService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(region);
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockHuaweiCloudVmStateManager.stopService(serviceStateManageRequest1)).thenReturn(
                 true);
 
@@ -478,20 +478,20 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(region);
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.restartService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(region);
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockHuaweiCloudVmStateManager.restartService(serviceStateManageRequest1)).thenReturn(
                 false);
 
@@ -513,20 +513,20 @@ class HuaweiCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(region);
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure HuaweiCloudVmStateManager.restartService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(region);
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("06e10d9a-d32c-432e-94a2-d4bf4af17ee6"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockHuaweiCloudVmStateManager.restartService(serviceStateManageRequest1)).thenReturn(
                 true);
 

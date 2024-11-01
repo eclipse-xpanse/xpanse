@@ -17,8 +17,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
@@ -44,7 +44,7 @@ public class ServiceOrderManager {
     @Resource
     private ServiceOrderStorage serviceOrderStorage;
     @Resource
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     private UserServiceHelper userServiceHelper;
     @Resource
@@ -56,33 +56,33 @@ public class ServiceOrderManager {
      * Create service order entity and store into the database.
      *
      * @param task                task to be created
-     * @param deployServiceEntity deploy service entity
+     * @param serviceDeployment deploy service entity
      */
     public ServiceOrderEntity storeNewServiceOrderEntity(DeployTask task,
-                                                         DeployServiceEntity deployServiceEntity) {
+            ServiceDeploymentEntity serviceDeployment) {
         ServiceOrderEntity orderTask = new ServiceOrderEntity();
         orderTask.setOrderId(task.getOrderId());
         orderTask.setParentOrderId(task.getParentOrderId());
         orderTask.setTaskType(task.getTaskType());
         orderTask.setUserId(task.getUserId());
-        orderTask.setDeployServiceEntity(deployServiceEntity);
+        orderTask.setServiceDeploymentEntity(serviceDeployment);
         orderTask.setOriginalServerId(task.getServiceId());
         orderTask.setWorkflowId(task.getWorkflowId());
         orderTask.setNewDeployRequest(task.getDeployRequest());
         orderTask.setTaskStatus(TaskStatus.CREATED);
         orderTask.setRequestBody(task.getRequest());
-        if (Objects.nonNull(deployServiceEntity)) {
-            orderTask.setPreviousDeployRequest(deployServiceEntity.getDeployRequest());
+        if (Objects.nonNull(serviceDeployment)) {
+            orderTask.setPreviousDeployRequest(serviceDeployment.getDeployRequest());
             orderTask.setPreviousDeployedResources(
                     EntityTransUtils.transToDeployResourceList(
-                            deployServiceEntity.getDeployResourceList()));
-            if (!CollectionUtils.isEmpty(deployServiceEntity.getPrivateProperties())) {
-                deployServiceEntity.setPrivateProperties(
-                        new HashMap<>(deployServiceEntity.getPrivateProperties()));
+                            serviceDeployment.getDeployResourceList()));
+            if (!CollectionUtils.isEmpty(serviceDeployment.getPrivateProperties())) {
+                serviceDeployment.setPrivateProperties(
+                        new HashMap<>(serviceDeployment.getPrivateProperties()));
             }
-            if (!CollectionUtils.isEmpty(deployServiceEntity.getProperties())) {
+            if (!CollectionUtils.isEmpty(serviceDeployment.getProperties())) {
                 orderTask.setPreviousDeployedServiceProperties(
-                        new HashMap<>(deployServiceEntity.getProperties()));
+                        new HashMap<>(serviceDeployment.getProperties()));
             }
         }
         return serviceOrderStorage.storeAndFlush(orderTask);
@@ -112,7 +112,8 @@ public class ServiceOrderManager {
             UUID serviceId, ServiceOrderType taskType, TaskStatus taskStatus) {
         validateDeployService(serviceId);
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
+        query.setServiceDeploymentEntity(serviceDeploymentStorage
+                .findServiceDeploymentById(serviceId));
         query.setTaskType(taskType);
         query.setTaskStatus(taskStatus);
         if (!userServiceHelper.currentUserHasRole(ROLE_ADMIN)) {
@@ -156,7 +157,8 @@ public class ServiceOrderManager {
     public void deleteOrdersByServiceId(UUID serviceId) {
         validateDeployService(serviceId);
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
+        query.setServiceDeploymentEntity(serviceDeploymentStorage
+                .findServiceDeploymentById(serviceId));
         if (!userServiceHelper.currentUserHasRole(ROLE_ADMIN)) {
             query.setUserId(userServiceHelper.getCurrentUserId());
         }
@@ -187,7 +189,8 @@ public class ServiceOrderManager {
     }
 
     private void validateDeployService(UUID serviceId) {
-        DeployServiceEntity deployedService = deployServiceStorage.findDeployServiceById(serviceId);
+        ServiceDeploymentEntity deployedService =
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
         if (Objects.nonNull(deployedService)) {
             if (isNotOwnerOrAdminUser(deployedService)) {
                 String errorMsg =
@@ -210,7 +213,7 @@ public class ServiceOrderManager {
     private ServiceOrderEntity getServiceOrderEntity(UUID orderId) {
         ServiceOrderEntity orderEntity = serviceOrderStorage.getEntityById(orderId);
         if (Objects.nonNull(orderEntity)) {
-            DeployServiceEntity deployedService = orderEntity.getDeployServiceEntity();
+            ServiceDeploymentEntity deployedService = orderEntity.getServiceDeploymentEntity();
             if (Objects.nonNull(deployedService)) {
                 if (isNotOwnerOrAdminUser(deployedService)) {
                     String errorMsg =
@@ -222,8 +225,8 @@ public class ServiceOrderManager {
         return orderEntity;
     }
 
-    private boolean isNotOwnerOrAdminUser(DeployServiceEntity deployServiceEntity) {
-        boolean isOwner = userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
+    private boolean isNotOwnerOrAdminUser(ServiceDeploymentEntity serviceDeploymentEntity) {
+        boolean isOwner = userServiceHelper.currentUserIsOwner(serviceDeploymentEntity.getUserId());
         boolean isAdmin = userServiceHelper.currentUserHasRole(ROLE_ADMIN);
         return !isOwner && !isAdmin;
     }

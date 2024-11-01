@@ -21,9 +21,9 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
@@ -82,7 +82,7 @@ public class DeployService {
     @Resource
     private ServiceTemplateStorage serviceTemplateStorage;
     @Resource
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     private ServiceDeployVariablesJsonSchemaValidator serviceDeployVariablesJsonSchemaValidator;
     @Resource
@@ -131,9 +131,10 @@ public class DeployService {
     public ServiceOrder createOrderToRedeployFailedService(UUID serviceId) {
         MDC.put(SERVICE_ID, serviceId.toString());
         String errMsg = "No permissions to redeploy services belonging to other users.";
-        DeployServiceEntity deployServiceEntity = getServiceOwnedByCurrentUser(serviceId, errMsg);
-        DeployTask redeployTask = getRedeployTask(deployServiceEntity);
-        redeployService(redeployTask, deployServiceEntity);
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                getServiceOwnedByCurrentUser(serviceId, errMsg);
+        DeployTask redeployTask = getRedeployTask(serviceDeploymentEntity);
+        redeployService(redeployTask, serviceDeploymentEntity);
         log.info("Order task {} to redeploy failed service {} started.",
                 redeployTask.getOrderId(), redeployTask.getServiceId());
         return new ServiceOrder(redeployTask.getOrderId(), redeployTask.getServiceId());
@@ -152,9 +153,10 @@ public class DeployService {
         MDC.put(SERVICE_ID, serviceId.toString());
         modifyRequest.setUserId(this.userServiceHelper.getCurrentUserId());
         String errMsg = "No permissions to modify services belonging to other users.";
-        DeployServiceEntity deployServiceEntity = getServiceOwnedByCurrentUser(serviceId, errMsg);
-        DeployTask modifyTask = getModifyTask(modifyRequest, deployServiceEntity);
-        modifyService(modifyTask, deployServiceEntity);
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                getServiceOwnedByCurrentUser(serviceId, errMsg);
+        DeployTask modifyTask = getModifyTask(modifyRequest, serviceDeploymentEntity);
+        modifyService(modifyTask, serviceDeploymentEntity);
         log.info("Order task {} to modify deployed service {} started.",
                 modifyTask.getOrderId(), modifyTask.getServiceId());
         return new ServiceOrder(modifyTask.getOrderId(), modifyTask.getServiceId());
@@ -169,9 +171,10 @@ public class DeployService {
     public ServiceOrder createOrderToDestroyDeployedService(UUID serviceId) {
         MDC.put(SERVICE_ID, serviceId.toString());
         String errMsg = "No permissions to destroy services belonging to other users.";
-        DeployServiceEntity deployServiceEntity = getServiceOwnedByCurrentUser(serviceId, errMsg);
-        DeployTask destroyTask = getDestroyTask(deployServiceEntity);
-        destroyService(destroyTask, deployServiceEntity);
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                getServiceOwnedByCurrentUser(serviceId, errMsg);
+        DeployTask destroyTask = getDestroyTask(serviceDeploymentEntity);
+        destroyService(destroyTask, serviceDeploymentEntity);
         log.info("Order task {} to destroy deployed service {} started.",
                 destroyTask.getOrderId(), destroyTask.getServiceId());
         return new ServiceOrder(destroyTask.getOrderId(), destroyTask.getServiceId());
@@ -187,9 +190,10 @@ public class DeployService {
     public ServiceOrder createOrderToPurgeDestroyedService(UUID serviceId) {
         MDC.put(SERVICE_ID, serviceId.toString());
         String errMsg = "No permissions to purge services belonging to other users.";
-        DeployServiceEntity deployServiceEntity = getServiceOwnedByCurrentUser(serviceId, errMsg);
-        DeployTask purgeTask = getPurgeTask(deployServiceEntity);
-        purgeService(purgeTask, deployServiceEntity);
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                getServiceOwnedByCurrentUser(serviceId, errMsg);
+        DeployTask purgeTask = getPurgeTask(serviceDeploymentEntity);
+        purgeService(purgeTask, serviceDeploymentEntity);
         log.info("Order task {} to purge the destroyed service {} started.",
                 purgeTask.getOrderId(), serviceId);
         return new ServiceOrder(purgeTask.getOrderId(), purgeTask.getServiceId());
@@ -224,8 +228,8 @@ public class DeployService {
     public List<DeployResource> listResourcesOfDeployedService(UUID serviceId,
                                                                DeployResourceKind resourceKind) {
         String errorMsg = "No permissions to view resources of services belonging to other users.";
-        DeployServiceEntity deployedService = getServiceOwnedByCurrentUser(serviceId, errorMsg);
-        Stream<DeployResourceEntity> resourceEntities =
+        ServiceDeploymentEntity deployedService = getServiceOwnedByCurrentUser(serviceId, errorMsg);
+        Stream<ServiceResourceEntity> resourceEntities =
                 deployedService.getDeployResourceList().stream();
         if (Objects.nonNull(resourceKind)) {
             resourceEntities = resourceEntities.filter(
@@ -242,8 +246,8 @@ public class DeployService {
      * @return DeployServiceEntity.
      * @throws AccessDeniedException if the current user is not the owner of the service.
      */
-    private DeployServiceEntity getServiceOwnedByCurrentUser(UUID serviceId, String errorMsg) {
-        DeployServiceEntity deployedService =
+    private ServiceDeploymentEntity getServiceOwnedByCurrentUser(UUID serviceId, String errorMsg) {
+        ServiceDeploymentEntity deployedService =
                 deployServiceEntityHandler.getDeployServiceEntity(serviceId);
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(deployedService.getUserId());
@@ -352,8 +356,8 @@ public class DeployService {
         }
     }
 
-    private DeployServiceEntity storeNewDeployServiceEntity(DeployTask deployTask) {
-        DeployServiceEntity entity = new DeployServiceEntity();
+    private ServiceDeploymentEntity storeNewDeployServiceEntity(DeployTask deployTask) {
+        ServiceDeploymentEntity entity = new ServiceDeploymentEntity();
         entity.setId(deployTask.getServiceId());
         entity.setCreateTime(OffsetDateTime.now());
         entity.setVersion(StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
@@ -376,7 +380,7 @@ public class DeployService {
         defaultLockConfig.setDestroyLocked(false);
         defaultLockConfig.setModifyLocked(false);
         entity.setLockConfig(defaultLockConfig);
-        DeployServiceEntity storedEntity = deployServiceEntityHandler.storeAndFlush(entity);
+        ServiceDeploymentEntity storedEntity = deployServiceEntityHandler.storeAndFlush(entity);
         if (Objects.isNull(storedEntity)) {
             log.error("Store new deploy service entity with id {} failed.",
                     deployTask.getServiceId());
@@ -391,7 +395,7 @@ public class DeployService {
         RuntimeException exception = null;
         Deployer deployer = deployerKindManager.getDeployment(
                 deployTask.getOcl().getDeployment().getDeployerTool().getKind());
-        DeployServiceEntity serviceEntity = storeNewDeployServiceEntity(deployTask);
+        ServiceDeploymentEntity serviceEntity = storeNewDeployServiceEntity(deployTask);
         ServiceOrderEntity serviceOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(deployTask, serviceEntity);
         try {
@@ -412,19 +416,19 @@ public class DeployService {
      * Redeploy service with failed state.
      *
      * @param redeployTask        redeployTask
-     * @param deployServiceEntity deployServiceEntity
+     * @param serviceDeploymentEntity deployServiceEntity
      */
     private void redeployService(DeployTask redeployTask,
-                                 DeployServiceEntity deployServiceEntity) {
+                                 ServiceDeploymentEntity serviceDeploymentEntity) {
         DeployResult redeployResult;
         RuntimeException exception = null;
         Deployer deployer = deployerKindManager.getDeployment(
                 redeployTask.getOcl().getDeployment().getDeployerTool().getKind());
-        ServiceOrderEntity serviceOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(redeployTask, deployServiceEntity);
+        ServiceOrderEntity serviceOrderEntity = serviceOrderManager
+                .storeNewServiceOrderEntity(redeployTask, serviceDeploymentEntity);
         try {
             policyValidator.validateDeploymentWithPolicies(redeployTask);
-            deployServiceEntityHandler.updateServiceDeploymentStatus(deployServiceEntity,
+            deployServiceEntityHandler.updateServiceDeploymentStatus(serviceDeploymentEntity,
                     ServiceDeploymentState.DEPLOYING);
             serviceOrderManager.startOrderProgress(serviceOrderEntity);
             redeployResult = deployer.deploy(redeployTask);
@@ -442,14 +446,14 @@ public class DeployService {
     /**
      * Get modify task by stored deploy service entity.
      *
-     * @param deployServiceEntity deploy service entity.
+     * @param serviceDeploymentEntity deploy service entity.
      */
     private DeployTask getModifyTask(ModifyRequest modifyRequest,
-                                     DeployServiceEntity deployServiceEntity) {
-        if (Objects.nonNull(deployServiceEntity.getLockConfig())
-                && deployServiceEntity.getLockConfig().isModifyLocked()) {
+                                     ServiceDeploymentEntity serviceDeploymentEntity) {
+        if (Objects.nonNull(serviceDeploymentEntity.getLockConfig())
+                && serviceDeploymentEntity.getLockConfig().isModifyLocked()) {
             String errorMsg =
-                    "Service " + deployServiceEntity.getId() + " is locked from modification.";
+                    "Service " + serviceDeploymentEntity.getId() + " is locked from modification.";
             throw new ServiceLockedException(errorMsg);
         }
 
@@ -458,28 +462,28 @@ public class DeployService {
             throw new ServiceModifyParamsNotFoundException("No params found for modify services.");
         }
 
-        if (!deployServiceEntity.getServiceDeploymentState()
+        if (!serviceDeploymentEntity.getServiceDeploymentState()
                 .equals(ServiceDeploymentState.DEPLOY_SUCCESS)
-                && !deployServiceEntity.getServiceDeploymentState()
+                && !serviceDeploymentEntity.getServiceDeploymentState()
                 .equals(ServiceDeploymentState.MODIFICATION_FAILED)
-                && !deployServiceEntity.getServiceDeploymentState()
+                && !serviceDeploymentEntity.getServiceDeploymentState()
                 .equals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL)) {
             throw new InvalidServiceStateException(
                     String.format("Service %s with the state %s is not allowed to modify.",
-                            deployServiceEntity.getId(),
-                            deployServiceEntity.getServiceDeploymentState()));
+                            serviceDeploymentEntity.getId(),
+                            serviceDeploymentEntity.getServiceDeploymentState()));
         }
         ServiceTemplateEntity existingServiceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(
-                        deployServiceEntity.getServiceTemplateId());
-        DeployRequest previousDeployRequest = deployServiceEntity.getDeployRequest();
+                        serviceDeploymentEntity.getServiceTemplateId());
+        DeployRequest previousDeployRequest = serviceDeploymentEntity.getDeployRequest();
         DeployRequest newDeployRequest = new DeployRequest();
         BeanUtils.copyProperties(previousDeployRequest, newDeployRequest);
         if (StringUtils.isNotEmpty(modifyRequest.getCustomerServiceName())) {
             newDeployRequest.setCustomerServiceName(modifyRequest.getCustomerServiceName());
         }
         if (StringUtils.isNotBlank(modifyRequest.getFlavor())) {
-            validateFlavorDowngradedIsAllowed(deployServiceEntity.getFlavor(),
+            validateFlavorDowngradedIsAllowed(serviceDeploymentEntity.getFlavor(),
                     modifyRequest.getFlavor(), existingServiceTemplate.getOcl().getFlavors());
             newDeployRequest.setFlavor(modifyRequest.getFlavor());
         }
@@ -490,7 +494,7 @@ public class DeployService {
         }
         validateDeployRequestWithServiceTemplate(existingServiceTemplate, newDeployRequest);
         DeployTask modifyTask = deployServiceEntityConverter.getDeployTaskByStoredService(
-                ServiceOrderType.MODIFY, deployServiceEntity);
+                ServiceOrderType.MODIFY, serviceDeploymentEntity);
         modifyTask.setDeployRequest(newDeployRequest);
         modifyTask.setRequest(modifyRequest);
         return modifyTask;
@@ -514,19 +518,19 @@ public class DeployService {
      * Async method to modify service.
      *
      * @param modifyTask          modifyTask.
-     * @param deployServiceEntity deployServiceEntity
+     * @param serviceDeployment deployServiceEntity
      */
-    public void modifyService(DeployTask modifyTask, DeployServiceEntity deployServiceEntity) {
+    public void modifyService(DeployTask modifyTask, ServiceDeploymentEntity serviceDeployment) {
         RuntimeException exception = null;
         DeployResult modifyResult;
         MDC.put(SERVICE_ID, modifyTask.getServiceId().toString());
         Deployer deployer = deployerKindManager.getDeployment(
                 modifyTask.getOcl().getDeployment().getDeployerTool().getKind());
         ServiceOrderEntity serviceOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(modifyTask, deployServiceEntity);
+                serviceOrderManager.storeNewServiceOrderEntity(modifyTask, serviceDeployment);
         try {
-            deployServiceEntity.setDeployRequest(modifyTask.getDeployRequest());
-            deployServiceEntityHandler.updateServiceDeploymentStatus(deployServiceEntity,
+            serviceDeployment.setDeployRequest(modifyTask.getDeployRequest());
+            deployServiceEntityHandler.updateServiceDeploymentStatus(serviceDeployment,
                     ServiceDeploymentState.MODIFYING);
             serviceOrderManager.startOrderProgress(serviceOrderEntity);
             modifyResult = deployer.modify(modifyTask);
@@ -544,23 +548,23 @@ public class DeployService {
      * Async method to destroy service.
      *
      * @param destroyTask         destroyTask.
-     * @param deployServiceEntity deployServiceEntity
+     * @param serviceDeployment deployServiceEntity
      */
-    public void destroyService(DeployTask destroyTask, DeployServiceEntity deployServiceEntity) {
-        destroy(destroyTask, deployServiceEntity);
+    public void destroyService(DeployTask destroyTask, ServiceDeploymentEntity serviceDeployment) {
+        destroy(destroyTask, serviceDeployment);
     }
 
-    private void destroy(DeployTask destroyTask, DeployServiceEntity deployServiceEntity) {
+    private void destroy(DeployTask destroyTask, ServiceDeploymentEntity serviceDeploymentEntity) {
         DeployResult destroyResult;
         RuntimeException exception = null;
         MDC.put(SERVICE_ID, destroyTask.getServiceId().toString());
-        ServiceOrderEntity serviceOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(destroyTask, deployServiceEntity);
+        ServiceOrderEntity serviceOrderEntity = serviceOrderManager
+                .storeNewServiceOrderEntity(destroyTask, serviceDeploymentEntity);
         Deployer deployer = deployerKindManager.getDeployment(
                 destroyTask.getOcl().getDeployment().getDeployerTool().getKind());
         try {
             if (ServiceOrderType.ROLLBACK != destroyTask.getTaskType()) {
-                deployServiceEntityHandler.updateServiceDeploymentStatus(deployServiceEntity,
+                deployServiceEntityHandler.updateServiceDeploymentStatus(serviceDeploymentEntity,
                         ServiceDeploymentState.DESTROYING);
             }
             serviceOrderManager.startOrderProgress(serviceOrderEntity);
@@ -579,19 +583,19 @@ public class DeployService {
      * purge the service based on the serviceDeploymentState.
      *
      * @param purgeTask           purgeTask.
-     * @param deployServiceEntity deployServiceEntity
+     * @param serviceDeployment deployServiceEntity
      */
-    private void purgeService(DeployTask purgeTask, DeployServiceEntity deployServiceEntity) {
+    private void purgeService(DeployTask purgeTask, ServiceDeploymentEntity serviceDeployment) {
         RuntimeException exception = null;
         DeployResult purgeResult;
         MDC.put(SERVICE_ID, purgeTask.getServiceId().toString());
         ServiceOrderEntity serviceOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(purgeTask, deployServiceEntity);
-        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
+                serviceOrderManager.storeNewServiceOrderEntity(purgeTask, serviceDeployment);
+        if (!CollectionUtils.isEmpty(serviceDeployment.getDeployResourceList())) {
             try {
                 log.info("Resources of service {} need to clear with order task {}",
                         purgeTask.getServiceId(), purgeTask.getOrderId());
-                deployServiceEntityHandler.updateServiceDeploymentStatus(deployServiceEntity,
+                deployServiceEntityHandler.updateServiceDeploymentStatus(serviceDeployment,
                         ServiceDeploymentState.DESTROYING);
                 serviceOrderManager.startOrderProgress(serviceOrderEntity);
                 Deployer deployer = deployerKindManager.getDeployment(
@@ -607,7 +611,7 @@ public class DeployService {
             }
         } else {
             log.info("No resources of service {} need to clear", purgeTask.getServiceId());
-            deployServiceStorage.deleteDeployService(deployServiceEntity);
+            serviceDeploymentStorage.deleteServiceDeployment(serviceDeployment);
         }
     }
 
@@ -638,47 +642,47 @@ public class DeployService {
     public void destroyServiceById(String id) {
         MDC.put(SERVICE_ID, id);
         UUID serviceId = UUID.fromString(id);
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(serviceId);
         DeployTask destroyTask = deployServiceEntityConverter.getDeployTaskByStoredService(
-                ServiceOrderType.DESTROY, deployServiceEntity);
-        destroy(destroyTask, deployServiceEntity);
+                ServiceOrderType.DESTROY, serviceDeploymentEntity);
+        destroy(destroyTask, serviceDeploymentEntity);
     }
 
     /**
      * Get destroy task by stored deploy service entity.
      *
-     * @param deployServiceEntity deploy service entity.
+     * @param serviceDeploymentEntity deploy service entity.
      */
-    private DeployTask getDestroyTask(DeployServiceEntity deployServiceEntity) {
-        if (Objects.nonNull(deployServiceEntity.getLockConfig())
-                && deployServiceEntity.getLockConfig().isDestroyLocked()) {
+    private DeployTask getDestroyTask(ServiceDeploymentEntity serviceDeploymentEntity) {
+        if (Objects.nonNull(serviceDeploymentEntity.getLockConfig())
+                && serviceDeploymentEntity.getLockConfig().isDestroyLocked()) {
             String errorMsg =
-                    "Service " + deployServiceEntity.getId() + " is locked from deletion.";
+                    "Service " + serviceDeploymentEntity.getId() + " is locked from deletion.";
             throw new ServiceLockedException(errorMsg);
         }
         // Get state of service.
-        ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
+        ServiceDeploymentState state = serviceDeploymentEntity.getServiceDeploymentState();
         if (state.equals(ServiceDeploymentState.DEPLOYING) || state.equals(
                 ServiceDeploymentState.DESTROYING) || state.equals(
                 ServiceDeploymentState.MODIFYING)) {
             throw new InvalidServiceStateException(
                     String.format("Service %s with the state %s is not allowed to destroy.",
-                            deployServiceEntity.getId(), state));
+                            serviceDeploymentEntity.getId(), state));
         }
         return deployServiceEntityConverter.getDeployTaskByStoredService(
-                ServiceOrderType.DESTROY, deployServiceEntity);
+                ServiceOrderType.DESTROY, serviceDeploymentEntity);
     }
 
     /**
      * Get purge task by stored deploy service entity.
      *
-     * @param deployServiceEntity deploy service entity.
+     * @param serviceDeploymentEntity deploy service entity.
      * @return deploy task.
      */
-    private DeployTask getPurgeTask(DeployServiceEntity deployServiceEntity) {
+    private DeployTask getPurgeTask(ServiceDeploymentEntity serviceDeploymentEntity) {
         // Get state of service.
-        ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
+        ServiceDeploymentState state = serviceDeploymentEntity.getServiceDeploymentState();
         if (!(state == ServiceDeploymentState.DEPLOY_FAILED
                 || state == ServiceDeploymentState.DESTROY_SUCCESS
                 || state == ServiceDeploymentState.DESTROY_FAILED
@@ -686,32 +690,32 @@ public class DeployService {
                 || state == ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED)) {
             throw new InvalidServiceStateException(
                     String.format("Service %s with the state %s is not allowed to purge.",
-                            deployServiceEntity.getId(), state));
+                            serviceDeploymentEntity.getId(), state));
         }
         return deployServiceEntityConverter.getDeployTaskByStoredService(
-                ServiceOrderType.PURGE, deployServiceEntity);
+                ServiceOrderType.PURGE, serviceDeploymentEntity);
     }
 
 
     /**
      * Get deploy task to redeploy the failed service by stored deploy service entity.
      *
-     * @param deployServiceEntity deploy service entity.
+     * @param serviceDeploymentEntity deploy service entity.
      * @return deploy task.
      */
-    public DeployTask getRedeployTask(DeployServiceEntity deployServiceEntity) {
-        MDC.put(SERVICE_ID, deployServiceEntity.getId().toString());
+    public DeployTask getRedeployTask(ServiceDeploymentEntity serviceDeploymentEntity) {
+        MDC.put(SERVICE_ID, serviceDeploymentEntity.getId().toString());
         // Get state of service.
-        ServiceDeploymentState state = deployServiceEntity.getServiceDeploymentState();
+        ServiceDeploymentState state = serviceDeploymentEntity.getServiceDeploymentState();
         if (!(state == ServiceDeploymentState.DEPLOY_FAILED
                 || state == ServiceDeploymentState.DESTROY_FAILED
                 || state == ServiceDeploymentState.ROLLBACK_FAILED)) {
             throw new InvalidServiceStateException(
                     String.format("Service %s with the state %s is not allowed to redeploy.",
-                            deployServiceEntity.getId(), state));
+                            serviceDeploymentEntity.getId(), state));
         }
         return deployServiceEntityConverter.getDeployTaskByStoredService(
-                ServiceOrderType.RETRY, deployServiceEntity);
+                ServiceOrderType.RETRY, serviceDeploymentEntity);
     }
 
 

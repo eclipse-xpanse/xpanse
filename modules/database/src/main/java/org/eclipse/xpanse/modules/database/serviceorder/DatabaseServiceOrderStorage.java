@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,11 +48,11 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
         Specification<ServiceOrderEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
-                    if (Objects.nonNull(entity.getDeployServiceEntity())
-                            && Objects.nonNull(entity.getDeployServiceEntity().getId())) {
+                    if (Objects.nonNull(entity.getServiceDeploymentEntity())
+                            && Objects.nonNull(entity.getServiceDeploymentEntity().getId())) {
                         predicateList.add(criteriaBuilder.equal(root
-                                        .get("deployServiceEntity").get("id"),
-                                entity.getDeployServiceEntity().getId()));
+                                        .get("serviceDeploymentEntity").get("id"),
+                                entity.getServiceDeploymentEntity().getId()));
                     }
                     if (Objects.nonNull(entity.getTaskType())) {
                         predicateList.add(criteriaBuilder.equal(root.get("taskType"),
@@ -80,19 +80,19 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
     }
 
     @Override
-    public DeployServiceEntity getDeployServiceByOrderId(UUID uuid) {
+    public ServiceDeploymentEntity getDeployServiceByOrderId(UUID uuid) {
         Optional<ServiceOrderEntity> optional = repository.findById(uuid);
         if (optional.isEmpty()) {
             throw new ServiceOrderNotFound(
                     String.format("Service order with id %s not found.", uuid)
             );
         }
-        if (Objects.isNull(optional.get().getDeployServiceEntity())) {
+        if (Objects.isNull(optional.get().getServiceDeploymentEntity())) {
             throw new ServiceNotDeployedException(
                     String.format("No service related to order with id %s.", uuid)
             );
         }
-        return optional.get().getDeployServiceEntity();
+        return optional.get().getServiceDeploymentEntity();
     }
 
     @Override

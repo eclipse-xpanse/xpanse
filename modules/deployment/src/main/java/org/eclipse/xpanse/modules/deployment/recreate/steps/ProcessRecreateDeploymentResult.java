@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.recreate.RecreateService;
@@ -93,13 +93,13 @@ public class ProcessRecreateDeploymentResult implements Serializable, JavaDelega
     }
 
     private boolean isDeploySuccess(UUID originalServiceId) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(originalServiceId);
 
-        if (Objects.isNull(deployServiceEntity)) {
+        if (Objects.isNull(serviceDeploymentEntity)) {
             return false;
         }
-        return deployServiceEntity.getServiceDeploymentState()
+        return serviceDeploymentEntity.getServiceDeploymentState()
                 == ServiceDeploymentState.DEPLOY_SUCCESS;
     }
 
@@ -115,11 +115,11 @@ public class ProcessRecreateDeploymentResult implements Serializable, JavaDelega
 
     private boolean isRecreateSuccess(UUID originalServiceId) {
 
-        DeployServiceEntity newDeployServiceEntity =
+        ServiceDeploymentEntity newServiceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(originalServiceId);
 
-        if (Objects.nonNull(newDeployServiceEntity)) {
-            return newDeployServiceEntity.getServiceDeploymentState()
+        if (Objects.nonNull(newServiceDeploymentEntity)) {
+            return newServiceDeploymentEntity.getServiceDeploymentState()
                     == ServiceDeploymentState.DEPLOY_SUCCESS;
         }
         return false;

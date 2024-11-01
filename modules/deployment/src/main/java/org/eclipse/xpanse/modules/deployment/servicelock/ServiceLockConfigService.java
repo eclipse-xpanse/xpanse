@@ -9,7 +9,7 @@ package org.eclipse.xpanse.modules.deployment.servicelock;
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
@@ -54,7 +54,7 @@ public class ServiceLockConfigService {
      */
     public ServiceOrder changeServiceLockConfig(UUID serviceId,
                                                 ServiceLockConfig lockConfig) {
-        DeployServiceEntity deployedService =
+        ServiceDeploymentEntity deployedService =
                 deployServiceEntityHandler.getDeployServiceEntity(serviceId);
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(deployedService.getUserId());

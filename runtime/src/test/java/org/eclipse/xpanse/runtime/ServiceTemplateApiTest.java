@@ -30,8 +30,8 @@ import java.util.Locale;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DatabaseServiceDeploymentStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.PriceWithRegion;
@@ -77,7 +77,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
     private final OclLoader oclLoader = new OclLoader();
 
     @MockBean
-    private DatabaseDeployServiceStorage mockDeployServiceStorage;
+    private DatabaseServiceDeploymentStorage mockDeployServiceStorage;
 
     @Test
     @WithJwt(file = "jwt_isv.json")
@@ -737,7 +737,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         List.of(errorMsg2));
         unregister(serviceTemplate.getServiceTemplateId());
         when(mockDeployServiceStorage.listServices(any(ServiceQueryModel.class))).thenReturn(
-                List.of(new DeployServiceEntity()));
+                List.of(new ServiceDeploymentEntity()));
         MockHttpServletResponse deleteResponse2 = deleteTemplate(id);
         assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse2.getStatus());
         assertEquals(deleteResponse2.getContentAsString(),

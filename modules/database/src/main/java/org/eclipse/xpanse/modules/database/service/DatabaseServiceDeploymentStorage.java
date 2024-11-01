@@ -19,41 +19,41 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implementation of the DeployServiceStorage.
+ * Implementation of the ServiceDeploymentStorage.
  */
 @Component
 @Transactional
-public class DatabaseDeployServiceStorage implements DeployServiceStorage {
+public class DatabaseServiceDeploymentStorage implements ServiceDeploymentStorage {
 
-    private final DeployServiceRepository deployServiceRepository;
+    private final ServiceDeploymentRepository serviceDeploymentRepository;
 
     @Autowired
-    public DatabaseDeployServiceStorage(DeployServiceRepository deployServiceRepository) {
-        this.deployServiceRepository = deployServiceRepository;
+    public DatabaseServiceDeploymentStorage(ServiceDeploymentRepository repository) {
+        this.serviceDeploymentRepository = repository;
     }
 
     /**
      * Store the entity to the database and flush the data immediately.
      *
-     * @param deployServiceEntity the entity of service.
-     * @return deployServiceEntity the entity of service.
+     * @param serviceDeploymentEntity the entity of service.
+     * @return serviceDeploymentEntity the entity of service.
      */
     @Override
-    public DeployServiceEntity storeAndFlush(DeployServiceEntity deployServiceEntity) {
-        return this.deployServiceRepository.saveAndFlush(deployServiceEntity);
+    public ServiceDeploymentEntity storeAndFlush(ServiceDeploymentEntity serviceDeploymentEntity) {
+        return this.serviceDeploymentRepository.saveAndFlush(serviceDeploymentEntity);
     }
 
     /**
-     * Method to list database entries based DeployServiceEntity.
+     * Method to list database entries based ServiceDeploymentEntity.
      *
-     * @param serviceQuery query model for search deploy service entity.
+     * @param serviceQuery query model for search service deployment entity.
      * @return Returns the database entry for the provided arguments.
      */
     @Override
-    public List<DeployServiceEntity> listServices(
+    public List<ServiceDeploymentEntity> listServices(
             ServiceQueryModel serviceQuery) {
 
-        Specification<DeployServiceEntity> specification =
+        Specification<ServiceDeploymentEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(serviceQuery.getServiceTemplateId())) {
@@ -103,24 +103,24 @@ public class DatabaseDeployServiceStorage implements DeployServiceStorage {
                     return query.getRestriction();
                 };
 
-        return deployServiceRepository.findAll(specification);
+        return serviceDeploymentRepository.findAll(specification);
     }
 
     /**
      * Get detail of deployed service using ID.
      *
      * @param id the ID of deployed service.
-     * @return registerServiceEntity
+     * @return serviceDeploymentEntity
      */
     @Override
-    public DeployServiceEntity findDeployServiceById(UUID id) {
-        Optional<DeployServiceEntity> optional =
-                this.deployServiceRepository.findById(id);
+    public ServiceDeploymentEntity findServiceDeploymentById(UUID id) {
+        Optional<ServiceDeploymentEntity> optional =
+                this.serviceDeploymentRepository.findById(id);
         return optional.orElse(null);
     }
 
     @Override
-    public void deleteDeployService(DeployServiceEntity deployServiceEntity) {
-        this.deployServiceRepository.delete(deployServiceEntity);
+    public void deleteServiceDeployment(ServiceDeploymentEntity serviceDeploymentEntity) {
+        this.serviceDeploymentRepository.delete(serviceDeploymentEntity);
     }
 }

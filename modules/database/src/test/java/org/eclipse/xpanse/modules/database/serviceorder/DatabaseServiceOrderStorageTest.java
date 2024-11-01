@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
@@ -33,7 +33,7 @@ class DatabaseServiceOrderStorageTest {
     private ServiceOrderRepository mockRepository;
 
     @Mock
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
 
     private DatabaseServiceOrderStorage test;
 
@@ -45,7 +45,7 @@ class DatabaseServiceOrderStorageTest {
     ServiceOrderEntity getServiceOrderEntity() {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
         serviceOrderEntity.setOrderId(orderId);
-        serviceOrderEntity.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
+        serviceOrderEntity.setServiceDeploymentEntity(serviceDeploymentStorage.findServiceDeploymentById(serviceId));
         serviceOrderEntity.setTaskType(ServiceOrderType.DEPLOY);
         serviceOrderEntity.setUserId(userId);
         serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
@@ -79,7 +79,7 @@ class DatabaseServiceOrderStorageTest {
 
         // Configure ServiceOrderRepository.findAll(...).
         final ServiceOrderEntity queryEntity = new ServiceOrderEntity();
-        queryEntity.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
+        queryEntity.setServiceDeploymentEntity(serviceDeploymentStorage.findServiceDeploymentById(serviceId));
         queryEntity.setTaskType(ServiceOrderType.DEPLOY);
         queryEntity.setUserId(userId);
         queryEntity.setTaskStatus(TaskStatus.CREATED);
@@ -97,7 +97,7 @@ class DatabaseServiceOrderStorageTest {
         // Setup
         final ServiceOrderEntity entity = new ServiceOrderEntity();
         entity.setOrderId(orderId);
-        entity.setDeployServiceEntity(deployServiceStorage.findDeployServiceById(serviceId));
+        entity.setServiceDeploymentEntity(serviceDeploymentStorage.findServiceDeploymentById(serviceId));
         entity.setTaskType(ServiceOrderType.DESTROY);
         entity.setUserId(userId);
         entity.setTaskStatus(TaskStatus.CREATED);

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
@@ -49,7 +49,7 @@ public class OpenstackServersManager {
             String site = request.getRegion().getSite();
             List<String> errorMessages = new ArrayList<>();
             OSClient.OSClientV3 osClient = getOsClient(csp, site, userId, serviceId);
-            for (DeployResourceEntity resource : request.getDeployResourceEntityList()) {
+            for (ServiceResourceEntity resource : request.getServiceResourceEntityList()) {
                 Server serverBeforeStart =
                         osClient.compute().servers().get(resource.getResourceId());
                 if (serverBeforeStart.getStatus().equals(Server.Status.ACTIVE)) {
@@ -92,7 +92,7 @@ public class OpenstackServersManager {
             UUID serviceId = request.getServiceId();
             OSClient.OSClientV3 osClient = getOsClient(csp, site, userId, serviceId);
             List<String> errorMessages = new ArrayList<>();
-            for (DeployResourceEntity resource : request.getDeployResourceEntityList()) {
+            for (ServiceResourceEntity resource : request.getServiceResourceEntityList()) {
                 Server serverBeforeStop =
                         osClient.compute().servers().get(resource.getResourceId());
                 if (serverBeforeStop.getStatus().equals(Server.Status.SHUTOFF)) {
@@ -134,7 +134,7 @@ public class OpenstackServersManager {
             UUID serviceId = request.getServiceId();
             OSClient.OSClientV3 osClient = getOsClient(csp, site, userId, serviceId);
             List<String> errorMessages = new ArrayList<>();
-            for (DeployResourceEntity resource : request.getDeployResourceEntityList()) {
+            for (ServiceResourceEntity resource : request.getServiceResourceEntityList()) {
                 Server serverBeforeRestart =
                         osClient.compute().servers().get(resource.getResourceId());
                 if (!serverBeforeRestart.getStatus().equals(Server.Status.ACTIVE)) {

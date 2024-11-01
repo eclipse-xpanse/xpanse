@@ -14,7 +14,7 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,13 +34,13 @@ class ServiceConfigurationEntityTest {
     private ServiceConfigurationEntity test;
 
     @Mock
-    private DeployServiceEntity deployServiceEntity;
+    private ServiceDeploymentEntity serviceDeploymentEntity;
 
     @BeforeEach
     void setUp() {
         test = new ServiceConfigurationEntity();
         test.setId(id);
-        test.setDeployServiceEntity(deployServiceEntity);
+        test.setServiceDeploymentEntity(serviceDeploymentEntity);
         test.setConfiguration(getConfiguration());
         test.setCreatedTime(createTime);
     }
@@ -50,7 +50,7 @@ class ServiceConfigurationEntityTest {
         assertThat(test.getId()).isEqualTo(id);
         assertThat(test.getConfiguration()).isEqualTo(getConfiguration());
         assertThat(test.getCreatedTime()).isEqualTo(createTime);
-        assertThat(test.getDeployServiceEntity()).isEqualTo(deployServiceEntity);
+        assertThat(test.getServiceDeploymentEntity()).isEqualTo(serviceDeploymentEntity);
     }
 
     @Test
@@ -93,10 +93,10 @@ class ServiceConfigurationEntityTest {
     @Test
     void testToString() {
         String result = String.format(
-                "ServiceConfigurationEntity(id=%s, deployServiceEntity=%s, configuration=%s, "
+                "ServiceConfigurationEntity(id=%s, serviceDeploymentEntity=%s, configuration=%s, "
                         + "createdTime=%s, "
                         + "updatedTime=%s)",
-                id, deployServiceEntity, getConfiguration(), createTime, null);
+                id, serviceDeploymentEntity, getConfiguration(), createTime, null);
 
         assertThat(test.toString()).isEqualTo(result);
     }

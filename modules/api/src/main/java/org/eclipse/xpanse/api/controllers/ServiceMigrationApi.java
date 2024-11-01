@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
@@ -88,16 +88,16 @@ public class ServiceMigrationApi {
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
         validateData(migrateRequest);
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(
                         migrateRequest.getOriginalServiceId());
         String userId = getUserId();
-        if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {
+        if (!StringUtils.equals(userId, serviceDeploymentEntity.getUserId())) {
             throw new AccessDeniedException(
                     "No permissions to migrate services belonging to other users.");
         }
-        if (Objects.nonNull(deployServiceEntity.getLockConfig())
-                && deployServiceEntity.getLockConfig().isModifyLocked()) {
+        if (Objects.nonNull(serviceDeploymentEntity.getLockConfig())
+                && serviceDeploymentEntity.getLockConfig().isModifyLocked()) {
             String errorMsg = String.format("Service with id %s is locked from migration.",
                     migrateRequest.getOriginalServiceId());
             throw new ServiceLockedException(errorMsg);

@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
@@ -91,13 +91,13 @@ public class ProcessDeploymentResult implements Serializable, JavaDelegate {
     }
 
     private boolean isDeploySuccess(UUID newServiceId) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(newServiceId);
 
-        if (Objects.isNull(deployServiceEntity)) {
+        if (Objects.isNull(serviceDeploymentEntity)) {
             return false;
         }
-        return deployServiceEntity.getServiceDeploymentState()
+        return serviceDeploymentEntity.getServiceDeploymentState()
                 == ServiceDeploymentState.DEPLOY_SUCCESS;
     }
 }

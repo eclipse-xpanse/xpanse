@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -53,7 +53,7 @@ public class ServiceOrderEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SERVICE_ID", nullable = false)
-    private DeployServiceEntity deployServiceEntity;
+    private ServiceDeploymentEntity serviceDeploymentEntity;
 
     @Column(name = "PARENT_ORDER_ID")
     private UUID parentOrderId;

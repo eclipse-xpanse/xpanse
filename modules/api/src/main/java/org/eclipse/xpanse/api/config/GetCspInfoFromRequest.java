@@ -16,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.service.DatabaseDeployServiceStorage;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.DatabaseServiceDeploymentStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.DatabaseServiceMigrationStorage;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.DatabaseServiceOrderStorage;
@@ -45,7 +45,7 @@ public class GetCspInfoFromRequest {
     @Resource
     private DatabaseServiceTemplateStorage serviceTemplateStorage;
     @Resource
-    private DatabaseDeployServiceStorage deployServiceStorage;
+    private DatabaseServiceDeploymentStorage deployServiceStorage;
     @Resource
     private DatabaseServicePolicyStorage servicePolicyStorage;
     @Resource
@@ -104,8 +104,8 @@ public class GetCspInfoFromRequest {
      */
     public Csp getCspFromServiceId(String id) {
         try {
-            DeployServiceEntity deployService =
-                    deployServiceStorage.findDeployServiceById(UUID.fromString(id));
+            ServiceDeploymentEntity deployService =
+                    deployServiceStorage.findServiceDeploymentById(UUID.fromString(id));
             if (Objects.nonNull(deployService)) {
                 return deployService.getCsp();
             }
@@ -129,8 +129,8 @@ public class GetCspInfoFromRequest {
             ServiceMigrationEntity serviceMigrationEntity =
                     serviceMigrationStorage.findServiceMigrationById(UUID.fromString(id));
             if (Objects.nonNull(serviceMigrationEntity)) {
-                DeployServiceEntity deployService =
-                        deployServiceStorage.findDeployServiceById(
+                ServiceDeploymentEntity deployService =
+                        deployServiceStorage.findServiceDeploymentById(
                                 serviceMigrationEntity.getOldServiceId());
                 return deployService.getCsp();
             }
@@ -154,8 +154,8 @@ public class GetCspInfoFromRequest {
             ServiceRecreateEntity serviceRecreateEntity =
                     serviceRecreateStorage.findServiceRecreateById(UUID.fromString(id));
             if (Objects.nonNull(serviceRecreateEntity)) {
-                DeployServiceEntity deployService =
-                        deployServiceStorage.findDeployServiceById(
+                ServiceDeploymentEntity deployService =
+                        deployServiceStorage.findServiceDeploymentById(
                                 serviceRecreateEntity.getServiceId());
                 return deployService.getCsp();
             }
@@ -219,8 +219,8 @@ public class GetCspInfoFromRequest {
                             serviceMigrationStorage.findServiceMigrationById(
                                     UUID.fromString(processInstanceId));
                     if (Objects.nonNull(serviceMigrationEntity)) {
-                        DeployServiceEntity deployService =
-                                deployServiceStorage.findDeployServiceById(
+                        ServiceDeploymentEntity deployService =
+                                deployServiceStorage.findServiceDeploymentById(
                                         serviceMigrationEntity.getOldServiceId());
                         return deployService.getCsp();
                     }
@@ -242,9 +242,10 @@ public class GetCspInfoFromRequest {
         try {
             ServiceOrderEntity order =
                     serviceOrderTaskStorage.getEntityById(UUID.fromString(orderId));
-            if (Objects.nonNull(order) && Objects.nonNull(order.getDeployServiceEntity().getId())) {
-                DeployServiceEntity deployService = deployServiceStorage
-                        .findDeployServiceById(order.getDeployServiceEntity().getId());
+            if (Objects.nonNull(order)
+                    && Objects.nonNull(order.getServiceDeploymentEntity().getId())) {
+                ServiceDeploymentEntity deployService = deployServiceStorage
+                        .findServiceDeploymentById(order.getServiceDeploymentEntity().getId());
                 return deployService.getCsp();
             }
         } catch (Exception e) {

@@ -20,7 +20,7 @@ import com.huaweicloud.sdk.ecs.v2.model.ServerId;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,11 +34,11 @@ public class FlexibleEngineServerManageRequestConverter {
      * Build BatchStartServersRequest Object.
      */
     public BatchStartServersRequest buildBatchStartServersRequest(
-            List<DeployResourceEntity> deployResourceEntityList) {
+            List<ServiceResourceEntity> serviceResourceEntityList) {
         BatchStartServersRequest request = new BatchStartServersRequest();
         BatchStartServersRequestBody body = new BatchStartServersRequestBody();
         BatchStartServersOption osStart = new BatchStartServersOption();
-        List<ServerId> serverIdList = getServerIdList(deployResourceEntityList);
+        List<ServerId> serverIdList = getServerIdList(serviceResourceEntityList);
         osStart.withServers(serverIdList);
         body.withOsStart(osStart);
         request.withBody(body);
@@ -49,11 +49,11 @@ public class FlexibleEngineServerManageRequestConverter {
      * Build BatchStopServersRequest Object.
      */
     public BatchStopServersRequest buildBatchStopServersRequest(
-            List<DeployResourceEntity> deployResourceEntityList) {
+            List<ServiceResourceEntity> serviceResourceEntityList) {
         BatchStopServersRequest request = new BatchStopServersRequest();
         BatchStopServersRequestBody body = new BatchStopServersRequestBody();
         BatchStopServersOption osStop = new BatchStopServersOption();
-        List<ServerId> serverIdList = getServerIdList(deployResourceEntityList);
+        List<ServerId> serverIdList = getServerIdList(serviceResourceEntityList);
         osStop.withServers(serverIdList).withType(TypeEnum.SOFT);
         body.withOsStop(osStop);
         request.withBody(body);
@@ -64,11 +64,11 @@ public class FlexibleEngineServerManageRequestConverter {
      * Build BatchRebootServersRequest Object.
      */
     public BatchRebootServersRequest buildBatchRebootServersRequest(
-            List<DeployResourceEntity> deployResourceEntityList) {
+            List<ServiceResourceEntity> serviceResourceEntityList) {
         BatchRebootServersRequest request = new BatchRebootServersRequest();
         BatchRebootServersRequestBody body = new BatchRebootServersRequestBody();
         BatchRebootSeversOption reboot = new BatchRebootSeversOption();
-        List<ServerId> serverIdList = getServerIdList(deployResourceEntityList);
+        List<ServerId> serverIdList = getServerIdList(serviceResourceEntityList);
         reboot.withServers(serverIdList).withType(BatchRebootSeversOption.TypeEnum.SOFT);
         body.withReboot(reboot);
         request.withBody(body);
@@ -76,9 +76,9 @@ public class FlexibleEngineServerManageRequestConverter {
 
     }
 
-    private List<ServerId> getServerIdList(List<DeployResourceEntity> deployResourceEntityList) {
-        return deployResourceEntityList.stream()
-                .map(DeployResourceEntity::getResourceId)
+    private List<ServerId> getServerIdList(List<ServiceResourceEntity> serviceResourceEntityList) {
+        return serviceResourceEntityList.stream()
+                .map(ServiceResourceEntity::getResourceId)
                 .map(uuid -> new ServerId().withId(uuid))
                 .collect(Collectors.toList());
     }

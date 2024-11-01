@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
@@ -590,10 +590,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     String setInvalidStateAndGetExceptedErrorMsg(UUID serviceId,
                                                  ServiceDeploymentState state, String action) {
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(serviceId);
-        deployServiceEntity.setServiceDeploymentState(state);
-        deployServiceStorage.storeAndFlush(deployServiceEntity);
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
+        serviceDeploymentEntity.setServiceDeploymentState(state);
+        serviceDeploymentStorage.storeAndFlush(serviceDeploymentEntity);
         return String.format("Service %s with the state %s is not allowed to %s.",
                 serviceId, state, action);
     }
@@ -601,10 +601,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testApisThrowsAccessDeniedException(UUID serviceId) throws Exception {
         // SetUp
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(serviceId);
-        deployServiceEntity.setUserId("invalid-user-id");
-        deployServiceStorage.storeAndFlush(deployServiceEntity);
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
+        serviceDeploymentEntity.setUserId("invalid-user-id");
+        serviceDeploymentStorage.storeAndFlush(serviceDeploymentEntity);
 
         // SetUp changeLockConfig
         String errorMsg1 =

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
@@ -159,10 +159,10 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         assertNotNull(orderId);
         assertNotNull(serviceId);
         String errorUserId = "errorUserId";
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(serviceId);
-        deployServiceEntity.setUserId(errorUserId);
-        deployServiceStorage.storeAndFlush(deployServiceEntity);
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
+        serviceDeploymentEntity.setUserId(errorUserId);
+        serviceDeploymentStorage.storeAndFlush(serviceDeploymentEntity);
         ServiceOrderEntity serviceOrderEntity = serviceOrderStorage.getEntityById(orderId);
         serviceOrderEntity.setUserId(errorUserId);
         serviceOrderStorage.storeAndFlush(serviceOrderEntity);

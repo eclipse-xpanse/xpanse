@@ -15,6 +15,6 @@ import org.springframework.stereotype.Repository;
  * Interface to access default JPA methods.
  */
 @Repository
-public interface DeployResourceRepository extends CustomJpaRepository<DeployResourceEntity, UUID>,
-        JpaSpecificationExecutor<DeployResourceEntity> {
+public interface ServiceResourceRepository extends CustomJpaRepository<ServiceResourceEntity, UUID>,
+        JpaSpecificationExecutor<ServiceResourceEntity> {
 }

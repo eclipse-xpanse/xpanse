@@ -10,7 +10,7 @@ import jakarta.annotation.Resource;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
@@ -35,21 +35,22 @@ public class SensitiveDataHandler {
     /**
      * Method to mask all sensitive data after deployment is completed.
      *
-     * @param deployServiceEntity entity to be updated.
+     * @param serviceDeploymentEntity entity to be updated.
      */
-    public void maskSensitiveFields(DeployServiceEntity deployServiceEntity) {
+    public void maskSensitiveFields(ServiceDeploymentEntity serviceDeploymentEntity) {
         log.debug("masking sensitive input data after deployment");
-        if (Objects.nonNull(deployServiceEntity.getDeployRequest().getServiceRequestProperties())) {
+        if (Objects.nonNull(serviceDeploymentEntity
+                .getDeployRequest().getServiceRequestProperties())) {
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
-                            deployServiceEntity.getServiceTemplateId());
+                            serviceDeploymentEntity.getServiceTemplateId());
             for (DeployVariable deployVariable
                     : serviceTemplateEntity.getOcl().getDeployment()
                     .getVariables()) {
                 if (deployVariable.getSensitiveScope() != SensitiveScope.NONE
-                        && (deployServiceEntity.getDeployRequest().getServiceRequestProperties()
+                        && (serviceDeploymentEntity.getDeployRequest().getServiceRequestProperties()
                         .containsKey(deployVariable.getName()))) {
-                    deployServiceEntity.getDeployRequest().getServiceRequestProperties()
+                    serviceDeploymentEntity.getDeployRequest().getServiceRequestProperties()
                             .put(deployVariable.getName(), "********");
 
                 }
