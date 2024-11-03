@@ -11,11 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleTaskResult;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
     final ServiceConfigurationStatus status = ServiceConfigurationStatus.PENDING;
     final List<AnsibleTaskResult> tasks = List.of();
     @Mock
-    private DeployServiceEntity deployServiceEntity;
+    private ServiceDeploymentEntity serviceDeploymentEntity;
     @Mock
     private ServiceOrderEntity serviceOrderEntity;
 
@@ -45,7 +44,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
     void setUp() {
         test = new ServiceConfigurationChangeDetailsEntity();
         test.setId(id);
-        test.setDeployServiceEntity(deployServiceEntity);
+        test.setServiceDeploymentEntity(serviceDeploymentEntity);
         test.setServiceOrderEntity(serviceOrderEntity);
         test.setResourceName(resourceName);
         test.setConfigManager(configManager);
@@ -58,7 +57,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
     @Test
     void testGetters() {
         assertThat(test.getId()).isEqualTo(id);
-        assertThat(test.getDeployServiceEntity()).isEqualTo(deployServiceEntity);
+        assertThat(test.getServiceDeploymentEntity()).isEqualTo(serviceDeploymentEntity);
         assertThat(test.getServiceOrderEntity()).isEqualTo(serviceOrderEntity);
         assertThat(test.getResourceName()).isEqualTo(resourceName);
         assertThat(test.getConfigManager()).isEqualTo(configManager);
@@ -90,14 +89,14 @@ public class ServiceConfigurationChangeDetailsEntityTest {
         String result = String.format(
                 "ServiceConfigurationChangeDetailsEntity(id=%s, "
                         + "serviceOrderEntity=%s, "
-                        + "deployServiceEntity=%s, "
+                        + "serviceDeploymentEntity=%s, "
                         + "resourceName=%s, "
                         + "configManager=%s, "
                         + "resultMessage=%s, "
                         + "properties=%s, "
                         + "status=%s, "
                         + "tasks=%s)", id, serviceOrderEntity,
-                deployServiceEntity, resourceName, configManager,
+                serviceDeploymentEntity, resourceName, configManager,
                 resultMessage, properties, status, tasks);
 
         assertThat(test.toString()).isEqualTo(result);

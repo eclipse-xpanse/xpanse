@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.database.serviceorder;
 
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 
 /**
  * Interface for persist of ServiceModificationAudit.
@@ -60,6 +60,6 @@ public interface ServiceOrderStorage {
      * @param uuid order id
      * @return DeployServiceEntity
      */
-    DeployServiceEntity getDeployServiceByOrderId(UUID uuid);
+    ServiceDeploymentEntity getDeployServiceByOrderId(UUID uuid);
 
 }

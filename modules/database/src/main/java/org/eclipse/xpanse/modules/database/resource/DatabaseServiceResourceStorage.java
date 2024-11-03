@@ -17,51 +17,51 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Implementation of the DeployResourceStorage.
+ * Implementation of the ServiceResourceStorage.
  */
 @Component
 @Transactional
-public class DatabaseDeployResourceStorage implements DeployResourceStorage {
+public class DatabaseServiceResourceStorage implements ServiceResourceStorage {
 
-    private final DeployResourceRepository deployResourceRepository;
+    private final ServiceResourceRepository serviceResourceRepository;
 
     @Autowired
-    public DatabaseDeployResourceStorage(DeployResourceRepository deployResourceRepository) {
-        this.deployResourceRepository = deployResourceRepository;
+    public DatabaseServiceResourceStorage(ServiceResourceRepository serviceResourceRepository) {
+        this.serviceResourceRepository = serviceResourceRepository;
     }
 
     @Override
     public void deleteByDeployServiceId(UUID serviceId) {
-        Specification<DeployResourceEntity> specification =
+        Specification<ServiceResourceEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     predicateList.add(criteriaBuilder.equal(root.get("serviceId"), serviceId));
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
                 };
-        deployResourceRepository.delete(specification);
+        serviceResourceRepository.delete(specification);
     }
 
     /**
-     * Get detail of deployed resource using ID.
+     * Get detail of service resource using ID.
      *
      * @param id the ID of deployed resource.
-     * @return DeployResourceEntity
+     * @return ServiceResourceEntity
      */
     @Override
-    public DeployResourceEntity findDeployResourceById(UUID id) {
-        return deployResourceRepository.findById(id).orElse(null);
+    public ServiceResourceEntity findServiceResourceById(UUID id) {
+        return serviceResourceRepository.findById(id).orElse(null);
     }
 
     /**
-     * Get detail of deployed resource using ID.
+     * Get detail of service resource using ID.
      *
      * @param resourceId the RESOURCE_ID of deployed resource.
-     * @return DeployResourceEntity
+     * @return ServiceResourceEntity
      */
     @Override
-    public DeployResourceEntity findDeployResourceByResourceId(String resourceId) {
-        Specification<DeployResourceEntity> specification =
+    public ServiceResourceEntity findServiceResourceByResourceId(String resourceId) {
+        Specification<ServiceResourceEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     predicateList.add(criteriaBuilder.equal(root.get("resourceId"),
@@ -70,8 +70,8 @@ public class DatabaseDeployResourceStorage implements DeployResourceStorage {
                             .getRestriction();
                 };
 
-        List<DeployResourceEntity> deployResources =
-                deployResourceRepository.findAll(specification);
+        List<ServiceResourceEntity> deployResources =
+                serviceResourceRepository.findAll(specification);
         if (!CollectionUtils.isEmpty(deployResources)) {
             return deployResources.getFirst();
         }

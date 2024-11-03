@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -154,9 +154,9 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         return request;
     }
 
-    List<DeployResourceEntity> getDeployResources() {
-        List<DeployResourceEntity> deployResources = new ArrayList<>();
-        DeployResourceEntity zookeeperResource = new DeployResourceEntity();
+    List<ServiceResourceEntity> getDeployResources() {
+        List<ServiceResourceEntity> deployResources = new ArrayList<>();
+        ServiceResourceEntity zookeeperResource = new ServiceResourceEntity();
         zookeeperResource.setId(UUID.randomUUID());
         zookeeperResource.setGroupType(HUAWEI_CLOUD_COMPUTE_INSTANCE);
         zookeeperResource.setGroupName(ZOOKEEPER);
@@ -165,7 +165,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         zookeeperResource.setResourceKind(DeployResourceKind.VM);
         deployResources.add(zookeeperResource);
         for(int i=0; i<3; i++){
-            DeployResourceEntity kafkaResource = new DeployResourceEntity();
+            ServiceResourceEntity kafkaResource = new ServiceResourceEntity();
             kafkaResource.setId(UUID.randomUUID());
             kafkaResource.setGroupType(HUAWEI_CLOUD_COMPUTE_INSTANCE);
             kafkaResource.setGroupName(KAFKA_BROKER);

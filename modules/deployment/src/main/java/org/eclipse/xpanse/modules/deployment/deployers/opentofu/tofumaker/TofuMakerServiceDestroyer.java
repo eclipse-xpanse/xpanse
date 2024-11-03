@@ -6,7 +6,7 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
@@ -50,9 +50,9 @@ public class TofuMakerServiceDestroyer {
      * method to perform service destroy using scripts provided in OCL.
      */
     public DeployResult destroyFromScripts(DeployTask deployTask) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
-        String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
+        String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncDestroyFromScriptsRequest request =
                 getDestroyFromScriptsRequest(deployTask, resourceState);
@@ -71,9 +71,9 @@ public class TofuMakerServiceDestroyer {
      * method to perform service destroy using scripts form GIT repo.
      */
     public DeployResult destroyFromGitRepo(DeployTask deployTask) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
-        String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
+        String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncDestroyFromGitRepoRequest request =
                 getDestroyFromGitRepoRequest(deployTask, resourceState);

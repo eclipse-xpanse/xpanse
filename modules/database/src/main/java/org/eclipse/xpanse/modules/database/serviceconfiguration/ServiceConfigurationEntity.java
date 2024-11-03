@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -41,7 +41,7 @@ public class ServiceConfigurationEntity {
     @OneToOne
     @JoinColumn(name = "service_id")
     @JsonIgnoreProperties({"deployResourceList", "serviceConfigurationEntity"})
-    private DeployServiceEntity deployServiceEntity;
+    private ServiceDeploymentEntity serviceDeploymentEntity;
 
     @Column(columnDefinition = "json")
     @Type(value = JsonType.class)

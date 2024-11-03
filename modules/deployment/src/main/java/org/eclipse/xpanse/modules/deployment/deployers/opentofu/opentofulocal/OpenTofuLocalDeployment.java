@@ -25,7 +25,7 @@ import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
@@ -97,9 +97,9 @@ public class OpenTofuLocalDeployment implements Deployer {
      */
     @Override
     public DeployResult destroy(DeployTask task) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(task.getServiceId());
-        String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
+        String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         if (StringUtils.isBlank(resourceState)) {
             String errorMsg = String.format("tfState of deployed service with id %s not found.",
                     task.getServiceId());
@@ -119,10 +119,10 @@ public class OpenTofuLocalDeployment implements Deployer {
      */
     @Override
     public DeployResult modify(DeployTask task) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(task.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(
-                deployServiceEntity);
+                serviceDeploymentEntity);
         if (StringUtils.isBlank(resourceState)) {
             String errorMsg = String.format("tfState of deployed service with id %s not found.",
                     task.getServiceId());

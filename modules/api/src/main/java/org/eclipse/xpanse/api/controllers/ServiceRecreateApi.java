@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.recreate.RecreateService;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
@@ -85,35 +85,35 @@ public class ServiceRecreateApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public UUID recreateService(@Valid @PathVariable("serviceId") String serviceId) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(
                         UUID.fromString(serviceId));
         String userId = getUserId();
-        if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {
+        if (!StringUtils.equals(userId, serviceDeploymentEntity.getUserId())) {
             throw new AccessDeniedException(
                     "No permissions to recreate services belonging to other users.");
         }
 
-        if (Objects.nonNull(deployServiceEntity.getLockConfig())
-                && deployServiceEntity.getLockConfig().isModifyLocked()) {
+        if (Objects.nonNull(serviceDeploymentEntity.getLockConfig())
+                && serviceDeploymentEntity.getLockConfig().isModifyLocked()) {
             String errorMsg = String.format("Service with id %s is locked from recreate.",
                     UUID.fromString(serviceId));
             throw new ServiceLockedException(errorMsg);
         }
 
-        if (!deployServiceEntity.getServiceDeploymentState()
+        if (!serviceDeploymentEntity.getServiceDeploymentState()
                 .equals(ServiceDeploymentState.DEPLOY_SUCCESS)
-                && !deployServiceEntity.getServiceDeploymentState()
+                && !serviceDeploymentEntity.getServiceDeploymentState()
                 .equals(ServiceDeploymentState.MODIFICATION_FAILED)
-                && !deployServiceEntity.getServiceDeploymentState()
+                && !serviceDeploymentEntity.getServiceDeploymentState()
                 .equals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL)) {
             throw new InvalidServiceStateException(
                     String.format("Service %s with the state %s is not allowed to recreate.",
-                            deployServiceEntity.getId(),
-                            deployServiceEntity.getServiceDeploymentState()));
+                            serviceDeploymentEntity.getId(),
+                            serviceDeploymentEntity.getServiceDeploymentState()));
         }
 
-        DeployServiceEntity deployedService =
+        ServiceDeploymentEntity deployedService =
                 deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(serviceId));
 
         Map<String, Object> variable =
@@ -175,7 +175,7 @@ public class ServiceRecreateApi {
     }
 
     private Map<String, Object> getRecreateProcessVariable(
-            DeployServiceEntity deployedService,
+            ServiceDeploymentEntity deployedService,
             String userId) {
         Map<String, Object> variable = new HashMap<>();
         variable.put(RecreateConstants.ID, deployedService.getDeployRequest().getServiceId());

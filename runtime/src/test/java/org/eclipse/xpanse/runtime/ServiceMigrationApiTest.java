@@ -9,7 +9,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
@@ -129,10 +129,10 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         // Setup
         ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
         serviceLockConfig.setModifyLocked(true);
-        DeployServiceEntity deployService =
-                deployServiceStorage.findDeployServiceById(migrateRequest.getOriginalServiceId());
+        ServiceDeploymentEntity deployService =
+                serviceDeploymentStorage.findServiceDeploymentById(migrateRequest.getOriginalServiceId());
         deployService.setLockConfig(serviceLockConfig);
-        deployServiceStorage.storeAndFlush(deployService);
+        serviceDeploymentStorage.storeAndFlush(deployService);
 
         String message = String.format("Service with id %s is locked from migration.",
                 migrateRequest.getOriginalServiceId());
@@ -171,9 +171,9 @@ class ServiceMigrationApiTest extends ApisTestCommon {
                 Collections.singletonList(
                         "No permissions to migrate services belonging to other users."));
 
-        DeployServiceEntity deployService = deployServiceStorage.findDeployServiceById(serviceId);
+        ServiceDeploymentEntity deployService = serviceDeploymentStorage.findServiceDeploymentById(serviceId);
         deployService.setUserId(null);
-        deployServiceStorage.storeAndFlush(deployService);
+        serviceDeploymentStorage.storeAndFlush(deployService);
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         MigrateRequest migrateRequest = new MigrateRequest();
         BeanUtils.copyProperties(deployRequest, migrateRequest);

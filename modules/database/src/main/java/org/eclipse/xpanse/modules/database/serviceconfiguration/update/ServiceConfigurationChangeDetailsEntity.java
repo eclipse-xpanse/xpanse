@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleTaskResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
@@ -64,7 +64,7 @@ public class ServiceConfigurationChangeDetailsEntity implements Serializable {
             foreignKeyDefinition = "FOREIGN KEY (SERVICE_ID) "
                     + "REFERENCES DEPLOY_SERVICE(ID) ON DELETE CASCADE"))
     @Cascade(CascadeType.ALL)
-    private DeployServiceEntity deployServiceEntity;
+    private ServiceDeploymentEntity serviceDeploymentEntity;
 
     private String resourceName;
 

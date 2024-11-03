@@ -6,7 +6,7 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
@@ -50,9 +50,9 @@ public class TerraformBootServiceModifier {
      * method to perform service modify using scripts provided in OCL.
      */
     public DeployResult modifyFromScripts(DeployTask deployTask) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
-        String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
+        String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
         result.setOrderId(deployTask.getOrderId());
         TerraformAsyncModifyFromScriptsRequest request =
@@ -71,9 +71,9 @@ public class TerraformBootServiceModifier {
      * method to perform service modify using scripts form GIT repo.
      */
     public DeployResult modifyFromGitRepo(DeployTask deployTask) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
-        String resourceState = TfResourceTransUtils.getStoredStateContent(deployServiceEntity);
+        String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
         result.setOrderId(deployTask.getOrderId());
         TerraformAsyncModifyFromGitRepoRequest request =

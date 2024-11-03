@@ -54,7 +54,7 @@ public class HuaweiCloudVmStateManager {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
             BatchStartServersRequest request = converter.buildBatchStartServersRequest(
-                    serviceStateManageRequest.getDeployResourceEntityList());
+                    serviceStateManageRequest.getServiceResourceEntityList());
             BatchStartServersResponse response = ecsClient.batchStartServersInvoker(request)
                     .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
                     .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
@@ -79,7 +79,7 @@ public class HuaweiCloudVmStateManager {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
             BatchStopServersRequest batchStopServersRequest =
                     converter.buildBatchStopServersRequest(
-                            serviceStateManageRequest.getDeployResourceEntityList());
+                            serviceStateManageRequest.getServiceResourceEntityList());
             BatchStopServersResponse response =
                     ecsClient.batchStopServersInvoker(batchStopServersRequest)
                             .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
@@ -104,7 +104,7 @@ public class HuaweiCloudVmStateManager {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
             BatchRebootServersRequest request = converter.buildBatchRebootServersRequest(
-                    serviceStateManageRequest.getDeployResourceEntityList());
+                    serviceStateManageRequest.getServiceResourceEntityList());
             BatchRebootServersResponse response = ecsClient.batchRebootServersInvoker(request)
                     .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
                     .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)

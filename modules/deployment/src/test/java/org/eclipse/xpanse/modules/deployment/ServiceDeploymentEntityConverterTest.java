@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
@@ -30,21 +30,21 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DeployServiceEntityConverterTest {
+class ServiceDeploymentEntityConverterTest {
     @Mock
     private ServiceTemplateStorage serviceTemplateStorage;
     @InjectMocks
     private DeployServiceEntityConverter converter;
-    private DeployServiceEntity deployServiceEntity;
+    private ServiceDeploymentEntity serviceDeploymentEntity;
     private ServiceTemplateEntity serviceTemplateEntity;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        deployServiceEntity = new DeployServiceEntity();
-        deployServiceEntity.setId(UUID.randomUUID());
-        deployServiceEntity.setDeployRequest(new DeployRequest());
-        deployServiceEntity.setServiceTemplateId(UUID.randomUUID());
+        serviceDeploymentEntity = new ServiceDeploymentEntity();
+        serviceDeploymentEntity.setId(UUID.randomUUID());
+        serviceDeploymentEntity.setDeployRequest(new DeployRequest());
+        serviceDeploymentEntity.setServiceTemplateId(UUID.randomUUID());
 
         Ocl ocl = new Ocl();
         ocl.setCategory(Category.AI);
@@ -63,23 +63,23 @@ class DeployServiceEntityConverterTest {
         ocl.setServiceConfigurationManage(new ServiceConfigurationManage());
 
         serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setId(deployServiceEntity.getServiceTemplateId());
+        serviceTemplateEntity.setId(serviceDeploymentEntity.getServiceTemplateId());
         serviceTemplateEntity.setOcl(ocl);
 
         when(serviceTemplateStorage.getServiceTemplateById(
-                deployServiceEntity.getServiceTemplateId()))
+                serviceDeploymentEntity.getServiceTemplateId()))
                 .thenReturn(serviceTemplateEntity);
     }
 
     @Test
     void testGetDeployTaskByStoredService() {
         DeployTask deployTask = converter.getDeployTaskByStoredService(
-                ServiceOrderType.DEPLOY, deployServiceEntity);
+                ServiceOrderType.DEPLOY, serviceDeploymentEntity);
 
         assertNotNull(deployTask);
         assertEquals(ServiceOrderType.DEPLOY, deployTask.getTaskType());
-        assertEquals(deployServiceEntity.getId(), deployTask.getServiceId());
-        assertEquals(deployServiceEntity.getDeployRequest(), deployTask.getDeployRequest());
+        assertEquals(serviceDeploymentEntity.getId(), deployTask.getServiceId());
+        assertEquals(serviceDeploymentEntity.getDeployRequest(), deployTask.getDeployRequest());
         assertEquals(serviceTemplateEntity.getOcl(), deployTask.getOcl());
         assertEquals(serviceTemplateEntity.getId(), deployTask.getServiceTemplateId());
     }
@@ -87,10 +87,10 @@ class DeployServiceEntityConverterTest {
     @Test
     void testGetInitialServiceConfiguration() {
         ServiceConfigurationEntity serviceConfigurationEntity =
-                converter.getInitialServiceConfiguration(deployServiceEntity);
+                converter.getInitialServiceConfiguration(serviceDeploymentEntity);
 
         assertNotNull(serviceConfigurationEntity);
-        assertEquals(deployServiceEntity, serviceConfigurationEntity.getDeployServiceEntity());
+        assertEquals(serviceDeploymentEntity, serviceConfigurationEntity.getServiceDeploymentEntity());
         assertNotNull(serviceConfigurationEntity.getCreatedTime());
         assertNotNull(serviceConfigurationEntity.getConfiguration());
     }

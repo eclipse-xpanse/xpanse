@@ -60,7 +60,7 @@ public class FlexibleEngineVmStateManager {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
             BatchStartServersRequest request =
                     requestConverter.buildBatchStartServersRequest(
-                            serviceStateManageRequest.getDeployResourceEntityList());
+                            serviceStateManageRequest.getServiceResourceEntityList());
             BatchStartServersResponse response =
                     ecsClient.batchStartServersInvoker(request)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
@@ -86,7 +86,7 @@ public class FlexibleEngineVmStateManager {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
             BatchStopServersRequest batchStopServersRequest =
                     requestConverter.buildBatchStopServersRequest(
-                            serviceStateManageRequest.getDeployResourceEntityList());
+                            serviceStateManageRequest.getServiceResourceEntityList());
             BatchStopServersResponse response =
                     ecsClient.batchStopServersInvoker(batchStopServersRequest)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
@@ -112,7 +112,7 @@ public class FlexibleEngineVmStateManager {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
             BatchRebootServersRequest request =
                     requestConverter.buildBatchRebootServersRequest(
-                            serviceStateManageRequest.getDeployResourceEntityList());
+                            serviceStateManageRequest.getServiceResourceEntityList());
             BatchRebootServersResponse response =
                     ecsClient.batchRebootServersInvoker(request)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())

@@ -25,17 +25,17 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 
 /**
- * DeployResourceEntity for persistence.
+ * ServiceResourceEntity for persistence.
  */
 @Data
-@Table(name = "DEPLOY_RESOURCE")
+@Table(name = "SERVICE_RESOURCE")
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class DeployResourceEntity extends CreateModifiedTime {
+public class ServiceResourceEntity extends CreateModifiedTime {
 
     /**
      * The id of the entity.
@@ -46,31 +46,31 @@ public class DeployResourceEntity extends CreateModifiedTime {
     private UUID id;
 
     /**
-     * The type of the group which configuration the deployed resource.
+     * The type of the group which configuration the service resource.
      */
     @Column(name = "GROUP_TYPE")
     private String groupType;
 
     /**
-     * The name of the group which configuration the deployed resource.
+     * The name of the group which configuration the service resource.
      */
     @Column(name = "GROUP_NAME")
     private String groupName;
 
     /**
-     * The id of the deployed resource.
+     * The id of the service resource.
      */
     @Column(name = "RESOURCE_ID")
     private String resourceId;
 
     /**
-     * The name of the deployed resource.
+     * The name of the service resource.
      */
     @Column(name = "RESOURCE_NAME")
     private String resourceName;
 
     /**
-     * The kind of the deployed resource.
+     * The kind of the service resource.
      */
     @Column(name = "RESOURCE_KIND")
     @Enumerated(EnumType.STRING)
@@ -80,17 +80,17 @@ public class DeployResourceEntity extends CreateModifiedTime {
      * The deployService we belonged to.
      */
     @ManyToOne
-    @JoinColumn(name = "deployService_id")
-    @JsonIgnoreProperties({"deployResourceEntity"})
-    private DeployServiceEntity deployService;
+    @JoinColumn(name = "SERVICE_ID")
+    @JsonIgnoreProperties({"deployResourceList"})
+    private ServiceDeploymentEntity serviceDeploymentEntity;
 
     /**
-     * The properties of the deployed resource.
+     * The properties of the service resource.
      */
     @ElementCollection
-    @CollectionTable(name = "DEPLOY_RESOURCE_PROPERTY",
-            joinColumns = @JoinColumn(name = "deployResource_id", nullable = false))
-    @MapKeyColumn(name = "p_key")
+    @CollectionTable(name = "SERVICE_RESOURCE_PROPERTY",
+            joinColumns = @JoinColumn(name = "RESOURCE_ID", nullable = false))
+    @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
     private Map<String, String> properties;
 }

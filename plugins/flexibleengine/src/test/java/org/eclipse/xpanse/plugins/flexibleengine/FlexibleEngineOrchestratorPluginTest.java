@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -306,20 +306,20 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.startService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockFlexibleEngineVmStateManagerService.startService(
                 serviceStateManageRequest1)).thenReturn(false);
 
@@ -337,20 +337,20 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.startService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockFlexibleEngineVmStateManagerService.startService(
                 serviceStateManageRequest1)).thenReturn(true);
 
@@ -368,20 +368,20 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.stopService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockFlexibleEngineVmStateManagerService.stopService(
                 serviceStateManageRequest1)).thenReturn(false);
 
@@ -399,20 +399,20 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.stopService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockFlexibleEngineVmStateManagerService.stopService(
                 serviceStateManageRequest1)).thenReturn(true);
 
@@ -430,20 +430,20 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.restartService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockFlexibleEngineVmStateManagerService.restartService(
                 serviceStateManageRequest1)).thenReturn(false);
 
@@ -461,20 +461,20 @@ class FlexibleEngineOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure FlexibleEngineVmStateManager.restartService(...).
         final ServiceStateManageRequest serviceStateManageRequest1 =
                 new ServiceStateManageRequest();
         serviceStateManageRequest1.setUserId("userId");
         serviceStateManageRequest1.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
-        deployResourceEntity1.setResourceId("resourceId");
-        serviceStateManageRequest1.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockFlexibleEngineVmStateManagerService.restartService(
                 serviceStateManageRequest1)).thenReturn(true);
 

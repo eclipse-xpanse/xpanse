@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
@@ -102,7 +102,7 @@ public class ApisTestCommon {
     @Resource
     public ServiceOrderManager serviceOrderManager;
     @Resource
-    protected DeployServiceStorage deployServiceStorage;
+    protected ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     protected ServiceTemplateStorage serviceTemplateStorage;
     @Resource
@@ -397,8 +397,8 @@ public class ApisTestCommon {
     }
 
     protected void deleteDeployedService(UUID serviceId) {
-        deployServiceStorage.deleteDeployService(
-                deployServiceStorage.findDeployServiceById(serviceId));
+        serviceDeploymentStorage.deleteServiceDeployment(
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId));
     }
 
     protected DeployRequest getDeployRequest(ServiceTemplateDetailVo serviceTemplate) {

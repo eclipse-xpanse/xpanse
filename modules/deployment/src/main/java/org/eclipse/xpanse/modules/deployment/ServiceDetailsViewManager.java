@@ -13,8 +13,8 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
@@ -42,7 +42,7 @@ public class ServiceDetailsViewManager {
     @Resource
     private UserServiceHelper userServiceHelper;
     @Resource
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     private ServiceStateManager serviceStateManager;
     @Resource
@@ -55,22 +55,22 @@ public class ServiceDetailsViewManager {
      * @return serviceDetailVo
      */
     public DeployedServiceDetails getServiceDetailsByIdForIsv(UUID id) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
         ServiceHostingType serviceHostingType =
-                deployServiceEntity.getDeployRequest().getServiceHostingType();
+                serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
             String errorMsg = String.format("the details of Service with id %s no accessible", id);
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        boolean isManagedByCurrentUser =
-                userServiceHelper.currentUserCanManageNamespace(deployServiceEntity.getNamespace());
+        boolean isManagedByCurrentUser = userServiceHelper
+                .currentUserCanManageNamespace(serviceDeploymentEntity.getNamespace());
         if (!isManagedByCurrentUser) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
-        return EntityTransUtils.transToDeployedServiceDetails(deployServiceEntity);
+        return EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
     }
 
     /**
@@ -90,7 +90,7 @@ public class ServiceDetailsViewManager {
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
         String currentUserId = userServiceHelper.getCurrentUserId();
         query.setUserId(currentUserId);
-        return deployServiceStorage.listServices(query).stream()
+        return serviceDeploymentStorage.listServices(query).stream()
                 .map(EntityTransUtils::convertToDeployedService).toList();
     }
 
@@ -133,23 +133,23 @@ public class ServiceDetailsViewManager {
      * @return serviceDetailVo
      */
     public DeployedServiceDetails getSelfHostedServiceDetailsByIdForEndUser(UUID id) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
         boolean currentUserIsOwner =
-                userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
+                userServiceHelper.currentUserIsOwner(serviceDeploymentEntity.getUserId());
         if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
         ServiceHostingType serviceHostingType =
-                deployServiceEntity.getDeployRequest().getServiceHostingType();
+                serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SELF != serviceHostingType) {
             String errorMsg = String.format(
                     "details of non service-self hosted with id %s is not " + "accessible", id);
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        return EntityTransUtils.transToDeployedServiceDetails(deployServiceEntity);
+        return EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
     }
 
     /**
@@ -159,23 +159,23 @@ public class ServiceDetailsViewManager {
      * @return VendorHostedDeployedServiceDetails
      */
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsByIdForEndUser(UUID id) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(id);
         boolean currentUserIsOwner =
-                userServiceHelper.currentUserIsOwner(deployServiceEntity.getUserId());
+                userServiceHelper.currentUserIsOwner(serviceDeploymentEntity.getUserId());
         if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
         ServiceHostingType serviceHostingType =
-                deployServiceEntity.getDeployRequest().getServiceHostingType();
+                serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
             String errorMsg = String.format(
                     "details of non service-vendor hosted with id %s is not accessible", id);
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        return EntityTransUtils.transToVendorHostedServiceDetails(deployServiceEntity);
+        return EntityTransUtils.transToVendorHostedServiceDetails(serviceDeploymentEntity);
     }
 
 
@@ -198,7 +198,7 @@ public class ServiceDetailsViewManager {
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
         String namespace = userServiceHelper.getCurrentUserManageNamespace();
         query.setNamespace(namespace);
-        List<DeployServiceEntity> deployServices = deployServiceStorage.listServices(query);
+        List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
         return deployServices.stream().map(EntityTransUtils::convertToDeployedService).toList();
     }
 

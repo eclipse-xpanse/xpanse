@@ -14,8 +14,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
@@ -52,10 +52,10 @@ public class EntityTransUtils {
      * @return list of DeployResource
      */
     public static List<DeployResource> transToDeployResourceList(
-            List<DeployResourceEntity> entities) {
+            List<ServiceResourceEntity> entities) {
         List<DeployResource> resources = new ArrayList<>();
         if (!CollectionUtils.isEmpty(entities)) {
-            for (DeployResourceEntity entity : entities) {
+            for (ServiceResourceEntity entity : entities) {
                 DeployResource deployResource = new DeployResource();
                 BeanUtils.copyProperties(entity, deployResource);
                 resources.add(deployResource);
@@ -71,7 +71,7 @@ public class EntityTransUtils {
      * @param serviceEntity DeployServiceEntity
      * @return result
      */
-    public static DeployedService convertToDeployedService(DeployServiceEntity serviceEntity) {
+    public static DeployedService convertToDeployedService(ServiceDeploymentEntity serviceEntity) {
         if (Objects.nonNull(serviceEntity)) {
             DeployedService deployedService = new DeployedService();
             BeanUtils.copyProperties(serviceEntity, deployedService);
@@ -92,7 +92,8 @@ public class EntityTransUtils {
      * @param entity DeployServiceEntity.
      * @return DeployedServiceDetails
      */
-    public static DeployedServiceDetails transToDeployedServiceDetails(DeployServiceEntity entity) {
+    public static DeployedServiceDetails
+            transToDeployedServiceDetails(ServiceDeploymentEntity entity) {
         DeployedServiceDetails details = new DeployedServiceDetails();
         details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
         details.setBillingMode(entity.getDeployRequest().getBillingMode());
@@ -118,7 +119,7 @@ public class EntityTransUtils {
      * @return serviceDetailVo
      */
     public static VendorHostedDeployedServiceDetails transToVendorHostedServiceDetails(
-            DeployServiceEntity entity) {
+            ServiceDeploymentEntity entity) {
         VendorHostedDeployedServiceDetails details = new VendorHostedDeployedServiceDetails();
         details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
         BeanUtils.copyProperties(entity, details);
@@ -169,7 +170,7 @@ public class EntityTransUtils {
     public static ServiceOrderDetails transToServiceOrderDetails(ServiceOrderEntity entity) {
         ServiceOrderDetails details = new ServiceOrderDetails();
         BeanUtils.copyProperties(entity, details);
-        details.setServiceId(entity.getDeployServiceEntity().getId());
+        details.setServiceId(entity.getServiceDeploymentEntity().getId());
         return details;
     }
 

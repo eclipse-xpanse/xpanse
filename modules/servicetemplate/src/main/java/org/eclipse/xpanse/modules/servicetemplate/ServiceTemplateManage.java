@@ -16,8 +16,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
@@ -69,7 +69,7 @@ public class ServiceTemplateManage {
     @Resource
     private ServiceTemplateStorage templateStorage;
     @Resource
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
     @Resource
@@ -382,7 +382,7 @@ public class ServiceTemplateManage {
             log.error(errMsg);
             throw new ServiceTemplateStillInUseException(errMsg);
         }
-        List<DeployServiceEntity> deployServiceEntities =
+        List<ServiceDeploymentEntity> deployServiceEntities =
                 listDeployServicesByTemplateId(existingTemplate.getId());
         if (!deployServiceEntities.isEmpty()) {
             String errMsg = String.format("Service template with id %s is still in use.", id);
@@ -411,10 +411,10 @@ public class ServiceTemplateManage {
         return templateStorage.getServiceTemplateById(id);
     }
 
-    private List<DeployServiceEntity> listDeployServicesByTemplateId(UUID serviceTemplateId) {
+    private List<ServiceDeploymentEntity> listDeployServicesByTemplateId(UUID serviceTemplateId) {
         ServiceQueryModel query = new ServiceQueryModel();
         query.setServiceTemplateId(serviceTemplateId);
-        return deployServiceStorage.listServices(query);
+        return serviceDeploymentStorage.listServices(query);
     }
 
 

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
@@ -39,21 +39,21 @@ public class DeployServiceEntityConverter {
      * Method to create a DeployTask from DeployServiceEntity.
      *
      * @param orderType           ServiceOrderType.
-     * @param deployServiceEntity DeployServiceEntity object.
+     * @param serviceDeploymentEntity DeployServiceEntity object.
      * @return DeployTask object.
      */
     public DeployTask getDeployTaskByStoredService(ServiceOrderType orderType,
-                                                   DeployServiceEntity deployServiceEntity) {
+            ServiceDeploymentEntity serviceDeploymentEntity) {
         // Set Ocl and CreateRequest
         DeployTask deployTask = new DeployTask();
         deployTask.setOrderId(UUID.randomUUID());
         deployTask.setTaskType(orderType);
-        deployTask.setServiceId(deployServiceEntity.getId());
-        deployTask.setUserId(deployServiceEntity.getUserId());
-        deployTask.setDeployRequest(deployServiceEntity.getDeployRequest());
-        deployTask.setNamespace(deployServiceEntity.getNamespace());
+        deployTask.setServiceId(serviceDeploymentEntity.getId());
+        deployTask.setUserId(serviceDeploymentEntity.getUserId());
+        deployTask.setDeployRequest(serviceDeploymentEntity.getDeployRequest());
+        deployTask.setNamespace(serviceDeploymentEntity.getNamespace());
         ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
-                deployServiceEntity.getServiceTemplateId());
+                serviceDeploymentEntity.getServiceTemplateId());
         deployTask.setOcl(serviceTemplateEntity.getOcl());
         deployTask.setServiceTemplateId(serviceTemplateEntity.getId());
         return deployTask;
@@ -62,23 +62,23 @@ public class DeployServiceEntityConverter {
     /**
      * Method to create a ServiceConfigurationEntity from DeployTask.
      *
-     * @param deployServiceEntity DeployServiceEntity object.
+     * @param serviceDeploymentEntity DeployServiceEntity object.
      * @return ServiceConfigurationEntity.
      */
     public ServiceConfigurationEntity getInitialServiceConfiguration(
-            DeployServiceEntity deployServiceEntity) {
+            ServiceDeploymentEntity serviceDeploymentEntity) {
         ServiceConfigurationEntity entity = new ServiceConfigurationEntity();
-        entity.setDeployServiceEntity(deployServiceEntity);
+        entity.setServiceDeploymentEntity(serviceDeploymentEntity);
         entity.setCreatedTime(OffsetDateTime.now());
-        Map<String, Object> configuration = getServiceConfiguration(deployServiceEntity);
+        Map<String, Object> configuration = getServiceConfiguration(serviceDeploymentEntity);
         entity.setConfiguration(configuration);
         return entity;
     }
 
-    private Map<String, Object> getServiceConfiguration(DeployServiceEntity deployServiceEntity) {
+    private Map<String, Object> getServiceConfiguration(ServiceDeploymentEntity serviceDeployment) {
         Map<String, Object> configuration = new HashMap<>();
         DeployTask deployTask = getDeployTaskByStoredService(ServiceOrderType.DEPLOY,
-                deployServiceEntity);
+                serviceDeployment);
         ServiceConfigurationManage serviceConfigurationManage =
                 deployTask.getOcl().getServiceConfigurationManage();
         if (Objects.nonNull(serviceConfigurationManage)) {

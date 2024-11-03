@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
 import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
@@ -97,28 +97,29 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
     }
 
     private boolean isDestroySuccess(UUID oldServiceId) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(oldServiceId);
 
-        if (Objects.isNull(deployServiceEntity)) {
+        if (Objects.isNull(serviceDeploymentEntity)) {
             return false;
         }
-        return deployServiceEntity.getServiceDeploymentState()
+        return serviceDeploymentEntity.getServiceDeploymentState()
                 == ServiceDeploymentState.DESTROY_SUCCESS;
     }
 
     private boolean isMigrationSuccess(UUID newServiceId, UUID oldServiceId) {
 
-        DeployServiceEntity newDeployServiceEntity =
+        ServiceDeploymentEntity newServiceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(newServiceId);
 
-        DeployServiceEntity oldDeployServiceEntity =
+        ServiceDeploymentEntity oldServiceDeploymentEntity =
                 deployServiceEntityHandler.getDeployServiceEntity(oldServiceId);
 
-        if (Objects.nonNull(newDeployServiceEntity) && Objects.nonNull(oldDeployServiceEntity)) {
-            return newDeployServiceEntity.getServiceDeploymentState()
+        if (Objects.nonNull(newServiceDeploymentEntity)
+                && Objects.nonNull(oldServiceDeploymentEntity)) {
+            return newServiceDeploymentEntity.getServiceDeploymentState()
                     == ServiceDeploymentState.DEPLOY_SUCCESS
-                    && oldDeployServiceEntity.getServiceDeploymentState()
+                    && oldServiceDeploymentEntity.getServiceDeploymentState()
                     == ServiceDeploymentState.DESTROY_SUCCESS;
         }
         return false;

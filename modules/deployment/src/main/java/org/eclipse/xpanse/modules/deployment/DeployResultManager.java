@@ -15,9 +15,9 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
@@ -52,7 +52,7 @@ import org.springframework.util.CollectionUtils;
 public class DeployResultManager {
 
     @Resource
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     private ServiceOrderStorage serviceOrderStorage;
     @Resource
@@ -108,7 +108,7 @@ public class DeployResultManager {
         ServiceOrderEntity storedOrderEntity = serviceOrderStorage.getEntityById(orderId);
         ServiceOrderType taskType = storedOrderEntity.getTaskType();
         // update deployServiceEntity
-        DeployServiceEntity updatedServiceEntity =
+        ServiceDeploymentEntity updatedServiceEntity =
                 updateDeployServiceEntityWithDeployResult(deployResult, taskType);
         // When the task failed and task type is deploy or retry, start a new order to rollback.
         if (isFailedDeployTask(deployResult.getIsTaskSuccessful(), taskType)) {
@@ -162,18 +162,18 @@ public class DeployResultManager {
      * Perform rollback when deployment fails and destroy the created resources.
      */
     public void rollbackOnDeploymentFailure(DeployTask rollbackTask,
-                                            DeployServiceEntity deployServiceEntity) {
+                                            ServiceDeploymentEntity serviceDeploymentEntity) {
         DeployResult rollbackResult;
         RuntimeException exception = null;
         log.info("Performing rollback of already provisioned resources.");
         rollbackTask.setOrderId(UUID.randomUUID());
         rollbackTask.setTaskType(ServiceOrderType.ROLLBACK);
-        ServiceOrderEntity serviceOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(rollbackTask, deployServiceEntity);
+        ServiceOrderEntity serviceOrderEntity = serviceOrderManager
+                .storeNewServiceOrderEntity(rollbackTask, serviceDeploymentEntity);
         Deployer deployer = deployerKindManager.getDeployment(
                 rollbackTask.getOcl().getDeployment().getDeployerTool().getKind());
         try {
-            if (CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
+            if (CollectionUtils.isEmpty(serviceDeploymentEntity.getDeployResourceList())) {
                 log.info("No resources need to destroy, the rollback task success.");
                 rollbackResult = new DeployResult();
                 rollbackResult.setOrderId(rollbackTask.getOrderId());
@@ -200,104 +200,103 @@ public class DeployResultManager {
                 && (taskType == ServiceOrderType.DEPLOY || taskType == ServiceOrderType.RETRY);
     }
 
-    private DeployServiceEntity updateDeployServiceEntityWithDeployResult(
+    private ServiceDeploymentEntity updateDeployServiceEntityWithDeployResult(
             DeployResult deployResult, ServiceOrderType taskType) {
-        DeployServiceEntity deployServiceEntity =
+        ServiceDeploymentEntity serviceDeploymentEntity =
                 serviceOrderStorage.getDeployServiceByOrderId(deployResult.getOrderId());
         log.info("Update deploy service entity {} with deploy result {}",
-                deployServiceEntity.getId(), deployResult);
+                serviceDeploymentEntity.getId(), deployResult);
         if (StringUtils.isNotBlank(deployResult.getTfStateContent())) {
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
-                            deployServiceEntity.getServiceTemplateId());
+                            serviceDeploymentEntity.getServiceTemplateId());
             DeployerKind deployerKind =
                     serviceTemplateEntity.getOcl().getDeployment().getDeployerTool().getKind();
-            resourceHandlerManager.getResourceHandler(deployServiceEntity.getCsp(), deployerKind)
-                    .handler(deployResult);
+            resourceHandlerManager.getResourceHandler(serviceDeploymentEntity.getCsp(),
+                            deployerKind).handler(deployResult);
         }
-        DeployServiceEntity deployServiceToUpdate = new DeployServiceEntity();
-        BeanUtils.copyProperties(deployServiceEntity, deployServiceToUpdate);
+        ServiceDeploymentEntity deployServiceToUpdate = new ServiceDeploymentEntity();
+        BeanUtils.copyProperties(serviceDeploymentEntity, deployServiceToUpdate);
         updateServiceEntityWithDeployResult(deployResult, taskType, deployServiceToUpdate);
-        return deployServiceStorage.storeAndFlush(deployServiceToUpdate);
+        return serviceDeploymentStorage.storeAndFlush(deployServiceToUpdate);
     }
 
 
     private void updateServiceEntityWithDeployResult(DeployResult deployResult,
-                                                     ServiceOrderType taskType,
-                                                     DeployServiceEntity deployServiceEntity) {
+            ServiceOrderType taskType, ServiceDeploymentEntity serviceDeploymentEntity) {
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         ServiceDeploymentState deploymentState =
                 getServiceDeploymentState(taskType, isTaskSuccessful);
         if (Objects.nonNull(deploymentState)) {
-            deployServiceEntity.setServiceDeploymentState(deploymentState);
+            serviceDeploymentEntity.setServiceDeploymentState(deploymentState);
         }
         if (StringUtils.isNotBlank(deployResult.getMessage())) {
-            deployServiceEntity.setResultMessage(deployResult.getMessage());
+            serviceDeploymentEntity.setResultMessage(deployResult.getMessage());
         } else {
             // When rollback successfully, the result message should be the previous error message.
             if (isTaskSuccessful && taskType != ServiceOrderType.ROLLBACK) {
-                deployServiceEntity.setResultMessage(null);
+                serviceDeploymentEntity.setResultMessage(null);
             }
         }
         if (deploymentState == ServiceDeploymentState.MODIFICATION_SUCCESSFUL) {
-            DeployRequest modifyRequest = deployServiceEntity.getDeployRequest();
-            deployServiceEntity.setFlavor(modifyRequest.getFlavor());
-            deployServiceEntity.setCustomerServiceName(modifyRequest.getCustomerServiceName());
+            DeployRequest modifyRequest = serviceDeploymentEntity.getDeployRequest();
+            serviceDeploymentEntity.setFlavor(modifyRequest.getFlavor());
+            serviceDeploymentEntity.setCustomerServiceName(modifyRequest.getCustomerServiceName());
         }
 
-        updateServiceConfiguration(deploymentState, deployServiceEntity);
-        updateServiceState(deploymentState, deployServiceEntity);
+        updateServiceConfiguration(deploymentState, serviceDeploymentEntity);
+        updateServiceState(deploymentState, serviceDeploymentEntity);
 
         if (CollectionUtils.isEmpty(deployResult.getPrivateProperties())) {
             if (isTaskSuccessful) {
-                deployServiceEntity.setPrivateProperties(Collections.emptyMap());
+                serviceDeploymentEntity.setPrivateProperties(Collections.emptyMap());
             }
         } else {
-            deployServiceEntity.setPrivateProperties(deployResult.getPrivateProperties());
+            serviceDeploymentEntity.setPrivateProperties(deployResult.getPrivateProperties());
         }
 
         if (CollectionUtils.isEmpty(deployResult.getProperties())) {
             if (isTaskSuccessful) {
-                deployServiceEntity.setProperties(Collections.emptyMap());
+                serviceDeploymentEntity.setProperties(Collections.emptyMap());
             }
         } else {
-            deployServiceEntity.setProperties(deployResult.getProperties());
+            serviceDeploymentEntity.setProperties(deployResult.getProperties());
         }
 
         if (CollectionUtils.isEmpty(deployResult.getResources())) {
             if (isTaskSuccessful) {
-                deployServiceEntity.setDeployResourceList(Collections.emptyList());
+                serviceDeploymentEntity.setDeployResourceList(Collections.emptyList());
             }
         } else {
-            deployServiceEntity.setDeployResourceList(
-                    getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
+            serviceDeploymentEntity.setDeployResourceList(getDeployResourceEntityList(
+                    deployResult.getResources(), serviceDeploymentEntity));
         }
-        sensitiveDataHandler.maskSensitiveFields(deployServiceEntity);
+        sensitiveDataHandler.maskSensitiveFields(serviceDeploymentEntity);
     }
 
     private void updateServiceConfiguration(ServiceDeploymentState state,
-                                            DeployServiceEntity deployServiceEntity) {
+                                            ServiceDeploymentEntity serviceDeploymentEntity) {
         if (state == ServiceDeploymentState.DEPLOY_SUCCESS) {
             ServiceConfigurationEntity serviceConfigurationEntity =
                     deployServiceEntityConverter.getInitialServiceConfiguration(
-                            deployServiceEntity);
-            deployServiceEntity.setServiceConfigurationEntity(serviceConfigurationEntity);
+                            serviceDeploymentEntity);
+            serviceDeploymentEntity.setServiceConfigurationEntity(serviceConfigurationEntity);
         }
         if (state == ServiceDeploymentState.DESTROY_SUCCESS) {
-            deployServiceEntity.setServiceConfigurationEntity(null);
+            serviceDeploymentEntity.setServiceConfigurationEntity(null);
         }
     }
 
     private void updateServiceState(ServiceDeploymentState state,
-                                    DeployServiceEntity deployServiceEntity) {
+                                    ServiceDeploymentEntity serviceDeploymentEntity) {
         if (state == ServiceDeploymentState.DEPLOY_SUCCESS
                 || state == ServiceDeploymentState.MODIFICATION_SUCCESSFUL) {
-            deployServiceEntity.setServiceState(ServiceState.RUNNING);
-            deployServiceEntity.setLastStartedAt(OffsetDateTime.now());
+            serviceDeploymentEntity.setServiceState(ServiceState.RUNNING);
+            serviceDeploymentEntity.setLastStartedAt(OffsetDateTime.now());
         }
         if (state == ServiceDeploymentState.DEPLOY_FAILED
                 || state == ServiceDeploymentState.DESTROY_SUCCESS) {
-            deployServiceEntity.setServiceState(ServiceState.NOT_RUNNING);
+            serviceDeploymentEntity.setServiceState(ServiceState.NOT_RUNNING);
         }
         // case other cases, do not change the state of service.
     }
@@ -320,18 +319,18 @@ public class DeployResultManager {
 
 
     /**
-     * Convert deploy resources to deploy resource entities.
+     * Convert service resources to deploy resource entities.
      */
-    private List<DeployResourceEntity> getDeployResourceEntityList(
-            List<DeployResource> deployResources, DeployServiceEntity deployServiceEntity) {
-        List<DeployResourceEntity> deployResourceEntities = new ArrayList<>();
+    private List<ServiceResourceEntity> getDeployResourceEntityList(
+            List<DeployResource> deployResources, ServiceDeploymentEntity serviceDeploymentEntity) {
+        List<ServiceResourceEntity> deployResourceEntities = new ArrayList<>();
         if (CollectionUtils.isEmpty(deployResources)) {
             return deployResourceEntities;
         }
         for (DeployResource resource : deployResources) {
-            DeployResourceEntity deployResource = new DeployResourceEntity();
+            ServiceResourceEntity deployResource = new ServiceResourceEntity();
             BeanUtils.copyProperties(resource, deployResource);
-            deployResource.setDeployService(deployServiceEntity);
+            deployResource.setServiceDeploymentEntity(serviceDeploymentEntity);
             deployResourceEntities.add(deployResource);
         }
         return deployResourceEntities;

@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-class DeployServiceEntityTest {
+class ServiceDeploymentEntityTest {
 
     private final OffsetDateTime LAST_STARTED_AT = OffsetDateTime.now();
     private final OffsetDateTime LAST_STOPPED_AT = OffsetDateTime.now();
@@ -47,15 +47,15 @@ class DeployServiceEntityTest {
     private final UUID SERVICE_TEMPLATE_ID =
             UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f3d");
     private final DeployRequest CREATE_REQUEST = new DeployRequest();
-    private final List<DeployResourceEntity> DEPLOY_RESOURCE_LIST = new ArrayList<>();
+    private final List<ServiceResourceEntity> DEPLOY_RESOURCE_LIST = new ArrayList<>();
     private final Map<String, String> PROPERTIES = new HashMap<>();
     private final Map<String, String> PRIVATE_PROPERTIES = new HashMap<>();
     private final String RESULT_MESSAGE = "RESULT_MESSAGE";
-    private DeployServiceEntity test;
+    private ServiceDeploymentEntity test;
 
     @BeforeEach
     void setUp() {
-        test = new DeployServiceEntity();
+        test = new ServiceDeploymentEntity();
         test.setId(ID);
         test.setUserId(USER_ID);
         test.setCategory(CATEGORY);
@@ -105,7 +105,7 @@ class DeployServiceEntityTest {
     @Test
     void testToString() {
         String expectedToString =
-                "DeployServiceEntity(id=" + ID + ", userId=" + USER_ID + ", category=" + CATEGORY
+                "ServiceDeploymentEntity(id=" + ID + ", userId=" + USER_ID + ", category=" + CATEGORY
                         + ", name=" + NAME + ", customerServiceName=" + CUSTOMER_SERVICE_NAME
                         + ", version=" + VERSION + ", namespace=" + NAMESPACE + ", csp=" + CSP
                         + ", flavor=" + FLAVOR + ", serviceDeploymentState=" + SERVICE_STATE
@@ -126,7 +126,7 @@ class DeployServiceEntityTest {
         assertNotEquals(test, o);
         assertNotEquals(test.hashCode(), o.hashCode());
 
-        DeployServiceEntity test1 = new DeployServiceEntity();
+        ServiceDeploymentEntity test1 = new ServiceDeploymentEntity();
         assertTrue(test.canEqual(test1));
         assertNotEquals(test, test1);
         assertNotEquals(test.hashCode(), test1.hashCode());

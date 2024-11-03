@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeploymentStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
@@ -50,7 +50,7 @@ public class ServiceDeploymentStatusChangePolling {
     private int pollingWaitPeriod;
 
     @Resource
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
 
     /**
      * Method to fetch order status by polling database for a fixed period of time.
@@ -75,20 +75,20 @@ public class ServiceDeploymentStatusChangePolling {
                     .pollDelay(0, TimeUnit.SECONDS) // first check runs without wait.
                     .pollInterval(pollingInterval, TimeUnit.SECONDS)
                     .until(() -> {
-                        DeployServiceEntity deployServiceEntity =
-                                deployServiceStorage.findDeployServiceById(serviceId);
-                        if (Objects.isNull(deployServiceEntity)) {
+                        ServiceDeploymentEntity serviceDeploymentEntity =
+                                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
+                        if (Objects.isNull(serviceDeploymentEntity)) {
                             throw new ServiceNotDeployedException(
                                     "Service with id " + serviceId + " not found");
                         }
                         ref.set(new DeploymentStatusUpdate(
-                                deployServiceEntity.getServiceDeploymentState(),
+                                serviceDeploymentEntity.getServiceDeploymentState(),
                                 FINAL_SERVICE_DEPLOYMENT_STATES.contains(
-                                        deployServiceEntity.getServiceDeploymentState())));
+                                        serviceDeploymentEntity.getServiceDeploymentState())));
                         return Objects.isNull(previousKnownServiceDeploymentState)
                                 || FINAL_SERVICE_DEPLOYMENT_STATES.contains(
-                                deployServiceEntity.getServiceDeploymentState())
-                                || deployServiceEntity.getServiceDeploymentState()
+                                serviceDeploymentEntity.getServiceDeploymentState())
+                                || serviceDeploymentEntity.getServiceDeploymentState()
                                 != previousKnownServiceDeploymentState;
                     });
         } catch (ConditionTimeoutException conditionTimeoutException) {

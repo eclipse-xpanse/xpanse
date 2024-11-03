@@ -10,8 +10,8 @@ import jakarta.annotation.Resource;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
-import org.eclipse.xpanse.modules.database.service.DeployServiceStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 public class DeployServiceEntityHandler {
 
     @Resource
-    private DeployServiceStorage deployServiceStorage;
+    private ServiceDeploymentStorage serviceDeploymentStorage;
 
     /**
      * Get deploy service entity by id.
@@ -32,30 +32,31 @@ public class DeployServiceEntityHandler {
      * @param id service id.
      * @return deploy service entity.
      */
-    public DeployServiceEntity getDeployServiceEntity(UUID id) {
-        DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
-        if (Objects.isNull(deployServiceEntity)) {
+    public ServiceDeploymentEntity getDeployServiceEntity(UUID id) {
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                serviceDeploymentStorage.findServiceDeploymentById(id);
+        if (Objects.isNull(serviceDeploymentEntity)) {
             String errorMsg = String.format("Service with id %s not found.", id);
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
-        return deployServiceEntity;
+        return serviceDeploymentEntity;
     }
 
     /**
      * Store and flush deploy service entity.
      *
-     * @param deployServiceEntity deploy service entity.
+     * @param serviceDeploymentEntity deploy service entity.
      * @return updated deploy service entity.
      */
-    public DeployServiceEntity storeAndFlush(DeployServiceEntity deployServiceEntity) {
-        return deployServiceStorage.storeAndFlush(deployServiceEntity);
+    public ServiceDeploymentEntity storeAndFlush(ServiceDeploymentEntity serviceDeploymentEntity) {
+        return serviceDeploymentStorage.storeAndFlush(serviceDeploymentEntity);
     }
 
-    public DeployServiceEntity updateServiceDeploymentStatus(DeployServiceEntity deployService,
-                                                             ServiceDeploymentState state) {
+    public ServiceDeploymentEntity updateServiceDeploymentStatus(
+            ServiceDeploymentEntity deployService, ServiceDeploymentState state) {
         deployService.setServiceDeploymentState(state);
-        return deployServiceStorage.storeAndFlush(deployService);
+        return serviceDeploymentStorage.storeAndFlush(deployService);
     }
 
 

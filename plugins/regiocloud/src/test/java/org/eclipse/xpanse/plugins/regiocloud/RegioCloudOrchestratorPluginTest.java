@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.resource.DeployResourceEntity;
+import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.billing.Price;
 import org.eclipse.xpanse.modules.models.billing.RatingMode;
@@ -251,19 +251,19 @@ class RegioCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure OpenstackServersManager.startService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
         request.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity1.setResourceId("resourceId");
-        request.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        request.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockServersManager.startService(csp, request)).thenReturn(false);
 
         // Run the test
@@ -280,19 +280,19 @@ class RegioCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure OpenstackServersManager.startService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
         request.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity1.setResourceId("resourceId");
-        request.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        request.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockServersManager.startService(csp, request)).thenReturn(true);
 
         // Run the test
@@ -309,19 +309,19 @@ class RegioCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure OpenstackServersManager.stopService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
         request.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity1.setResourceId("resourceId");
-        request.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        request.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockServersManager.stopService(csp, request)).thenReturn(false);
 
         // Run the test
@@ -338,19 +338,19 @@ class RegioCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure OpenstackServersManager.stopService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
         request.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity1.setResourceId("resourceId");
-        request.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        request.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockServersManager.stopService(csp, request)).thenReturn(true);
 
         // Run the test
@@ -367,19 +367,19 @@ class RegioCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure OpenstackServersManager.restartService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
         request.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity1.setResourceId("resourceId");
-        request.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        request.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockServersManager.restartService(csp, request)).thenReturn(false);
 
         // Run the test
@@ -396,19 +396,19 @@ class RegioCloudOrchestratorPluginTest {
         final ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setUserId("userId");
         serviceStateManageRequest.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity = new DeployResourceEntity();
-        deployResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity.setResourceId("resourceId");
-        serviceStateManageRequest.setDeployResourceEntityList(List.of(deployResourceEntity));
+        final ServiceResourceEntity serviceResourceEntity = new ServiceResourceEntity();
+        serviceResourceEntity.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity.setResourceId("resourceId");
+        serviceStateManageRequest.setServiceResourceEntityList(List.of(serviceResourceEntity));
 
         // Configure OpenstackServersManager.restartService(...).
         final ServiceStateManageRequest request = new ServiceStateManageRequest();
         request.setUserId("userId");
         request.setRegion(getRegion());
-        final DeployResourceEntity deployResourceEntity1 = new DeployResourceEntity();
-        deployResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
-        deployResourceEntity1.setResourceId("resourceId");
-        request.setDeployResourceEntityList(List.of(deployResourceEntity1));
+        final ServiceResourceEntity serviceResourceEntity1 = new ServiceResourceEntity();
+        serviceResourceEntity1.setId(UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21"));
+        serviceResourceEntity1.setResourceId("resourceId");
+        request.setServiceResourceEntityList(List.of(serviceResourceEntity1));
         when(mockServersManager.restartService(csp, request)).thenReturn(true);
 
         // Run the test
