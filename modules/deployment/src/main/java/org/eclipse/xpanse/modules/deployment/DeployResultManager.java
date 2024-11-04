@@ -19,13 +19,11 @@ import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
-import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
-import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.deployment.recreate.RecreateService;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
@@ -59,8 +57,6 @@ public class DeployResultManager {
     private ServiceTemplateStorage serviceTemplateStorage;
     @Resource
     private ResourceHandlerManager resourceHandlerManager;
-    @Resource
-    private MigrationService migrationService;
     @Resource
     private RecreateService recreateService;
     @Resource
@@ -107,30 +103,27 @@ public class DeployResultManager {
         UUID orderId = deployResult.getOrderId();
         ServiceOrderEntity storedOrderEntity = serviceOrderStorage.getEntityById(orderId);
         ServiceOrderType taskType = storedOrderEntity.getTaskType();
+        boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         // update deployServiceEntity
         ServiceDeploymentEntity updatedServiceEntity =
                 updateDeployServiceEntityWithDeployResult(deployResult, taskType);
-        // When the task failed and task type is deploy or retry, start a new order to rollback.
-        if (isFailedDeployTask(deployResult.getIsTaskSuccessful(), taskType)) {
+        // When the task failed and task type is deploy or retry, just update the task status and
+        // error message. Then start a new rollback order task and wait the order callback.
+        if (isFailedDeployTask(isTaskSuccessful, taskType)) {
+            storedOrderEntity.setTaskStatus(TaskStatus.FAILED);
+            storedOrderEntity.setErrorMsg(deployResult.getMessage());
+            serviceOrderStorage.storeAndFlush(storedOrderEntity);
             DeployTask rollbackTask = deployServiceEntityConverter.getDeployTaskByStoredService(
-                            ServiceOrderType.ROLLBACK, updatedServiceEntity);
+                    ServiceOrderType.ROLLBACK, updatedServiceEntity);
             rollbackTask.setParentOrderId(orderId);
+            rollbackTask.setOriginalServiceId(storedOrderEntity.getOriginalServiceId());
+            rollbackTask.setWorkflowId(storedOrderEntity.getWorkflowId());
             rollbackOnDeploymentFailure(rollbackTask, updatedServiceEntity);
+            return;
         }
 
         UUID serviceId = updatedServiceEntity.getId();
-        // complete migration and recreate receive task.
         if (taskType == ServiceOrderType.DEPLOY || taskType == ServiceOrderType.ROLLBACK) {
-            if (isFailedDeployTask(deployResult.getIsTaskSuccessful(), taskType)) {
-                return;
-            }
-            ServiceMigrationEntity serviceMigrationEntity =
-                    migrationService.getServiceMigrationEntityByNewServiceId(serviceId);
-            if (Objects.nonNull(serviceMigrationEntity)) {
-                workflowUtils.completeReceiveTask(
-                        serviceMigrationEntity.getMigrationId().toString(),
-                        MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
-            }
             ServiceRecreateEntity serviceRecreateEntity =
                     recreateService.getServiceRecreateEntityByNewServiceId(serviceId);
             if (Objects.nonNull(serviceRecreateEntity)) {
@@ -140,13 +133,6 @@ public class DeployResultManager {
         }
 
         if (taskType == ServiceOrderType.DESTROY) {
-            ServiceMigrationEntity serviceMigrationEntity =
-                    migrationService.getServiceMigrationEntityByOldServiceId(serviceId);
-            if (Objects.nonNull(serviceMigrationEntity)) {
-                workflowUtils.completeReceiveTask(
-                        serviceMigrationEntity.getMigrationId().toString(),
-                        MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
-            }
             ServiceRecreateEntity serviceRecreateEntity =
                     recreateService.getServiceRecreateEntityByOldServiceId(serviceId);
             if (Objects.nonNull(serviceRecreateEntity)) {
@@ -154,8 +140,7 @@ public class DeployResultManager {
                         RecreateConstants.RECREATE_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
             }
         }
-        // update storedOrderEntity
-        updateServiceOrderEntityWithDeployResult(deployResult);
+        updateServiceOrderEntityWithDeployResult(deployResult, storedOrderEntity);
     }
 
     /**
@@ -203,7 +188,7 @@ public class DeployResultManager {
     private ServiceDeploymentEntity updateDeployServiceEntityWithDeployResult(
             DeployResult deployResult, ServiceOrderType taskType) {
         ServiceDeploymentEntity serviceDeploymentEntity =
-                serviceOrderStorage.getDeployServiceByOrderId(deployResult.getOrderId());
+                serviceOrderStorage.getServiceDeploymentByOrderId(deployResult.getOrderId());
         log.info("Update deploy service entity {} with deploy result {}",
                 serviceDeploymentEntity.getId(), deployResult);
         if (StringUtils.isNotBlank(deployResult.getTfStateContent())) {
@@ -342,40 +327,60 @@ public class DeployResultManager {
      *
      * @param deployResult Deployment Result.
      */
-    private void updateServiceOrderEntityWithDeployResult(DeployResult deployResult) {
-        ServiceOrderEntity storedOrderEntity =
-                serviceOrderStorage.getEntityById(deployResult.getOrderId());
+    private void updateServiceOrderEntityWithDeployResult(DeployResult deployResult,
+                                                          ServiceOrderEntity storedOrderEntity) {
+        // When the related parent order id is not null, complete the parent service order.
+        if (Objects.nonNull(storedOrderEntity.getParentOrderId())) {
+            completeParentServiceOrder(storedOrderEntity.getParentOrderId());
+        }
+        // When the related workflow id is not null, process the related workflow task.
+        if (Objects.nonNull(storedOrderEntity.getWorkflowId())) {
+            processRelatedWorkflowTask(storedOrderEntity);
+        }
         ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
         BeanUtils.copyProperties(storedOrderEntity, entityToUpdate);
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         TaskStatus taskStatus = isTaskSuccessful ? TaskStatus.SUCCESSFUL : TaskStatus.FAILED;
-        ServiceOrderType taskType = storedOrderEntity.getTaskType();
-        // When the task failed and task type is deploy or retry, just update the task status and
-        // wait the new rollback task complete to set the completed time of this task.
-        if (isFailedDeployTask(isTaskSuccessful, taskType)) {
-            entityToUpdate.setTaskStatus(taskStatus);
-            serviceOrderStorage.storeAndFlush(entityToUpdate);
-            return;
-        }
-        // When the task type is rollback, complete this order and then update the parent order.
-        if (taskType == ServiceOrderType.ROLLBACK) {
-            entityToUpdate.setTaskStatus(taskStatus);
-            entityToUpdate.setCompletedTime(OffsetDateTime.now());
-            serviceOrderStorage.storeAndFlush(entityToUpdate);
-            completeParentServiceOrder(storedOrderEntity.getParentOrderId());
-            return;
-        }
-        // Update the task status and completed time.
         entityToUpdate.setTaskStatus(taskStatus);
         entityToUpdate.setCompletedTime(OffsetDateTime.now());
+        entityToUpdate.setErrorMsg(deployResult.getMessage());
+        // finally, update the service order entity of this order task.
         serviceOrderStorage.storeAndFlush(entityToUpdate);
     }
 
     private void completeParentServiceOrder(UUID parentOrderId) {
         ServiceOrderEntity parentOrder = serviceOrderStorage.getEntityById(parentOrderId);
-        ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
-        BeanUtils.copyProperties(parentOrder, entityToUpdate);
-        entityToUpdate.setCompletedTime(OffsetDateTime.now());
-        serviceOrderStorage.storeAndFlush(entityToUpdate);
+        // When the parent order is not a migrate task, complete it.
+        if (parentOrder.getTaskType() != ServiceOrderType.MIGRATE) {
+            ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
+            BeanUtils.copyProperties(parentOrder, entityToUpdate);
+            entityToUpdate.setCompletedTime(OffsetDateTime.now());
+            serviceOrderStorage.storeAndFlush(entityToUpdate);
+        }
+        // process the related workflow task of the parent order.
+        if (Objects.nonNull(parentOrder.getWorkflowId())) {
+            processRelatedWorkflowTask(parentOrder);
+        }
+    }
+
+    private void processRelatedWorkflowTask(ServiceOrderEntity serviceOrder) {
+        try {
+            ServiceOrderEntity parentOrder =
+                    serviceOrderStorage.getEntityById(serviceOrder.getParentOrderId());
+            if (parentOrder.getTaskType() == ServiceOrderType.MIGRATE) {
+                if (serviceOrder.getTaskType() == ServiceOrderType.DEPLOY
+                        || serviceOrder.getTaskType() == ServiceOrderType.RETRY) {
+                    workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                            MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
+                }
+                if (serviceOrder.getTaskType() == ServiceOrderType.DESTROY) {
+                    workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                            MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to process the related workflow task of service order: {}",
+                    serviceOrder.getOrderId(), e);
+        }
     }
 }

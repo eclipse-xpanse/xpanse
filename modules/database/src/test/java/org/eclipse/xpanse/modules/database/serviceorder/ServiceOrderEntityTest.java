@@ -45,7 +45,7 @@ class ServiceOrderEntityTest {
     @Mock
     private Object mockRequest;
     @Mock
-    private ServiceDeploymentEntity serviceDeploymentEntity;
+    private ServiceDeploymentEntity mockServiceDeploymentEntity;
     private ServiceOrderEntity test;
 
     @BeforeEach
@@ -53,9 +53,9 @@ class ServiceOrderEntityTest {
         test = new ServiceOrderEntity();
         test.setOrderId(uuid);
         test.setParentOrderId(uuid);
-        test.setWorkflowId(uuid);
-        test.setServiceDeploymentEntity(serviceDeploymentEntity);
-        test.setOriginalServerId(uuid);
+        test.setWorkflowId(uuid.toString());
+        test.setServiceDeploymentEntity(mockServiceDeploymentEntity);
+        test.setOriginalServiceId(uuid);
         test.setTaskType(taskType);
         test.setUserId(userId);
         test.setStartedTime(startedTime);
@@ -75,9 +75,9 @@ class ServiceOrderEntityTest {
     void testGetters() {
         assertThat(test.getOrderId()).isEqualTo(uuid);
         assertThat(test.getParentOrderId()).isEqualTo(uuid);
-        assertThat(test.getServiceDeploymentEntity()).isEqualTo(serviceDeploymentEntity);
-        assertThat(test.getOriginalServerId()).isEqualTo(uuid);
-        assertThat(test.getWorkflowId()).isEqualTo(uuid);
+        assertThat(test.getServiceDeploymentEntity()).isEqualTo(mockServiceDeploymentEntity);
+        assertThat(test.getOriginalServiceId()).isEqualTo(uuid);
+        assertThat(test.getWorkflowId()).isEqualTo(uuid.toString());
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
@@ -113,10 +113,10 @@ class ServiceOrderEntityTest {
     @Test
     void testToString() {
         String result = "ServiceOrderEntity(orderId=" + uuid
-                + ", serviceDeploymentEntity=" + serviceDeploymentEntity
+                + ", serviceDeploymentEntity=" + mockServiceDeploymentEntity
                 + ", parentOrderId=" + uuid
                 + ", workflowId=" + uuid
-                + ", originalServerId=" + uuid
+                + ", originalServiceId=" + uuid
                 + ", taskType=" + taskType
                 + ", userId=" + userId
                 + ", taskStatus=" + taskStatus

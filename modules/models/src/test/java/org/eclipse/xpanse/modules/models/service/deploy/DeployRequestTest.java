@@ -27,17 +27,17 @@ import org.springframework.beans.BeanUtils;
 class DeployRequestTest {
 
     private final UUID id = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
-    private final String userId = "userId" ;
+    private final String userId = "userId";
     private final boolean IS_ACCEPT_EULA = true;
     private final Category category = Category.COMPUTE;
-    private final String serviceName = "service" ;
-    private final String customerServiceName = "customerService" ;
-    private final String version = "1.0" ;
-    private final String regionName = "us-east-1" ;
-    private final String areaName = "Asia China" ;
+    private final String serviceName = "service";
+    private final String customerServiceName = "customerService";
+    private final String version = "1.0";
+    private final String regionName = "us-east-1";
+    private final String areaName = "Asia China";
     private final Region region = new Region();
     private final Csp csp = Csp.HUAWEI_CLOUD;
-    private final String flavor = "flavor" ;
+    private final String flavor = "flavor";
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private final Map<String, Object> properties = Collections.singletonMap("key", "value");
     private final Map<String, String> availabilityZones = Collections.singletonMap("key", "value");
@@ -121,7 +121,8 @@ class DeployRequestTest {
                 ", availabilityZones=" + availabilityZones +
                 ", isEulaAccepted=" + IS_ACCEPT_EULA +
                 ", billingMode=" + billingMode +
-                "), serviceId=" + id + ")";
+                "), serviceId=" + id
+                + ")";
         assertEquals(expectedToString, request.toString());
     }
 

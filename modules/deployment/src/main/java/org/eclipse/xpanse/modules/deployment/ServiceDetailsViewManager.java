@@ -38,7 +38,7 @@ import org.springframework.util.CollectionUtils;
 public class ServiceDetailsViewManager {
 
     @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
+    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @Resource
     private UserServiceHelper userServiceHelper;
     @Resource
@@ -56,7 +56,7 @@ public class ServiceDetailsViewManager {
      */
     public DeployedServiceDetails getServiceDetailsByIdForIsv(UUID id) {
         ServiceDeploymentEntity serviceDeploymentEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(id);
+                serviceDeploymentEntityHandler.getServiceDeploymentEntity(id);
         ServiceHostingType serviceHostingType =
                 serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
@@ -134,7 +134,7 @@ public class ServiceDetailsViewManager {
      */
     public DeployedServiceDetails getSelfHostedServiceDetailsByIdForEndUser(UUID id) {
         ServiceDeploymentEntity serviceDeploymentEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(id);
+                serviceDeploymentEntityHandler.getServiceDeploymentEntity(id);
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(serviceDeploymentEntity.getUserId());
         if (!currentUserIsOwner) {
@@ -160,7 +160,7 @@ public class ServiceDetailsViewManager {
      */
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsByIdForEndUser(UUID id) {
         ServiceDeploymentEntity serviceDeploymentEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(id);
+                serviceDeploymentEntityHandler.getServiceDeploymentEntity(id);
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(serviceDeploymentEntity.getUserId());
         if (!currentUserIsOwner) {

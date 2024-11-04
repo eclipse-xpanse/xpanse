@@ -10,6 +10,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.annotation.Resource;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +19,6 @@ import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.DatabaseServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.database.servicemigration.DatabaseServiceMigrationStorage;
-import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.DatabaseServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
@@ -33,6 +32,7 @@ import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Bean provide methods to get the csp info.
@@ -52,8 +52,6 @@ public class GetCspInfoFromRequest {
     private DatabaseUserPolicyStorage userPolicyStorage;
     @Resource
     private TaskService taskService;
-    @Resource
-    private DatabaseServiceMigrationStorage serviceMigrationStorage;
     @Resource
     private DatabaseServiceOrderStorage serviceOrderTaskStorage;
     @Resource
@@ -111,31 +109,6 @@ public class GetCspInfoFromRequest {
             }
         } catch (Exception e) {
             log.error("Get csp with service id:{} failed.", id, e);
-        }
-        return null;
-    }
-
-    /**
-     * Get Csp with id of migrate.
-     *
-     * @param id id of service.
-     * @return csp.
-     */
-    public Csp getCspFromServiceMigrationId(String id) {
-        if (StringUtils.isBlank(id)) {
-            return null;
-        }
-        try {
-            ServiceMigrationEntity serviceMigrationEntity =
-                    serviceMigrationStorage.findServiceMigrationById(UUID.fromString(id));
-            if (Objects.nonNull(serviceMigrationEntity)) {
-                ServiceDeploymentEntity deployService =
-                        deployServiceStorage.findServiceDeploymentById(
-                                serviceMigrationEntity.getOldServiceId());
-                return deployService.getCsp();
-            }
-        } catch (Exception e) {
-            log.error("Get csp with service migration id:{} failed.", id, e);
         }
         return null;
     }
@@ -215,13 +188,14 @@ public class GetCspInfoFromRequest {
             if (Objects.nonNull(task)) {
                 String processInstanceId = task.getProcessInstanceId();
                 if (StringUtils.isNotBlank(processInstanceId)) {
-                    ServiceMigrationEntity serviceMigrationEntity =
-                            serviceMigrationStorage.findServiceMigrationById(
-                                    UUID.fromString(processInstanceId));
-                    if (Objects.nonNull(serviceMigrationEntity)) {
+                    ServiceOrderEntity queryOrderEntity = new ServiceOrderEntity();
+                    queryOrderEntity.setWorkflowId(processInstanceId);
+                    List<ServiceOrderEntity> orderEntities =
+                            serviceOrderTaskStorage.queryEntities(queryOrderEntity);
+                    if (!CollectionUtils.isEmpty(orderEntities)) {
+                        UUID serviceId = orderEntities.getFirst().getOriginalServiceId();
                         ServiceDeploymentEntity deployService =
-                                deployServiceStorage.findServiceDeploymentById(
-                                        serviceMigrationEntity.getOldServiceId());
+                                deployServiceStorage.findServiceDeploymentById(serviceId);
                         return deployService.getCsp();
                     }
                 }

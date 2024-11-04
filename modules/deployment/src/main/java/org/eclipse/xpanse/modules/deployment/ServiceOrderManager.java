@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.security.access.AccessDeniedException;
@@ -55,34 +56,34 @@ public class ServiceOrderManager {
     /**
      * Create service order entity and store into the database.
      *
-     * @param task                task to be created
-     * @param serviceDeployment deploy service entity
+     * @param task                    task to be created
+     * @param serviceDeploymentEntity service deployment entity
      */
-    public ServiceOrderEntity storeNewServiceOrderEntity(DeployTask task,
-            ServiceDeploymentEntity serviceDeployment) {
+    public ServiceOrderEntity storeNewServiceOrderEntity(
+            DeployTask task, ServiceDeploymentEntity serviceDeploymentEntity) {
         ServiceOrderEntity orderTask = new ServiceOrderEntity();
         orderTask.setOrderId(task.getOrderId());
         orderTask.setParentOrderId(task.getParentOrderId());
         orderTask.setTaskType(task.getTaskType());
         orderTask.setUserId(task.getUserId());
-        orderTask.setServiceDeploymentEntity(serviceDeployment);
-        orderTask.setOriginalServerId(task.getServiceId());
+        orderTask.setServiceDeploymentEntity(serviceDeploymentEntity);
+        orderTask.setOriginalServiceId(task.getOriginalServiceId());
         orderTask.setWorkflowId(task.getWorkflowId());
         orderTask.setNewDeployRequest(task.getDeployRequest());
         orderTask.setTaskStatus(TaskStatus.CREATED);
         orderTask.setRequestBody(task.getRequest());
-        if (Objects.nonNull(serviceDeployment)) {
-            orderTask.setPreviousDeployRequest(serviceDeployment.getDeployRequest());
+        if (Objects.nonNull(serviceDeploymentEntity)) {
+            orderTask.setPreviousDeployRequest(serviceDeploymentEntity.getDeployRequest());
             orderTask.setPreviousDeployedResources(
                     EntityTransUtils.transToDeployResourceList(
-                            serviceDeployment.getDeployResourceList()));
-            if (!CollectionUtils.isEmpty(serviceDeployment.getPrivateProperties())) {
-                serviceDeployment.setPrivateProperties(
-                        new HashMap<>(serviceDeployment.getPrivateProperties()));
+                            serviceDeploymentEntity.getDeployResourceList()));
+            if (!CollectionUtils.isEmpty(serviceDeploymentEntity.getPrivateProperties())) {
+                serviceDeploymentEntity.setPrivateProperties(
+                        new HashMap<>(serviceDeploymentEntity.getPrivateProperties()));
             }
-            if (!CollectionUtils.isEmpty(serviceDeployment.getProperties())) {
+            if (!CollectionUtils.isEmpty(serviceDeploymentEntity.getProperties())) {
                 orderTask.setPreviousDeployedServiceProperties(
-                        new HashMap<>(serviceDeployment.getProperties()));
+                        new HashMap<>(serviceDeploymentEntity.getProperties()));
             }
         }
         return serviceOrderStorage.storeAndFlush(orderTask);
@@ -100,6 +101,25 @@ public class ServiceOrderManager {
         return serviceOrderStorage.storeAndFlush(serviceOrder);
     }
 
+    /**
+     * Complete order progress.
+     *
+     * @param orderId    service order id.
+     * @param taskStatus task status.
+     */
+    public void completeOrderProgress(UUID orderId, TaskStatus taskStatus, String errorMsg) {
+        ServiceOrderEntity serviceOrder = serviceOrderStorage.getEntityById(orderId);
+        if (Objects.isNull(serviceOrder)) {
+            String errMsg = String.format("Service order with id %s not found.", orderId);
+            log.error(errMsg);
+            throw new ServiceOrderNotFound(errMsg);
+        }
+        serviceOrder.setTaskStatus(taskStatus);
+        serviceOrder.setCompletedTime(OffsetDateTime.now());
+        serviceOrder.setErrorMsg(errorMsg);
+        serviceOrderStorage.storeAndFlush(serviceOrder);
+    }
+
 
     /**
      * List the service orders.
@@ -112,8 +132,8 @@ public class ServiceOrderManager {
             UUID serviceId, ServiceOrderType taskType, TaskStatus taskStatus) {
         validateDeployService(serviceId);
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setServiceDeploymentEntity(serviceDeploymentStorage
-                .findServiceDeploymentById(serviceId));
+        query.setServiceDeploymentEntity(
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId));
         query.setTaskType(taskType);
         query.setTaskStatus(taskStatus);
         if (!userServiceHelper.currentUserHasRole(ROLE_ADMIN)) {
@@ -157,8 +177,8 @@ public class ServiceOrderManager {
     public void deleteOrdersByServiceId(UUID serviceId) {
         validateDeployService(serviceId);
         ServiceOrderEntity query = new ServiceOrderEntity();
-        query.setServiceDeploymentEntity(serviceDeploymentStorage
-                .findServiceDeploymentById(serviceId));
+        query.setServiceDeploymentEntity(
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId));
         if (!userServiceHelper.currentUserHasRole(ROLE_ADMIN)) {
             query.setUserId(userServiceHelper.getCurrentUserId());
         }

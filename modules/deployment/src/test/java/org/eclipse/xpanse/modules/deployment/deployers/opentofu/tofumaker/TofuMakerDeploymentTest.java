@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.config.TofuMakerConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.AdminApi;
@@ -55,7 +55,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {TofuMakerServiceDeployer.class, TofuMakerServiceModifier.class,
         DeployEnvironments.class,
         PluginManager.class, OpenTofuFromScriptsApi.class, TofuMakerConfig.class,
-        DeployServiceEntityHandler.class, TofuMakerScriptValidator.class,
+        ServiceDeploymentEntityHandler.class, TofuMakerScriptValidator.class,
         TofuMakerServiceDeployer.class, TofuMakerDeployment.class, TofuMakerHelper.class,
         AdminApi.class, TofuMakerDeploymentPlanManage.class, TofuMakerServiceDestroyer.class})
 @ExtendWith(SpringExtension.class)
@@ -83,7 +83,7 @@ class TofuMakerDeploymentTest {
     @MockBean
     TofuMakerConfig tofuMakerConfig;
     @MockBean
-    DeployServiceEntityHandler deployServiceEntityHandler;
+    ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @MockBean
     TofuMakerScriptValidator tofuMakerScriptValidator;
     @MockBean

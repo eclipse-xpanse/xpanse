@@ -402,7 +402,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testApisThrowsServiceLockedException(serviceId);
         testApisThrowsAccessDeniedException(serviceId);
 
-        deleteDeployedService(serviceId);
+        deleteServiceDeployment(serviceId);
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 

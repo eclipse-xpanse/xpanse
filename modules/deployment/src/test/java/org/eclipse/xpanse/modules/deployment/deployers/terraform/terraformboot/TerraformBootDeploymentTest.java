@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config.TerraformBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.AdminApi;
@@ -55,7 +55,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {TerraformBootServiceDeployer.class,
         TerraformBootServiceModifier.class, DeployEnvironments.class,
         PluginManager.class, TerraformFromScriptsApi.class, TerraformBootConfig.class,
-        DeployServiceEntityHandler.class, TerraformBootScriptValidator.class,
+        ServiceDeploymentEntityHandler.class, TerraformBootScriptValidator.class,
         TerraformBootServiceDeployer.class, TerraformBootDeployment.class,
         TerraformFromGitRepoApi.class, TerraformBootHelper.class, AdminApi.class,
         TerraformBootDeploymentPlanManage.class, TerraformBootServiceDestroyer.class})
@@ -86,7 +86,7 @@ class TerraformBootDeploymentTest {
     @MockBean
     TerraformBootConfig terraformBootConfig;
     @MockBean
-    DeployServiceEntityHandler deployServiceEntityHandler;
+    ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @MockBean
     TerraformBootScriptValidator terraformBootScriptValidator;
     @Autowired

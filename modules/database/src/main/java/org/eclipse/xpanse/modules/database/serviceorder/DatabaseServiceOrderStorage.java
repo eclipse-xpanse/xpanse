@@ -43,8 +43,10 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
     }
 
     @Override
-    public List<ServiceOrderEntity> queryEntities(
-            ServiceOrderEntity entity) {
+    public List<ServiceOrderEntity> queryEntities(ServiceOrderEntity entity) {
+        if (Objects.isNull(entity)) {
+            return new ArrayList<>();
+        }
         Specification<ServiceOrderEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
@@ -61,6 +63,14 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
                     if (Objects.nonNull(entity.getTaskStatus())) {
                         predicateList.add(criteriaBuilder.equal(root.get("taskStatus"),
                                 entity.getTaskStatus()));
+                    }
+                    if (Objects.nonNull(entity.getParentOrderId())) {
+                        predicateList.add(criteriaBuilder.equal(root.get("parentOrderId"),
+                                entity.getParentOrderId()));
+                    }
+                    if (Objects.nonNull(entity.getWorkflowId())) {
+                        predicateList.add(criteriaBuilder.equal(root.get("workflowId"),
+                                entity.getWorkflowId()));
                     }
                     assert query != null;
                     query.orderBy(criteriaBuilder.desc(root.get("startedTime")));
@@ -80,7 +90,7 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
     }
 
     @Override
-    public ServiceDeploymentEntity getDeployServiceByOrderId(UUID uuid) {
+    public ServiceDeploymentEntity getServiceDeploymentByOrderId(UUID uuid) {
         Optional<ServiceOrderEntity> optional = repository.findById(uuid);
         if (optional.isEmpty()) {
             throw new ServiceOrderNotFound(

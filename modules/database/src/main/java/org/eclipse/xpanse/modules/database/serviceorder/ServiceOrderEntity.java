@@ -59,10 +59,10 @@ public class ServiceOrderEntity implements Serializable {
     private UUID parentOrderId;
 
     @Column(name = "WORKFLOW_ID")
-    private UUID workflowId;
+    private String workflowId;
 
     @Column(name = "ORIGINAL_SERVICE_ID")
-    private UUID originalServerId;
+    private UUID originalServiceId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "TASK_TYPE", nullable = false)

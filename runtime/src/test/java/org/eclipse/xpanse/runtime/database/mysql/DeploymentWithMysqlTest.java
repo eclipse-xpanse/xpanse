@@ -46,8 +46,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrati
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
-import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
-import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -103,14 +101,14 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
             if (serviceDeploymentState.equals(ServiceDeploymentState.DEPLOY_SUCCESS)) {
                 testModifyAndGetDetails(serviceId, serviceTemplate);
-                UUID migrateId = migrateService(serviceId, serviceTemplate);
-                if (waitMigrationCompleted(migrateId)) {
-                    ServiceMigrationDetails migrationDetails =
-                            serviceMigrationApi.getMigrationOrderDetailsById(migrateId.toString());
-                    testDestroyAndGetDetails(migrationDetails.getNewServiceId());
+                ServiceOrder migrateOrder = migrateService(serviceId, serviceTemplate);
+                if (waitServiceOrderIsCompleted(migrateOrder.getOrderId())) {
+                    ServiceOrderDetails serviceOrderDetails = serviceOrderManageApi
+                            .getOrderDetailsByOrderId(migrateOrder.getOrderId().toString());
+                    testDestroyAndGetDetails(serviceOrderDetails.getServiceId());
                     testListServiceOrders(serviceId);
                     testDeleteServiceOrders(serviceId);
-                    testPurgeAndGetDetails(migrationDetails.getOldServiceId());
+                    testPurgeAndGetDetails(serviceOrderDetails.getOriginalServiceId());
                 }
             } else {
                 testListServiceOrders(serviceId);
@@ -200,32 +198,14 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return serviceTemplateApi.register(ocl);
     }
 
-    UUID migrateService(UUID serviceId, ServiceTemplateDetailVo serviceTemplate) {
+    ServiceOrder migrateService(UUID serviceId, ServiceTemplateDetailVo serviceTemplate) {
         MigrateRequest migrateRequest = new MigrateRequest();
         migrateRequest.setOriginalServiceId(serviceId);
         DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
         BeanUtils.copyProperties(deployRequestBase, migrateRequest);
-        UUID migrateId = serviceMigrationApi.migrate(migrateRequest);
-        // Verify the results
-        Assertions.assertNotNull(migrateId);
-        return migrateId;
+        return serviceMigrationApi.migrate(migrateRequest);
     }
 
-    boolean waitMigrationCompleted(UUID id) {
-        final long endTime = System.nanoTime() + TimeUnit.MINUTES.toNanos(3);
-        while (endTime > System.nanoTime()) {
-            if (migrationStatueIsCompleted(id)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean migrationStatueIsCompleted(UUID id) {
-        ServiceMigrationDetails migrationDetails =
-                serviceMigrationApi.getMigrationOrderDetailsById(id.toString());
-        return migrationDetails.getMigrationStatus() == MigrationStatus.MIGRATION_COMPLETED;
-    }
 
     void testModifyAndGetDetails(UUID serviceId, ServiceTemplateDetailVo serviceTemplate)
             throws Exception {

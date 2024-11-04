@@ -62,7 +62,7 @@ public class StartRecreateDestroy implements Serializable, JavaDelegate {
         ServiceRecreateEntity serviceRecreateEntity = saveServiceRecreateEntity(processInstanceId);
 
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        String serviceId = variables.get(RecreateConstants.ID).toString();
+        UUID serviceId = (UUID) variables.get(RecreateConstants.ID);
         log.info("Recreate workflow of Instance Id : {} start destroy old service with id:{}",
                 processInstanceId, serviceId);
 
@@ -75,7 +75,7 @@ public class StartRecreateDestroy implements Serializable, JavaDelegate {
                         0);
             }
 
-            deployService.destroyServiceById(serviceId);
+            deployService.destroyServiceByWorkflow(serviceId, processInstanceId, null);
         } catch (ServiceRecreateFailedException e) {
             log.info("Recreate workflow of Instance Id : {} start destroy old service with id: {},"
                     + " error: {}", processInstanceId, serviceId, e.getMessage());

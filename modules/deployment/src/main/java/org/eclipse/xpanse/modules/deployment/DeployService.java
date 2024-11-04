@@ -90,7 +90,7 @@ public class DeployService {
     @Resource
     private SensitiveDataHandler sensitiveDataHandler;
     @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
+    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @Resource
     private DeployResultManager deployResultManager;
     @Resource
@@ -248,7 +248,7 @@ public class DeployService {
      */
     private ServiceDeploymentEntity getServiceOwnedByCurrentUser(UUID serviceId, String errorMsg) {
         ServiceDeploymentEntity deployedService =
-                deployServiceEntityHandler.getDeployServiceEntity(serviceId);
+                serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(deployedService.getUserId());
         if (!currentUserIsOwner) {
@@ -380,7 +380,7 @@ public class DeployService {
         defaultLockConfig.setDestroyLocked(false);
         defaultLockConfig.setModifyLocked(false);
         entity.setLockConfig(defaultLockConfig);
-        ServiceDeploymentEntity storedEntity = deployServiceEntityHandler.storeAndFlush(entity);
+        ServiceDeploymentEntity storedEntity = serviceDeploymentEntityHandler.storeAndFlush(entity);
         if (Objects.isNull(storedEntity)) {
             log.error("Store new deploy service entity with id {} failed.",
                     deployTask.getServiceId());
@@ -415,7 +415,7 @@ public class DeployService {
     /**
      * Redeploy service with failed state.
      *
-     * @param redeployTask        redeployTask
+     * @param redeployTask            redeployTask
      * @param serviceDeploymentEntity deployServiceEntity
      */
     private void redeployService(DeployTask redeployTask,
@@ -428,7 +428,7 @@ public class DeployService {
                 .storeNewServiceOrderEntity(redeployTask, serviceDeploymentEntity);
         try {
             policyValidator.validateDeploymentWithPolicies(redeployTask);
-            deployServiceEntityHandler.updateServiceDeploymentStatus(serviceDeploymentEntity,
+            serviceDeploymentEntityHandler.updateServiceDeploymentStatus(serviceDeploymentEntity,
                     ServiceDeploymentState.DEPLOYING);
             serviceOrderManager.startOrderProgress(serviceOrderEntity);
             redeployResult = deployer.deploy(redeployTask);
@@ -517,7 +517,7 @@ public class DeployService {
     /**
      * Async method to modify service.
      *
-     * @param modifyTask          modifyTask.
+     * @param modifyTask        modifyTask.
      * @param serviceDeployment deployServiceEntity
      */
     public void modifyService(DeployTask modifyTask, ServiceDeploymentEntity serviceDeployment) {
@@ -530,7 +530,7 @@ public class DeployService {
                 serviceOrderManager.storeNewServiceOrderEntity(modifyTask, serviceDeployment);
         try {
             serviceDeployment.setDeployRequest(modifyTask.getDeployRequest());
-            deployServiceEntityHandler.updateServiceDeploymentStatus(serviceDeployment,
+            serviceDeploymentEntityHandler.updateServiceDeploymentStatus(serviceDeployment,
                     ServiceDeploymentState.MODIFYING);
             serviceOrderManager.startOrderProgress(serviceOrderEntity);
             modifyResult = deployer.modify(modifyTask);
@@ -547,7 +547,7 @@ public class DeployService {
     /**
      * Async method to destroy service.
      *
-     * @param destroyTask         destroyTask.
+     * @param destroyTask       destroyTask.
      * @param serviceDeployment deployServiceEntity
      */
     public void destroyService(DeployTask destroyTask, ServiceDeploymentEntity serviceDeployment) {
@@ -564,8 +564,8 @@ public class DeployService {
                 destroyTask.getOcl().getDeployment().getDeployerTool().getKind());
         try {
             if (ServiceOrderType.ROLLBACK != destroyTask.getTaskType()) {
-                deployServiceEntityHandler.updateServiceDeploymentStatus(serviceDeploymentEntity,
-                        ServiceDeploymentState.DESTROYING);
+                serviceDeploymentEntityHandler.updateServiceDeploymentStatus(
+                        serviceDeploymentEntity, ServiceDeploymentState.DESTROYING);
             }
             serviceOrderManager.startOrderProgress(serviceOrderEntity);
             destroyResult = deployer.destroy(destroyTask);
@@ -582,7 +582,7 @@ public class DeployService {
     /**
      * purge the service based on the serviceDeploymentState.
      *
-     * @param purgeTask           purgeTask.
+     * @param purgeTask         purgeTask.
      * @param serviceDeployment deployServiceEntity
      */
     private void purgeService(DeployTask purgeTask, ServiceDeploymentEntity serviceDeployment) {
@@ -595,7 +595,7 @@ public class DeployService {
             try {
                 log.info("Resources of service {} need to clear with order task {}",
                         purgeTask.getServiceId(), purgeTask.getOrderId());
-                deployServiceEntityHandler.updateServiceDeploymentStatus(serviceDeployment,
+                serviceDeploymentEntityHandler.updateServiceDeploymentStatus(serviceDeployment,
                         ServiceDeploymentState.DESTROYING);
                 serviceOrderManager.startOrderProgress(serviceOrderEntity);
                 Deployer deployer = deployerKindManager.getDeployment(
@@ -616,37 +616,59 @@ public class DeployService {
     }
 
     /**
-     * Deployment service.
+     * Start a new order to execute the deployment task in workflow.
      *
-     * @param newId         new service id.
-     * @param userId        user id.
-     * @param deployRequest deploy request.
+     * @param originalServiceId original service id.
+     * @param workflowId        workflow id.
+     * @param parentOrderId     parent order id.
+     * @param deployRequest     deployRequest
+     * @return serviceOrder
      */
-    public void deployServiceById(UUID newId, String userId, DeployRequest deployRequest) {
-        log.info("Migrate workflow start deploy new service instance with id: {}", newId);
-        MDC.put(SERVICE_ID, newId.toString());
-        deployRequest.setServiceId(newId);
-        deployRequest.setUserId(userId);
-        DeployTask deployTask = createNewDeployTask(deployRequest);
-        deployTask.setTaskType(ServiceOrderType.DEPLOY);
-        // override task id and user id.
-        deployTask.setServiceId(newId);
-        deployTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
-        deployTask.setTaskType(ServiceOrderType.DEPLOY);
-        deployService(deployTask);
+    public ServiceOrder deployServiceByWorkflow(UUID originalServiceId, String workflowId,
+                                                UUID parentOrderId, DeployRequest deployRequest) {
+        MDC.put(SERVICE_ID, deployRequest.getServiceId().toString());
+        // check if the new service is already deployed.
+        ServiceDeploymentEntity deployServiceEntity =
+                serviceDeploymentStorage.findServiceDeploymentById(deployRequest.getServiceId());
+        if (Objects.nonNull(deployServiceEntity)) {
+            // retry to deploy the service.
+            DeployTask retryTask = getRedeployTask(deployServiceEntity);
+            retryTask.setOriginalServiceId(originalServiceId);
+            retryTask.setParentOrderId(parentOrderId);
+            retryTask.setWorkflowId(workflowId);
+            redeployService(retryTask, deployServiceEntity);
+            return new ServiceOrder(retryTask.getOrderId(), retryTask.getServiceId());
+        } else {
+            DeployTask deployTask = createNewDeployTask(deployRequest);
+            deployTask.setOriginalServiceId(originalServiceId);
+            deployTask.setParentOrderId(parentOrderId);
+            deployTask.setWorkflowId(workflowId);
+            deployService(deployTask);
+            return new ServiceOrder(deployTask.getOrderId(), deployTask.getServiceId());
+        }
     }
 
+
     /**
-     * Destroy service by deployed service id.
+     * Start a new order to execute the destroy task in workflow.
+     *
+     * @param originalServiceId original service id.
+     * @param workflowId        workflow id.
+     * @param parentOrderId     parent order id.
+     * @return serviceOrder.
      */
-    public void destroyServiceById(String id) {
-        MDC.put(SERVICE_ID, id);
-        UUID serviceId = UUID.fromString(id);
-        ServiceDeploymentEntity serviceDeploymentEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(serviceId);
+    public ServiceOrder destroyServiceByWorkflow(UUID originalServiceId, String workflowId,
+                                                 UUID parentOrderId) {
+        MDC.put(SERVICE_ID, originalServiceId.toString());
+        ServiceDeploymentEntity deployServiceEntity =
+                serviceDeploymentEntityHandler.getServiceDeploymentEntity(originalServiceId);
         DeployTask destroyTask = deployServiceEntityConverter.getDeployTaskByStoredService(
-                ServiceOrderType.DESTROY, serviceDeploymentEntity);
-        destroy(destroyTask, serviceDeploymentEntity);
+                ServiceOrderType.DESTROY, deployServiceEntity);
+        destroyTask.setOriginalServiceId(originalServiceId);
+        destroyTask.setWorkflowId(workflowId);
+        destroyTask.setParentOrderId(parentOrderId);
+        destroy(destroyTask, deployServiceEntity);
+        return new ServiceOrder(destroyTask.getOrderId(), destroyTask.getServiceId());
     }
 
     /**

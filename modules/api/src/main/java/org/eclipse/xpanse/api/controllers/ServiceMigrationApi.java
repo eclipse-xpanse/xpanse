@@ -11,12 +11,10 @@ import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMI
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -25,16 +23,20 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
-import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
-import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
-import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,12 +45,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,16 +64,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServiceMigrationApi {
 
     @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
-
+    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @Resource
     private UserServiceHelper userServiceHelper;
-
     @Resource
     private WorkflowUtils workflowUtils;
-
     @Resource
-    private MigrationService migrationService;
+    private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource
+    private ServiceOrderManager serviceOrderManager;
 
     /**
      * Create a job to migrate the deployed service.
@@ -86,27 +84,35 @@ public class ServiceMigrationApi {
     @PostMapping(value = "/services/migration", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public UUID migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
+    public ServiceOrder migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
         validateData(migrateRequest);
-        ServiceDeploymentEntity serviceDeploymentEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(
+        ServiceDeploymentEntity deployServiceEntity =
+                this.serviceDeploymentEntityHandler.getServiceDeploymentEntity(
                         migrateRequest.getOriginalServiceId());
-        String userId = getUserId();
-        if (!StringUtils.equals(userId, serviceDeploymentEntity.getUserId())) {
+        String userId = this.userServiceHelper.getCurrentUserId();
+        if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
                     "No permissions to migrate services belonging to other users.");
         }
-        if (Objects.nonNull(serviceDeploymentEntity.getLockConfig())
-                && serviceDeploymentEntity.getLockConfig().isModifyLocked()) {
+        if (Objects.nonNull(deployServiceEntity.getLockConfig())
+                && deployServiceEntity.getLockConfig().isModifyLocked()) {
             String errorMsg = String.format("Service with id %s is locked from migration.",
                     migrateRequest.getOriginalServiceId());
             throw new ServiceLockedException(errorMsg);
         }
+        migrateRequest.setUserId(userId);
+        DeployTask migrateTask = getMigrateTask(migrateRequest);
+        ServiceOrderEntity migrateOrderEntity =
+                serviceOrderManager.storeNewServiceOrderEntity(migrateTask, deployServiceEntity);
         Map<String, Object> variable =
-                getMigrateProcessVariable(migrateRequest, UUID.randomUUID(), userId);
+                getMigrateProcessVariable(migrateRequest, migrateOrderEntity);
         ProcessInstance instance =
                 workflowUtils.startProcess(MigrateConstants.PROCESS_KEY, variable);
-        return UUID.fromString(instance.getProcessInstanceId());
+        migrateOrderEntity.setWorkflowId(instance.getProcessInstanceId());
+        ServiceOrderEntity updatedOrderEntity =
+                serviceOrderManager.startOrderProgress(migrateOrderEntity);
+        return new ServiceOrder(updatedOrderEntity.getOrderId(),
+                updatedOrderEntity.getOriginalServiceId());
     }
 
     private void validateData(MigrateRequest migrateRequest) {
@@ -116,83 +122,51 @@ public class ServiceMigrationApi {
         searchServiceTemplate.setCsp(migrateRequest.getCsp());
         searchServiceTemplate.setCategory(migrateRequest.getCategory());
         searchServiceTemplate.setServiceHostingType(migrateRequest.getServiceHostingType());
-        ServiceTemplateEntity existingServiceTemplate =
-                migrationService.findServiceTemplate(searchServiceTemplate);
-        if (Objects.nonNull(existingServiceTemplate)
-                && StringUtils.isNotBlank(existingServiceTemplate.getOcl().getEula())
+        ServiceTemplateEntity existingTemplate =
+                serviceTemplateStorage.findServiceTemplate(searchServiceTemplate);
+        if (Objects.isNull(existingTemplate)) {
+            String errorMsg =
+                    String.format("Not found available service template by search " + "info: %s",
+                            searchServiceTemplate);
+            log.error(errorMsg);
+            throw new ServiceTemplateNotRegistered(errorMsg);
+        }
+        if (StringUtils.isNotBlank(existingTemplate.getOcl().getEula())
                 && !migrateRequest.isEulaAccepted()) {
             log.error("Service not accepted Eula.");
             throw new EulaNotAccepted("Service not accepted Eula.");
         }
-        if (!existingServiceTemplate.getOcl().getBilling().getBillingModes()
+        if (!existingTemplate.getOcl().getBilling().getBillingModes()
                 .contains(migrateRequest.getBillingMode())) {
             String errorMsg = String.format(
                     "The service template with id %s does not support billing mode %s.",
-                    existingServiceTemplate.getId(), migrateRequest.getBillingMode());
+                    existingTemplate.getId(), migrateRequest.getBillingMode());
             log.error(errorMsg);
             throw new BillingModeNotSupported(errorMsg);
         }
     }
 
-    /**
-     * List all services migration by a user.
-     *
-     * @param migrationId     ID of the service migrate.
-     * @param newServiceId    ID of the new service.
-     * @param oldServiceId    ID of the old service.
-     * @param migrationStatus Status of the service migrate.
-     * @return list of all services deployed by a user.
-     */
-    @Tag(name = "Migration", description = "APIs to manage the service migration.")
-    @Operation(description = "List all services migration by a user.")
-    @GetMapping(value = "/services/migrations", produces =
-            MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceMigrationId")
-    public List<ServiceMigrationDetails> listServiceMigrations(
-            @Parameter(name = "migrationId", description = "Id of the service migrate")
-            @RequestParam(name = "migrationId", required = false) UUID migrationId,
-            @Parameter(name = "newServiceId", description = "Id of the new service")
-            @RequestParam(name = "newServiceId", required = false) UUID newServiceId,
-            @Parameter(name = "oldServiceId", description = "Id of the old service")
-            @RequestParam(name = "oldServiceId", required = false) UUID oldServiceId,
-            @Parameter(name = "migrationStatus", description = "Status of the service migrate")
-            @RequestParam(name = "migrationStatus", required = false)
-            MigrationStatus migrationStatus
-    ) {
-        return migrationService.listServiceMigrations(migrationId, newServiceId, oldServiceId,
-                migrationStatus, getUserId());
-    }
-
-    /**
-     * Get migration records based on migration id.
-     *
-     * @param migrationId ID of the service migrate.
-     * @return serviceMigrationEntity.
-     */
-    @Tag(name = "Migration", description = "APIs to manage the service migration.")
-    @Operation(description = "Get migration records based on migration id.")
-    @GetMapping(value = "/services/migration/{migrationId}", produces =
-            MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceMigrationId")
-    public ServiceMigrationDetails getMigrationOrderDetailsById(
-            @Parameter(name = "migrationId", description = "Migration ID")
-            @PathVariable("migrationId") String migrationId) {
-        return migrationService.getMigrationOrderDetails(UUID.fromString(migrationId), getUserId());
-    }
-
-    private String getUserId() {
-        return userServiceHelper.getCurrentUserId();
+    private DeployTask getMigrateTask(MigrateRequest migrateRequest) {
+        DeployTask migrateTask = new DeployTask();
+        migrateTask.setOrderId(UUID.randomUUID());
+        migrateTask.setTaskType(ServiceOrderType.MIGRATE);
+        migrateTask.setServiceId(migrateRequest.getOriginalServiceId());
+        migrateTask.setOriginalServiceId(migrateRequest.getOriginalServiceId());
+        migrateTask.setUserId(migrateRequest.getUserId());
+        migrateTask.setRequest(migrateRequest);
+        return migrateTask;
     }
 
     private Map<String, Object> getMigrateProcessVariable(MigrateRequest migrateRequest,
-                                                          UUID newServiceId, String userId) {
+                                                          ServiceOrderEntity migrateOrderEntity) {
         Map<String, Object> variable = new HashMap<>();
-        variable.put(MigrateConstants.ID, migrateRequest.getOriginalServiceId());
-        variable.put(MigrateConstants.NEW_ID, newServiceId);
+        variable.put(MigrateConstants.MIGRATE_ORDER_ID, migrateOrderEntity.getOrderId());
+        variable.put(MigrateConstants.ORIGINAL_SERVICE_ID, migrateRequest.getOriginalServiceId());
+        variable.put(MigrateConstants.NEW_SERVICE_ID, UUID.randomUUID());
         variable.put(MigrateConstants.MIGRATE_REQUEST, migrateRequest);
-        variable.put(MigrateConstants.USER_ID, userId);
+        variable.put(MigrateConstants.USER_ID, migrateRequest.getUserId());
+        variable.put(MigrateConstants.DEPLOY_RETRY_NUM, 0);
+        variable.put(MigrateConstants.DESTROY_RETRY_NUM, 0);
         return variable;
     }
 

@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
@@ -91,7 +91,7 @@ class OpenTofuLocalDeploymentTest {
     @Mock
     OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
     @Mock
-    DeployServiceEntityHandler deployServiceEntityHandler;
+    ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     private Ocl ocl;
     private Ocl oclWithGitScripts;
 
@@ -189,7 +189,7 @@ class OpenTofuLocalDeploymentTest {
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
         serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
-        when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
+        when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
         DeployResult deployResult = openTofuLocalDeployment.modify(deployTask);
         assertNotNull(deployResult);
@@ -215,7 +215,7 @@ class OpenTofuLocalDeploymentTest {
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
         serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
-        when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
+        when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
 
 
@@ -253,7 +253,7 @@ class OpenTofuLocalDeploymentTest {
             String tfState = getFileContent();
             ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
             serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
-            when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
+            when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                     serviceDeploymentEntity);
             ocl.getDeployment().setDeployer(errorDeployer);
             DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.MODIFY);

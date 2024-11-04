@@ -76,7 +76,7 @@ public class ServiceConfigurationManager {
     private static final String HOSTS = "hosts";
 
     @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
+    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
     @Resource
     private ServiceConfigurationChangeDetailsStorage serviceConfigurationChangeDetailsStorage;
@@ -131,8 +131,8 @@ public class ServiceConfigurationManager {
     public ServiceOrder changeServiceConfiguration(String serviceId,
                                                    ServiceConfigurationUpdate configurationUpdate) {
         try {
-            ServiceDeploymentEntity serviceDeploymentEntity =
-                    deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(serviceId));
+            ServiceDeploymentEntity serviceDeploymentEntity = serviceDeploymentEntityHandler
+                    .getServiceDeploymentEntity(UUID.fromString(serviceId));
             ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage
                     .getServiceTemplateById(serviceDeploymentEntity.getServiceTemplateId());
             if (Objects.isNull(serviceTemplateEntity)) {
@@ -468,7 +468,7 @@ public class ServiceConfigurationManager {
     private List<DeployResource> getDeployResources(UUID serviceId,
                                                     DeployResourceKind resourceKind) {
         ServiceDeploymentEntity deployedService =
-                deployServiceEntityHandler.getDeployServiceEntity(serviceId);
+                serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
         Stream<ServiceResourceEntity> resourceEntities =
                 deployedService.getDeployResourceList().stream();
         if (Objects.nonNull(resourceKind)) {

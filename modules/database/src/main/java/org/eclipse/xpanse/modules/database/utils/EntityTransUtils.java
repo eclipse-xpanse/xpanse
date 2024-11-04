@@ -18,7 +18,6 @@ import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
-import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
@@ -29,7 +28,6 @@ import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServic
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
-import org.eclipse.xpanse.modules.models.workflow.migrate.view.ServiceMigrationDetails;
 import org.eclipse.xpanse.modules.models.workflow.recreate.view.ServiceRecreateDetails;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
@@ -136,19 +134,6 @@ public class EntityTransUtils {
     }
 
     /**
-     * ServiceMigrationEntity converted to ServiceMigrationDetails.
-     *
-     * @param serviceMigrationEntity ServiceMigrationEntity.
-     * @return ServiceMigrationDetails
-     */
-    public static ServiceMigrationDetails transToServiceMigrationDetails(
-            ServiceMigrationEntity serviceMigrationEntity) {
-        ServiceMigrationDetails details = new ServiceMigrationDetails();
-        BeanUtils.copyProperties(serviceMigrationEntity, details);
-        return details;
-    }
-
-    /**
      * ServiceRecreateEntity converted to ServiceRecreateDetails.
      *
      * @param serviceRecreateEntity ServiceRecreateEntity.
@@ -197,7 +182,7 @@ public class EntityTransUtils {
      */
     public static List<ServiceConfigurationChangeOrderDetails>
             transToServiceConfigurationChangeOrderDetails(
-            List<ServiceConfigurationChangeDetailsEntity> requests) {
+                List<ServiceConfigurationChangeDetailsEntity> requests) {
 
         Map<UUID, List<ServiceConfigurationChangeDetailsEntity>> orderDetailsMap = requests.stream()
                 .collect(Collectors.groupingBy(

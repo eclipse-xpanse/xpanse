@@ -36,8 +36,8 @@ class DeployTaskTest {
         test.setOrderId(uuid);
         test.setParentOrderId(uuid);
         test.setServiceId(uuid);
-        test.setOriginalServerId(uuid);
-        test.setWorkflowId(uuid);
+        test.setOriginalServiceId(uuid);
+        test.setWorkflowId(uuid.toString());
         test.setTaskType(taskType);
         test.setUserId(userId);
         test.setNamespace(namespace);
@@ -52,8 +52,8 @@ class DeployTaskTest {
         assertThat(test.getOrderId()).isEqualTo(uuid);
         assertThat(test.getParentOrderId()).isEqualTo(uuid);
         assertThat(test.getServiceId()).isEqualTo(uuid);
-        assertThat(test.getOriginalServerId()).isEqualTo(uuid);
-        assertThat(test.getWorkflowId()).isEqualTo(uuid);
+        assertThat(test.getOriginalServiceId()).isEqualTo(uuid);
+        assertThat(test.getWorkflowId()).isEqualTo(uuid.toString());
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getNamespace()).isEqualTo(namespace);
@@ -85,7 +85,7 @@ class DeployTaskTest {
                 + ", taskType=" + taskType
                 + ", userId=" + userId
                 + ", serviceId=" + uuid
-                + ", originalServerId=" + uuid
+                + ", originalServiceId=" + uuid
                 + ", workflowId=" + uuid
                 + ", namespace=" + namespace
                 + ", deployRequest=" + mockDeployRequest
