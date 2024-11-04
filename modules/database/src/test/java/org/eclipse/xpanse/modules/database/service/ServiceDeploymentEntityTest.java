@@ -48,8 +48,8 @@ class ServiceDeploymentEntityTest {
             UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f3d");
     private final DeployRequest CREATE_REQUEST = new DeployRequest();
     private final List<ServiceResourceEntity> DEPLOY_RESOURCE_LIST = new ArrayList<>();
-    private final Map<String, String> PROPERTIES = new HashMap<>();
-    private final Map<String, String> PRIVATE_PROPERTIES = new HashMap<>();
+    private final Map<String, String> OUTPUT_PROPERTIES = new HashMap<>();
+    private final Map<String, String> DEPLOYMENT_GENERATED_FILES = new HashMap<>();
     private final String RESULT_MESSAGE = "RESULT_MESSAGE";
     private ServiceDeploymentEntity test;
 
@@ -70,8 +70,8 @@ class ServiceDeploymentEntityTest {
         test.setServiceTemplateId(SERVICE_TEMPLATE_ID);
         test.setDeployRequest(CREATE_REQUEST);
         test.setDeployResourceList(DEPLOY_RESOURCE_LIST);
-        test.setProperties(PROPERTIES);
-        test.setPrivateProperties(PRIVATE_PROPERTIES);
+        test.setOutputProperties(OUTPUT_PROPERTIES);
+        test.setDeploymentGeneratedFiles(DEPLOYMENT_GENERATED_FILES);
         test.setResultMessage(RESULT_MESSAGE);
         test.setLastStartedAt(LAST_STARTED_AT);
         test.setLastStoppedAt(LAST_STOPPED_AT);
@@ -94,8 +94,8 @@ class ServiceDeploymentEntityTest {
         assertEquals(SERVICE_TEMPLATE_ID, test.getServiceTemplateId());
         assertEquals(CREATE_REQUEST, test.getDeployRequest());
         assertEquals(DEPLOY_RESOURCE_LIST, test.getDeployResourceList());
-        assertEquals(PROPERTIES, test.getProperties());
-        assertEquals(PRIVATE_PROPERTIES, test.getPrivateProperties());
+        assertEquals(OUTPUT_PROPERTIES, test.getOutputProperties());
+        assertEquals(DEPLOYMENT_GENERATED_FILES, test.getDeploymentGeneratedFiles());
         assertEquals(RESULT_MESSAGE, test.getResultMessage());
         assertEquals(LAST_STARTED_AT, test.getLastStartedAt());
         assertEquals(LAST_STOPPED_AT, test.getLastStoppedAt());
@@ -105,14 +105,17 @@ class ServiceDeploymentEntityTest {
     @Test
     void testToString() {
         String expectedToString =
-                "ServiceDeploymentEntity(id=" + ID + ", userId=" + USER_ID + ", category=" + CATEGORY
+                "ServiceDeploymentEntity(id=" + ID + ", userId=" + USER_ID + ", category=" +
+                        CATEGORY
                         + ", name=" + NAME + ", customerServiceName=" + CUSTOMER_SERVICE_NAME
                         + ", version=" + VERSION + ", namespace=" + NAMESPACE + ", csp=" + CSP
                         + ", flavor=" + FLAVOR + ", serviceDeploymentState=" + SERVICE_STATE
                         + ", resultMessage=" + RESULT_MESSAGE + ", serviceState="
                         + SERVICE_RUN_STATE + ", serviceTemplateId=" + SERVICE_TEMPLATE_ID
-                        + ", deployRequest=" + CREATE_REQUEST + ", properties=" + PROPERTIES
-                        + ", privateProperties=" + PRIVATE_PROPERTIES + ", lastStartedAt="
+                        + ", deployRequest=" + CREATE_REQUEST + ", outputProperties=" +
+                        OUTPUT_PROPERTIES
+                        + ", deploymentGeneratedFiles=" + DEPLOYMENT_GENERATED_FILES +
+                        ", lastStartedAt="
                         + LAST_STARTED_AT + ", lastStoppedAt=" + LAST_STOPPED_AT + ", lockConfig="
                         + LOCK_CONFIG + ")";
         assertEquals(expectedToString, test.toString());

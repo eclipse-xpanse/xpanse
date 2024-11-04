@@ -46,7 +46,7 @@ public class FlexibleEngineTerraformResourceHandler implements DeployResourceHan
         List<DeployResource> deployResourceList = new ArrayList<>();
         TfState tfState;
         try {
-            var stateFile = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
+            var stateFile = deployResult.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
             tfState = objectMapper.readValue(stateFile, TfState.class);
         } catch (IOException ex) {
             log.error("Parse terraform state content failed.");
@@ -56,7 +56,7 @@ public class FlexibleEngineTerraformResourceHandler implements DeployResourceHan
             if (Objects.nonNull(tfState.getOutputs()) && !tfState.getOutputs().isEmpty()) {
                 for (String outputKey : tfState.getOutputs().keySet()) {
                     TfOutput tfOutput = tfState.getOutputs().get(outputKey);
-                    deployResult.getProperties().put(outputKey, tfOutput.getValue());
+                    deployResult.getOutputProperties().put(outputKey, tfOutput.getValue());
                 }
             }
             Set<String> supportTypes =

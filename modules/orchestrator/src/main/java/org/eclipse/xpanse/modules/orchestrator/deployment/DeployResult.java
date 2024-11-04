@@ -38,12 +38,13 @@ public class DeployResult {
     private List<@Valid DeployResource> resources;
 
     @NotNull
-    @Schema(description = "The result properties of the service instance.")
-    private Map<String, String> properties = new HashMap<>();
+    @Schema(description = "The output properties of the service instance.")
+    private Map<String, String> outputProperties = new HashMap<>();
 
     @NotNull
-    @Schema(description = "The private properties of the service instance deployment.")
-    private Map<String, String> privateProperties = new HashMap<>();
+    @Schema(description = "The deployment generated files of the service instance deployment.")
+    private Map<String, String> deploymentGeneratedFiles = new HashMap<>();
+
 
     @Schema(description = "The version of deployer tool used to execute deployment scripts.")
     private String deployerVersionUsed;

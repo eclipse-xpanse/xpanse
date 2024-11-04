@@ -143,17 +143,18 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
     private List<ServiceOrderEntity> serviceOrderList;
 
     /**
-     * The properties of the service deployment.
+     * The output properties of the service deployment.
      */
     @ElementCollection
     @CollectionTable(name = "SERVICE_DEPLOYMENT_OUTPUT",
             joinColumns = @JoinColumn(name = "SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
-    private Map<String, String> properties;
+    private Map<String, String> outputProperties;
 
     /**
-     * The private properties of the service deployment. This is not returned to the customer.
+     * The deployment generated files of the service deployment. This is not returned to the
+     * customer.
      * This can be used by the deployer for storing any internal data.
      */
     @ElementCollection
@@ -161,7 +162,7 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
             joinColumns = @JoinColumn(name = "SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
-    private Map<String, String> privateProperties;
+    private Map<String, String> deploymentGeneratedFiles;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")

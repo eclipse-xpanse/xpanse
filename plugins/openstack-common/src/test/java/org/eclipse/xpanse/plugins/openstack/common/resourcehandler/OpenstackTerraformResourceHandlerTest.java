@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.URI;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfState;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
-import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerraformResourceHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.CollectionUtils;
@@ -25,11 +24,11 @@ class OpenstackTerraformResourceHandlerTest {
                 URI.create("file:src/test/resources/openstack-tfstate.json").toURL(),
                 TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getPrivateProperties()
+        deployResult.getDeploymentGeneratedFiles()
                 .put(STATE_FILE_NAME, objectMapper.writeValueAsString(tfState));
         openstackHandler.handler(deployResult);
         Assertions.assertFalse(CollectionUtils.isEmpty(deployResult.getResources()));
-        Assertions.assertFalse(deployResult.getProperties().isEmpty());
+        Assertions.assertFalse(deployResult.getOutputProperties().isEmpty());
     }
 
 
@@ -39,10 +38,10 @@ class OpenstackTerraformResourceHandlerTest {
                 URI.create("file:src/test/resources/openstack-tfstate-destroy.json").toURL(),
                 TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getPrivateProperties()
+        deployResult.getDeploymentGeneratedFiles()
                 .put(STATE_FILE_NAME, objectMapper.writeValueAsString(tfState));
         openstackHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isEmpty(deployResult.getResources()));
-        Assertions.assertTrue(deployResult.getProperties().isEmpty());
+        Assertions.assertTrue(deployResult.getOutputProperties().isEmpty());
     }
 }

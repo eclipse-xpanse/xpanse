@@ -79,12 +79,12 @@ public class TfResourceTransUtils {
 
     public static String getStoredStateContent(ServiceDeploymentEntity serviceDeploymentEntity) {
         if (Objects.isNull(serviceDeploymentEntity)
-                || CollectionUtils.isEmpty(serviceDeploymentEntity.getPrivateProperties())
+                || CollectionUtils.isEmpty(serviceDeploymentEntity.getDeploymentGeneratedFiles())
                 || StringUtils.isEmpty(
-                serviceDeploymentEntity.getPrivateProperties().get(STATE_FILE_NAME))) {
+                serviceDeploymentEntity.getDeploymentGeneratedFiles().get(STATE_FILE_NAME))) {
             throw new ServiceNotDeployedException(
                     "Can't find valid state context in stored deployed service.");
         }
-        return serviceDeploymentEntity.getPrivateProperties().get(STATE_FILE_NAME);
+        return serviceDeploymentEntity.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
     }
 }

@@ -65,7 +65,7 @@ class TerraformLocalDeploymentTest {
             resource "random_id" "new" {
               byte_length = 4
             }
-                                    
+            
             output "random_id" {
               value = resource.random_id_2.new.id
             }
@@ -159,17 +159,17 @@ class TerraformLocalDeploymentTest {
 
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         DeployResult deployResult = terraformLocalDeployment.deploy(deployTask);
-        String tfState = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
+        String tfState = deployResult.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
         Assertions.assertNotNull(deployResult);
-        Assertions.assertNotNull(deployResult.getPrivateProperties());
+        Assertions.assertNotNull(deployResult.getDeploymentGeneratedFiles());
         Assertions.assertNull(tfState);
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DEPLOY);
             DeployResult deployResult1 = terraformLocalDeployment.deploy(deployTask1);
             Assertions.assertNotNull(deployResult1);
-            Assertions.assertNotNull(deployResult1.getPrivateProperties());
-            String tfState1 = deployResult1.getPrivateProperties().get(STATE_FILE_NAME);
+            Assertions.assertNotNull(deployResult1.getDeploymentGeneratedFiles());
+            String tfState1 = deployResult1.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
             Assertions.assertNull(tfState1);
         } catch (Exception e) {
             log.error("testDeploy throw unexpected exception.", e);
@@ -181,21 +181,21 @@ class TerraformLocalDeploymentTest {
     void testModify() {
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
-        serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
+        serviceDeploymentEntity.setDeploymentGeneratedFiles(Map.of(STATE_FILE_NAME, tfState));
         when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
 
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.MODIFY);
         DeployResult deployResult = terraformLocalDeployment.modify(deployTask);
         Assertions.assertNotNull(deployResult);
-        Assertions.assertNotNull(deployResult.getPrivateProperties());
+        Assertions.assertNotNull(deployResult.getDeploymentGeneratedFiles());
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.MODIFY);
             DeployResult deployResult1 = terraformLocalDeployment.deploy(deployTask1);
             Assertions.assertNotNull(deployResult1);
-            Assertions.assertNotNull(deployResult1.getPrivateProperties());
-            String tfState1 = deployResult1.getPrivateProperties().get(STATE_FILE_NAME);
+            Assertions.assertNotNull(deployResult1.getDeploymentGeneratedFiles());
+            String tfState1 = deployResult1.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
             Assertions.assertNull(tfState1);
         } catch (Exception e) {
             log.error("testDeploy throw unexpected exception.", e);
@@ -207,20 +207,20 @@ class TerraformLocalDeploymentTest {
     void testDestroy() {
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
-        serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
+        serviceDeploymentEntity.setDeploymentGeneratedFiles(Map.of(STATE_FILE_NAME, tfState));
         when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
 
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
         DeployResult destroyResult = terraformLocalDeployment.destroy(deployTask);
         Assertions.assertNotNull(destroyResult);
-        Assertions.assertNotNull(destroyResult.getPrivateProperties());
+        Assertions.assertNotNull(destroyResult.getDeploymentGeneratedFiles());
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DESTROY);
             DeployResult destroyResult1 = terraformLocalDeployment.destroy(deployTask1);
             Assertions.assertNotNull(destroyResult1);
-            Assertions.assertNotNull(destroyResult1.getPrivateProperties());
+            Assertions.assertNotNull(destroyResult1.getDeploymentGeneratedFiles());
         } catch (Exception e) {
             log.error("testDestroy throw unexpected exception.", e);
         }
@@ -238,7 +238,8 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testDestroy_FailedCausedByTerraformExecutorException() {
-        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn(
+                "terraform");
         try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
                 TfResourceTransUtils.class)) {
             tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
@@ -246,7 +247,7 @@ class TerraformLocalDeploymentTest {
             ocl.getDeployment().setDeployer(errorDeployer);
             DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
             DeployResult deployResult = this.terraformLocalDeployment.destroy(deployTask);
-            Assertions.assertTrue(deployResult.getProperties().isEmpty());
+            Assertions.assertTrue(deployResult.getOutputProperties().isEmpty());
             Assertions.assertNotNull(deployResult);
         }
     }
@@ -259,7 +260,8 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testGetDeployPlanAsJson() {
-        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn(
+                "terraform");
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         String deployPlanJson = terraformLocalDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
@@ -274,7 +276,8 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
-        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn(
+                "terraform");
         ocl.getDeployment().setDeployer(errorDeployer);
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         Assertions.assertThrows(TerraformExecutorException.class,
@@ -283,7 +286,8 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testValidate() {
-        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn(
+                "terraform");
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(new ArrayList<>());
@@ -307,7 +311,8 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testValidateFailed() {
-        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("terraform");
+        when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn(
+                "terraform");
         ocl.getDeployment().setDeployer(invalidDeployer);
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();

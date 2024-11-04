@@ -26,8 +26,8 @@ class DeployResultTest {
 
     private final UUID orderId = UUID.fromString("f0dcb6ea-cbe7-4c88-9c94-a5d00e82a4f2");
     private final boolean isSuccessful = true;
-    private final Map<String, String> properties = Collections.singletonMap("key", "value");
-    private final Map<String, String> privateProperties =
+    private final Map<String, String> outputProperties = Collections.singletonMap("key", "value");
+    private final Map<String, String> deploymentGeneratedFiles =
             Collections.singletonMap("privateKey", "privateValue");
     private final String message = "success";
     private final String tfStateContent = "tfStateContent";
@@ -43,8 +43,8 @@ class DeployResultTest {
         test.setOrderId(orderId);
         test.setIsTaskSuccessful(isSuccessful);
         test.setResources(resources);
-        test.setProperties(properties);
-        test.setPrivateProperties(privateProperties);
+        test.setOutputProperties(outputProperties);
+        test.setDeploymentGeneratedFiles(deploymentGeneratedFiles);
         test.setMessage(message);
         test.setTfStateContent(tfStateContent);
         test.setDeployerVersionUsed(deployerVersionUsed);
@@ -56,8 +56,8 @@ class DeployResultTest {
         assertEquals(isSuccessful, test.getIsTaskSuccessful());
         assertEquals(message, test.getMessage());
         assertEquals(resources, test.getResources());
-        assertEquals(properties, test.getProperties());
-        assertEquals(privateProperties, test.getPrivateProperties());
+        assertEquals(outputProperties, test.getOutputProperties());
+        assertEquals(deploymentGeneratedFiles, test.getDeploymentGeneratedFiles());
         assertEquals(tfStateContent, test.getTfStateContent());
         assertEquals(deployerVersionUsed, test.getDeployerVersionUsed());
     }
@@ -83,8 +83,8 @@ class DeployResultTest {
                 + ", isTaskSuccessful=" + isSuccessful
                 + ", message=" + message
                 + ", resources=" + resources
-                + ", properties=" + properties
-                + ", privateProperties=" + privateProperties
+                + ", outputProperties=" + outputProperties
+                + ", deploymentGeneratedFiles=" + deploymentGeneratedFiles
                 + ", deployerVersionUsed=" + deployerVersionUsed
                 + ", tfStateContent=" + tfStateContent
                 + ")";
