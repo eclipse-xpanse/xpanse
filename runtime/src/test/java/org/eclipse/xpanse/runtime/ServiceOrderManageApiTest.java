@@ -116,7 +116,7 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
 
         assertThat(serviceOrders.getFirst()).isEqualTo(orderDetails);
 
-        deleteDeployedService(serviceId);
+        deleteServiceDeployment(serviceId);
 
         MockHttpServletResponse deleteOrderResponse = deleteOrderByOrderId(orderId);
         assertThat(deleteOrderResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -185,7 +185,7 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.FORBIDDEN.value(), deleteOrderResponse.getStatus());
         assertEquals(result, deleteOrderResponse.getContentAsString());
 
-        deleteDeployedService(serviceId);
+        deleteServiceDeployment(serviceId);
     }
 
 

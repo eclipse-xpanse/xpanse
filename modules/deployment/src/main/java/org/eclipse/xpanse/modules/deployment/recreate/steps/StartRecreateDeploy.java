@@ -84,7 +84,9 @@ public class StartRecreateDeploy implements Serializable, JavaDelegate {
         String userId = (String) variables.get(RecreateConstants.USER_ID);
         DeployRequest deployRequest =
                 (DeployRequest) variables.get(RecreateConstants.RECREATE_REQUEST);
-        deployService.deployServiceById(originalServiceId, userId, deployRequest);
+        deployRequest.setUserId(userId);
+        deployService.deployServiceByWorkflow(originalServiceId, processInstanceId,
+                UUID.randomUUID(), deployRequest);
     }
 }
 

@@ -34,10 +34,10 @@ public interface ServiceOrderStorage {
     /**
      * Method to get database entry based ServiceOrderEntity.
      *
-     * @param uuid uuid of ServiceOrderEntity.
+     * @param orderId orderId of ServiceOrderEntity.
      * @return Returns the database entry for the provided arguments.
      */
-    ServiceOrderEntity getEntityById(UUID uuid);
+    ServiceOrderEntity getEntityById(UUID orderId);
 
     /**
      * Delete service order entity from database by entity.
@@ -57,9 +57,9 @@ public interface ServiceOrderStorage {
     /**
      * Get deploy service entity by order id.
      *
-     * @param uuid order id
+     * @param orderId order id
      * @return DeployServiceEntity
      */
-    ServiceDeploymentEntity getDeployServiceByOrderId(UUID uuid);
+    ServiceDeploymentEntity getServiceDeploymentByOrderId(UUID orderId);
 
 }

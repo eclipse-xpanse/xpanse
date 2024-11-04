@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
@@ -85,7 +85,7 @@ class TerraformLocalDeploymentTest {
     @Mock
     Executor taskExecutor;
     @Mock
-    DeployServiceEntityHandler deployServiceEntityHandler;
+    ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @Mock
     TerraformInstaller terraformInstaller;
 
@@ -182,7 +182,7 @@ class TerraformLocalDeploymentTest {
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
         serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
-        when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
+        when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
 
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.MODIFY);
@@ -208,7 +208,7 @@ class TerraformLocalDeploymentTest {
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
         serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
-        when(deployServiceEntityHandler.getDeployServiceEntity(any())).thenReturn(
+        when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
 
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);

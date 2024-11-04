@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.modules.deployment.migration.steps;
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -15,13 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.database.servicemigration.ServiceMigrationEntity;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
-import org.eclipse.xpanse.modules.deployment.migration.MigrationService;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.workflow.migrate.enums.MigrationStatus;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,106 +29,67 @@ import org.springframework.stereotype.Component;
 public class ProcessDestroyResult implements Serializable, JavaDelegate {
 
     private final RuntimeService runtimeService;
-    private final DeployServiceEntityHandler deployServiceEntityHandler;
-    private final MigrationService migrationService;
+    private final ServiceOrderManager serviceOrderManager;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+
 
     /**
      * Constructor for ProcessDestroyResult bean.
      */
     @Autowired
     public ProcessDestroyResult(RuntimeService runtimeService,
-                                DeployServiceEntityHandler deployServiceEntityHandler,
-                                MigrationService migrationService) {
+                                ServiceOrderManager serviceOrderManager,
+                                ServiceDeploymentEntityHandler serviceDeploymentEntityHandler) {
         this.runtimeService = runtimeService;
-        this.deployServiceEntityHandler = deployServiceEntityHandler;
-        this.migrationService = migrationService;
+        this.serviceOrderManager = serviceOrderManager;
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
     }
 
     @Override
     public void execute(DelegateExecution execution) {
         String processInstanceId = execution.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        String oldServiceId = variables.get(MigrateConstants.ID).toString();
+        UUID originalServiceId = (UUID) variables.get(MigrateConstants.ORIGINAL_SERVICE_ID);
+        UUID migrateOrderId = (UUID) variables.get(MigrateConstants.MIGRATE_ORDER_ID);
 
-        log.info("Migration workflow of Instance Id : {} start check destroy status",
-                processInstanceId);
-        ServiceMigrationEntity serviceMigrationEntity =
-                migrationService.getServiceMigrationEntityById(UUID.fromString(processInstanceId));
-
-        boolean isDestroySuccess =
-                isDestroySuccess(UUID.fromString(oldServiceId));
-
-        if (isDestroySuccess) {
-            migrationService.updateServiceMigrationStatus(serviceMigrationEntity,
-                    MigrationStatus.DESTROY_COMPLETED, OffsetDateTime.now());
-            String newServiceId = variables.get(MigrateConstants.NEW_ID).toString();
-            updateStatus(serviceMigrationEntity, UUID.fromString(newServiceId),
-                    UUID.fromString(oldServiceId));
+        try {
+            boolean isDestroySuccess =
+                    serviceDeploymentEntityHandler.isServiceDestroyedSuccess(originalServiceId);
             runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
-                    true);
-            log.info("destroy step completed for migration order {}", processInstanceId);
-        } else {
-            migrationService.updateServiceMigrationStatus(serviceMigrationEntity,
-                    MigrationStatus.DESTROY_FAILED, OffsetDateTime.now());
-
+                    isDestroySuccess);
+            if (isDestroySuccess) {
+                serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.SUCCESSFUL,
+                        null);
+            } else {
+                int destroyRetryNum = getDestroyRetryNum(variables);
+                runtimeService.setVariable(processInstanceId,
+                        MigrateConstants.DESTROY_RETRY_NUM, destroyRetryNum + 1);
+                log.info("Process failed destroy task of migration workflow with id:{}. "
+                        + "RetryCount:{}", processInstanceId, destroyRetryNum);
+                if (destroyRetryNum >= 1) {
+                    String userId = (String) variables.get(MigrateConstants.USER_ID);
+                    runtimeService.setVariable(processInstanceId, MigrateConstants.ASSIGNEE,
+                            userId);
+                    serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.FAILED,
+                            null);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to process destroy task of migration workflow with id:{}",
+                    processInstanceId, e);
             runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
                     false);
-            int destroyRetryNum = updateDestroyRetryNum(processInstanceId, variables);
-            if (destroyRetryNum >= 1) {
-                String userId = (String) variables.get(MigrateConstants.USER_ID);
-                runtimeService.setVariable(processInstanceId, MigrateConstants.ASSIGNEE, userId);
-            }
+            serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.FAILED,
+                    e.getMessage());
+
         }
     }
 
-    private int updateDestroyRetryNum(String processInstanceId, Map<String, Object> variables) {
-        int destroyRetryNum = (int) variables.get(MigrateConstants.DESTROY_RETRY_NUM);
-        if (destroyRetryNum > 0) {
-            log.info("Process instance: {} retry destroy service,RetryNum:{}",
-                    processInstanceId, destroyRetryNum);
+    private int getDestroyRetryNum(Map<String, Object> variables) {
+        if (Objects.isNull(variables.get(MigrateConstants.DESTROY_RETRY_NUM))) {
+            return 0;
         }
-        runtimeService.setVariable(processInstanceId, MigrateConstants.DESTROY_RETRY_NUM,
-                destroyRetryNum + 1);
-        return destroyRetryNum;
+        return (int) variables.get(MigrateConstants.DESTROY_RETRY_NUM);
     }
 
-    private boolean isDestroySuccess(UUID oldServiceId) {
-        ServiceDeploymentEntity serviceDeploymentEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(oldServiceId);
-
-        if (Objects.isNull(serviceDeploymentEntity)) {
-            return false;
-        }
-        return serviceDeploymentEntity.getServiceDeploymentState()
-                == ServiceDeploymentState.DESTROY_SUCCESS;
-    }
-
-    private boolean isMigrationSuccess(UUID newServiceId, UUID oldServiceId) {
-
-        ServiceDeploymentEntity newServiceDeploymentEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(newServiceId);
-
-        ServiceDeploymentEntity oldServiceDeploymentEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(oldServiceId);
-
-        if (Objects.nonNull(newServiceDeploymentEntity)
-                && Objects.nonNull(oldServiceDeploymentEntity)) {
-            return newServiceDeploymentEntity.getServiceDeploymentState()
-                    == ServiceDeploymentState.DEPLOY_SUCCESS
-                    && oldServiceDeploymentEntity.getServiceDeploymentState()
-                    == ServiceDeploymentState.DESTROY_SUCCESS;
-        }
-        return false;
-    }
-
-    private void updateStatus(ServiceMigrationEntity serviceMigrationEntity, UUID newServiceId,
-            UUID oldServiceId) {
-        if (isMigrationSuccess(newServiceId, oldServiceId)) {
-            migrationService.updateServiceMigrationStatus(serviceMigrationEntity,
-                    MigrationStatus.MIGRATION_COMPLETED, OffsetDateTime.now());
-        } else {
-            migrationService.updateServiceMigrationStatus(serviceMigrationEntity,
-                    MigrationStatus.MIGRATION_FAILED, OffsetDateTime.now());
-        }
-    }
 }

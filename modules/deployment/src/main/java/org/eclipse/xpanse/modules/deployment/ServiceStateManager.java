@@ -45,7 +45,7 @@ import org.springframework.util.CollectionUtils;
 public class ServiceStateManager {
 
     @Resource
-    private DeployServiceEntityHandler serviceHandler;
+    private ServiceDeploymentEntityHandler serviceHandler;
     @Resource
     private PluginManager pluginManager;
     @Resource
@@ -208,7 +208,7 @@ public class ServiceStateManager {
 
     private ServiceDeploymentEntity getDeployedServiceAndValidateState(
             UUID serviceId, UUID orderId, ServiceOrderType taskType) {
-        ServiceDeploymentEntity service = serviceHandler.getDeployServiceEntity(serviceId);
+        ServiceDeploymentEntity service = serviceHandler.getServiceDeploymentEntity(serviceId);
         validateDeployServiceEntity(service, orderId);
         if (service.getServiceState() == ServiceState.STARTING
                 || service.getServiceState() == ServiceState.STOPPING

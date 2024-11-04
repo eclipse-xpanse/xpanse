@@ -27,11 +27,15 @@ class ServiceOrderDetailsTest {
             ZoneOffset.UTC);
     private final UUID serviceId = UUID.fromString("168b2be0-3535-4042-b53c-23cabd874a51");
     private final UUID orderId = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab61");
+    private final UUID originalServiceId = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab62");
+    private final UUID parentOrderId = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab63");
+    private final String workflowId = "workflowId";
     private final String errorMsg = "error message";
     private final String userId = "userId";
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
-
+    @Mock
+    private Object requestBody;
     @Mock
     private DeployRequest mockPreviousDeployRequest;
     @Mock
@@ -50,12 +54,16 @@ class ServiceOrderDetailsTest {
         test = new ServiceOrderDetails();
         test.setOrderId(orderId);
         test.setServiceId(serviceId);
+        test.setOriginalServiceId(originalServiceId);
+        test.setParentOrderId(parentOrderId);
+        test.setWorkflowId(workflowId);
         test.setTaskType(taskType);
         test.setUserId(userId);
         test.setStartedTime(startedTime);
         test.setCompletedTime(completedTime);
         test.setErrorMsg(errorMsg);
         test.setTaskStatus(taskStatus);
+        test.setRequestBody(requestBody);
         test.setPreviousDeployRequest(mockPreviousDeployRequest);
         test.setNewDeployRequest(mockNewDeployRequest);
         test.setPreviousDeployedResources(mockPreviousDeployedResources);
@@ -67,12 +75,16 @@ class ServiceOrderDetailsTest {
     void testGetters() {
         assertThat(test.getOrderId()).isEqualTo(orderId);
         assertThat(test.getServiceId()).isEqualTo(serviceId);
+        assertThat(test.getOriginalServiceId()).isEqualTo(originalServiceId);
+        assertThat(test.getParentOrderId()).isEqualTo(parentOrderId);
+        assertThat(test.getWorkflowId()).isEqualTo(workflowId);
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
         assertThat(test.getErrorMsg()).isEqualTo(errorMsg);
         assertThat(test.getCompletedTime()).isEqualTo(completedTime);
         assertThat(test.getStartedTime()).isEqualTo(startedTime);
+        assertThat(test.getRequestBody()).isEqualTo(requestBody);
         assertThat(test.getPreviousDeployRequest()).isEqualTo(mockPreviousDeployRequest);
         assertThat(test.getNewDeployRequest()).isEqualTo(mockNewDeployRequest);
         assertThat(test.getPreviousDeployedResources()).isEqualTo(mockPreviousDeployedResources);
@@ -103,10 +115,14 @@ class ServiceOrderDetailsTest {
                 + ", serviceId=" + serviceId
                 + ", taskType=" + taskType
                 + ", taskStatus=" + taskStatus
+                + ", originalServiceId=" + originalServiceId
+                + ", parentOrderId=" + parentOrderId
+                + ", workflowId=" + workflowId
                 + ", errorMsg=" + errorMsg
                 + ", userId=" + userId
                 + ", startedTime=" + startedTime
                 + ", completedTime=" + completedTime
+                + ", requestBody=" + requestBody
                 + ", previousDeployRequest=" + mockPreviousDeployRequest
                 + ", newDeployRequest=" + mockNewDeployRequest
                 + ", previousDeployedResources=" + mockPreviousDeployedResources

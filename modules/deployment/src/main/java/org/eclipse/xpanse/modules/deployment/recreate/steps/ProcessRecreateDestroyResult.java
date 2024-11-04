@@ -9,18 +9,15 @@ package org.eclipse.xpanse.modules.deployment.recreate.steps;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.recreate.RecreateService;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.workflow.recreate.enums.RecreateStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,7 +30,7 @@ import org.springframework.stereotype.Component;
 public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate {
 
     private final RuntimeService runtimeService;
-    private final DeployServiceEntityHandler deployServiceEntityHandler;
+    private final ServiceDeploymentEntityHandler deploymentEntityHandler;
     private final RecreateService recreateService;
 
     /**
@@ -41,10 +38,10 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
      */
     @Autowired
     public ProcessRecreateDestroyResult(RuntimeService runtimeService,
-                                        DeployServiceEntityHandler deployServiceEntityHandler,
+                                        ServiceDeploymentEntityHandler deploymentEntityHandler,
                                         RecreateService recreateService) {
         this.runtimeService = runtimeService;
-        this.deployServiceEntityHandler = deployServiceEntityHandler;
+        this.deploymentEntityHandler = deploymentEntityHandler;
         this.recreateService = recreateService;
     }
 
@@ -60,7 +57,7 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
                 recreateService.getServiceRecreateEntityById(UUID.fromString(processInstanceId));
 
         boolean isDestroySuccess =
-                isDestroySuccess(UUID.fromString(serviceId));
+                deploymentEntityHandler.isServiceDestroyedSuccess(UUID.fromString(serviceId));
 
         if (isDestroySuccess) {
             recreateService.updateServiceRecreateStatus(serviceRecreateEntity,
@@ -92,16 +89,5 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
         runtimeService.setVariable(processInstanceId, RecreateConstants.DESTROY_RETRY_NUM,
                 destroyRetryNum + 1);
         return destroyRetryNum;
-    }
-
-    private boolean isDestroySuccess(UUID serviceId) {
-        ServiceDeploymentEntity serviceDeploymentEntity =
-                deployServiceEntityHandler.getDeployServiceEntity(serviceId);
-
-        if (Objects.isNull(serviceDeploymentEntity)) {
-            return false;
-        }
-        return serviceDeploymentEntity.getServiceDeploymentState()
-                == ServiceDeploymentState.DESTROY_SUCCESS;
     }
 }

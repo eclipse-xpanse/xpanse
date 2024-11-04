@@ -226,7 +226,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(purgeCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
-        deleteDeployedService(serviceId);
+        deleteServiceDeployment(serviceId);
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 

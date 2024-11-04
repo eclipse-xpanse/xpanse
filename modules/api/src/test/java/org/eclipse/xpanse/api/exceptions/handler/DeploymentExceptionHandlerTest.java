@@ -18,7 +18,7 @@ import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
@@ -70,7 +70,7 @@ class DeploymentExceptionHandlerTest {
     @MockBean
     private DeployerKindManager deployerKindManager;
     @MockBean
-    private DeployServiceEntityHandler deployServiceEntityHandler;
+    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @MockBean
     private PluginManager pluginManager;
     @MockBean

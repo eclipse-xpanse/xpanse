@@ -7,7 +7,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
@@ -31,7 +31,7 @@ public class TofuMakerServiceDestroyer {
     private final OpenTofuFromScriptsApi openTofuFromScriptsApi;
     private final OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
     private final TofuMakerHelper tofuMakerHelper;
-    private final DeployServiceEntityHandler deployServiceEntityHandler;
+    private final ServiceDeploymentEntityHandler deploymentEntityHandler;
 
     /**
      * Constructor for OpenTofuMakerServiceDestroyer bean.
@@ -39,11 +39,11 @@ public class TofuMakerServiceDestroyer {
     public TofuMakerServiceDestroyer(OpenTofuFromScriptsApi openTofuFromScriptsApi,
                                      OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
                                      TofuMakerHelper tofuMakerHelper,
-                                     DeployServiceEntityHandler deployServiceEntityHandler) {
+                                     ServiceDeploymentEntityHandler deploymentEntityHandler) {
         this.openTofuFromScriptsApi = openTofuFromScriptsApi;
         this.openTofuFromGitRepoApi = openTofuFromGitRepoApi;
         this.tofuMakerHelper = tofuMakerHelper;
-        this.deployServiceEntityHandler = deployServiceEntityHandler;
+        this.deploymentEntityHandler = deploymentEntityHandler;
     }
 
     /**
@@ -51,7 +51,7 @@ public class TofuMakerServiceDestroyer {
      */
     public DeployResult destroyFromScripts(DeployTask deployTask) {
         ServiceDeploymentEntity serviceDeploymentEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
+                deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncDestroyFromScriptsRequest request =
@@ -72,7 +72,7 @@ public class TofuMakerServiceDestroyer {
      */
     public DeployResult destroyFromGitRepo(DeployTask deployTask) {
         ServiceDeploymentEntity serviceDeploymentEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
+                deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
         OpenTofuAsyncDestroyFromGitRepoRequest request =
@@ -89,7 +89,8 @@ public class TofuMakerServiceDestroyer {
     }
 
     private OpenTofuAsyncDestroyFromScriptsRequest getDestroyFromScriptsRequest(DeployTask task,
-             String stateFile) throws OpenTofuMakerRequestFailedException {
+                                                                                String stateFile)
+            throws OpenTofuMakerRequestFailedException {
         OpenTofuAsyncDestroyFromScriptsRequest request =
                 new OpenTofuAsyncDestroyFromScriptsRequest();
         request.setRequestId(task.getOrderId());

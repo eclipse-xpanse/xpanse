@@ -43,6 +43,15 @@ public class ServiceOrderDetails {
     @Schema(description = "The task status of the service order.")
     private TaskStatus taskStatus;
 
+    @Schema(description = "The id of the original service.")
+    private UUID originalServiceId;
+
+    @Schema(description = "The id of the parent service order.")
+    private UUID parentOrderId;
+
+    @Schema(description = "The id of the workflow.")
+    private String workflowId;
+
     @Schema(description = "The error message if the service order task failed.")
     private String errorMsg;
 
@@ -58,6 +67,9 @@ public class ServiceOrderDetails {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime completedTime;
+
+    @Schema(description = "The request json of the service order.")
+    private Object requestBody;
 
     @Schema(description = "The deploy request of the service before this service order.")
     private DeployRequest previousDeployRequest;

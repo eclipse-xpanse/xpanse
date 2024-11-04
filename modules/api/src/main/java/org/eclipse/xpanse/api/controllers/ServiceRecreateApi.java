@@ -25,7 +25,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.recreate.RecreateService;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
@@ -62,7 +62,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServiceRecreateApi {
 
     @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
+    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
     @Resource
     private UserServiceHelper userServiceHelper;
@@ -85,9 +85,8 @@ public class ServiceRecreateApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public UUID recreateService(@Valid @PathVariable("serviceId") String serviceId) {
-        ServiceDeploymentEntity serviceDeploymentEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(
-                        UUID.fromString(serviceId));
+        ServiceDeploymentEntity serviceDeploymentEntity = serviceDeploymentEntityHandler
+                .getServiceDeploymentEntity(UUID.fromString(serviceId));
         String userId = getUserId();
         if (!StringUtils.equals(userId, serviceDeploymentEntity.getUserId())) {
             throw new AccessDeniedException(
@@ -113,8 +112,8 @@ public class ServiceRecreateApi {
                             serviceDeploymentEntity.getServiceDeploymentState()));
         }
 
-        ServiceDeploymentEntity deployedService =
-                deployServiceEntityHandler.getDeployServiceEntity(UUID.fromString(serviceId));
+        ServiceDeploymentEntity deployedService = serviceDeploymentEntityHandler
+                .getServiceDeploymentEntity(UUID.fromString(serviceId));
 
         Map<String, Object> variable =
                 getRecreateProcessVariable(deployedService, userId);

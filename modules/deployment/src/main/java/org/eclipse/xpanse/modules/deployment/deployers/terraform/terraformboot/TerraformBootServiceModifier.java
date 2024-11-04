@@ -7,7 +7,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
@@ -31,7 +31,7 @@ public class TerraformBootServiceModifier {
     private final TerraformFromScriptsApi terraformFromScriptsApi;
     private final TerraformFromGitRepoApi terraformFromGitRepoApi;
     private final TerraformBootHelper terraformBootHelper;
-    private final DeployServiceEntityHandler deployServiceEntityHandler;
+    private final ServiceDeploymentEntityHandler deploymentEntityHandler;
 
     /**
      * Constructor for TerraformBootServiceDestroyer bean.
@@ -39,11 +39,11 @@ public class TerraformBootServiceModifier {
     public TerraformBootServiceModifier(TerraformFromScriptsApi terraformFromScriptsApi,
                                         TerraformFromGitRepoApi terraformFromGitRepoApi,
                                         TerraformBootHelper terraformBootHelper,
-                                        DeployServiceEntityHandler deployServiceEntityHandler) {
+                                        ServiceDeploymentEntityHandler deploymentEntityHandler) {
         this.terraformFromScriptsApi = terraformFromScriptsApi;
         this.terraformFromGitRepoApi = terraformFromGitRepoApi;
         this.terraformBootHelper = terraformBootHelper;
-        this.deployServiceEntityHandler = deployServiceEntityHandler;
+        this.deploymentEntityHandler = deploymentEntityHandler;
     }
 
     /**
@@ -51,7 +51,7 @@ public class TerraformBootServiceModifier {
      */
     public DeployResult modifyFromScripts(DeployTask deployTask) {
         ServiceDeploymentEntity serviceDeploymentEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
+                this.deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
         result.setOrderId(deployTask.getOrderId());
@@ -72,7 +72,7 @@ public class TerraformBootServiceModifier {
      */
     public DeployResult modifyFromGitRepo(DeployTask deployTask) {
         ServiceDeploymentEntity serviceDeploymentEntity =
-                this.deployServiceEntityHandler.getDeployServiceEntity(deployTask.getServiceId());
+                this.deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
         result.setOrderId(deployTask.getOrderId());

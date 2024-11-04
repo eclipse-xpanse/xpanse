@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityHandler;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -35,7 +35,7 @@ public class ServiceLockConfigService {
     private ServiceOrderManager serviceOrderManager;
 
     @Resource
-    private DeployServiceEntityHandler deployServiceEntityHandler;
+    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
     @Resource
     private DeployServiceEntityConverter deployServiceEntityConverter;
@@ -55,7 +55,7 @@ public class ServiceLockConfigService {
     public ServiceOrder changeServiceLockConfig(UUID serviceId,
                                                 ServiceLockConfig lockConfig) {
         ServiceDeploymentEntity deployedService =
-                deployServiceEntityHandler.getDeployServiceEntity(serviceId);
+                serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(deployedService.getUserId());
         if (!currentUserIsOwner) {
@@ -71,7 +71,7 @@ public class ServiceLockConfigService {
                 serviceOrderManager.storeNewServiceOrderEntity(lockChangeTask, deployedService);
         serviceOrder.setStartedTime(OffsetDateTime.now());
         deployedService.setLockConfig(lockConfig);
-        deployServiceEntityHandler.storeAndFlush(deployedService);
+        serviceDeploymentEntityHandler.storeAndFlush(deployedService);
         serviceOrder.setCompletedTime(OffsetDateTime.now());
         serviceOrder.setTaskStatus(TaskStatus.SUCCESSFUL);
         serviceOrderStorage.storeAndFlush(serviceOrder);
