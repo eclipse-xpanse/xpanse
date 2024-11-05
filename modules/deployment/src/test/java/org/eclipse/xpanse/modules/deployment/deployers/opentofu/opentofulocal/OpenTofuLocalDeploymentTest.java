@@ -67,7 +67,7 @@ class OpenTofuLocalDeploymentTest {
             resource "random_id" "new" {
               byte_length = 4
             }
-                                    
+            
             output "random_id" {
               value = resource.random_id_2.new.id
             }
@@ -164,17 +164,17 @@ class OpenTofuLocalDeploymentTest {
         when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         DeployResult deployResult = openTofuLocalDeployment.deploy(deployTask);
-        String tfState = deployResult.getPrivateProperties().get(STATE_FILE_NAME);
+        String tfState = deployResult.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
         assertNotNull(deployResult);
-        assertNotNull(deployResult.getPrivateProperties());
+        assertNotNull(deployResult.getDeploymentGeneratedFiles());
         Assertions.assertNull(tfState);
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DEPLOY);
             DeployResult deployResult1 = openTofuLocalDeployment.deploy(deployTask1);
             assertNotNull(deployResult1);
-            assertNotNull(deployResult1.getPrivateProperties());
-            String tfState1 = deployResult1.getPrivateProperties().get(STATE_FILE_NAME);
+            assertNotNull(deployResult1.getDeploymentGeneratedFiles());
+            String tfState1 = deployResult1.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
             Assertions.assertNull(tfState1);
         } catch (Exception e) {
             log.error("testDeploy throw unexpected exception.", e);
@@ -188,20 +188,20 @@ class OpenTofuLocalDeploymentTest {
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.MODIFY);
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
-        serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
+        serviceDeploymentEntity.setDeploymentGeneratedFiles(Map.of(STATE_FILE_NAME, tfState));
         when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
         DeployResult deployResult = openTofuLocalDeployment.modify(deployTask);
         assertNotNull(deployResult);
-        assertNotNull(deployResult.getPrivateProperties());
+        assertNotNull(deployResult.getDeploymentGeneratedFiles());
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.MODIFY);
             DeployResult deployResult1 =
                     openTofuLocalDeployment.modify(deployTask1);
             assertNotNull(deployResult1);
-            assertNotNull(deployResult1.getPrivateProperties());
-            String tfState1 = deployResult1.getPrivateProperties().get(STATE_FILE_NAME);
+            assertNotNull(deployResult1.getDeploymentGeneratedFiles());
+            String tfState1 = deployResult1.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
             Assertions.assertNull(tfState1);
         } catch (Exception e) {
             log.error("testDeploy throw unexpected exception.", e);
@@ -214,7 +214,7 @@ class OpenTofuLocalDeploymentTest {
         when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
-        serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
+        serviceDeploymentEntity.setDeploymentGeneratedFiles(Map.of(STATE_FILE_NAME, tfState));
         when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
 
@@ -222,13 +222,13 @@ class OpenTofuLocalDeploymentTest {
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
         DeployResult destroyResult = openTofuLocalDeployment.destroy(deployTask);
         assertNotNull(destroyResult);
-        assertNotNull(destroyResult.getPrivateProperties());
+        assertNotNull(destroyResult.getDeploymentGeneratedFiles());
 
         try {
             DeployTask deployTask1 = getDeployTask(oclWithGitScripts, ServiceOrderType.DESTROY);
             DeployResult destroyResult1 = openTofuLocalDeployment.destroy(deployTask1);
             assertNotNull(destroyResult1);
-            assertNotNull(destroyResult1.getPrivateProperties());
+            assertNotNull(destroyResult1.getDeploymentGeneratedFiles());
         } catch (Exception e) {
             log.error("testDestroy throw unexpected exception.", e);
         }
@@ -252,7 +252,7 @@ class OpenTofuLocalDeploymentTest {
                     .thenReturn("Test");
             String tfState = getFileContent();
             ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
-            serviceDeploymentEntity.setPrivateProperties(Map.of(STATE_FILE_NAME, tfState));
+            serviceDeploymentEntity.setDeploymentGeneratedFiles(Map.of(STATE_FILE_NAME, tfState));
             when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                     serviceDeploymentEntity);
             ocl.getDeployment().setDeployer(errorDeployer);
@@ -272,7 +272,7 @@ class OpenTofuLocalDeploymentTest {
             ocl.getDeployment().setDeployer(errorDeployer);
             DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
             DeployResult deployResult = this.openTofuLocalDeployment.destroy(deployTask);
-            Assertions.assertTrue(deployResult.getProperties().isEmpty());
+            Assertions.assertTrue(deployResult.getOutputProperties().isEmpty());
         }
     }
 

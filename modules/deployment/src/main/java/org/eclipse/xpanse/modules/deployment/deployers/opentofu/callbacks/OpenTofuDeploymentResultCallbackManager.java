@@ -49,10 +49,10 @@ public class OpenTofuDeploymentResultCallbackManager {
             deployResult.setMessage(null);
         }
         deployResult.setTfStateContent(result.getTerraformState());
-        deployResult.getPrivateProperties()
+        deployResult.getDeploymentGeneratedFiles()
                 .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
         if (Objects.nonNull(result.getImportantFileContentMap())) {
-            deployResult.getPrivateProperties().putAll(result.getImportantFileContentMap());
+            deployResult.getDeploymentGeneratedFiles().putAll(result.getImportantFileContentMap());
         }
         return deployResult;
     }

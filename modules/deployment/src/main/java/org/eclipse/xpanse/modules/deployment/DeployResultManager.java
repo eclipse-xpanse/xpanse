@@ -232,20 +232,21 @@ public class DeployResultManager {
         updateServiceConfiguration(deploymentState, serviceDeploymentEntity);
         updateServiceState(deploymentState, serviceDeploymentEntity);
 
-        if (CollectionUtils.isEmpty(deployResult.getPrivateProperties())) {
+        if (CollectionUtils.isEmpty(deployResult.getDeploymentGeneratedFiles())) {
             if (isTaskSuccessful) {
-                serviceDeploymentEntity.setPrivateProperties(Collections.emptyMap());
+                serviceDeploymentEntity.setDeploymentGeneratedFiles(Collections.emptyMap());
             }
         } else {
-            serviceDeploymentEntity.setPrivateProperties(deployResult.getPrivateProperties());
+            serviceDeploymentEntity.setDeploymentGeneratedFiles(
+                    deployResult.getDeploymentGeneratedFiles());
         }
 
-        if (CollectionUtils.isEmpty(deployResult.getProperties())) {
+        if (CollectionUtils.isEmpty(deployResult.getOutputProperties())) {
             if (isTaskSuccessful) {
-                serviceDeploymentEntity.setProperties(Collections.emptyMap());
+                serviceDeploymentEntity.setOutputProperties(Collections.emptyMap());
             }
         } else {
-            serviceDeploymentEntity.setProperties(deployResult.getProperties());
+            serviceDeploymentEntity.setOutputProperties(deployResult.getOutputProperties());
         }
 
         if (CollectionUtils.isEmpty(deployResult.getResources())) {

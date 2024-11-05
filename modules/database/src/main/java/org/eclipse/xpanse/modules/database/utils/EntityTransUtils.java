@@ -101,8 +101,8 @@ public class EntityTransUtils {
         if (!CollectionUtils.isEmpty(entity.getDeployResourceList())) {
             details.setDeployResources(transToDeployResourceList(entity.getDeployResourceList()));
         }
-        if (!CollectionUtils.isEmpty(entity.getProperties())) {
-            details.setDeployedServiceProperties(entity.getProperties());
+        if (!CollectionUtils.isEmpty(entity.getOutputProperties())) {
+            details.setDeployedServiceProperties(entity.getOutputProperties());
         }
         if (Objects.nonNull(entity.getServiceTemplateId())) {
             details.setServiceTemplateId(entity.getServiceTemplateId());
@@ -124,8 +124,8 @@ public class EntityTransUtils {
         details.setServiceId(entity.getId());
         details.setBillingMode(entity.getDeployRequest().getBillingMode());
         details.setRegion(entity.getDeployRequest().getRegion());
-        if (!CollectionUtils.isEmpty(entity.getProperties())) {
-            details.setDeployedServiceProperties(entity.getProperties());
+        if (!CollectionUtils.isEmpty(entity.getOutputProperties())) {
+            details.setDeployedServiceProperties(entity.getOutputProperties());
         }
         if (Objects.nonNull(entity.getServiceTemplateId())) {
             details.setServiceTemplateId(entity.getServiceTemplateId());

@@ -24,11 +24,11 @@ class FlexibleEngineTerraformResourceHandlerTest {
         TfState tfState = objectMapper.readValue(
                 URI.create("file:src/test/resources/flexible-tfstate.json").toURL(), TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getPrivateProperties()
+        deployResult.getDeploymentGeneratedFiles()
                 .put(STATE_FILE_NAME, objectMapper.writeValueAsString(tfState));
         flexibleHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(deployResult.getResources()));
-        Assertions.assertFalse(deployResult.getProperties().isEmpty());
+        Assertions.assertFalse(deployResult.getOutputProperties().isEmpty());
     }
 
 
@@ -38,10 +38,10 @@ class FlexibleEngineTerraformResourceHandlerTest {
                 URI.create("file:src/test/resources/flexible-tfstate-destroy.json").toURL(),
                 TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getPrivateProperties().put(STATE_FILE_NAME,
+        deployResult.getDeploymentGeneratedFiles().put(STATE_FILE_NAME,
                 objectMapper.writeValueAsString(tfState));
         flexibleHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isEmpty(deployResult.getResources()));
-        Assertions.assertTrue(deployResult.getProperties().isEmpty());
+        Assertions.assertTrue(deployResult.getOutputProperties().isEmpty());
     }
 }
