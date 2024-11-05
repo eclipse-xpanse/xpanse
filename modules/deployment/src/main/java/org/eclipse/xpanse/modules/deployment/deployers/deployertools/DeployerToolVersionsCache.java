@@ -36,6 +36,8 @@ public class DeployerToolVersionsCache {
         try {
             return versionsFetcher.fetchOfficialVersionsOfDeployerTool(deployerKind);
         } catch (Exception e) {
+            log.error("Failed to fetch versions from website for deploy tool {}, get "
+                    + "versions from default config.", deployerKind.toValue(), e);
             return versionsFetcher.getVersionsFromDefaultConfigOfDeployerTool(deployerKind);
         }
     }
@@ -51,7 +53,6 @@ public class DeployerToolVersionsCache {
         log.info("Updated versions cache of deployer:{} with versions:{}.",
                 deployerKind.toValue(), versions);
     }
-
 
 
 }

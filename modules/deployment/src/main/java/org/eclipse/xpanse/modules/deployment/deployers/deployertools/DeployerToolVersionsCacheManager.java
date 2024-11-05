@@ -5,13 +5,15 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.deployertools;
 
-import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -21,7 +23,8 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Component
-public class DeployerToolVersionsCacheManager {
+public class DeployerToolVersionsCacheManager implements
+        ApplicationListener<ApplicationStartedEvent> {
     @Resource
     private DeployerToolVersionsCache versionsCache;
     @Resource
@@ -30,9 +33,14 @@ public class DeployerToolVersionsCacheManager {
     /**
      * Initialize the versions caches for all deployer tools.
      */
-    @PostConstruct
-    public void initializeCache() {
+    @Override
+    public void onApplicationEvent(@Nonnull ApplicationStartedEvent event) {
+        initializeCache();
+    }
+
+    private void initializeCache() {
         Arrays.stream(DeployerKind.values()).forEach(deployerKind -> {
+            log.info("Initializing versions cache for deployer tool {}.", deployerKind.toValue());
             Set<String> versions = versionsCache.getVersionsCacheOfDeployerTool(deployerKind);
             log.info("Initialized versions cache for deployer tool {} with versions {}.",
                     deployerKind.toValue(), versions);
@@ -45,8 +53,11 @@ public class DeployerToolVersionsCacheManager {
      */
     @Scheduled(cron = "0 0 1 * * ?")
     public void fetchVersionsFromWebsiteAndLoadCache() {
+        log.info("Scheduled to fetch versions from website and update the cache.");
         Arrays.stream(DeployerKind.values()).forEach(deployerKind -> {
             try {
+                log.info("Fetching versions from website for deployer tool {}.",
+                        deployerKind.toValue());
                 fetchVersionsFromWebsiteAndLoadCacheForDeployerTool(deployerKind);
             } catch (Exception e) {
                 log.error("Failed to fetch versions from website for deployer tool {}.",
@@ -116,5 +127,4 @@ public class DeployerToolVersionsCacheManager {
                 + "{}.", deployerKind.toValue(), availableVersionsFromWebsite);
         return availableVersionsFromWebsite;
     }
-
 }
