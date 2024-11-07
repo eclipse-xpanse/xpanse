@@ -12,7 +12,8 @@ package org.eclipse.xpanse.modules.deployment.recreate.consts;
 public class RecreateConstants {
 
     public static final String PROCESS_KEY = "recreate";
-    public static final String ID = "id";
+    public static final String SERVICE_ID = "serviceId";
+    public static final String RECREATE_ORDER_ID = "recreateOrderId";
     public static final String RECREATE_REQUEST = "recreateRequest";
     public static final String IS_DEPLOY_SUCCESS = "isDeploySuccess";
     public static final String IS_DESTROY_SUCCESS = "isDestroySuccess";

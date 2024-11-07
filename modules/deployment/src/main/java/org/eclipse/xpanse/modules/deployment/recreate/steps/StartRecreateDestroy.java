@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.deployment.recreate.steps;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 import lombok.SneakyThrows;
@@ -16,12 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
-import org.eclipse.xpanse.modules.deployment.recreate.RecreateService;
+import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.workflow.recreate.enums.RecreateStatus;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.recreate.exceptions.ServiceRecreateFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,18 +35,19 @@ public class StartRecreateDestroy implements Serializable, JavaDelegate {
     private static final long serialVersionUID = 2725212494105579585L;
 
     private final DeployService deployService;
+    private final ServiceOrderManager serviceOrderManager;
     private final RuntimeService runtimeService;
-    private final RecreateService recreateService;
 
     /**
      * Constructor for StartRecreateDeploy bean.
      */
     @Autowired
-    public StartRecreateDestroy(DeployService deployService, RuntimeService runtimeService,
-                                RecreateService recreateService) {
+    public StartRecreateDestroy(DeployService deployService,
+                                ServiceOrderManager serviceOrderManager,
+                                RuntimeService runtimeService) {
         this.deployService = deployService;
+        this.serviceOrderManager = serviceOrderManager;
         this.runtimeService = runtimeService;
-        this.recreateService = recreateService;
     }
 
     /**
@@ -59,53 +57,27 @@ public class StartRecreateDestroy implements Serializable, JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) {
         String processInstanceId = execution.getProcessInstanceId();
-        ServiceRecreateEntity serviceRecreateEntity = saveServiceRecreateEntity(processInstanceId);
 
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        UUID serviceId = (UUID) variables.get(RecreateConstants.ID);
-        log.info("Recreate workflow of Instance Id : {} start destroy old service with id:{}",
-                processInstanceId, serviceId);
-
+        UUID serviceId = (UUID) variables.get(RecreateConstants.SERVICE_ID);
+        UUID recreateOrderId = (UUID) variables.get(RecreateConstants.RECREATE_ORDER_ID);
+        int retryDestroyTimes = (int) variables.get(RecreateConstants.DESTROY_RETRY_NUM);
+        log.info(
+                "Recreate workflow of instance id : {} start destroy old service with id:{}. "
+                        + "Retry times:{}",
+                processInstanceId, serviceId, retryDestroyTimes);
         try {
-            recreateService.updateServiceRecreateStatus(serviceRecreateEntity,
-                    RecreateStatus.DESTROY_STARTED, OffsetDateTime.now());
 
-            if (!variables.containsKey(RecreateConstants.DESTROY_RETRY_NUM)) {
-                runtimeService.setVariable(processInstanceId, RecreateConstants.DESTROY_RETRY_NUM,
-                        0);
-            }
-
-            deployService.destroyServiceByWorkflow(serviceId, processInstanceId, null);
+            deployService.destroyServiceByWorkflow(serviceId, processInstanceId, recreateOrderId);
         } catch (ServiceRecreateFailedException e) {
-            log.info("Recreate workflow of Instance Id : {} start destroy old service with id: {},"
+            log.error("Recreate workflow of instance id : {} start destroy old service with id: {},"
                     + " error: {}", processInstanceId, serviceId, e.getMessage());
-            recreateService.updateServiceRecreateStatus(serviceRecreateEntity,
-                    RecreateStatus.DESTROY_FAILED, OffsetDateTime.now());
+            runtimeService.setVariable(processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS,
+                    false);
+            serviceOrderManager.completeOrderProgress(recreateOrderId, TaskStatus.FAILED,
+                    e.getMessage());
         }
 
-    }
-
-    private ServiceRecreateEntity saveServiceRecreateEntity(String processInstanceId) {
-        Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        DeployRequest deployRequest =
-                (DeployRequest) variables.get(RecreateConstants.RECREATE_REQUEST);
-        String userId = (String) variables.get(RecreateConstants.USER_ID);
-        ServiceRecreateEntity serviceRecreateEntity =
-                getServiceRecreateEntity(processInstanceId, deployRequest.getServiceId(),
-                        userId);
-        return recreateService.storeOrFlushServiceRecreateEntity(serviceRecreateEntity);
-    }
-
-
-    private ServiceRecreateEntity getServiceRecreateEntity(String processInstanceId,
-                                                           UUID serviceId, String userId) {
-        ServiceRecreateEntity entity = new ServiceRecreateEntity();
-        entity.setRecreateId(UUID.fromString(processInstanceId));
-        entity.setServiceId(serviceId);
-        entity.setRecreateStatus(RecreateStatus.RECREATE_STARTED);
-        entity.setUserId(userId);
-        entity.setCreateTime(OffsetDateTime.now());
-        return entity;
     }
 }
 

@@ -14,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,17 +53,22 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
         UUID originalServiceId = (UUID) variables.get(MigrateConstants.ORIGINAL_SERVICE_ID);
         UUID migrateOrderId = (UUID) variables.get(MigrateConstants.MIGRATE_ORDER_ID);
-
+        log.info("Migration workflow of instance id : {} start check destroy status.",
+                processInstanceId);
         try {
-            boolean isDestroySuccess =
-                    serviceDeploymentEntityHandler.isServiceDestroyedSuccess(originalServiceId);
-            runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
-                    isDestroySuccess);
-            if (isDestroySuccess) {
+            ServiceDeploymentEntity serviceDeploymentEntity =
+                    serviceDeploymentEntityHandler.getServiceDeploymentEntity(originalServiceId);
+            if (Objects.nonNull(serviceDeploymentEntity)
+                    && serviceDeploymentEntity.getServiceDeploymentState()
+                    == ServiceDeploymentState.DESTROY_SUCCESS) {
+                runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
+                        true);
                 serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.SUCCESSFUL,
                         null);
             } else {
                 int destroyRetryNum = getDestroyRetryNum(variables);
+                runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
+                        false);
                 runtimeService.setVariable(processInstanceId,
                         MigrateConstants.DESTROY_RETRY_NUM, destroyRetryNum + 1);
                 log.info("Process failed destroy task of migration workflow with id:{}. "
@@ -71,7 +78,7 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
                     runtimeService.setVariable(processInstanceId, MigrateConstants.ASSIGNEE,
                             userId);
                     serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.FAILED,
-                            null);
+                            serviceDeploymentEntity.getResultMessage());
                 }
             }
         } catch (Exception e) {
