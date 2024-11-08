@@ -729,8 +729,11 @@ public class DeployService {
         MDC.put(SERVICE_ID, serviceDeploymentEntity.getId().toString());
         // Get state of service.
         ServiceDeploymentState state = serviceDeploymentEntity.getServiceDeploymentState();
+        // Retry's deploy service trigger when service deployment state is DEPLOYMENT_FAILED
+        // Recreate's deploy service trigger when service deployment state is DESTROY_SUCCESS
         if (!(state == ServiceDeploymentState.DEPLOY_FAILED
                 || state == ServiceDeploymentState.DESTROY_FAILED
+                || state == ServiceDeploymentState.DESTROY_SUCCESS
                 || state == ServiceDeploymentState.ROLLBACK_FAILED)) {
             throw new InvalidServiceStateException(
                     String.format("Service %s with the state %s is not allowed to redeploy.",

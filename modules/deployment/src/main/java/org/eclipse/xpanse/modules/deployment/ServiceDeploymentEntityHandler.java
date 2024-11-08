@@ -65,41 +65,4 @@ public class ServiceDeploymentEntityHandler {
         serviceDeployment.setServiceDeploymentState(state);
         serviceDeploymentStorage.storeAndFlush(serviceDeployment);
     }
-
-    /**
-     * Check whether the service is deployed successfully.
-     *
-     * @param serviceId service id
-     * @return return true if the service is deployed successfully, otherwise return false.
-     */
-
-    public boolean isServiceDeployedSuccess(UUID serviceId) {
-        ServiceDeploymentEntity serviceDeploymentEntity =
-                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
-        if (Objects.isNull(serviceDeploymentEntity)) {
-            return false;
-        }
-        return serviceDeploymentEntity.getServiceDeploymentState()
-                == ServiceDeploymentState.DEPLOY_SUCCESS;
-    }
-
-
-    /**
-     * Check whether the service is destroyed successfully.
-     *
-     * @param serviceId service id
-     * @return return true if the service is destroyed successfully, otherwise return false.
-     */
-
-    public boolean isServiceDestroyedSuccess(UUID serviceId) {
-        ServiceDeploymentEntity serviceDeploymentEntity =
-                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
-        if (Objects.isNull(serviceDeploymentEntity)) {
-            return false;
-        }
-        return serviceDeploymentEntity.getServiceDeploymentState()
-                == ServiceDeploymentState.DESTROY_SUCCESS;
-    }
-
-
 }
