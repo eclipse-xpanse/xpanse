@@ -67,6 +67,8 @@ public class ProcessDeploymentResult implements Serializable, JavaDelegate {
                 int deployRetryNum = getDeployRetryNum(variables);
                 runtimeService.setVariable(processInstanceId, MigrateConstants.DEPLOY_RETRY_NUM,
                         deployRetryNum + 1);
+                runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS,
+                        false);
                 log.info("Process failed deployment task of migration workflow with id:{}. "
                         + "RetryCount:{}", processInstanceId, deployRetryNum);
                 if (deployRetryNum >= 1) {
