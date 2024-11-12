@@ -3,7 +3,7 @@
   "info": {
     "title": "Terraform-Boot API",
     "description": "RESTful Services to interact with Terraform-Boot runtime",
-    "version": "1.0.12-SNAPSHOT"
+    "version": "1.0.14-SNAPSHOT"
   },
   "servers": [
     {
@@ -65,8 +65,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -75,8 +75,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -136,8 +136,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -146,8 +146,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -207,8 +207,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -217,8 +217,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -278,8 +278,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -288,8 +288,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -342,8 +342,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -352,8 +352,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -413,8 +413,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -423,8 +423,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -484,8 +484,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -494,8 +494,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -548,8 +548,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -558,8 +558,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -619,8 +619,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -629,8 +629,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -690,8 +690,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -700,8 +700,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -761,8 +761,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -771,8 +771,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -825,8 +825,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -835,8 +835,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -896,8 +896,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -906,8 +906,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -967,8 +967,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -977,8 +977,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1051,8 +1051,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1061,8 +1061,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1133,8 +1133,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1143,8 +1143,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1215,8 +1215,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1225,8 +1225,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1290,8 +1290,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1300,8 +1300,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1372,8 +1372,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1382,8 +1382,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1426,8 +1426,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1436,8 +1436,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1508,8 +1508,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1518,8 +1518,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1579,8 +1579,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1589,8 +1589,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1643,8 +1643,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1653,8 +1653,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1718,8 +1718,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1728,8 +1728,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1800,8 +1800,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1810,8 +1810,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1928,7 +1928,8 @@
         "type": "object",
         "properties": {
           "detail": {
-            "type": "string"
+            "type": "string",
+            "description": "Detail of validation error."
           }
         },
         "description": "List of validation errors."
@@ -2095,7 +2096,7 @@
             "type": "string",
             "description": ".tfstate file contents returned as string."
           },
-          "importantFileContentMap": {
+          "generatedFileContentMap": {
             "type": "object",
             "additionalProperties": {
               "type": "string",

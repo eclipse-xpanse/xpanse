@@ -27,7 +27,7 @@ class DeployResultTest {
     private final UUID orderId = UUID.fromString("f0dcb6ea-cbe7-4c88-9c94-a5d00e82a4f2");
     private final boolean isSuccessful = true;
     private final Map<String, String> outputProperties = Collections.singletonMap("key", "value");
-    private final Map<String, String> deploymentGeneratedFiles =
+    private final Map<String, String> generatedFileContentMap =
             Collections.singletonMap("privateKey", "privateValue");
     private final String message = "success";
     private final String tfStateContent = "tfStateContent";
@@ -44,7 +44,7 @@ class DeployResultTest {
         test.setIsTaskSuccessful(isSuccessful);
         test.setResources(resources);
         test.setOutputProperties(outputProperties);
-        test.setDeploymentGeneratedFiles(deploymentGeneratedFiles);
+        test.setDeploymentGeneratedFiles(generatedFileContentMap);
         test.setMessage(message);
         test.setTfStateContent(tfStateContent);
         test.setDeployerVersionUsed(deployerVersionUsed);
@@ -57,7 +57,7 @@ class DeployResultTest {
         assertEquals(message, test.getMessage());
         assertEquals(resources, test.getResources());
         assertEquals(outputProperties, test.getOutputProperties());
-        assertEquals(deploymentGeneratedFiles, test.getDeploymentGeneratedFiles());
+        assertEquals(generatedFileContentMap, test.getDeploymentGeneratedFiles());
         assertEquals(tfStateContent, test.getTfStateContent());
         assertEquals(deployerVersionUsed, test.getDeployerVersionUsed());
     }
@@ -84,7 +84,7 @@ class DeployResultTest {
                 + ", message=" + message
                 + ", resources=" + resources
                 + ", outputProperties=" + outputProperties
-                + ", deploymentGeneratedFiles=" + deploymentGeneratedFiles
+                + ", deploymentGeneratedFiles=" + generatedFileContentMap
                 + ", deployerVersionUsed=" + deployerVersionUsed
                 + ", tfStateContent=" + tfStateContent
                 + ")";

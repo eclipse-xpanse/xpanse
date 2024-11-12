@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.resourcehandler;
 
-import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.STATE_FILE_NAME;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class HuaweiCloudTerraformResourceHandler implements DeployResourceHandle
         List<DeployResource> deployResourceList = new ArrayList<>();
         TfState tfState;
         try {
-            var stateFile = deployResult.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
+            var stateFile = deployResult.getTfStateContent();
             tfState = objectMapper.readValue(stateFile, TfState.class);
         } catch (IOException ex) {
             log.error("Parse terraform state content failed.");

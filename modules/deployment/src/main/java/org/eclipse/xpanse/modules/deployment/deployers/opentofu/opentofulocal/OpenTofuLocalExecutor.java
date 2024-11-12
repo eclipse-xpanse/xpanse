@@ -6,24 +6,20 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
+import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_VARS_FILE_NAME;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.systemcmd.SystemCmd;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
-import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 
 /**
@@ -32,11 +28,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValida
 @Slf4j
 public class OpenTofuLocalExecutor {
 
-    private static final String VARS_FILE_NAME = "variables.tfvars.json";
-    private static final String STATE_FILE_NAME = "terraform.tfstate";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final List<String> EXCLUDED_FILE_SUFFIX_LIST =
-            Arrays.asList(".tf", ".tfstate", ".binary", ".hcl");
 
     static {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -44,34 +36,29 @@ public class OpenTofuLocalExecutor {
 
     @Getter
     private final String executorPath;
+    @Getter
+    private final String taskWorkspace;
     private final Map<String, String> env;
     private final Map<String, Object> variables;
-    private final String workspace;
-    private final DeployResultFileUtils deployResultFileUtils;
 
     /**
      * Constructor for openTofuExecutor.
      *
-     * @param executorPath          path of the open tofu executor.
-     * @param env                   environment for the open tofu command line.
-     * @param variables             variables for the open tofu command line.
-     * @param workspace             workspace for the open tofu command line.
-     * @param deployResultFileUtils file tool class.
+     * @param executorPath  path of the open tofu executor.
+     * @param env           environment for the open tofu command line.
+     * @param variables     variables for the open tofu command line.
+     * @param taskWorkspace workspace with scripts for the open tofu command line.
      */
     OpenTofuLocalExecutor(String executorPath,
                           Map<String, String> env,
                           Map<String, Object> variables,
-                          String workspace,
-                          @Nullable String subDirectory,
-                          DeployResultFileUtils deployResultFileUtils) {
+                          String taskWorkspace) {
         this.executorPath = executorPath;
         this.env = env;
         this.variables = variables;
-        this.workspace =
-                Objects.nonNull(subDirectory)
-                        ? workspace + File.separator + subDirectory
-                        : workspace;
-        this.deployResultFileUtils = deployResultFileUtils;
+        this.taskWorkspace = taskWorkspace;
+        log.info("Created OpenTofuLocalExecutor with executorPath: {} and taskWorkspace: {}",
+                executorPath, taskWorkspace);
     }
 
     /**
@@ -129,12 +116,32 @@ public class OpenTofuLocalExecutor {
      * @return Returns result of SystemCmd executed.
      */
     private SystemCmdResult executeWithVariables(StringBuilder command) {
-        createVariablesFile();
+        createVariablesFile(this.taskWorkspace, variables);
         command.append(" -var-file=");
-        command.append(VARS_FILE_NAME);
+        command.append(TF_VARS_FILE_NAME);
         SystemCmdResult systemCmdResult = execute(command.toString());
-        cleanUpVariablesFile();
+        cleanUpVariablesFile(this.taskWorkspace);
         return systemCmdResult;
+    }
+
+    private void createVariablesFile(String taskWorkspace, Map<String, Object> variables) {
+        try {
+            File variablesFile = new File(taskWorkspace, TF_VARS_FILE_NAME);
+            log.info("creating variables file");
+            OBJECT_MAPPER.writeValue(variablesFile, variables);
+        } catch (IOException ioException) {
+            throw new OpenTofuExecutorException("Creating variables file failed", ioException);
+        }
+    }
+
+    private void cleanUpVariablesFile(String taskWorkspace) {
+        try {
+            File file = new File(taskWorkspace, TF_VARS_FILE_NAME);
+            log.info("cleaning up variables file");
+            Files.deleteIfExists(file.toPath());
+        } catch (IOException ioException) {
+            log.error("Cleanup of variables file failed", ioException);
+        }
     }
 
     /**
@@ -145,7 +152,7 @@ public class OpenTofuLocalExecutor {
     private SystemCmdResult execute(String cmd) {
         SystemCmd systemCmd = new SystemCmd();
         systemCmd.setEnv(env);
-        systemCmd.setWorkDir(workspace);
+        systemCmd.setWorkDir(taskWorkspace);
         return systemCmd.execute(cmd);
     }
 
@@ -197,47 +204,6 @@ public class OpenTofuLocalExecutor {
         }
     }
 
-    /**
-     * Reads the contents of the "terraform.tfstate" file from the OpenTofu workspace.
-     *
-     * @return file contents as string.
-     */
-    public String getTerraformState() {
-        String state = null;
-        String path = workspace + File.separator + STATE_FILE_NAME;
-        try {
-            deployResultFileUtils.waitUntilFileIsNotLocked(path);
-            File tfState = new File(path);
-            if (tfState.exists()) {
-                state = Files.readString(tfState.toPath());
-            }
-        } catch (IOException ex) {
-            log.error("OpenTofuExecutor read state file failed.", ex);
-        }
-        return state;
-    }
-
-    /**
-     * Reads the contents of the other important file from the OpenTofu workspace.
-     *
-     * @return Map fileName as key, contents as value.
-     */
-    public Map<String, String> getImportantFilesContent() {
-        Map<String, String> fileContentMap = new HashMap<>();
-        File workPath = new File(workspace);
-        if (workPath.isDirectory() && workPath.exists()) {
-            File[] files = workPath.listFiles();
-            if (Objects.nonNull(files)) {
-                Arrays.stream(files).forEach(file -> {
-                    if (file.isFile() && !isExcludedFile(file.getName())) {
-                        String content = readFileContent(file);
-                        fileContentMap.put(file.getName(), content);
-                    }
-                });
-            }
-        }
-        return fileContentMap;
-    }
 
     /**
      * Method to execute open tofu plan and get the plan as a json string.
@@ -262,22 +228,6 @@ public class OpenTofuLocalExecutor {
                     planJsonResult.getCommandStdError());
         }
         return planJsonResult.getCommandStdOutput();
-    }
-
-    private boolean isExcludedFile(String fileName) {
-        String fileSuffix = fileName.substring(fileName.lastIndexOf("."));
-        return EXCLUDED_FILE_SUFFIX_LIST.contains(fileSuffix);
-    }
-
-    private String readFileContent(File file) {
-        String fileContent = "";
-        try {
-            fileContent = Files.readString(file.toPath());
-            log.info("Read file content with name:{} successfully.", file.getName());
-        } catch (IOException e) {
-            log.error("Read file content with name:{} error.", file.getName(), e);
-        }
-        return fileContent;
     }
 
 
@@ -309,29 +259,6 @@ public class OpenTofuLocalExecutor {
             throw new IllegalStateException(
                     "Serialising command output to validate result object failed.", ex);
         }
-    }
-
-    private void createVariablesFile() {
-        try {
-            log.info("creating variables file");
-            OBJECT_MAPPER.writeValue(new File(getVariablesFilePath()), variables);
-        } catch (IOException ioException) {
-            throw new OpenTofuExecutorException("Creating variables file failed", ioException);
-        }
-    }
-
-    private void cleanUpVariablesFile() {
-        File file = new File(getVariablesFilePath());
-        try {
-            log.info("cleaning up variables file");
-            Files.deleteIfExists(file.toPath());
-        } catch (IOException ioException) {
-            log.error("Cleanup of variables file failed", ioException);
-        }
-    }
-
-    private String getVariablesFilePath() {
-        return this.workspace + File.separator + VARS_FILE_NAME;
     }
 
 }

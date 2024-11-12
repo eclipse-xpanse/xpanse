@@ -43,8 +43,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * async deploy resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -62,8 +62,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * async deploy resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -124,8 +124,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * async destroy resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -143,8 +143,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * async destroy resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -205,8 +205,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * async modify resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -224,8 +224,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * async modify resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -286,8 +286,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Deploy resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -306,8 +306,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Deploy resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -369,8 +369,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Destroy the resources from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -389,8 +389,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Destroy the resources from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -452,8 +452,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Modify resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -472,8 +472,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Modify resources via OpenTofu from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -535,8 +535,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Get OpenTofu Plan as JSON string from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -554,8 +554,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Get OpenTofu Plan as JSON string from the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -617,8 +617,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Validate the OpenTofu modules in the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -636,8 +636,8 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
 
     /**
      * Validate the OpenTofu modules in the given directory.
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK

@@ -1,6 +1,5 @@
 package org.eclipse.xpanse.plugins.openstack.common.resourcehandler;
 
-import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.STATE_FILE_NAME;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -24,8 +23,7 @@ class OpenstackTerraformResourceHandlerTest {
                 URI.create("file:src/test/resources/openstack-tfstate.json").toURL(),
                 TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getDeploymentGeneratedFiles()
-                .put(STATE_FILE_NAME, objectMapper.writeValueAsString(tfState));
+        deployResult.setTfStateContent(objectMapper.writeValueAsString(tfState));
         openstackHandler.handler(deployResult);
         Assertions.assertFalse(CollectionUtils.isEmpty(deployResult.getResources()));
         Assertions.assertFalse(deployResult.getOutputProperties().isEmpty());
@@ -38,8 +36,7 @@ class OpenstackTerraformResourceHandlerTest {
                 URI.create("file:src/test/resources/openstack-tfstate-destroy.json").toURL(),
                 TfState.class);
         DeployResult deployResult = new DeployResult();
-        deployResult.getDeploymentGeneratedFiles()
-                .put(STATE_FILE_NAME, objectMapper.writeValueAsString(tfState));
+        deployResult.setTfStateContent(objectMapper.writeValueAsString(tfState));
         openstackHandler.handler(deployResult);
         Assertions.assertTrue(CollectionUtils.isEmpty(deployResult.getResources()));
         Assertions.assertTrue(deployResult.getOutputProperties().isEmpty());
