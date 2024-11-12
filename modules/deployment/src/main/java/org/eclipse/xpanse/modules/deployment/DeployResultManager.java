@@ -328,7 +328,7 @@ public class DeployResultManager {
 
     private void completeParentServiceOrder(UUID parentOrderId) {
         ServiceOrderEntity parentOrder = serviceOrderStorage.getEntityById(parentOrderId);
-        // When the parent order is not a migrate task, complete it.
+        // When the parent order is not a migrate or recreate task, complete it.
         if (parentOrder.getTaskType() != ServiceOrderType.MIGRATE
                 && parentOrder.getTaskType() != ServiceOrderType.RECREATE) {
             ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();

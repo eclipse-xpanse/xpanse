@@ -112,7 +112,7 @@ public class ServiceMigrationApi {
         ServiceOrderEntity updatedOrderEntity =
                 serviceOrderManager.startOrderProgress(migrateOrderEntity);
         return new ServiceOrder(updatedOrderEntity.getOrderId(),
-                updatedOrderEntity.getOriginalServiceId());
+                (UUID) variable.get(MigrateConstants.NEW_SERVICE_ID));
     }
 
     private void validateData(MigrateRequest migrateRequest) {
