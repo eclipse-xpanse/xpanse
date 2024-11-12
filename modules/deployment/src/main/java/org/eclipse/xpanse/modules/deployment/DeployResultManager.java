@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_STATE_FILE_NAME;
+
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
+import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
@@ -128,7 +131,7 @@ public class DeployResultManager {
         DeployResult rollbackResult;
         RuntimeException exception = null;
         log.info("Performing rollback of already provisioned resources.");
-        rollbackTask.setOrderId(UUID.randomUUID());
+        rollbackTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         rollbackTask.setTaskType(ServiceOrderType.ROLLBACK);
         ServiceOrderEntity serviceOrderEntity = serviceOrderManager
                 .storeNewServiceOrderEntity(rollbackTask, serviceDeploymentEntity);
@@ -169,6 +172,8 @@ public class DeployResultManager {
         log.info("Update deploy service entity {} with deploy result {}",
                 serviceDeploymentEntity.getId(), deployResult);
         if (StringUtils.isNotBlank(deployResult.getTfStateContent())) {
+            deployResult.getDeploymentGeneratedFiles()
+                    .put(TF_STATE_FILE_NAME, deployResult.getTfStateContent());
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
                             serviceDeploymentEntity.getServiceTemplateId());
@@ -176,7 +181,18 @@ public class DeployResultManager {
                     serviceTemplateEntity.getOcl().getDeployment().getDeployerTool().getKind();
             resourceHandlerManager.getResourceHandler(serviceDeploymentEntity.getCsp(),
                     deployerKind).handler(deployResult);
+        } else {
+            if (Objects.nonNull(serviceDeploymentEntity.getDeploymentGeneratedFiles())) {
+                String storedTfStateContent = serviceDeploymentEntity.getDeploymentGeneratedFiles()
+                        .get(TF_STATE_FILE_NAME);
+                if (StringUtils.isNotBlank(storedTfStateContent)) {
+                    deployResult.setTfStateContent(storedTfStateContent);
+                    deployResult.getDeploymentGeneratedFiles()
+                            .put(TF_STATE_FILE_NAME, deployResult.getTfStateContent());
+                }
+            }
         }
+
         ServiceDeploymentEntity deployServiceToUpdate = new ServiceDeploymentEntity();
         BeanUtils.copyProperties(serviceDeploymentEntity, deployServiceToUpdate);
         updateServiceEntityWithDeployResult(deployResult, taskType, deployServiceToUpdate);
@@ -185,7 +201,8 @@ public class DeployResultManager {
 
 
     private void updateServiceEntityWithDeployResult(DeployResult deployResult,
-            ServiceOrderType taskType, ServiceDeploymentEntity serviceDeployment) {
+                                                     ServiceOrderType taskType,
+                                                     ServiceDeploymentEntity serviceDeployment) {
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         ServiceDeploymentState deploymentState =
                 getServiceDeploymentState(taskType, isTaskSuccessful);
@@ -370,7 +387,6 @@ public class DeployResultManager {
                     }
                 }
             }
-
         } catch (Exception e) {
             log.error("Failed to process the related workflow task of service order: {}",
                     serviceOrder.getOrderId(), e);

@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
@@ -38,15 +38,15 @@ public class DeployServiceEntityConverter {
     /**
      * Method to create a DeployTask from DeployServiceEntity.
      *
-     * @param orderType           ServiceOrderType.
+     * @param orderType               ServiceOrderType.
      * @param serviceDeploymentEntity DeployServiceEntity object.
      * @return DeployTask object.
      */
-    public DeployTask getDeployTaskByStoredService(ServiceOrderType orderType,
-            ServiceDeploymentEntity serviceDeploymentEntity) {
+    public DeployTask getDeployTaskByStoredService(
+            ServiceOrderType orderType, ServiceDeploymentEntity serviceDeploymentEntity) {
         // Set Ocl and CreateRequest
         DeployTask deployTask = new DeployTask();
-        deployTask.setOrderId(UUID.randomUUID());
+        deployTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         deployTask.setTaskType(orderType);
         deployTask.setServiceId(serviceDeploymentEntity.getId());
         deployTask.setUserId(serviceDeploymentEntity.getUserId());

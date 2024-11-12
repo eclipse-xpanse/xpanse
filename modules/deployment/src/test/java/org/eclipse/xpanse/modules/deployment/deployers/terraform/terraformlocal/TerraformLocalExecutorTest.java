@@ -6,7 +6,7 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.SCRIPT_FILE_NAME;
+import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_SCRIPT_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,16 +17,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfState;
-import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
+import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
@@ -37,31 +33,38 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TerraformLocalExecutorTest {
-    private static final String workspace =
-            System.getProperty("java.io.tmpdir") + "/terraform_workspace/" + UUID.randomUUID();
+
+    private static String workspace = "";
     @Mock
     private Map<String, String> mockEnv;
     @Mock
     private Map<String, Object> mockVariables;
-    private TerraformLocalExecutor terraformLocalExecutorUnderTest;
-    @Mock
-    private DeployResultFileUtils deployResultFileUtilsTest;
+    @InjectMocks
+    private TerraformLocalExecutor terraformLocalExecutor;
+    @InjectMocks
+    private DeploymentScriptsHelper scriptsHelper;
 
     @BeforeAll
-    static void initWorkSpace() throws Exception {
+    static void initTaskWorkspace() throws Exception {
+        File baseWorkspace = new File(System.getProperty("java.io.tmpdir"), "ws-test");
+        File taskWorkspace = new File(baseWorkspace, UUID.randomUUID().toString());
+        if (!taskWorkspace.exists() && !taskWorkspace.mkdirs()) {
+            return;
+        }
+        workspace = taskWorkspace.getAbsolutePath();
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         String script = ocl.getDeployment().getDeployer();
-        File ws = new File(workspace);
-        ws.mkdirs();
-        String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
+        String scriptPath = workspace + File.separator + TF_SCRIPT_FILE_NAME;
         try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(script);
         }
@@ -69,8 +72,10 @@ class TerraformLocalExecutorTest {
 
     @BeforeEach
     void setUp() {
-        terraformLocalExecutorUnderTest = new TerraformLocalExecutor("terraform",
-                mockEnv, mockVariables, workspace, null, deployResultFileUtilsTest);
+        ReflectionTestUtils.setField(scriptsHelper, "awaitAtMost", 60);
+        ReflectionTestUtils.setField(scriptsHelper, "awaitPollingInterval", 1);
+        terraformLocalExecutor = new TerraformLocalExecutor("terraform",
+                mockEnv, mockVariables, workspace);
     }
 
     @Test
@@ -83,7 +88,7 @@ class TerraformLocalExecutorTest {
         expectedResult.setDiagnostics(Collections.emptyList());
         // Run the test
         final DeploymentScriptValidationResult result =
-                terraformLocalExecutorUnderTest.tfValidate();
+                terraformLocalExecutor.tfValidate();
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -93,7 +98,7 @@ class TerraformLocalExecutorTest {
     @Order(2)
     void testTfInit() {
         // Run the test
-        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfInit();
+        final SystemCmdResult result = terraformLocalExecutor.tfInit();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -103,14 +108,14 @@ class TerraformLocalExecutorTest {
     @Test
     @Order(3)
     void testGetTerraformPlanAsJson() {
-        assertNotNull(terraformLocalExecutorUnderTest.getTerraformPlanAsJson());
+        assertNotNull(terraformLocalExecutor.getTerraformPlanAsJson());
     }
 
     @Test
     @Order(4)
     void testTfPlan() {
         // Run the test
-        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfPlan();
+        final SystemCmdResult result = terraformLocalExecutor.tfPlan();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -123,7 +128,7 @@ class TerraformLocalExecutorTest {
     void testTfPlanWithOutput() {
         // Setup
         // Run the test
-        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfPlanWithOutput();
+        final SystemCmdResult result = terraformLocalExecutor.tfPlanWithOutput();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -135,7 +140,7 @@ class TerraformLocalExecutorTest {
     @Order(6)
     void testTfApply() {
         // Run the test
-        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfApply();
+        final SystemCmdResult result = terraformLocalExecutor.tfApply();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -147,7 +152,7 @@ class TerraformLocalExecutorTest {
     @Order(7)
     void testTfDestroy() {
         // Run the test
-        final SystemCmdResult result = terraformLocalExecutorUnderTest.tfDestroy();
+        final SystemCmdResult result = terraformLocalExecutor.tfDestroy();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -161,10 +166,10 @@ class TerraformLocalExecutorTest {
     void testDeploy() throws JsonProcessingException {
         // Setup
         // Run the test
-        terraformLocalExecutorUnderTest.deploy();
+        terraformLocalExecutor.deploy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(terraformLocalExecutorUnderTest.getTerraformState(),
+                new ObjectMapper().readValue(scriptsHelper.getTaskTerraformState(workspace),
                         TfState.class);
         assertFalse(tfState.getOutputs().isEmpty());
     }
@@ -174,30 +179,11 @@ class TerraformLocalExecutorTest {
     void testDestroy() throws JsonProcessingException {
         // Setup
         // Run the test
-        terraformLocalExecutorUnderTest.destroy();
+        terraformLocalExecutor.destroy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(terraformLocalExecutorUnderTest.getTerraformState(),
+                new ObjectMapper().readValue(scriptsHelper.getTaskTerraformState(workspace),
                         TfState.class);
         assertTrue(tfState.getOutputs().isEmpty());
-    }
-
-    @Test
-    @Order(10)
-    void testGetImportantFilesContent() throws Exception {
-        // Setup
-        // Run the test
-        final Map<String, String> result =
-                terraformLocalExecutorUnderTest.getImportantFilesContent();
-        // Verify the results
-        assertTrue(result.containsKey("terraform.tfstate.backup"));
-
-        deleteWorkspace();
-    }
-
-    void deleteWorkspace() throws Exception {
-        Path path = Paths.get(workspace);
-        Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile)
-                .forEach(File::delete);
     }
 }

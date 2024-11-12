@@ -1,6 +1,6 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
-import static org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuLocalDeployment.SCRIPT_FILE_NAME;
+import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_SCRIPT_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -15,9 +15,8 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.resources.TfState;
-import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
+import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,32 +25,37 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class OpenTofuLocalExecutorTest {
-    private static final String workspace =
-            System.getProperty("java.io.tmpdir") + "/opentofu_workspace/" + UUID.randomUUID();
+    private static String workspace = "";
     @Mock
     private Map<String, String> mockEnv;
     @Mock
     private Map<String, Object> mockVariables;
-    private OpenTofuLocalExecutor openTofuLocalExecutorUnderTest;
-    @Mock
-    private DeployResultFileUtils deployResultFileUtilsTest;
+    @InjectMocks
+    private OpenTofuLocalExecutor openTofuLocalExecutor;
+    @InjectMocks
+    private DeploymentScriptsHelper deploymentScriptsHelper;
 
     @BeforeAll
-    static void initWorkSpace() throws Exception {
+    static void initTaskWorkspace() throws Exception {
+        File baseWorkspace = new File(System.getProperty("java.io.tmpdir"), "ws-test");
+        File taskWorkspace = new File(baseWorkspace, UUID.randomUUID().toString());
+        if (!taskWorkspace.exists() && !taskWorkspace.mkdirs()) {
+            return;
+        }
+        workspace = taskWorkspace.getAbsolutePath();
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
         String script = ocl.getDeployment().getDeployer();
-        File ws = new File(workspace + "/" + UUID.randomUUID());
-        ws.mkdirs();
-        String scriptPath = workspace + File.separator + SCRIPT_FILE_NAME;
+        String scriptPath = workspace + File.separator + TF_SCRIPT_FILE_NAME;
         try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(script);
         }
@@ -59,15 +63,17 @@ class OpenTofuLocalExecutorTest {
 
     @BeforeEach
     void setUp() {
-        openTofuLocalExecutorUnderTest = new OpenTofuLocalExecutor(
-                "tofu", mockEnv, mockVariables, workspace, null, deployResultFileUtilsTest);
+        ReflectionTestUtils.setField(deploymentScriptsHelper, "awaitAtMost", 60);
+        ReflectionTestUtils.setField(deploymentScriptsHelper, "awaitPollingInterval", 1);
+        openTofuLocalExecutor =
+                new OpenTofuLocalExecutor("tofu", mockEnv, mockVariables, workspace);
     }
 
     @Test
     @Order(1)
     void testTfInit() {
         // Run the test
-        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfInit();
+        final SystemCmdResult result = openTofuLocalExecutor.tfInit();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -77,14 +83,14 @@ class OpenTofuLocalExecutorTest {
     @Test
     @Order(2)
     void testGetOpenTofuPlanAsJson() {
-        assertNotNull(openTofuLocalExecutorUnderTest.getOpenTofuPlanAsJson());
+        assertNotNull(openTofuLocalExecutor.getOpenTofuPlanAsJson());
     }
 
     @Test
     @Order(3)
     void testTfPlan() {
         // Run the test
-        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfPlan();
+        final SystemCmdResult result = openTofuLocalExecutor.tfPlan();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -97,7 +103,7 @@ class OpenTofuLocalExecutorTest {
     void testTfPlanWithOutput() {
         // Setup
         // Run the test
-        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfPlanWithOutput();
+        final SystemCmdResult result = openTofuLocalExecutor.tfPlanWithOutput();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -109,7 +115,7 @@ class OpenTofuLocalExecutorTest {
     @Order(5)
     void testTfApply() {
         // Run the test
-        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfApply();
+        final SystemCmdResult result = openTofuLocalExecutor.tfApply();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -121,7 +127,7 @@ class OpenTofuLocalExecutorTest {
     @Order(6)
     void testTfDestroy() {
         // Run the test
-        final SystemCmdResult result = openTofuLocalExecutorUnderTest.tfDestroy();
+        final SystemCmdResult result = openTofuLocalExecutor.tfDestroy();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
@@ -135,10 +141,11 @@ class OpenTofuLocalExecutorTest {
     void testDeploy() throws JsonProcessingException {
         // Setup
         // Run the test
-        openTofuLocalExecutorUnderTest.deploy();
+        openTofuLocalExecutor.deploy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(openTofuLocalExecutorUnderTest.getTerraformState(),
+                new ObjectMapper().readValue(
+                        deploymentScriptsHelper.getTaskTerraformState(workspace),
                         TfState.class);
         assertFalse(tfState.getOutputs().isEmpty());
     }
@@ -148,23 +155,14 @@ class OpenTofuLocalExecutorTest {
     void testDestroy() throws JsonProcessingException {
         // Setup
         // Run the test
-        openTofuLocalExecutorUnderTest.destroy();
+        openTofuLocalExecutor.destroy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(openTofuLocalExecutorUnderTest.getTerraformState(),
+                new ObjectMapper().readValue(
+                        deploymentScriptsHelper.getTaskTerraformState(workspace),
                         TfState.class);
         assertTrue(tfState.getOutputs().isEmpty());
     }
 
-    @Test
-    @Order(9)
-    void testGetImportantFilesContent() {
-        // Setup
-        // Run the test
-        final Map<String, String> result =
-                openTofuLocalExecutorUnderTest.getImportantFilesContent();
-        // Verify the results
-        assertTrue(result.containsKey("terraform.tfstate.backup"));
-    }
 
 }

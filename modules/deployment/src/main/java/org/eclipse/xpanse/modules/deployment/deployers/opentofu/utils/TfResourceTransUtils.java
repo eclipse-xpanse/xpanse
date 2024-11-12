@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils;
 
+import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_STATE_FILE_NAME;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -22,8 +24,6 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 public class TfResourceTransUtils {
-
-    public static final String STATE_FILE_NAME = "terraform.tfstate";
 
     private TfResourceTransUtils() {
         // private constructor to block instantiation.
@@ -78,10 +78,10 @@ public class TfResourceTransUtils {
         if (Objects.isNull(serviceDeploymentEntity)
                 || CollectionUtils.isEmpty(serviceDeploymentEntity.getDeploymentGeneratedFiles())
                 || StringUtils.isEmpty(
-                serviceDeploymentEntity.getDeploymentGeneratedFiles().get(STATE_FILE_NAME))) {
+                serviceDeploymentEntity.getDeploymentGeneratedFiles().get(TF_STATE_FILE_NAME))) {
             throw new ServiceNotDeployedException(
                     "Can't find valid state context in stored deployed service.");
         }
-        return serviceDeploymentEntity.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
+        return serviceDeploymentEntity.getDeploymentGeneratedFiles().get(TF_STATE_FILE_NAME);
     }
 }

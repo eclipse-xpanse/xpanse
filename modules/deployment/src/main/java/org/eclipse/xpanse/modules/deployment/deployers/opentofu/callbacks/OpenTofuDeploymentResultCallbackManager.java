@@ -10,9 +10,9 @@ import jakarta.annotation.Resource;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.springframework.stereotype.Component;
 
@@ -48,11 +48,12 @@ public class OpenTofuDeploymentResultCallbackManager {
             deployResult.setIsTaskSuccessful(true);
             deployResult.setMessage(null);
         }
-        deployResult.setTfStateContent(result.getTerraformState());
-        deployResult.getDeploymentGeneratedFiles()
-                .put(TfResourceTransUtils.STATE_FILE_NAME, result.getTerraformState());
-        if (Objects.nonNull(result.getImportantFileContentMap())) {
-            deployResult.getDeploymentGeneratedFiles().putAll(result.getImportantFileContentMap());
+        if (StringUtils.isNotBlank(result.getTerraformState())) {
+            deployResult.setTfStateContent(result.getTerraformState());
+        }
+        if (Objects.nonNull(result.getGeneratedFileContentMap())) {
+            deployResult.getDeploymentGeneratedFiles()
+                    .putAll(result.getGeneratedFileContentMap());
         }
         return deployResult;
     }

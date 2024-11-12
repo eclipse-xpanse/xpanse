@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformLocalDeployment.STATE_FILE_NAME;
+import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_STATE_FILE_NAME;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -30,7 +30,8 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.Terr
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
-import org.eclipse.xpanse.modules.deployment.utils.DeployResultFileUtils;
+import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
+import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -52,6 +53,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * Test for TerraformDeployment.
@@ -65,19 +67,21 @@ class TerraformLocalDeploymentTest {
             resource "random_id" "new" {
               byte_length = 4
             }
-            
+                                    
             output "random_id" {
               value = resource.random_id_2.new.id
             }
             """;
     @InjectMocks
     TerraformLocalDeployment terraformLocalDeployment;
-    @Mock
-    DeployResultFileUtils deployResultFileUtils;
+    @InjectMocks
+    DeploymentScriptsHelper scriptsHelper;
+    @InjectMocks
+    TerraformLocalConfig terraformLocalConfig;
+    @InjectMocks
+    ScriptsGitRepoManage scriptsGitRepoManage;
     @Mock
     DeployEnvironments deployEnvironments;
-    @Mock
-    TerraformLocalConfig terraformLocalConfig;
     @Mock
     PluginManager pluginManager;
     @Mock
@@ -94,6 +98,15 @@ class TerraformLocalDeploymentTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        ReflectionTestUtils.setField(terraformLocalConfig, "workspaceDirectory", "ws-test");
+        ReflectionTestUtils.setField(scriptsHelper, "awaitAtMost", 60);
+        ReflectionTestUtils.setField(scriptsHelper, "awaitPollingInterval", 1);
+        ReflectionTestUtils.setField(scriptsHelper, "scriptsGitRepoManage",
+                scriptsGitRepoManage);
+        ReflectionTestUtils.setField(terraformLocalDeployment, "terraformLocalConfig",
+                terraformLocalConfig);
+        ReflectionTestUtils.setField(terraformLocalDeployment, "scriptsHelper",
+                scriptsHelper);
         OclLoader oclLoader = new OclLoader();
         ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
@@ -144,12 +157,11 @@ class TerraformLocalDeploymentTest {
     String getFileContent() {
         String content = "";
         try {
-            ClassPathResource classPathResource = new ClassPathResource(
-                    TerraformLocalDeployment.STATE_FILE_NAME);
+            ClassPathResource classPathResource = new ClassPathResource(TF_STATE_FILE_NAME);
             InputStream inputStream = classPathResource.getInputStream();
             content = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            log.error("Failed to read file: {}", TerraformLocalDeployment.STATE_FILE_NAME, e);
+            log.error("Failed to read file: {}", TF_STATE_FILE_NAME, e);
         }
         return content;
     }
@@ -159,7 +171,7 @@ class TerraformLocalDeploymentTest {
 
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         DeployResult deployResult = terraformLocalDeployment.deploy(deployTask);
-        String tfState = deployResult.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
+        String tfState = deployResult.getTfStateContent();
         Assertions.assertNotNull(deployResult);
         Assertions.assertNotNull(deployResult.getDeploymentGeneratedFiles());
         Assertions.assertNull(tfState);
@@ -169,7 +181,7 @@ class TerraformLocalDeploymentTest {
             DeployResult deployResult1 = terraformLocalDeployment.deploy(deployTask1);
             Assertions.assertNotNull(deployResult1);
             Assertions.assertNotNull(deployResult1.getDeploymentGeneratedFiles());
-            String tfState1 = deployResult1.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
+            String tfState1 = deployResult1.getTfStateContent();
             Assertions.assertNull(tfState1);
         } catch (Exception e) {
             log.error("testDeploy throw unexpected exception.", e);
@@ -181,7 +193,7 @@ class TerraformLocalDeploymentTest {
     void testModify() {
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
-        serviceDeploymentEntity.setDeploymentGeneratedFiles(Map.of(STATE_FILE_NAME, tfState));
+        serviceDeploymentEntity.setDeploymentGeneratedFiles(Map.of(TF_STATE_FILE_NAME, tfState));
         when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
 
@@ -195,7 +207,7 @@ class TerraformLocalDeploymentTest {
             DeployResult deployResult1 = terraformLocalDeployment.deploy(deployTask1);
             Assertions.assertNotNull(deployResult1);
             Assertions.assertNotNull(deployResult1.getDeploymentGeneratedFiles());
-            String tfState1 = deployResult1.getDeploymentGeneratedFiles().get(STATE_FILE_NAME);
+            String tfState1 = deployResult1.getTfStateContent();
             Assertions.assertNull(tfState1);
         } catch (Exception e) {
             log.error("testDeploy throw unexpected exception.", e);
@@ -207,7 +219,7 @@ class TerraformLocalDeploymentTest {
     void testDestroy() {
         String tfState = getFileContent();
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
-        serviceDeploymentEntity.setDeploymentGeneratedFiles(Map.of(STATE_FILE_NAME, tfState));
+        serviceDeploymentEntity.setDeploymentGeneratedFiles(Map.of(TF_STATE_FILE_NAME, tfState));
         when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any())).thenReturn(
                 serviceDeploymentEntity);
 
