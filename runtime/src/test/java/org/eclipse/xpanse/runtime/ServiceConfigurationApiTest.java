@@ -83,7 +83,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
     public static final String USER_ID = "userId";
 
     @Test
-    @WithJwt(file = "jwt_all_roles.json")
+    @WithJwt(file = "jwt_all_roles-no-policies.json")
     void test_change_service_configuration_success() throws Exception {
         ServiceOrder  deployOrder = test_register_and_deploy_service();
         if (Objects.nonNull(deployOrder) && waitServiceDeploymentIsCompleted(deployOrder.getServiceId())){
@@ -119,6 +119,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
 
     ServiceOrder test_register_and_deploy_service() throws Exception {
         // Setup
+        addCredentialForHuaweiCloud();
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_kafka_test.yml").toURL());
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);

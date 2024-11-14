@@ -81,9 +81,10 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     }
 
     @Test
-    @WithJwt(file = "jwt_all_roles.json")
+    @WithJwt(file = "jwt_all_roles-no-policies.json")
     void testServiceStateManageApis() throws Exception {
         // Setup
+        addCredentialForHuaweiCloud();
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);

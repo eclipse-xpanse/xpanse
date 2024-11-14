@@ -222,8 +222,13 @@ public class DeployResultManager {
             serviceDeployment.setFlavor(modifyRequest.getFlavor());
             serviceDeployment.setCustomerServiceName(modifyRequest.getCustomerServiceName());
         }
-
-        updateServiceConfiguration(deploymentState, serviceDeployment);
+        ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage
+                .getServiceTemplateById(serviceDeployment.getServiceTemplateId());
+        if (Objects.nonNull(serviceTemplateEntity)
+                && Objects.nonNull(serviceTemplateEntity
+                .getOcl().getServiceConfigurationManage())) {
+            updateServiceConfiguration(deploymentState, serviceDeployment);
+        }
         updateServiceState(deploymentState, serviceDeployment);
 
         if (CollectionUtils.isEmpty(deployResult.getDeploymentGeneratedFiles())) {

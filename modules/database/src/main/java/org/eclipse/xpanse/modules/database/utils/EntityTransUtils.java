@@ -154,7 +154,6 @@ public class EntityTransUtils {
             ServiceConfigurationEntity entity) {
         ServiceConfigurationDetails details = new ServiceConfigurationDetails();
         BeanUtils.copyProperties(entity, details);
-        details.setServiceId(entity.getId());
         return details;
     }
 
