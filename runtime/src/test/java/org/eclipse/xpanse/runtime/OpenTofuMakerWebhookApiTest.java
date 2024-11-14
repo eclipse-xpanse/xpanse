@@ -80,7 +80,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
     }
 
     @Test
-    @WithJwt(file = "jwt_all_roles.json")
+    @WithJwt(file = "jwt_all_roles-no-policies.json")
     void testOpenTofuBootWebhookApis() throws Exception {
         testOpenTofuBootWebhookApisThrowsException();
         testOpenTofuBootWebhookApisWell();
@@ -227,7 +227,6 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         assertThat(purgeCallBackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         deleteServiceDeployment(serviceId);
-        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     OpenTofuResult getOpenTofuResultByFile(String resourceFileName) throws Exception {

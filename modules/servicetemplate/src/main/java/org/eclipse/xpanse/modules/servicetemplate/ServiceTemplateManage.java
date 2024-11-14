@@ -99,7 +99,8 @@ public class ServiceTemplateManage {
         validateRegions(ocl);
         validateFlavors(ocl);
         billingConfigValidator.validateBillingConfig(ocl);
-        if (Objects.nonNull(ocl.getServiceConfigurationManage())) {
+        if (Objects.nonNull(existingTemplate.getOcl().getServiceConfigurationManage())
+                && Objects.nonNull(ocl.getServiceConfigurationManage())) {
             serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
         }
         validateServiceDeployment(ocl.getDeployment(), existingTemplate);

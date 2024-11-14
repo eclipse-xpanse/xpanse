@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
@@ -140,4 +141,7 @@ public class DeployedService {
 
     @Schema(description = "The locks whether the service can be modified or destroyed.")
     private ServiceLockConfig lockConfig;
+
+    @Schema(description = "Details of the service configuration.")
+    private ServiceConfigurationDetails serviceConfigurationDetails;
 }

@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +48,7 @@ class DeployedServiceTest {
     private final OffsetDateTime LAST_STARTED_AT = OffsetDateTime.now();
     private final OffsetDateTime LAST_STOPPED_AT = OffsetDateTime.now();
     private final ServiceLockConfig LOCK_CONFIG = new ServiceLockConfig();
+    private final ServiceConfigurationDetails serviceConfigurationDetails = new ServiceConfigurationDetails();
     private DeployedService deployedService;
 
     @BeforeEach
@@ -71,6 +73,7 @@ class DeployedServiceTest {
         deployedService.setLastStartedAt(LAST_STARTED_AT);
         deployedService.setLastStoppedAt(LAST_STOPPED_AT);
         deployedService.setLockConfig(LOCK_CONFIG);
+        deployedService.setServiceConfigurationDetails(serviceConfigurationDetails);
     }
 
     @Test
@@ -94,6 +97,7 @@ class DeployedServiceTest {
         assertEquals(SERVICE_STATE, deployedService.getServiceState());
         assertEquals(ServiceHostingType.SERVICE_VENDOR, deployedService.getServiceHostingType());
         assertEquals(LOCK_CONFIG, deployedService.getLockConfig());
+        assertEquals(serviceConfigurationDetails, deployedService.getServiceConfigurationDetails());
     }
 
     @Test
@@ -126,6 +130,7 @@ class DeployedServiceTest {
                         + ", createTime=" + createTime + ", lastModifiedTime=" + lastModifiedTime
                         + ", lastStartedAt=" + LAST_STARTED_AT + ", lastStoppedAt="
                         + LAST_STOPPED_AT + ", lockConfig=" + LOCK_CONFIG
+                        + ", serviceConfigurationDetails=" + serviceConfigurationDetails
                         + ")";
         assertEquals(expectedString, deployedService.toString());
     }

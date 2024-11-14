@@ -115,7 +115,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     }
 
     @Test
-    @WithJwt(file = "jwt_all_roles.json")
+    @WithJwt(file = "jwt_all_roles-no-policies.json")
     void testDeployApis() throws Exception {
         testDeployApisThrowExceptions();
         testDeployApisWithDeployerTerraformLocal();
@@ -403,7 +403,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testApisThrowsAccessDeniedException(serviceId);
 
         deleteServiceDeployment(serviceId);
-        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testDeployThrowPolicyEvaluationFailed(ServiceTemplateDetailVo serviceTemplate)
