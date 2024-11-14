@@ -77,7 +77,8 @@ public enum ResultType {
     INVALID_SERVICE_CONFIGURATION("Service Configuration Invalid"),
     SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND("Service Configuration Update Request Not Found"),
     SERVICE_CONFIGURATION_NOT_FOUND("Service Configuration Not Found"),
-    INVALID_DEPLOYER_TOOL("Invalid Deployer Tool");
+    INVALID_DEPLOYER_TOOL("Invalid Deployer Tool"),
+    DEPLOYMENT_SCRIPTS_CREATION_FAILED("Deployment Scripts Creation Failed");
 
     private final String value;
 

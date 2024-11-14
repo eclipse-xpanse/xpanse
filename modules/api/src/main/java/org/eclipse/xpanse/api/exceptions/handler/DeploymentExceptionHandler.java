@@ -11,6 +11,7 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
+import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentScriptsCreationFailedException;
 import org.eclipse.xpanse.modules.models.billing.exceptions.ServicePriceCalculationFailed;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.response.Response;
@@ -268,6 +269,18 @@ public class DeploymentExceptionHandler {
     @ResponseBody
     public Response handleInvalidDeployerToolException(InvalidDeployerToolException ex) {
         return getErrorResponse(ResultType.INVALID_DEPLOYER_TOOL,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for DeploymentScriptsCreationFailedException.
+     */
+    @ExceptionHandler({DeploymentScriptsCreationFailedException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public Response handleDeploymentScriptsCreatedException(
+            DeploymentScriptsCreationFailedException ex) {
+        return getErrorResponse(ResultType.DEPLOYMENT_SCRIPTS_CREATION_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 }

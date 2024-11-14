@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse.xpanse</groupId>
     <artifactId>xpanse-parent</artifactId>
-    <version>1.0.22-SNAPSHOT</version>
+    <version>1.0.23-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>xpanse</name>
     <description>Xpanse is here to make native cloud services configurable and portable.</description>
@@ -39,7 +39,7 @@
         <junit-jupiter.version>5.11.3</junit-jupiter.version>
         <lombok.version>1.18.34</lombok.version>
         <checkstyle-maven-plugin.version>3.6.0</checkstyle-maven-plugin.version>
-        <logbook.version>3.9.0</logbook.version>
+        <logbook.version>3.10.0</logbook.version>
         <wiremock.version>3.9.2</wiremock.version>
         <instancio.version>5.0.2</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
@@ -47,7 +47,7 @@
         <springdoc.version>2.6.0</springdoc.version>
         <slf4j-api.version>2.0.16</slf4j-api.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
-        <hypersistence-utils-hibernate.version>3.8.3</hypersistence-utils-hibernate.version>
+        <hypersistence-utils-hibernate.version>3.9.0</hypersistence-utils-hibernate.version>
         <mockito.version>5.14.2</mockito.version>
         <testcontainers.version>1.20.3</testcontainers.version>
         <apache.commons.io.version>2.17.0</apache.commons.io.version>
@@ -58,10 +58,10 @@
         <system.stubs.version>2.1.7</system.stubs.version>
         <junit4.version>4.13.2</junit4.version>
         <json.smart.version>2.5.0</json.smart.version>
-        <spring.oauth.addon.test.version>7.8.11</spring.oauth.addon.test.version>
+        <spring.oauth.addon.test.version>7.8.12</spring.oauth.addon.test.version>
         <openstack4j.version>3.12</openstack4j.version>
         <jackson.databind.version>2.15.2</jackson.databind.version>
-        <huaweicloud.sdk.version>3.1.120</huaweicloud.sdk.version>
+        <huaweicloud.sdk.version>3.1.121</huaweicloud.sdk.version>
         <maven.clean.plugin.version>3.4.0</maven.clean.plugin.version>
         <maven.compile.plugin.version>3.13.0</maven.compile.plugin.version>
         <maven.javadoc.plugin.version>3.11.1</maven.javadoc.plugin.version>

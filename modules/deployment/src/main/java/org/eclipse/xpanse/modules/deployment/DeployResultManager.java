@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_STATE_FILE_NAME;
+
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -21,12 +23,11 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
-import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
-import org.eclipse.xpanse.modules.deployment.recreate.RecreateService;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
+import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
@@ -57,8 +58,6 @@ public class DeployResultManager {
     private ServiceTemplateStorage serviceTemplateStorage;
     @Resource
     private ResourceHandlerManager resourceHandlerManager;
-    @Resource
-    private RecreateService recreateService;
     @Resource
     private WorkflowUtils workflowUtils;
     @Resource
@@ -121,25 +120,6 @@ public class DeployResultManager {
             rollbackOnDeploymentFailure(rollbackTask, updatedServiceEntity);
             return;
         }
-
-        UUID serviceId = updatedServiceEntity.getId();
-        if (taskType == ServiceOrderType.DEPLOY || taskType == ServiceOrderType.ROLLBACK) {
-            ServiceRecreateEntity serviceRecreateEntity =
-                    recreateService.getServiceRecreateEntityByNewServiceId(serviceId);
-            if (Objects.nonNull(serviceRecreateEntity)) {
-                workflowUtils.completeReceiveTask(serviceRecreateEntity.getRecreateId().toString(),
-                        RecreateConstants.RECREATE_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
-            }
-        }
-
-        if (taskType == ServiceOrderType.DESTROY) {
-            ServiceRecreateEntity serviceRecreateEntity =
-                    recreateService.getServiceRecreateEntityByOldServiceId(serviceId);
-            if (Objects.nonNull(serviceRecreateEntity)) {
-                workflowUtils.completeReceiveTask(serviceRecreateEntity.getRecreateId().toString(),
-                        RecreateConstants.RECREATE_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
-            }
-        }
         updateServiceOrderEntityWithDeployResult(deployResult, storedOrderEntity);
     }
 
@@ -151,7 +131,7 @@ public class DeployResultManager {
         DeployResult rollbackResult;
         RuntimeException exception = null;
         log.info("Performing rollback of already provisioned resources.");
-        rollbackTask.setOrderId(UUID.randomUUID());
+        rollbackTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         rollbackTask.setTaskType(ServiceOrderType.ROLLBACK);
         ServiceOrderEntity serviceOrderEntity = serviceOrderManager
                 .storeNewServiceOrderEntity(rollbackTask, serviceDeploymentEntity);
@@ -192,14 +172,27 @@ public class DeployResultManager {
         log.info("Update deploy service entity {} with deploy result {}",
                 serviceDeploymentEntity.getId(), deployResult);
         if (StringUtils.isNotBlank(deployResult.getTfStateContent())) {
+            deployResult.getDeploymentGeneratedFiles()
+                    .put(TF_STATE_FILE_NAME, deployResult.getTfStateContent());
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
                             serviceDeploymentEntity.getServiceTemplateId());
             DeployerKind deployerKind =
                     serviceTemplateEntity.getOcl().getDeployment().getDeployerTool().getKind();
             resourceHandlerManager.getResourceHandler(serviceDeploymentEntity.getCsp(),
-                            deployerKind).handler(deployResult);
+                    deployerKind).handler(deployResult);
+        } else {
+            if (Objects.nonNull(serviceDeploymentEntity.getDeploymentGeneratedFiles())) {
+                String storedTfStateContent = serviceDeploymentEntity.getDeploymentGeneratedFiles()
+                        .get(TF_STATE_FILE_NAME);
+                if (StringUtils.isNotBlank(storedTfStateContent)) {
+                    deployResult.setTfStateContent(storedTfStateContent);
+                    deployResult.getDeploymentGeneratedFiles()
+                            .put(TF_STATE_FILE_NAME, deployResult.getTfStateContent());
+                }
+            }
         }
+
         ServiceDeploymentEntity deployServiceToUpdate = new ServiceDeploymentEntity();
         BeanUtils.copyProperties(serviceDeploymentEntity, deployServiceToUpdate);
         updateServiceEntityWithDeployResult(deployResult, taskType, deployServiceToUpdate);
@@ -208,61 +201,62 @@ public class DeployResultManager {
 
 
     private void updateServiceEntityWithDeployResult(DeployResult deployResult,
-            ServiceOrderType taskType, ServiceDeploymentEntity serviceDeploymentEntity) {
+                                                     ServiceOrderType taskType,
+                                                     ServiceDeploymentEntity serviceDeployment) {
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         ServiceDeploymentState deploymentState =
                 getServiceDeploymentState(taskType, isTaskSuccessful);
         if (Objects.nonNull(deploymentState)) {
-            serviceDeploymentEntity.setServiceDeploymentState(deploymentState);
+            serviceDeployment.setServiceDeploymentState(deploymentState);
         }
         if (StringUtils.isNotBlank(deployResult.getMessage())) {
-            serviceDeploymentEntity.setResultMessage(deployResult.getMessage());
+            serviceDeployment.setResultMessage(deployResult.getMessage());
         } else {
             // When rollback successfully, the result message should be the previous error message.
             if (isTaskSuccessful && taskType != ServiceOrderType.ROLLBACK) {
-                serviceDeploymentEntity.setResultMessage(null);
+                serviceDeployment.setResultMessage(null);
             }
         }
         if (deploymentState == ServiceDeploymentState.MODIFICATION_SUCCESSFUL) {
-            DeployRequest modifyRequest = serviceDeploymentEntity.getDeployRequest();
-            serviceDeploymentEntity.setFlavor(modifyRequest.getFlavor());
-            serviceDeploymentEntity.setCustomerServiceName(modifyRequest.getCustomerServiceName());
+            DeployRequest modifyRequest = serviceDeployment.getDeployRequest();
+            serviceDeployment.setFlavor(modifyRequest.getFlavor());
+            serviceDeployment.setCustomerServiceName(modifyRequest.getCustomerServiceName());
         }
         ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage
-                .getServiceTemplateById(serviceDeploymentEntity.getServiceTemplateId());
+                .getServiceTemplateById(serviceDeployment.getServiceTemplateId());
         if (Objects.nonNull(serviceTemplateEntity)
                 && Objects.nonNull(serviceTemplateEntity
                 .getOcl().getServiceConfigurationManage())) {
-            updateServiceConfiguration(deploymentState, serviceDeploymentEntity);
+            updateServiceConfiguration(deploymentState, serviceDeployment);
         }
-        updateServiceState(deploymentState, serviceDeploymentEntity);
+        updateServiceState(deploymentState, serviceDeployment);
 
         if (CollectionUtils.isEmpty(deployResult.getDeploymentGeneratedFiles())) {
             if (isTaskSuccessful) {
-                serviceDeploymentEntity.setDeploymentGeneratedFiles(Collections.emptyMap());
+                serviceDeployment.setDeploymentGeneratedFiles(Collections.emptyMap());
             }
         } else {
-            serviceDeploymentEntity.setDeploymentGeneratedFiles(
+            serviceDeployment.setDeploymentGeneratedFiles(
                     deployResult.getDeploymentGeneratedFiles());
         }
 
         if (CollectionUtils.isEmpty(deployResult.getOutputProperties())) {
             if (isTaskSuccessful) {
-                serviceDeploymentEntity.setOutputProperties(Collections.emptyMap());
+                serviceDeployment.setOutputProperties(Collections.emptyMap());
             }
         } else {
-            serviceDeploymentEntity.setOutputProperties(deployResult.getOutputProperties());
+            serviceDeployment.setOutputProperties(deployResult.getOutputProperties());
         }
 
         if (CollectionUtils.isEmpty(deployResult.getResources())) {
             if (isTaskSuccessful) {
-                serviceDeploymentEntity.setDeployResourceList(Collections.emptyList());
+                serviceDeployment.setDeployResourceList(Collections.emptyList());
             }
         } else {
-            serviceDeploymentEntity.setDeployResourceList(getDeployResourceEntityList(
-                    deployResult.getResources(), serviceDeploymentEntity));
+            serviceDeployment.setDeployResourceList(getDeployResourceEntityList(
+                    deployResult.getResources(), serviceDeployment));
         }
-        sensitiveDataHandler.maskSensitiveFields(serviceDeploymentEntity);
+        sensitiveDataHandler.maskSensitiveFields(serviceDeployment);
     }
 
     private void updateServiceConfiguration(ServiceDeploymentState state,
@@ -350,14 +344,15 @@ public class DeployResultManager {
         entityToUpdate.setTaskStatus(taskStatus);
         entityToUpdate.setCompletedTime(OffsetDateTime.now());
         entityToUpdate.setErrorMsg(deployResult.getMessage());
-        // finally, update the service order entity of this order task.
+        // finally, update the service order entity of this current order task.
         serviceOrderStorage.storeAndFlush(entityToUpdate);
     }
 
     private void completeParentServiceOrder(UUID parentOrderId) {
         ServiceOrderEntity parentOrder = serviceOrderStorage.getEntityById(parentOrderId);
-        // When the parent order is not a migrate task, complete it.
-        if (parentOrder.getTaskType() != ServiceOrderType.MIGRATE) {
+        // When the parent order is not a migrate or recreate task, complete it.
+        if (parentOrder.getTaskType() != ServiceOrderType.MIGRATE
+                && parentOrder.getTaskType() != ServiceOrderType.RECREATE) {
             ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
             BeanUtils.copyProperties(parentOrder, entityToUpdate);
             entityToUpdate.setCompletedTime(OffsetDateTime.now());
@@ -371,17 +366,30 @@ public class DeployResultManager {
 
     private void processRelatedWorkflowTask(ServiceOrderEntity serviceOrder) {
         try {
-            ServiceOrderEntity parentOrder =
-                    serviceOrderStorage.getEntityById(serviceOrder.getParentOrderId());
-            if (parentOrder.getTaskType() == ServiceOrderType.MIGRATE) {
-                if (serviceOrder.getTaskType() == ServiceOrderType.DEPLOY
-                        || serviceOrder.getTaskType() == ServiceOrderType.RETRY) {
-                    workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
-                            MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
+            if (Objects.nonNull(serviceOrder.getParentOrderId())) {
+                ServiceOrderEntity parentOrder =
+                        serviceOrderStorage.getEntityById(serviceOrder.getParentOrderId());
+                if (parentOrder.getTaskType() == ServiceOrderType.MIGRATE) {
+                    if (serviceOrder.getTaskType() == ServiceOrderType.DEPLOY
+                            || serviceOrder.getTaskType() == ServiceOrderType.RETRY) {
+                        workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                                MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
+                    }
+                    if (serviceOrder.getTaskType() == ServiceOrderType.DESTROY) {
+                        workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                                MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
+                    }
                 }
-                if (serviceOrder.getTaskType() == ServiceOrderType.DESTROY) {
-                    workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
-                            MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
+                if (parentOrder.getTaskType() == ServiceOrderType.RECREATE) {
+                    if (serviceOrder.getTaskType() == ServiceOrderType.DEPLOY
+                            || serviceOrder.getTaskType() == ServiceOrderType.RETRY) {
+                        workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                                RecreateConstants.RECREATE_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
+                    }
+                    if (serviceOrder.getTaskType() == ServiceOrderType.DESTROY) {
+                        workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                                RecreateConstants.RECREATE_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
+                    }
                 }
             }
         } catch (Exception e) {

@@ -110,7 +110,8 @@ public class ServiceOrderManager {
     public void completeOrderProgress(UUID orderId, TaskStatus taskStatus, String errorMsg) {
         ServiceOrderEntity serviceOrder = serviceOrderStorage.getEntityById(orderId);
         if (Objects.isNull(serviceOrder)) {
-            String errMsg = String.format("Service order with id %s not found.", orderId);
+            String errMsg = String.format("Service order with id %s not found "
+                            + "when try to complete order progress.", orderId);
             log.error(errMsg);
             throw new ServiceOrderNotFound(errMsg);
         }

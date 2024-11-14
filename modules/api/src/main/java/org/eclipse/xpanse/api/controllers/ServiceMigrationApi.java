@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
@@ -112,7 +113,7 @@ public class ServiceMigrationApi {
         ServiceOrderEntity updatedOrderEntity =
                 serviceOrderManager.startOrderProgress(migrateOrderEntity);
         return new ServiceOrder(updatedOrderEntity.getOrderId(),
-                updatedOrderEntity.getOriginalServiceId());
+                (UUID) variable.get(MigrateConstants.NEW_SERVICE_ID));
     }
 
     private void validateData(MigrateRequest migrateRequest) {
@@ -148,7 +149,7 @@ public class ServiceMigrationApi {
 
     private DeployTask getMigrateTask(MigrateRequest migrateRequest) {
         DeployTask migrateTask = new DeployTask();
-        migrateTask.setOrderId(UUID.randomUUID());
+        migrateTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         migrateTask.setTaskType(ServiceOrderType.MIGRATE);
         migrateTask.setServiceId(migrateRequest.getOriginalServiceId());
         migrateTask.setOriginalServiceId(migrateRequest.getOriginalServiceId());

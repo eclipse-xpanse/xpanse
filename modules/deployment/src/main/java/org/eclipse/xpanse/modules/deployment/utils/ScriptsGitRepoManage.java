@@ -5,13 +5,20 @@
 
 package org.eclipse.xpanse.modules.deployment.utils;
 
+import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_SCRIPT_FILE_EXTENSION;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentScriptsCreationFailedException;
 import org.eclipse.xpanse.modules.models.common.exceptions.GitRepoCloneException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +46,7 @@ public class ScriptsGitRepoManage {
     @Retryable(retryFor = GitRepoCloneException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public File[] checkoutScripts(String workspace, ScriptsRepo scriptsRepo) {
+    public List<File> checkoutScripts(String workspace, ScriptsRepo scriptsRepo) {
         File workspaceDirectory = new File(workspace);
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
         repositoryBuilder.findGitDir(workspaceDirectory);
@@ -64,24 +71,42 @@ public class ScriptsGitRepoManage {
         } else {
             log.info("Scripts repo is already cloned in the workspace.");
         }
-        return folderContainsScripts(workspace, scriptsRepo);
+        List<File> files = getSourceFiles(workspace, scriptsRepo);
+        validateIfFolderContainsTerraformScripts(files, scriptsRepo);
+        return files;
     }
 
-    private File[] folderContainsScripts(String workspace, ScriptsRepo scriptsRepo) {
+    private List<File> getSourceFiles(String workspace, ScriptsRepo scriptsRepo) {
+        List<File> sourceFiles = new ArrayList<>();
         File directory = new File(workspace
-                + (Objects.nonNull(scriptsRepo.getScriptsPath())
+                + (StringUtils.isNotBlank(scriptsRepo.getScriptsPath())
                 ? File.separator + scriptsRepo.getScriptsPath()
                 : ""));
-        File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".tf"));
-        if (Objects.isNull(files) || files.length == 0) {
-            throw new GitRepoCloneException(
-                    "No terraform scripts found in the "
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (Objects.nonNull(files)) {
+                Arrays.stream(files).forEach(file -> {
+                    if (file.isFile()) {
+                        sourceFiles.add(file);
+                    }
+                });
+            }
+        }
+        return sourceFiles;
+    }
+
+    private void validateIfFolderContainsTerraformScripts(
+            List<File> files, ScriptsRepo scriptsRepo) {
+        boolean isScriptsExisted = files.stream()
+                .anyMatch(file -> file.getName().endsWith(TF_SCRIPT_FILE_EXTENSION));
+        if (!isScriptsExisted) {
+            throw new DeploymentScriptsCreationFailedException(
+                    "No deployment scripts found in the "
                             + scriptsRepo.getRepoUrl()
                             + " repo's '"
-                            + (Objects.nonNull(scriptsRepo.getScriptsPath())
-                            ? scriptsRepo.getScriptsPath() : "root")
+                            + (StringUtils.isNotBlank(scriptsRepo.getScriptsPath())
+                            ? File.separator + scriptsRepo.getScriptsPath() : "root")
                             + "' folder.");
         }
-        return files;
     }
 }

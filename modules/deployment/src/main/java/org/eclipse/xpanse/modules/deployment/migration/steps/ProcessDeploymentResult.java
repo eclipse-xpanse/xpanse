@@ -14,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,14 +53,22 @@ public class ProcessDeploymentResult implements Serializable, JavaDelegate {
         UUID migrateOrderId = (UUID) variables.get(MigrateConstants.MIGRATE_ORDER_ID);
         try {
             UUID newServiceId = (UUID) variables.get(MigrateConstants.NEW_SERVICE_ID);
-            boolean isDeploySuccess =
-                    serviceDeploymentEntityHandler.isServiceDeployedSuccess(newServiceId);
-            runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS,
-                    isDeploySuccess);
-            if (!isDeploySuccess) {
+            log.info(
+                    "Migration workflow of instance id : {} check deploy service status with id:{}",
+                    processInstanceId, newServiceId.toString());
+            ServiceDeploymentEntity serviceDeploymentEntity =
+                    serviceDeploymentEntityHandler.getServiceDeploymentEntity(newServiceId);
+            if (Objects.nonNull(serviceDeploymentEntity)
+                    && serviceDeploymentEntity.getServiceDeploymentState()
+                    == ServiceDeploymentState.DEPLOY_SUCCESS) {
+                runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS,
+                        true);
+            } else {
                 int deployRetryNum = getDeployRetryNum(variables);
                 runtimeService.setVariable(processInstanceId, MigrateConstants.DEPLOY_RETRY_NUM,
                         deployRetryNum + 1);
+                runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS,
+                        false);
                 log.info("Process failed deployment task of migration workflow with id:{}. "
                         + "RetryCount:{}", processInstanceId, deployRetryNum);
                 if (deployRetryNum >= 1) {
@@ -67,7 +77,7 @@ public class ProcessDeploymentResult implements Serializable, JavaDelegate {
                             userId);
 
                     serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.FAILED,
-                            null);
+                            serviceDeploymentEntity.getResultMessage());
                 }
             }
         } catch (Exception e) {

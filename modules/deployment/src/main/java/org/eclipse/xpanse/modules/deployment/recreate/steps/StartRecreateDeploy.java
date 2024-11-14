@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.deployment.recreate.steps;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 import lombok.SneakyThrows;
@@ -16,12 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
-import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
-import org.eclipse.xpanse.modules.deployment.recreate.RecreateService;
+import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.workflow.recreate.enums.RecreateStatus;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.recreate.exceptions.ServiceRecreateFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,17 +37,17 @@ public class StartRecreateDeploy implements Serializable, JavaDelegate {
 
     private final DeployService deployService;
     private final RuntimeService runtimeService;
-    private final RecreateService recreateService;
+    private final ServiceOrderManager serviceOrderManager;
 
     /**
      * Constructor for StartRecreateDeploy bean.
      */
     @Autowired
     public StartRecreateDeploy(DeployService deployService, RuntimeService runtimeService,
-                               RecreateService recreateService) {
+                               ServiceOrderManager serviceOrderManager) {
         this.deployService = deployService;
         this.runtimeService = runtimeService;
-        this.recreateService = recreateService;
+        this.serviceOrderManager = serviceOrderManager;
     }
 
     /**
@@ -60,25 +58,23 @@ public class StartRecreateDeploy implements Serializable, JavaDelegate {
     public void execute(DelegateExecution execution) {
         String processInstanceId = execution.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        UUID originalServiceId = (UUID) variables.get(RecreateConstants.ID);
-        log.info("Recreate workflow of Instance Id : {} start deploy new service with id:{}",
-                processInstanceId, originalServiceId.toString());
-
-        ServiceRecreateEntity serviceRecreateEntity =
-                recreateService.getServiceRecreateEntityById(UUID.fromString(processInstanceId));
+        UUID serviceId = (UUID) variables.get(RecreateConstants.SERVICE_ID);
+        UUID recreateOrderId = (UUID) variables.get(RecreateConstants.RECREATE_ORDER_ID);
+        log.info("Recreate workflow of instance id : {} start deploy new service with id:{}",
+                processInstanceId, serviceId.toString());
         try {
-            recreateService.updateServiceRecreateStatus(serviceRecreateEntity,
-                    RecreateStatus.DEPLOY_STARTED, OffsetDateTime.now());
-            startDeploy(processInstanceId, originalServiceId, variables);
+            startDeploy(processInstanceId, serviceId, recreateOrderId, variables);
         } catch (ServiceRecreateFailedException e) {
-            log.info("Recreate workflow of Instance Id : {} start deploy new service with id: {},"
-                    + " error: {}", processInstanceId, originalServiceId, e.getMessage());
-            recreateService.updateServiceRecreateStatus(serviceRecreateEntity,
-                    RecreateStatus.DEPLOY_FAILED, OffsetDateTime.now());
+            log.info("Recreate workflow of instance id : {} start deploy new service with id: {},"
+                    + " error: {}", processInstanceId, serviceId, e.getMessage());
+            runtimeService.setVariable(processInstanceId, RecreateConstants.IS_DEPLOY_SUCCESS,
+                    false);
+            serviceOrderManager.completeOrderProgress(recreateOrderId, TaskStatus.FAILED,
+                    e.getMessage());
         }
     }
 
-    private void startDeploy(String processInstanceId, UUID originalServiceId,
+    private void startDeploy(String processInstanceId, UUID originalServiceId, UUID recreateOrderId,
                              Map<String, Object> variables) {
         runtimeService.updateBusinessKey(processInstanceId, originalServiceId.toString());
         String userId = (String) variables.get(RecreateConstants.USER_ID);
@@ -86,7 +82,7 @@ public class StartRecreateDeploy implements Serializable, JavaDelegate {
                 (DeployRequest) variables.get(RecreateConstants.RECREATE_REQUEST);
         deployRequest.setUserId(userId);
         deployService.deployServiceByWorkflow(originalServiceId, processInstanceId,
-                UUID.randomUUID(), deployRequest);
+                recreateOrderId, deployRequest);
     }
 }
 

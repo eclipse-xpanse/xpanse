@@ -3,7 +3,7 @@
   "info": {
     "title": "Tofu-Maker API",
     "description": "RESTful Services to interact with Tofu-Maker runtime",
-    "version": "1.0.7-SNAPSHOT"
+    "version": "1.0.9-SNAPSHOT"
   },
   "servers": [
     {
@@ -55,8 +55,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -65,8 +65,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -126,8 +126,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -136,8 +136,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -197,8 +197,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -207,8 +207,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -268,8 +268,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -278,8 +278,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -332,8 +332,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -342,8 +342,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -403,8 +403,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -413,8 +413,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -474,8 +474,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -484,8 +484,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -538,8 +538,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -548,8 +548,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -609,8 +609,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -619,8 +619,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -680,8 +680,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -690,8 +690,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -751,8 +751,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -761,8 +761,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -815,8 +815,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -825,8 +825,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -886,8 +886,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -896,8 +896,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -957,8 +957,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -967,8 +967,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1032,8 +1032,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1042,8 +1042,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1114,8 +1114,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1124,8 +1124,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1196,8 +1196,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1206,8 +1206,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1271,8 +1271,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1281,8 +1281,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1353,8 +1353,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1363,8 +1363,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1407,8 +1407,8 @@
         "description": "Check health of OpenTofu Maker API service",
         "operationId": "healthCheck",
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1417,8 +1417,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1489,8 +1489,8 @@
           }
         ],
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1499,8 +1499,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1560,8 +1560,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1570,8 +1570,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1624,8 +1624,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1634,8 +1634,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1699,8 +1699,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1709,8 +1709,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1781,8 +1781,8 @@
           "required": true
         },
         "responses": {
-          "422": {
-            "description": "Unprocessable Entity",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1791,8 +1791,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1919,7 +1919,8 @@
         "type": "object",
         "properties": {
           "detail": {
-            "type": "string"
+            "type": "string",
+            "description": "Detail of validation error."
           }
         },
         "description": "List of validation errors."
@@ -2081,7 +2082,7 @@
             "type": "string",
             "description": ".tfstate file contents returned as string."
           },
-          "importantFileContentMap": {
+          "generatedFileContentMap": {
             "type": "object",
             "additionalProperties": {
               "type": "string",

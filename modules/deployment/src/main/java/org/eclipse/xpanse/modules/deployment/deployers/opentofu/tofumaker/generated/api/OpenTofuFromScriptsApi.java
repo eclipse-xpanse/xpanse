@@ -44,8 +44,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * async deploy resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -61,8 +61,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * async deploy resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -113,8 +113,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Async destroy the OpenTofu modules
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -130,8 +130,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Async destroy the OpenTofu modules
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -182,8 +182,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * async modify resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -199,8 +199,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * async modify resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>202</b> - Accepted
@@ -251,8 +251,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Deploy resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -269,8 +269,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Deploy resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -322,8 +322,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Destroy resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -340,8 +340,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Destroy resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -393,8 +393,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Modify resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -411,8 +411,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Modify resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -464,8 +464,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Get OpenTofu Plan as JSON string from the list of script files provided
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -482,8 +482,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Get OpenTofu Plan as JSON string from the list of script files provided
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -535,8 +535,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Deploy resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK
@@ -553,8 +553,8 @@ public class OpenTofuFromScriptsApi extends BaseApi {
 
     /**
      * Deploy resources via OpenTofu
-     * <p><b>422</b> - Unprocessable Entity
      * <p><b>400</b> - Bad Request
+     * <p><b>422</b> - Unprocessable Entity
      * <p><b>503</b> - Service Unavailable
      * <p><b>502</b> - Bad Gateway
      * <p><b>200</b> - OK

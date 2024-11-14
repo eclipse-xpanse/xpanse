@@ -46,7 +46,6 @@ public class VariableValidationFailedExceptionTest {
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(exception, exception);
         assertEquals(exception.hashCode(), exception.hashCode());
 
         Object obj = new Object();
@@ -54,17 +53,20 @@ public class VariableValidationFailedExceptionTest {
         assertNotEquals(exception, null);
         assertNotEquals(exception.hashCode(), obj.hashCode());
 
-        VariableValidationFailedException exception1 = new VariableValidationFailedException(errorReasons1);
+        VariableValidationFailedException exception1 =
+                new VariableValidationFailedException(errorReasons1);
         assertNotEquals(exception, exception1);
         assertNotEquals(exception.hashCode(), exception1.hashCode());
 
-        VariableValidationFailedException exception2 = new VariableValidationFailedException(errorReasons);
+        VariableValidationFailedException exception2 =
+                new VariableValidationFailedException(errorReasons);
         assertNotEquals(exception, exception2);
         assertNotEquals(exception2, exception1);
         assertNotEquals(exception.hashCode(), exception2.hashCode());
         assertNotEquals(exception2.hashCode(), exception1.hashCode());
 
-        VariableValidationFailedException exception3 = new VariableValidationFailedException(errorReasons2);
+        VariableValidationFailedException exception3 =
+                new VariableValidationFailedException(errorReasons2);
         assertNotEquals(exception, exception3);
         assertNotEquals(exception3, exception2);
         assertNotEquals(exception3, exception1);
@@ -75,7 +77,8 @@ public class VariableValidationFailedExceptionTest {
 
     @Test
     void testToString() {
-        String expectedToString = "VariableValidationFailedException(errorReasons=" + errorReasons + ")";
+        String expectedToString =
+                "VariableValidationFailedException(errorReasons=" + errorReasons + ")";
 
         assertEquals(expectedToString, exception.toString());
     }

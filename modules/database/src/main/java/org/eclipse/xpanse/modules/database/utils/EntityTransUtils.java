@@ -19,7 +19,6 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
-import org.eclipse.xpanse.modules.database.servicerecreate.ServiceRecreateEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
@@ -28,7 +27,6 @@ import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServic
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
-import org.eclipse.xpanse.modules.models.workflow.recreate.view.ServiceRecreateDetails;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -130,19 +128,6 @@ public class EntityTransUtils {
         if (Objects.nonNull(entity.getServiceTemplateId())) {
             details.setServiceTemplateId(entity.getServiceTemplateId());
         }
-        return details;
-    }
-
-    /**
-     * ServiceRecreateEntity converted to ServiceRecreateDetails.
-     *
-     * @param serviceRecreateEntity ServiceRecreateEntity.
-     * @return ServiceRecreateDetails
-     */
-    public static ServiceRecreateDetails transToServiceRecreateDetails(
-            ServiceRecreateEntity serviceRecreateEntity) {
-        ServiceRecreateDetails details = new ServiceRecreateDetails();
-        BeanUtils.copyProperties(serviceRecreateEntity, details);
         return details;
     }
 

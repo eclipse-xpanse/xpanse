@@ -20,6 +20,7 @@ public enum ServiceOrderType {
     MODIFY("modify"),
     DESTROY("destroy"),
     MIGRATE("migrate"),
+    RECREATE("recreate"),
     LOCK_CHANGE("lockChange"),
     CONFIG_CHANGE("configChange"),
     PURGE("purge"),
