@@ -37,7 +37,7 @@
         <spring-boot.version>3.3.5</spring-boot.version>
         <spring.retry.version>2.0.10</spring.retry.version>
         <junit-jupiter.version>5.11.3</junit-jupiter.version>
-        <lombok.version>1.18.34</lombok.version>
+        <lombok.version>1.18.36</lombok.version>
         <checkstyle-maven-plugin.version>3.6.0</checkstyle-maven-plugin.version>
         <logbook.version>3.10.0</logbook.version>
         <wiremock.version>3.9.2</wiremock.version>
