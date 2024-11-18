@@ -20,8 +20,8 @@ import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
@@ -135,7 +135,8 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         String result2 = objectMapper.writeValueAsString(expectedResponse2);
         // Run the test case 2
         final MockHttpServletResponse response2 =
-                reviewServiceRegistrationWithParams(serviceTemplateDetailVo.getServiceTemplateId(), request2);
+                reviewServiceRegistrationWithParams(serviceTemplateDetailVo.getServiceTemplateId(),
+                        request2);
         // Verify the result 2
         assertThat(response2.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response2.getContentAsString()).isEqualTo(result2);
@@ -188,19 +189,17 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         String errorMessage = "Failed to convert value of type 'java.lang.String' to required type";
 
         // Run the test case 1
-        MockHttpServletResponse response1 =
-                listServiceTemplatesWithParams(null, null, null, null,
-                        serviceRegistrationState1);
+        MockHttpServletResponse response1 = listServiceTemplatesWithParams(
+                null, null, null, null, serviceRegistrationState1);
         // Verify the results 1
         assertThat(response1.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
         assertThat(errorMessage).isSubstringOf(response1.getContentAsString());
 
         // Setup request 2
-        String serviceRegistrationState2 = ServiceRegistrationState.APPROVED.toValue();
+        String serviceRegistrationState2 = ServiceTemplateRegistrationState.APPROVED.toValue();
         // Run the test case 2
-        MockHttpServletResponse response2 =
-                listServiceTemplatesWithParams(null, null, null, null,
-                        serviceRegistrationState2);
+        MockHttpServletResponse response2 = listServiceTemplatesWithParams(
+                null, null, null, null, serviceRegistrationState2);
         List<ServiceTemplateDetailVo> detailsList2 =
                 objectMapper.readValue(response2.getContentAsString(),
                         new TypeReference<>() {
@@ -213,7 +212,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     void testListManagedServiceTemplatesWithStateApprovalPending(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup
-        String serviceRegistrationState = ServiceRegistrationState.APPROVAL_PENDING.toValue();
+        String serviceRegistrationState = ServiceTemplateRegistrationState.IN_PROGRESS.toValue();
         // Run the test
         MockHttpServletResponse response = listServiceTemplatesWithParams(
                 serviceTemplateDetailVo.getCategory().toValue(),
@@ -233,7 +232,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     void testListManagedServiceTemplatesReturnsEmptyList(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup
-        String serviceRegistrationState = ServiceRegistrationState.UNREGISTERED.toValue();
+        String serviceRegistrationState = ServiceTemplateRegistrationState.IN_PROGRESS.toValue();
         // Run the test
         MockHttpServletResponse response = listServiceTemplatesWithParams(
                 serviceTemplateDetailVo.getCategory().toValue(),
@@ -256,7 +255,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                                                            String serviceName,
                                                            String serviceVersion,
                                                            String serviceHostingType,
-                                                           String serviceRegistrationState)
+                                                           String serviceTemplateRegistrationState)
             throws Exception {
         MockHttpServletRequestBuilder getRequestBuilder = get("/xpanse/csp/service_templates");
         if (StringUtils.isNotBlank(categoryName)) {
@@ -271,9 +270,9 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         if (StringUtils.isNotBlank(serviceHostingType)) {
             getRequestBuilder = getRequestBuilder.param("serviceHostingType", serviceHostingType);
         }
-        if (StringUtils.isNotBlank(serviceRegistrationState)) {
-            getRequestBuilder =
-                    getRequestBuilder.param("serviceRegistrationState", serviceRegistrationState);
+        if (StringUtils.isNotBlank(serviceTemplateRegistrationState)) {
+            getRequestBuilder = getRequestBuilder.param("serviceTemplateRegistrationState",
+                    serviceTemplateRegistrationState);
         }
         return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
     }

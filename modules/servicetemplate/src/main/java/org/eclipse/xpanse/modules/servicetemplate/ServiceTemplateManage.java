@@ -31,8 +31,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
@@ -103,11 +103,14 @@ public class ServiceTemplateManage {
                 && Objects.nonNull(ocl.getServiceConfigurationManage())) {
             serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
         }
-        validateServiceDeployment(ocl.getDeployment(), existingTemplate);
-        existingTemplate.setOcl(ocl);
-        setServiceRegistrationState(existingTemplate);
+        existingTemplate.setIsUpdatePending(true);
         ServiceTemplateEntity updatedServiceTemplate =
                 templateStorage.storeAndFlush(existingTemplate);
+        validateServiceDeployment(ocl.getDeployment(), updatedServiceTemplate);
+        updatedServiceTemplate.setOcl(ocl);
+        setServiceTemplateRegistrationState(updatedServiceTemplate);
+        updatedServiceTemplate.setIsUpdatePending(false);
+        updatedServiceTemplate = templateStorage.storeAndFlush(existingTemplate);
         serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
         return updatedServiceTemplate;
     }
@@ -154,21 +157,26 @@ public class ServiceTemplateManage {
         newTemplate.setServiceHostingType(ocl.getServiceHostingType());
         newTemplate.setOcl(ocl);
         newTemplate.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
-        setServiceRegistrationState(newTemplate);
+        newTemplate.setIsUpdatePending(false);
+        setServiceTemplateRegistrationState(newTemplate);
         return newTemplate;
     }
 
 
-    private void setServiceRegistrationState(ServiceTemplateEntity serviceTemplate) {
+    private void setServiceTemplateRegistrationState(ServiceTemplateEntity serviceTemplate) {
         Csp csp = serviceTemplate.getCsp();
         OrchestratorPlugin cspPlugin = pluginManager.getOrchestratorPlugin(csp);
         boolean cspAutoApproveIsEnabled = cspPlugin.autoApproveServiceTemplateIsEnabled();
         if (cspAutoApproveIsEnabled) {
-            serviceTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
+            serviceTemplate.setServiceTemplateRegistrationState(
+                    ServiceTemplateRegistrationState.APPROVED);
+            serviceTemplate.setAvailableInCatalog(true);
             log.info("Service template {} managed by Csp {} auto approved",
                     serviceTemplate.getId(), csp);
         } else {
-            serviceTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVAL_PENDING);
+            serviceTemplate.setServiceTemplateRegistrationState(
+                    ServiceTemplateRegistrationState.IN_PROGRESS);
+            serviceTemplate.setAvailableInCatalog(false);
         }
     }
 
@@ -185,9 +193,10 @@ public class ServiceTemplateManage {
 
     private void validateServiceVersion(Ocl ocl) {
         Semver newSemver = getSemverVersion(ocl.getServiceVersion());
-        ServiceTemplateQueryModel query = new ServiceTemplateQueryModel(ocl.getCategory(),
-                ocl.getCloudServiceProvider().getName(), ocl.getName(), null,
-                ocl.getServiceHostingType(), null, false);
+        ServiceTemplateQueryModel query = ServiceTemplateQueryModel.builder()
+                .category(ocl.getCategory()).csp(ocl.getCloudServiceProvider().getName())
+                .serviceName(ocl.getName()).serviceHostingType(ocl.getServiceHostingType())
+                .checkNamespace(false).build();
         List<ServiceTemplateEntity> templates = templateStorage.listServiceTemplates(query);
         if (!CollectionUtils.isEmpty(templates)) {
             Semver highestVersion = templates.stream()
@@ -235,8 +244,7 @@ public class ServiceTemplateManage {
         }
         validateServiceDeployment(ocl.getDeployment(), newTemplate);
         ocl.setIcon(IconProcessorUtil.processImage(ocl));
-        String userManageNamespace =
-                userServiceHelper.getCurrentUserManageNamespace();
+        String userManageNamespace = userServiceHelper.getCurrentUserManageNamespace();
         newTemplate.setNamespace(userManageNamespace);
         ServiceTemplateEntity storedServiceTemplate = templateStorage.storeAndFlush(newTemplate);
         serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
@@ -326,18 +334,23 @@ public class ServiceTemplateManage {
      */
     public void reviewServiceTemplateRegistration(UUID id, ReviewRegistrationRequest request) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, false, true);
-        if (ServiceRegistrationState.APPROVED == existingTemplate.getServiceRegistrationState()
-                || ServiceRegistrationState.REJECTED
-                == existingTemplate.getServiceRegistrationState()) {
+        ServiceTemplateRegistrationState state =
+                existingTemplate.getServiceTemplateRegistrationState();
+        if (ServiceTemplateRegistrationState.APPROVED == state
+                || ServiceTemplateRegistrationState.REJECTED == state) {
             String errMsg = String.format("Service template with id %s already reviewed.",
                     existingTemplate.getId());
             log.error(errMsg);
             throw new ServiceTemplateAlreadyReviewed(errMsg);
         }
         if (ServiceReviewResult.APPROVED == request.getReviewResult()) {
-            existingTemplate.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
+            existingTemplate.setServiceTemplateRegistrationState(
+                    ServiceTemplateRegistrationState.APPROVED);
+            existingTemplate.setAvailableInCatalog(true);
         } else if (ServiceReviewResult.REJECTED == request.getReviewResult()) {
-            existingTemplate.setServiceRegistrationState(ServiceRegistrationState.REJECTED);
+            existingTemplate.setServiceTemplateRegistrationState(
+                    ServiceTemplateRegistrationState.REJECTED);
+            existingTemplate.setAvailableInCatalog(false);
         }
         String reviewComment = StringUtils.isNotBlank(request.getReviewComment())
                 ? request.getReviewComment() : request.getReviewResult().toValue();
@@ -354,7 +367,7 @@ public class ServiceTemplateManage {
      */
     public ServiceTemplateEntity unregisterServiceTemplate(UUID id) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
-        existingTemplate.setServiceRegistrationState(ServiceRegistrationState.UNREGISTERED);
+        existingTemplate.setAvailableInCatalog(false);
         return templateStorage.storeAndFlush(existingTemplate);
     }
 
@@ -366,7 +379,7 @@ public class ServiceTemplateManage {
      */
     public ServiceTemplateEntity reRegisterServiceTemplate(UUID id) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
-        setServiceRegistrationState(existingTemplate);
+        existingTemplate.setAvailableInCatalog(true);
         return templateStorage.storeAndFlush(existingTemplate);
     }
 
@@ -377,8 +390,7 @@ public class ServiceTemplateManage {
      */
     public void deleteServiceTemplate(UUID id) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
-        if (ServiceRegistrationState.UNREGISTERED
-                != existingTemplate.getServiceRegistrationState()) {
+        if (existingTemplate.getAvailableInCatalog()) {
             String errMsg = String.format("Service template with id %s is not unregistered.", id);
             log.error(errMsg);
             throw new ServiceTemplateStillInUseException(errMsg);
@@ -445,7 +457,7 @@ public class ServiceTemplateManage {
     }
 
     private void fillParamFromUserMetadata(ServiceTemplateQueryModel query) {
-        if (query.isCheckNamespace()) {
+        if (Objects.nonNull(query.getCheckNamespace()) && query.getCheckNamespace()) {
             String namespace = userServiceHelper.getCurrentUserManageNamespace();
             query.setNamespace(namespace);
         }

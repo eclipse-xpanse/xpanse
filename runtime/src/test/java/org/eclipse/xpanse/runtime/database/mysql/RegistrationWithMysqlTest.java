@@ -15,7 +15,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
@@ -53,17 +53,18 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                 registeredServiceTemplate.getVersion());
         Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),
                 registeredServiceTemplate.getCsp());
-        Assertions.assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                registeredServiceTemplate.getServiceRegistrationState());
+        Assertions.assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
+                registeredServiceTemplate.getServiceTemplateRegistrationState());
 
         ServiceTemplateDetailVo serviceTemplateDetail =
-                serviceTemplateApi.details(registeredServiceTemplate.getServiceTemplateId().toString());
+                serviceTemplateApi.details(
+                        registeredServiceTemplate.getServiceTemplateId().toString());
 
         List<ServiceTemplateDetailVo> serviceTemplates =
                 serviceTemplateApi.listServiceTemplates(ocl.getCategory(),
                         ocl.getCloudServiceProvider().getName(), ocl.getName(),
                         ocl.getServiceVersion(), ocl.getServiceHostingType(),
-                        ServiceRegistrationState.APPROVAL_PENDING);
+                        ServiceTemplateRegistrationState.IN_PROGRESS, null, null);
 
         Assertions.assertEquals(1, serviceTemplates.size());
         Assertions.assertEquals(serviceTemplateDetail.getServiceTemplateId(),
@@ -87,13 +88,15 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                 serviceTemplateApi.register(ocl);
         ocl.setDescription("Hello");
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
-                serviceTemplateApi.update(serviceTemplateDetailVo.getServiceTemplateId().toString(), ocl);
+                serviceTemplateApi.update(serviceTemplateDetailVo.getServiceTemplateId().toString(),
+                        ocl);
         Assertions.assertEquals(1, serviceTemplateApi.listServiceTemplates(
-                null, null, null, null, null, null
+                null, null, null, null, null, null, null, null
         ).stream().filter(registeredServiceVo1 -> registeredServiceVo1.getName()
                 .equals(serviceTemplateDetailVo.getName())).toList().size());
         Assertions.assertEquals("Hello",
-                serviceTemplateApi.details(updatedServiceTemplateDetailVo.getServiceTemplateId().toString())
+                serviceTemplateApi.details(
+                                updatedServiceTemplateDetailVo.getServiceTemplateId().toString())
                         .getDescription());
     }
 

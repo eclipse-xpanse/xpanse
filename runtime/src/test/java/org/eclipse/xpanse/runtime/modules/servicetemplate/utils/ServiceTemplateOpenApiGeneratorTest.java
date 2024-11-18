@@ -15,7 +15,7 @@ import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -133,8 +133,12 @@ class ServiceTemplateOpenApiGeneratorTest {
         serviceTemplateEntity.setCategory(ocl.getCategory());
         serviceTemplateEntity.setServiceHostingType(ocl.getServiceHostingType());
         serviceTemplateEntity.setOcl(ocl);
-        serviceTemplateEntity.setServiceRegistrationState(
-                ServiceRegistrationState.APPROVAL_PENDING);
+        serviceTemplateEntity.setServiceTemplateRegistrationState(
+                ServiceTemplateRegistrationState.APPROVED);
+        serviceTemplateEntity.setServiceProviderContactDetails(
+                ocl.getServiceProviderContactDetails());
+        serviceTemplateEntity.setAvailableInCatalog(true);
+        serviceTemplateEntity.setIsUpdatePending(false);
         serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
         return serviceTemplateEntity;
     }

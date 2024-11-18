@@ -67,6 +67,7 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
                             serviceTemplateEntity.getCategory()));
                     predicateList.add(criteriaBuilder.equal(root.get("serviceHostingType"),
                             serviceTemplateEntity.getServiceHostingType()));
+                    assert query != null;
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
                 };
@@ -92,7 +93,6 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
                         predicateList.add(criteriaBuilder.equal(root.get("category"),
                                 serviceQuery.getCategory()));
                     }
-
                     if (Objects.nonNull(serviceQuery.getCsp())) {
                         predicateList.add(criteriaBuilder.equal(root.get("csp"),
                                 serviceQuery.getCsp()));
@@ -114,12 +114,20 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
                         predicateList.add(criteriaBuilder.equal(root.get("serviceHostingType"),
                                 serviceQuery.getServiceHostingType()));
                     }
-                    if (Objects.nonNull(serviceQuery.getServiceRegistrationState())) {
-                        predicateList.add(
-                                criteriaBuilder.equal(root.get("serviceRegistrationState"),
-                                        serviceQuery.getServiceRegistrationState()));
+                    if (Objects.nonNull(serviceQuery.getServiceTemplateRegistrationState())) {
+                        predicateList.add(criteriaBuilder.equal(
+                                root.get("serviceTemplateRegistrationState"),
+                                serviceQuery.getServiceTemplateRegistrationState()));
                     }
-
+                    if (Objects.nonNull(serviceQuery.getAvailableInCatalog())) {
+                        predicateList.add(criteriaBuilder.equal(root.get("availableInCatalog"),
+                                        serviceQuery.getAvailableInCatalog()));
+                    }
+                    if (Objects.nonNull(serviceQuery.getIsUpdatePending())) {
+                        predicateList.add(criteriaBuilder.equal(root.get("isUpdatePending"),
+                                        serviceQuery.getIsUpdatePending()));
+                    }
+                    assert query != null;
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
                 };

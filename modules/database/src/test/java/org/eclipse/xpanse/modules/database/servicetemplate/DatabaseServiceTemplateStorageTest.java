@@ -14,7 +14,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -169,9 +169,8 @@ class DatabaseServiceTemplateStorageTest {
     @Test
     void testQueryServiceTemplates() {
         // Setup
-        final ServiceTemplateQueryModel serviceQuery =
-                new ServiceTemplateQueryModel(Category.AI, Csp.HUAWEI_CLOUD, null, null, null, null,
-                        false);
+        final ServiceTemplateQueryModel serviceQuery = ServiceTemplateQueryModel.builder()
+                .category(Category.AI).csp(Csp.HUAWEI_CLOUD).checkNamespace(false).build();
 
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(id);
@@ -203,10 +202,11 @@ class DatabaseServiceTemplateStorageTest {
     @Test
     void testQueryServiceTemplates_ServiceTemplateRepositoryReturnsNoItems() {
         // Setup
-        final ServiceTemplateQueryModel serviceQuery = new ServiceTemplateQueryModel(Category.AI,
-                Csp.HUAWEI_CLOUD, "serviceName", "serviceVersion", ServiceHostingType.SELF,
-                ServiceRegistrationState.APPROVED, false);
-
+        final ServiceTemplateQueryModel serviceQuery = ServiceTemplateQueryModel.builder()
+                .category(Category.AI).csp(Csp.HUAWEI_CLOUD).serviceName("serviceName")
+                .serviceVersion("serviceVersion")
+                .serviceTemplateRegistrationState(ServiceTemplateRegistrationState.APPROVED)
+                .checkNamespace(false).build();
         when(mockServiceTemplateRepository.findAll(any(Specification.class)))
                 .thenReturn(Collections.emptyList());
 

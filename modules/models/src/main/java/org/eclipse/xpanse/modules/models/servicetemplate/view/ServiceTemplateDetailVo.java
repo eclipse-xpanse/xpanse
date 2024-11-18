@@ -29,7 +29,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.springframework.hateoas.RepresentationModel;
 
 /**
@@ -117,7 +117,15 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
 
     @NotNull
     @Schema(description = "State of registered service template.")
-    private ServiceRegistrationState serviceRegistrationState;
+    private ServiceTemplateRegistrationState serviceTemplateRegistrationState;
+
+    @NotNull
+    @Schema(description = "Is service template in updating.")
+    private Boolean isUpdatePending;
+
+    @NotNull
+    @Schema(description = "Is available in catalog.")
+    private Boolean availableInCatalog;
 
     @Schema(description = "Comment of reviewed service template.")
     private String reviewComment;

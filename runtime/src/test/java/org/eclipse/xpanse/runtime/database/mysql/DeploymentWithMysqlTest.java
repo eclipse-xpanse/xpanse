@@ -42,7 +42,7 @@ import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJso
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
@@ -122,7 +122,9 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(
                         serviceTemplate.getServiceTemplateId());
-        serviceTemplateEntity.setServiceRegistrationState(ServiceRegistrationState.APPROVED);
+        serviceTemplateEntity.setServiceTemplateRegistrationState(
+                ServiceTemplateRegistrationState.APPROVED);
+        serviceTemplateEntity.setAvailableInCatalog(true);
         serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
     }
 

@@ -88,7 +88,6 @@ public class TerraformLocalDeployment implements Deployer {
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
-
         DeployResult destroyResult = new DeployResult();
         destroyResult.setOrderId(task.getOrderId());
         asyncExecDestroy(task, resourceState);

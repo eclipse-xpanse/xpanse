@@ -185,9 +185,9 @@ class ServiceCatalogApiTest extends ApisTestCommon {
         // Setup request 1
         UUID id1 = serviceTemplateDetailVo.getServiceTemplateId();
         Response expectedResponse1 = Response.errorResponse(
-                ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
+                ResultType.UNAVAILABLE_SERVICE_TEMPLATE,
                 Collections.singletonList(
-                        String.format("Service template with id %s not approved.", id1)));
+                        String.format("Service template with id %s is unavailable.", id1)));
         String result1 = objectMapper.writeValueAsString(expectedResponse1);
         // Run the test case 1
         final MockHttpServletResponse response1 = getOrderableServiceDetailsWithId(id1);

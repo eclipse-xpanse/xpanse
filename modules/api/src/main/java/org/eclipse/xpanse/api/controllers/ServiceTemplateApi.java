@@ -29,7 +29,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
@@ -218,12 +218,12 @@ public class ServiceTemplateApi {
     /**
      * List service templates with query params.
      *
-     * @param category                 category of the service.
-     * @param csp                      name of the cloud service provider.
-     * @param serviceName              name of the service.
-     * @param serviceVersion           version of the service.
-     * @param serviceHostingType       type of the service hosting.
-     * @param serviceRegistrationState state of the service registration.
+     * @param category                         category of the service.
+     * @param csp                              name of the cloud service provider.
+     * @param serviceName                      name of the service.
+     * @param serviceVersion                   version of the service.
+     * @param serviceHostingType               type of the service hosting.
+     * @param serviceTemplateRegistrationState state of the service registration.
      * @return service templates
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
@@ -243,12 +243,22 @@ public class ServiceTemplateApi {
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
             @RequestParam(name = "serviceHostingType", required = false)
             ServiceHostingType serviceHostingType,
-            @Parameter(name = "serviceRegistrationState", description = "state of registration")
-            @RequestParam(name = "serviceRegistrationState", required = false)
-            ServiceRegistrationState serviceRegistrationState) {
-        ServiceTemplateQueryModel queryRequest =
-                new ServiceTemplateQueryModel(category, csp, serviceName, serviceVersion,
-                        serviceHostingType, serviceRegistrationState, true);
+            @Parameter(name = "serviceTemplateRegistrationState",
+                    description = "state of service template registration")
+            @RequestParam(name = "serviceTemplateRegistrationState", required = false)
+            ServiceTemplateRegistrationState serviceTemplateRegistrationState,
+            @Parameter(name = "availableInCatalog", description = "is available in catalog")
+            @RequestParam(name = "availableInCatalog", required = false)
+            Boolean availableInCatalog,
+            @Parameter(name = "isUpdatePending", description = "is service template updating")
+            @RequestParam(name = "isUpdatePending", required = false)
+            Boolean isUpdatePending) {
+        ServiceTemplateQueryModel queryRequest = ServiceTemplateQueryModel.builder()
+                .category(category).csp(csp).serviceName(serviceName)
+                .serviceVersion(serviceVersion).serviceHostingType(serviceHostingType)
+                .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
+                .availableInCatalog(availableInCatalog)
+                .isUpdatePending(isUpdatePending).checkNamespace(true).build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);
         log.info(serviceTemplateEntities.size() + " service templates found.");

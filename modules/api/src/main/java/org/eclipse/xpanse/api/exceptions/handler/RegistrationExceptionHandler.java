@@ -18,12 +18,12 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyReviewed;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateStillInUseException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceTemplateException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -115,14 +115,14 @@ public class RegistrationExceptionHandler {
     }
 
     /**
-     * Exception handler for ServiceTemplateNotApproved.
+     * Exception handler for UnavailableServiceTemplateException.
      */
-    @ExceptionHandler({ServiceTemplateNotApproved.class})
+    @ExceptionHandler({UnavailableServiceTemplateException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleServiceTemplateNotApproved(
-            ServiceTemplateNotApproved ex) {
-        return getErrorResponse(ResultType.SERVICE_TEMPLATE_NOT_APPROVED,
+    public Response handleUnavailableServiceTemplateException(
+            UnavailableServiceTemplateException ex) {
+        return getErrorResponse(ResultType.UNAVAILABLE_SERVICE_TEMPLATE,
                 Collections.singletonList(ex.getMessage()));
     }
 

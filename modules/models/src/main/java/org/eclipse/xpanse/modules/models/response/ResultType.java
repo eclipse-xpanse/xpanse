@@ -35,7 +35,7 @@ public enum ResultType {
     SERVICE_TEMPLATE_ALREADY_REGISTERED("Service Template Already Registered"),
     ICON_PROCESSING_FAILED("Icon Processing Failed"),
     SERVICE_TEMPLATE_NOT_REGISTERED("Service Template Not Registered"),
-    SERVICE_TEMPLATE_NOT_APPROVED("Service Template Not Approved"),
+    UNAVAILABLE_SERVICE_TEMPLATE("Service Template Is Unavailable"),
     SERVICE_TEMPLATE_ALREADY_REVIEWED("Service Template Already Reviewed"),
     INVALID_SERVICE_VERSION("Invalid Service Version"),
     INVALID_SERVICE_FLAVORS("Invalid Service Flavors"),
