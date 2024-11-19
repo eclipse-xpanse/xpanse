@@ -88,6 +88,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 /**
  * Test for ServiceDeployerApi.
@@ -325,12 +326,12 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         mockPolicyEvaluationResult(false);
         MockHttpServletResponse response = deployService(getDeployRequest(serviceTemplate));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-        List<DeployedServiceDetails> deployedServices =
-                listDeployedServicesDetails(ServiceDeploymentState.DEPLOY_FAILED);
-        Assertions.assertNotNull(deployedServices);
-        UUID serviceId = deployedServices.getFirst().getServiceId();
+
         // Set up the deployment with policy evaluation successful and redeploy.
         mockPolicyEvaluationResult(true);
+        List<DeployedServiceDetails> deployedServices = listDeployedServicesDetails(null);
+        Assertions.assertNotNull(deployedServices);
+        UUID serviceId = deployedServices.getFirst().getServiceId();
         testRedeploy(serviceId);
 
         listDeployedServices();
@@ -909,8 +910,11 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     List<DeployedServiceDetails> listDeployedServicesDetails(ServiceDeploymentState state)
             throws Exception {
 
-        final MockHttpServletResponse listResponse = mockMvc.perform(
-                        get("/xpanse/services/details").param("serviceState", state.toValue())
+        MockHttpServletRequestBuilder requestBuilder = get("/xpanse/services/details");
+        if (Objects.nonNull(state)) {
+            requestBuilder.queryParam("serviceState", state.toValue());
+        }
+        final MockHttpServletResponse listResponse = mockMvc.perform(requestBuilder
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();

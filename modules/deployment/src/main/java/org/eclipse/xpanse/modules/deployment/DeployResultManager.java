@@ -102,12 +102,12 @@ public class DeployResultManager {
         UUID orderId = deployResult.getOrderId();
         ServiceOrderEntity storedOrderEntity = serviceOrderStorage.getEntityById(orderId);
         ServiceOrderType taskType = storedOrderEntity.getTaskType();
-        boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         // update deployServiceEntity
         ServiceDeploymentEntity updatedServiceEntity =
                 updateDeployServiceEntityWithDeployResult(deployResult, taskType);
         // When the task failed and task type is deploy or retry, just update the task status and
         // error message. Then start a new rollback order task and wait the order callback.
+        boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         if (isFailedDeployTask(isTaskSuccessful, taskType)) {
             storedOrderEntity.setTaskStatus(TaskStatus.FAILED);
             storedOrderEntity.setErrorMsg(deployResult.getMessage());
@@ -174,13 +174,6 @@ public class DeployResultManager {
         if (StringUtils.isNotBlank(deployResult.getTfStateContent())) {
             deployResult.getDeploymentGeneratedFiles()
                     .put(TF_STATE_FILE_NAME, deployResult.getTfStateContent());
-            ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            serviceDeploymentEntity.getServiceTemplateId());
-            DeployerKind deployerKind =
-                    serviceTemplateEntity.getOcl().getDeployment().getDeployerTool().getKind();
-            resourceHandlerManager.getResourceHandler(serviceDeploymentEntity.getCsp(),
-                    deployerKind).handler(deployResult);
         } else {
             if (Objects.nonNull(serviceDeploymentEntity.getDeploymentGeneratedFiles())) {
                 String storedTfStateContent = serviceDeploymentEntity.getDeploymentGeneratedFiles()
@@ -191,6 +184,19 @@ public class DeployResultManager {
                             .put(TF_STATE_FILE_NAME, deployResult.getTfStateContent());
                 }
             }
+        }
+
+        ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
+                serviceDeploymentEntity.getServiceTemplateId());
+        DeployerKind deployerKind =
+                serviceTemplateEntity.getOcl().getDeployment().getDeployerTool().getKind();
+        try {
+            resourceHandlerManager.getResourceHandler(serviceDeploymentEntity.getCsp(),
+                    deployerKind).handler(deployResult);
+        } catch (RuntimeException e) {
+            log.error("Exception occurred in handling deployment result.", e);
+            deployResult.setIsTaskSuccessful(false);
+            deployResult.setMessage(e.getMessage());
         }
 
         ServiceDeploymentEntity deployServiceToUpdate = new ServiceDeploymentEntity();

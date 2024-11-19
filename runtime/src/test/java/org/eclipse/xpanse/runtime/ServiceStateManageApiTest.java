@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -29,6 +30,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.OrderFailedResponse;
@@ -55,6 +57,7 @@ import org.openstack4j.model.compute.Server;
 import org.openstack4j.openstack.OSFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -66,6 +69,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceStateManageApiTest extends ApisTestCommon {
+    @MockBean
+    private PolicyValidator mockPolicyValidator;
+    void mockDeploymentWitPolicies() {
+        doNothing().when(mockPolicyValidator).validateDeploymentWithPolicies(any());
+    }
 
     @BeforeEach
     void setUp() {
@@ -92,6 +100,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
             return;
         }
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
+        mockDeploymentWitPolicies();
         ServiceOrder serviceOrder = deployService(serviceTemplate);
         if (waitServiceDeploymentIsCompleted(serviceOrder.getServiceId())) {
             ServiceDeploymentEntity serviceDeploymentEntity =
@@ -105,7 +114,8 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         }
     }
 
-    void testServiceStateManageApisThrowExceptions(ServiceDeploymentEntity service) throws Exception {
+    void testServiceStateManageApisThrowExceptions(ServiceDeploymentEntity service)
+            throws Exception {
         // Setup
         UUID uuid = UUID.randomUUID();
         String taskIdPrefix = "Task ";
@@ -511,7 +521,8 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 "USERNAME_PASSWORD");
     }
 
-    void testServiceStateManageApisWithOpenstackSdk(ServiceDeploymentEntity service) throws Exception {
+    void testServiceStateManageApisWithOpenstackSdk(ServiceDeploymentEntity service)
+            throws Exception {
         OSClient.OSClientV3 mockOsClient = getMockOsClientWithMockServices();
 
         Server mockServer = mock(Server.class);
