@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -23,10 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
+import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidationResult;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
@@ -63,20 +60,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
     @MockBean
-    private OpenTofuFromScriptsApi mockOpenTofuFromScriptsApi;
-    @MockBean
-    private OpenTofuFromGitRepoApi mockOpenTofuFromGitRepoApi;
+    private PolicyValidator mockPolicyValidator;
 
-    void mockOpenTofuMakerServices() {
-        OpenTofuValidationResult validationResult = new OpenTofuValidationResult();
-        validationResult.setValid(true);
-        when(mockOpenTofuFromScriptsApi.validateWithScripts(any()))
-                .thenReturn(validationResult);
-        doNothing().when(mockOpenTofuFromScriptsApi).asyncDeployWithScripts(any());
-
-        when(mockOpenTofuFromGitRepoApi.validateScriptsFromGitRepo(any()))
-                .thenReturn(validationResult);
-        doNothing().when(mockOpenTofuFromGitRepoApi).asyncDeployFromGitRepo(any());
+    void mockDeploymentWitPolicies() {
+        doNothing().when(mockPolicyValidator).validateDeploymentWithPolicies(any());
     }
 
     @Test
@@ -108,7 +95,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
     void testOpenTofuBootWebhookApisWell() throws Exception {
         addCredentialForHuaweiCloud();
         // Setup
-        mockOpenTofuMakerServices();
+        mockDeploymentWitPolicies();
         addCredentialForHuaweiCloud();
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
@@ -129,7 +116,6 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
             return;
         }
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
-
         // deploy a service
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         final MockHttpServletResponse deployResponse =

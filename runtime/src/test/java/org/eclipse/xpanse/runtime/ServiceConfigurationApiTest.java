@@ -10,6 +10,8 @@ import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.HEADER_TRACK
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -23,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
+import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -39,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -52,48 +56,48 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 class ServiceConfigurationApiTest extends ApisTestCommon {
 
-    private static final Logger log = LoggerFactory.getLogger(ServiceConfigurationApiTest.class);
-
     public static final String KAFKA_CFG_MESSAGE_MAX_BYTES = "kafka_cfg_message_max_bytes";
     public static final Integer KAFKA_CFG_MESSAGE_MAX_BYTES_VALUE = 2048;
-
     public static final String KAFKA_CFG_LOG_DIRS = "kafka_cfg_log_dirs";
     public static final String KAFKA_CFG_LOG_DIRS_VALUE = "/var/lib/kafka/logs2";
-
     public static final String KAFKA_CFG_NUM_IO_THREADS = "kafka_cfg_num_io_threads";
     public static final Integer KAFKA_CFG_NUM_IO_THREADS_VALUE = 2;
-
-    public static final String KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR = "kafka_offsets_topic_replication_factor";
+    public static final String KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR =
+            "kafka_offsets_topic_replication_factor";
     public static final Integer KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR_VALUE = 2;
-
-    public static final String KAFKA_LOG_FLUSH_INTERVAL_MESSAGES = "kafka_log_flush_interval_messages";
+    public static final String KAFKA_LOG_FLUSH_INTERVAL_MESSAGES =
+            "kafka_log_flush_interval_messages";
     public static final Integer KAFKA_LOG_FLUSH_INTERVAL_MESSAGES_VALUE = 10000;
-
     public static final String ZOOKEEPER_SNAP_COUNT = "zookeeper_snap_count";
     public static final Integer ZOOKEEPER_SNAP_COUNT_VALUE = 1;
-
-    public static final String ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT = "zookeeper_global_outstanding_limit";
+    public static final String ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT =
+            "zookeeper_global_outstanding_limit";
     public static final Integer ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT_VALUE = 10000;
-
     public static final String HUAWEI_CLOUD_COMPUTE_INSTANCE = "huaweicloud_compute_instance";
-
     public static final String ZOOKEEPER = "zookeeper";
-
     public static final String KAFKA_BROKER = "kafka-broker";
     public static final String USER_ID = "userId";
+    private static final Logger log = LoggerFactory.getLogger(ServiceConfigurationApiTest.class);
+    @MockBean
+    private PolicyValidator mockPolicyValidator;
+
+    void mockDeploymentWitPolicies() {
+        doNothing().when(mockPolicyValidator).validateDeploymentWithPolicies(any());
+    }
 
     @Test
     @WithJwt(file = "jwt_all_roles-no-policies.json")
     void test_change_service_configuration_success() throws Exception {
-        ServiceOrder  deployOrder = test_register_and_deploy_service();
-        if (Objects.nonNull(deployOrder) && waitServiceDeploymentIsCompleted(deployOrder.getServiceId())){
+        ServiceOrder deployOrder = test_register_and_deploy_service();
+        if (Objects.nonNull(deployOrder) && waitServiceDeploymentIsCompleted(
+                deployOrder.getServiceId())) {
             test_change_service_configuration_well(deployOrder.getServiceId());
         }
     }
 
     private void test_change_service_configuration_well(UUID serviceId) throws Exception {
-        ServiceOrder order  = changeServiceConfiguration(serviceId);
-        if (Objects.nonNull(order) && waitServiceOrderIsCompleted(order.getOrderId()) ) {
+        ServiceOrder order = changeServiceConfiguration(serviceId);
+        if (Objects.nonNull(order) && waitServiceOrderIsCompleted(order.getOrderId())) {
             List<ServiceConfigurationChangeOrderDetails> requests =
                     listServiceConfigurationChangeDetails(order.getOrderId(), order.getServiceId());
             assertFalse(requests.isEmpty());
@@ -101,21 +105,22 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
             requests.forEach(request -> assertEquals(request.getOrderId(), order.getOrderId()));
             requests.forEach(
                     request -> request.getChangeRequests().forEach(
-                            requestDetails->
-                                    assertEquals(requestDetails.getStatus(), ServiceConfigurationStatus.PENDING)
+                            requestDetails ->
+                                    assertEquals(requestDetails.getStatus(),
+                                            ServiceConfigurationStatus.PENDING)
                     )
             );
-            requests.forEach(request -> request.getChangeRequests().forEach(requestDetails->{
-                if(ZOOKEEPER.equals(requestDetails.getConfigManager())){
-                    assertEquals(requestDetails.getProperties(),getZookeeperConfig());
+            requests.forEach(request -> request.getChangeRequests().forEach(requestDetails -> {
+                if (ZOOKEEPER.equals(requestDetails.getConfigManager())) {
+                    assertEquals(requestDetails.getProperties(), getZookeeperConfig());
                 }
-                if(KAFKA_BROKER.equals(requestDetails.getConfigManager())){
-                    assertEquals(requestDetails.getProperties(),getKafkaBrokerConfig());
+                if (KAFKA_BROKER.equals(requestDetails.getConfigManager())) {
+                    assertEquals(requestDetails.getProperties(), getKafkaBrokerConfig());
                 }
 
             }));
         }
-        }
+    }
 
     ServiceOrder test_register_and_deploy_service() throws Exception {
         // Setup
@@ -128,12 +133,15 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
             return null;
         }
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
-       return deployService(serviceTemplate);
+        mockDeploymentWitPolicies();
+        return deployService(serviceTemplate);
     }
+
     Map<String, Object> getZookeeperConfig() {
         Map<String, Object> configuration = new HashMap<>();
         configuration.put(ZOOKEEPER_SNAP_COUNT, ZOOKEEPER_SNAP_COUNT_VALUE);
-        configuration.put(ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT, ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT_VALUE);
+        configuration.put(ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT,
+                ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT_VALUE);
         return configuration;
     }
 
@@ -142,8 +150,10 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         configuration.put(KAFKA_CFG_MESSAGE_MAX_BYTES, KAFKA_CFG_MESSAGE_MAX_BYTES_VALUE);
         configuration.put(KAFKA_CFG_LOG_DIRS, KAFKA_CFG_LOG_DIRS_VALUE);
         configuration.put(KAFKA_CFG_NUM_IO_THREADS, KAFKA_CFG_NUM_IO_THREADS_VALUE);
-        configuration.put(KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR, KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR_VALUE);
-        configuration.put(KAFKA_LOG_FLUSH_INTERVAL_MESSAGES, KAFKA_LOG_FLUSH_INTERVAL_MESSAGES_VALUE);
+        configuration.put(KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR,
+                KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR_VALUE);
+        configuration.put(KAFKA_LOG_FLUSH_INTERVAL_MESSAGES,
+                KAFKA_LOG_FLUSH_INTERVAL_MESSAGES_VALUE);
         return configuration;
     }
 
@@ -162,16 +172,16 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         zookeeperResource.setGroupType(HUAWEI_CLOUD_COMPUTE_INSTANCE);
         zookeeperResource.setGroupName(ZOOKEEPER);
         zookeeperResource.setResourceId(UUID.randomUUID().toString());
-        zookeeperResource.setResourceName("kafka-zookeeper"+UUID.randomUUID());
+        zookeeperResource.setResourceName("kafka-zookeeper" + UUID.randomUUID());
         zookeeperResource.setResourceKind(DeployResourceKind.VM);
         deployResources.add(zookeeperResource);
-        for(int i=0; i<3; i++){
+        for (int i = 0; i < 3; i++) {
             ServiceResourceEntity kafkaResource = new ServiceResourceEntity();
             kafkaResource.setId(UUID.randomUUID());
             kafkaResource.setGroupType(HUAWEI_CLOUD_COMPUTE_INSTANCE);
             kafkaResource.setGroupName(KAFKA_BROKER);
             kafkaResource.setResourceId(UUID.randomUUID().toString());
-            kafkaResource.setResourceName(KAFKA_BROKER+"-"+UUID.randomUUID());
+            kafkaResource.setResourceName(KAFKA_BROKER + "-" + UUID.randomUUID());
             kafkaResource.setResourceKind(DeployResourceKind.VM);
             deployResources.add(kafkaResource);
         }
@@ -188,18 +198,21 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
         if (response.getStatus() == HttpStatus.OK.value()) {
-            ServiceOrder order = objectMapper.readValue(response.getContentAsString(), ServiceOrder.class);
+            ServiceOrder order =
+                    objectMapper.readValue(response.getContentAsString(), ServiceOrder.class);
             assertNotNull(order);
             assertEquals(order.getServiceId(), serviceId);
             return order;
         } else {
-            Response responseError = objectMapper.readValue(response.getContentAsString(), Response.class);
+            Response responseError =
+                    objectMapper.readValue(response.getContentAsString(), Response.class);
             log.error("Change service configuration failed. Error: " + responseError.getDetails());
             return null;
         }
     }
 
-    List<ServiceConfigurationChangeOrderDetails> listServiceConfigurationChangeDetails(UUID orderId, UUID serviceId)
+    List<ServiceConfigurationChangeOrderDetails> listServiceConfigurationChangeDetails(UUID orderId,
+                                                                                       UUID serviceId)
             throws Exception {
 
         final MockHttpServletResponse listResponse = mockMvc.perform(
@@ -212,6 +225,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
         assertNotNull(listResponse.getHeader(HEADER_TRACKING_ID));
         return objectMapper.readValue(listResponse.getContentAsString(),
-                new TypeReference<List<ServiceConfigurationChangeOrderDetails>>() {});
+                new TypeReference<List<ServiceConfigurationChangeOrderDetails>>() {
+                });
     }
 }

@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -23,10 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
+import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformValidationResult;
 import org.eclipse.xpanse.modules.models.response.Response;
 import org.eclipse.xpanse.modules.models.response.ResultType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
@@ -60,21 +57,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
         "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,test"})
 @AutoConfigureMockMvc
 public class TerraformBootWebhookApiTest extends ApisTestCommon {
-    @MockBean
-    private TerraformFromScriptsApi mockTerraformFromScriptsApi;
-    @MockBean
-    private TerraformFromGitRepoApi mockTerraformFromGitRepoApi;
 
-    void mockTerraformBootServices() {
-        TerraformValidationResult validationResult = new TerraformValidationResult();
-        validationResult.setValid(true);
-        when(mockTerraformFromScriptsApi.validateWithScripts(any()))
-                .thenReturn(validationResult);
-        doNothing().when(mockTerraformFromScriptsApi).asyncDeployWithScripts(any());
+    @MockBean
+    private PolicyValidator mockPolicyValidator;
 
-        when(mockTerraformFromGitRepoApi.validateScriptsFromGitRepo(any()))
-                .thenReturn(validationResult);
-        doNothing().when(mockTerraformFromGitRepoApi).asyncDeployFromGitRepo(any());
+    void mockDeploymentWitPolicies() {
+        doNothing().when(mockPolicyValidator).validateDeploymentWithPolicies(any());
     }
 
     @Test
@@ -105,7 +93,7 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
     void testTerraformBootWebhookApisWell() throws Exception {
         addCredentialForHuaweiCloud();
         // Setup
-        mockTerraformBootServices();
+        mockDeploymentWitPolicies();
         addCredentialForHuaweiCloud();
         Ocl ocl = new OclLoader().getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
