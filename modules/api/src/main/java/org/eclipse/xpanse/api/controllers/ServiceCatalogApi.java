@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
@@ -26,8 +27,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryM
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotApproved;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceTemplateException;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -75,7 +75,7 @@ public class ServiceCatalogApi {
             produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public List<UserOrderableServiceVo> listOrderableServices(
+    public List<UserOrderableServiceVo> getOrderableServices(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category categoryName,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
@@ -88,15 +88,15 @@ public class ServiceCatalogApi {
             @RequestParam(name = "serviceHostingType", required = false)
             ServiceHostingType serviceHostingType) {
 
-        ServiceTemplateQueryModel queryRequest = new ServiceTemplateQueryModel(categoryName,
-                cspName, serviceName, serviceVersion, serviceHostingType,
-                ServiceRegistrationState.APPROVED, false);
+        ServiceTemplateQueryModel queryRequest = ServiceTemplateQueryModel.builder()
+                .category(categoryName).csp(cspName).serviceName(serviceName)
+                .serviceVersion(serviceVersion).serviceHostingType(serviceHostingType)
+                .availableInCatalog(true).checkNamespace(false).build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);
         log.info(serviceTemplateEntities.size() + " orderable services found.");
         return serviceTemplateEntities.stream()
-                .sorted(Comparator.comparingInt(
-                        serviceTemplateDetailVo -> serviceTemplateDetailVo.getCsp().ordinal()))
+                .sorted(Comparator.comparingInt(template -> template.getCsp().ordinal()))
                 .map(ServiceTemplateEntityConverter::convertToUserOrderableServiceVo)
                 .toList();
     }
@@ -119,11 +119,10 @@ public class ServiceCatalogApi {
             @PathVariable("id") String id) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManage.getServiceTemplateDetails(UUID.fromString(id), false, false);
-        if (ServiceRegistrationState.APPROVED
-                != serviceTemplateEntity.getServiceRegistrationState()) {
-            String errMsg = String.format("Service template with id %s not approved.", id);
+        if (Objects.equals(false, serviceTemplateEntity.getAvailableInCatalog())) {
+            String errMsg = String.format("Service template with id %s is unavailable.", id);
             log.error(errMsg);
-            throw new ServiceTemplateNotApproved(errMsg);
+            throw new UnavailableServiceTemplateException(errMsg);
         }
         String successMsg = String.format("Get orderable service with id %s successful.", id);
         log.info(successMsg);

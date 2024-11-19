@@ -25,7 +25,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationMan
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -36,22 +36,26 @@ import org.springframework.beans.BeanUtils;
  */
 class ServiceTemplateDetailVoTest {
 
-    private static final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
-    private static final Category category = Category.COMPUTE;
-    private static final String name = "kafka";
-    private static final String version = "1.0.0";
-    private static final String eula = "eula";
-    private static final Csp csp = Csp.HUAWEI_CLOUD;
-    private static final String description = "description";
-    private static final String namespace = "namespace";
-    private static final String icon = "icon";
-    private static final Deployment DEPLOYMENT = new Deployment();
-    private static final OffsetDateTime createTime = OffsetDateTime.now();
-    private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
-    private static final ServiceRegistrationState serviceRegistrationState =
-            ServiceRegistrationState.APPROVED;
-    private static final ServiceConfigurationManage serviceConfigurationManage = new ServiceConfigurationManage();
+    private final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
+    private final Category category = Category.COMPUTE;
+    private final String name = "kafka";
+    private final String version = "1.0.0";
+    private final String eula = "eula";
+    private final Csp csp = Csp.HUAWEI_CLOUD;
+    private final String description = "description";
+    private final String namespace = "namespace";
+    private final String icon = "icon";
+    private final Deployment deployment = new Deployment();
+    private final OffsetDateTime createTime = OffsetDateTime.now();
+    private final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
+    private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
+    private final ServiceTemplateRegistrationState serviceTemplateRegistrationState =
+            ServiceTemplateRegistrationState.APPROVED;
+    private final Boolean availableInCatalog = true;
+    private final Boolean isUpdatePending = false;
     private final String reviewComment = "reviewComment";
+    private final ServiceConfigurationManage serviceConfigurationManage =
+            new ServiceConfigurationManage();
     @Mock
     private ServiceProviderContactDetails serviceProviderContactDetails;
     private List<Region> regions;
@@ -89,15 +93,18 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setDescription(description);
         serviceTemplateDetailVo.setNamespace(namespace);
         serviceTemplateDetailVo.setIcon(icon);
-        serviceTemplateDetailVo.setDeployment(DEPLOYMENT);
+        serviceTemplateDetailVo.setDeployment(deployment);
         serviceTemplateDetailVo.setVariables(variables);
         serviceTemplateDetailVo.setFlavors(flavors);
         serviceTemplateDetailVo.setBilling(billing);
         serviceTemplateDetailVo.setCreateTime(createTime);
         serviceTemplateDetailVo.setLastModifiedTime(lastModifiedTime);
-        serviceTemplateDetailVo.setServiceRegistrationState(serviceRegistrationState);
+        serviceTemplateDetailVo.setServiceTemplateRegistrationState(
+                serviceTemplateRegistrationState);
+        serviceTemplateDetailVo.setAvailableInCatalog(availableInCatalog);
+        serviceTemplateDetailVo.setIsUpdatePending(isUpdatePending);
         serviceTemplateDetailVo.setReviewComment(reviewComment);
-        serviceTemplateDetailVo.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        serviceTemplateDetailVo.setServiceHostingType(serviceHostingType);
         serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
         serviceTemplateDetailVo.setEula(eula);
         serviceTemplateDetailVo.setServiceConfigurationManage(serviceConfigurationManage);
@@ -119,15 +126,17 @@ class ServiceTemplateDetailVoTest {
         assertEquals(billing, serviceTemplateDetailVo.getBilling());
         assertEquals(createTime, serviceTemplateDetailVo.getCreateTime());
         assertEquals(lastModifiedTime, serviceTemplateDetailVo.getLastModifiedTime());
-        assertEquals(serviceRegistrationState,
-                serviceTemplateDetailVo.getServiceRegistrationState());
+        assertEquals(serviceTemplateRegistrationState,
+                serviceTemplateDetailVo.getServiceTemplateRegistrationState());
+        assertEquals(availableInCatalog, serviceTemplateDetailVo.getAvailableInCatalog());
+        assertEquals(isUpdatePending, serviceTemplateDetailVo.getIsUpdatePending());
         assertEquals(reviewComment, serviceTemplateDetailVo.getReviewComment());
-        assertEquals(ServiceHostingType.SERVICE_VENDOR,
-                serviceTemplateDetailVo.getServiceHostingType());
+        assertEquals(serviceHostingType, serviceTemplateDetailVo.getServiceHostingType());
         assertEquals(serviceProviderContactDetails,
                 serviceTemplateDetailVo.getServiceProviderContactDetails());
         assertEquals(eula, serviceTemplateDetailVo.getEula());
-        assertEquals(serviceConfigurationManage, serviceTemplateDetailVo.getServiceConfigurationManage());
+        assertEquals(serviceConfigurationManage,
+                serviceTemplateDetailVo.getServiceConfigurationManage());
     }
 
     @Test
@@ -146,19 +155,30 @@ class ServiceTemplateDetailVoTest {
 
     @Test
     void testToString() {
-        String expectedToString =
-                "ServiceTemplateDetailVo(" + "serviceTemplateId=" + uuid + ", " + "name=" + name + ", "
-                        + "version=" + version + ", " + "csp=" + csp + ", " + "category=" + category
-                        + ", " + "namespace=" + namespace + ", " + "regions=" + regions + ", "
-                        + "description=" + description + ", " + "icon=" + icon + ", "
-                        + "deployment=" + DEPLOYMENT + ", " + "variables=" + variables + ", "
-                        + "flavors=" + flavors + ", " + "billing=" + billing + ", "
-                        + "serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR + ", "
-                        + "createTime=" + createTime + ", " + "lastModifiedTime=" + lastModifiedTime
-                        + ", " + "serviceRegistrationState=" + serviceRegistrationState + ", "
-                        + "reviewComment=" + reviewComment + ", " + "serviceProviderContactDetails="
-                        + serviceProviderContactDetails + ", " + "eula=" + eula + ", "
-                        + "serviceConfigurationManage=" + serviceConfigurationManage +")";
+        String expectedToString = "ServiceTemplateDetailVo(serviceTemplateId=" + uuid
+                + ", name=" + name
+                + ", version=" + version
+                + ", csp=" + csp
+                + ", category=" + category
+                + ", namespace=" + namespace
+                + ", regions=" + regions
+                + ", description=" + description
+                + ", icon=" + icon
+                + ", deployment=" + deployment
+                + ", variables=" + variables
+                + ", flavors=" + flavors
+                + ", billing=" + billing
+                + ", serviceHostingType=" + serviceHostingType
+                + ", createTime=" + createTime
+                + ", lastModifiedTime=" + lastModifiedTime
+                + ", serviceTemplateRegistrationState=" + serviceTemplateRegistrationState
+                + ", isUpdatePending=" + isUpdatePending
+                + ", availableInCatalog=" + availableInCatalog
+                + ", reviewComment=" + reviewComment
+                + ", serviceProviderContactDetails=" + serviceProviderContactDetails
+                + ", eula=" + eula
+                + ", serviceConfigurationManage=" + serviceConfigurationManage
+                + ")";
 
         assertEquals(expectedToString, serviceTemplateDetailVo.toString());
     }

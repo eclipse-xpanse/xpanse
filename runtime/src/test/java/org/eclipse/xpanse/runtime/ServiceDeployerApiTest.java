@@ -842,7 +842,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     void testDeployThrowsServiceTemplateNotApproved(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
         // SetUp
-        String errorMsg = String.format("Found service template with id %s but not approved.",
+        String errorMsg = String.format("Found service template with id %s is unavailable.",
                 serviceTemplate.getServiceTemplateId());
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         // Run the test
@@ -852,7 +852,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         OrderFailedResponse response = objectMapper.readValue(
                 deployResponse.getContentAsString(), OrderFailedResponse.class);
         assertFalse(response.getSuccess());
-        assertEquals(response.getResultType(), ResultType.SERVICE_TEMPLATE_NOT_APPROVED);
+        assertEquals(response.getResultType(), ResultType.UNAVAILABLE_SERVICE_TEMPLATE);
         assertEquals(response.getDetails(), List.of(errorMsg));
     }
 

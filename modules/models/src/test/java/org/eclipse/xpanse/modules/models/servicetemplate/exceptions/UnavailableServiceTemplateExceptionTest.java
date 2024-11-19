@@ -13,16 +13,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test of ServiceTemplateNotApproved.
+ * Test of UnavailableServiceTemplateException.
  */
-class ServiceTemplateNotApprovedTest {
+class UnavailableServiceTemplateExceptionTest {
 
-    private static final String message = "service not approved.";
-    private static ServiceTemplateNotApproved exception;
+    private static final String message = "service template is unavailable.";
+    private static UnavailableServiceTemplateException exception;
 
     @BeforeEach
     void setUp() {
-        exception = new ServiceTemplateNotApproved(message);
+        exception = new UnavailableServiceTemplateException(message);
     }
 
     @Test
@@ -40,10 +40,10 @@ class ServiceTemplateNotApprovedTest {
         assertNotEquals(exception, null);
         assertNotEquals(exception.hashCode(), obj.hashCode());
 
-        ServiceTemplateNotApproved exception1 =
-                new ServiceTemplateNotApproved(message);
-        ServiceTemplateNotApproved exception2 =
-                new ServiceTemplateNotApproved("different message");
+        UnavailableServiceTemplateException exception1 =
+                new UnavailableServiceTemplateException(message);
+        UnavailableServiceTemplateException exception2 =
+                new UnavailableServiceTemplateException("different message");
 
         assertNotEquals(exception, exception1);
         assertNotEquals(exception, exception2);

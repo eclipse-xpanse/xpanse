@@ -30,7 +30,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.hibernate.annotations.Type;
 
@@ -76,9 +76,15 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Convert(converter = ObjectJsonConverter.class)
     private Ocl ocl;
 
-    @Column(name = "SERVICE_REGISTRATION_STATE")
+    @Column(name = "SERVICE_TEMPLATE_REGISTRATION_STATE")
     @Enumerated(EnumType.STRING)
-    private ServiceRegistrationState serviceRegistrationState;
+    private ServiceTemplateRegistrationState serviceTemplateRegistrationState;
+
+    @Column(name = "IS_UPDATE_PENDING", nullable = false)
+    private Boolean isUpdatePending;
+
+    @Column(name = "AVAILABLE_IN_CATALOG", nullable = false)
+    private Boolean availableInCatalog;
 
     @Column(name = "REVIEW_COMMENT", length = Integer.MAX_VALUE)
     private String reviewComment;

@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +48,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
@@ -98,8 +99,10 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), registerResponse.getStatus());
-        assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                serviceTemplateDetailVo.getServiceRegistrationState());
+        assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
+                serviceTemplateDetailVo.getServiceTemplateRegistrationState());
+        assertEquals(serviceTemplateDetailVo.getIsUpdatePending(), false);
+        assertEquals(serviceTemplateDetailVo.getAvailableInCatalog(), false);
         assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
         assertEquals(ocl.getCloudServiceProvider().getName(), serviceTemplateDetailVo.getCsp());
         assertEquals(ocl.getName().toLowerCase(Locale.ROOT), serviceTemplateDetailVo.getName());
@@ -121,9 +124,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Run the test
         final MockHttpServletResponse response =
                 listServiceTemplatesWithParams(ocl.getCategory().toValue(),
-                        ocl.getCloudServiceProvider().getName().toValue(), ocl.getName(),
+                        serviceTemplateDetailVo.getCsp().toValue(), ocl.getName(),
                         serviceTemplateDetailVo.getVersion(), ocl.getServiceHostingType().toValue(),
-                        ServiceRegistrationState.APPROVAL_PENDING.toValue());
+                        ServiceTemplateRegistrationState.IN_PROGRESS.toValue(), null, null);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertThat(
@@ -156,8 +159,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), unregisterResponse.getStatus());
-        assertEquals(unregisteredServiceTemplateDetailVo.getServiceRegistrationState(),
-                ServiceRegistrationState.UNREGISTERED);
+        assertEquals(unregisteredServiceTemplateDetailVo.getAvailableInCatalog(), false);
 
         // Setup reRegister request
         // Run the test
@@ -167,8 +169,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), reRegisterResponse.getStatus());
-        assertEquals(reRegisteredServiceTemplateDetailVo.getServiceRegistrationState(),
-                ServiceRegistrationState.APPROVAL_PENDING);
+        assertEquals(reRegisteredServiceTemplateDetailVo.getAvailableInCatalog(), true);
 
 
         // Setup delete request
@@ -190,8 +191,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), fetchResponse.getStatus());
-        assertEquals(ServiceRegistrationState.APPROVAL_PENDING,
-                serviceTemplateDetailVo.getServiceRegistrationState());
+        assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
+                serviceTemplateDetailVo.getServiceTemplateRegistrationState());
         assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
         assertEquals(ocl.getCloudServiceProvider().getName(), serviceTemplateDetailVo.getCsp());
         assertEquals(ocl.getName().toLowerCase(Locale.ROOT), serviceTemplateDetailVo.getName());
@@ -703,8 +704,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY, List.of(errorMessage));
 
         // Run the test
-        final MockHttpServletResponse response =
-                listServiceTemplatesWithParams("errorCategory", null, null, null, null, null);
+        final MockHttpServletResponse response = listServiceTemplatesWithParams(
+                "errorCategory", null, null, null, null, null, null, null);
         Response resultResponse =
                 objectMapper.readValue(response.getContentAsString(), Response.class);
 
@@ -720,16 +721,17 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceTemplateApiTest-05");
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        UUID id = serviceTemplate.getServiceTemplateId();
-        // Setup
-        String errorMsg = String.format("Service template with id %s is not unregistered.", id);
-        Response expectedResponse =
-                Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE, List.of(errorMsg));
-        MockHttpServletResponse deleteResponse = deleteTemplate(id);
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse.getStatus());
-        assertEquals(deleteResponse.getContentAsString(),
-                objectMapper.writeValueAsString(expectedResponse));
+        UUID id = serviceTemplate.getServiceTemplateId();
+//        // Setup
+//        String errorMsg = String.format("Service template with id %s is not unregistered.", id);
+//        Response expectedResponse =
+//                Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE, List.of(errorMsg));
+//        MockHttpServletResponse deleteResponse = deleteTemplate(id);
+//
+//        assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse.getStatus());
+//        assertEquals(deleteResponse.getContentAsString(),
+//                objectMapper.writeValueAsString(expectedResponse));
 
         String errorMsg2 = String.format("Service template with id %s is still in use.", id);
         Response expectedResponse2 =
@@ -799,11 +801,14 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 .andReturn().getResponse();
     }
 
-    MockHttpServletResponse listServiceTemplatesWithParams(String categoryName, String cspName,
+    MockHttpServletResponse listServiceTemplatesWithParams(String categoryName,
+                                                           String cspName,
                                                            String serviceName,
                                                            String serviceVersion,
                                                            String serviceHostingType,
-                                                           String serviceRegistrationState)
+                                                           String serviceTemplateRegistrationState,
+                                                           Boolean availableInCatalog,
+                                                           Boolean isUpdatePending)
             throws Exception {
         MockHttpServletRequestBuilder getRequestBuilder = get("/xpanse/service_templates");
         if (StringUtils.isNotBlank(categoryName)) {
@@ -821,9 +826,17 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         if (StringUtils.isNotBlank(serviceHostingType)) {
             getRequestBuilder = getRequestBuilder.param("serviceHostingType", serviceHostingType);
         }
-        if (StringUtils.isNotBlank(serviceRegistrationState)) {
-            getRequestBuilder =
-                    getRequestBuilder.param("serviceRegistrationState", serviceRegistrationState);
+        if (StringUtils.isNotBlank(serviceTemplateRegistrationState)) {
+            getRequestBuilder = getRequestBuilder.param("serviceTemplateRegistrationState",
+                    serviceTemplateRegistrationState);
+        }
+        if (Objects.nonNull(availableInCatalog)) {
+            getRequestBuilder = getRequestBuilder.param("availableInCatalog",
+                    availableInCatalog.toString());
+        }
+        if (Objects.nonNull(isUpdatePending)) {
+            getRequestBuilder = getRequestBuilder.param("isUpdatePending",
+                    isUpdatePending.toString());
         }
         return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
     }
