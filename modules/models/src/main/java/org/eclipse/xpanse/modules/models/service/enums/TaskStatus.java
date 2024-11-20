@@ -16,7 +16,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
  */
 public enum TaskStatus {
     CREATED("created"),
-    IN_PROGRESS("in progress"),
+    IN_PROGRESS("in-progress"),
     SUCCESSFUL("successful"),
     FAILED("failed");
 

@@ -11,7 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
+import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
@@ -23,14 +26,17 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.BeanUtils;
 
+@ExtendWith(MockitoExtension.class)
 class ServiceTemplateEntityTest {
     private final UUID id = UUID.randomUUID();
     private final ServiceTemplateRegistrationState serviceTemplateRegistrationState =
             ServiceTemplateRegistrationState.APPROVED;
     private final String namespace = "namespace";
-    private final String reviewComment = "reviewComment";
     private Category category;
     private Csp csp;
     private String name;
@@ -40,6 +46,10 @@ class ServiceTemplateEntityTest {
     private JsonObjectSchema jsonObjectSchema;
     private ServiceProviderContactDetails serviceProviderContactDetails;
     private ServiceTemplateEntity testEntity;
+    @Mock
+    private List<ServicePolicyEntity> mockServicePolicyList;
+    @Mock
+    private List<ServiceTemplateHistoryEntity> mockServiceTemplateHistory;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -69,9 +79,10 @@ class ServiceTemplateEntityTest {
         testEntity.setServiceTemplateRegistrationState(serviceTemplateRegistrationState);
         testEntity.setIsUpdatePending(false);
         testEntity.setAvailableInCatalog(true);
-        testEntity.setReviewComment(reviewComment);
         testEntity.setJsonObjectSchema(jsonObjectSchema);
         testEntity.setServiceProviderContactDetails(serviceProviderContactDetails);
+        testEntity.setServicePolicyList(mockServicePolicyList);
+        testEntity.setServiceTemplateHistory(mockServiceTemplateHistory);
     }
 
     @Test
@@ -90,6 +101,8 @@ class ServiceTemplateEntityTest {
         assertEquals(ocl, testEntity.getOcl());
         assertEquals(id, testEntity.getId());
         assertEquals(serviceProviderContactDetails, testEntity.getServiceProviderContactDetails());
+        assertEquals(mockServicePolicyList, testEntity.getServicePolicyList());
+        assertEquals(mockServiceTemplateHistory, testEntity.getServiceTemplateHistory());
     }
 
     @Test
@@ -121,7 +134,6 @@ class ServiceTemplateEntityTest {
                 + ", serviceTemplateRegistrationState=" + serviceTemplateRegistrationState
                 + ", isUpdatePending=false"
                 + ", availableInCatalog=true"
-                + ", reviewComment=" + reviewComment
                 + ", serviceProviderContactDetails=" + serviceProviderContactDetails
                 + ", jsonObjectSchema=" + jsonObjectSchema
                 + ")";

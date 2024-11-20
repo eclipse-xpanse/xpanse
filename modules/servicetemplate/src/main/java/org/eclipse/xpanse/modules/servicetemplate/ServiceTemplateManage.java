@@ -352,9 +352,6 @@ public class ServiceTemplateManage {
                     ServiceTemplateRegistrationState.REJECTED);
             existingTemplate.setAvailableInCatalog(false);
         }
-        String reviewComment = StringUtils.isNotBlank(request.getReviewComment())
-                ? request.getReviewComment() : request.getReviewResult().toValue();
-        existingTemplate.setReviewComment(reviewComment);
         templateStorage.storeAndFlush(existingTemplate);
     }
 
