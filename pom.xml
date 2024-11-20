@@ -84,7 +84,7 @@
         <github-api.version>1.326</github-api.version>
         <springdoc.openapi.plugin.version>1.4</springdoc.openapi.plugin.version>
         <swagger.parser.version>2.1.24</swagger.parser.version>
-        <swagger.core.v3.version>2.2.25</swagger.core.v3.version>
+        <swagger.core.v3.version>2.2.26</swagger.core.v3.version>
         <hcl4j.version>0.9.4</hcl4j.version>
         <jackson.datatype.jsr310.version>2.18.1</jackson.datatype.jsr310.version>
     </properties>
