@@ -15,7 +15,7 @@ class ServiceTemplateRegistrationStateConverterTest {
     @Test
     void testConvert() {
         assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
-                converterTest.convert("inProgress"));
+                converterTest.convert("in-progress"));
         assertEquals(ServiceTemplateRegistrationState.APPROVED, converterTest.convert("approved"));
         assertEquals(ServiceTemplateRegistrationState.REJECTED, converterTest.convert("rejected"));
         assertThrows(UnsupportedEnumValueException.class,

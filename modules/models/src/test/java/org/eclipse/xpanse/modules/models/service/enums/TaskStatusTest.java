@@ -12,7 +12,7 @@ class TaskStatusTest {
     void testGetByValue() {
         assertThat(TaskStatus.getByValue("created")).isEqualTo(
                 TaskStatus.CREATED);
-        assertThat(TaskStatus.getByValue("in progress")).isEqualTo(
+        assertThat(TaskStatus.getByValue("in-progress")).isEqualTo(
                 TaskStatus.IN_PROGRESS);
         assertThat(TaskStatus.getByValue("successful")).isEqualTo(
                 TaskStatus.SUCCESSFUL);
@@ -25,7 +25,7 @@ class TaskStatusTest {
     @Test
     void testToValue() {
         assertThat(TaskStatus.CREATED.toValue()).isEqualTo("created");
-        assertThat(TaskStatus.IN_PROGRESS.toValue()).isEqualTo("in progress");
+        assertThat(TaskStatus.IN_PROGRESS.toValue()).isEqualTo("in-progress");
         assertThat(TaskStatus.SUCCESSFUL.toValue()).isEqualTo("successful");
         assertThat(TaskStatus.FAILED.toValue()).isEqualTo("failed");
     }

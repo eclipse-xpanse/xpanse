@@ -11,37 +11,37 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
- * Defines possible states of a managed service template registration.
+ * Defines status enumerations for change of service template.
  */
-public enum ServiceTemplateRegistrationState {
+public enum ServiceTemplateChangeStatus {
 
-    IN_PROGRESS("in-progress"),
-    APPROVED("approved"),
+    IN_REVIEW("in-review"),
+    ACCEPTED("accepted"),
     REJECTED("rejected");
 
     private final String state;
 
-    ServiceTemplateRegistrationState(String state) {
+    ServiceTemplateChangeStatus(String state) {
         this.state = state;
     }
 
     /**
-     * For ServiceTemplateRegistrationState deserialize.
+     * For ServiceTemplateChangeStatus deserialize.
      */
     @JsonCreator
-    public static ServiceTemplateRegistrationState getByValue(String state) {
-        for (ServiceTemplateRegistrationState registrationState : values()) {
+    public static ServiceTemplateChangeStatus getByValue(String state) {
+        for (ServiceTemplateChangeStatus registrationState : values()) {
             if (StringUtils.equalsIgnoreCase(registrationState.state, state)) {
                 return registrationState;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("ServiceTemplateRegistrationState value %s is not supported.",
+                String.format("ServiceTemplateChangeStatus value %s is not supported.",
                         state));
     }
 
     /**
-     * For ServiceTemplateRegistrationState serialize.
+     * For ServiceTemplateChangeStatus serialize.
      */
     @JsonValue
     public String toValue() {

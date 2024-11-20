@@ -25,6 +25,7 @@ import lombok.ToString;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
+import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -86,9 +87,6 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Column(name = "AVAILABLE_IN_CATALOG", nullable = false)
     private Boolean availableInCatalog;
 
-    @Column(name = "REVIEW_COMMENT", length = Integer.MAX_VALUE)
-    private String reviewComment;
-
     @Column(name = "SERVICE_PROVIDER_CONTACT_DETAILS", columnDefinition = "json", nullable = false)
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
@@ -99,8 +97,12 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Convert(converter = ObjectJsonConverter.class)
     private JsonObjectSchema jsonObjectSchema;
 
-    @OneToMany(mappedBy = "serviceTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "serviceTemplate", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
     private List<ServicePolicyEntity> servicePolicyList;
+
+    @OneToMany(mappedBy = "serviceTemplate", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @ToString.Exclude
+    private List<ServiceTemplateHistoryEntity> serviceTemplateHistory;
 
 }

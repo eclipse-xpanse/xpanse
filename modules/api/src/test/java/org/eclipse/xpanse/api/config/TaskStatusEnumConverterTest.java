@@ -15,7 +15,7 @@ class TaskStatusEnumConverterTest {
     @Test
     void testConvert() {
         assertThat(converterTest.convert("created")).isEqualTo(TaskStatus.CREATED);
-        assertThat(converterTest.convert("in progress")).isEqualTo(TaskStatus.IN_PROGRESS);
+        assertThat(converterTest.convert("in-progress")).isEqualTo(TaskStatus.IN_PROGRESS);
         assertThat(converterTest.convert("successful")).isEqualTo(TaskStatus.SUCCESSFUL);
         assertThat(converterTest.convert("failed")).isEqualTo(TaskStatus.FAILED);
         assertThrows(UnsupportedEnumValueException.class, () -> converterTest.convert("unknown"));
