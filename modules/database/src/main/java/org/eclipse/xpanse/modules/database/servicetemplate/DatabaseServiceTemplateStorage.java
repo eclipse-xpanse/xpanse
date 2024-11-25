@@ -52,8 +52,7 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
      * @return Returns the database entry for the provided arguments.
      */
     @Override
-    public ServiceTemplateEntity findServiceTemplate(
-            ServiceTemplateEntity serviceTemplateEntity) {
+    public ServiceTemplateEntity findServiceTemplate(ServiceTemplateEntity serviceTemplateEntity) {
         Specification<ServiceTemplateEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
@@ -71,9 +70,7 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
                 };
-        Optional<ServiceTemplateEntity> optional = repository.findOne(specification);
-        return optional.orElse(null);
-
+        return repository.findOne(specification).orElse(null);
     }
 
     /**
@@ -121,11 +118,11 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
                     }
                     if (Objects.nonNull(serviceQuery.getAvailableInCatalog())) {
                         predicateList.add(criteriaBuilder.equal(root.get("availableInCatalog"),
-                                        serviceQuery.getAvailableInCatalog()));
+                                serviceQuery.getAvailableInCatalog()));
                     }
                     if (Objects.nonNull(serviceQuery.getIsUpdatePending())) {
                         predicateList.add(criteriaBuilder.equal(root.get("isUpdatePending"),
-                                        serviceQuery.getIsUpdatePending()));
+                                serviceQuery.getIsUpdatePending()));
                     }
                     assert query != null;
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))

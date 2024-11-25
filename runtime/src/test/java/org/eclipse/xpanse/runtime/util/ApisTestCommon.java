@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -59,6 +60,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationReque
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.models.servicetemplatechange.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
@@ -369,14 +371,23 @@ public class ApisTestCommon {
                 .andReturn().getResponse();
         assertNotNull(registerResponse.getHeader(HEADER_TRACKING_ID));
         if (registerResponse.getStatus() == HttpStatus.OK.value()) {
-            return objectMapper.readValue(registerResponse.getContentAsString(),
-                    ServiceTemplateDetailVo.class);
+            ServiceTemplateChangeInfo serviceTemplateChangeInfo = objectMapper.readValue(
+                    registerResponse.getContentAsString(), ServiceTemplateChangeInfo.class);
+            return getServiceTemplateDetailsVo(serviceTemplateChangeInfo.getServiceTemplateId());
         } else {
             Response response = objectMapper.readValue(registerResponse.getContentAsString(),
                     Response.class);
             log.error("Register service template failed. Error: " + response.getDetails());
             return null;
         }
+    }
+
+    protected ServiceTemplateDetailVo getServiceTemplateDetailsVo(UUID id) throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(get("/xpanse/service_templates/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return objectMapper.readValue(response.getContentAsString(), ServiceTemplateDetailVo.class);
     }
 
     protected void approveServiceTemplateRegistration(UUID id) throws Exception {

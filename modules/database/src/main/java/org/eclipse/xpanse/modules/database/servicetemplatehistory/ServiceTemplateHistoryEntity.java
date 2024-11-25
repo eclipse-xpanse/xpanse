@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -43,6 +44,7 @@ public class ServiceTemplateHistoryEntity extends CreateModifiedTime {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SERVICE_TEMPLATE_ID", nullable = false)
+    @ToString.Exclude
     private ServiceTemplateEntity serviceTemplate;
 
     @Column(name = "REQUEST_TYPE", nullable = false)

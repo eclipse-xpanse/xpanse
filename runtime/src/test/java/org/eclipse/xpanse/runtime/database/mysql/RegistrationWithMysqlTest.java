@@ -19,6 +19,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRe
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.models.servicetemplatechange.ServiceTemplateChangeInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,8 +45,11 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
     @WithJwt(file = "jwt_isv.json")
     void testRegisterNewService() throws Exception {
         Ocl ocl = getOclFromFile();
-        ServiceTemplateDetailVo registeredServiceTemplate =
+        ServiceTemplateChangeInfo serviceTemplateChangeInfo =
                 serviceTemplateApi.register(ocl);
+        ServiceTemplateDetailVo registeredServiceTemplate =
+                serviceTemplateApi.details(
+                        serviceTemplateChangeInfo.getServiceTemplateId().toString());
         Assertions.assertTrue(Objects.nonNull(registeredServiceTemplate));
         Assertions.assertEquals(ocl.getCategory(), registeredServiceTemplate.getCategory());
         Assertions.assertEquals(ocl.getName(), registeredServiceTemplate.getName());
@@ -84,8 +88,9 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
     @WithJwt(file = "jwt_isv.json")
     void testServiceRegistrationUpdate() throws Exception {
         Ocl ocl = getOclFromFile();
-        ServiceTemplateDetailVo serviceTemplateDetailVo =
-                serviceTemplateApi.register(ocl);
+        ServiceTemplateChangeInfo serviceTemplateChangeInfo = serviceTemplateApi.register(ocl);
+        ServiceTemplateDetailVo serviceTemplateDetailVo = serviceTemplateApi.details(
+                serviceTemplateChangeInfo.getServiceTemplateId().toString());
         ocl.setDescription("Hello");
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
                 serviceTemplateApi.update(serviceTemplateDetailVo.getServiceTemplateId().toString(),

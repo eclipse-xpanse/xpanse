@@ -9,6 +9,7 @@ package org.eclipse.xpanse.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -20,7 +21,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
@@ -51,6 +51,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKin
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.models.servicetemplatechange.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,7 +70,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  * Test for ServiceTemplateManageApi.
  */
 @Slf4j
-@Transactional
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
@@ -94,11 +94,18 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ocl.setName("serviceTemplateApiTest-01");
         // Run the test
         final MockHttpServletResponse registerResponse = register(ocl);
-        ServiceTemplateDetailVo serviceTemplateDetailVo =
-                objectMapper.readValue(registerResponse.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
+        ServiceTemplateChangeInfo serviceTemplateChangeInfo = objectMapper.readValue(
+                registerResponse.getContentAsString(), ServiceTemplateChangeInfo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), registerResponse.getStatus());
+        assertNotNull(serviceTemplateChangeInfo.getServiceTemplateId());
+        assertNotNull(serviceTemplateChangeInfo.getChangeId());
+        UUID serviceTemplateId = serviceTemplateChangeInfo.getServiceTemplateId();
+
+        // Setup detail request
+        final MockHttpServletResponse detailResponse = detail(serviceTemplateId);
+        ServiceTemplateDetailVo serviceTemplateDetailVo = objectMapper.readValue(
+                detailResponse.getContentAsString(), ServiceTemplateDetailVo.class);
         assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
         assertEquals(serviceTemplateDetailVo.getIsUpdatePending(), false);
@@ -108,16 +115,6 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(ocl.getName().toLowerCase(Locale.ROOT), serviceTemplateDetailVo.getName());
         assertEquals(new Semver(ocl.getServiceVersion()).getVersion(),
                 serviceTemplateDetailVo.getVersion());
-
-        // Setup detail request
-        UUID id = serviceTemplateDetailVo.getServiceTemplateId();
-        String result = objectMapper.writeValueAsString(serviceTemplateDetailVo);
-        // Run the test
-        final MockHttpServletResponse detailResponse = detail(id);
-        // Verify the results
-        assertEquals(HttpStatus.OK.value(), detailResponse.getStatus());
-        assertEquals(result, detailResponse.getContentAsString());
-
 
         // Setup list request
         List<ServiceTemplateDetailVo> serviceTemplateDetailVos = List.of(serviceTemplateDetailVo);
@@ -135,13 +132,12 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(response.getContentAsString(),
                         ServiceTemplateDetailVo[].class)).toList());
 
-
         // Setup update request
         Ocl updateOcl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         updateOcl.setName("serviceTemplateApiTest-01");
         // Run the test
-        final MockHttpServletResponse updateResponse = update(id, updateOcl);
+        final MockHttpServletResponse updateResponse = update(serviceTemplateId, updateOcl);
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
                 objectMapper.readValue(updateResponse.getContentAsString(),
                         ServiceTemplateDetailVo.class);
@@ -153,7 +149,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         // Setup unregister request
         // Run the test
-        final MockHttpServletResponse unregisterResponse = unregister(id);
+        final MockHttpServletResponse unregisterResponse = unregister(serviceTemplateId);
         ServiceTemplateDetailVo unregisteredServiceTemplateDetailVo =
                 objectMapper.readValue(unregisterResponse.getContentAsString(),
                         ServiceTemplateDetailVo.class);
@@ -163,7 +159,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         // Setup reRegister request
         // Run the test
-        final MockHttpServletResponse reRegisterResponse = reRegisterServiceTemplate(id);
+        final MockHttpServletResponse reRegisterResponse =
+                reRegisterServiceTemplate(serviceTemplateId);
         ServiceTemplateDetailVo reRegisteredServiceTemplateDetailVo =
                 objectMapper.readValue(reRegisterResponse.getContentAsString(),
                         ServiceTemplateDetailVo.class);
@@ -173,9 +170,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
 
         // Setup delete request
-        unregister(id);
+        unregister(serviceTemplateId);
         // Run the test
-        final MockHttpServletResponse deleteResponse = deleteTemplate(id);
+        final MockHttpServletResponse deleteResponse = deleteTemplate(serviceTemplateId);
         // Verify the results
         assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.getStatus());
     }
@@ -186,11 +183,20 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl = oclLoader.getOcl(url);
         // Run the test
         final MockHttpServletResponse fetchResponse = fetch(url.toString());
-        ServiceTemplateDetailVo serviceTemplateDetailVo =
-                objectMapper.readValue(fetchResponse.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
+        ServiceTemplateChangeInfo serviceTemplateChangeInfo = objectMapper.readValue(
+                fetchResponse.getContentAsString(), ServiceTemplateChangeInfo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), fetchResponse.getStatus());
+        assertNotNull(serviceTemplateChangeInfo.getServiceTemplateId());
+        assertNotNull(serviceTemplateChangeInfo.getChangeId());
+        UUID serviceTemplateId = serviceTemplateChangeInfo.getServiceTemplateId();
+
+        // Setup detail request
+        final MockHttpServletResponse detailResponse = detail(serviceTemplateId);
+        ServiceTemplateDetailVo serviceTemplateDetailVo = objectMapper.readValue(
+                detailResponse.getContentAsString(), ServiceTemplateDetailVo.class);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), detailResponse.getStatus());
         assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
         assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
@@ -200,9 +206,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         // Setup fetch update request
         URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL();
-        UUID id = serviceTemplateDetailVo.getServiceTemplateId();
         // Run the test
-        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id, updateUrl.toString());
+        final MockHttpServletResponse fetchUpdateResponse =
+                fetchUpdate(serviceTemplateId, updateUrl.toString());
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
                 objectMapper.readValue(fetchUpdateResponse.getContentAsString(),
                         ServiceTemplateDetailVo.class);
@@ -211,7 +217,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(serviceTemplateDetailVo.getServiceTemplateId(),
                 updatedServiceTemplateDetailVo.getServiceTemplateId());
 
-        deleteServiceTemplate(serviceTemplateDetailVo.getServiceTemplateId());
+        deleteServiceTemplate(serviceTemplateId);
     }
 
 
@@ -283,10 +289,10 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceTemplateApiTest-02");
         MockHttpServletResponse response = register(ocl);
-        ServiceTemplateDetailVo serviceTemplateDetail =
+        ServiceTemplateChangeInfo serviceTemplateChangeInfo =
                 objectMapper.readValue(response.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
-        UUID id = serviceTemplateDetail.getServiceTemplateId();
+                        ServiceTemplateChangeInfo.class);
+        UUID id = serviceTemplateChangeInfo.getServiceTemplateId();
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(id);
         serviceTemplateEntity.setNamespace("test");
@@ -521,9 +527,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName("serviceTemplateApiTest-03");
         MockHttpServletResponse response = register(ocl);
-        ServiceTemplateDetailVo serviceTemplateDetail =
+        ServiceTemplateChangeInfo serviceTemplateDetail =
                 objectMapper.readValue(response.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
+                        ServiceTemplateChangeInfo.class);
         Response expectedResponse =
                 Response.errorResponse(ResultType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
                         Collections.singletonList(
