@@ -38,11 +38,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -58,7 +58,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @AutoConfigureMockMvc
 public class TerraformBootWebhookApiTest extends ApisTestCommon {
 
-    @MockBean
+    @MockitoBean
     private PolicyValidator mockPolicyValidator;
 
     void mockDeploymentWitPolicies() {

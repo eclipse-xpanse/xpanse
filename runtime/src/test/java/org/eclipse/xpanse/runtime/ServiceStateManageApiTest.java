@@ -57,10 +57,10 @@ import org.openstack4j.model.compute.Server;
 import org.openstack4j.openstack.OSFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Transactional
@@ -69,7 +69,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceStateManageApiTest extends ApisTestCommon {
-    @MockBean
+    @MockitoBean
     private PolicyValidator mockPolicyValidator;
     void mockDeploymentWitPolicies() {
         doNothing().when(mockPolicyValidator).validateDeploymentWithPolicies(any());

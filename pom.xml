@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>3.4.0</version>
     </parent>
     <licenses>
         <license>
@@ -44,7 +44,7 @@
         <instancio.version>5.0.2</instancio.version>
         <caffeine.cache.version>3.1.8</caffeine.cache.version>
         <jacoco.version>0.8.12</jacoco.version>
-        <springdoc.version>2.6.0</springdoc.version>
+        <springdoc.version>2.7.0</springdoc.version>
         <slf4j-api.version>2.0.16</slf4j-api.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hypersistence-utils-hibernate.version>3.9.0</hypersistence-utils-hibernate.version>

@@ -85,7 +85,7 @@ import org.openstack4j.openstack.networking.internal.SecurityGroupServiceImpl;
 import org.openstack4j.openstack.networking.internal.SubnetServiceImpl;
 import org.openstack4j.openstack.storage.block.internal.BlockStorageServiceImpl;
 import org.openstack4j.openstack.storage.block.internal.BlockVolumeServiceImpl;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -112,23 +112,23 @@ public class ApisTestCommon {
     protected ServiceOrderStorage serviceOrderStorage;
     @Resource
     protected MockMvc mockMvc;
-    @MockBean
+    @MockitoBean
     protected HuaweiCloudClient huaweiCloudClient;
-    @MockBean
+    @MockitoBean
     protected FlexibleEngineClient flexibleEngineClient;
-    @MockBean
+    @MockitoBean
     protected EcsClient mockEcsClient;
-    @MockBean
+    @MockitoBean
     protected VpcClient mockVpcClient;
-    @MockBean
+    @MockitoBean
     protected EipClient mockEipClient;
-    @MockBean
+    @MockitoBean
     protected EvsClient mockEvsClient;
-    @MockBean
+    @MockitoBean
     protected IamClient mockIamClient;
-    @MockBean
+    @MockitoBean
     protected BssClient mockBssClient;
-    @MockBean
+    @MockitoBean
     protected BssintlClient mockBssintlClient;
     protected MockedStatic<OSFactory> mockOsFactory;
 

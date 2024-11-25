@@ -87,6 +87,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
@@ -98,9 +99,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test",})
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest extends ApisTestCommon {
-    @MockBean
+    @MockitoBean
     private PoliciesValidateApi mockPoliciesValidateApi;
-    @MockBean
+    @MockitoBean
     private PoliciesEvaluationApi mockPoliciesEvaluationApi;
 
     @Test

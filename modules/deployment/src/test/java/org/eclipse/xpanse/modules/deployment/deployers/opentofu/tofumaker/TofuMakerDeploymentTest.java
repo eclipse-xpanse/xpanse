@@ -43,9 +43,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -74,25 +74,25 @@ class TofuMakerDeploymentTest {
               value = resource.random_id_2.new.id
             }
             """;
-    @MockBean
+    @MockitoBean
     DeployEnvironments deployEnvironments;
-    @MockBean
+    @MockitoBean
     PluginManager pluginManager;
-    @MockBean
+    @MockitoBean
     OpenTofuFromScriptsApi terraformApi;
-    @MockBean
+    @MockitoBean
     TofuMakerConfig tofuMakerConfig;
-    @MockBean
+    @MockitoBean
     ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @MockBean
+    @MockitoBean
     TofuMakerScriptValidator tofuMakerScriptValidator;
-    @MockBean
+    @MockitoBean
     OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
     @Autowired
     TofuMakerServiceDeployer tofuMakerServiceDeployer;
     @Autowired
     TofuMakerServiceModifier tofuMakerServiceModifier;
-    @MockBean
+    @MockitoBean
     AdminApi adminApi;
 
     @Autowired

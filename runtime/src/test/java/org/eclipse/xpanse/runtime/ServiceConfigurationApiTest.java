@@ -42,10 +42,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -78,7 +78,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
     public static final String KAFKA_BROKER = "kafka-broker";
     public static final String USER_ID = "userId";
     private static final Logger log = LoggerFactory.getLogger(ServiceConfigurationApiTest.class);
-    @MockBean
+    @MockitoBean
     private PolicyValidator mockPolicyValidator;
 
     void mockDeploymentWitPolicies() {
