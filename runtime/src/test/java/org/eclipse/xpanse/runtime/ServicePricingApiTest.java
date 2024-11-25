@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.core.type.TypeReference;
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
@@ -47,7 +46,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * Test for ServicePricingApi.
  */
 @Slf4j
-@Transactional
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
@@ -72,7 +70,8 @@ class ServicePricingApiTest extends ApisTestCommon {
         String flavorName = ocl.getFlavors().getServiceFlavors().getFirst().getName();
         String regionName = ocl.getCloudServiceProvider().getRegions().getFirst().getName();
         testGetServicePricing(ocl, flavorName, regionName, HuaweiCloudConstants.INTERNATIONAL_SITE);
-        testGetServicePricing(ocl, flavorName, regionName, HuaweiCloudConstants.CHINESE_MAINLAND_SITE);
+        testGetServicePricing(ocl, flavorName, regionName,
+                HuaweiCloudConstants.CHINESE_MAINLAND_SITE);
         ocl.getFlavors().getServiceFlavors().getFirst().getPricing().getResourceUsage()
                 .getMarkUpPrices().forEach(priceWithRegion -> {
                     priceWithRegion.getPrice().setPeriod(PricingPeriod.ONE_TIME);

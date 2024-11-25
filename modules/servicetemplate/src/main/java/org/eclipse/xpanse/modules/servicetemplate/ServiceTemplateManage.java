@@ -22,6 +22,8 @@ import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
+import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryStorage;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
@@ -32,7 +34,9 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationReque
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateChangeStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
@@ -69,6 +73,8 @@ public class ServiceTemplateManage {
     @Resource
     private ServiceTemplateStorage templateStorage;
     @Resource
+    private ServiceTemplateHistoryStorage serviceTemplateHistoryStorage;
+    @Resource
     private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
@@ -84,6 +90,8 @@ public class ServiceTemplateManage {
     private PluginManager pluginManager;
     @Resource
     private ServiceConfigurationParameterValidator serviceConfigurationParameterValidator;
+
+    private static final String AUTO_APPROVED_REVIEW_COMMENT = "auto-approved by CSP";
 
     /**
      * Update service template using id and the ocl model.
@@ -147,7 +155,7 @@ public class ServiceTemplateManage {
         }
     }
 
-    private ServiceTemplateEntity getNewServiceTemplateEntity(Ocl ocl) {
+    private ServiceTemplateEntity createServiceTemplateEntity(Ocl ocl) {
         ServiceTemplateEntity newTemplate = new ServiceTemplateEntity();
         newTemplate.setId(UUID.randomUUID());
         newTemplate.setName(StringUtils.lowerCase(ocl.getName()));
@@ -162,12 +170,27 @@ public class ServiceTemplateManage {
         return newTemplate;
     }
 
+    private ServiceTemplateHistoryEntity createServiceTemplateHistory(
+            ServiceTemplateRequestType requestType, ServiceTemplateEntity serviceTemplate) {
+        ServiceTemplateHistoryEntity serviceTemplateHistory = new ServiceTemplateHistoryEntity();
+        serviceTemplateHistory.setChangeId(UUID.randomUUID());
+        serviceTemplateHistory.setServiceTemplate(serviceTemplate);
+        serviceTemplateHistory.setOcl(serviceTemplate.getOcl());
+        serviceTemplateHistory.setRequestType(requestType);
+        Csp csp = serviceTemplate.getCsp();
+        if (isAutoApproveEnabledForCsp(csp)) {
+            serviceTemplateHistory.setStatus(ServiceTemplateChangeStatus.ACCEPTED);
+            serviceTemplateHistory.setReviewComment(AUTO_APPROVED_REVIEW_COMMENT);
+        } else {
+            serviceTemplateHistory.setStatus(ServiceTemplateChangeStatus.IN_REVIEW);
+        }
+        return serviceTemplateHistoryStorage.storeAndFlush(serviceTemplateHistory);
+    }
+
 
     private void setServiceTemplateRegistrationState(ServiceTemplateEntity serviceTemplate) {
         Csp csp = serviceTemplate.getCsp();
-        OrchestratorPlugin cspPlugin = pluginManager.getOrchestratorPlugin(csp);
-        boolean cspAutoApproveIsEnabled = cspPlugin.autoApproveServiceTemplateIsEnabled();
-        if (cspAutoApproveIsEnabled) {
+        if (isAutoApproveEnabledForCsp(csp)) {
             serviceTemplate.setServiceTemplateRegistrationState(
                     ServiceTemplateRegistrationState.APPROVED);
             serviceTemplate.setAvailableInCatalog(true);
@@ -178,6 +201,11 @@ public class ServiceTemplateManage {
                     ServiceTemplateRegistrationState.IN_PROGRESS);
             serviceTemplate.setAvailableInCatalog(false);
         }
+    }
+
+    private boolean isAutoApproveEnabledForCsp(Csp csp) {
+        OrchestratorPlugin cspPlugin = pluginManager.getOrchestratorPlugin(csp);
+        return cspPlugin.autoApproveServiceTemplateIsEnabled();
     }
 
 
@@ -224,10 +252,10 @@ public class ServiceTemplateManage {
      * Register service template using the ocl.
      *
      * @param ocl the Ocl model describing the service template.
-     * @return Returns service template DB newTemplate.
+     * @return Returns service template history entity.
      */
-    public ServiceTemplateEntity registerServiceTemplate(Ocl ocl) {
-        ServiceTemplateEntity newTemplate = getNewServiceTemplateEntity(ocl);
+    public ServiceTemplateHistoryEntity registerServiceTemplate(Ocl ocl) {
+        ServiceTemplateEntity newTemplate = createServiceTemplateEntity(ocl);
         ServiceTemplateEntity existingTemplate = templateStorage.findServiceTemplate(newTemplate);
         if (Objects.nonNull(existingTemplate)) {
             String errorMsg = String.format("Service template already registered with id %s",
@@ -247,8 +275,10 @@ public class ServiceTemplateManage {
         String userManageNamespace = userServiceHelper.getCurrentUserManageNamespace();
         newTemplate.setNamespace(userManageNamespace);
         ServiceTemplateEntity storedServiceTemplate = templateStorage.storeAndFlush(newTemplate);
+        ServiceTemplateHistoryEntity serviceTemplateHistory = createServiceTemplateHistory(
+                ServiceTemplateRequestType.REGISTER, storedServiceTemplate);
         serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
-        return storedServiceTemplate;
+        return serviceTemplateHistory;
     }
 
     private void validateFlavors(Ocl ocl) {

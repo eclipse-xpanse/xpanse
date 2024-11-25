@@ -45,6 +45,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.models.servicetemplatechange.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
@@ -84,10 +85,12 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testDeployer() throws Exception {
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate();
-        if (Objects.isNull(serviceTemplate)) {
+        ServiceTemplateChangeInfo serviceTemplateHistory = registerServiceTemplate();
+        if (Objects.isNull(serviceTemplateHistory)) {
             return;
         }
+        ServiceTemplateDetailVo serviceTemplate = serviceTemplateApi.details(
+                serviceTemplateHistory.getServiceTemplateId().toString());
         approveServiceTemplateRegistration(serviceTemplate);
         addCredentialForHuaweiCloud();
         ServiceOrder serviceOrder = deployService(serviceTemplate);
@@ -193,7 +196,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return deployRequestBase;
     }
 
-    ServiceTemplateDetailVo registerServiceTemplate() throws Exception {
+    ServiceTemplateChangeInfo registerServiceTemplate() throws Exception {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName(UUID.randomUUID().toString());

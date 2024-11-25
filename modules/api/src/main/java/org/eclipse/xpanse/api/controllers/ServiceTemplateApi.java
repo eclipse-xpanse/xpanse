@@ -25,6 +25,7 @@ import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
+import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -32,6 +33,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.models.servicetemplatechange.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -79,10 +81,11 @@ public class ServiceTemplateApi {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public ServiceTemplateDetailVo register(@Valid @RequestBody Ocl ocl) {
-        ServiceTemplateEntity templateEntity = serviceTemplateManage.registerServiceTemplate(ocl);
-        log.info("Register service template with id {} successfully.", templateEntity.getId());
-        return convertToServiceTemplateDetailVo(templateEntity);
+    public ServiceTemplateChangeInfo register(@Valid @RequestBody Ocl ocl) {
+        ServiceTemplateHistoryEntity serviceTemplateHistory =
+                serviceTemplateManage.registerServiceTemplate(ocl);
+        return new ServiceTemplateChangeInfo(serviceTemplateHistory.getServiceTemplate().getId(),
+                serviceTemplateHistory.getChangeId());
     }
 
     /**
@@ -102,7 +105,6 @@ public class ServiceTemplateApi {
             String id, @Valid @RequestBody Ocl ocl) {
         ServiceTemplateEntity templateEntity =
                 serviceTemplateManage.updateServiceTemplate(UUID.fromString(id), ocl);
-        log.info("Update service template with id {} successfully.", id);
         return convertToServiceTemplateDetailVo(templateEntity);
     }
 
@@ -118,13 +120,14 @@ public class ServiceTemplateApi {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromOclLocation")
-    public ServiceTemplateDetailVo fetch(
+    public ServiceTemplateChangeInfo fetch(
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        ServiceTemplateEntity templateEntity = serviceTemplateManage.registerServiceTemplate(ocl);
-        log.info("Register service template by file with URL {} successfully.", oclLocation);
-        return convertToServiceTemplateDetailVo(templateEntity);
+        ServiceTemplateHistoryEntity serviceTemplateHistory =
+                serviceTemplateManage.registerServiceTemplate(ocl);
+        return new ServiceTemplateChangeInfo(serviceTemplateHistory.getServiceTemplate().getId(),
+                serviceTemplateHistory.getChangeId());
     }
 
 
