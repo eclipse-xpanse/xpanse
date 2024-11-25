@@ -64,7 +64,7 @@ public class ServiceOrderStatusChangePolling {
                         TaskStatus taskStatus = serviceOrderEntity.getTaskStatus();
                         boolean isOrderCompleted = FINAL_TASK_STATUS.contains(taskStatus);
                         ref.set(new ServiceOrderStatusUpdate(taskStatus, isOrderCompleted,
-                                serviceOrderEntity.getErrorMsg()));
+                                serviceOrderEntity.getErrorResponse()));
                         boolean statusIsChanged = Objects.nonNull(previousKnownTaskStatus)
                                 && taskStatus != previousKnownTaskStatus;
                         return isOrderCompleted || statusIsChanged;

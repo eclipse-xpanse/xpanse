@@ -23,8 +23,8 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidatePolicyList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidateResponse;
@@ -134,7 +134,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
     void testGetPolicyDetails_ThrowsPolicyNotFoundException(UUID uuid) throws Exception {
         // Setup
         String errMsg = String.format("The user policy with id %s not found.", uuid);
-        Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         // Run the test
@@ -195,11 +195,11 @@ class UserPolicyManageApiTest extends ApisTestCommon {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        Response result = objectMapper.readValue(response.getContentAsString(), Response.class);
+        ErrorResponse result = objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        Assertions.assertEquals(result.getResultType(), ResultType.POLICY_VALIDATION_FAILED);
+        Assertions.assertEquals(result.getErrorType(), ErrorType.POLICY_VALIDATION_FAILED);
     }
 
     void testAddPolicy_ThrowsPolicyDuplicateException(UserPolicy userPolicy) throws Exception {
@@ -208,7 +208,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         mockPoliciesValidateRequest(true);
         String errMsg = String.format("The same policy already exists for Csp: %s."
                 + " with id: %s", userPolicy.getCsp(), userPolicy.getUserPolicyId());
-        Response result = Response.errorResponse(ResultType.POLICY_DUPLICATE, List.of(errMsg));
+        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_DUPLICATE, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final UserPolicyCreateRequest createRequest = new UserPolicyCreateRequest();
@@ -259,7 +259,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         // Setup
         mockPoliciesValidateRequest(true);
         String errMsg = String.format("The user policy with id %s not found.", uuid);
-        Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
@@ -295,7 +295,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         // Setup
         UUID uuid = UUID.randomUUID();
         String errMsg = String.format("The user policy with id %s not found.", uuid);
-        Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         // Run the test

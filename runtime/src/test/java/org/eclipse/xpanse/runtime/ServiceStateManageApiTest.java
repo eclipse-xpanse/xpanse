@@ -33,9 +33,9 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.response.OrderFailedResponse;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.OrderFailedErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -122,8 +122,8 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // run the test
         final MockHttpServletResponse response = startService(uuid);
 
-        Response result =
-                CommonExceptionHandler.getErrorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+        ErrorResponse result =
+                CommonExceptionHandler.getErrorResponse(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
                         Collections.singletonList(
                                 String.format("Service with id %s not found.", uuid)));
         // Verify the results
@@ -144,7 +144,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         String taskId1 =
                 response1.getContentAsString().substring(taskIdStartIndex1, taskIdEndIndex1 + 1);
 
-        Response result1 = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+        ErrorResponse result1 = ErrorResponse.errorResponse(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 Collections.singletonList(
                         String.format("%s Service with id %s has no vm resources.",
                                 taskId1, service.getId())));
@@ -156,7 +156,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Setup
         service.setCsp(Csp.AWS);
         service = serviceDeploymentStorage.storeAndFlush(service);
-        Response result2 = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
+        ErrorResponse result2 = ErrorResponse.errorResponse(ErrorType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
                         String.format("Can't find suitable plugin for the Csp %s",
                                 Csp.AWS.toValue())));
@@ -180,7 +180,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         int taskIdEndIndex3 = response3.getContentAsString().indexOf(":", taskIdStartIndex3);
         String taskId3 =
                 response3.getContentAsString().substring(taskIdStartIndex3, taskIdEndIndex3 + 1);
-        Response result3 = Response.errorResponse(ResultType.ACCESS_DENIED,
+        ErrorResponse result3 = ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
                 Collections.singletonList(
                         String.format("%s No permissions to manage status of the service "
                                 + "belonging to other users.", taskId3)));
@@ -206,7 +206,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 String.format("%s Service %s with deployment state %s is not supported"
                                 + " to manage status.", taskId4, service.getId(),
                         service.getServiceDeploymentState());
-        Response result4 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
+        ErrorResponse result4 = ErrorResponse.errorResponse(ErrorType.SERVICE_STATE_INVALID,
                 Collections.singletonList(errorMsg4));
 
         // Verify the results
@@ -226,7 +226,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         String taskId5 =
                 response5.getContentAsString().substring(taskIdStartIndex5, taskIdEndIndex5 + 1);
 
-        Response errorResult5 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
+        ErrorResponse errorResult5 = ErrorResponse.errorResponse(ErrorType.SERVICE_STATE_INVALID,
                 Collections.singletonList(String.format(
                         "%s Service %s with a running management task, please try again " +
                                 "later.",
@@ -248,7 +248,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         String taskId6 =
                 response6.getContentAsString().substring(taskIdStartIndex6, taskIdEndIndex6 + 1);
 
-        Response errorResult6 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
+        ErrorResponse errorResult6 = ErrorResponse.errorResponse(ErrorType.SERVICE_STATE_INVALID,
                 Collections.singletonList(
                         String.format(
                                 "%s Service %s with state RUNNING is not supported to " +
@@ -269,7 +269,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         int taskIdEndIndex7 = response7.getContentAsString().indexOf(":", taskIdStartIndex7);
         String taskId7 =
                 response7.getContentAsString().substring(taskIdStartIndex7, taskIdEndIndex7 + 1);
-        Response errorResult7 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
+        ErrorResponse errorResult7 = ErrorResponse.errorResponse(ErrorType.SERVICE_STATE_INVALID,
                 Collections.singletonList(String.format(
                         "%s Service %s with a running management task, please try again " +
                                 "later.",
@@ -290,7 +290,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         String taskId8 =
                 response8.getContentAsString().substring(taskIdStartIndex8, taskIdEndIndex8 + 1);
 
-        Response errorResult8 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
+        ErrorResponse errorResult8 = ErrorResponse.errorResponse(ErrorType.SERVICE_STATE_INVALID,
                 Collections.singletonList(
                         String.format(
                                 "%s Service %s with state STOPPED is not supported to stop.",
@@ -309,7 +309,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         int taskIdEndIndex9 = response9.getContentAsString().indexOf(":", taskIdStartIndex9);
         String taskId9 =
                 response9.getContentAsString().substring(taskIdStartIndex9, taskIdEndIndex9 + 1);
-        Response errorResult9 = Response.errorResponse(ResultType.SERVICE_STATE_INVALID,
+        ErrorResponse errorResult9 = ErrorResponse.errorResponse(ErrorType.SERVICE_STATE_INVALID,
                 Collections.singletonList(
                         String.format(
                                 "%s Service %s with state STOPPED is not supported to " +
@@ -381,9 +381,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         mockShowJobInvoker(restartFailedJobResponse);
         // Run the test
         final MockHttpServletResponse restartFailedResponse = restartService(service.getId());
-        OrderFailedResponse restartServiceOrder =
+        OrderFailedErrorResponse restartServiceOrder =
                 objectMapper.readValue(restartFailedResponse.getContentAsString(),
-                        OrderFailedResponse.class);
+                        OrderFailedErrorResponse.class);
         UUID restartFailedTaskId =
                 UUID.fromString(restartServiceOrder.getOrderId());
         // Verify the results
@@ -402,9 +402,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         mockShowJobInvoker(rebootJobResponse);
         // Run the test
         final MockHttpServletResponse restartResponse = restartService(service.getId());
-        OrderFailedResponse restartServiceOrder1 =
+        OrderFailedErrorResponse restartServiceOrder1 =
                 objectMapper.readValue(restartResponse.getContentAsString(),
-                        OrderFailedResponse.class);
+                        OrderFailedErrorResponse.class);
         UUID restartTaskId = UUID.fromString(restartServiceOrder1.getOrderId());
         // Verify the results
         assertThat(restartResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
@@ -535,9 +535,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 startActionFailedResponse);
         // Run the test
         final MockHttpServletResponse startFailedResponse = startService(service.getId());
-        OrderFailedResponse startServiceOrder =
+        OrderFailedErrorResponse startServiceOrder =
                 objectMapper.readValue(startFailedResponse.getContentAsString(),
-                        OrderFailedResponse.class);
+                        OrderFailedErrorResponse.class);
         UUID startFailedTaskId =
                 UUID.fromString(startServiceOrder.getOrderId());
 
@@ -553,9 +553,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 .action(service.getId().toString(), Action.START)).thenReturn(startActionResponse);
         // Run the test
         final MockHttpServletResponse startResponse = startService(service.getId());
-        OrderFailedResponse startServiceOrder1 =
+        OrderFailedErrorResponse startServiceOrder1 =
                 objectMapper.readValue(startResponse.getContentAsString(),
-                        OrderFailedResponse.class);
+                        OrderFailedErrorResponse.class);
         UUID startTaskId =
                 UUID.fromString(startServiceOrder1.getOrderId());
         assertThat(startResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
@@ -573,9 +573,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse restartFailedResponse = restartService(service.getId());
-        OrderFailedResponse restartServiceOrder =
+        OrderFailedErrorResponse restartServiceOrder =
                 objectMapper.readValue(restartFailedResponse.getContentAsString(),
-                        OrderFailedResponse.class);
+                        OrderFailedErrorResponse.class);
         UUID restartFailedTaskId =
                 UUID.fromString(restartServiceOrder.getOrderId());
         // Verify the results
@@ -591,9 +591,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 restartActionResponse);
         // Run the test
         final MockHttpServletResponse restartResponse = restartService(service.getId());
-        OrderFailedResponse restartServiceOrder1 =
+        OrderFailedErrorResponse restartServiceOrder1 =
                 objectMapper.readValue(restartResponse.getContentAsString(),
-                        OrderFailedResponse.class);
+                        OrderFailedErrorResponse.class);
         UUID restartTaskId =
                 UUID.fromString(restartServiceOrder1.getOrderId());
         // Verify the results
@@ -611,9 +611,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse stopFailedResponse = stopService(service.getId());
-        OrderFailedResponse stopServiceOrder =
+        OrderFailedErrorResponse stopServiceOrder =
                 objectMapper.readValue(stopFailedResponse.getContentAsString(),
-                        OrderFailedResponse.class);
+                        OrderFailedErrorResponse.class);
         UUID stopFailedTaskId =
                 UUID.fromString(stopServiceOrder.getOrderId());
         // Verify the results
@@ -629,9 +629,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse stopSdkResponse = stopService(service.getId());
-        OrderFailedResponse stopServiceOrder1 =
+        OrderFailedErrorResponse stopServiceOrder1 =
                 objectMapper.readValue(stopFailedResponse.getContentAsString(),
-                        OrderFailedResponse.class);
+                        OrderFailedErrorResponse.class);
         UUID stopTaskId =
                 UUID.fromString(stopServiceOrder1.getOrderId());
         // Verify the results

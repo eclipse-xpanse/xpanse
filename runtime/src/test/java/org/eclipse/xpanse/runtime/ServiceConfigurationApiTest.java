@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.deployment.PolicyValidator;
-import org.eclipse.xpanse.modules.models.response.Response;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
@@ -204,9 +204,8 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
             assertEquals(order.getServiceId(), serviceId);
             return order;
         } else {
-            Response responseError =
-                    objectMapper.readValue(response.getContentAsString(), Response.class);
-            log.error("Change service configuration failed. Error: " + responseError.getDetails());
+            ErrorResponse errorResponseError = objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
+            log.error("Change service configuration failed. Error: " + errorResponseError.getDetails());
             return null;
         }
     }

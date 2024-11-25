@@ -13,8 +13,8 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialCapabil
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariablesNotComplete;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.eclipse.xpanse.modules.models.credential.exceptions.NoCredentialDefinitionAvailable;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -37,8 +37,8 @@ public class CredentialManageExceptionHandler {
     @ExceptionHandler({CredentialCapabilityNotFound.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleCredentialCapabilityNotFound(CredentialCapabilityNotFound ex) {
-        return getErrorResponse(ResultType.CREDENTIAL_CAPABILITY_NOT_FOUND,
+    public ErrorResponse handleCredentialCapabilityNotFound(CredentialCapabilityNotFound ex) {
+        return getErrorResponse(ErrorType.CREDENTIAL_CAPABILITY_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -48,8 +48,8 @@ public class CredentialManageExceptionHandler {
     @ExceptionHandler({CredentialsNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleCredentialsNotFoundException(CredentialsNotFoundException ex) {
-        return getErrorResponse(ResultType.CREDENTIALS_NOT_FOUND,
+    public ErrorResponse handleCredentialsNotFoundException(CredentialsNotFoundException ex) {
+        return getErrorResponse(ErrorType.CREDENTIALS_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -59,8 +59,8 @@ public class CredentialManageExceptionHandler {
     @ExceptionHandler({CredentialVariablesNotComplete.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleCredentialVariablesNotComplete(CredentialVariablesNotComplete ex) {
-        return getErrorResponse(ResultType.CREDENTIALS_VARIABLES_NOT_COMPLETE,
+    public ErrorResponse handleCredentialVariablesNotComplete(CredentialVariablesNotComplete ex) {
+        return getErrorResponse(ErrorType.CREDENTIALS_VARIABLES_NOT_COMPLETE,
                 ex.getErrorReasons().stream().toList());
     }
 
@@ -70,9 +70,9 @@ public class CredentialManageExceptionHandler {
     @ExceptionHandler({NoCredentialDefinitionAvailable.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleNoCredentialDefinitionAvailable(
+    public ErrorResponse handleNoCredentialDefinitionAvailable(
             NoCredentialDefinitionAvailable ex) {
-        return getErrorResponse(ResultType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
+        return getErrorResponse(ErrorType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
                 Collections.singletonList(ex.getMessage()));
     }
 }

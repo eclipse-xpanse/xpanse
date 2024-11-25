@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.deployment.recreate.steps;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.SneakyThrows;
@@ -18,6 +19,8 @@ import org.activiti.engine.delegate.JavaDelegate;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.workflow.recreate.exceptions.ServiceRecreateFailedException;
@@ -70,7 +73,8 @@ public class StartRecreateDeploy implements Serializable, JavaDelegate {
             runtimeService.setVariable(processInstanceId, RecreateConstants.IS_DEPLOY_SUCCESS,
                     false);
             serviceOrderManager.completeOrderProgress(recreateOrderId, TaskStatus.FAILED,
-                    e.getMessage());
+                    ErrorResponse.errorResponse(ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                            List.of(e.getMessage())));
         }
     }
 

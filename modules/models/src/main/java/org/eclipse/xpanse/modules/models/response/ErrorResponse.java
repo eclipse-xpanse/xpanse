@@ -20,22 +20,18 @@ import lombok.Data;
 @Data
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Response {
+public class ErrorResponse {
 
     @NotNull
     @Schema(description = "The result code of response.")
-    private ResultType resultType;
+    private ErrorType errorType;
 
     @NotNull
     @NotEmpty
     @Schema(description = "Details of the errors occurred")
     private List<String> details;
 
-    @NotNull
-    @Schema(description = "Describes if the request is successful")
-    private Boolean success;
-
-    Response() {
+    public ErrorResponse() {
     }
 
     /**
@@ -45,11 +41,10 @@ public class Response {
      * @param errMsg     error message
      * @return errorResponse
      */
-    public static Response errorResponse(ResultType resultCode, List<String> errMsg) {
-        Response response = new Response();
-        response.success = false;
-        response.resultType = resultCode;
-        response.details = errMsg;
-        return response;
+    public static ErrorResponse errorResponse(ErrorType resultCode, List<String> errMsg) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.errorType = resultCode;
+        errorResponse.details = errMsg;
+        return errorResponse;
     }
 }

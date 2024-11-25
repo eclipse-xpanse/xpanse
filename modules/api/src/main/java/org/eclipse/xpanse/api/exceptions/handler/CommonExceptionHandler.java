@@ -29,9 +29,9 @@ import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncrypt
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
-import org.eclipse.xpanse.modules.models.response.OrderFailedResponse;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.OrderFailedErrorResponse;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -59,19 +59,19 @@ public class CommonExceptionHandler {
     /**
      * Get error response.
      *
-     * @param resultType resultType
+     * @param errorType resultType
      * @param details    details
      * @return Response
      */
-    public static Response getErrorResponse(ResultType resultType, List<String> details) {
+    public static ErrorResponse getErrorResponse(ErrorType errorType, List<String> details) {
         if (StringUtils.isNotBlank(MDC.get(SERVICE_ID))) {
-            OrderFailedResponse orderFailedResponse = OrderFailedResponse.errorResponse(
-                    resultType, details);
+            OrderFailedErrorResponse orderFailedResponse = OrderFailedErrorResponse.errorResponse(
+                    errorType, details);
             orderFailedResponse.setServiceId(MDC.get(SERVICE_ID));
             orderFailedResponse.setOrderId(MDC.get(ORDER_ID));
             return orderFailedResponse;
         } else {
-            return Response.errorResponse(resultType, details);
+            return ErrorResponse.errorResponse(errorType, details);
         }
     }
 
@@ -82,7 +82,7 @@ public class CommonExceptionHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public Response handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.error("handleMethodArgumentNotValidException: ", ex);
         BindingResult bindingResult = ex.getBindingResult();
         List<String> errors = new ArrayList<>();
@@ -106,7 +106,7 @@ public class CommonExceptionHandler {
             errors.add(errorMsg);
             errors.sort(String::compareTo);
         }
-        return getErrorResponse(ResultType.UNPROCESSABLE_ENTITY, errors);
+        return getErrorResponse(ErrorType.UNPROCESSABLE_ENTITY, errors);
     }
 
     /**
@@ -114,10 +114,10 @@ public class CommonExceptionHandler {
      */
     @ExceptionHandler({RuntimeException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Response handleRuntimeException(RuntimeException ex) {
+    public ErrorResponse handleRuntimeException(RuntimeException ex) {
         String failMessage = ex.getMessage();
         log.error("handleRuntimeException: ", ex);
-        return getErrorResponse(ResultType.RUNTIME_ERROR,
+        return getErrorResponse(ErrorType.RUNTIME_ERROR,
                 Collections.singletonList(failMessage));
     }
 
@@ -126,10 +126,10 @@ public class CommonExceptionHandler {
      */
     @ExceptionHandler({HttpMessageConversionException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Response handleHttpMessageConversionException(HttpMessageConversionException ex) {
+    public ErrorResponse handleHttpMessageConversionException(HttpMessageConversionException ex) {
         log.error("handleHttpMessageConversionException: ", ex);
         String failMessage = ex.getMessage();
-        return getErrorResponse(ResultType.BAD_PARAMETERS,
+        return getErrorResponse(ErrorType.BAD_PARAMETERS,
                 Collections.singletonList(failMessage));
     }
 
@@ -138,10 +138,10 @@ public class CommonExceptionHandler {
      */
     @ExceptionHandler({IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Response handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("handleIllegalArgumentException: ", ex);
         String failMessage = ex.getMessage();
-        return getErrorResponse(ResultType.BAD_PARAMETERS,
+        return getErrorResponse(ErrorType.BAD_PARAMETERS,
                 Collections.singletonList(failMessage));
     }
 
@@ -150,10 +150,10 @@ public class CommonExceptionHandler {
      */
     @ExceptionHandler({Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Response handleException(Exception ex) {
+    public ErrorResponse handleException(Exception ex) {
         log.error("handleException: ", ex);
         String failMessage = ex.getClass().getName() + ":" + ex.getMessage();
-        return getErrorResponse(ResultType.RUNTIME_ERROR,
+        return getErrorResponse(ErrorType.RUNTIME_ERROR,
                 Collections.singletonList(failMessage));
     }
 
@@ -163,8 +163,8 @@ public class CommonExceptionHandler {
     @ExceptionHandler({ResponseInvalidException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
-    public Response handleResponseInvalidException(ResponseInvalidException ex) {
-        return getErrorResponse(ResultType.INVALID_RESPONSE, ex.getErrorReasons());
+    public ErrorResponse handleResponseInvalidException(ResponseInvalidException ex) {
+        return getErrorResponse(ErrorType.INVALID_RESPONSE, ex.getErrorReasons());
     }
 
     /**
@@ -173,8 +173,8 @@ public class CommonExceptionHandler {
     @ExceptionHandler({XpanseUnhandledException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public Response handleXpanseUnhandledException(XpanseUnhandledException ex) {
-        return getErrorResponse(ResultType.UNHANDLED_EXCEPTION,
+    public ErrorResponse handleXpanseUnhandledException(XpanseUnhandledException ex) {
+        return getErrorResponse(ErrorType.UNHANDLED_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -184,8 +184,8 @@ public class CommonExceptionHandler {
     @ExceptionHandler({AccessDeniedException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
-    public Response handleAccessDeniedException(AccessDeniedException ex) {
-        return getErrorResponse(ResultType.ACCESS_DENIED,
+    public ErrorResponse handleAccessDeniedException(AccessDeniedException ex) {
+        return getErrorResponse(ErrorType.ACCESS_DENIED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -195,9 +195,9 @@ public class CommonExceptionHandler {
     @ExceptionHandler({SensitiveFieldEncryptionOrDecryptionFailedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleSensitiveFieldEncryptionOrDecryptionFailedException(
+    public ErrorResponse handleSensitiveFieldEncryptionOrDecryptionFailedException(
             SensitiveFieldEncryptionOrDecryptionFailedException ex) {
-        return getErrorResponse(ResultType.SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION,
+        return getErrorResponse(ErrorType.SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -207,8 +207,8 @@ public class CommonExceptionHandler {
     @ExceptionHandler({UnsupportedEnumValueException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
-    public Response handleUnsupportedEnumValueException(UnsupportedEnumValueException ex) {
-        return getErrorResponse(ResultType.UNSUPPORTED_ENUM_VALUE,
+    public ErrorResponse handleUnsupportedEnumValueException(UnsupportedEnumValueException ex) {
+        return getErrorResponse(ErrorType.UNSUPPORTED_ENUM_VALUE,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -218,9 +218,9 @@ public class CommonExceptionHandler {
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
-    public Response handleMethodArgumentTypeMismatchException(
+    public ErrorResponse handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex) {
-        return getErrorResponse(ResultType.UNPROCESSABLE_ENTITY,
+        return getErrorResponse(ErrorType.UNPROCESSABLE_ENTITY,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -230,8 +230,8 @@ public class CommonExceptionHandler {
     @ExceptionHandler({UserNotLoggedInException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public Response handleUserNoLoginException(UserNotLoggedInException ex) {
-        return getErrorResponse(ResultType.USER_NO_LOGIN_EXCEPTION,
+    public ErrorResponse handleUserNoLoginException(UserNotLoggedInException ex) {
+        return getErrorResponse(ErrorType.USER_NO_LOGIN_EXCEPTION,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -240,10 +240,10 @@ public class CommonExceptionHandler {
      */
     @ExceptionHandler({GitRepoCloneException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Response handleGitRepoCloneException(GitRepoCloneException ex) {
+    public ErrorResponse handleGitRepoCloneException(GitRepoCloneException ex) {
         log.error("GitRepoCloneException: ", ex);
         String failMessage = ex.getMessage();
-        return getErrorResponse(ResultType.INVALID_GIT_REPO_DETAILS,
+        return getErrorResponse(ErrorType.INVALID_GIT_REPO_DETAILS,
                 Collections.singletonList(failMessage));
     }
 
@@ -253,8 +253,8 @@ public class CommonExceptionHandler {
     @ExceptionHandler({ClientApiCallFailedException.class})
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     @ResponseBody
-    public Response handleClientApiCalledException(ClientApiCallFailedException ex) {
-        return getErrorResponse(ResultType.BACKEND_FAILURE,
+    public ErrorResponse handleClientApiCalledException(ClientApiCallFailedException ex) {
+        return getErrorResponse(ErrorType.BACKEND_FAILURE,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -264,8 +264,8 @@ public class CommonExceptionHandler {
     @ExceptionHandler({ClientAuthenticationFailedException.class})
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     @ResponseBody
-    public Response handleClientAuthException(ClientAuthenticationFailedException ex) {
-        return getErrorResponse(ResultType.BACKEND_FAILURE,
+    public ErrorResponse handleClientAuthException(ClientAuthenticationFailedException ex) {
+        return getErrorResponse(ErrorType.BACKEND_FAILURE,
                 Collections.singletonList(ex.getMessage()));
     }
 

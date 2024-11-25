@@ -13,8 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Result codes for the REST API.
  */
-public enum ResultType {
-    SUCCESS("Success"),
+public enum ErrorType {
     RUNTIME_ERROR("Runtime Error"),
     BAD_PARAMETERS("Parameters Invalid"),
     TERRAFORM_SCRIPT_INVALID("Terraform Script Invalid"),
@@ -78,11 +77,16 @@ public enum ResultType {
     SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND("Service Configuration Update Request Not Found"),
     SERVICE_CONFIGURATION_NOT_FOUND("Service Configuration Not Found"),
     INVALID_DEPLOYER_TOOL("Invalid Deployer Tool"),
-    DEPLOYMENT_SCRIPTS_CREATION_FAILED("Deployment Scripts Creation Failed");
+    DEPLOYMENT_SCRIPTS_CREATION_FAILED("Deployment Scripts Creation Failed"),
+    ASYNC_START_SERVICE_ERROR("Async Start Service Error"),
+    ASYNC_STOP_SERVICE_ERROR("Async Stop Service Error"),
+    ASYNC_RESTART_SERVICE_ERROR("Async Restart Service Error"),
+    DEPLOYMENT_FAILED_EXCEPTION("Deployment Failed Exception"),
+    DESTROY_FAILED_EXCEPTION("Destroy Failed Exception");
 
     private final String value;
 
-    ResultType(String value) {
+    ErrorType(String value) {
         this.value = value;
     }
 
@@ -92,10 +96,10 @@ public enum ResultType {
      * @param value value
      * @return ResultType
      */
-    public static ResultType getResultTypeByValue(String value) {
-        for (ResultType resultType : values()) {
-            if (StringUtils.endsWithIgnoreCase(resultType.value, value)) {
-                return resultType;
+    public static ErrorType getResultTypeByValue(String value) {
+        for (ErrorType errorType : values()) {
+            if (StringUtils.endsWithIgnoreCase(errorType.value, value)) {
+                return errorType;
             }
         }
         return null;
@@ -113,10 +117,10 @@ public enum ResultType {
      * For ResultType serialize.
      */
     @JsonCreator
-    public ResultType getByValue(String value) {
-        for (ResultType resultType : values()) {
-            if (StringUtils.endsWithIgnoreCase(resultType.value, value)) {
-                return resultType;
+    public ErrorType getByValue(String value) {
+        for (ErrorType errorType : values()) {
+            if (StringUtils.endsWithIgnoreCase(errorType.value, value)) {
+                return errorType;
             }
         }
         return null;

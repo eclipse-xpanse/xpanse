@@ -18,8 +18,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.util.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.logging.LoggingKeyConstant;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.security.TokenResponse;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
@@ -114,10 +114,10 @@ class AuthorizationApiTest extends ApisTestCommon {
     @Test
     void testCallApiUnauthorized() throws Exception {
         // SetUp
-        Response responseModel = Response.errorResponse(ResultType.UNAUTHORIZED,
+        ErrorResponse errorResponseModel = ErrorResponse.errorResponse(ErrorType.UNAUTHORIZED,
                 Collections.singletonList(
                         "Full authentication is required to access this resource"));
-        String resBody = objectMapper.writeValueAsString(responseModel);
+        String resBody = objectMapper.writeValueAsString(errorResponseModel);
 
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/health")
@@ -135,9 +135,9 @@ class AuthorizationApiTest extends ApisTestCommon {
     @WithJwt(file = "jwt_isv.json")
     void testCallApiAccessDenied() throws Exception {
         // SetUp
-        Response responseModel = Response.errorResponse(ResultType.ACCESS_DENIED,
-                Collections.singletonList(ResultType.ACCESS_DENIED.toValue()));
-        String resBody = objectMapper.writeValueAsString(responseModel);
+        ErrorResponse errorResponseModel = ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
+                Collections.singletonList(ErrorType.ACCESS_DENIED.toValue()));
+        String resBody = objectMapper.writeValueAsString(errorResponseModel);
         // Run the test
         final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services")
                         .accept(MediaType.APPLICATION_JSON))

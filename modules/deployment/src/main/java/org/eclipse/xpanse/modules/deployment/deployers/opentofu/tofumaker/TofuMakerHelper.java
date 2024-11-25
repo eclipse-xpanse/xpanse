@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.config
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuScriptGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.beans.factory.annotation.Value;
@@ -106,7 +106,7 @@ public class TofuMakerHelper {
                 return clientBaseUri;
             }
         } catch (UnknownHostException e) {
-            log.error(ResultType.TOFU_MAKER_REQUEST_FAILED.toValue());
+            log.error(ErrorType.TOFU_MAKER_REQUEST_FAILED.toValue());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
     }

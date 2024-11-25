@@ -18,7 +18,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(Include.NON_NULL)
-public class OrderFailedResponse extends Response {
+public class OrderFailedErrorResponse extends ErrorResponse {
 
     @Schema(description = "The service id associated with the request.")
     private String serviceId;
@@ -26,7 +26,7 @@ public class OrderFailedResponse extends Response {
     @Schema(description = "The order id associated with the request.")
     private String orderId;
 
-    private OrderFailedResponse() {
+    private OrderFailedErrorResponse() {
         super();
     }
 
@@ -37,10 +37,10 @@ public class OrderFailedResponse extends Response {
      * @param errMsg     error message
      * @return errorResponse
      */
-    public static OrderFailedResponse errorResponse(ResultType resultCode, List<String> errMsg) {
-        OrderFailedResponse response = new OrderFailedResponse();
-        response.setSuccess(false);
-        response.setResultType(resultCode);
+    public static OrderFailedErrorResponse errorResponse(ErrorType resultCode,
+                                                         List<String> errMsg) {
+        OrderFailedErrorResponse response = new OrderFailedErrorResponse();
+        response.setErrorType(resultCode);
         response.setDetails(errMsg);
         return response;
     }

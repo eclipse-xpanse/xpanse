@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 
 /**
@@ -30,5 +31,5 @@ public class ServiceOrderStatusUpdate {
     private Boolean isOrderCompleted;
 
     @Schema(description = "The error message if the service order failed.")
-    private String errorMsg;
+    private ErrorResponse error;
 }

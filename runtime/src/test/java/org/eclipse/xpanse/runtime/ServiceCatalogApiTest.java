@@ -22,8 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.awaitility.Awaitility;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -156,11 +156,11 @@ class ServiceCatalogApiTest extends ApisTestCommon {
 
         // Setup request 1
         UUID id1 = UUID.randomUUID();
-        Response expectedResponse1 = Response.errorResponse(
-                ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
+        ErrorResponse expectedErrorResponse1 = ErrorResponse.errorResponse(
+                ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED,
                 Collections.singletonList(
                         String.format("Service template with id %s not found.", id1)));
-        String result1 = objectMapper.writeValueAsString(expectedResponse1);
+        String result1 = objectMapper.writeValueAsString(expectedErrorResponse1);
         // Run the test case 1
         final MockHttpServletResponse response1 = getOrderableServiceDetailsWithId(id1);
         // Verify the result 1
@@ -184,11 +184,11 @@ class ServiceCatalogApiTest extends ApisTestCommon {
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup request 1
         UUID id1 = serviceTemplateDetailVo.getServiceTemplateId();
-        Response expectedResponse1 = Response.errorResponse(
-                ResultType.UNAVAILABLE_SERVICE_TEMPLATE,
+        ErrorResponse expectedErrorResponse1 = ErrorResponse.errorResponse(
+                ErrorType.UNAVAILABLE_SERVICE_TEMPLATE,
                 Collections.singletonList(
                         String.format("Service template with id %s is unavailable.", id1)));
-        String result1 = objectMapper.writeValueAsString(expectedResponse1);
+        String result1 = objectMapper.writeValueAsString(expectedErrorResponse1);
         // Run the test case 1
         final MockHttpServletResponse response1 = getOrderableServiceDetailsWithId(id1);
         // Verify the result 1
@@ -218,11 +218,11 @@ class ServiceCatalogApiTest extends ApisTestCommon {
 
         // Setup request 2
         UUID id2 = UUID.randomUUID();
-        Response expectedResponse = Response.errorResponse(
-                ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
+        ErrorResponse expectedErrorResponse = ErrorResponse.errorResponse(
+                ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED,
                 Collections.singletonList(
                         String.format("Service template with id %s not found.", id2)));
-        String result2 = objectMapper.writeValueAsString(expectedResponse);
+        String result2 = objectMapper.writeValueAsString(expectedErrorResponse);
         // Run the test case 2
         final MockHttpServletResponse response2 = mockMvc.perform(
                         get("/xpanse/catalog/services/{id}/openapi", id2)

@@ -49,7 +49,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.response.Response;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeploymentStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -375,9 +375,9 @@ public class ApisTestCommon {
                     registerResponse.getContentAsString(), ServiceTemplateChangeInfo.class);
             return getServiceTemplateDetailsVo(serviceTemplateChangeInfo.getServiceTemplateId());
         } else {
-            Response response = objectMapper.readValue(registerResponse.getContentAsString(),
-                    Response.class);
-            log.error("Register service template failed. Error: " + response.getDetails());
+            ErrorResponse errorResponse = objectMapper.readValue(registerResponse.getContentAsString(),
+                    ErrorResponse.class);
+            log.error("Register service template failed. Error: " + errorResponse.getDetails());
             return null;
         }
     }

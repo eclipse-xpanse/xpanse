@@ -70,7 +70,7 @@ class ServiceMetricsExceptionHandlerTest {
                         .param("resourceId", resourceId)
                         .param("onlyLastKnownMetric", "true"))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Resource Invalid For Monitoring"))
+                .andExpect(jsonPath("$.errorType").value("Resource Invalid For Monitoring"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -85,7 +85,7 @@ class ServiceMetricsExceptionHandlerTest {
                         .param("resourceId", resourceId)
                         .param("onlyLastKnownMetric", "true"))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Resource Not Found"))
+                .andExpect(jsonPath("$.errorType").value("Resource Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -100,7 +100,7 @@ class ServiceMetricsExceptionHandlerTest {
                         .param("resourceId", resourceId)
                         .param("onlyLastKnownMetric", "true"))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Metrics Data Not Ready"))
+                .andExpect(jsonPath("$.errorType").value("Metrics Data Not Ready"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 }

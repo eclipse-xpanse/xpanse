@@ -2,6 +2,7 @@ package org.eclipse.xpanse.modules.models.service.order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +16,13 @@ class ServiceOrderStatusUpdateTest {
     private final Boolean isOrderCompleted = false;
     private final TaskStatus taskStatus = TaskStatus.CREATED;
 
-    private final String errorMsg = "errorMessage";
+    private final ErrorResponse error = new ErrorResponse();
 
     private ServiceOrderStatusUpdate test;
 
     @BeforeEach
     void setUp() {
-        test = new ServiceOrderStatusUpdate(taskStatus, isOrderCompleted, errorMsg);
+        test = new ServiceOrderStatusUpdate(taskStatus, isOrderCompleted, error);
     }
 
 
@@ -29,7 +30,7 @@ class ServiceOrderStatusUpdateTest {
     void testGetters() {
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
         assertThat(test.getIsOrderCompleted()).isEqualTo(isOrderCompleted);
-        assertThat(test.getErrorMsg()).isEqualTo(errorMsg);
+        assertThat(test.getError()).isEqualTo(error);
     }
 
 
@@ -52,7 +53,7 @@ class ServiceOrderStatusUpdateTest {
     void testToString() {
         String expected = "ServiceOrderStatusUpdate(taskStatus=" + taskStatus + ", "
                 + "isOrderCompleted=" + isOrderCompleted + ", "
-                + "errorMsg=" + errorMsg + ")";
+                + "error=" + error + ")";
         assertThat(test.toString()).isEqualTo(expected);
     }
 }

@@ -11,8 +11,8 @@ import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.g
 
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationChangeDetailsEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationNotFoundException;
@@ -38,9 +38,9 @@ public class ServiceConfigurationExceptionHandler {
     @ExceptionHandler({ServiceConfigurationInvalidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleServiceConfigurationInvalidException(
+    public ErrorResponse handleServiceConfigurationInvalidException(
             ServiceConfigurationInvalidException ex) {
-        return getErrorResponse(ResultType.INVALID_SERVICE_CONFIGURATION,
+        return getErrorResponse(ErrorType.INVALID_SERVICE_CONFIGURATION,
                 ex.getErrorReasons());
     }
 
@@ -50,9 +50,9 @@ public class ServiceConfigurationExceptionHandler {
     @ExceptionHandler({ServiceConfigurationChangeDetailsEntityNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleServiceConfigurationUpdateRequestNotFoundException(
+    public ErrorResponse handleServiceConfigurationUpdateRequestNotFoundException(
             ServiceConfigurationChangeDetailsEntityNotFoundException ex) {
-        return getErrorResponse(ResultType.SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND,
+        return getErrorResponse(ErrorType.SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -62,9 +62,9 @@ public class ServiceConfigurationExceptionHandler {
     @ExceptionHandler({ServiceConfigurationNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleServiceConfigurationNotFoundException(
+    public ErrorResponse handleServiceConfigurationNotFoundException(
             ServiceConfigurationNotFoundException ex) {
-        return getErrorResponse(ResultType.SERVICE_CONFIGURATION_NOT_FOUND,
+        return getErrorResponse(ErrorType.SERVICE_CONFIGURATION_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 }

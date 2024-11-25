@@ -67,7 +67,7 @@ class CredentialManageExceptionHandlerTest {
         when(userServiceHelper.getCurrentUserId()).thenReturn(userId);
         this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Credential Capability Not Found"))
+                .andExpect(jsonPath("$.errorType").value("Credential Capability Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -78,7 +78,7 @@ class CredentialManageExceptionHandlerTest {
         when(userServiceHelper.getCurrentUserId()).thenReturn(userId);
         this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Credentials Not Found"))
+                .andExpect(jsonPath("$.errorType").value("Credentials Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -89,7 +89,7 @@ class CredentialManageExceptionHandlerTest {
         when(userServiceHelper.getCurrentUserId()).thenReturn(userId);
         this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Credential Variables Not Complete"))
+                .andExpect(jsonPath("$.errorType").value("Credential Variables Not Complete"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -100,7 +100,7 @@ class CredentialManageExceptionHandlerTest {
         when(userServiceHelper.getCurrentUserId()).thenReturn(userId);
         this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("No Credential Definition Available"))
+                .andExpect(jsonPath("$.errorType").value("No Credential Definition Available"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -111,7 +111,7 @@ class CredentialManageExceptionHandlerTest {
                 .thenThrow(new UserNotLoggedInException("Unable to get current login information"));
         this.mockMvc.perform(get("/xpanse/user/credentials"))
                 .andExpect(status().is(401))
-                .andExpect(jsonPath("$.resultType").value("Current Login User No Found"))
+                .andExpect(jsonPath("$.errorType").value("Current Login User No Found"))
                 .andExpect(
                         jsonPath("$.details[0]").value("Unable to get current login information"));
     }

@@ -73,7 +73,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Terraform Script Invalid"))
+                .andExpect(jsonPath("$.errorType").value("Terraform Script Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -85,7 +85,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Service Template Already Registered"))
+                .andExpect(jsonPath("$.errorType").value("Service Template Already Registered"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -97,7 +97,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Icon Processing Failed"))
+                .andExpect(jsonPath("$.errorType").value("Icon Processing Failed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -109,7 +109,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Service Template Not Registered"))
+                .andExpect(jsonPath("$.errorType").value("Service Template Not Registered"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -121,7 +121,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Service Template Is Unavailable"))
+                .andExpect(jsonPath("$.errorType").value("Service Template Is Unavailable"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -133,7 +133,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Service Template Already Reviewed"))
+                .andExpect(jsonPath("$.errorType").value("Service Template Already Reviewed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -145,7 +145,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Service Template Update Not Allowed"))
+                .andExpect(jsonPath("$.errorType").value("Service Template Update Not Allowed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -157,7 +157,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Variable Schema Definition Invalid"))
+                .andExpect(jsonPath("$.errorType").value("Variable Schema Definition Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -169,7 +169,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Invalid Service Version"))
+                .andExpect(jsonPath("$.errorType").value("Invalid Service Version"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -181,7 +181,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Invalid Service Flavors"))
+                .andExpect(jsonPath("$.errorType").value("Invalid Service Flavors"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -193,7 +193,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Unavailable Service Regions"))
+                .andExpect(jsonPath("$.errorType").value("Unavailable Service Regions"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -205,7 +205,7 @@ class RegistrationExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Invalid Billing Config"))
+                .andExpect(jsonPath("$.errorType").value("Invalid Billing Config"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 }
