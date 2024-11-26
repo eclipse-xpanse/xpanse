@@ -90,9 +90,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -120,21 +120,21 @@ class OpenstackTestlabOrchestratorPluginTest {
     private final String regionName = "RegionOne";
     private final UUID uuid = UUID.randomUUID();
     private final String resourceId = "7b5b6ee6-cab4-4e72-be6e-854a67c6d381";
-    @MockBean
+    @MockitoBean
     private CredentialCenter mockCredentialCenter;
-    @MockBean
+    @MockitoBean
     private MonitorMetricsStore mockMonitorMetricsStore;
-    @MockBean
+    @MockitoBean
     private OpenstackServersManager mockServersManager;
-    @MockBean
+    @MockitoBean
     private OpenstackResourceManager mockResourceManager;
-    @MockBean
+    @MockitoBean
     private OpenstackServicePriceCalculator mockPriceCalculator;
-    @MockBean
+    @MockitoBean
     private DatabaseServiceDeploymentStorage databaseServiceDeploymentStorage;
-    @MockBean
+    @MockitoBean
     private ServiceTemplateStorage serviceTemplateStorage;
-    @MockBean
+    @MockitoBean
     private DeployEnvironments deployEnvironments;
 
     @Resource

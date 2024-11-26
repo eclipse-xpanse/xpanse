@@ -43,9 +43,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -75,25 +75,25 @@ class TerraformBootDeploymentTest {
               value = resource.random_id_2.new.id
             }
             """;
-    @MockBean
+    @MockitoBean
     DeployEnvironments deployEnvironments;
-    @MockBean
+    @MockitoBean
     PluginManager pluginManager;
-    @MockBean
+    @MockitoBean
     TerraformFromScriptsApi terraformApi;
-    @MockBean
+    @MockitoBean
     TerraformFromGitRepoApi terraformFromGitRepoApi;
-    @MockBean
+    @MockitoBean
     TerraformBootConfig terraformBootConfig;
-    @MockBean
+    @MockitoBean
     ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @MockBean
+    @MockitoBean
     TerraformBootScriptValidator terraformBootScriptValidator;
     @Autowired
     TerraformBootServiceDeployer terraformBootServiceDeployer;
     @Autowired
     TerraformBootServiceModifier terraformBootServiceModifier;
-    @MockBean
+    @MockitoBean
     AdminApi adminApi;
 
     @Autowired

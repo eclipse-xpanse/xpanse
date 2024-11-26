@@ -15,7 +15,8 @@ import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfoHolder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -24,7 +25,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Component
-public class IdentityProviderManager {
+public class IdentityProviderManager implements ApplicationListener<ContextRefreshedEvent> {
 
     @Getter
     private IdentityProviderService activeIdentityProviderService;
@@ -38,8 +39,8 @@ public class IdentityProviderManager {
     /**
      * Instantiates active IdentityProviderService.
      */
-    @Bean
-    public void loadActiveIdentityProviderServices() {
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
         if (!webSecurityIsEnabled) {
             log.info("Security is disabled, authentication and authorization are not required.");
             activeIdentityProviderService = null;

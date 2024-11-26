@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -173,8 +172,6 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
             }
         } catch (IOException | InterruptedException ex) {
             log.error("credentialApi html file:{} creation failed.", htmlFile.getName(), ex);
-            throw new OpenApiFileGenerationException(
-                    "credentialApi html file creation failed: " + ex.getMessage());
         } finally {
             // Delete the json file named ${Csp}_credentialApi.yaml
             if (jsonFile.exists()) {

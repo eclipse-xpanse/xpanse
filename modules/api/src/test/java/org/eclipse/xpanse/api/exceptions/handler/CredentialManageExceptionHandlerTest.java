@@ -29,8 +29,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -46,13 +46,13 @@ class CredentialManageExceptionHandlerTest {
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext context;
-    @MockBean
+    @MockitoBean
     private PluginManager pluginManager;
-    @MockBean
+    @MockitoBean
     private CspPluginValidator cspPluginValidator;
-    @MockBean
+    @MockitoBean
     private CredentialCenter credentialCenter;
-    @MockBean
+    @MockitoBean
     private UserServiceHelper userServiceHelper;
 
     @BeforeEach

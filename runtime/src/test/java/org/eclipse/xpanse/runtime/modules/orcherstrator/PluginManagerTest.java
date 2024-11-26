@@ -38,7 +38,6 @@ class PluginManagerTest {
     void setup() {
         plugins = applicationContext.getBeansOfType(OrchestratorPlugin.class).values().stream()
                 .toList();
-        this.pluginManager.loadPlugins();
     }
 
     @Test

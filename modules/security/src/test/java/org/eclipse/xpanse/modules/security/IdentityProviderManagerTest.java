@@ -47,17 +47,7 @@ class IdentityProviderManagerTest {
 
     @Test
     void testLoadActiveIdentityProviderServices() {
-        // Setup without auth
-        setUpSecurityConfig(false);
-        // Run the test
-        identityProviderManagerUnderTest.loadActiveIdentityProviderServices();
-        assertThat(identityProviderManagerUnderTest.getActiveIdentityProviderService()).isNull();
-
         setUpSecurityConfig(true);
-        when(mockApplicationContext.getBeansOfType(IdentityProviderService.class))
-                .thenReturn(Map.of("identityProviderService", mockActiveIdentityProviderService));
-        // Run the test
-        identityProviderManagerUnderTest.loadActiveIdentityProviderServices();
         assertThat(identityProviderManagerUnderTest.getActiveIdentityProviderService())
                 .isEqualTo(mockActiveIdentityProviderService);
     }

@@ -44,8 +44,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -61,27 +61,27 @@ class DeploymentExceptionHandlerTest {
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext context;
-    @MockBean
+    @MockitoBean
     private ServiceDetailsViewManager serviceDetailsViewManager;
-    @MockBean
+    @MockitoBean
     private DeployService deployService;
-    @MockBean
+    @MockitoBean
     private WorkflowUtils workflowUtils;
-    @MockBean
+    @MockitoBean
     private DeployerKindManager deployerKindManager;
-    @MockBean
+    @MockitoBean
     private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @MockBean
+    @MockitoBean
     private PluginManager pluginManager;
-    @MockBean
+    @MockitoBean
     private CspPluginValidator cspPluginValidator;
-    @MockBean
+    @MockitoBean
     private OrchestratorPlugin orchestratorPlugin;
-    @MockBean
+    @MockitoBean
     private ServiceOrderManager serviceOrderManager;
-    @MockBean
+    @MockitoBean
     private ServiceOrderStorage serviceOrderStorage;
-    @MockBean
+    @MockitoBean
     private DeployServiceEntityConverter deployServiceEntityConverter;
 
     @BeforeEach

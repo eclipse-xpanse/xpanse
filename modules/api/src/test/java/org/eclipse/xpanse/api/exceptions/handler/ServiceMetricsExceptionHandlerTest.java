@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,18 +40,18 @@ class ServiceMetricsExceptionHandlerTest {
 
     private final String serviceId = "e034af0c-be03-453e-92cd-fd69acbfe526";
     private final String resourceId = "a034af0c-be03-453e-92cd-fd69acbfe526";
-    @MockBean
+    @MockitoBean
     private PluginManager pluginManager;
-    @MockBean
+    @MockitoBean
     private CspPluginValidator cspPluginValidator;
-    @MockBean
+    @MockitoBean
     private OrchestratorPlugin orchestratorPlugin;
     @Autowired
     private WebApplicationContext context;
 
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private ServiceMetricsAdapter serviceMetricsAdapter;
 
     @BeforeEach

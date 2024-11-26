@@ -24,7 +24,8 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.DuplicateCredenti
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -33,7 +34,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Component
-public class PluginManager {
+public class PluginManager implements ApplicationListener<ContextRefreshedEvent> {
 
     @Getter
     private final Map<Csp, OrchestratorPlugin> pluginsMap = new ConcurrentHashMap<>();
@@ -45,8 +46,9 @@ public class PluginManager {
     /**
      * Instantiates plugins map.
      */
-    @Bean
-    public void loadPlugins() {
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
         applicationContext.getBeansOfType(OrchestratorPlugin.class).forEach((key, value) -> {
             if (isPluginUsable(value.requiredProperties(), value.getCsp())) {
                 pluginsMap.put(value.getCsp(), value);

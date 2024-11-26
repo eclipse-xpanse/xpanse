@@ -25,7 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -46,7 +46,7 @@ class ServiceMetricsApiTest {
 
     private final String resourceId = "e034af0c-be03-453e-92cd-fd69acbfe526";
 
-    @MockBean
+    @MockitoBean
     private ServiceMetricsAdapter mockServiceMetricsAdapter;
 
     private ServiceMetricsApi serviceMetricsApiUnderTest;
