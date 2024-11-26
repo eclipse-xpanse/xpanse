@@ -13,8 +13,8 @@ import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFai
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -37,9 +37,9 @@ public class PolicyManageExceptionHandler {
     @ExceptionHandler({PolicyNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handlePolicyNotFoundException(
+    public ErrorResponse handlePolicyNotFoundException(
             PolicyNotFoundException ex) {
-        return getErrorResponse(ResultType.POLICY_NOT_FOUND,
+        return getErrorResponse(ErrorType.POLICY_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -49,9 +49,9 @@ public class PolicyManageExceptionHandler {
     @ExceptionHandler({PolicyDuplicateException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handlePolicyDuplicateException(
+    public ErrorResponse handlePolicyDuplicateException(
             PolicyDuplicateException ex) {
-        return getErrorResponse(ResultType.POLICY_DUPLICATE,
+        return getErrorResponse(ErrorType.POLICY_DUPLICATE,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -61,9 +61,9 @@ public class PolicyManageExceptionHandler {
     @ExceptionHandler({PoliciesValidationFailedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handlePoliciesValidationFailedException(
+    public ErrorResponse handlePoliciesValidationFailedException(
             PoliciesValidationFailedException ex) {
-        return getErrorResponse(ResultType.POLICY_VALIDATION_FAILED,
+        return getErrorResponse(ErrorType.POLICY_VALIDATION_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -74,9 +74,9 @@ public class PolicyManageExceptionHandler {
     @ExceptionHandler({PoliciesEvaluationFailedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handlePoliciesEvaluationFailedException(
+    public ErrorResponse handlePoliciesEvaluationFailedException(
             PoliciesEvaluationFailedException ex) {
-        return getErrorResponse(ResultType.POLICY_EVALUATION_FAILED,
+        return getErrorResponse(ErrorType.POLICY_EVALUATION_FAILED,
                 Collections.singletonList(ex.getMessage()));
     }
 }

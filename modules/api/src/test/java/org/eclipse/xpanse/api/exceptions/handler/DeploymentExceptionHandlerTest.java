@@ -95,7 +95,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new FlavorInvalidException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Flavor Invalid"))
+                .andExpect(jsonPath("$.errorType").value("Flavor Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -105,7 +105,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new TerraformExecutorException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(502))
-                .andExpect(jsonPath("$.resultType").value("Terraform Execution Failed"))
+                .andExpect(jsonPath("$.errorType").value("Terraform Execution Failed"))
                 .andExpect(jsonPath("$.details[0]").value("TFExecutor Exception: test error"));
     }
 
@@ -115,7 +115,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new PluginNotFoundException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Plugin Not Found"))
+                .andExpect(jsonPath("$.errorType").value("Plugin Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -125,7 +125,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new DeployerNotFoundException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Deployer Not Found"))
+                .andExpect(jsonPath("$.errorType").value("Deployer Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -135,7 +135,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new InvalidServiceStateException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Invalid Service State"))
+                .andExpect(jsonPath("$.errorType").value("Invalid Service State"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -146,7 +146,7 @@ class DeploymentExceptionHandlerTest {
 
         this.mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", UUID.randomUUID()))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Service Deployment Not Found"))
+                .andExpect(jsonPath("$.errorType").value("Service Deployment Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -156,7 +156,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new InvalidDeploymentVariableException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Deployment Variable Invalid"))
+                .andExpect(jsonPath("$.errorType").value("Deployment Variable Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -166,7 +166,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new VariableValidationFailedException(List.of("test error")));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Variable Validation Failed")).andExpect(
+                .andExpect(jsonPath("$.errorType").value("Variable Validation Failed")).andExpect(
                         jsonPath("$.details[0]").value("Variable validation failed: [test error]"));
     }
 
@@ -176,7 +176,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new ServiceLockedException("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Service Locked"))
+                .andExpect(jsonPath("$.errorType").value("Service Locked"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -186,7 +186,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new EulaNotAccepted("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Eula Not Accepted"))
+                .andExpect(jsonPath("$.errorType").value("Eula Not Accepted"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -197,7 +197,7 @@ class DeploymentExceptionHandlerTest {
                 any())).thenThrow(new ServiceFlavorDowngradeNotAllowed("test error"));
 
         this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Service Flavor Downgrade Not Allowed"))
+                .andExpect(jsonPath("$.errorType").value("Service Flavor Downgrade Not Allowed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 }

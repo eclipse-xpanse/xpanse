@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.models.response.OrderFailedResponse;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.OrderFailedErrorResponse;
 import org.eclipse.xpanse.modules.security.common.XpanseAuthentication;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
@@ -110,8 +110,8 @@ public class Oauth2WebSecurityFilter {
                     httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     httpResponse.setCharacterEncoding(UTF_8);
                     httpResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    Response responseModel = getUnauthorizedResponse(authException);
-                    String resBody = objectMapper.writeValueAsString(responseModel);
+                    ErrorResponse errorResponseModel = getUnauthorizedResponse(authException);
+                    String resBody = objectMapper.writeValueAsString(errorResponseModel);
                     PrintWriter printWriter = httpResponse.getWriter();
                     printWriter.print(resBody);
                     printWriter.flush();
@@ -141,17 +141,17 @@ public class Oauth2WebSecurityFilter {
      *
      * @return Response
      */
-    private Response getUnauthorizedResponse(AuthenticationException authException) {
-        ResultType resultType = ResultType.UNAUTHORIZED;
+    private ErrorResponse getUnauthorizedResponse(AuthenticationException authException) {
+        ErrorType errorType = ErrorType.UNAUTHORIZED;
         List<String> details = Collections.singletonList(authException.getMessage());
         if (StringUtils.isNotBlank(MDC.get(SERVICE_ID))) {
-            OrderFailedResponse orderFailedResponse =
-                    OrderFailedResponse.errorResponse(resultType, details);
+            OrderFailedErrorResponse orderFailedResponse =
+                    OrderFailedErrorResponse.errorResponse(errorType, details);
             orderFailedResponse.setServiceId(MDC.get(SERVICE_ID));
             orderFailedResponse.setOrderId(MDC.get(ORDER_ID));
             return orderFailedResponse;
         } else {
-            return Response.errorResponse(resultType, details);
+            return ErrorResponse.errorResponse(errorType, details);
         }
     }
 

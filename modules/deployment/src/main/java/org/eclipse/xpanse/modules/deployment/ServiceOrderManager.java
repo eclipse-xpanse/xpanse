@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceOrderStatusChangePolling;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
@@ -107,7 +108,8 @@ public class ServiceOrderManager {
      * @param orderId    service order id.
      * @param taskStatus task status.
      */
-    public void completeOrderProgress(UUID orderId, TaskStatus taskStatus, String errorMsg) {
+    public void completeOrderProgress(UUID orderId, TaskStatus taskStatus,
+                                      ErrorResponse errorResponse) {
         ServiceOrderEntity serviceOrder = serviceOrderStorage.getEntityById(orderId);
         if (Objects.isNull(serviceOrder)) {
             String errMsg = String.format("Service order with id %s not found "
@@ -117,10 +119,11 @@ public class ServiceOrderManager {
         }
         serviceOrder.setTaskStatus(taskStatus);
         serviceOrder.setCompletedTime(OffsetDateTime.now());
-        serviceOrder.setErrorMsg(errorMsg);
+        if (Objects.nonNull(errorResponse)) {
+            serviceOrder.setErrorResponse(errorResponse);
+        }
         serviceOrderStorage.storeAndFlush(serviceOrder);
     }
-
 
     /**
      * List the service orders.

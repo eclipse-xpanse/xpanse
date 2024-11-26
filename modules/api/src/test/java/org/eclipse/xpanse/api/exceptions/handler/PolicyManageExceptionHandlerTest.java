@@ -58,7 +58,7 @@ class PolicyManageExceptionHandlerTest {
 
         this.mockMvc.perform(get("/xpanse/policies/{id}", id))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Policy Validation Failed"))
+                .andExpect(jsonPath("$.errorType").value("Policy Validation Failed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -70,7 +70,7 @@ class PolicyManageExceptionHandlerTest {
 
         this.mockMvc.perform(get("/xpanse/policies/{id}", id))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Policy Not Found"))
+                .andExpect(jsonPath("$.errorType").value("Policy Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -82,7 +82,7 @@ class PolicyManageExceptionHandlerTest {
 
         this.mockMvc.perform(get("/xpanse/policies/{id}", id))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Duplicate Policy"))
+                .andExpect(jsonPath("$.errorType").value("Duplicate Policy"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -93,7 +93,7 @@ class PolicyManageExceptionHandlerTest {
 
         this.mockMvc.perform(get("/xpanse/policies/{id}", id))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Policy Evaluation Failed"))
+                .andExpect(jsonPath("$.errorType").value("Policy Evaluation Failed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 

@@ -22,8 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -156,7 +156,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
     void testGetServicePolicyDetails_ThrowsPolicyNotFoundException(UUID uuid) throws Exception {
         // Setup
         String errMsg = String.format("The service policy with id %s not found.", uuid);
-        Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         // Run the test
@@ -212,11 +212,11 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
                                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        Response result = objectMapper.readValue(response.getContentAsString(), Response.class);
+        ErrorResponse result = objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        Assertions.assertEquals(result.getResultType(), ResultType.POLICY_VALIDATION_FAILED);
+        Assertions.assertEquals(result.getErrorType(), ErrorType.POLICY_VALIDATION_FAILED);
     }
 
     void testAddServicePolicy_ThrowsFlavorInValidationException(
@@ -229,7 +229,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String errMsg = String.format(
                 "Flavor name %s is not valid for service template with id %s.", errorFlavorName,
                 serviceTemplate.getServiceTemplateId());
-        Response result = Response.errorResponse(ResultType.FLAVOR_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.FLAVOR_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
@@ -257,7 +257,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String errMsg = String.format("The same policy already exists with id: %s for "
                         + "the registered service template with id: %s.",
                 servicePolicy.getServicePolicyId(), servicePolicy.getServiceTemplateId());
-        Response result = Response.errorResponse(ResultType.POLICY_DUPLICATE, List.of(errMsg));
+        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_DUPLICATE, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
@@ -306,7 +306,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         // Setup
         mockPoliciesValidateRequest(true);
         String errMsg = String.format("The service policy with id %s not found.", uuid);
-        Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
@@ -340,7 +340,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         // Setup
         UUID uuid = UUID.randomUUID();
         String errMsg = String.format("The service policy with id %s not found.", uuid);
-        Response result = Response.errorResponse(ResultType.POLICY_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         // Run the test

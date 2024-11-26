@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.deployment.recreate.steps;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,6 +19,8 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +84,9 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
                     runtimeService.setVariable(processInstanceId, RecreateConstants.ASSIGNEE,
                             userId);
                     serviceOrderManager.completeOrderProgress(recreateOrderId,
-                            TaskStatus.FAILED, serviceDeploymentEntity.getResultMessage());
+                            TaskStatus.FAILED,
+                            ErrorResponse.errorResponse(ErrorType.DESTROY_FAILED_EXCEPTION,
+                            List.of(serviceDeploymentEntity.getResultMessage())));
                 }
             }
         } catch (Exception e) {
@@ -90,7 +95,8 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
             runtimeService.setVariable(processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS,
                     false);
             serviceOrderManager.completeOrderProgress(recreateOrderId, TaskStatus.FAILED,
-                    e.getMessage());
+                    ErrorResponse.errorResponse(ErrorType.DESTROY_FAILED_EXCEPTION,
+                            List.of(e.getMessage())));
 
         }
     }

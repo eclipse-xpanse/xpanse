@@ -69,7 +69,7 @@ class CommonExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Parameters Invalid"))
+                .andExpect(jsonPath("$.errorType").value("Parameters Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -81,7 +81,7 @@ class CommonExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.resultType").value("Parameters Invalid"))
+                .andExpect(jsonPath("$.errorType").value("Parameters Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -93,7 +93,7 @@ class CommonExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(422))
-                .andExpect(jsonPath("$.resultType").value("Response Not Valid"))
+                .andExpect(jsonPath("$.errorType").value("Response Not Valid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -105,7 +105,7 @@ class CommonExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(500))
-                .andExpect(jsonPath("$.resultType").value("Unhandled Exception"))
+                .andExpect(jsonPath("$.errorType").value("Unhandled Exception"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -118,7 +118,7 @@ class CommonExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(403))
-                .andExpect(jsonPath("$.resultType").value("Access Denied"))
+                .andExpect(jsonPath("$.errorType").value("Access Denied"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -129,7 +129,7 @@ class CommonExceptionHandlerTest {
 
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
-                .andExpect(status().is(400)).andExpect(jsonPath("$.resultType").value(
+                .andExpect(status().is(400)).andExpect(jsonPath("$.errorType").value(
                         "Sensitive " + "Field Encryption Or Decryption Failed Exception"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
@@ -142,7 +142,7 @@ class CommonExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(422))
-                .andExpect(jsonPath("$.resultType").value("Unsupported Enum Value"))
+                .andExpect(jsonPath("$.errorType").value("Unsupported Enum Value"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
@@ -154,7 +154,7 @@ class CommonExceptionHandlerTest {
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(422))
-                .andExpect(jsonPath("$.resultType").value("Unprocessable Entity")).andExpect(
+                .andExpect(jsonPath("$.errorType").value("Unprocessable Entity")).andExpect(
                         jsonPath("$.details[0]").value(
                                 "Method parameter 'null': Failed to convert value of type" +
                                         " 'java.lang.String' to required type 'org.eclipse.xpanse.modules.models.common.enums.Csp'"));

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
@@ -49,7 +49,7 @@ public class DeployVariableSchemaValidator {
         if (!hasAutoFillAndParentKind(deployVariables)) {
             log.error("variable schema definition invalid");
             throw new InvalidValueSchemaException(
-                    List.of(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID.toValue()));
+                    List.of(ErrorType.VARIABLE_SCHEMA_DEFINITION_INVALID.toValue()));
         }
     }
 

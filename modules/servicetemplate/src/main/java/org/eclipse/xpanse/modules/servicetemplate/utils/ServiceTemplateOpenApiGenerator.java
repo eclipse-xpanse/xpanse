@@ -435,10 +435,10 @@ public class ServiceTemplateOpenApiGenerator {
                             "components": {
                                 "schemas": {
                                     "OrderFailedResponse": {
-                                        "required": ["details", "resultType", "success"],
+                                        "required": ["details", "errorType", "success"],
                                         "type": "object",
                                         "properties": {
-                                            "resultType": {
+                                            "errorType": {
                                                 "type": "string",
                                                 "description": "The result code of response.",
                                                 "enum": [

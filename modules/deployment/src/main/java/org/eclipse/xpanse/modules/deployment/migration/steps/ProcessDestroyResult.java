@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.deployment.migration.steps;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,6 +19,8 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +81,8 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
                     runtimeService.setVariable(processInstanceId, MigrateConstants.ASSIGNEE,
                             userId);
                     serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.FAILED,
-                            serviceDeploymentEntity.getResultMessage());
+                            ErrorResponse.errorResponse(ErrorType.DESTROY_FAILED_EXCEPTION,
+                                    List.of(serviceDeploymentEntity.getResultMessage())));
                 }
             }
         } catch (Exception e) {
@@ -87,7 +91,8 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
             runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
                     false);
             serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.FAILED,
-                    e.getMessage());
+                    ErrorResponse.errorResponse(ErrorType.DESTROY_FAILED_EXCEPTION,
+                            List.of(e.getMessage())));
 
         }
     }

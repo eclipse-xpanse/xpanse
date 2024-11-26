@@ -38,8 +38,8 @@ import java.util.Collections;
 import java.util.List;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
@@ -446,57 +446,57 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
             Csp csp, String site, String region) throws Exception {
         final MockHttpServletResponse listVpcResponse = getExistingResourceNamesWithKind(
                 DeployResourceKind.VPC, csp, site, region);
-        Response vpcResponse =
-                objectMapper.readValue(listVpcResponse.getContentAsString(), Response.class);
+        ErrorResponse vpcErrorResponse =
+                objectMapper.readValue(listVpcResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listVpcResponse.getStatus());
-        Assertions.assertEquals(vpcResponse.getResultType(), ResultType.BACKEND_FAILURE);
+        Assertions.assertEquals(vpcErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listSubnetResponse = getExistingResourceNamesWithKind(
                 DeployResourceKind.SUBNET, csp, site, region);
-        Response subnetResponse =
-                objectMapper.readValue(listSubnetResponse.getContentAsString(), Response.class);
+        ErrorResponse subnetErrorResponse =
+                objectMapper.readValue(listSubnetResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listSubnetResponse.getStatus());
-        Assertions.assertEquals(subnetResponse.getResultType(), ResultType.BACKEND_FAILURE);
+        Assertions.assertEquals(subnetErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listSecurityGroupResponse = getExistingResourceNamesWithKind(
                 DeployResourceKind.SECURITY_GROUP, csp, site, region);
-        Response securityGroupResponse = objectMapper.readValue(
-                listSecurityGroupResponse.getContentAsString(), Response.class);
+        ErrorResponse securityGroupErrorResponse = objectMapper.readValue(
+                listSecurityGroupResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(),
                 listSecurityGroupResponse.getStatus());
-        Assertions.assertEquals(securityGroupResponse.getResultType(), ResultType.BACKEND_FAILURE);
+        Assertions.assertEquals(securityGroupErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listSecurityGroupRuleResponse =
                 getExistingResourceNamesWithKind(
                         DeployResourceKind.SECURITY_GROUP_RULE, csp, site, region);
-        Response securityGroupRuleResponse =
+        ErrorResponse securityGroupRuleErrorResponse =
                 objectMapper.readValue(listSecurityGroupRuleResponse.getContentAsString(),
-                        Response.class);
+                        ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(),
                 listSecurityGroupRuleResponse.getStatus());
-        Assertions.assertEquals(securityGroupRuleResponse.getResultType(),
-                ResultType.BACKEND_FAILURE);
+        Assertions.assertEquals(securityGroupRuleErrorResponse.getErrorType(),
+                ErrorType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listPublicIpResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.PUBLIC_IP, csp, site, region);
-        Response publicIpResponse =
-                objectMapper.readValue(listPublicIpResponse.getContentAsString(), Response.class);
+        ErrorResponse publicIpErrorResponse =
+                objectMapper.readValue(listPublicIpResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listPublicIpResponse.getStatus());
-        Assertions.assertEquals(publicIpResponse.getResultType(), ResultType.BACKEND_FAILURE);
+        Assertions.assertEquals(publicIpErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listVolumeResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, csp, site, region);
-        Response volumeResponse =
-                objectMapper.readValue(listVolumeResponse.getContentAsString(), Response.class);
+        ErrorResponse volumeErrorResponse =
+                objectMapper.readValue(listVolumeResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listVolumeResponse.getStatus());
-        Assertions.assertEquals(volumeResponse.getResultType(), ResultType.BACKEND_FAILURE);
+        Assertions.assertEquals(volumeErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
 
         final MockHttpServletResponse listKeypairResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, csp, site, region);
-        Response keypairResponse =
-                objectMapper.readValue(listKeypairResponse.getContentAsString(), Response.class);
+        ErrorResponse keypairErrorResponse =
+                objectMapper.readValue(listKeypairResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listKeypairResponse.getStatus());
-        Assertions.assertEquals(keypairResponse.getResultType(), ResultType.BACKEND_FAILURE);
+        Assertions.assertEquals(keypairErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
     }
 
     void testGetExistingResourceNamesWithKindForCspWithOsClient(Csp csp) throws Exception {

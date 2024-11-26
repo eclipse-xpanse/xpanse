@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -27,7 +28,7 @@ class ServiceOrderEntityTest {
     private final OffsetDateTime completedTime = OffsetDateTime.of(LocalDateTime.now(),
             ZoneOffset.UTC);
     private final UUID uuid = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab61");
-    private final String errorMsg = "error message";
+    private final ErrorResponse errorResponse = new ErrorResponse();
     private final String userId = "userId";
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
@@ -60,7 +61,7 @@ class ServiceOrderEntityTest {
         test.setUserId(userId);
         test.setStartedTime(startedTime);
         test.setCompletedTime(completedTime);
-        test.setErrorMsg(errorMsg);
+        test.setErrorResponse(errorResponse);
         test.setTaskStatus(taskStatus);
         test.setPreviousDeployRequest(mockPreviousDeployRequest);
         test.setNewDeployRequest(mockNewDeployRequest);
@@ -81,7 +82,7 @@ class ServiceOrderEntityTest {
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
-        assertThat(test.getErrorMsg()).isEqualTo(errorMsg);
+        assertThat(test.getErrorResponse()).isEqualTo(errorResponse);
         assertThat(test.getCompletedTime()).isEqualTo(completedTime);
         assertThat(test.getStartedTime()).isEqualTo(startedTime);
         assertThat(test.getPreviousDeployRequest()).isEqualTo(mockPreviousDeployRequest);
@@ -120,7 +121,7 @@ class ServiceOrderEntityTest {
                 + ", taskType=" + taskType
                 + ", userId=" + userId
                 + ", taskStatus=" + taskStatus
-                + ", errorMsg=" + errorMsg
+                + ", errorResponse=" + errorResponse
                 + ", startedTime=" + startedTime
                 + ", completedTime=" + completedTime
                 + ", previousDeployRequest=" + mockPreviousDeployRequest

@@ -27,6 +27,7 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -75,8 +76,11 @@ public class ServiceOrderEntity implements Serializable {
     @Column(name = "TASK_STATUS", nullable = false)
     private TaskStatus taskStatus;
 
-    @Column(name = "ERROR_MSG", length = Integer.MAX_VALUE)
-    private String errorMsg;
+
+    @Column(name = "ERROR", columnDefinition = "json")
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private ErrorResponse errorResponse;
 
     @CreatedDate
     @Column(name = "STARTED_TIME")

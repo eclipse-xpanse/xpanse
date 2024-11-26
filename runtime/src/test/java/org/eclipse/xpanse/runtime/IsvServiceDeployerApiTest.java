@@ -27,8 +27,8 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
@@ -167,11 +167,11 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailsResponse.getStatus());
         assertNotNull(detailsResponse.getHeader(HEADER_TRACKING_ID));
-        Response response =
-                objectMapper.readValue(detailsResponse.getContentAsString(), Response.class);
-        assertFalse(response.getSuccess());
-        assertEquals(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND, response.getResultType());
-        assertEquals(List.of(refuseMsg), response.getDetails());
+        ErrorResponse errorResponse =
+                objectMapper.readValue(detailsResponse.getContentAsString(), ErrorResponse.class);
+
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, errorResponse.getErrorType());
+        assertEquals(List.of(refuseMsg), errorResponse.getDetails());
     }
 
 

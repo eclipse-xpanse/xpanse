@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -100,7 +100,7 @@ class ServiceMigrationApiTest extends ApisTestCommon {
     void testMigrateThrowsServiceNotFoundException(MigrateRequest migrateRequest) throws Exception {
         migrateRequest.setOriginalServiceId(UUID.randomUUID());
         // Setup
-        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+        ErrorResponse expectedErrorResponse = ErrorResponse.errorResponse(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
                 List.of(String.format("Service with id %s not found.",
                         migrateRequest.getOriginalServiceId())));
         // Run the test
@@ -109,7 +109,7 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(expectedResponse));
+                objectMapper.writeValueAsString(expectedErrorResponse));
     }
 
     void testMigrateThrowsServiceLockedException(MigrateRequest migrateRequest) throws Exception {
@@ -123,9 +123,9 @@ class ServiceMigrationApiTest extends ApisTestCommon {
 
         String message = String.format("Service with id %s is locked from migration.",
                 migrateRequest.getOriginalServiceId());
-        Response expectedResponse = Response.errorResponse(ResultType.SERVICE_LOCKED,
+        ErrorResponse expectedErrorResponse = ErrorResponse.errorResponse(ErrorType.SERVICE_LOCKED,
                 Collections.singletonList(message));
-        String result = objectMapper.writeValueAsString(expectedResponse);
+        String result = objectMapper.writeValueAsString(expectedErrorResponse);
         // Run the test
         final MockHttpServletResponse response = migrateService(migrateRequest);
 
@@ -139,7 +139,7 @@ class ServiceMigrationApiTest extends ApisTestCommon {
                                                 ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
 
-        Response expectedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
+        ErrorResponse expectedErrorResponse = ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
                 Collections.singletonList(
                         "No permissions to migrate services belonging to other users."));
 
@@ -157,7 +157,7 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
         assertThat(response.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(expectedResponse));
+                objectMapper.writeValueAsString(expectedErrorResponse));
     }
 
 

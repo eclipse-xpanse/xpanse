@@ -28,6 +28,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
@@ -109,9 +111,10 @@ public class DeployResultManager {
         // error message. Then start a new rollback order task and wait the order callback.
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         if (isFailedDeployTask(isTaskSuccessful, taskType)) {
-            storedOrderEntity.setTaskStatus(TaskStatus.FAILED);
-            storedOrderEntity.setErrorMsg(deployResult.getMessage());
-            serviceOrderStorage.storeAndFlush(storedOrderEntity);
+            serviceOrderManager.completeOrderProgress(storedOrderEntity.getOrderId(),
+                    TaskStatus.FAILED,
+                    ErrorResponse.errorResponse(ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                            List.of(deployResult.getMessage())));
             DeployTask rollbackTask = deployServiceEntityConverter.getDeployTaskByStoredService(
                     ServiceOrderType.ROLLBACK, updatedServiceEntity);
             rollbackTask.setParentOrderId(orderId);
@@ -347,11 +350,10 @@ public class DeployResultManager {
         BeanUtils.copyProperties(storedOrderEntity, entityToUpdate);
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         TaskStatus taskStatus = isTaskSuccessful ? TaskStatus.SUCCESSFUL : TaskStatus.FAILED;
-        entityToUpdate.setTaskStatus(taskStatus);
         entityToUpdate.setCompletedTime(OffsetDateTime.now());
-        entityToUpdate.setErrorMsg(deployResult.getMessage());
-        // finally, update the service order entity of this current order task.
-        serviceOrderStorage.storeAndFlush(entityToUpdate);
+        serviceOrderManager.completeOrderProgress(storedOrderEntity.getOrderId(), taskStatus,
+                ErrorResponse.errorResponse(ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                        List.of(deployResult.getMessage())));
     }
 
     private void completeParentServiceOrder(UUID parentOrderId) {

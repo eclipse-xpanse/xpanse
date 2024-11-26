@@ -24,8 +24,8 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
@@ -93,7 +93,7 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         ServiceOrderStatusUpdate orderIsCompletedResult =
                 getLatestServiceOrderStatus(orderId, null);
         assertThat(orderIsCompletedResult).isNotNull();
-        assertThat(orderIsCompletedResult.getIsOrderCompleted()).isTrue();
+        assertThat(orderIsCompletedResult.getIsOrderCompleted()).isFalse();
 
         MockHttpServletResponse orderDetailsResponse = getOrderDetailsByOrderId(orderId);
         assertEquals(HttpStatus.OK.value(), orderDetailsResponse.getStatus());
@@ -101,12 +101,12 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
                 orderDetailsResponse.getContentAsString(), ServiceOrderDetails.class);
 
         assertThat(orderDetails.getOrderId()).isEqualTo(orderId);
-        assertThat(orderDetails.getTaskStatus()).isEqualTo(TaskStatus.SUCCESSFUL);
+        assertThat(orderDetails.getTaskStatus()).isEqualTo(TaskStatus.IN_PROGRESS);
         assertThat(orderDetails.getTaskType()).isEqualTo(ServiceOrderType.DEPLOY);
         assertThat(orderDetails.getServiceId()).isEqualTo(serviceId);
 
         MockHttpServletResponse serviceOrdersResponse =
-                listServiceOrders(serviceId, ServiceOrderType.DEPLOY, TaskStatus.SUCCESSFUL);
+                listServiceOrders(serviceId, ServiceOrderType.DEPLOY, TaskStatus.IN_PROGRESS);
 
         assertThat(serviceOrdersResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         List<ServiceOrderDetails> serviceOrders = objectMapper.readValue(
@@ -168,10 +168,10 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         serviceOrderStorage.storeAndFlush(serviceOrderEntity);
 
         String errorMsg = "No permissions to manage service orders belonging to other users.";
-        Response expectedResponse =
-                Response.errorResponse(ResultType.ACCESS_DENIED,
+        ErrorResponse expectedErrorResponse =
+                ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
                         Collections.singletonList(errorMsg));
-        String result = objectMapper.writeValueAsString(expectedResponse);
+        String result = objectMapper.writeValueAsString(expectedErrorResponse);
 
         MockHttpServletResponse listOrdersResponse = listServiceOrders(serviceId, null, null);
         assertEquals(HttpStatus.FORBIDDEN.value(), listOrdersResponse.getStatus());
@@ -192,11 +192,11 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
     void testApisThrowServiceOrderNotFound() throws Exception {
         // SetUp
         UUID orderId = UUID.randomUUID();
-        Response expectedResponse =
-                Response.errorResponse(ResultType.SERVICE_ORDER_NOT_FOUND,
+        ErrorResponse expectedErrorResponse =
+                ErrorResponse.errorResponse(ErrorType.SERVICE_ORDER_NOT_FOUND,
                         Collections.singletonList(
                                 String.format("Service order with id %s not found.", orderId)));
-        String result = objectMapper.writeValueAsString(expectedResponse);
+        String result = objectMapper.writeValueAsString(expectedErrorResponse);
 
         MockHttpServletResponse getAuditResponse = getOrderDetailsByOrderId(orderId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), getAuditResponse.getStatus());
@@ -211,11 +211,11 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
     void testApisThrowServiceNotFound() throws Exception {
         // SetUp
         UUID serviceId = UUID.randomUUID();
-        Response expectedResponse =
-                Response.errorResponse(ResultType.SERVICE_DEPLOYMENT_NOT_FOUND,
+        ErrorResponse expectedErrorResponse =
+                ErrorResponse.errorResponse(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
                         Collections.singletonList(
                                 String.format("Service with id %s not found.", serviceId)));
-        String result = objectMapper.writeValueAsString(expectedResponse);
+        String result = objectMapper.writeValueAsString(expectedErrorResponse);
 
         MockHttpServletResponse listOrdersResponse = listServiceOrders(serviceId, null, null);
         assertEquals(HttpStatus.BAD_REQUEST.value(), listOrdersResponse.getStatus());

@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.deployment.recreate.steps;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,6 +19,8 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +66,8 @@ public class ProcessRecreateDeploymentResult implements Serializable, JavaDelega
             if (Objects.nonNull(serviceDeploymentEntity)
                     && serviceDeploymentEntity.getServiceDeploymentState()
                     == ServiceDeploymentState.DEPLOY_SUCCESS) {
-                serviceOrderManager.completeOrderProgress(
-                        recreateOrderId, TaskStatus.SUCCESSFUL, null);
+                serviceOrderManager.completeOrderProgress(recreateOrderId, TaskStatus.SUCCESSFUL,
+                        null);
                 runtimeService.setVariable(processInstanceId, RecreateConstants.IS_DEPLOY_SUCCESS,
                         true);
                 log.info("Deployment step completed for recreate order workflow with id {}.",
@@ -82,7 +85,8 @@ public class ProcessRecreateDeploymentResult implements Serializable, JavaDelega
                     runtimeService.setVariable(processInstanceId, RecreateConstants.ASSIGNEE,
                             userId);
                     serviceOrderManager.completeOrderProgress(recreateOrderId, TaskStatus.FAILED,
-                            serviceDeploymentEntity.getResultMessage());
+                            ErrorResponse.errorResponse(ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                                    List.of(serviceDeploymentEntity.getResultMessage())));
                 }
             }
         } catch (Exception e) {
@@ -90,8 +94,9 @@ public class ProcessRecreateDeploymentResult implements Serializable, JavaDelega
                     processInstanceId, e);
             runtimeService.setVariable(processInstanceId, RecreateConstants.IS_DEPLOY_SUCCESS,
                     false);
-            serviceOrderManager.completeOrderProgress(recreateOrderId,
-                    TaskStatus.FAILED, e.getMessage());
+            serviceOrderManager.completeOrderProgress(recreateOrderId, TaskStatus.FAILED,
+                    ErrorResponse.errorResponse(ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                            List.of(e.getMessage())));
         }
     }
 

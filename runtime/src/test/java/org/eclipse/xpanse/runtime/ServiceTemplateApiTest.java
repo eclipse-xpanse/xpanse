@@ -38,8 +38,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.models.billing.PriceWithRegion;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
@@ -245,8 +245,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
     void testManageApisThrowsServiceTemplateNotRegistered() throws Exception {
         // Setup
         UUID id = UUID.randomUUID();
-        Response expectedResponse =
-                Response.errorResponse(ResultType.SERVICE_TEMPLATE_NOT_REGISTERED,
+        ErrorResponse expectedResponse =
+                ErrorResponse.errorResponse(ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED,
                         Collections.singletonList(
                                 String.format("Service template with id %s not found.", id)));
         String result = objectMapper.writeValueAsString(expectedResponse);
@@ -281,7 +281,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
     void testManageApisThrowsAccessDeniedException() throws Exception {
 
-        Response accessDeniedResponse = Response.errorResponse(ResultType.ACCESS_DENIED,
+        ErrorResponse accessDeniedResponse = ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
                 Collections.singletonList("No permissions to view or manage service template "
                         + "belonging to other namespaces."));
         // Setup
@@ -375,10 +375,10 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ocl.getServiceProviderContactDetails().getChats().add(duplicateAddress);
         // Run the test
         final MockHttpServletResponse response = register(ocl);
-        Response result = objectMapper.readValue(response.getContentAsString(), Response.class);
+        ErrorResponse result = objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
-        assertEquals(result.getResultType(), ResultType.UNPROCESSABLE_ENTITY);
+        assertEquals(result.getErrorType(), ErrorType.UNPROCESSABLE_ENTITY);
         assertFalse(result.getDetails().isEmpty());
 
         Ocl oclTest = oclLoader.getOcl(
@@ -386,19 +386,19 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         oclTest.getDeployment().getDeployerTool().setVersion(null);
         // Run the test
         final MockHttpServletResponse response1 = register(oclTest);
-        Response result1 = objectMapper.readValue(response1.getContentAsString(), Response.class);
+        ErrorResponse result1 = objectMapper.readValue(response1.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response1.getStatus());
-        assertEquals(result1.getResultType(), ResultType.UNPROCESSABLE_ENTITY);
+        assertEquals(result1.getErrorType(), ErrorType.UNPROCESSABLE_ENTITY);
         assertFalse(result1.getDetails().isEmpty());
 
         oclTest.getDeployment().getDeployerTool().setVersion("> v1.6.0");
         // Run the test
         final MockHttpServletResponse response2 = register(oclTest);
-        Response result2 = objectMapper.readValue(response2.getContentAsString(), Response.class);
+        ErrorResponse result2 = objectMapper.readValue(response2.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response2.getStatus());
-        assertEquals(result2.getResultType(), ResultType.UNPROCESSABLE_ENTITY);
+        assertEquals(result2.getErrorType(), ErrorType.UNPROCESSABLE_ENTITY);
         assertFalse(result2.getDetails().isEmpty());
     }
 
@@ -408,7 +408,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         Csp csp = Csp.AWS;
         ocl.getCloudServiceProvider().setName(csp);
-        Response expectedResponse = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
+        ErrorResponse expectedResponse = ErrorResponse.errorResponse(ErrorType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
                         String.format("Can't find suitable plugin for the Csp %s", csp.toValue())));
         // Run the test
@@ -424,16 +424,15 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getDeployment().setDeployer("error_" + ocl.getDeployment().getDeployer());
-        Response expectedResponse = Response.errorResponse(ResultType.TERRAFORM_EXECUTION_FAILED,
+        ErrorResponse expectedResponse = ErrorResponse.errorResponse(ErrorType.TERRAFORM_EXECUTION_FAILED,
                 Collections.singletonList("Executor Exception:TFExecutor.tfInit failed"));
         // Run the test
         final MockHttpServletResponse response = register(ocl);
-        Response responseModel =
-                objectMapper.readValue(response.getContentAsString(), Response.class);
+        ErrorResponse responseModel =
+                objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.BAD_GATEWAY.value(), response.getStatus());
-        assertEquals(responseModel.getResultType(), expectedResponse.getResultType());
-        assertEquals(responseModel.getSuccess(), expectedResponse.getSuccess());
+        assertEquals(responseModel.getErrorType(), expectedResponse.getErrorType());
     }
 
     void testRegisterThrowsInvalidValueSchemaException() throws Exception {
@@ -451,8 +450,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         String errorMessage = String.format(
                 "The deploy variable configuration list with duplicated variable name %s",
                 deployVariableWithRepeatName.getName());
-        Response expectedResponse =
-                Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+        ErrorResponse expectedResponse =
+                ErrorResponse.errorResponse(ErrorType.VARIABLE_SCHEMA_DEFINITION_INVALID,
                         Collections.singletonList(errorMessage));
         // Run the test
         final MockHttpServletResponse response = register(ocl);
@@ -477,8 +476,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         String errorMessage2 = String.format(
                 "The availability zone configuration list with duplicated variable name %s",
                 availabilityZoneConfig.getVarName());
-        Response expectedResponse2 =
-                Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+        ErrorResponse expectedResponse2 =
+                ErrorResponse.errorResponse(ErrorType.VARIABLE_SCHEMA_DEFINITION_INVALID,
                         Collections.singletonList(errorMessage2));
         // Run the test
         final MockHttpServletResponse response2 = register(ocl2);
@@ -509,8 +508,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         String errorMessage3 = String.format("Value schema key %s in deploy variable %s is invalid",
                 errorSchemaKey, errorVariable.getName());
-        Response expectedResponse3 =
-                Response.errorResponse(ResultType.VARIABLE_SCHEMA_DEFINITION_INVALID,
+        ErrorResponse expectedResponse3 =
+                ErrorResponse.errorResponse(ErrorType.VARIABLE_SCHEMA_DEFINITION_INVALID,
                         Collections.singletonList(errorMessage3));
         // Run the test
         final MockHttpServletResponse response3 = register(ocl3);
@@ -530,8 +529,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ServiceTemplateChangeInfo serviceTemplateDetail =
                 objectMapper.readValue(response.getContentAsString(),
                         ServiceTemplateChangeInfo.class);
-        Response expectedResponse =
-                Response.errorResponse(ResultType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
+        ErrorResponse expectedResponse =
+                ErrorResponse.errorResponse(ErrorType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
                         Collections.singletonList(
                                 String.format("Service template already registered with id %s",
                                         serviceTemplateDetail.getServiceTemplateId())));
@@ -554,7 +553,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ocl.setServiceVersion(serviceVersion);
         String errorMsg1 = String.format("The service version %s is a invalid semver version.",
                 serviceVersion);
-        Response expectedResponse1 = Response.errorResponse(ResultType.INVALID_SERVICE_VERSION,
+        ErrorResponse expectedResponse1 = ErrorResponse.errorResponse(ErrorType.INVALID_SERVICE_VERSION,
                 Collections.singletonList(errorMsg1));
         // Run the test
         final MockHttpServletResponse registerResponse1 = register(ocl);
@@ -574,7 +573,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         String errorMsg2 = String.format("The version %s of service must be higher than the"
                         + " highest version %s of the registered services with same name", lowerVersion,
                 existingServiceVersion);
-        Response expectedResponse2 = Response.errorResponse(ResultType.INVALID_SERVICE_VERSION,
+        ErrorResponse expectedResponse2 = ErrorResponse.errorResponse(ErrorType.INVALID_SERVICE_VERSION,
                 Collections.singletonList(errorMsg2));
         // Run the test
         final MockHttpServletResponse registerResponse2 = register(ocl);
@@ -636,12 +635,12 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 Arrays.asList(errorMsg1, errorMsg2, errorMsg3, errorMsg4, errorMsg5);
         // Run the test
         final MockHttpServletResponse registerResponse = register(ocl);
-        Response response =
-                objectMapper.readValue(registerResponse.getContentAsString(), Response.class);
+        ErrorResponse errorResponse =
+                objectMapper.readValue(registerResponse.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
-        assertEquals(response.getResultType(), ResultType.INVALID_BILLING_CONFIG);
-        assertTrue(response.getDetails().containsAll(expectedDetails));
+        assertEquals(errorResponse.getErrorType(), ErrorType.INVALID_BILLING_CONFIG);
+        assertTrue(errorResponse.getDetails().containsAll(expectedDetails));
     }
 
 
@@ -657,12 +656,12 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         List<String> expectedDetails = Collections.singletonList(errorMsg);
         // Run the test
         final MockHttpServletResponse registerResponse = register(ocl);
-        Response response =
-                objectMapper.readValue(registerResponse.getContentAsString(), Response.class);
+        ErrorResponse errorResponse =
+                objectMapper.readValue(registerResponse.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
-        assertEquals(response.getResultType(), ResultType.INVALID_SERVICE_FLAVORS);
-        assertTrue(response.getDetails().containsAll(expectedDetails));
+        assertEquals(errorResponse.getErrorType(), ErrorType.INVALID_SERVICE_FLAVORS);
+        assertTrue(errorResponse.getDetails().containsAll(expectedDetails));
     }
 
     void testRegisterThrowsUnavailableServiceRegionsException() throws Exception {
@@ -677,12 +676,12 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 errorRegionName, ocl.getCloudServiceProvider().getName().toValue());
         // Run the test
         final MockHttpServletResponse registerResponse = register(ocl);
-        Response response =
-                objectMapper.readValue(registerResponse.getContentAsString(), Response.class);
+        ErrorResponse errorResponse =
+                objectMapper.readValue(registerResponse.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
-        assertEquals(response.getResultType(), ResultType.UNAVAILABLE_SERVICE_REGIONS);
-        assertEquals(response.getDetails(), Collections.singletonList(errorMsg));
+        assertEquals(errorResponse.getErrorType(), ErrorType.UNAVAILABLE_SERVICE_REGIONS);
+        assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
     }
 
 
@@ -690,35 +689,33 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Setup
         String fileUrl =
                 URI.create("file:src/test/resources/ocl_terraform_error.yml").toURL().toString();
-        Response expectedResponse = Response.errorResponse(ResultType.RUNTIME_ERROR,
+        ErrorResponse expectedErrorResponse = ErrorResponse.errorResponse(ErrorType.RUNTIME_ERROR,
                 Collections.singletonList("java.io.FileNotFoundException:"));
 
         // Run the test
         final MockHttpServletResponse response = fetch(fileUrl);
-        Response responseModel =
-                objectMapper.readValue(response.getContentAsString(), Response.class);
+        ErrorResponse errorResponseModel =
+                objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
-        assertEquals(responseModel.getResultType(), expectedResponse.getResultType());
-        assertEquals(responseModel.getSuccess(), expectedResponse.getSuccess());
+        assertEquals(errorResponseModel.getErrorType(), expectedErrorResponse.getErrorType());
     }
 
     void testListServiceTemplatesThrowsException() throws Exception {
         // Setup
         String errorMessage = "Failed to convert value of type 'java.lang.String' to required type";
-        Response expectedResponse =
-                Response.errorResponse(ResultType.UNPROCESSABLE_ENTITY, List.of(errorMessage));
+        ErrorResponse expectedResponse =
+                ErrorResponse.errorResponse(ErrorType.UNPROCESSABLE_ENTITY, List.of(errorMessage));
 
         // Run the test
         final MockHttpServletResponse response = listServiceTemplatesWithParams(
                 "errorCategory", null, null, null, null, null, null, null);
-        Response resultResponse =
-                objectMapper.readValue(response.getContentAsString(), Response.class);
+        ErrorResponse resultResponse =
+                objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
 
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
-        assertEquals(expectedResponse.getSuccess(), resultResponse.getSuccess());
-        assertEquals(expectedResponse.getResultType(), resultResponse.getResultType());
+       assertEquals(expectedResponse.getErrorType(), resultResponse.getErrorType());
     }
 
     void testDeleteServiceTemplateThrowsException() throws Exception {
@@ -740,8 +737,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 //                objectMapper.writeValueAsString(expectedResponse));
 
         String errorMsg2 = String.format("Service template with id %s is still in use.", id);
-        Response expectedResponse2 =
-                Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE,
+        ErrorResponse expectedErrorResponse2 =
+                ErrorResponse.errorResponse(ErrorType.SERVICE_TEMPLATE_STILL_IN_USE,
                         List.of(errorMsg2));
         unregister(serviceTemplate.getServiceTemplateId());
         when(mockDeployServiceStorage.listServices(any(ServiceQueryModel.class))).thenReturn(
@@ -749,7 +746,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         MockHttpServletResponse deleteResponse2 = deleteTemplate(id);
         assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse2.getStatus());
         assertEquals(deleteResponse2.getContentAsString(),
-                objectMapper.writeValueAsString(expectedResponse2));
+                objectMapper.writeValueAsString(expectedErrorResponse2));
 
         deleteTemplate(serviceTemplate.getServiceTemplateId());
     }

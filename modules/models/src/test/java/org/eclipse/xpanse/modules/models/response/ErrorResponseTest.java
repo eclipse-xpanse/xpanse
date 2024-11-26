@@ -3,36 +3,36 @@ package org.eclipse.xpanse.modules.models.response;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-class OrderFailedResponseTest {
+class ErrorResponseTest {
 
-
-    private final ResultType resultType = ResultType.ACCESS_DENIED;
-    private final List<String> details = List.of(ResultType.ACCESS_DENIED.toValue());
+    private final ErrorType errorType = ErrorType.ACCESS_DENIED;
+    private final List<String> details = List.of(ErrorType.ACCESS_DENIED.toValue());
     private final Boolean success = false;
-    private final String id = UUID.randomUUID().toString();
-    private OrderFailedResponse test;
+    private ErrorResponse test;
 
     @BeforeEach
     void setUp() {
-        test = OrderFailedResponse.errorResponse(resultType, details);
-        test.setSuccess(success);
-        test.setServiceId(id);
-        test.setOrderId(id);
+        test = new ErrorResponse();
+        test.setErrorType(errorType);
+        test.setDetails(details);
     }
 
+    @Test
+    void testErrorResponse() {
+        // Run the test
+        final ErrorResponse result = ErrorResponse.errorResponse(errorType, details);
+        assertThat(result.getErrorType()).isEqualTo(errorType);
+        assertThat(result.getDetails()).isEqualTo(details);
+    }
 
     @Test
     void testGetters() {
-        assertThat(test.getResultType()).isEqualTo(resultType);
+        assertThat(test.getErrorType()).isEqualTo(errorType);
         assertThat(test.getDetails()).isEqualTo(details);
-        assertThat(test.getSuccess()).isEqualTo(success);
-        assertThat(test.getServiceId()).isEqualTo(id);
-        assertThat(test.getOrderId()).isEqualTo(id);
     }
 
     @Test
@@ -42,7 +42,7 @@ class OrderFailedResponseTest {
         assertThat(test.equals(o)).isFalse();
         assertThat(test.hashCode()).isNotEqualTo(o.hashCode());
 
-        OrderFailedResponse test2 = OrderFailedResponse.errorResponse(resultType, details);
+        ErrorResponse test2 = new ErrorResponse();
         assertThat(test.canEqual(test2)).isTrue();
         assertThat(test.equals(test2)).isFalse();
         assertThat(test.hashCode()).isNotEqualTo(test2.hashCode());
@@ -56,7 +56,8 @@ class OrderFailedResponseTest {
 
     @Test
     void testToString() {
-        String result = "OrderFailedResponse(serviceId=" + id + ", orderId=" + id + ")";
+        String result =
+                "ErrorResponse(errorType=ACCESS_DENIED, details=[Access Denied])";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

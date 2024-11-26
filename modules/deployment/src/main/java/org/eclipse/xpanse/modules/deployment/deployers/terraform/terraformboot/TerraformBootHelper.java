@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.c
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformScriptGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.beans.factory.annotation.Value;
@@ -106,7 +106,7 @@ public class TerraformBootHelper {
                 return clientBaseUri;
             }
         } catch (UnknownHostException e) {
-            log.error(ResultType.TERRAFORM_BOOT_REQUEST_FAILED.toValue());
+            log.error(ErrorType.TERRAFORM_BOOT_REQUEST_FAILED.toValue());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }

@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -37,9 +37,9 @@ public class ServiceMetricsExceptionHandler {
     @ExceptionHandler({ResourceNotSupportedForMonitoringException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleResourceNotSupportedForMonitoringException(
+    public ErrorResponse handleResourceNotSupportedForMonitoringException(
             ResourceNotSupportedForMonitoringException ex) {
-        return getErrorResponse(ResultType.RESOURCE_TYPE_INVALID_FOR_MONITORING,
+        return getErrorResponse(ErrorType.RESOURCE_TYPE_INVALID_FOR_MONITORING,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -49,8 +49,8 @@ public class ServiceMetricsExceptionHandler {
     @ExceptionHandler({ResourceNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return getErrorResponse(ResultType.RESOURCE_NOT_FOUND,
+    public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return getErrorResponse(ErrorType.RESOURCE_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
@@ -60,9 +60,9 @@ public class ServiceMetricsExceptionHandler {
     @ExceptionHandler({MetricsDataNotYetAvailableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Response handleMetricsDataNotYetAvailableException(
+    public ErrorResponse handleMetricsDataNotYetAvailableException(
             MetricsDataNotYetAvailableException ex) {
-        return getErrorResponse(ResultType.METRICS_DATA_NOT_READY,
+        return getErrorResponse(ErrorType.METRICS_DATA_NOT_READY,
                 Collections.singletonList(ex.getMessage()));
     }
 }

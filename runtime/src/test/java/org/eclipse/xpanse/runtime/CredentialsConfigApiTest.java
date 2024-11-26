@@ -16,8 +16,8 @@ import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.huaweicloud.HuaweiCloudOrchestratorPlugin;
@@ -117,7 +117,7 @@ class CredentialsConfigApiTest extends ApisTestCommon {
 
         // Setup
         Csp aws = Csp.AWS;
-        Response awsResult = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
+        ErrorResponse awsResult = ErrorResponse.errorResponse(ErrorType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
                         String.format("Can't find suitable plugin for the Csp %s", aws.toValue())));
         // Run the test
@@ -235,7 +235,7 @@ class CredentialsConfigApiTest extends ApisTestCommon {
 
         // Setup
         Csp aliCloud = Csp.ALIBABA_CLOUD;
-        Response aliCloudResult = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
+        ErrorResponse aliCloudResult = ErrorResponse.errorResponse(ErrorType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
                         String.format("Can't find suitable plugin for the Csp %s",
                                 aliCloud.toValue())));
@@ -365,7 +365,7 @@ class CredentialsConfigApiTest extends ApisTestCommon {
 
         // Setup
         Csp aliCloud = Csp.ALIBABA_CLOUD;
-        Response aliCloudResult = Response.errorResponse(ResultType.PLUGIN_NOT_FOUND,
+        ErrorResponse aliCloudResult = ErrorResponse.errorResponse(ErrorType.PLUGIN_NOT_FOUND,
                 Collections.singletonList(
                         String.format("Can't find suitable plugin for the Csp %s",
                                 aliCloud.toValue())));
@@ -387,8 +387,8 @@ class CredentialsConfigApiTest extends ApisTestCommon {
 
     void testGetCredentialCapabilitiesThrowsException(Csp csp) throws Exception {
         CredentialType httpType = CredentialType.HTTP_AUTHENTICATION;
-        Response huaweiResult1 = Response.errorResponse(
-                ResultType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
+        ErrorResponse huaweiResult1 = ErrorResponse.errorResponse(
+                ErrorType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
                 Collections.singletonList(String.format("Not found credential definition with type"
                                 + " %s of the cloud service provider %s", httpType.toValue(),
                         csp.toValue())));

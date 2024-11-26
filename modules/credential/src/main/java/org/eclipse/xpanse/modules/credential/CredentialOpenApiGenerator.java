@@ -382,12 +382,12 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                                     "Response": {
                                         "required": [
                                             "details",
-                                            "resultType",
+                                            "errorType",
                                             "success"
                                         ],
                                         "type": "object",
                                         "properties": {
-                                            "resultType": {
+                                            "errorType": {
                                                 "type": "string",
                                                 "description": "The result code of response.",
                                                 "enum": [

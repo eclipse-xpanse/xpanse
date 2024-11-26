@@ -24,8 +24,8 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
-import org.eclipse.xpanse.modules.models.response.Response;
-import org.eclipse.xpanse.modules.models.response.ResultType;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -77,7 +77,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         // Setup
         // Setup
         UUID uuid = UUID.randomUUID();
-        ResultType expectedResultType = ResultType.SERVICE_ORDER_NOT_FOUND;
+        ErrorType expectedErrorType = ErrorType.SERVICE_ORDER_NOT_FOUND;
         String errorMsg = String.format("Service order with id %s not found.", uuid);
         List<String> expectedDetails = Collections.singletonList(errorMsg);
         OpenTofuResult deployResult = getOpenTofuResultByFile("deploy_success_callback.json");
@@ -86,9 +86,9 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         final MockHttpServletResponse deployCallbackResponse = orderCallback(uuid, deployResult);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployCallbackResponse.getStatus());
-        Response deployCallbackResult =
-                objectMapper.readValue(deployCallbackResponse.getContentAsString(), Response.class);
-        assertEquals(deployCallbackResult.getResultType(), expectedResultType);
+        ErrorResponse deployCallbackResult =
+                objectMapper.readValue(deployCallbackResponse.getContentAsString(), ErrorResponse.class);
+        assertEquals(deployCallbackResult.getErrorType(), expectedErrorType);
         assertEquals(deployCallbackResult.getDetails(), expectedDetails);
     }
 
