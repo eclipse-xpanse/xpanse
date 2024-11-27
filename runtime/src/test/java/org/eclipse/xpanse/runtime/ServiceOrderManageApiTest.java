@@ -93,7 +93,7 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         ServiceOrderStatusUpdate orderIsCompletedResult =
                 getLatestServiceOrderStatus(orderId, null);
         assertThat(orderIsCompletedResult).isNotNull();
-        assertThat(orderIsCompletedResult.getIsOrderCompleted()).isFalse();
+        assertThat(orderIsCompletedResult.getIsOrderCompleted()).isTrue();
 
         MockHttpServletResponse orderDetailsResponse = getOrderDetailsByOrderId(orderId);
         assertEquals(HttpStatus.OK.value(), orderDetailsResponse.getStatus());
@@ -101,12 +101,12 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
                 orderDetailsResponse.getContentAsString(), ServiceOrderDetails.class);
 
         assertThat(orderDetails.getOrderId()).isEqualTo(orderId);
-        assertThat(orderDetails.getTaskStatus()).isEqualTo(TaskStatus.IN_PROGRESS);
+        assertThat(orderDetails.getTaskStatus()).isEqualTo(TaskStatus.SUCCESSFUL);
         assertThat(orderDetails.getTaskType()).isEqualTo(ServiceOrderType.DEPLOY);
         assertThat(orderDetails.getServiceId()).isEqualTo(serviceId);
 
         MockHttpServletResponse serviceOrdersResponse =
-                listServiceOrders(serviceId, ServiceOrderType.DEPLOY, TaskStatus.IN_PROGRESS);
+                listServiceOrders(serviceId, ServiceOrderType.DEPLOY, TaskStatus.SUCCESSFUL);
 
         assertThat(serviceOrdersResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         List<ServiceOrderDetails> serviceOrders = objectMapper.readValue(

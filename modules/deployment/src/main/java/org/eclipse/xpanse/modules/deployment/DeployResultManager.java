@@ -352,7 +352,8 @@ public class DeployResultManager {
         TaskStatus taskStatus = isTaskSuccessful ? TaskStatus.SUCCESSFUL : TaskStatus.FAILED;
         entityToUpdate.setCompletedTime(OffsetDateTime.now());
         serviceOrderManager.completeOrderProgress(storedOrderEntity.getOrderId(), taskStatus,
-                ErrorResponse.errorResponse(ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                isTaskSuccessful ? null
+                        : ErrorResponse.errorResponse(ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
                         List.of(deployResult.getMessage())));
     }
 
