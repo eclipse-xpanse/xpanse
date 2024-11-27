@@ -83,7 +83,6 @@ import org.openstack4j.openstack.networking.domain.NeutronAvailabilityZone;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -732,7 +731,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 objectMapper.readValue(redeployResponse.getContentAsString(), ServiceOrder.class);
         assertEquals(serviceId, serviceOrder.getServiceId());
         assertNotNull(serviceOrder.getOrderId());
-        assertFalse(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
+        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
         assertTrue(waitServiceDeploymentIsCompleted(serviceId));
     }
 
@@ -757,7 +756,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 objectMapper.readValue(modifyResponse.getContentAsString(), ServiceOrder.class);
         assertEquals(serviceId, serviceOrder.getServiceId());
         assertNotNull(serviceOrder.getOrderId());
-        assertFalse(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
+        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
         assertTrue(waitServiceDeploymentIsCompleted(serviceId));
     }
 
@@ -786,7 +785,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 objectMapper.readValue(destroyResponse.getContentAsString(), ServiceOrder.class);
         assertEquals(serviceId, serviceOrder.getServiceId());
         assertNotNull(serviceOrder.getOrderId());
-        assertFalse(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
+        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
         assertTrue(waitServiceDeploymentIsCompleted(serviceId));
     }
 
