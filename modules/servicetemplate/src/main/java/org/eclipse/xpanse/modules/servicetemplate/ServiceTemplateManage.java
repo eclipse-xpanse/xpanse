@@ -59,6 +59,7 @@ import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceConfigurationPara
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.semver4j.Semver;
 import org.semver4j.SemverException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -70,6 +71,7 @@ import org.springframework.util.CollectionUtils;
 @Service
 public class ServiceTemplateManage {
 
+    private static final String AUTO_APPROVED_REVIEW_COMMENT = "auto-approved by CSP";
     @Resource
     private ServiceTemplateStorage templateStorage;
     @Resource
@@ -91,36 +93,74 @@ public class ServiceTemplateManage {
     @Resource
     private ServiceConfigurationParameterValidator serviceConfigurationParameterValidator;
 
-    private static final String AUTO_APPROVED_REVIEW_COMMENT = "auto-approved by CSP";
-
     /**
      * Update service template using id and the ocl model.
      *
-     * @param id  id of the service template.
-     * @param ocl the Ocl model describing the service template.
-     * @return Returns service template DB newTemplate.
+     * @param id                               id of the service template.
+     * @param ocl                              the Ocl model describing the service template.
+     * @param isRemoveFromCatalogUntilApproved If remove the service template from catalog
+     *                                         until the updated one is approved.
+     * @return Returns service template history entity.
      */
-    public ServiceTemplateEntity updateServiceTemplate(UUID id, Ocl ocl) {
-        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
-        iconUpdate(existingTemplate, ocl);
-        checkParams(existingTemplate, ocl);
+    public ServiceTemplateHistoryEntity updateServiceTemplate(
+            UUID id, Ocl ocl, boolean isRemoveFromCatalogUntilApproved) {
+        ServiceTemplateEntity existingServiceTemplate = getServiceTemplateDetails(id, true, false);
+        if (existingServiceTemplate.getIsUpdatePending()) {
+            ServiceTemplateHistoryEntity updatingHistory =
+                    queryAnyInProgressServiceTemplateUpdateRequest(existingServiceTemplate);
+            if (Objects.nonNull(updatingHistory)) {
+                String errorMsg = String.format("The service template with id %s can not be updated"
+                                + " until the updating progress with change id %s is completed.",
+                        id, updatingHistory.getChangeId());
+                log.error(errorMsg);
+                throw new ServiceTemplateUpdateNotAllowed(errorMsg);
+            }
+        }
+        ServiceTemplateEntity serviceTemplateToUpdate = new ServiceTemplateEntity();
+        BeanUtils.copyProperties(existingServiceTemplate, serviceTemplateToUpdate);
+        iconUpdate(serviceTemplateToUpdate, ocl);
+        checkParams(serviceTemplateToUpdate, ocl);
         validateRegions(ocl);
         validateFlavors(ocl);
+        validateServiceDeployment(ocl.getDeployment(), serviceTemplateToUpdate);
         billingConfigValidator.validateBillingConfig(ocl);
-        if (Objects.nonNull(existingTemplate.getOcl().getServiceConfigurationManage())
+        if (Objects.nonNull(serviceTemplateToUpdate.getOcl().getServiceConfigurationManage())
                 && Objects.nonNull(ocl.getServiceConfigurationManage())) {
             serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
         }
-        existingTemplate.setIsUpdatePending(true);
-        ServiceTemplateEntity updatedServiceTemplate =
-                templateStorage.storeAndFlush(existingTemplate);
-        validateServiceDeployment(ocl.getDeployment(), updatedServiceTemplate);
-        updatedServiceTemplate.setOcl(ocl);
-        setServiceTemplateRegistrationState(updatedServiceTemplate);
-        updatedServiceTemplate.setIsUpdatePending(false);
-        updatedServiceTemplate = templateStorage.storeAndFlush(existingTemplate);
-        serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
-        return updatedServiceTemplate;
+        serviceTemplateToUpdate.setOcl(ocl);
+        boolean isAutoApprovedEnabled =
+                isAutoApproveEnabledForCsp(ocl.getCloudServiceProvider().getName());
+        final ServiceTemplateHistoryEntity storedUpdateHistory =
+                createServiceTemplateHistory(isAutoApprovedEnabled,
+                        ServiceTemplateRequestType.UPDATE, serviceTemplateToUpdate);
+        // if auto approved is enabled by CSP, approved service template with new ocl directly
+        if (isAutoApprovedEnabled) {
+            serviceTemplateToUpdate.setAvailableInCatalog(true);
+            serviceTemplateToUpdate.setIsUpdatePending(false);
+            ServiceTemplateEntity updatedServiceTemplate =
+                    templateStorage.storeAndFlush(serviceTemplateToUpdate);
+            serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
+        } else {
+            existingServiceTemplate.setIsUpdatePending(true);
+            if (existingServiceTemplate.getAvailableInCatalog()
+                    && isRemoveFromCatalogUntilApproved) {
+                existingServiceTemplate.setAvailableInCatalog(false);
+            }
+            templateStorage.storeAndFlush(existingServiceTemplate);
+        }
+        return storedUpdateHistory;
+    }
+
+
+    private ServiceTemplateHistoryEntity queryAnyInProgressServiceTemplateUpdateRequest(
+            ServiceTemplateEntity serviceTemplate) {
+        ServiceTemplateHistoryEntity queryUpdateHistory = new ServiceTemplateHistoryEntity();
+        queryUpdateHistory.setServiceTemplate(serviceTemplate);
+        queryUpdateHistory.setRequestType(ServiceTemplateRequestType.UPDATE);
+        queryUpdateHistory.setStatus(ServiceTemplateChangeStatus.IN_REVIEW);
+        return serviceTemplateHistoryStorage.listServiceTemplateHistory(queryUpdateHistory)
+                .getFirst();
     }
 
     private void checkParams(ServiceTemplateEntity existingTemplate, Ocl ocl) {
@@ -156,51 +196,37 @@ public class ServiceTemplateManage {
     }
 
     private ServiceTemplateEntity createServiceTemplateEntity(Ocl ocl) {
-        ServiceTemplateEntity newTemplate = new ServiceTemplateEntity();
-        newTemplate.setId(UUID.randomUUID());
-        newTemplate.setName(StringUtils.lowerCase(ocl.getName()));
-        newTemplate.setVersion(getSemverVersion(ocl.getServiceVersion()).getVersion());
-        newTemplate.setCsp(ocl.getCloudServiceProvider().getName());
-        newTemplate.setCategory(ocl.getCategory());
-        newTemplate.setServiceHostingType(ocl.getServiceHostingType());
-        newTemplate.setOcl(ocl);
-        newTemplate.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
-        newTemplate.setIsUpdatePending(false);
-        setServiceTemplateRegistrationState(newTemplate);
-        return newTemplate;
+        ServiceTemplateEntity newServiceTemplate = new ServiceTemplateEntity();
+        newServiceTemplate.setId(UUID.randomUUID());
+        newServiceTemplate.setCategory(ocl.getCategory());
+        newServiceTemplate.setCsp(ocl.getCloudServiceProvider().getName());
+        newServiceTemplate.setName(StringUtils.lowerCase(ocl.getName()));
+        newServiceTemplate.setVersion(getSemverVersion(ocl.getServiceVersion()).getVersion());
+        newServiceTemplate.setServiceHostingType(ocl.getServiceHostingType());
+        newServiceTemplate.setOcl(ocl);
+        newServiceTemplate.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
+        validateServiceDeployment(ocl.getDeployment(), newServiceTemplate);
+        newServiceTemplate.setNamespace(userServiceHelper.getCurrentUserManageNamespace());
+        return newServiceTemplate;
     }
 
     private ServiceTemplateHistoryEntity createServiceTemplateHistory(
-            ServiceTemplateRequestType requestType, ServiceTemplateEntity serviceTemplate) {
+            boolean isAutoApproveEnabled, ServiceTemplateRequestType requestType,
+            ServiceTemplateEntity serviceTemplate) {
         ServiceTemplateHistoryEntity serviceTemplateHistory = new ServiceTemplateHistoryEntity();
         serviceTemplateHistory.setChangeId(UUID.randomUUID());
         serviceTemplateHistory.setServiceTemplate(serviceTemplate);
         serviceTemplateHistory.setOcl(serviceTemplate.getOcl());
         serviceTemplateHistory.setRequestType(requestType);
-        Csp csp = serviceTemplate.getCsp();
-        if (isAutoApproveEnabledForCsp(csp)) {
+        if (isAutoApproveEnabled) {
             serviceTemplateHistory.setStatus(ServiceTemplateChangeStatus.ACCEPTED);
             serviceTemplateHistory.setReviewComment(AUTO_APPROVED_REVIEW_COMMENT);
+            serviceTemplateHistory.setBlockTemplateUntilReviewed(false);
         } else {
             serviceTemplateHistory.setStatus(ServiceTemplateChangeStatus.IN_REVIEW);
+            serviceTemplateHistory.setBlockTemplateUntilReviewed(true);
         }
         return serviceTemplateHistoryStorage.storeAndFlush(serviceTemplateHistory);
-    }
-
-
-    private void setServiceTemplateRegistrationState(ServiceTemplateEntity serviceTemplate) {
-        Csp csp = serviceTemplate.getCsp();
-        if (isAutoApproveEnabledForCsp(csp)) {
-            serviceTemplate.setServiceTemplateRegistrationState(
-                    ServiceTemplateRegistrationState.APPROVED);
-            serviceTemplate.setAvailableInCatalog(true);
-            log.info("Service template {} managed by Csp {} auto approved",
-                    serviceTemplate.getId(), csp);
-        } else {
-            serviceTemplate.setServiceTemplateRegistrationState(
-                    ServiceTemplateRegistrationState.IN_PROGRESS);
-            serviceTemplate.setAvailableInCatalog(false);
-        }
     }
 
     private boolean isAutoApproveEnabledForCsp(Csp csp) {
@@ -219,21 +245,16 @@ public class ServiceTemplateManage {
         }
     }
 
-    private void validateServiceVersion(Ocl ocl) {
-        Semver newSemver = getSemverVersion(ocl.getServiceVersion());
-        ServiceTemplateQueryModel query = ServiceTemplateQueryModel.builder()
-                .category(ocl.getCategory()).csp(ocl.getCloudServiceProvider().getName())
-                .serviceName(ocl.getName()).serviceHostingType(ocl.getServiceHostingType())
-                .checkNamespace(false).build();
-        List<ServiceTemplateEntity> templates = templateStorage.listServiceTemplates(query);
-        if (!CollectionUtils.isEmpty(templates)) {
-            Semver highestVersion = templates.stream()
+    private void validateServiceVersion(Semver newServiceVersion,
+                                        List<ServiceTemplateEntity> existingTemplates) {
+        if (!CollectionUtils.isEmpty(existingTemplates)) {
+            Semver highestVersion = existingTemplates.stream()
                     .map(serviceTemplate -> new Semver(serviceTemplate.getVersion())).sorted()
                     .toList().reversed().getFirst();
-            if (!newSemver.isGreaterThan(highestVersion)) {
+            if (!newServiceVersion.isGreaterThan(highestVersion)) {
                 String errorMsg = String.format("The version %s of service must be higher than the"
                                 + " highest version %s of the registered services with same name",
-                        newSemver, highestVersion);
+                        newServiceVersion, highestVersion);
                 log.error(errorMsg);
                 throw new InvalidServiceVersionException(errorMsg);
             }
@@ -255,30 +276,49 @@ public class ServiceTemplateManage {
      * @return Returns service template history entity.
      */
     public ServiceTemplateHistoryEntity registerServiceTemplate(Ocl ocl) {
-        ServiceTemplateEntity newTemplate = createServiceTemplateEntity(ocl);
-        ServiceTemplateEntity existingTemplate = templateStorage.findServiceTemplate(newTemplate);
+        Semver newServiceVersion = getSemverVersion(ocl.getServiceVersion());
+        ocl.setVersion(newServiceVersion.getVersion());
+        ServiceTemplateQueryModel queryModel = ServiceTemplateQueryModel.builder()
+                .category(ocl.getCategory()).csp(ocl.getCloudServiceProvider().getName())
+                .serviceName(ocl.getName()).serviceHostingType(ocl.getServiceHostingType()).build();
+        List<ServiceTemplateEntity> existingServiceTemplates =
+                templateStorage.listServiceTemplates(queryModel);
+        ServiceTemplateEntity existingTemplate = existingServiceTemplates.stream()
+                .filter(template -> newServiceVersion.isEqualTo(new Semver(template.getVersion())))
+                .findAny().orElse(null);
         if (Objects.nonNull(existingTemplate)) {
             String errorMsg = String.format("Service template already registered with id %s",
                     existingTemplate.getId());
             log.error(errorMsg);
             throw new ServiceTemplateAlreadyRegistered(errorMsg);
         }
-        validateServiceVersion(ocl);
+        validateServiceVersion(newServiceVersion, existingServiceTemplates);
+        ocl.setIcon(IconProcessorUtil.processImage(ocl));
         validateRegions(ocl);
         validateFlavors(ocl);
         billingConfigValidator.validateBillingConfig(ocl);
         if (Objects.nonNull(ocl.getServiceConfigurationManage())) {
             serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
         }
-        validateServiceDeployment(ocl.getDeployment(), newTemplate);
-        ocl.setIcon(IconProcessorUtil.processImage(ocl));
-        String userManageNamespace = userServiceHelper.getCurrentUserManageNamespace();
-        newTemplate.setNamespace(userManageNamespace);
-        ServiceTemplateEntity storedServiceTemplate = templateStorage.storeAndFlush(newTemplate);
-        ServiceTemplateHistoryEntity serviceTemplateHistory = createServiceTemplateHistory(
-                ServiceTemplateRequestType.REGISTER, storedServiceTemplate);
-        serviceTemplateOpenApiGenerator.generateServiceApi(storedServiceTemplate);
-        return serviceTemplateHistory;
+        ServiceTemplateEntity serviceTemplateToRegister = createServiceTemplateEntity(ocl);
+        boolean isAutoApprovedEnabled =
+                isAutoApproveEnabledForCsp(serviceTemplateToRegister.getCsp());
+        if (isAutoApprovedEnabled) {
+            serviceTemplateToRegister.setServiceTemplateRegistrationState(
+                    ServiceTemplateRegistrationState.APPROVED);
+        } else {
+            serviceTemplateToRegister.setServiceTemplateRegistrationState(
+                    ServiceTemplateRegistrationState.IN_REVIEW);
+        }
+        serviceTemplateToRegister.setIsUpdatePending(false);
+        serviceTemplateToRegister.setAvailableInCatalog(isAutoApprovedEnabled);
+        ServiceTemplateEntity registeredServiceTemplate =
+                templateStorage.storeAndFlush(serviceTemplateToRegister);
+        ServiceTemplateHistoryEntity storedRegisterHistory =
+                createServiceTemplateHistory(isAutoApprovedEnabled,
+                        ServiceTemplateRequestType.REGISTER, registeredServiceTemplate);
+        serviceTemplateOpenApiGenerator.generateServiceApi(registeredServiceTemplate);
+        return storedRegisterHistory;
     }
 
     private void validateFlavors(Ocl ocl) {
@@ -286,20 +326,19 @@ public class ServiceTemplateManage {
         // Check if service flavor names are unique
         Map<String, Long> nameCountMap = ocl.getFlavors().getServiceFlavors().stream()
                 .collect(Collectors.groupingBy(ServiceFlavor::getName, Collectors.counting()));
-        nameCountMap.entrySet().stream().filter(entry -> entry.getValue() > 1)
-                .forEach(entry -> {
-                    String message = String.format("Duplicate flavor with name %s in service.",
-                            entry.getKey());
-                    errors.add(message);
-                });
+        nameCountMap.entrySet().stream().filter(entry -> entry.getValue() > 1).forEach(entry -> {
+            String message =
+                    String.format("Duplicate flavor with name %s in service.", entry.getKey());
+            errors.add(message);
+        });
         if (!CollectionUtils.isEmpty(errors)) {
             throw new InvalidServiceFlavorsException(errors);
         }
     }
 
     private void validateRegions(Ocl ocl) {
-        OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(
-                ocl.getCloudServiceProvider().getName());
+        OrchestratorPlugin plugin =
+                pluginManager.getOrchestratorPlugin(ocl.getCloudServiceProvider().getName());
         plugin.validateRegionsOfService(ocl);
     }
 
@@ -335,8 +374,8 @@ public class ServiceTemplateManage {
             }
         }
         if (checkCsp) {
-            boolean hasManagePermissions = userServiceHelper.currentUserCanManageCsp(
-                    existingTemplate.getCsp());
+            boolean hasManagePermissions =
+                    userServiceHelper.currentUserCanManageCsp(existingTemplate.getCsp());
             if (!hasManagePermissions) {
                 throw new AccessDeniedException("No permissions to review service template "
                         + "belonging to other cloud service providers.");

@@ -100,12 +100,19 @@ public class ServiceTemplateApi {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public ServiceTemplateDetailVo update(
-            @Parameter(name = "id", description = "id of service template") @PathVariable("id")
-            String id, @Valid @RequestBody Ocl ocl) {
-        ServiceTemplateEntity templateEntity =
-                serviceTemplateManage.updateServiceTemplate(UUID.fromString(id), ocl);
-        return convertToServiceTemplateDetailVo(templateEntity);
+    public ServiceTemplateChangeInfo update(
+            @Parameter(name = "id", description = "id of service template")
+            @PathVariable("id") String id,
+            @Parameter(name = "isRemoveServiceTemplateUntilApproved",
+                    description = "If true, the old service template is also removed from catalog "
+                            + "until the updated one is reviewed and approved.")
+            @RequestParam(name = "isRemoveServiceTemplateUntilApproved")
+            Boolean isRemoveServiceTemplateUntilApproved,
+            @Valid @RequestBody Ocl ocl) {
+        ServiceTemplateHistoryEntity updateHistory = serviceTemplateManage.updateServiceTemplate(
+                UUID.fromString(id), ocl, isRemoveServiceTemplateUntilApproved);
+        return new ServiceTemplateChangeInfo(updateHistory.getServiceTemplate().getId(),
+                updateHistory.getChangeId());
     }
 
     /**
@@ -145,16 +152,21 @@ public class ServiceTemplateApi {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
-    public ServiceTemplateDetailVo fetchUpdate(
+    public ServiceTemplateChangeInfo fetchUpdate(
             @Parameter(name = "id", description = "id of service template")
             @PathVariable(name = "id") String id,
+            @Parameter(name = "isRemoveServiceTemplateUntilApproved",
+                    description = "If true, the old service template is also removed from catalog "
+                            + "until the updated one is reviewed and approved.")
+            @RequestParam(name = "isRemoveServiceTemplateUntilApproved")
+            Boolean isRemoveServiceTemplateUntilApproved,
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
             @RequestParam(name = "oclLocation") String oclLocation) throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        ServiceTemplateEntity templateEntity =
-                serviceTemplateManage.updateServiceTemplate(UUID.fromString(id), ocl);
-        log.info("Update service template with id {} by URL {} successfully.", id, oclLocation);
-        return convertToServiceTemplateDetailVo(templateEntity);
+        ServiceTemplateHistoryEntity updateHistory = serviceTemplateManage.updateServiceTemplate(
+                UUID.fromString(id), ocl, isRemoveServiceTemplateUntilApproved);
+        return new ServiceTemplateChangeInfo(updateHistory.getServiceTemplate().getId(),
+                updateHistory.getChangeId());
     }
 
     /**

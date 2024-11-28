@@ -210,7 +210,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     void testListManagedServiceTemplatesWithStateApprovalPending(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup
-        String serviceRegistrationState = ServiceTemplateRegistrationState.IN_PROGRESS.toValue();
+        String serviceRegistrationState = ServiceTemplateRegistrationState.IN_REVIEW.toValue();
         // Run the test
         MockHttpServletResponse response = listServiceTemplatesWithParams(
                 serviceTemplateDetailVo.getCategory().toValue(),
@@ -229,8 +229,8 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
 
     void testListManagedServiceTemplatesReturnsEmptyList(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
-        // Setup
-        String serviceRegistrationState = ServiceTemplateRegistrationState.IN_PROGRESS.toValue();
+        // SetupServiceTemplateApiTest
+        String serviceRegistrationState = ServiceTemplateRegistrationState.IN_REVIEW.toValue();
         // Run the test
         MockHttpServletResponse response = listServiceTemplatesWithParams(
                 serviceTemplateDetailVo.getCategory().toValue(),

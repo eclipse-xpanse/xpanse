@@ -38,14 +38,6 @@ public interface ServiceTemplateStorage {
     ServiceTemplateEntity getServiceTemplateById(UUID uuid);
 
     /**
-     * Method to list database entry based ServiceTemplateEntity by query model.
-     *
-     * @param serviceTemplateEntity the model of registered service.
-     * @return Returns the database entry for the provided arguments.
-     */
-    ServiceTemplateEntity findServiceTemplate(ServiceTemplateEntity serviceTemplateEntity);
-
-    /**
      * Remove service template entity from database by entity.
      *
      * @param serviceTemplateEntity service template entity

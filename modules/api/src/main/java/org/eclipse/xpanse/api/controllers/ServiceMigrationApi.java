@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
@@ -35,7 +37,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccept
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceTemplateException;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
@@ -117,21 +119,18 @@ public class ServiceMigrationApi {
     }
 
     private void validateData(MigrateRequest migrateRequest) {
-        ServiceTemplateEntity searchServiceTemplate = new ServiceTemplateEntity();
-        searchServiceTemplate.setName(StringUtils.lowerCase(migrateRequest.getServiceName()));
-        searchServiceTemplate.setVersion(StringUtils.lowerCase(migrateRequest.getVersion()));
-        searchServiceTemplate.setCsp(migrateRequest.getCsp());
-        searchServiceTemplate.setCategory(migrateRequest.getCategory());
-        searchServiceTemplate.setServiceHostingType(migrateRequest.getServiceHostingType());
-        ServiceTemplateEntity existingTemplate =
-                serviceTemplateStorage.findServiceTemplate(searchServiceTemplate);
-        if (Objects.isNull(existingTemplate)) {
-            String errorMsg =
-                    String.format("Not found available service template by search " + "info: %s",
-                            searchServiceTemplate);
-            log.error(errorMsg);
-            throw new ServiceTemplateNotRegistered(errorMsg);
-        }
+        ServiceTemplateQueryModel queryModel = ServiceTemplateQueryModel.builder()
+                .category(migrateRequest.getCategory()).csp(migrateRequest.getCsp())
+                .serviceName(migrateRequest.getServiceName())
+                .serviceVersion(migrateRequest.getVersion())
+                .serviceHostingType(migrateRequest.getServiceHostingType()).build();
+        List<ServiceTemplateEntity> existingServiceTemplates =
+                serviceTemplateStorage.listServiceTemplates(queryModel);
+        ServiceTemplateEntity existingTemplate = existingServiceTemplates.stream()
+                .filter(serviceTemplate -> serviceTemplate.getAvailableInCatalog()
+                        && Objects.nonNull(serviceTemplate.getOcl()))
+                .findFirst().orElseThrow(() -> new UnavailableServiceTemplateException(
+                        "No available service templates found"));
         if (StringUtils.isNotBlank(existingTemplate.getOcl().getEula())
                 && !migrateRequest.isEulaAccepted()) {
             log.error("Service not accepted Eula.");

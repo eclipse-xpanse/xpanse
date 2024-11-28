@@ -45,84 +45,49 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
         return repository.saveAndFlush(serviceTemplateEntity);
     }
 
-    /**
-     * Method to list database entry based ServiceTemplateEntity by query model.
-     *
-     * @param serviceTemplateEntity ServiceTemplateEntity.
-     * @return Returns the database entry for the provided arguments.
-     */
     @Override
-    public ServiceTemplateEntity findServiceTemplate(ServiceTemplateEntity serviceTemplateEntity) {
-        Specification<ServiceTemplateEntity> specification =
-                (root, query, criteriaBuilder) -> {
-                    List<Predicate> predicateList = new ArrayList<>();
-                    predicateList.add(criteriaBuilder.equal(root.get("csp"),
-                            serviceTemplateEntity.getCsp()));
-                    predicateList.add(criteriaBuilder.equal(root.get("name"),
-                            StringUtils.lowerCase(serviceTemplateEntity.getName())));
-                    predicateList.add(criteriaBuilder.equal(root.get("version"),
-                            StringUtils.lowerCase(serviceTemplateEntity.getVersion())));
-                    predicateList.add(criteriaBuilder.equal(root.get("category"),
-                            serviceTemplateEntity.getCategory()));
-                    predicateList.add(criteriaBuilder.equal(root.get("serviceHostingType"),
-                            serviceTemplateEntity.getServiceHostingType()));
-                    assert query != null;
-                    return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
-                            .getRestriction();
-                };
-        return repository.findOne(specification).orElse(null);
-    }
-
-    /**
-     * Method to list database entry based ServiceTemplateEntity.
-     *
-     * @param serviceQuery query model for search register service entity.
-     * @return Returns the database entry for the provided arguments.
-     */
-    @Override
-    public List<ServiceTemplateEntity> listServiceTemplates(
-            ServiceTemplateQueryModel serviceQuery) {
+    public List<ServiceTemplateEntity> listServiceTemplates(ServiceTemplateQueryModel queryModel) {
 
         Specification<ServiceTemplateEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
-                    if (Objects.nonNull(serviceQuery.getCategory())) {
+                    if (Objects.nonNull(queryModel.getCategory())) {
                         predicateList.add(criteriaBuilder.equal(root.get("category"),
-                                serviceQuery.getCategory()));
+                                queryModel.getCategory()));
                     }
-                    if (Objects.nonNull(serviceQuery.getCsp())) {
+                    if (Objects.nonNull(queryModel.getCsp())) {
                         predicateList.add(criteriaBuilder.equal(root.get("csp"),
-                                serviceQuery.getCsp()));
+                                queryModel.getCsp()));
                     }
-                    if (StringUtils.isNotBlank(serviceQuery.getServiceName())) {
+                    if (StringUtils.isNotBlank(queryModel.getServiceName())) {
                         predicateList.add(criteriaBuilder.equal(root.get("name"),
-                                StringUtils.lowerCase(serviceQuery.getServiceName())));
+                                StringUtils.lowerCase(queryModel.getServiceName())));
 
                     }
-                    if (StringUtils.isNotBlank(serviceQuery.getServiceVersion())) {
+                    if (StringUtils.isNotBlank(queryModel.getServiceVersion())) {
                         predicateList.add(criteriaBuilder.equal(root.get("version"),
-                                StringUtils.lowerCase(serviceQuery.getServiceVersion())));
+                                StringUtils.lowerCase(queryModel.getServiceVersion())));
                     }
-                    if (StringUtils.isNotBlank(serviceQuery.getNamespace())) {
+                    if (StringUtils.isNotBlank(queryModel.getNamespace())) {
                         predicateList.add(criteriaBuilder.equal(root.get("namespace"),
-                                serviceQuery.getNamespace()));
+                                queryModel.getNamespace()));
                     }
-                    if (Objects.nonNull(serviceQuery.getServiceHostingType())) {
+                    if (Objects.nonNull(queryModel.getServiceHostingType())) {
                         predicateList.add(criteriaBuilder.equal(root.get("serviceHostingType"),
-                                serviceQuery.getServiceHostingType()));
+                                queryModel.getServiceHostingType()));
                     }
-                    if (Objects.nonNull(serviceQuery.getServiceTemplateRegistrationState())) {
+                    if (Objects.nonNull(queryModel.getServiceTemplateRegistrationState())) {
                         predicateList.add(criteriaBuilder.equal(
                                 root.get("serviceTemplateRegistrationState"),
-                                serviceQuery.getServiceTemplateRegistrationState()));
+                                queryModel.getServiceTemplateRegistrationState()));
                     }
-                    if (Objects.nonNull(serviceQuery.getAvailableInCatalog())) {
+                    if (Objects.nonNull(queryModel.getAvailableInCatalog())) {
                         predicateList.add(criteriaBuilder.equal(root.get("availableInCatalog"),
-                                serviceQuery.getAvailableInCatalog()));
+                                queryModel.getAvailableInCatalog()));
                     }
-                    if (Objects.nonNull(serviceQuery.getIsUpdatePending())) {
+                    if (Objects.nonNull(queryModel.getIsUpdatePending())) {
                         predicateList.add(criteriaBuilder.equal(root.get("isUpdatePending"),
-                                serviceQuery.getIsUpdatePending()));
+                                queryModel.getIsUpdatePending()));
                     }
                     assert query != null;
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))

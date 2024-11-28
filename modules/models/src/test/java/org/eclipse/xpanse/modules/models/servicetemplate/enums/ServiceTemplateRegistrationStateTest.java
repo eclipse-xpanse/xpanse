@@ -15,8 +15,8 @@ class ServiceTemplateRegistrationStateTest {
 
     @Test
     void testGetByValue() {
-        assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
-                ServiceTemplateRegistrationState.getByValue("in-progress"));
+        assertEquals(ServiceTemplateRegistrationState.IN_REVIEW,
+                ServiceTemplateRegistrationState.getByValue("in-review"));
         assertEquals(ServiceTemplateRegistrationState.APPROVED,
                 ServiceTemplateRegistrationState.getByValue("approved"));
         assertEquals(ServiceTemplateRegistrationState.REJECTED,
@@ -30,7 +30,7 @@ class ServiceTemplateRegistrationStateTest {
 
     @Test
     void testToValue() {
-        assertEquals("in-progress", ServiceTemplateRegistrationState.IN_PROGRESS.toValue());
+        assertEquals("in-review", ServiceTemplateRegistrationState.IN_REVIEW.toValue());
         assertEquals("approved", ServiceTemplateRegistrationState.APPROVED.toValue());
         assertEquals("rejected", ServiceTemplateRegistrationState.REJECTED.toValue());
     }

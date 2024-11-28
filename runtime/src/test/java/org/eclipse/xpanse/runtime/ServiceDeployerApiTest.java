@@ -38,8 +38,6 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
-import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
-import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
@@ -60,11 +58,9 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesEvaluationApi;
@@ -382,8 +378,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         lowerPriorityFlavor.setPriority(10);
         ocl.getFlavors().getServiceFlavors().add(lowerPriorityFlavor);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        testDeployThrowsServiceTemplateNotRegistered();
-        testDeployThrowsServiceTemplateNotApproved(serviceTemplate);
+        testDeployThrowsUnavailableServiceTemplate(serviceTemplate);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         setMockPoliciesValidateApi();
         addServicePolicies(serviceTemplate);
@@ -465,7 +460,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 getComputeResourceInventoryOfService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), getResourcesResponse.getStatus());
         errorResponse =
-                objectMapper.readValue(getResourcesResponse.getContentAsString(), ErrorResponse.class);
+                objectMapper.readValue(getResourcesResponse.getContentAsString(),
+                        ErrorResponse.class);
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
         assertEquals(errorResponse.getDetails(), List.of(errorMsg));
 
@@ -477,7 +473,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), changeLockResponse.getStatus());
         errorResponse =
-                objectMapper.readValue(changeLockResponse.getContentAsString(), ErrorResponse.class);
+                objectMapper.readValue(changeLockResponse.getContentAsString(),
+                        ErrorResponse.class);
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
         assertEquals(errorResponse.getDetails(), List.of(errorMsg));
 
@@ -605,7 +602,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), changeLockResponse.getStatus());
         ErrorResponse errorResponse =
-                objectMapper.readValue(changeLockResponse.getContentAsString(), ErrorResponse.class);
+                objectMapper.readValue(changeLockResponse.getContentAsString(),
+                        ErrorResponse.class);
         assertEquals(ErrorType.ACCESS_DENIED, errorResponse.getErrorType());
         assertEquals(List.of(errorMsg1), errorResponse.getDetails());
 
@@ -615,7 +613,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 getComputeResourceInventoryOfService(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), getResourcesResponse.getStatus());
         errorResponse =
-                objectMapper.readValue(getResourcesResponse.getContentAsString(), ErrorResponse.class);
+                objectMapper.readValue(getResourcesResponse.getContentAsString(),
+                        ErrorResponse.class);
         assertEquals(ErrorType.ACCESS_DENIED, errorResponse.getErrorType());
         assertEquals(List.of(errorMsg2), errorResponse.getDetails());
 
@@ -819,23 +818,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
-    void testDeployThrowsServiceTemplateNotApproved(ServiceTemplateDetailVo serviceTemplate)
-            throws Exception {
-        // SetUp
-        String errorMsg = String.format("Found service template with id %s is unavailable.",
-                serviceTemplate.getServiceTemplateId());
-        DeployRequest deployRequest = getDeployRequest(serviceTemplate);
-        // Run the test
-        final MockHttpServletResponse deployResponse = deployService(deployRequest);
-        // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
-        OrderFailedErrorResponse response = objectMapper.readValue(
-                deployResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(response.getErrorType(), ErrorType.UNAVAILABLE_SERVICE_TEMPLATE);
-        assertEquals(response.getDetails(), List.of(errorMsg));
-    }
-
-
     void testPurge(UUID serviceId) throws Exception {
         // Run the test
         final MockHttpServletResponse purgeResponse = purgeService(serviceId);
@@ -892,8 +874,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
             requestBuilder.queryParam("serviceState", state.toValue());
         }
         final MockHttpServletResponse listResponse = mockMvc.perform(requestBuilder
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
         assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
         assertNotNull(listResponse.getHeader(HEADER_TRACKING_ID));
@@ -902,28 +884,30 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 });
     }
 
-    void testDeployThrowsServiceTemplateNotRegistered() throws Exception {
-        String errorMsg = "No available service templates found.";
-        DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setServiceName("redis");
-        deployRequest.setVersion("1.0.0");
-        deployRequest.setCsp(Csp.HUAWEI_CLOUD);
-        deployRequest.setCategory(Category.AI);
-        deployRequest.setFlavor("flavor2");
-        Region region = new Region();
-        region.setName("regionName");
-        region.setArea("areaName");
-        deployRequest.setRegion(region);
-        deployRequest.setServiceHostingType(ServiceHostingType.SELF);
-        deployRequest.setBillingMode(BillingMode.FIXED);
+    void testDeployThrowsUnavailableServiceTemplate(ServiceTemplateDetailVo template)
+            throws Exception {
+        String errorMsg = "No available service templates found";
+        DeployRequest deployRequest = getDeployRequest(template);
         // Run the test
         final MockHttpServletResponse deployResponse = deployService(deployRequest);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
         OrderFailedErrorResponse response = objectMapper.readValue(
                 deployResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(response.getErrorType(), ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED);
+        assertEquals(response.getErrorType(), ErrorType.UNAVAILABLE_SERVICE_TEMPLATE);
         assertEquals(response.getDetails(), List.of(errorMsg));
+
+        // SetUp
+        DeployRequest deployRequest1 = getDeployRequest(template);
+        deployRequest1.setServiceName("redis");
+        // Run the test
+        final MockHttpServletResponse deployResponse1 = deployService(deployRequest1);
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse1.getStatus());
+        OrderFailedErrorResponse response1 = objectMapper.readValue(
+                deployResponse1.getContentAsString(), OrderFailedErrorResponse.class);
+        assertEquals(response1.getErrorType(), ErrorType.UNAVAILABLE_SERVICE_TEMPLATE);
+        assertEquals(response1.getDetails(), List.of(errorMsg));
     }
 
 

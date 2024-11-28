@@ -5,22 +5,24 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplatechange.ServiceTemplateChangeInfo;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.semver4j.Semver;
@@ -31,7 +33,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql,test"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql,test",
+        "huaweicloud.auto.approve.service.template.enabled=true"})
 @AutoConfigureMockMvc
 class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
 
@@ -43,74 +46,76 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     @Test
     @WithJwt(file = "jwt_isv.json")
-    void testRegisterNewService() throws Exception {
-        Ocl ocl = getOclFromFile();
-        ServiceTemplateChangeInfo serviceTemplateChangeInfo =
-                serviceTemplateApi.register(ocl);
-        ServiceTemplateDetailVo registeredServiceTemplate =
-                serviceTemplateApi.details(
-                        serviceTemplateChangeInfo.getServiceTemplateId().toString());
-        Assertions.assertTrue(Objects.nonNull(registeredServiceTemplate));
-        Assertions.assertEquals(ocl.getCategory(), registeredServiceTemplate.getCategory());
-        Assertions.assertEquals(ocl.getName(), registeredServiceTemplate.getName());
-        Assertions.assertEquals(new Semver(ocl.getServiceVersion()).getVersion(),
-                registeredServiceTemplate.getVersion());
-        Assertions.assertEquals(ocl.getCloudServiceProvider().getName(),
-                registeredServiceTemplate.getCsp());
-        Assertions.assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
-                registeredServiceTemplate.getServiceTemplateRegistrationState());
-
-        ServiceTemplateDetailVo serviceTemplateDetail =
-                serviceTemplateApi.details(
-                        registeredServiceTemplate.getServiceTemplateId().toString());
-
-        List<ServiceTemplateDetailVo> serviceTemplates =
-                serviceTemplateApi.listServiceTemplates(ocl.getCategory(),
-                        ocl.getCloudServiceProvider().getName(), ocl.getName(),
-                        ocl.getServiceVersion(), ocl.getServiceHostingType(),
-                        ServiceTemplateRegistrationState.IN_PROGRESS, null, null);
-
-        Assertions.assertEquals(1, serviceTemplates.size());
-        Assertions.assertEquals(serviceTemplateDetail.getServiceTemplateId(),
-                serviceTemplates.getFirst().getServiceTemplateId());
-    }
-
-    @Test
-    @WithJwt(file = "jwt_isv.json")
-    void testRegisterUniqueValidation() throws Exception {
-        Ocl ocl = getOclFromFile();
-        serviceTemplateApi.register(ocl);
-        assertThrows(ServiceTemplateAlreadyRegistered.class,
-                () -> serviceTemplateApi.register(ocl));
-    }
-
-    @Test
-    @WithJwt(file = "jwt_isv.json")
-    void testServiceRegistrationUpdate() throws Exception {
-        Ocl ocl = getOclFromFile();
-        ServiceTemplateChangeInfo serviceTemplateChangeInfo = serviceTemplateApi.register(ocl);
-        ServiceTemplateDetailVo serviceTemplateDetailVo = serviceTemplateApi.details(
-                serviceTemplateChangeInfo.getServiceTemplateId().toString());
-        ocl.setDescription("Hello");
-        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
-                serviceTemplateApi.update(serviceTemplateDetailVo.getServiceTemplateId().toString(),
-                        ocl);
-        Assertions.assertEquals(1, serviceTemplateApi.listServiceTemplates(
-                null, null, null, null, null, null, null, null
-        ).stream().filter(registeredServiceVo1 -> registeredServiceVo1.getName()
-                .equals(serviceTemplateDetailVo.getName())).toList().size());
-        Assertions.assertEquals("Hello",
-                serviceTemplateApi.details(
-                                updatedServiceTemplateDetailVo.getServiceTemplateId().toString())
-                        .getDescription());
-    }
-
-    private Ocl getOclFromFile() throws Exception {
-        Ocl ocl =
-                oclLoader.getOcl(
-                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+    void testServiceTemplateApisWorkWell() throws Exception {
+        // Setup register request
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName(UUID.randomUUID().toString());
-        return ocl;
+        // Run the test
+        ServiceTemplateChangeInfo registerChangeInfo = serviceTemplateApi.register(ocl);
+        // Verify the results
+        assertNotNull(registerChangeInfo.getServiceTemplateId());
+        assertNotNull(registerChangeInfo.getChangeId());
+        String serviceTemplateId = registerChangeInfo.getServiceTemplateId().toString();
+        ServiceTemplateDetailVo serviceTemplateDetailVo =
+                serviceTemplateApi.details(serviceTemplateId);
+        assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
+        assertEquals(ocl.getCloudServiceProvider().getName(), serviceTemplateDetailVo.getCsp());
+        assertEquals(ocl.getName().toLowerCase(), serviceTemplateDetailVo.getName());
+        assertEquals(new Semver(ocl.getServiceVersion()).getVersion(),
+                serviceTemplateDetailVo.getVersion());
+        assertEquals(ServiceTemplateRegistrationState.APPROVED,
+                serviceTemplateDetailVo.getServiceTemplateRegistrationState());
+        assertFalse(serviceTemplateDetailVo.getIsUpdatePending());
+        assertTrue(serviceTemplateDetailVo.getAvailableInCatalog());
+
+        // Setup list request
+        List<ServiceTemplateDetailVo> serviceTemplateDetailVos =
+                serviceTemplateApi.listServiceTemplates(ocl.getCategory(),
+                        serviceTemplateDetailVo.getCsp(), ocl.getName(),
+                        serviceTemplateDetailVo.getVersion(), ocl.getServiceHostingType(),
+                        ServiceTemplateRegistrationState.APPROVED, true, false);
+        // Verify the results
+        assertTrue(CollectionUtils.isNotEmpty(serviceTemplateDetailVos));
+        assertEquals(serviceTemplateDetailVos.getFirst(), serviceTemplateDetailVo);
+
+        // Setup update request
+        ocl.setDescription("update-test");
+        // Run the update test with 'isRemoveServiceTemplateUntilApproved' is true
+        boolean isRemoveServiceTemplateUntilApproved = true;
+        ServiceTemplateChangeInfo updateChangeInfo = serviceTemplateApi.
+                update(serviceTemplateId, isRemoveServiceTemplateUntilApproved, ocl);
+        // Verify the results
+        assertNotNull(updateChangeInfo.getServiceTemplateId());
+        assertNotNull(updateChangeInfo.getChangeId());
+        // Verify the results
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
+                serviceTemplateApi.details(serviceTemplateId);
+        assertFalse(updatedServiceTemplateDetailVo.getIsUpdatePending());
+        assertTrue(updatedServiceTemplateDetailVo.getAvailableInCatalog());
+        assertEquals(ServiceTemplateRegistrationState.APPROVED,
+                serviceTemplateDetailVo.getServiceTemplateRegistrationState());
+
+        // Setup unregister request
+        // Run the test
+        ServiceTemplateDetailVo unregisteredServiceTemplateDetailVo =
+                serviceTemplateApi.unregister(serviceTemplateId);
+        // Verify the results
+        assertFalse(unregisteredServiceTemplateDetailVo.getAvailableInCatalog());
+        assertFalse(unregisteredServiceTemplateDetailVo.getIsUpdatePending());
+
+        // Setup reRegister request
+        // Run the test
+        ServiceTemplateDetailVo reRegisteredServiceTemplateDetailVo =
+                serviceTemplateApi.reRegisterServiceTemplate(serviceTemplateId);
+        // Verify the results
+        assertTrue(reRegisteredServiceTemplateDetailVo.getAvailableInCatalog());
+        assertFalse(reRegisteredServiceTemplateDetailVo.getIsUpdatePending());
+
+        // Setup delete request
+        serviceTemplateApi.unregister(serviceTemplateId);
+        // Run the test
+        assertDoesNotThrow(() -> serviceTemplateApi.deleteServiceTemplate(serviceTemplateId));
     }
 
 }
