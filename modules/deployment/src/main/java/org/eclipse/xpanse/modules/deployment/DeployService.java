@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceDeploymentStatusChangePolling;
@@ -263,25 +264,19 @@ public class DeployService {
      * @return new deploy task.
      */
     private DeployTask createNewDeployTask(DeployRequest deployRequest) {
-        // Find the approved service template and fill Ocl.
-        ServiceTemplateEntity searchServiceTemplate = new ServiceTemplateEntity();
-        searchServiceTemplate.setName(StringUtils.lowerCase(deployRequest.getServiceName()));
-        searchServiceTemplate.setVersion(StringUtils.lowerCase(deployRequest.getVersion()));
-        searchServiceTemplate.setCsp(deployRequest.getCsp());
-        searchServiceTemplate.setCategory(deployRequest.getCategory());
-        searchServiceTemplate.setServiceHostingType(deployRequest.getServiceHostingType());
-        ServiceTemplateEntity existingServiceTemplate =
-                serviceTemplateStorage.findServiceTemplate(searchServiceTemplate);
-        if (Objects.isNull(existingServiceTemplate) || Objects.isNull(
-                existingServiceTemplate.getId()) || Objects.isNull(
-                existingServiceTemplate.getOcl())) {
-            throw new ServiceTemplateNotRegistered("No available service templates found.");
-        }
-        if (Objects.equals(existingServiceTemplate.getAvailableInCatalog(), false)) {
-            String errMsg = String.format("Found service template with id %s is unavailable.",
-                    existingServiceTemplate.getId());
-            throw new UnavailableServiceTemplateException(errMsg);
-        }
+        // Find service templates and fill Ocl.
+        ServiceTemplateQueryModel queryModel = ServiceTemplateQueryModel.builder()
+                .category(deployRequest.getCategory()).csp(deployRequest.getCsp())
+                .serviceName(deployRequest.getServiceName())
+                .serviceVersion(deployRequest.getVersion())
+                .serviceHostingType(deployRequest.getServiceHostingType()).build();
+        List<ServiceTemplateEntity> existingServiceTemplates =
+                serviceTemplateStorage.listServiceTemplates(queryModel);
+        ServiceTemplateEntity existingServiceTemplate = existingServiceTemplates.stream()
+                .filter(serviceTemplate -> serviceTemplate.getAvailableInCatalog()
+                        && Objects.nonNull(serviceTemplate.getOcl()))
+                .findFirst().orElseThrow(() -> new UnavailableServiceTemplateException(
+                        "No available service templates found"));
         if (StringUtils.isNotBlank(existingServiceTemplate.getOcl().getEula())
                 && !deployRequest.isEulaAccepted()) {
             log.error("Service not accepted Eula.");

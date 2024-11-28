@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.database.servicetemplatehistory;
 
+import java.util.List;
+
 /**
  * Interface for persist of ServiceTemplateHistory.
  */
@@ -20,5 +22,14 @@ public interface ServiceTemplateHistoryStorage {
      */
     ServiceTemplateHistoryEntity storeAndFlush(
             ServiceTemplateHistoryEntity serviceTemplateHistoryEntity);
+
+    /**
+     * List ServiceTemplateHistoryEntity by queryEntity.
+     *
+     * @param queryEntity to be queried.
+     * @return list of ServiceTemplateHistoryEntity.
+     */
+    List<ServiceTemplateHistoryEntity> listServiceTemplateHistory(
+            ServiceTemplateHistoryEntity queryEntity);
 
 }

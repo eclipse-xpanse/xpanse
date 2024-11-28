@@ -38,8 +38,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.models.billing.PriceWithRegion;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
@@ -71,12 +71,12 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
  */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test",
+        "huaweicloud.auto.approve.service.template.enabled=false"})
 @AutoConfigureMockMvc
 class ServiceTemplateApiTest extends ApisTestCommon {
 
     private final OclLoader oclLoader = new OclLoader();
-
     @MockitoBean
     private DatabaseServiceDeploymentStorage mockDeployServiceStorage;
 
@@ -91,7 +91,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Setup register request
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("serviceTemplateApiTest-01");
+        ocl.setName(UUID.randomUUID().toString());
         // Run the test
         final MockHttpServletResponse registerResponse = register(ocl);
         ServiceTemplateChangeInfo serviceTemplateChangeInfo = objectMapper.readValue(
@@ -106,15 +106,15 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         final MockHttpServletResponse detailResponse = detail(serviceTemplateId);
         ServiceTemplateDetailVo serviceTemplateDetailVo = objectMapper.readValue(
                 detailResponse.getContentAsString(), ServiceTemplateDetailVo.class);
-        assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
-                serviceTemplateDetailVo.getServiceTemplateRegistrationState());
-        assertEquals(serviceTemplateDetailVo.getIsUpdatePending(), false);
-        assertEquals(serviceTemplateDetailVo.getAvailableInCatalog(), false);
         assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
         assertEquals(ocl.getCloudServiceProvider().getName(), serviceTemplateDetailVo.getCsp());
         assertEquals(ocl.getName().toLowerCase(Locale.ROOT), serviceTemplateDetailVo.getName());
         assertEquals(new Semver(ocl.getServiceVersion()).getVersion(),
                 serviceTemplateDetailVo.getVersion());
+        assertEquals(ServiceTemplateRegistrationState.IN_REVIEW,
+                serviceTemplateDetailVo.getServiceTemplateRegistrationState());
+        assertFalse(serviceTemplateDetailVo.getIsUpdatePending());
+        assertFalse(serviceTemplateDetailVo.getAvailableInCatalog());
 
         // Setup list request
         List<ServiceTemplateDetailVo> serviceTemplateDetailVos = List.of(serviceTemplateDetailVo);
@@ -123,29 +123,31 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 listServiceTemplatesWithParams(ocl.getCategory().toValue(),
                         serviceTemplateDetailVo.getCsp().toValue(), ocl.getName(),
                         serviceTemplateDetailVo.getVersion(), ocl.getServiceHostingType().toValue(),
-                        ServiceTemplateRegistrationState.IN_PROGRESS.toValue(), null, null);
+                        ServiceTemplateRegistrationState.IN_REVIEW.toValue(), false, false);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertThat(
-                serviceTemplateDetailVos).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
-                "lastModifiedTime").isEqualTo(Arrays.stream(
-                objectMapper.readValue(response.getContentAsString(),
+        assertThat(serviceTemplateDetailVos)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("lastModifiedTime")
+                .isEqualTo(Arrays.stream(objectMapper.readValue(response.getContentAsString(),
                         ServiceTemplateDetailVo[].class)).toList());
 
         // Setup update request
-        Ocl updateOcl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        updateOcl.setName("serviceTemplateApiTest-01");
-        // Run the test
-        final MockHttpServletResponse updateResponse = update(serviceTemplateId, updateOcl);
-        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
-                objectMapper.readValue(updateResponse.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
+        ocl.setDescription("update-test");
+        // Run the update test with 'isRemoveServiceTemplateUntilApproved' is false
+        boolean isRemoveServiceTemplateUntilApproved = false;
+        final MockHttpServletResponse updateResponse1 =
+                update(serviceTemplateId, isRemoveServiceTemplateUntilApproved, ocl);
         // Verify the results
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(serviceTemplateDetailVo.getServiceTemplateId(),
-                updatedServiceTemplateDetailVo.getServiceTemplateId());
-
+        assertEquals(HttpStatus.OK.value(), updateResponse1.getStatus());
+        ServiceTemplateChangeInfo updateChangeInfo1 =
+                objectMapper.readValue(updateResponse1.getContentAsString(),
+                        ServiceTemplateChangeInfo.class);
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo1 =
+                getServiceTemplateDetailsVo(updateChangeInfo1.getServiceTemplateId());
+        assertTrue(updatedServiceTemplateDetailVo1.getIsUpdatePending());
+        assertFalse(updatedServiceTemplateDetailVo1.getAvailableInCatalog());
+        assertEquals(ServiceTemplateRegistrationState.IN_REVIEW,
+                serviceTemplateDetailVo.getServiceTemplateRegistrationState());
 
         // Setup unregister request
         // Run the test
@@ -197,29 +199,34 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 detailResponse.getContentAsString(), ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), detailResponse.getStatus());
-        assertEquals(ServiceTemplateRegistrationState.IN_PROGRESS,
+        assertEquals(ServiceTemplateRegistrationState.IN_REVIEW,
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
         assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
         assertEquals(ocl.getCloudServiceProvider().getName(), serviceTemplateDetailVo.getCsp());
         assertEquals(ocl.getName().toLowerCase(Locale.ROOT), serviceTemplateDetailVo.getName());
         assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
+        assertFalse(serviceTemplateDetailVo.getIsUpdatePending());
+        assertFalse(serviceTemplateDetailVo.getAvailableInCatalog());
 
         // Setup fetch update request
         URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL();
         // Run the test
-        final MockHttpServletResponse fetchUpdateResponse =
-                fetchUpdate(serviceTemplateId, updateUrl.toString());
-        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
-                objectMapper.readValue(fetchUpdateResponse.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
+        boolean isRemoveServiceTemplateUntilApproved = false;
+        final MockHttpServletResponse fetchUpdateResponse1 =
+                fetchUpdate(serviceTemplateId, isRemoveServiceTemplateUntilApproved,
+                        updateUrl.toString());
         // Verify the results
-        assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
-        assertEquals(serviceTemplateDetailVo.getServiceTemplateId(),
-                updatedServiceTemplateDetailVo.getServiceTemplateId());
+        assertEquals(HttpStatus.OK.value(), fetchUpdateResponse1.getStatus());
+        ServiceTemplateChangeInfo updateChangeInfo1 =
+                objectMapper.readValue(fetchUpdateResponse1.getContentAsString(),
+                        ServiceTemplateChangeInfo.class);
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo1 =
+                getServiceTemplateDetailsVo(updateChangeInfo1.getServiceTemplateId());
+        assertTrue(updatedServiceTemplateDetailVo1.getIsUpdatePending());
+        assertFalse(updatedServiceTemplateDetailVo1.getAvailableInCatalog());
 
         deleteServiceTemplate(serviceTemplateId);
     }
-
 
     @Test
     @WithJwt(file = "jwt_isv.json")
@@ -236,6 +243,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         testRegisterThrowsInvalidServiceFlavorsException();
         testRegisterThrowsInvalidBillingConfigException();
         testRegisterThrowsUnavailableServiceRegionsException();
+        testUpdateServiceTemplateThrowsNotAllowedException();
 
         testFetchThrowsRuntimeException();
         testListServiceTemplatesThrowsException();
@@ -261,13 +269,14 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL();
         // Run the test -update
         Ocl updateOcl = oclLoader.getOcl(updateUrl);
-        final MockHttpServletResponse updateResponse = update(id, updateOcl);
+        final MockHttpServletResponse updateResponse = update(id, false, updateOcl);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse.getStatus());
         assertEquals(result, updateResponse.getContentAsString());
 
         // Run the test -fetchUpdate
-        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id, updateUrl.toString());
+        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id,
+                false, updateUrl.toString());
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), fetchUpdateResponse.getStatus());
         assertEquals(result, fetchUpdateResponse.getContentAsString());
@@ -311,14 +320,15 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Run the test update
         Ocl updateOcl = oclLoader.getOcl(updateUrl);
         updateOcl.setName("serviceTemplateApiTest-02");
-        final MockHttpServletResponse updateResponse = update(id, updateOcl);
+        final MockHttpServletResponse updateResponse = update(id, false, updateOcl);
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), updateResponse.getStatus());
         assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
                 updateResponse.getContentAsString());
 
         // Run the test -fetchUpdate
-        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id, updateUrl.toString());
+        final MockHttpServletResponse fetchUpdateResponse = fetchUpdate(id,
+                false, updateUrl.toString());
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), fetchUpdateResponse.getStatus());
         assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
@@ -375,7 +385,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ocl.getServiceProviderContactDetails().getChats().add(duplicateAddress);
         // Run the test
         final MockHttpServletResponse response = register(ocl);
-        ErrorResponse result = objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
+        ErrorResponse result =
+                objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
         assertEquals(result.getErrorType(), ErrorType.UNPROCESSABLE_ENTITY);
@@ -386,7 +397,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         oclTest.getDeployment().getDeployerTool().setVersion(null);
         // Run the test
         final MockHttpServletResponse response1 = register(oclTest);
-        ErrorResponse result1 = objectMapper.readValue(response1.getContentAsString(), ErrorResponse.class);
+        ErrorResponse result1 =
+                objectMapper.readValue(response1.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response1.getStatus());
         assertEquals(result1.getErrorType(), ErrorType.UNPROCESSABLE_ENTITY);
@@ -395,7 +407,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         oclTest.getDeployment().getDeployerTool().setVersion("> v1.6.0");
         // Run the test
         final MockHttpServletResponse response2 = register(oclTest);
-        ErrorResponse result2 = objectMapper.readValue(response2.getContentAsString(), ErrorResponse.class);
+        ErrorResponse result2 =
+                objectMapper.readValue(response2.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response2.getStatus());
         assertEquals(result2.getErrorType(), ErrorType.UNPROCESSABLE_ENTITY);
@@ -424,8 +437,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getDeployment().setDeployer("error_" + ocl.getDeployment().getDeployer());
-        ErrorResponse expectedResponse = ErrorResponse.errorResponse(ErrorType.TERRAFORM_EXECUTION_FAILED,
-                Collections.singletonList("Executor Exception:TFExecutor.tfInit failed"));
+        ErrorResponse expectedResponse =
+                ErrorResponse.errorResponse(ErrorType.TERRAFORM_EXECUTION_FAILED,
+                        Collections.singletonList("Executor Exception:TFExecutor.tfInit failed"));
         // Run the test
         final MockHttpServletResponse response = register(ocl);
         ErrorResponse responseModel =
@@ -529,11 +543,11 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ServiceTemplateChangeInfo serviceTemplateDetail =
                 objectMapper.readValue(response.getContentAsString(),
                         ServiceTemplateChangeInfo.class);
+        String errorMsg = String.format("Service template already registered with id %s",
+                serviceTemplateDetail.getServiceTemplateId());
         ErrorResponse expectedResponse =
                 ErrorResponse.errorResponse(ErrorType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
-                        Collections.singletonList(
-                                String.format("Service template already registered with id %s",
-                                        serviceTemplateDetail.getServiceTemplateId())));
+                        Collections.singletonList(errorMsg));
         String result = objectMapper.writeValueAsString(expectedResponse);
         // Run the test
         final MockHttpServletResponse registerSameResponse = register(ocl);
@@ -553,8 +567,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ocl.setServiceVersion(serviceVersion);
         String errorMsg1 = String.format("The service version %s is a invalid semver version.",
                 serviceVersion);
-        ErrorResponse expectedResponse1 = ErrorResponse.errorResponse(ErrorType.INVALID_SERVICE_VERSION,
-                Collections.singletonList(errorMsg1));
+        ErrorResponse expectedResponse1 =
+                ErrorResponse.errorResponse(ErrorType.INVALID_SERVICE_VERSION,
+                        Collections.singletonList(errorMsg1));
         // Run the test
         final MockHttpServletResponse registerResponse1 = register(ocl);
         // Verify the results
@@ -573,8 +588,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         String errorMsg2 = String.format("The version %s of service must be higher than the"
                         + " highest version %s of the registered services with same name", lowerVersion,
                 existingServiceVersion);
-        ErrorResponse expectedResponse2 = ErrorResponse.errorResponse(ErrorType.INVALID_SERVICE_VERSION,
-                Collections.singletonList(errorMsg2));
+        ErrorResponse expectedResponse2 =
+                ErrorResponse.errorResponse(ErrorType.INVALID_SERVICE_VERSION,
+                        Collections.singletonList(errorMsg2));
         // Run the test
         final MockHttpServletResponse registerResponse2 = register(ocl);
         // Verify the results
@@ -685,6 +701,42 @@ class ServiceTemplateApiTest extends ApisTestCommon {
     }
 
 
+    void testUpdateServiceTemplateThrowsNotAllowedException() throws Exception {
+        // Setup
+        Ocl ocl = oclLoader.getOcl(
+                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        // Run the test
+        final MockHttpServletResponse registerResponse = register(ocl);
+        ServiceTemplateChangeInfo serviceTemplateChangeInfo =
+                objectMapper.readValue(registerResponse.getContentAsString(),
+                        ServiceTemplateChangeInfo.class);
+
+        UUID serviceTemplateId = serviceTemplateChangeInfo.getServiceTemplateId();
+        boolean isRemoveFromCatalogUtilApproved = false;
+        ocl.setDescription("update-test-01");
+        final MockHttpServletResponse updateResponse = update(serviceTemplateId,
+                isRemoveFromCatalogUtilApproved, ocl);
+        ServiceTemplateChangeInfo updateServiceTemplateChangeInfo =
+                objectMapper.readValue(updateResponse.getContentAsString(),
+                        ServiceTemplateChangeInfo.class);
+        UUID changeId = updateServiceTemplateChangeInfo.getChangeId();
+
+        String errorMsg = String.format("The service template with id %s can not be updated"
+                        + " until the updating progress with change id %s is completed.",
+                serviceTemplateId, changeId);
+        ocl.setDescription("update-test-01");
+        // Update service template again.
+        final MockHttpServletResponse updateResponse2 = update(serviceTemplateId,
+                isRemoveFromCatalogUtilApproved, ocl);
+        ErrorResponse response =
+                objectMapper.readValue(updateResponse2.getContentAsString(), ErrorResponse.class);
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse2.getStatus());
+        assertEquals(response.getErrorType(), ErrorType.SERVICE_TEMPLATE_UPDATE_NOT_ALLOWED);
+        assertEquals(response.getDetails(), Collections.singletonList(errorMsg));
+    }
+
+
     void testFetchThrowsRuntimeException() throws Exception {
         // Setup
         String fileUrl =
@@ -715,7 +767,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
-       assertEquals(expectedResponse.getErrorType(), resultResponse.getErrorType());
+        assertEquals(expectedResponse.getErrorType(), resultResponse.getErrorType());
     }
 
     void testDeleteServiceTemplateThrowsException() throws Exception {
@@ -759,11 +811,16 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 .getResponse();
     }
 
-    MockHttpServletResponse update(UUID id, Ocl ocl) throws Exception {
+    MockHttpServletResponse update(UUID id, boolean isRemoveServiceTemplateUntilApproved, Ocl ocl)
+            throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
-        return mockMvc.perform(put("/xpanse/service_templates/{id}", id).content(requestBody)
-                        .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON)).andReturn()
+        return mockMvc.perform(put("/xpanse/service_templates/{id}", id)
+                        .param("isRemoveServiceTemplateUntilApproved",
+                                String.valueOf(isRemoveServiceTemplateUntilApproved))
+                        .content(requestBody)
+                        .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON))
+                .andReturn()
                 .getResponse();
     }
 
@@ -772,10 +829,13 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
     }
 
-    MockHttpServletResponse fetchUpdate(UUID id, String url) throws Exception {
-        return mockMvc.perform(
-                put("/xpanse/service_templates/file/{id}", id).param("oclLocation", url)
-                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+    MockHttpServletResponse fetchUpdate(UUID id, boolean isRemoveServiceTemplateUntilApproved,
+                                        String url) throws Exception {
+        return mockMvc.perform(put("/xpanse/service_templates/file/{id}", id)
+                .param("isRemoveServiceTemplateUntilApproved",
+                        String.valueOf(isRemoveServiceTemplateUntilApproved))
+                .param("oclLocation", url)
+                .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
     }
 
     MockHttpServletResponse detail(UUID id) throws Exception {

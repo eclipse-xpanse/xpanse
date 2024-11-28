@@ -93,7 +93,7 @@ public class CspPluginValidator {
             fetchMethodName = ServiceTemplateApi.class.getDeclaredMethod("fetch", String.class)
                     .getName();
             fetchUpdateMethodName = ServiceTemplateApi.class.getDeclaredMethod("fetchUpdate",
-                    String.class, String.class).getName();
+                    String.class, Boolean.class, String.class).getName();
         } catch (NoSuchMethodException e) {
             log.error("Failed to get fetch or fetchUpdate method name", e);
         }
@@ -105,7 +105,7 @@ public class CspPluginValidator {
         }
         if (StringUtils.equals(fetchUpdateMethodName, methodName)) {
             Object[] args = joinPoint.getArgs();
-            String oclLocation = (String) args[1];
+            String oclLocation = (String) args[2];
             Ocl ocl = getOclByLocation(oclLocation);
             validatePluginForCspIsActive(ocl.getCloudServiceProvider().getName());
         }
