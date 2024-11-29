@@ -71,7 +71,7 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
 
         // Setup list request
         List<ServiceTemplateDetailVo> serviceTemplateDetailVos =
-                serviceTemplateApi.listServiceTemplates(ocl.getCategory(),
+                serviceTemplateApi.getAllServiceTemplatesByIsv(ocl.getCategory(),
                         serviceTemplateDetailVo.getCsp(), ocl.getName(),
                         serviceTemplateDetailVo.getVersion(), ocl.getServiceHostingType(),
                         ServiceTemplateRegistrationState.APPROVED, true, false);

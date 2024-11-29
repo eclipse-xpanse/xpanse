@@ -218,13 +218,12 @@ public class ServiceTemplateManage {
         serviceTemplateHistory.setServiceTemplate(serviceTemplate);
         serviceTemplateHistory.setOcl(serviceTemplate.getOcl());
         serviceTemplateHistory.setRequestType(requestType);
+        serviceTemplateHistory.setBlockTemplateUntilReviewed(false);
         if (isAutoApproveEnabled) {
             serviceTemplateHistory.setStatus(ServiceTemplateChangeStatus.ACCEPTED);
             serviceTemplateHistory.setReviewComment(AUTO_APPROVED_REVIEW_COMMENT);
-            serviceTemplateHistory.setBlockTemplateUntilReviewed(false);
         } else {
             serviceTemplateHistory.setStatus(ServiceTemplateChangeStatus.IN_REVIEW);
-            serviceTemplateHistory.setBlockTemplateUntilReviewed(true);
         }
         return serviceTemplateHistoryStorage.storeAndFlush(serviceTemplateHistory);
     }

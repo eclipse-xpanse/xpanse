@@ -378,7 +378,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         lowerPriorityFlavor.setPriority(10);
         ocl.getFlavors().getServiceFlavors().add(lowerPriorityFlavor);
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        testDeployThrowsUnavailableServiceTemplate(serviceTemplate);
+        testDeployThrowsServiceTemplateNotRegistered(serviceTemplate);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         setMockPoliciesValidateApi();
         addServicePolicies(serviceTemplate);
@@ -884,7 +884,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 });
     }
 
-    void testDeployThrowsUnavailableServiceTemplate(ServiceTemplateDetailVo template)
+    void testDeployThrowsServiceTemplateNotRegistered(ServiceTemplateDetailVo template)
             throws Exception {
         String errorMsg = "No available service templates found";
         DeployRequest deployRequest = getDeployRequest(template);
@@ -894,7 +894,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse.getStatus());
         OrderFailedErrorResponse response = objectMapper.readValue(
                 deployResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(response.getErrorType(), ErrorType.UNAVAILABLE_SERVICE_TEMPLATE);
+        assertEquals(response.getErrorType(), ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED);
         assertEquals(response.getDetails(), List.of(errorMsg));
 
         // SetUp
@@ -906,7 +906,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse1.getStatus());
         OrderFailedErrorResponse response1 = objectMapper.readValue(
                 deployResponse1.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(response1.getErrorType(), ErrorType.UNAVAILABLE_SERVICE_TEMPLATE);
+        assertEquals(response1.getErrorType(), ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED);
         assertEquals(response1.getDetails(), List.of(errorMsg));
     }
 

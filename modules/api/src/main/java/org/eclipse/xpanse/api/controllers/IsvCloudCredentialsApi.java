@@ -130,9 +130,8 @@ public class IsvCloudCredentialsApi {
     @DeleteMapping(value = "/credentials",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(description =
-            "Delete the credentials of the user in the USER role to connect to the cloud service "
-                    + "provider.")
+    @Operation(description = "Delete the credentials of the user in the USER role "
+            + "to connect to the cloud service provider.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public void deleteIsvCloudCredential(
             @Parameter(name = "cspName", description = "The cloud service provider.")
@@ -141,7 +140,7 @@ public class IsvCloudCredentialsApi {
             @RequestParam(name = "siteName") String siteName,
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type") CredentialType type,
-            @Parameter(name = "name", description = "The name of of credential.")
+            @Parameter(name = "name", description = "The name of credential.")
             @RequestParam(name = "name") String name) {
         credentialCenter.deleteCredential(csp, siteName, type, name, null);
     }

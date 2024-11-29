@@ -37,7 +37,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccept
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceTemplateException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
@@ -129,7 +129,7 @@ public class ServiceMigrationApi {
         ServiceTemplateEntity existingTemplate = existingServiceTemplates.stream()
                 .filter(serviceTemplate -> serviceTemplate.getAvailableInCatalog()
                         && Objects.nonNull(serviceTemplate.getOcl()))
-                .findFirst().orElseThrow(() -> new UnavailableServiceTemplateException(
+                .findFirst().orElseThrow(() -> new ServiceTemplateNotRegistered(
                         "No available service templates found"));
         if (StringUtils.isNotBlank(existingTemplate.getOcl().getEula())
                 && !migrateRequest.isEulaAccepted()) {

@@ -54,7 +54,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceTemplateException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
@@ -275,7 +274,7 @@ public class DeployService {
         ServiceTemplateEntity existingServiceTemplate = existingServiceTemplates.stream()
                 .filter(serviceTemplate -> serviceTemplate.getAvailableInCatalog()
                         && Objects.nonNull(serviceTemplate.getOcl()))
-                .findFirst().orElseThrow(() -> new UnavailableServiceTemplateException(
+                .findFirst().orElseThrow(() -> new ServiceTemplateNotRegistered(
                         "No available service templates found"));
         if (StringUtils.isNotBlank(existingServiceTemplate.getOcl().getEula())
                 && !deployRequest.isEulaAccepted()) {
@@ -364,11 +363,7 @@ public class DeployService {
         entity.setDeployResourceList(new ArrayList<>());
         entity.setNamespace(deployTask.getNamespace());
         entity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
-        if (Objects.nonNull(deployTask.getServiceTemplateId())) {
-            entity.setServiceTemplateId(deployTask.getServiceTemplateId());
-        } else {
-            throw new ServiceTemplateNotRegistered("service template id can't be null.");
-        }
+        entity.setServiceTemplateId(deployTask.getServiceTemplateId());
         ServiceLockConfig defaultLockConfig = new ServiceLockConfig();
         defaultLockConfig.setDestroyLocked(false);
         defaultLockConfig.setModifyLocked(false);

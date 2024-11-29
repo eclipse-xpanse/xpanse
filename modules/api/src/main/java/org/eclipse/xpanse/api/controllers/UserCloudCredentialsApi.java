@@ -140,7 +140,7 @@ public class UserCloudCredentialsApi {
             @RequestParam(name = "siteName") String siteName,
             @Parameter(name = "type", description = "The type of credential.")
             @RequestParam(name = "type") CredentialType type,
-            @Parameter(name = "name", description = "The name of of credential.")
+            @Parameter(name = "name", description = "The name of credential.")
             @RequestParam(name = "name") String name) {
         credentialCenter.deleteCredential(csp, siteName, type, name, getUserId());
     }

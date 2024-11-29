@@ -246,7 +246,7 @@ public class ServiceTemplateApi {
     @GetMapping(value = "/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public List<ServiceTemplateDetailVo> listServiceTemplates(
+    public List<ServiceTemplateDetailVo> getAllServiceTemplatesByIsv(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) Category category,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
