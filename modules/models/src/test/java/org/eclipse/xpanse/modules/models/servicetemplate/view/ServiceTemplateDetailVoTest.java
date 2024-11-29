@@ -53,7 +53,6 @@ class ServiceTemplateDetailVoTest {
             ServiceTemplateRegistrationState.APPROVED;
     private final Boolean availableInCatalog = true;
     private final Boolean isUpdatePending = false;
-    private final String reviewComment = "reviewComment";
     private final ServiceConfigurationManage serviceConfigurationManage =
             new ServiceConfigurationManage();
     @Mock
@@ -103,7 +102,6 @@ class ServiceTemplateDetailVoTest {
                 serviceTemplateRegistrationState);
         serviceTemplateDetailVo.setAvailableInCatalog(availableInCatalog);
         serviceTemplateDetailVo.setIsUpdatePending(isUpdatePending);
-        serviceTemplateDetailVo.setReviewComment(reviewComment);
         serviceTemplateDetailVo.setServiceHostingType(serviceHostingType);
         serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
         serviceTemplateDetailVo.setEula(eula);
@@ -130,7 +128,6 @@ class ServiceTemplateDetailVoTest {
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
         assertEquals(availableInCatalog, serviceTemplateDetailVo.getAvailableInCatalog());
         assertEquals(isUpdatePending, serviceTemplateDetailVo.getIsUpdatePending());
-        assertEquals(reviewComment, serviceTemplateDetailVo.getReviewComment());
         assertEquals(serviceHostingType, serviceTemplateDetailVo.getServiceHostingType());
         assertEquals(serviceProviderContactDetails,
                 serviceTemplateDetailVo.getServiceProviderContactDetails());
@@ -174,7 +171,6 @@ class ServiceTemplateDetailVoTest {
                 + ", serviceTemplateRegistrationState=" + serviceTemplateRegistrationState
                 + ", isUpdatePending=" + isUpdatePending
                 + ", availableInCatalog=" + availableInCatalog
-                + ", reviewComment=" + reviewComment
                 + ", serviceProviderContactDetails=" + serviceProviderContactDetails
                 + ", eula=" + eula
                 + ", serviceConfigurationManage=" + serviceConfigurationManage

@@ -27,7 +27,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryM
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceTemplateException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateDisabledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -114,15 +114,15 @@ public class ServiceCatalogApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
-    public UserOrderableServiceVo getOrderableServiceDetails(
+    public UserOrderableServiceVo getOrderableServiceDetailsById(
             @Parameter(name = "id", description = "The id of orderable service.")
             @PathVariable("id") String id) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManage.getServiceTemplateDetails(UUID.fromString(id), false, false);
         if (Objects.equals(false, serviceTemplateEntity.getAvailableInCatalog())) {
-            String errMsg = String.format("Service template with id %s is unavailable.", id);
+            String errMsg = "Service template with id " + id + " is disabled to order service.";
             log.error(errMsg);
-            throw new UnavailableServiceTemplateException(errMsg);
+            throw new ServiceTemplateDisabledException(errMsg);
         }
         String successMsg = String.format("Get orderable service with id %s successful.", id);
         log.info(successMsg);

@@ -127,9 +127,6 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
     @Schema(description = "Is available in catalog.")
     private Boolean availableInCatalog;
 
-    @Schema(description = "Comment of reviewed service template.")
-    private String reviewComment;
-
     @NotNull
     @Schema(description = "The contact details of the service provider.")
     private ServiceProviderContactDetails serviceProviderContactDetails;

@@ -184,10 +184,9 @@ class ServiceCatalogApiTest extends ApisTestCommon {
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup request 1
         UUID id1 = serviceTemplateDetailVo.getServiceTemplateId();
+        String errMsg = "Service template with id " + id1 + " is disabled to order service.";
         ErrorResponse expectedErrorResponse1 = ErrorResponse.errorResponse(
-                ErrorType.UNAVAILABLE_SERVICE_TEMPLATE,
-                Collections.singletonList(
-                        String.format("Service template with id %s is unavailable.", id1)));
+                ErrorType.SERVICE_TEMPLATE_DISABLED, Collections.singletonList(errMsg));
         String result1 = objectMapper.writeValueAsString(expectedErrorResponse1);
         // Run the test case 1
         final MockHttpServletResponse response1 = getOrderableServiceDetailsWithId(id1);

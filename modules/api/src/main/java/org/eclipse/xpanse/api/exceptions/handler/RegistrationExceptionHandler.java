@@ -18,12 +18,12 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyReviewed;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateDisabledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateStillInUseException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceTemplateException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -115,14 +115,14 @@ public class RegistrationExceptionHandler {
     }
 
     /**
-     * Exception handler for UnavailableServiceTemplateException.
+     * Exception handler for ServiceTemplateDisabledException.
      */
-    @ExceptionHandler({UnavailableServiceTemplateException.class})
+    @ExceptionHandler({ServiceTemplateDisabledException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleUnavailableServiceTemplateException(
-            UnavailableServiceTemplateException ex) {
-        return getErrorResponse(ErrorType.UNAVAILABLE_SERVICE_TEMPLATE,
+    public ErrorResponse handleServiceTemplateDisabledException(
+            ServiceTemplateDisabledException ex) {
+        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_DISABLED,
                 Collections.singletonList(ex.getMessage()));
     }
 
