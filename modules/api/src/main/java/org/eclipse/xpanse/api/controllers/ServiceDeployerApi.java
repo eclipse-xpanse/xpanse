@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.api.controllers;
 
 
+import static org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter.convertToUserOrderableServiceVo;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_CSP;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.api.config.OrderFailedApiResponses;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.deployment.servicelock.ServiceLockConfigService;
@@ -41,6 +43,7 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.CacheControl;
@@ -342,6 +345,27 @@ public class ServiceDeployerApi {
             ServiceDeploymentState lastKnownServiceDeploymentState) {
         return deployService.getLatestServiceDeploymentStatus(UUID.fromString(serviceId),
                 lastKnownServiceDeploymentState);
+    }
+
+    /**
+     * Get service template details by service id.
+     *
+     * @param serviceId service id
+     * @return service template details
+     */
+    @Tag(name = "Service", description = "APIs to manage the services")
+    @Operation(description = "Get service template details by service id.")
+    @GetMapping(value = "/services/{serviceId}/service_template",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
+    public UserOrderableServiceVo getOrderableServiceDetailsByServiceId(
+            @Parameter(name = "serviceId", description = "The id of deployed service.")
+            @PathVariable("serviceId") String serviceId) {
+        ServiceTemplateEntity usedServiceTemplate =
+                deployService.getOrderableServiceDetailsByServiceId(UUID.fromString(serviceId));
+        return convertToUserOrderableServiceVo(usedServiceTemplate);
     }
 
 

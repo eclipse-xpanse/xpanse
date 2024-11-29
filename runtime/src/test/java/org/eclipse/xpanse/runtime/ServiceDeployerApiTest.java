@@ -63,6 +63,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesEvaluationApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalCmdList;
@@ -330,6 +331,15 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         UUID serviceId = deployedServices.getFirst().getServiceId();
         testRedeploy(serviceId);
 
+        MockHttpServletResponse getOrderableTemplateResponse =
+                getOrderableServiceDetailsByServiceId(serviceId);
+        assertEquals(HttpStatus.OK.value(), getOrderableTemplateResponse.getStatus());
+        UserOrderableServiceVo userOrderableServiceVo =
+                objectMapper.readValue(getOrderableTemplateResponse.getContentAsString(),
+                        UserOrderableServiceVo.class);
+        assertEquals(serviceTemplate.getServiceTemplateId(),
+                userOrderableServiceVo.getServiceTemplateId());
+
         listDeployedServices();
         testGetComputeResourcesOfService(serviceId);
         List<DeployedServiceDetails> deployedServiceDetailsList =
@@ -462,6 +472,15 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         errorResponse =
                 objectMapper.readValue(getResourcesResponse.getContentAsString(),
                         ErrorResponse.class);
+        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(errorResponse.getDetails(), List.of(errorMsg));
+
+        // Setup getOrderableServiceDetailsByServiceId
+        final MockHttpServletResponse getOrderableDetailsResponse =
+                getOrderableServiceDetailsByServiceId(serviceId);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), getOrderableDetailsResponse.getStatus());
+        errorResponse = objectMapper.readValue(
+                getOrderableDetailsResponse.getContentAsString(), ErrorResponse.class);
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
         assertEquals(errorResponse.getDetails(), List.of(errorMsg));
 
@@ -985,6 +1004,15 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     MockHttpServletResponse getComputeResourceInventoryOfService(UUID serviceId) throws Exception {
         MockHttpServletResponse response = mockMvc.perform(
                 get("/xpanse/services/{serviceId}/resources/compute", serviceId)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse();
+        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
+        return response;
+    }
+
+    MockHttpServletResponse getOrderableServiceDetailsByServiceId(UUID serviceId) throws Exception {
+        MockHttpServletResponse response = mockMvc.perform(
+                get("/xpanse/services/{serviceId}/service_template", serviceId)
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));

@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import jakarta.annotation.Resource;
 import java.net.URI;
@@ -45,6 +47,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.models.servicetemplatechange.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
@@ -99,6 +102,11 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         boolean deployOrderIsCompleted = waitServiceOrderIsCompleted(deployOrderId);
         if (deployOrderIsCompleted) {
             DeployedServiceDetails deployedServiceDetails = getDeployedServiceDetails(serviceId);
+
+            UserOrderableServiceVo orderableServiceDetails =
+                    serviceDeployerApi.getOrderableServiceDetailsByServiceId(serviceId.toString());
+            assertEquals(orderableServiceDetails.getServiceTemplateId(),
+                    serviceTemplateHistory.getServiceTemplateId());
             ServiceDeploymentState serviceDeploymentState =
                     deployedServiceDetails.getServiceDeploymentState();
 
@@ -211,7 +219,6 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return serviceMigrationApi.migrate(migrateRequest);
     }
 
-
     void testModifyAndGetDetails(UUID serviceId, ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
         // SetUp
@@ -230,9 +237,9 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
             ServiceOrderDetails serviceOrderDetails =
                     serviceOrderManageApi.getOrderDetailsByOrderId(
                             serviceOrder.getOrderId().toString());
-            Assertions.assertEquals(serviceOrderDetails.getTaskStatus(),
+            assertEquals(serviceOrderDetails.getTaskStatus(),
                     TaskStatus.SUCCESSFUL);
-            Assertions.assertEquals(serviceOrderDetails.getTaskType(),
+            assertEquals(serviceOrderDetails.getTaskType(),
                     ServiceOrderType.MODIFY);
 
         }
@@ -246,9 +253,9 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
             ServiceOrderDetails serviceOrderDetails =
                     serviceOrderManageApi.getOrderDetailsByOrderId(
                             serviceOrder.getOrderId().toString());
-            Assertions.assertEquals(serviceOrderDetails.getTaskStatus(),
+            assertEquals(serviceOrderDetails.getTaskStatus(),
                     TaskStatus.SUCCESSFUL);
-            Assertions.assertEquals(serviceOrderDetails.getTaskType(),
+            assertEquals(serviceOrderDetails.getTaskType(),
                     ServiceOrderType.DESTROY);
         }
     }

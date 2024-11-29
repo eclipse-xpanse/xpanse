@@ -762,4 +762,17 @@ public class DeployService {
         return stateDeferredResult;
     }
 
+
+    /**
+     * Get used service template entity by service id.
+     *
+     * @param serviceId id of deployed service.
+     * @return service template entity used to deploy the service.
+     */
+    public ServiceTemplateEntity getOrderableServiceDetailsByServiceId(UUID serviceId) {
+        ServiceDeploymentEntity deployedService =
+                serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
+        return serviceTemplateStorage.getServiceTemplateById(
+                deployedService.getServiceTemplateId());
+    }
 }
