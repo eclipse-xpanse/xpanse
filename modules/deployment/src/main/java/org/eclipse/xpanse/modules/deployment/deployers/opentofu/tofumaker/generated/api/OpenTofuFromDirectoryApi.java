@@ -28,7 +28,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.9.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
+        "version: 7.10.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromDirectoryApi")
 public class OpenTofuFromDirectoryApi extends BaseApi {
 
@@ -56,8 +57,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     public void asyncDeployFromDirectory(String moduleDirectory,
                                          OpenTofuAsyncDeployFromDirectoryRequest openTofuAsyncDeployFromDirectoryRequest)
             throws RestClientException {
-        asyncDeployFromDirectoryWithHttpInfo(moduleDirectory,
-                openTofuAsyncDeployFromDirectoryRequest);
+        asyncDeployFromDirectoryWithHttpInfo(moduleDirectory, openTofuAsyncDeployFromDirectoryRequest);
     }
 
     /**
@@ -87,20 +87,18 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         // verify the required parameter 'openTofuAsyncDeployFromDirectoryRequest' is set
         if (openTofuAsyncDeployFromDirectoryRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDeployFromDirectoryRequest' when calling asyncDeployFromDirectory");
+                    "Missing the required parameter 'openTofuAsyncDeployFromDirectoryRequest' when calling " +
+                            "asyncDeployFromDirectory");
         }
 
         // create path and map variables
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
         uriVariables.put("module_directory", moduleDirectory);
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*"
@@ -109,17 +107,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {
         };
-        return apiClient.invokeAPI("/tofu-maker/directory/deploy/async/{module_directory}",
-                HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/directory/deploy/async/{module_directory}", HttpMethod.POST,
+                uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams,
+                localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -137,8 +133,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     public void asyncDestroyFromDirectory(String moduleDirectory,
                                           OpenTofuAsyncDestroyFromDirectoryRequest openTofuAsyncDestroyFromDirectoryRequest)
             throws RestClientException {
-        asyncDestroyFromDirectoryWithHttpInfo(moduleDirectory,
-                openTofuAsyncDestroyFromDirectoryRequest);
+        asyncDestroyFromDirectoryWithHttpInfo(moduleDirectory, openTofuAsyncDestroyFromDirectoryRequest);
     }
 
     /**
@@ -168,20 +163,18 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         // verify the required parameter 'openTofuAsyncDestroyFromDirectoryRequest' is set
         if (openTofuAsyncDestroyFromDirectoryRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDestroyFromDirectoryRequest' when calling asyncDestroyFromDirectory");
+                    "Missing the required parameter 'openTofuAsyncDestroyFromDirectoryRequest' when calling " +
+                            "asyncDestroyFromDirectory");
         }
 
         // create path and map variables
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
         uriVariables.put("module_directory", moduleDirectory);
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*"
@@ -190,17 +183,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {
         };
-        return apiClient.invokeAPI("/tofu-maker/directory/destroy/async/{module_directory}",
-                HttpMethod.DELETE, uriVariables, localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/directory/destroy/async/{module_directory}", HttpMethod.DELETE,
+                uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams,
+                localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -218,8 +209,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     public void asyncModifyFromDirectory(String moduleDirectory,
                                          OpenTofuAsyncModifyFromDirectoryRequest openTofuAsyncModifyFromDirectoryRequest)
             throws RestClientException {
-        asyncModifyFromDirectoryWithHttpInfo(moduleDirectory,
-                openTofuAsyncModifyFromDirectoryRequest);
+        asyncModifyFromDirectoryWithHttpInfo(moduleDirectory, openTofuAsyncModifyFromDirectoryRequest);
     }
 
     /**
@@ -249,20 +239,18 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         // verify the required parameter 'openTofuAsyncModifyFromDirectoryRequest' is set
         if (openTofuAsyncModifyFromDirectoryRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncModifyFromDirectoryRequest' when calling asyncModifyFromDirectory");
+                    "Missing the required parameter 'openTofuAsyncModifyFromDirectoryRequest' when calling " +
+                            "asyncModifyFromDirectory");
         }
 
         // create path and map variables
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
         uriVariables.put("module_directory", moduleDirectory);
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*"
@@ -271,17 +259,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {
         };
-        return apiClient.invokeAPI("/tofu-maker/directory/modify/async/{module_directory}",
-                HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/directory/modify/async/{module_directory}", HttpMethod.POST,
+                uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams,
+                localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -300,8 +286,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     public OpenTofuResult deployFromDirectory(String moduleDirectory,
                                               OpenTofuDeployFromDirectoryRequest openTofuDeployFromDirectoryRequest)
             throws RestClientException {
-        return deployFromDirectoryWithHttpInfo(moduleDirectory,
-                openTofuDeployFromDirectoryRequest).getBody();
+        return deployFromDirectoryWithHttpInfo(moduleDirectory, openTofuDeployFromDirectoryRequest).getBody();
     }
 
     /**
@@ -331,20 +316,18 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         // verify the required parameter 'openTofuDeployFromDirectoryRequest' is set
         if (openTofuDeployFromDirectoryRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDeployFromDirectoryRequest' when calling deployFromDirectory");
+                    "Missing the required parameter 'openTofuDeployFromDirectoryRequest' when calling " +
+                            "deployFromDirectory");
         }
 
         // create path and map variables
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
         uriVariables.put("module_directory", moduleDirectory);
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -353,18 +336,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {
-                };
-        return apiClient.invokeAPI("/tofu-maker/directory/deploy/{module_directory}",
-                HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {
+        };
+        return apiClient.invokeAPI("/tofu-maker/directory/deploy/{module_directory}", HttpMethod.POST, uriVariables,
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -383,8 +363,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     public OpenTofuResult destroyFromDirectory(String moduleDirectory,
                                                OpenTofuDestroyFromDirectoryRequest openTofuDestroyFromDirectoryRequest)
             throws RestClientException {
-        return destroyFromDirectoryWithHttpInfo(moduleDirectory,
-                openTofuDestroyFromDirectoryRequest).getBody();
+        return destroyFromDirectoryWithHttpInfo(moduleDirectory, openTofuDestroyFromDirectoryRequest).getBody();
     }
 
     /**
@@ -414,20 +393,18 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         // verify the required parameter 'openTofuDestroyFromDirectoryRequest' is set
         if (openTofuDestroyFromDirectoryRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDestroyFromDirectoryRequest' when calling destroyFromDirectory");
+                    "Missing the required parameter 'openTofuDestroyFromDirectoryRequest' when calling " +
+                            "destroyFromDirectory");
         }
 
         // create path and map variables
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
         uriVariables.put("module_directory", moduleDirectory);
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -436,18 +413,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {
-                };
-        return apiClient.invokeAPI("/tofu-maker/directory/destroy/{module_directory}",
-                HttpMethod.DELETE, uriVariables, localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {
+        };
+        return apiClient.invokeAPI("/tofu-maker/directory/destroy/{module_directory}", HttpMethod.DELETE, uriVariables,
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -466,8 +440,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     public OpenTofuResult modifyFromDirectory(String moduleDirectory,
                                               OpenTofuModifyFromDirectoryRequest openTofuModifyFromDirectoryRequest)
             throws RestClientException {
-        return modifyFromDirectoryWithHttpInfo(moduleDirectory,
-                openTofuModifyFromDirectoryRequest).getBody();
+        return modifyFromDirectoryWithHttpInfo(moduleDirectory, openTofuModifyFromDirectoryRequest).getBody();
     }
 
     /**
@@ -497,20 +470,18 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         // verify the required parameter 'openTofuModifyFromDirectoryRequest' is set
         if (openTofuModifyFromDirectoryRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuModifyFromDirectoryRequest' when calling modifyFromDirectory");
+                    "Missing the required parameter 'openTofuModifyFromDirectoryRequest' when calling " +
+                            "modifyFromDirectory");
         }
 
         // create path and map variables
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
         uriVariables.put("module_directory", moduleDirectory);
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -519,18 +490,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {
-                };
-        return apiClient.invokeAPI("/tofu-maker/directory/modify/{module_directory}",
-                HttpMethod.POST, uriVariables, localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {
+        };
+        return apiClient.invokeAPI("/tofu-maker/directory/modify/{module_directory}", HttpMethod.POST, uriVariables,
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -546,8 +514,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      * @return OpenTofuPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuPlan plan(String moduleDirectory,
-                             OpenTofuPlanFromDirectoryRequest openTofuPlanFromDirectoryRequest)
+    public OpenTofuPlan plan(String moduleDirectory, OpenTofuPlanFromDirectoryRequest openTofuPlanFromDirectoryRequest)
             throws RestClientException {
         return planWithHttpInfo(moduleDirectory, openTofuPlanFromDirectoryRequest).getBody();
     }
@@ -586,13 +553,10 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
         uriVariables.put("module_directory", moduleDirectory);
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -601,18 +565,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuPlan> localReturnType =
-                new ParameterizedTypeReference<OpenTofuPlan>() {
-                };
-        return apiClient.invokeAPI("/tofu-maker/directory/plan/{module_directory}", HttpMethod.POST,
-                uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
-                localVarAuthNames, localReturnType);
+        ParameterizedTypeReference<OpenTofuPlan> localReturnType = new ParameterizedTypeReference<OpenTofuPlan>() {
+        };
+        return apiClient.invokeAPI("/tofu-maker/directory/plan/{module_directory}", HttpMethod.POST, uriVariables,
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -628,8 +589,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      * @return OpenTofuValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuValidationResult validateFromDirectory(String moduleDirectory,
-                                                          String opentofuVersion)
+    public OpenTofuValidationResult validateFromDirectory(String moduleDirectory, String opentofuVersion)
             throws RestClientException {
         return validateFromDirectoryWithHttpInfo(moduleDirectory, opentofuVersion).getBody();
     }
@@ -647,8 +607,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      * @return ResponseEntity&lt;OpenTofuValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<OpenTofuValidationResult> validateFromDirectoryWithHttpInfo(
-            String moduleDirectory, String opentofuVersion) throws RestClientException {
+    public ResponseEntity<OpenTofuValidationResult> validateFromDirectoryWithHttpInfo(String moduleDirectory,
+                                                                                      String opentofuVersion)
+            throws RestClientException {
         Object localVarPostBody = null;
 
         // verify the required parameter 'moduleDirectory' is set
@@ -668,62 +629,52 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         uriVariables.put("module_directory", moduleDirectory);
         uriVariables.put("opentofu_version", opentofuVersion);
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
         };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {};
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<OpenTofuValidationResult> localReturnType =
                 new ParameterizedTypeReference<OpenTofuValidationResult>() {
                 };
-        return apiClient.invokeAPI(
-                "/tofu-maker/directory/validate/{module_directory}/{opentofu_version}",
-                HttpMethod.GET, uriVariables, localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/directory/validate/{module_directory}/{opentofu_version}",
+                HttpMethod.GET, uriVariables, localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     @Override
     public <T> ResponseEntity<T> invokeAPI(String url, HttpMethod method, Object request,
-                                           ParameterizedTypeReference<T> returnType)
-            throws RestClientException {
+                                           ParameterizedTypeReference<T> returnType) throws RestClientException {
         String localVarPath = url.replace(apiClient.getBasePath(), "");
         Object localVarPostBody = request;
 
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
         };
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {};
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        return apiClient.invokeAPI(localVarPath, method, uriVariables, localVarQueryParams,
-                localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
-                localVarAccept, localVarContentType, localVarAuthNames, returnType);
+        return apiClient.invokeAPI(localVarPath, method, uriVariables, localVarQueryParams, localVarPostBody,
+                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, returnType);
     }
 }

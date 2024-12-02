@@ -29,7 +29,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.9.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
+        "version: 7.10.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi")
 public class OpenTofuFromScriptsApi extends BaseApi {
 
@@ -53,8 +54,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @param openTofuAsyncDeployFromScriptsRequest (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDeployWithScripts(
-            OpenTofuAsyncDeployFromScriptsRequest openTofuAsyncDeployFromScriptsRequest)
+    public void asyncDeployWithScripts(OpenTofuAsyncDeployFromScriptsRequest openTofuAsyncDeployFromScriptsRequest)
             throws RestClientException {
         asyncDeployWithScriptsWithHttpInfo(openTofuAsyncDeployFromScriptsRequest);
     }
@@ -72,24 +72,21 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDeployWithScriptsWithHttpInfo(
-            OpenTofuAsyncDeployFromScriptsRequest openTofuAsyncDeployFromScriptsRequest)
-            throws RestClientException {
+            OpenTofuAsyncDeployFromScriptsRequest openTofuAsyncDeployFromScriptsRequest) throws RestClientException {
         Object localVarPostBody = openTofuAsyncDeployFromScriptsRequest;
 
         // verify the required parameter 'openTofuAsyncDeployFromScriptsRequest' is set
         if (openTofuAsyncDeployFromScriptsRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDeployFromScriptsRequest' when calling asyncDeployWithScripts");
+                    "Missing the required parameter 'openTofuAsyncDeployFromScriptsRequest' when calling " +
+                            "asyncDeployWithScripts");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*"
@@ -98,17 +95,16 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {
         };
         return apiClient.invokeAPI("/tofu-maker/scripts/deploy/async", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     /**
@@ -122,8 +118,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @param openTofuAsyncDestroyFromScriptsRequest (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDestroyWithScripts(
-            OpenTofuAsyncDestroyFromScriptsRequest openTofuAsyncDestroyFromScriptsRequest)
+    public void asyncDestroyWithScripts(OpenTofuAsyncDestroyFromScriptsRequest openTofuAsyncDestroyFromScriptsRequest)
             throws RestClientException {
         asyncDestroyWithScriptsWithHttpInfo(openTofuAsyncDestroyFromScriptsRequest);
     }
@@ -141,24 +136,21 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDestroyWithScriptsWithHttpInfo(
-            OpenTofuAsyncDestroyFromScriptsRequest openTofuAsyncDestroyFromScriptsRequest)
-            throws RestClientException {
+            OpenTofuAsyncDestroyFromScriptsRequest openTofuAsyncDestroyFromScriptsRequest) throws RestClientException {
         Object localVarPostBody = openTofuAsyncDestroyFromScriptsRequest;
 
         // verify the required parameter 'openTofuAsyncDestroyFromScriptsRequest' is set
         if (openTofuAsyncDestroyFromScriptsRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDestroyFromScriptsRequest' when calling asyncDestroyWithScripts");
+                    "Missing the required parameter 'openTofuAsyncDestroyFromScriptsRequest' when calling " +
+                            "asyncDestroyWithScripts");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*"
@@ -167,17 +159,16 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {
         };
         return apiClient.invokeAPI("/tofu-maker/scripts/destroy/async", HttpMethod.DELETE,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     /**
@@ -191,8 +182,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @param openTofuAsyncModifyFromScriptsRequest (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncModifyWithScripts(
-            OpenTofuAsyncModifyFromScriptsRequest openTofuAsyncModifyFromScriptsRequest)
+    public void asyncModifyWithScripts(OpenTofuAsyncModifyFromScriptsRequest openTofuAsyncModifyFromScriptsRequest)
             throws RestClientException {
         asyncModifyWithScriptsWithHttpInfo(openTofuAsyncModifyFromScriptsRequest);
     }
@@ -210,24 +200,21 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncModifyWithScriptsWithHttpInfo(
-            OpenTofuAsyncModifyFromScriptsRequest openTofuAsyncModifyFromScriptsRequest)
-            throws RestClientException {
+            OpenTofuAsyncModifyFromScriptsRequest openTofuAsyncModifyFromScriptsRequest) throws RestClientException {
         Object localVarPostBody = openTofuAsyncModifyFromScriptsRequest;
 
         // verify the required parameter 'openTofuAsyncModifyFromScriptsRequest' is set
         if (openTofuAsyncModifyFromScriptsRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncModifyFromScriptsRequest' when calling asyncModifyWithScripts");
+                    "Missing the required parameter 'openTofuAsyncModifyFromScriptsRequest' when calling " +
+                            "asyncModifyWithScripts");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*"
@@ -236,17 +223,16 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {
         };
         return apiClient.invokeAPI("/tofu-maker/scripts/modify/async", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     /**
@@ -261,8 +247,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult deployWithScripts(
-            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest)
+    public OpenTofuResult deployWithScripts(OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest)
             throws RestClientException {
         return deployWithScriptsWithHttpInfo(openTofuDeployWithScriptsRequest).getBody();
     }
@@ -280,8 +265,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> deployWithScriptsWithHttpInfo(
-            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest)
-            throws RestClientException {
+            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = openTofuDeployWithScriptsRequest;
 
         // verify the required parameter 'openTofuDeployWithScriptsRequest' is set
@@ -291,13 +275,10 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -306,18 +287,16 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {
-                };
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {
+        };
         return apiClient.invokeAPI("/tofu-maker/scripts/deploy", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     /**
@@ -332,8 +311,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult destroyWithScripts(
-            OpenTofuDestroyWithScriptsRequest openTofuDestroyWithScriptsRequest)
+    public OpenTofuResult destroyWithScripts(OpenTofuDestroyWithScriptsRequest openTofuDestroyWithScriptsRequest)
             throws RestClientException {
         return destroyWithScriptsWithHttpInfo(openTofuDestroyWithScriptsRequest).getBody();
     }
@@ -351,24 +329,21 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> destroyWithScriptsWithHttpInfo(
-            OpenTofuDestroyWithScriptsRequest openTofuDestroyWithScriptsRequest)
-            throws RestClientException {
+            OpenTofuDestroyWithScriptsRequest openTofuDestroyWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = openTofuDestroyWithScriptsRequest;
 
         // verify the required parameter 'openTofuDestroyWithScriptsRequest' is set
         if (openTofuDestroyWithScriptsRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDestroyWithScriptsRequest' when calling destroyWithScripts");
+                    "Missing the required parameter 'openTofuDestroyWithScriptsRequest' when calling " +
+                            "destroyWithScripts");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -377,18 +352,16 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {
-                };
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {
+        };
         return apiClient.invokeAPI("/tofu-maker/scripts/destroy", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     /**
@@ -403,8 +376,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult modifyWithScripts(
-            OpenTofuModifyWithScriptsRequest openTofuModifyWithScriptsRequest)
+    public OpenTofuResult modifyWithScripts(OpenTofuModifyWithScriptsRequest openTofuModifyWithScriptsRequest)
             throws RestClientException {
         return modifyWithScriptsWithHttpInfo(openTofuModifyWithScriptsRequest).getBody();
     }
@@ -422,8 +394,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> modifyWithScriptsWithHttpInfo(
-            OpenTofuModifyWithScriptsRequest openTofuModifyWithScriptsRequest)
-            throws RestClientException {
+            OpenTofuModifyWithScriptsRequest openTofuModifyWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = openTofuModifyWithScriptsRequest;
 
         // verify the required parameter 'openTofuModifyWithScriptsRequest' is set
@@ -433,13 +404,10 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -448,18 +416,16 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {
-                };
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {
+        };
         return apiClient.invokeAPI("/tofu-maker/scripts/modify", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     /**
@@ -474,8 +440,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @return OpenTofuPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuPlan planWithScripts(
-            OpenTofuPlanWithScriptsRequest openTofuPlanWithScriptsRequest)
+    public OpenTofuPlan planWithScripts(OpenTofuPlanWithScriptsRequest openTofuPlanWithScriptsRequest)
             throws RestClientException {
         return planWithScriptsWithHttpInfo(openTofuPlanWithScriptsRequest).getBody();
     }
@@ -493,8 +458,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuPlan> planWithScriptsWithHttpInfo(
-            OpenTofuPlanWithScriptsRequest openTofuPlanWithScriptsRequest)
-            throws RestClientException {
+            OpenTofuPlanWithScriptsRequest openTofuPlanWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = openTofuPlanWithScriptsRequest;
 
         // verify the required parameter 'openTofuPlanWithScriptsRequest' is set
@@ -504,13 +468,10 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -519,18 +480,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuPlan> localReturnType =
-                new ParameterizedTypeReference<OpenTofuPlan>() {
-                };
-        return apiClient.invokeAPI("/tofu-maker/scripts/plan", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        ParameterizedTypeReference<OpenTofuPlan> localReturnType = new ParameterizedTypeReference<OpenTofuPlan>() {
+        };
+        return apiClient.invokeAPI("/tofu-maker/scripts/plan", HttpMethod.POST, Collections.<String, Object>emptyMap(),
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -546,8 +504,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public OpenTofuValidationResult validateWithScripts(
-            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest)
-            throws RestClientException {
+            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest) throws RestClientException {
         return validateWithScriptsWithHttpInfo(openTofuDeployWithScriptsRequest).getBody();
     }
 
@@ -564,24 +521,21 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuValidationResult> validateWithScriptsWithHttpInfo(
-            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest)
-            throws RestClientException {
+            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest) throws RestClientException {
         Object localVarPostBody = openTofuDeployWithScriptsRequest;
 
         // verify the required parameter 'openTofuDeployWithScriptsRequest' is set
         if (openTofuDeployWithScriptsRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDeployWithScriptsRequest' when calling validateWithScripts");
+                    "Missing the required parameter 'openTofuDeployWithScriptsRequest' when calling " +
+                            "validateWithScripts");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -590,8 +544,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
@@ -599,26 +552,22 @@ public class OpenTofuFromScriptsApi extends BaseApi {
                 new ParameterizedTypeReference<OpenTofuValidationResult>() {
                 };
         return apiClient.invokeAPI("/tofu-maker/scripts/validate", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     @Override
     public <T> ResponseEntity<T> invokeAPI(String url, HttpMethod method, Object request,
-                                           ParameterizedTypeReference<T> returnType)
-            throws RestClientException {
+                                           ParameterizedTypeReference<T> returnType) throws RestClientException {
         String localVarPath = url.replace(apiClient.getBasePath(), "");
         Object localVarPostBody = request;
 
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -627,13 +576,12 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        return apiClient.invokeAPI(localVarPath, method, uriVariables, localVarQueryParams,
-                localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
-                localVarAccept, localVarContentType, localVarAuthNames, returnType);
+        return apiClient.invokeAPI(localVarPath, method, uriVariables, localVarQueryParams, localVarPostBody,
+                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, returnType);
     }
 }
