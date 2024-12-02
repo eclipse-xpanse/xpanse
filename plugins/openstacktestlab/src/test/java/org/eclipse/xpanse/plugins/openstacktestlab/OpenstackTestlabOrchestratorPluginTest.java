@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
@@ -103,7 +104,8 @@ import org.springframework.test.util.ReflectionTestUtils;
         MeasuresService.class, MetricsQueryBuilder.class, CredentialCenter.class, AesUtil.class,
         MonitorMetricsStore.class, OpenstackTerraformResourceHandler.class, PluginManager.class,
         ServiceTemplateStorage.class, OpenstackResourceManager.class,
-        OpenstackServicePriceCalculator.class, ProviderAuthInfoResolver.class
+        OpenstackServicePriceCalculator.class, ProviderAuthInfoResolver.class,
+        ProxyConfigurationManager.class
 })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestPropertySource(properties = {"OPENSTACK_TESTLAB_AUTH_URL=http://127.0.0.1/identity/v3"})

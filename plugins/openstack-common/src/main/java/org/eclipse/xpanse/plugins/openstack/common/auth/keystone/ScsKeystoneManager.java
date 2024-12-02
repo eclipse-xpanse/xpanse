@@ -6,8 +6,10 @@
 
 package org.eclipse.xpanse.plugins.openstack.common.auth.keystone;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
@@ -15,8 +17,11 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants;
 import org.openstack4j.api.OSClient;
+import org.openstack4j.core.transport.Config;
+import org.openstack4j.core.transport.ProxyHost;
 import org.openstack4j.model.common.Identifier;
 import org.openstack4j.openstack.OSFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,6 +29,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ScsKeystoneManager {
+
+    private final ProxyConfigurationManager proxyConfigurationManager;
+
+    @Autowired
+    public ScsKeystoneManager(ProxyConfigurationManager proxyConfigurationManager) {
+        this.proxyConfigurationManager = proxyConfigurationManager;
+    }
 
     /**
      * Get the Openstack API client based on the credential information.
@@ -74,6 +86,42 @@ public class ScsKeystoneManager {
                         Identifier.byName(tenant),
                         Identifier.byName(domain))
                 .endpoint(authUrl)
+                .withConfig(createProxyConfig(authUrl))
                 .authenticate();
+    }
+
+    private Config createProxyConfig(String url) {
+        Config config = null;
+        if (Objects.nonNull(proxyConfigurationManager.getHttpsProxyDetails())
+                || Objects.nonNull(proxyConfigurationManager.getHttpProxyDetails())) {
+            URI uri = URI.create(url);
+            if ("http".equalsIgnoreCase(uri.getScheme())
+                    && Objects.nonNull(proxyConfigurationManager.getHttpProxyDetails())) {
+                config = Config.newConfig()
+                        .withProxy(ProxyHost.of(
+                                // bug in openstack4J. It expects full URL for the host argument.
+                                proxyConfigurationManager.getHttpProxyDetails().getProxyUrl(),
+                                proxyConfigurationManager.getHttpProxyDetails().getProxyPort(),
+                                proxyConfigurationManager.getHttpProxyDetails().getProxyUsername(),
+                                proxyConfigurationManager.getHttpProxyDetails()
+                                        .getProxyPassword()));
+            }
+            if ("https".equalsIgnoreCase(uri.getScheme())
+                    && Objects.nonNull(proxyConfigurationManager.getHttpsProxyDetails())) {
+                config = Config.newConfig()
+                        .withProxy(ProxyHost.of(
+                                // bug in openstack4J. It expects full URL for the host argument.
+                                // bug in openstack4J. It expects full URL for the host argument.
+                                proxyConfigurationManager.getHttpsProxyDetails().getProxyUrl(),
+                                proxyConfigurationManager.getHttpsProxyDetails().getProxyPort(),
+                                proxyConfigurationManager.getHttpsProxyDetails().getProxyUsername(),
+                                proxyConfigurationManager.getHttpsProxyDetails()
+                                        .getProxyPassword()));
+            }
+        }
+        if (Objects.isNull(config)) {
+            config = Config.newConfig();
+        }
+        return config;
     }
 }
