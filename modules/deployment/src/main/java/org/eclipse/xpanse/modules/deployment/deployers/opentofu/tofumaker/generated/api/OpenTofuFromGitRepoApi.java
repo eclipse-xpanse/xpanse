@@ -29,7 +29,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.9.0")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
+        "version: 7.10.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi")
 public class OpenTofuFromGitRepoApi extends BaseApi {
 
@@ -53,8 +54,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @param openTofuAsyncDeployFromGitRepoRequest (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDeployFromGitRepo(
-            OpenTofuAsyncDeployFromGitRepoRequest openTofuAsyncDeployFromGitRepoRequest)
+    public void asyncDeployFromGitRepo(OpenTofuAsyncDeployFromGitRepoRequest openTofuAsyncDeployFromGitRepoRequest)
             throws RestClientException {
         asyncDeployFromGitRepoWithHttpInfo(openTofuAsyncDeployFromGitRepoRequest);
     }
@@ -72,24 +72,21 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDeployFromGitRepoWithHttpInfo(
-            OpenTofuAsyncDeployFromGitRepoRequest openTofuAsyncDeployFromGitRepoRequest)
-            throws RestClientException {
+            OpenTofuAsyncDeployFromGitRepoRequest openTofuAsyncDeployFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = openTofuAsyncDeployFromGitRepoRequest;
 
         // verify the required parameter 'openTofuAsyncDeployFromGitRepoRequest' is set
         if (openTofuAsyncDeployFromGitRepoRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDeployFromGitRepoRequest' when calling asyncDeployFromGitRepo");
+                    "Missing the required parameter 'openTofuAsyncDeployFromGitRepoRequest' when calling " +
+                            "asyncDeployFromGitRepo");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*"
@@ -98,17 +95,16 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {
         };
         return apiClient.invokeAPI("/tofu-maker/git/deploy/async", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     /**
@@ -122,8 +118,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @param openTofuAsyncDestroyFromGitRepoRequest (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncDestroyFromGitRepo(
-            OpenTofuAsyncDestroyFromGitRepoRequest openTofuAsyncDestroyFromGitRepoRequest)
+    public void asyncDestroyFromGitRepo(OpenTofuAsyncDestroyFromGitRepoRequest openTofuAsyncDestroyFromGitRepoRequest)
             throws RestClientException {
         asyncDestroyFromGitRepoWithHttpInfo(openTofuAsyncDestroyFromGitRepoRequest);
     }
@@ -141,24 +136,21 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDestroyFromGitRepoWithHttpInfo(
-            OpenTofuAsyncDestroyFromGitRepoRequest openTofuAsyncDestroyFromGitRepoRequest)
-            throws RestClientException {
+            OpenTofuAsyncDestroyFromGitRepoRequest openTofuAsyncDestroyFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = openTofuAsyncDestroyFromGitRepoRequest;
 
         // verify the required parameter 'openTofuAsyncDestroyFromGitRepoRequest' is set
         if (openTofuAsyncDestroyFromGitRepoRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDestroyFromGitRepoRequest' when calling asyncDestroyFromGitRepo");
+                    "Missing the required parameter 'openTofuAsyncDestroyFromGitRepoRequest' when calling " +
+                            "asyncDestroyFromGitRepo");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*"
@@ -167,17 +159,16 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {
         };
         return apiClient.invokeAPI("/tofu-maker/git/destroy/async", HttpMethod.DELETE,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     /**
@@ -191,8 +182,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @param openTofuAsyncModifyFromGitRepoRequest (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void asyncModifyFromGitRepo(
-            OpenTofuAsyncModifyFromGitRepoRequest openTofuAsyncModifyFromGitRepoRequest)
+    public void asyncModifyFromGitRepo(OpenTofuAsyncModifyFromGitRepoRequest openTofuAsyncModifyFromGitRepoRequest)
             throws RestClientException {
         asyncModifyFromGitRepoWithHttpInfo(openTofuAsyncModifyFromGitRepoRequest);
     }
@@ -210,24 +200,21 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncModifyFromGitRepoWithHttpInfo(
-            OpenTofuAsyncModifyFromGitRepoRequest openTofuAsyncModifyFromGitRepoRequest)
-            throws RestClientException {
+            OpenTofuAsyncModifyFromGitRepoRequest openTofuAsyncModifyFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = openTofuAsyncModifyFromGitRepoRequest;
 
         // verify the required parameter 'openTofuAsyncModifyFromGitRepoRequest' is set
         if (openTofuAsyncModifyFromGitRepoRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncModifyFromGitRepoRequest' when calling asyncModifyFromGitRepo");
+                    "Missing the required parameter 'openTofuAsyncModifyFromGitRepoRequest' when calling " +
+                            "asyncModifyFromGitRepo");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*"
@@ -236,17 +223,16 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<Void> localReturnType = new ParameterizedTypeReference<Void>() {
         };
         return apiClient.invokeAPI("/tofu-maker/git/modify/async", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+                Collections.<String, Object>emptyMap(), localVarQueryParams, localVarPostBody, localVarHeaderParams,
+                localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localReturnType);
     }
 
     /**
@@ -261,8 +247,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult deployFromGitRepo(
-            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest)
+    public OpenTofuResult deployFromGitRepo(OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest)
             throws RestClientException {
         return deployFromGitRepoWithHttpInfo(openTofuDeployFromGitRepoRequest).getBody();
     }
@@ -280,8 +265,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> deployFromGitRepoWithHttpInfo(
-            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest)
-            throws RestClientException {
+            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = openTofuDeployFromGitRepoRequest;
 
         // verify the required parameter 'openTofuDeployFromGitRepoRequest' is set
@@ -291,13 +275,10 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -306,18 +287,15 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {
-                };
-        return apiClient.invokeAPI("/tofu-maker/git/deploy", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {
+        };
+        return apiClient.invokeAPI("/tofu-maker/git/deploy", HttpMethod.POST, Collections.<String, Object>emptyMap(),
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -332,8 +310,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult destroyFromGitRepo(
-            OpenTofuDestroyFromGitRepoRequest openTofuDestroyFromGitRepoRequest)
+    public OpenTofuResult destroyFromGitRepo(OpenTofuDestroyFromGitRepoRequest openTofuDestroyFromGitRepoRequest)
             throws RestClientException {
         return destroyFromGitRepoWithHttpInfo(openTofuDestroyFromGitRepoRequest).getBody();
     }
@@ -351,24 +328,21 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> destroyFromGitRepoWithHttpInfo(
-            OpenTofuDestroyFromGitRepoRequest openTofuDestroyFromGitRepoRequest)
-            throws RestClientException {
+            OpenTofuDestroyFromGitRepoRequest openTofuDestroyFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = openTofuDestroyFromGitRepoRequest;
 
         // verify the required parameter 'openTofuDestroyFromGitRepoRequest' is set
         if (openTofuDestroyFromGitRepoRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDestroyFromGitRepoRequest' when calling destroyFromGitRepo");
+                    "Missing the required parameter 'openTofuDestroyFromGitRepoRequest' when calling " +
+                            "destroyFromGitRepo");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -377,18 +351,15 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {
-                };
-        return apiClient.invokeAPI("/tofu-maker/git/destroy", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {
+        };
+        return apiClient.invokeAPI("/tofu-maker/git/destroy", HttpMethod.POST, Collections.<String, Object>emptyMap(),
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -403,8 +374,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult modifyFromGitRepo(
-            OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest)
+    public OpenTofuResult modifyFromGitRepo(OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest)
             throws RestClientException {
         return modifyFromGitRepoWithHttpInfo(openTofuModifyFromGitRepoRequest).getBody();
     }
@@ -422,8 +392,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> modifyFromGitRepoWithHttpInfo(
-            OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest)
-            throws RestClientException {
+            OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = openTofuModifyFromGitRepoRequest;
 
         // verify the required parameter 'openTofuModifyFromGitRepoRequest' is set
@@ -433,13 +402,10 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -448,18 +414,15 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {
-                };
-        return apiClient.invokeAPI("/tofu-maker/git/modify", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        ParameterizedTypeReference<OpenTofuResult> localReturnType = new ParameterizedTypeReference<OpenTofuResult>() {
+        };
+        return apiClient.invokeAPI("/tofu-maker/git/modify", HttpMethod.POST, Collections.<String, Object>emptyMap(),
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -474,8 +437,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @return OpenTofuPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuPlan planFromGitRepo(
-            OpenTofuPlanFromGitRepoRequest openTofuPlanFromGitRepoRequest)
+    public OpenTofuPlan planFromGitRepo(OpenTofuPlanFromGitRepoRequest openTofuPlanFromGitRepoRequest)
             throws RestClientException {
         return planFromGitRepoWithHttpInfo(openTofuPlanFromGitRepoRequest).getBody();
     }
@@ -493,8 +455,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuPlan> planFromGitRepoWithHttpInfo(
-            OpenTofuPlanFromGitRepoRequest openTofuPlanFromGitRepoRequest)
-            throws RestClientException {
+            OpenTofuPlanFromGitRepoRequest openTofuPlanFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = openTofuPlanFromGitRepoRequest;
 
         // verify the required parameter 'openTofuPlanFromGitRepoRequest' is set
@@ -504,13 +465,10 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -519,18 +477,15 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuPlan> localReturnType =
-                new ParameterizedTypeReference<OpenTofuPlan>() {
-                };
-        return apiClient.invokeAPI("/tofu-maker/git/plan", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        ParameterizedTypeReference<OpenTofuPlan> localReturnType = new ParameterizedTypeReference<OpenTofuPlan>() {
+        };
+        return apiClient.invokeAPI("/tofu-maker/git/plan", HttpMethod.POST, Collections.<String, Object>emptyMap(),
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     /**
@@ -546,8 +501,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public OpenTofuValidationResult validateScriptsFromGitRepo(
-            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest)
-            throws RestClientException {
+            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest) throws RestClientException {
         return validateScriptsFromGitRepoWithHttpInfo(openTofuDeployFromGitRepoRequest).getBody();
     }
 
@@ -564,24 +518,21 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuValidationResult> validateScriptsFromGitRepoWithHttpInfo(
-            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest)
-            throws RestClientException {
+            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest) throws RestClientException {
         Object localVarPostBody = openTofuDeployFromGitRepoRequest;
 
         // verify the required parameter 'openTofuDeployFromGitRepoRequest' is set
         if (openTofuDeployFromGitRepoRequest == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDeployFromGitRepoRequest' when calling validateScriptsFromGitRepo");
+                    "Missing the required parameter 'openTofuDeployFromGitRepoRequest' when calling " +
+                            "validateScriptsFromGitRepo");
         }
 
 
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -590,35 +541,29 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
         ParameterizedTypeReference<OpenTofuValidationResult> localReturnType =
                 new ParameterizedTypeReference<OpenTofuValidationResult>() {
                 };
-        return apiClient.invokeAPI("/tofu-maker/git/validate", HttpMethod.POST,
-                Collections.emptyMap(), localVarQueryParams, localVarPostBody,
-                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept,
-                localVarContentType, localVarAuthNames, localReturnType);
+        return apiClient.invokeAPI("/tofu-maker/git/validate", HttpMethod.POST, Collections.<String, Object>emptyMap(),
+                localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
+                localVarAccept, localVarContentType, localVarAuthNames, localReturnType);
     }
 
     @Override
     public <T> ResponseEntity<T> invokeAPI(String url, HttpMethod method, Object request,
-                                           ParameterizedTypeReference<T> returnType)
-            throws RestClientException {
+                                           ParameterizedTypeReference<T> returnType) throws RestClientException {
         String localVarPath = url.replace(apiClient.getBasePath(), "");
         Object localVarPostBody = request;
 
         final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        final MultiValueMap<String, String> localVarQueryParams =
-                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, String> localVarQueryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders localVarHeaderParams = new HttpHeaders();
-        final MultiValueMap<String, String> localVarCookieParams =
-                new LinkedMultiValueMap<String, String>();
-        final MultiValueMap<String, Object> localVarFormParams =
-                new LinkedMultiValueMap<String, Object>();
+        final MultiValueMap<String, String> localVarCookieParams = new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams = new LinkedMultiValueMap<String, Object>();
 
         final String[] localVarAccepts = {
                 "*/*", "application/json"
@@ -627,13 +572,12 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
         final String[] localVarContentTypes = {
                 "application/json"
         };
-        final MediaType localVarContentType =
-                apiClient.selectHeaderContentType(localVarContentTypes);
+        final MediaType localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        return apiClient.invokeAPI(localVarPath, method, uriVariables, localVarQueryParams,
-                localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams,
-                localVarAccept, localVarContentType, localVarAuthNames, returnType);
+        return apiClient.invokeAPI(localVarPath, method, uriVariables, localVarQueryParams, localVarPostBody,
+                localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType,
+                localVarAuthNames, returnType);
     }
 }
