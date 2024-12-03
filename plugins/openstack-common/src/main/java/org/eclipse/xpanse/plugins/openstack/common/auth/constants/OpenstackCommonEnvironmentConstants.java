@@ -19,8 +19,6 @@ public class OpenstackCommonEnvironmentConstants {
     public static final String PROJECT_DOMAIN = "OS_PROJECT_DOMAIN_NAME";
     public static final String OS_AUTH_URL = "OS_AUTH_URL";
     public static final String SERVICE_PROJECT = "OS_SERVICE_PROJECT";
-    public static final String PROXY_HOST = "OS_PROXY_HOST";
-    public static final String PROXY_PORT = "OS_PROXY_PORT";
     public static final String SSL_VERIFICATION_DISABLED = "OS_SSL_VERIFICATION_DISABLED";
     public static final String OPENSTACK_TESTLAB_AUTH_URL = "OPENSTACK_TESTLAB_AUTH_URL";
     public static final String PLUS_SERVER_AUTH_URL = "PLUS_SERVER_AUTH_URL";

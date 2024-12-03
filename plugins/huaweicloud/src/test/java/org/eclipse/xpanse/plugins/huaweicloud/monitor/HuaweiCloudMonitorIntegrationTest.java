@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -54,7 +55,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         HuaweiCloudDataModelConverter.class, MonitorMetricsStore.class,
         HuaweiCloudResourceManager.class, HuaweiCloudTerraformResourceHandler.class,
         HuaweiCloudPriceCalculator.class, HuaweiCloudGlobalPriceCalculator.class,
-        HuaweiCloudRetryStrategy.class})
+        HuaweiCloudRetryStrategy.class, ProxyConfigurationManager.class})
 class HuaweiCloudMonitorIntegrationTest {
 
     @RegisterExtension

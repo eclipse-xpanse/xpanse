@@ -54,6 +54,8 @@ public class SystemCmd {
             String[] safeCmd = cmd.split(" +");
             ProcessBuilder processBuilder = new ProcessBuilder(safeCmd);
             if (this.env != null) {
+                // No need to additionally pass proxy variables.
+                // It will be automatically copied from the parent (JVM) process.
                 processBuilder.environment().putAll(this.env);
             }
             if (!Objects.equals(workDir, "")) {

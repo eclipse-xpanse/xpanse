@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
+import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Component;
 public class OpenstackKeystoneManager {
 
     private final Environment environment;
+    private final ProxyConfigurationManager proxyConfigurationManager;
 
     /**
      * Constructor for OpenstackKeystoneManager.
@@ -41,8 +43,10 @@ public class OpenstackKeystoneManager {
      * @param environment Environment Bean
      */
     @Autowired
-    public OpenstackKeystoneManager(Environment environment) {
+    public OpenstackKeystoneManager(Environment environment,
+                                    ProxyConfigurationManager proxyConfigurationManager) {
         this.environment = environment;
+        this.proxyConfigurationManager = proxyConfigurationManager;
     }
 
     private String getIpAddressFromUrl(String url) {
@@ -104,15 +108,11 @@ public class OpenstackKeystoneManager {
         // the authentication details in the thread context.
         String serviceTenant =
                 this.environment.getProperty(OpenstackCommonEnvironmentConstants.SERVICE_PROJECT);
-        String proxyHost =
-                this.environment.getProperty(OpenstackCommonEnvironmentConstants.PROXY_HOST);
-        String proxyPort =
-                this.environment.getProperty(OpenstackCommonEnvironmentConstants.PROXY_PORT);
         String sslDisabled = this.environment.getProperty(
                 OpenstackCommonEnvironmentConstants.SSL_VERIFICATION_DISABLED);
         return OSFactory
                 .builderV3()
-                .withConfig(buildClientConfig(authUrl, proxyHost, proxyPort, sslDisabled))
+                .withConfig(buildClientConfig(authUrl, sslDisabled))
                 .credentials(userName, password, Identifier.byName(userDomain))
                 .scopeToProject(
                         Identifier.byName(Objects.isNull(serviceTenant) ? tenant : serviceTenant),
@@ -121,14 +121,43 @@ public class OpenstackKeystoneManager {
                 .authenticate();
     }
 
-    private Config buildClientConfig(String url, String proxyHost, String proxyPort,
-                                     String sslDisabled) {
-        Config config = Config.newConfig()
-                .withEndpointNATResolution(getIpAddressFromUrl(url))
-                .withEndpointURLResolver(new CustomEndPointResolver())
-                .withSSLVerificationDisabled()
-                .withProxy(Objects.nonNull(proxyHost)
-                        ? ProxyHost.of(proxyHost, Integer.parseInt(proxyPort)) : null);
+    private Config buildClientConfig(String url, String sslDisabled) {
+        Config config = null;
+        if (Objects.nonNull(proxyConfigurationManager.getHttpsProxyDetails())
+                || Objects.nonNull(proxyConfigurationManager.getHttpProxyDetails())) {
+            URI uri = URI.create(url);
+            if ("http".equalsIgnoreCase(uri.getScheme())
+                    && Objects.nonNull(proxyConfigurationManager.getHttpProxyDetails())) {
+                config = Config.newConfig()
+                        .withEndpointNATResolution(getIpAddressFromUrl(url))
+                        .withEndpointURLResolver(new CustomEndPointResolver())
+                        .withProxy(ProxyHost.of(
+                                // bug in openstack4J. It expects full URL for the host argument.
+                                proxyConfigurationManager.getHttpProxyDetails().getProxyUrl(),
+                                proxyConfigurationManager.getHttpProxyDetails().getProxyPort(),
+                                proxyConfigurationManager.getHttpProxyDetails().getProxyUsername(),
+                                proxyConfigurationManager
+                                        .getHttpProxyDetails().getProxyPassword()));
+            }
+            if ("https".equalsIgnoreCase(uri.getScheme())
+                    && Objects.nonNull(proxyConfigurationManager.getHttpsProxyDetails())) {
+                config = Config.newConfig()
+                        .withEndpointNATResolution(getIpAddressFromUrl(url))
+                        .withEndpointURLResolver(new CustomEndPointResolver())
+                        .withProxy(ProxyHost.of(
+                                // bug in openstack4J. It expects full URL for the host argument.
+                                proxyConfigurationManager.getHttpsProxyDetails().getProxyUrl(),
+                                proxyConfigurationManager.getHttpsProxyDetails().getProxyPort(),
+                                proxyConfigurationManager.getHttpsProxyDetails().getProxyUsername(),
+                                proxyConfigurationManager
+                                        .getHttpsProxyDetails().getProxyPassword()));
+            }
+        }
+        if (Objects.isNull(config)) {
+            config = Config.newConfig()
+                    .withEndpointNATResolution(getIpAddressFromUrl(url))
+                    .withEndpointURLResolver(new CustomEndPointResolver());
+        }
         if (Objects.nonNull(sslDisabled) && sslDisabled.equals("true")) {
             config.withSSLVerificationDisabled();
         }

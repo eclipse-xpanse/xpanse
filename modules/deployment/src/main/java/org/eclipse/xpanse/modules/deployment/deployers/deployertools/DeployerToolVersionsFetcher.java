@@ -93,7 +93,7 @@ public class DeployerToolVersionsFetcher {
         } catch (Exception e) {
             String errorMsg = String.format("Failed to fetch available versions from website for "
                     + "deployer tool %s.", deployerKind.toValue());
-            log.error(errorMsg + " Retry count: " + retryCount, e.getMessage());
+            log.error(errorMsg + " Retry count: " + retryCount, e);
             throw new ClientApiCallFailedException(errorMsg);
         }
         log.info("Get available versions {} from website for deployer tool {}."
@@ -135,7 +135,8 @@ public class DeployerToolVersionsFetcher {
             connection.setConnectTimeout(10000);
             connection.setRequestMethod(HttpMethod.HEAD.name());
             return connection.getResponseCode() == HttpStatus.OK.value();
-        } catch (IOException e) {
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new IOException("Failed to connect to the endpoint: " + endpoint);
         }
     }

@@ -27,6 +27,8 @@ import com.huaweicloud.sdk.vpc.v2.VpcClient;
 import com.huaweicloud.sdk.vpc.v2.region.VpcRegion;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +41,9 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
 
     @Value("${huaweicloud.sdk.enable.http.debug.logs:false}")
     private boolean sdkHttpDebugLogsEnabled;
+
+    @Autowired
+    private ProxyConfigurationManager proxyConfigurationManager;
 
     /**
      * Get HuaweiCloud CES Client.
@@ -161,6 +166,16 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
             HttpListener responseListener =
                     HttpListener.forResponseListener(this::outputResponseInfo);
             httpConfig.addHttpListener(responseListener);
+        }
+        if (proxyConfigurationManager.getHttpsProxyDetails() != null) {
+            httpConfig.setProxyHost(
+                    proxyConfigurationManager.getHttpsProxyDetails().getProxyHost());
+            httpConfig.setProxyPort(
+                    proxyConfigurationManager.getHttpsProxyDetails().getProxyPort());
+            httpConfig.setProxyUsername(
+                    proxyConfigurationManager.getHttpsProxyDetails().getProxyUsername());
+            httpConfig.setProxyPassword(
+                    proxyConfigurationManager.getHttpsProxyDetails().getProxyPassword());
         }
         return httpConfig;
     }
