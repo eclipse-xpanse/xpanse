@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -52,8 +53,8 @@ public class ServiceOrderDetails {
     @Schema(description = "The id of the workflow.")
     private String workflowId;
 
-    @Schema(description = "The error message if the service order task failed.")
-    private String errorMsg;
+    @Schema(description = "The error response if the service order task failed.")
+    private ErrorResponse errorResponse;
 
     @Schema(description = "The id of the user who created the service order.")
     private String userId;
