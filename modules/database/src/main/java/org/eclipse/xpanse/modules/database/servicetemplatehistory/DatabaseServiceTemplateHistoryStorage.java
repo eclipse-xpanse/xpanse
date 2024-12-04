@@ -6,12 +6,10 @@
 
 package org.eclipse.xpanse.modules.database.servicetemplatehistory;
 
-import jakarta.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.exceptions.ServiceTemplateChangeRequestNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,21 +36,11 @@ public class DatabaseServiceTemplateHistoryStorage implements ServiceTemplateHis
     }
 
     @Override
-    public List<ServiceTemplateHistoryEntity> listServiceTemplateHistory(
-            ServiceTemplateHistoryEntity queryEntity) {
-        Specification<ServiceTemplateHistoryEntity> specification =
-                (root, query, criteriaBuilder) -> {
-                    List<Predicate> predicateList = new ArrayList<>();
-                    predicateList.add(criteriaBuilder.equal(root.get("serviceTemplate").get("id"),
-                            queryEntity.getServiceTemplate().getId()));
-                    predicateList.add(criteriaBuilder.equal(root.get("requestType"),
-                            queryEntity.getRequestType()));
-                    predicateList.add(criteriaBuilder.equal(root.get("status"),
-                            queryEntity.getStatus()));
-                    return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
-                            .getRestriction();
-                };
-        return repository.findAll(specification);
+    public ServiceTemplateHistoryEntity getEntityById(UUID changeId) {
+        return repository.findById(changeId).orElseThrow(() ->
+                new ServiceTemplateChangeRequestNotFound(
+                        "Service template change request with id " + changeId + " not found.")
+        );
     }
 
 }

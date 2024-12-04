@@ -13,6 +13,5 @@ public class ServiceTemplateNotRegistered extends RuntimeException {
         super(message);
     }
 
-
 }
 

@@ -4,7 +4,7 @@
  */
 
 
-package org.eclipse.xpanse.modules.models.servicetemplatechange;
+package org.eclipse.xpanse.modules.models.servicetemplate.change;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Defines view object for service template history.
+ * Defines view object for service template request.
  */
 @Data
 @AllArgsConstructor

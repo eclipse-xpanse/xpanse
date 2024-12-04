@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.net.URI;
@@ -46,12 +47,14 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateChangeInfo;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateHistoryVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.eclipse.xpanse.modules.models.servicetemplatechange.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -115,6 +118,37 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
         assertFalse(serviceTemplateDetailVo.getIsUpdatePending());
         assertFalse(serviceTemplateDetailVo.getAvailableInCatalog());
+
+        // Setup list history
+        // Run the test
+        final MockHttpServletResponse listHistoryResponse =
+                listServiceTemplateHistoryWithParams(serviceTemplateId,
+                        ServiceTemplateRequestType.REGISTER.toValue(), null);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), listHistoryResponse.getStatus());
+        List<ServiceTemplateHistoryVo> historyVos =
+                objectMapper.readValue(listHistoryResponse.getContentAsString(),
+                        new TypeReference<List<ServiceTemplateHistoryVo>>() {
+                        });
+        assertEquals(1, historyVos.size());
+        ServiceTemplateHistoryVo serviceTemplateHistoryVo = historyVos.getFirst();
+        assertEquals(serviceTemplateId, serviceTemplateHistoryVo.getServiceTemplateId());
+
+        UUID changeId = serviceTemplateChangeInfo.getChangeId();
+        // Setup list history
+        // Run the test
+        final MockHttpServletResponse getHistoryRequestResponse =
+                getServiceTemplateRequestByChangeId(changeId);
+        // Verify the results
+        assertEquals(HttpStatus.OK.value(), getHistoryRequestResponse.getStatus());
+        Ocl requestOcl = objectMapper.readValue(getHistoryRequestResponse.getContentAsString(),
+                Ocl.class);
+        assertNotNull(requestOcl);
+        assertEquals(ocl.getCategory(), requestOcl.getCategory());
+        assertEquals(ocl.getCloudServiceProvider().getName(),
+                requestOcl.getCloudServiceProvider().getName());
+        assertEquals(ocl.getName(), requestOcl.getName());
+        assertEquals(ocl.getServiceVersion(), requestOcl.getServiceVersion());
 
         // Setup list request
         List<ServiceTemplateDetailVo> serviceTemplateDetailVos = List.of(serviceTemplateDetailVo);
@@ -248,6 +282,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         testFetchThrowsRuntimeException();
         testListServiceTemplatesThrowsException();
         testDeleteServiceTemplateThrowsException();
+        testGetHistoryDetailsThrowsServiceTemplateRequestNotFound();
     }
 
     void testManageApisThrowsServiceTemplateNotRegistered() throws Exception {
@@ -264,6 +299,14 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
         assertEquals(result, detailResponse.getContentAsString());
+
+        // Run the test list service template history
+        final MockHttpServletResponse listHistoryResponse =
+                listServiceTemplateHistoryWithParams(id, "register", "in-review");
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), listHistoryResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(expectedResponse),
+                listHistoryResponse.getContentAsString());
 
         URL updateUrl =
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL();
@@ -288,6 +331,20 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(result, unregisterResponse.getContentAsString());
     }
 
+    void testGetHistoryDetailsThrowsServiceTemplateRequestNotFound() throws Exception {
+        UUID id = UUID.randomUUID();
+        ErrorResponse expectedResponse = ErrorResponse.errorResponse(
+                ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_FOUND,
+                Collections.singletonList(String.format(
+                        "Service template change request with id %s not found.", id)));
+        // Run the test -getRequestByChangeId()
+        final MockHttpServletResponse getRequestByChangeIdResponse =
+                getServiceTemplateRequestByChangeId(id);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), getRequestByChangeIdResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(expectedResponse),
+                getRequestByChangeIdResponse.getContentAsString());
+    }
+
     void testManageApisThrowsAccessDeniedException() throws Exception {
 
         ErrorResponse accessDeniedResponse = ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
@@ -296,7 +353,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("serviceTemplateApiTest-02");
+        ocl.setName(UUID.randomUUID().toString());
         MockHttpServletResponse response = register(ocl);
         ServiceTemplateChangeInfo serviceTemplateChangeInfo =
                 objectMapper.readValue(response.getContentAsString(),
@@ -313,6 +370,21 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.FORBIDDEN.value(), detailResponse.getStatus());
         assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
                 detailResponse.getContentAsString());
+
+        // Run the test list service template history
+        final MockHttpServletResponse listHistoryResponse =
+                listServiceTemplateHistoryWithParams(id, "register", null);
+
+        assertEquals(HttpStatus.FORBIDDEN.value(), listHistoryResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                listHistoryResponse.getContentAsString());
+
+        // Run the test -getRequestByChangeId()
+        final MockHttpServletResponse getRequestByChangeIdResponse =
+                getServiceTemplateRequestByChangeId(serviceTemplateChangeInfo.getChangeId());
+        assertEquals(HttpStatus.FORBIDDEN.value(), getRequestByChangeIdResponse.getStatus());
+        assertEquals(objectMapper.writeValueAsString(accessDeniedResponse),
+                getRequestByChangeIdResponse.getContentAsString());
 
         // Setup request update
         URL updateUrl =
@@ -755,7 +827,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
     void testListServiceTemplatesThrowsException() throws Exception {
         // Setup
-        String errorMessage = "Failed to convert value of type 'java.lang.String' to required type";
+        String errorMessage = "Failed to convert value of type 'java.lang.String' to required "
+                + "type";
         ErrorResponse expectedResponse =
                 ErrorResponse.errorResponse(ErrorType.UNPROCESSABLE_ENTITY, List.of(errorMessage));
 
@@ -768,6 +841,14 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
         assertEquals(expectedResponse.getErrorType(), resultResponse.getErrorType());
+
+        final MockHttpServletResponse historyResponse = listServiceTemplateHistoryWithParams(
+                UUID.randomUUID(), "errorStatus", null);
+        ErrorResponse resultResponse1 =
+                objectMapper.readValue(historyResponse.getContentAsString(), ErrorResponse.class);
+        // Verify the results
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), historyResponse.getStatus());
+        assertEquals(expectedResponse.getErrorType(), resultResponse1.getErrorType());
     }
 
     void testDeleteServiceTemplateThrowsException() throws Exception {
@@ -902,6 +983,30 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                     isUpdatePending.toString());
         }
         return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
+    }
+
+
+    MockHttpServletResponse listServiceTemplateHistoryWithParams(
+            UUID serviceTemplateId, String requestType, String changeStatus)
+            throws Exception {
+        MockHttpServletRequestBuilder getRequestBuilder =
+                get("/xpanse/service_templates/{serviceTemplateId}/history", serviceTemplateId);
+        if (Objects.nonNull(changeStatus)) {
+            getRequestBuilder = getRequestBuilder.param("changeStatus", changeStatus);
+        }
+        if (Objects.nonNull(requestType)) {
+            getRequestBuilder = getRequestBuilder.param("requestType", requestType);
+        }
+        return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
+    }
+
+
+    MockHttpServletResponse getServiceTemplateRequestByChangeId(UUID changeId)
+            throws Exception {
+        return mockMvc.perform(get("/xpanse/service_templates/request/{changeId}",
+                        changeId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
     }
 
 }
