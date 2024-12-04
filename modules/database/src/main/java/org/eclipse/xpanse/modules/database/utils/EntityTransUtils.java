@@ -19,6 +19,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
@@ -27,6 +28,7 @@ import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServic
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateHistoryVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -88,8 +90,8 @@ public class EntityTransUtils {
      * @param entity DeployServiceEntity.
      * @return DeployedServiceDetails
      */
-    public static DeployedServiceDetails
-            transToDeployedServiceDetails(ServiceDeploymentEntity entity) {
+    public static DeployedServiceDetails transToDeployedServiceDetails(
+            ServiceDeploymentEntity entity) {
         DeployedServiceDetails details = new DeployedServiceDetails();
         details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
         details.setBillingMode(entity.getDeployRequest().getBillingMode());
@@ -195,5 +197,21 @@ public class EntityTransUtils {
             orderDetailsList.add(orderDetails);
         });
         return orderDetailsList;
+    }
+
+
+    /**
+     * ServiceTemplateHistoryEntity converted to ServiceTemplateHistoryVo.
+     *
+     * @param serviceTemplateHistoryEntity ServiceTemplateHistoryEntity.
+     * @return serviceTemplateHistoryVo
+     */
+    public static ServiceTemplateHistoryVo convertToServiceTemplateHistoryVo(
+            ServiceTemplateHistoryEntity serviceTemplateHistoryEntity) {
+        ServiceTemplateHistoryVo serviceTemplateHistoryVo = new ServiceTemplateHistoryVo();
+        serviceTemplateHistoryVo.setServiceTemplateId(
+                serviceTemplateHistoryEntity.getServiceTemplate().getId());
+        BeanUtils.copyProperties(serviceTemplateHistoryEntity, serviceTemplateHistoryVo);
+        return serviceTemplateHistoryVo;
     }
 }

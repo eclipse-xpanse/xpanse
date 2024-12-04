@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.modules.database.servicetemplatehistory;
 
-import java.util.List;
+import java.util.UUID;
 
 /**
  * Interface for persist of ServiceTemplateHistory.
@@ -24,12 +24,11 @@ public interface ServiceTemplateHistoryStorage {
             ServiceTemplateHistoryEntity serviceTemplateHistoryEntity);
 
     /**
-     * List ServiceTemplateHistoryEntity by queryEntity.
+     * Get ServiceTemplateHistoryEntity by changeId.
      *
-     * @param queryEntity to be queried.
-     * @return list of ServiceTemplateHistoryEntity.
+     * @param changeId given changeId
+     * @return ServiceTemplateHistoryEntity
      */
-    List<ServiceTemplateHistoryEntity> listServiceTemplateHistory(
-            ServiceTemplateHistoryEntity queryEntity);
+    ServiceTemplateHistoryEntity getEntityById(UUID changeId);
 
 }

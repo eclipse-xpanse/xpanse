@@ -60,7 +60,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationReque
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.eclipse.xpanse.modules.models.servicetemplatechange.ServiceTemplateChangeInfo;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;

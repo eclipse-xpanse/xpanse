@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.servicetemplate.enums;
+package org.eclipse.xpanse.modules.models.servicetemplate.change.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

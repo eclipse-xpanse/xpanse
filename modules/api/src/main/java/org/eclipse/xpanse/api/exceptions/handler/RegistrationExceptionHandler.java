@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.billing.exceptions.InvalidBillingConfigException;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.exceptions.ServiceTemplateChangeRequestNotFound;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
@@ -193,6 +194,18 @@ public class RegistrationExceptionHandler {
     public ErrorResponse handleServiceTemplateStillInUseException(
             ServiceTemplateStillInUseException ex) {
         return getErrorResponse(ErrorType.SERVICE_TEMPLATE_STILL_IN_USE,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceTemplateChangeRequestNotFound.
+     */
+    @ExceptionHandler({ServiceTemplateChangeRequestNotFound.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleServiceTemplateChangeRequestNotFoundException(
+            ServiceTemplateChangeRequestNotFound ex) {
+        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 }

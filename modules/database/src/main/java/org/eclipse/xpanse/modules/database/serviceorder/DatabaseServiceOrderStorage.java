@@ -72,7 +72,6 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
                         predicateList.add(criteriaBuilder.equal(root.get("workflowId"),
                                 entity.getWorkflowId()));
                     }
-                    assert query != null;
                     query.orderBy(criteriaBuilder.desc(root.get("startedTime")));
                     query.distinct(true);
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))

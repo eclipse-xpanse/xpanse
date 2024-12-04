@@ -25,8 +25,8 @@ import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateChangeStatus;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRequestType;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateChangeStatus;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
 import org.hibernate.annotations.Type;
 
 /**

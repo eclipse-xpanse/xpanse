@@ -25,6 +25,8 @@ import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicySt
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
+import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryStorage;
 import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
 import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -52,6 +54,8 @@ public class GetCspInfoFromRequest {
     private TaskService taskService;
     @Resource
     private DatabaseServiceOrderStorage serviceOrderTaskStorage;
+    @Resource
+    private ServiceTemplateHistoryStorage serviceTemplateHistoryStorage;
 
     /**
      * Get Csp with the URL of Ocl.
@@ -195,6 +199,27 @@ public class GetCspInfoFromRequest {
             }
         } catch (Exception e) {
             log.error("Get csp with service order id:{} failed.", orderId, e);
+        }
+        return null;
+    }
+
+
+    /**
+     * Get Csp with service template change id.
+     *
+     * @param changeId id of service template change.
+     * @return csp.
+     */
+    public Csp getCspFromServiceTemplateChangeId(String changeId) {
+        try {
+            ServiceTemplateHistoryEntity serviceTemplateHistory =
+                    serviceTemplateHistoryStorage.getEntityById(UUID.fromString(changeId));
+            if (Objects.nonNull(serviceTemplateHistory) && Objects.nonNull(
+                    serviceTemplateHistory.getServiceTemplate())) {
+                return serviceTemplateHistory.getServiceTemplate().getCsp();
+            }
+        } catch (Exception e) {
+            log.error("Get csp with service template change id:{} failed.", changeId, e);
         }
         return null;
     }

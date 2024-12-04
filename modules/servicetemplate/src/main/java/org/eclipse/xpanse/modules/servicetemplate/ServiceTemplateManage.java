@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.servicetemplate;
 
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryM
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
 import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryStorage;
+import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
@@ -32,11 +34,12 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateHistoryVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateChangeStatus;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateChangeStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
@@ -155,12 +158,13 @@ public class ServiceTemplateManage {
 
     private ServiceTemplateHistoryEntity queryAnyInProgressServiceTemplateUpdateRequest(
             ServiceTemplateEntity serviceTemplate) {
-        ServiceTemplateHistoryEntity queryUpdateHistory = new ServiceTemplateHistoryEntity();
-        queryUpdateHistory.setServiceTemplate(serviceTemplate);
-        queryUpdateHistory.setRequestType(ServiceTemplateRequestType.UPDATE);
-        queryUpdateHistory.setStatus(ServiceTemplateChangeStatus.IN_REVIEW);
-        return serviceTemplateHistoryStorage.listServiceTemplateHistory(queryUpdateHistory)
-                .getFirst();
+        if (CollectionUtils.isEmpty(serviceTemplate.getServiceTemplateHistory())) {
+            return null;
+        }
+        return serviceTemplate.getServiceTemplateHistory().stream().filter(history ->
+                        ServiceTemplateRequestType.UPDATE == history.getRequestType()
+                                && ServiceTemplateChangeStatus.IN_REVIEW == history.getStatus())
+                .findFirst().orElse(null);
     }
 
     private void checkParams(ServiceTemplateEntity existingTemplate, Ocl ocl) {
@@ -276,7 +280,6 @@ public class ServiceTemplateManage {
      */
     public ServiceTemplateHistoryEntity registerServiceTemplate(Ocl ocl) {
         Semver newServiceVersion = getSemverVersion(ocl.getServiceVersion());
-        ocl.setVersion(newServiceVersion.getVersion());
         ServiceTemplateQueryModel queryModel = ServiceTemplateQueryModel.builder()
                 .category(ocl.getCategory()).csp(ocl.getCloudServiceProvider().getName())
                 .serviceName(ocl.getName()).serviceHostingType(ocl.getServiceHostingType()).build();
@@ -364,22 +367,7 @@ public class ServiceTemplateManage {
     public ServiceTemplateEntity getServiceTemplateDetails(UUID id, boolean checkNamespace,
                                                            boolean checkCsp) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateById(id);
-        if (checkNamespace) {
-            boolean hasManagePermissions = userServiceHelper.currentUserCanManageNamespace(
-                    existingTemplate.getNamespace());
-            if (!hasManagePermissions) {
-                throw new AccessDeniedException("No permissions to view or manage service template "
-                        + "belonging to other namespaces.");
-            }
-        }
-        if (checkCsp) {
-            boolean hasManagePermissions =
-                    userServiceHelper.currentUserCanManageCsp(existingTemplate.getCsp());
-            if (!hasManagePermissions) {
-                throw new AccessDeniedException("No permissions to review service template "
-                        + "belonging to other cloud service providers.");
-            }
-        }
+        checkPermission(existingTemplate, checkNamespace, checkCsp);
         return existingTemplate;
     }
 
@@ -485,8 +473,74 @@ public class ServiceTemplateManage {
         return openApiUrl;
     }
 
+    /**
+     * List service template history with query parameters.
+     *
+     * @param serviceTemplateId id of service template.
+     * @param requestType       type of service template request.
+     * @param changeStatus      status of service template request.
+     * @return list of service template history.
+     */
+    public List<ServiceTemplateHistoryVo> listServiceTemplateHistory(
+            UUID serviceTemplateId, ServiceTemplateRequestType requestType,
+            ServiceTemplateChangeStatus changeStatus) {
+        ServiceTemplateEntity existingTemplate =
+                getServiceTemplateDetails(serviceTemplateId, true, false);
+        List<ServiceTemplateHistoryEntity> historyList =
+                existingTemplate.getServiceTemplateHistory();
+        if (Objects.nonNull(requestType)) {
+            historyList = historyList.stream()
+                    .filter(history -> history.getRequestType() == requestType)
+                    .toList();
+        }
+        if (Objects.nonNull(changeStatus)) {
+            historyList = historyList.stream()
+                    .filter(history -> history.getStatus() == changeStatus)
+                    .toList();
+        }
+        return historyList.stream()
+                .sorted(Comparator.comparing(ServiceTemplateHistoryEntity::getCreateTime)
+                        .reversed())
+                .map(EntityTransUtils::convertToServiceTemplateHistoryVo)
+                .toList();
+    }
+
+
+    /**
+     * Get ocl of service template request by changeId.
+     *
+     * @param changeId changeId of service template history.
+     * @return ocl of service template request.
+     */
+    public Ocl getRequestedOclByChangeId(UUID changeId) {
+        ServiceTemplateHistoryEntity history =
+                serviceTemplateHistoryStorage.getEntityById(changeId);
+        checkPermission(history.getServiceTemplate(), true, false);
+        return history.getOcl();
+    }
+
     private ServiceTemplateEntity getServiceTemplateById(UUID id) {
         return templateStorage.getServiceTemplateById(id);
+    }
+
+    private void checkPermission(ServiceTemplateEntity serviceTemplate, boolean checkNamespace,
+                                 boolean checkCsp) {
+        if (checkNamespace) {
+            boolean hasManagePermissions = userServiceHelper.currentUserCanManageNamespace(
+                    serviceTemplate.getNamespace());
+            if (!hasManagePermissions) {
+                throw new AccessDeniedException("No permissions to view or manage service template "
+                        + "belonging to other namespaces.");
+            }
+        }
+        if (checkCsp) {
+            boolean hasManagePermissions =
+                    userServiceHelper.currentUserCanManageCsp(serviceTemplate.getCsp());
+            if (!hasManagePermissions) {
+                throw new AccessDeniedException("No permissions to review service template "
+                        + "belonging to other cloud service providers.");
+            }
+        }
     }
 
     private List<ServiceDeploymentEntity> listDeployServicesByTemplateId(UUID serviceTemplateId) {
