@@ -73,12 +73,6 @@
             <artifactId>wiremock-standalone</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.instancio</groupId>
-            <artifactId>instancio-core</artifactId>
-            <version>5.0.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.bertramlabs.plugins</groupId>
             <artifactId>hcl4j</artifactId>
             <version>${hcl4j.version}</version>
