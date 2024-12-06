@@ -82,6 +82,8 @@ public class ServiceTemplateEntityConverter {
             BeanUtils.copyProperties(serviceTemplateEntity, userOrderableServiceVo);
             userOrderableServiceVo.setServiceTemplateId(serviceTemplateEntity.getId());
             userOrderableServiceVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
+            userOrderableServiceVo.setNamespace(
+                    serviceTemplateEntity.getOcl().getNamespace());
             userOrderableServiceVo.setDescription(
                     serviceTemplateEntity.getOcl().getDescription());
             userOrderableServiceVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
