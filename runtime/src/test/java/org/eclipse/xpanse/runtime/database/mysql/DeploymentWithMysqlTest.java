@@ -92,7 +92,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         if (Objects.isNull(serviceTemplateHistory)) {
             return;
         }
-        ServiceTemplateDetailVo serviceTemplate = serviceTemplateApi.details(
+        ServiceTemplateDetailVo serviceTemplate = serviceTemplateApi.getServiceTemplateDetailsById(
                 serviceTemplateHistory.getServiceTemplateId().toString());
         approveServiceTemplateRegistration(serviceTemplate);
         addCredentialForHuaweiCloud();

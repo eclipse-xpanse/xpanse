@@ -208,12 +208,12 @@ class PlusServerOrchestratorPluginTest {
     void testGetAvailabilityZonesOfRegion() {
         // Setup
         when(mockResourceManager.getAvailabilityZonesOfRegion(
-                csp, siteName, regionName, userId, uuid))
+                csp, siteName, regionName, userId, uuid, null))
                 .thenReturn(List.of("value"));
 
         // Run the test
         final List<String> result = plugin.getAvailabilityZonesOfRegion(
-                siteName, regionName, userId, uuid);
+                siteName, regionName, userId, uuid, null);
 
         // Verify the results
         assertThat(result).isEqualTo(List.of("value"));
@@ -223,12 +223,12 @@ class PlusServerOrchestratorPluginTest {
     void testGetAvailabilityZonesOfRegion_OpenstackResourceManagerReturnsNoItems() {
         // Setup
         when(mockResourceManager.getAvailabilityZonesOfRegion(csp, siteName, regionName, userId,
-                uuid))
+                uuid, null))
                 .thenReturn(Collections.emptyList());
 
         // Run the test
         final List<String> result =
-                plugin.getAvailabilityZonesOfRegion(siteName, regionName, userId, uuid);
+                plugin.getAvailabilityZonesOfRegion(siteName, regionName, userId, uuid, null);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());

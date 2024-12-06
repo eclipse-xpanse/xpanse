@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -326,5 +327,28 @@ public class DeployEnvironments {
         inputVariables.putAll(getAvailabilityZoneVariables(deployTask));
         inputVariables.putAll(getAgentInstallationVariables(deployTask));
         return inputVariables;
+    }
+
+    /**
+     *  Returns the map of fixed variables in a service template.
+     */
+    public Map<String, Object> getFixedVariablesFromTemplate(
+            ServiceTemplateEntity serviceTemplateEntity) {
+        Map<String, Object> fixedVariables = new HashMap<>();
+        for (DeployVariable variable
+                : serviceTemplateEntity.getOcl().getDeployment().getVariables()) {
+            if (variable.getKind() == DeployVariableKind.FIX_VARIABLE) {
+                fixedVariables.put(variable.getName(),
+                        (variable.getSensitiveScope() != SensitiveScope.NONE)
+                                ? aesUtil.decode(variable.getValue()) : variable.getValue());
+            }
+            if (variable.getKind() == DeployVariableKind.FIX_ENV) {
+                fixedVariables.put(variable.getName(),
+                        (variable.getSensitiveScope() != SensitiveScope.NONE)
+                                ? aesUtil.decode(variable.getValue()) : variable.getValue());
+            }
+
+        }
+        return fixedVariables;
     }
 }

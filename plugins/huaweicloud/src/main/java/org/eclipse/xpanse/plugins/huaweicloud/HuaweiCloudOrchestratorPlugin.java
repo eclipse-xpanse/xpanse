@@ -88,7 +88,11 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
     public List<String> getAvailabilityZonesOfRegion(
-            String siteName, String regionName, String userId, UUID serviceId) {
+            String siteName,
+            String regionName,
+            String userId,
+            UUID serviceId,
+            UUID serviceTemplateId) {
         return resourceManager.getAvailabilityZonesOfRegion(siteName, regionName, userId);
     }
 

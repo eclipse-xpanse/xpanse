@@ -174,9 +174,9 @@ public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     @Cacheable(cacheNames = REGION_AZS_CACHE_NAME)
     public List<String> getAvailabilityZonesOfRegion(
-            String site, String region, String userId, UUID serviceId) {
+            String site, String region, String userId, UUID serviceId, UUID serviceTemplateId) {
         return resourceManager.getAvailabilityZonesOfRegion(
-                getCsp(), site, region, userId, serviceId);
+                getCsp(), site, region, userId, serviceId, serviceTemplateId);
     }
 
     @Override

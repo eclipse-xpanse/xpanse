@@ -79,8 +79,8 @@ public class ProviderAuthInfoResolver {
      * @return authenticated client
      */
     public OSClient.OSClientV3 getAuthenticatedClientForCsp(
-            Csp csp, String site, String userId, UUID serviceId) {
-        String authUrl = getProviderAuthUrl(csp, serviceId);
+            Csp csp, String site, String userId, UUID serviceId, UUID serviceTemplateId) {
+        String authUrl = getProviderAuthUrl(csp, serviceId, serviceTemplateId);
         AbstractCredentialInfo credential = getAuthCredential(csp, site, userId);
         return switch (csp) {
             case PLUS_SERVER, REGIO_CLOUD ->
@@ -95,15 +95,18 @@ public class ProviderAuthInfoResolver {
      * @param csp cloud service provider
      * @return auth url
      */
-    public String getProviderAuthUrl(Csp csp, UUID serviceId) {
+    public String getProviderAuthUrl(Csp csp, UUID serviceId, UUID serviceTemplateId) {
         String authUrl;
-        if (Objects.isNull(serviceId)) {
+        if (Objects.isNull(serviceId) && Objects.isNull(serviceTemplateId)) {
             authUrl = this.environment.getProperty(getAuthUrlKeyByCsp(csp));
-            log.info("Get auth url {} of provider {} from environment", authUrl, csp);
+            log.info("Using auth url {} of provider {} from environment", authUrl, csp.toValue());
         } else {
-            authUrl = getAuthUrlFromDeploymentVariables(csp, serviceId);
-            log.info("Get auth url {} of provider {} from the deploy variables of service {}",
-                    authUrl, csp, serviceId);
+            authUrl = getAuthUrlFromDeploymentVariables(csp, serviceId, serviceTemplateId);
+            log.info("Using auth url {} of provider {} from the deploy variables of {} {}",
+                    authUrl,
+                    csp.toValue(),
+                    Objects.nonNull(serviceTemplateId) ? "service template" : "service",
+                    Objects.nonNull(serviceTemplateId) ? serviceTemplateId : serviceId);
         }
         if (StringUtils.isBlank(authUrl)) {
             String errorMsg = String.format("The value of auth url of the provider "
@@ -139,21 +142,35 @@ public class ProviderAuthInfoResolver {
      * @param serviceId serviceId
      * @return auth url
      */
-    private String getAuthUrlFromDeploymentVariables(Csp csp, UUID serviceId) {
-        ServiceDeploymentEntity serviceDeploymentEntity =
-                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
-        ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
-                serviceDeploymentEntity.getServiceTemplateId());
-        Map<String, Object> serviceRequestVariables =
-                this.deployEnvironments.getAllDeploymentVariablesForService(
-                        serviceDeploymentEntity.getDeployRequest().getServiceRequestProperties(),
-                        serviceTemplateEntity.getOcl().getDeployment()
-                                .getVariables(),
-                        serviceDeploymentEntity.getFlavor(),
-                        serviceTemplateEntity.getOcl()
-                );
-        Object defaultAuthUrl =
-                serviceRequestVariables.get(OpenstackCommonEnvironmentConstants.OS_AUTH_URL);
+    private String getAuthUrlFromDeploymentVariables(
+            Csp csp, UUID serviceId, UUID serviceTemplateId) {
+        Object defaultAuthUrl = null;
+        if (Objects.nonNull(serviceId)) {
+            ServiceDeploymentEntity serviceDeploymentEntity =
+                    serviceDeploymentStorage.findServiceDeploymentById(serviceId);
+            ServiceTemplateEntity serviceTemplateEntity =
+                    serviceTemplateStorage.getServiceTemplateById(
+                            serviceDeploymentEntity.getServiceTemplateId());
+            Map<String, Object> serviceRequestVariables =
+                    this.deployEnvironments.getAllDeploymentVariablesForService(
+                            serviceDeploymentEntity.getDeployRequest()
+                                    .getServiceRequestProperties(),
+                            serviceTemplateEntity.getOcl().getDeployment()
+                                    .getVariables(),
+                            serviceDeploymentEntity.getFlavor(),
+                            serviceTemplateEntity.getOcl()
+                    );
+            defaultAuthUrl = serviceRequestVariables.get(
+                    OpenstackCommonEnvironmentConstants.OS_AUTH_URL);
+        }
+        if (Objects.nonNull(serviceTemplateId)) {
+            ServiceTemplateEntity serviceTemplateEntity =
+                    serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
+            Map<String, Object> getServiceTemplateVariables =
+                    this.deployEnvironments.getFixedVariablesFromTemplate(serviceTemplateEntity);
+            defaultAuthUrl = getServiceTemplateVariables.get(
+                    OpenstackCommonEnvironmentConstants.OS_AUTH_URL);
+        }
         if (Objects.isNull(defaultAuthUrl)) {
             return this.environment.getProperty(getAuthUrlKeyByCsp(csp));
         } else {

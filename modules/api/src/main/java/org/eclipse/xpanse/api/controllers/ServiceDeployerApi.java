@@ -20,10 +20,10 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.api.config.OrderFailedApiResponses;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -306,14 +306,18 @@ public class ServiceDeployerApi {
             @RequestParam(name = "siteName") String siteName,
             @Parameter(name = "regionName", description = "name of the region")
             @RequestParam(name = "regionName") String regionName,
+            @Parameter(name = "serviceTemplateId", description = "Id of the serviceTemplate")
+            @RequestParam(name = "serviceTemplateId", required = false) UUID serviceTemplateId,
             @Parameter(name = "serviceId", description = "Id of the deployed service")
-            @RequestParam(name = "serviceId", required = false) String serviceId) {
+            @RequestParam(name = "serviceId", required = false) UUID serviceId) {
         try {
-            UUID serviceUuid =
-                    StringUtils.isNotEmpty(serviceId) ? UUID.fromString(serviceId) : null;
+            if (Objects.nonNull(serviceTemplateId) && Objects.nonNull(serviceId)) {
+                throw new IllegalArgumentException("Either serviceTemplateId or "
+                        + "serviceId must be provided. Not both.");
+            }
             List<String> availabilityZones =
                     this.deployService.getAvailabilityZonesOfRegion(csp, siteName, regionName,
-                            serviceUuid);
+                            serviceId, serviceTemplateId);
             return ResponseEntity.ok().cacheControl(getCacheControl()).body(availabilityZones);
         } catch (Exception ex) {
             log.error("Error fetching availability zones", ex);

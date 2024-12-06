@@ -76,7 +76,6 @@ public class ServiceOrderEntity implements Serializable {
     @Column(name = "TASK_STATUS", nullable = false)
     private TaskStatus taskStatus;
 
-
     @Column(name = "ERROR", columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)

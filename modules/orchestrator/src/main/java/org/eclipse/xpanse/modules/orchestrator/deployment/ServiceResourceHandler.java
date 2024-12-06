@@ -49,5 +49,5 @@ public interface ServiceResourceHandler {
      * @return the availability zones of the specified region.
      */
     List<String> getAvailabilityZonesOfRegion(String siteName, String regionName, String userId,
-                                              UUID serviceId);
+                                              UUID serviceId, UUID serviceTemplateId);
 }
