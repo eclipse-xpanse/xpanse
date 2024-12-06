@@ -19,11 +19,9 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyRegistered;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateAlreadyReviewed;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.exceptions.ServiceTemplateChangeRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateDisabledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUpdateNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -78,18 +76,6 @@ class RegistrationExceptionHandlerTest {
     }
 
     @Test
-    void testServiceTemplateAlreadyRegistered() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new ServiceTemplateAlreadyRegistered("test error"));
-
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
-                .andExpect(status().is(400))
-                .andExpect(jsonPath("$.errorType").value("Service Template Already Registered"))
-                .andExpect(jsonPath("$.details[0]").value("test error"));
-    }
-
-    @Test
     void testIconProcessingFailedException() throws Exception {
         when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
                 new IconProcessingFailedException("test error"));
@@ -126,26 +112,14 @@ class RegistrationExceptionHandlerTest {
     }
 
     @Test
-    void testServiceTemplateAlreadyReviewed() throws Exception {
+    void testServiceTemplateChangeRequestNotAllowed() throws Exception {
         when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new ServiceTemplateAlreadyReviewed("test error"));
+                new ServiceTemplateChangeRequestNotAllowed("test error"));
 
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.errorType").value("Service Template Already Reviewed"))
-                .andExpect(jsonPath("$.details[0]").value("test error"));
-    }
-
-    @Test
-    void testServiceTemplateUpdateNotAllowed() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new ServiceTemplateUpdateNotAllowed("test error"));
-
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
-                .andExpect(status().is(400))
-                .andExpect(jsonPath("$.errorType").value("Service Template Update Not Allowed"))
+                .andExpect(jsonPath("$.errorType").value("Service Template Change Request Not Allowed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 

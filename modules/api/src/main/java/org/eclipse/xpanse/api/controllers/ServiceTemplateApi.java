@@ -185,17 +185,17 @@ public class ServiceTemplateApi {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
-    public ServiceTemplateDetailVo unregister(
+    public ServiceTemplateChangeInfo unregister(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
             @PathVariable("serviceTemplateId") String serviceTemplateId) {
-        ServiceTemplateEntity templateEntity =
+        ServiceTemplateHistoryEntity unregisterHistory =
                 serviceTemplateManage.unregisterServiceTemplate(UUID.fromString(serviceTemplateId));
-        log.info("Unregister service template with id {} successfully.", serviceTemplateId);
-        return convertToServiceTemplateDetailVo(templateEntity);
+        return new ServiceTemplateChangeInfo(unregisterHistory.getServiceTemplate().getId(),
+                unregisterHistory.getChangeId());
     }
 
     /**
-     * Unregister service template using id.
+     * Re-register the unregistered service template using id.
      *
      * @param serviceTemplateId id of service template.
      * @return response
@@ -206,20 +206,20 @@ public class ServiceTemplateApi {
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
-    public ServiceTemplateDetailVo reRegisterServiceTemplate(
+    public ServiceTemplateChangeInfo reRegisterServiceTemplate(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
             @PathVariable("serviceTemplateId") String serviceTemplateId) {
-        ServiceTemplateEntity templateEntity =
+        ServiceTemplateHistoryEntity reRegisterHistory =
                 serviceTemplateManage.reRegisterServiceTemplate(UUID.fromString(serviceTemplateId));
-        log.info("Re-register service template with id {} successfully.", serviceTemplateId);
-        return convertToServiceTemplateDetailVo(templateEntity);
+        return new ServiceTemplateChangeInfo(reRegisterHistory.getServiceTemplate().getId(),
+                reRegisterHistory.getChangeId());
     }
 
 
     /**
      * Delete service template using id.
      *
-     * @param id id of service template.
+     * @param serviceTemplateId id of service template.
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "Delete unregistered service template using id.")
@@ -229,9 +229,9 @@ public class ServiceTemplateApi {
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public void deleteServiceTemplate(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
-            @PathVariable("serviceTemplateId") String id) {
-        serviceTemplateManage.deleteServiceTemplate(UUID.fromString(id));
-        log.info("Unregister service template using id {} successfully.", id);
+            @PathVariable("serviceTemplateId") String serviceTemplateId) {
+        serviceTemplateManage.deleteServiceTemplate(UUID.fromString(serviceTemplateId));
+        log.info("Delete service template using id {} successfully.", serviceTemplateId);
     }
 
     /**
@@ -333,8 +333,8 @@ public class ServiceTemplateApi {
             @Parameter(name = "changeStatus", description = "status of service template request")
             @RequestParam(name = "changeStatus", required = false)
             ServiceTemplateChangeStatus changeStatus) {
-        return serviceTemplateManage.listServiceTemplateHistory(UUID.fromString(serviceTemplateId),
-                requestType, changeStatus);
+        return serviceTemplateManage.getServiceTemplateHistoryByServiceTemplateId(
+                UUID.fromString(serviceTemplateId), requestType, changeStatus);
     }
 
     /**
