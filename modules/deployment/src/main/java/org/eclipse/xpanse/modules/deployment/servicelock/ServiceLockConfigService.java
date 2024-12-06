@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -67,8 +68,8 @@ public class ServiceLockConfigService {
         DeployTask lockChangeTask = deployServiceEntityConverter.getDeployTaskByStoredService(
                 ServiceOrderType.LOCK_CHANGE, deployedService);
         lockChangeTask.setRequest(lockConfig);
-        ServiceOrderEntity serviceOrder =
-                serviceOrderManager.storeNewServiceOrderEntity(lockChangeTask, deployedService);
+        ServiceOrderEntity serviceOrder = serviceOrderManager
+                .storeNewServiceOrderEntity(lockChangeTask, deployedService, Handler.INTERNAL);
         serviceOrder.setStartedTime(OffsetDateTime.now());
         deployedService.setLockConfig(lockConfig);
         serviceDeploymentEntityHandler.storeAndFlush(deployedService);

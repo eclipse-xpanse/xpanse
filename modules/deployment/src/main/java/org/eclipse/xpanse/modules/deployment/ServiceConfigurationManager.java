@@ -36,6 +36,7 @@ import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -279,6 +280,7 @@ public class ServiceConfigurationManager {
         serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
         serviceOrderEntity.setStartedTime(OffsetDateTime.now());
         serviceOrderEntity.setNewConfigRequest(updateRequestMap);
+        serviceOrderEntity.setHandler(Handler.AGENT);
         return serviceOrderStorage.storeAndFlush(serviceOrderEntity);
     }
 
