@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
@@ -57,10 +58,11 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngineMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
@@ -85,10 +87,10 @@ import org.openstack4j.openstack.networking.internal.SecurityGroupServiceImpl;
 import org.openstack4j.openstack.networking.internal.SubnetServiceImpl;
 import org.openstack4j.openstack.storage.block.internal.BlockStorageServiceImpl;
 import org.openstack4j.openstack.storage.block.internal.BlockVolumeServiceImpl;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -375,8 +377,9 @@ public class ApisTestCommon {
                     registerResponse.getContentAsString(), ServiceTemplateChangeInfo.class);
             return getServiceTemplateDetailsVo(serviceTemplateChangeInfo.getServiceTemplateId());
         } else {
-            ErrorResponse errorResponse = objectMapper.readValue(registerResponse.getContentAsString(),
-                    ErrorResponse.class);
+            ErrorResponse errorResponse =
+                    objectMapper.readValue(registerResponse.getContentAsString(),
+                            ErrorResponse.class);
             log.error("Register service template failed. Error: " + errorResponse.getDetails());
             return null;
         }

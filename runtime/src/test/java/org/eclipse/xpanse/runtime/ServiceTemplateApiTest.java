@@ -49,6 +49,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateChangeInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateHistoryVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateChangeStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
@@ -97,13 +98,13 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ocl.setName(UUID.randomUUID().toString());
         // Run the test
         final MockHttpServletResponse registerResponse = register(ocl);
-        ServiceTemplateChangeInfo serviceTemplateChangeInfo = objectMapper.readValue(
+        ServiceTemplateChangeInfo registerChangeInfo = objectMapper.readValue(
                 registerResponse.getContentAsString(), ServiceTemplateChangeInfo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), registerResponse.getStatus());
-        assertNotNull(serviceTemplateChangeInfo.getServiceTemplateId());
-        assertNotNull(serviceTemplateChangeInfo.getChangeId());
-        UUID serviceTemplateId = serviceTemplateChangeInfo.getServiceTemplateId();
+        assertNotNull(registerChangeInfo.getServiceTemplateId());
+        assertNotNull(registerChangeInfo.getChangeId());
+        UUID serviceTemplateId = registerChangeInfo.getServiceTemplateId();
 
         // Setup detail request
         final MockHttpServletResponse detailResponse = detail(serviceTemplateId);
@@ -119,26 +120,23 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertFalse(serviceTemplateDetailVo.getIsUpdatePending());
         assertFalse(serviceTemplateDetailVo.getAvailableInCatalog());
 
-        // Setup list history
-        // Run the test
-        final MockHttpServletResponse listHistoryResponse =
+        // Setup listHistory request
+        final MockHttpServletResponse listRegisterHistoryResponse =
                 listServiceTemplateHistoryWithParams(serviceTemplateId,
-                        ServiceTemplateRequestType.REGISTER.toValue(), null);
-        // Verify the results
-        assertEquals(HttpStatus.OK.value(), listHistoryResponse.getStatus());
-        List<ServiceTemplateHistoryVo> historyVos =
-                objectMapper.readValue(listHistoryResponse.getContentAsString(),
-                        new TypeReference<List<ServiceTemplateHistoryVo>>() {
+                        ServiceTemplateRequestType.REGISTER.toValue(),
+                        ServiceTemplateChangeStatus.IN_REVIEW.toValue());
+        assertEquals(HttpStatus.OK.value(), listRegisterHistoryResponse.getStatus());
+        List<ServiceTemplateHistoryVo> registerHistoryVos =
+                objectMapper.readValue(listRegisterHistoryResponse.getContentAsString(),
+                        new TypeReference<>() {
                         });
-        assertEquals(1, historyVos.size());
-        ServiceTemplateHistoryVo serviceTemplateHistoryVo = historyVos.getFirst();
-        assertEquals(serviceTemplateId, serviceTemplateHistoryVo.getServiceTemplateId());
+        assertEquals(1, registerHistoryVos.size());
+        assertEquals(registerChangeInfo.getChangeId(), registerHistoryVos.getFirst().getChangeId());
 
-        UUID changeId = serviceTemplateChangeInfo.getChangeId();
         // Setup list history
         // Run the test
         final MockHttpServletResponse getHistoryRequestResponse =
-                getServiceTemplateRequestByChangeId(changeId);
+                getServiceTemplateRequestByChangeId(registerChangeInfo.getChangeId());
         // Verify the results
         assertEquals(HttpStatus.OK.value(), getHistoryRequestResponse.getStatus());
         Ocl requestOcl = objectMapper.readValue(getHistoryRequestResponse.getContentAsString(),
@@ -169,42 +167,87 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ocl.setDescription("update-test");
         // Run the update test with 'isRemoveServiceTemplateUntilApproved' is false
         boolean isRemoveServiceTemplateUntilApproved = false;
-        final MockHttpServletResponse updateResponse1 =
+        final MockHttpServletResponse updateResponse =
                 update(serviceTemplateId, isRemoveServiceTemplateUntilApproved, ocl);
         // Verify the results
-        assertEquals(HttpStatus.OK.value(), updateResponse1.getStatus());
-        ServiceTemplateChangeInfo updateChangeInfo1 =
-                objectMapper.readValue(updateResponse1.getContentAsString(),
+        assertEquals(HttpStatus.OK.value(), updateResponse.getStatus());
+        ServiceTemplateChangeInfo updateChangeInfo =
+                objectMapper.readValue(updateResponse.getContentAsString(),
                         ServiceTemplateChangeInfo.class);
-        ServiceTemplateDetailVo updatedServiceTemplateDetailVo1 =
-                getServiceTemplateDetailsVo(updateChangeInfo1.getServiceTemplateId());
-        assertTrue(updatedServiceTemplateDetailVo1.getIsUpdatePending());
-        assertFalse(updatedServiceTemplateDetailVo1.getAvailableInCatalog());
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
+                getServiceTemplateDetailsVo(updateChangeInfo.getServiceTemplateId());
+        assertTrue(updatedServiceTemplateDetailVo.getIsUpdatePending());
+        assertFalse(updatedServiceTemplateDetailVo.getAvailableInCatalog());
         assertEquals(ServiceTemplateRegistrationState.IN_REVIEW,
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
 
+        // Setup listHistory request
+        final MockHttpServletResponse listUpdateHistoryResponse =
+                listServiceTemplateHistoryWithParams(serviceTemplateId,
+                        ServiceTemplateRequestType.UPDATE.toValue(),
+                        ServiceTemplateChangeStatus.IN_REVIEW.toValue());
+        assertEquals(HttpStatus.OK.value(), listUpdateHistoryResponse.getStatus());
+        List<ServiceTemplateHistoryVo> updateHistoryVos =
+                objectMapper.readValue(listUpdateHistoryResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(1, updateHistoryVos.size());
+        assertEquals(updateChangeInfo.getChangeId(), updateHistoryVos.getFirst().getChangeId());
+
         // Setup unregister request
         // Run the test
+        updateServiceTemplateState(serviceTemplateId,
+                ServiceTemplateRegistrationState.APPROVED, true);
         final MockHttpServletResponse unregisterResponse = unregister(serviceTemplateId);
-        ServiceTemplateDetailVo unregisteredServiceTemplateDetailVo =
-                objectMapper.readValue(unregisterResponse.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), unregisterResponse.getStatus());
-        assertEquals(unregisteredServiceTemplateDetailVo.getAvailableInCatalog(), false);
+        ServiceTemplateChangeInfo unregisterChangeInfo =
+                objectMapper.readValue(unregisterResponse.getContentAsString(),
+                        ServiceTemplateChangeInfo.class);
+        ServiceTemplateDetailVo unregisteredServiceTemplateDetailVo =
+                getServiceTemplateDetailsVo(unregisterChangeInfo.getServiceTemplateId());
+        assertFalse(unregisteredServiceTemplateDetailVo.getAvailableInCatalog());
+
+        // Setup listHistory request
+        final MockHttpServletResponse listUnregisterHistoryResponse =
+                listServiceTemplateHistoryWithParams(serviceTemplateId,
+                        ServiceTemplateRequestType.UNREGISTER.toValue(),
+                        ServiceTemplateChangeStatus.ACCEPTED.toValue());
+        assertEquals(HttpStatus.OK.value(), listUnregisterHistoryResponse.getStatus());
+        List<ServiceTemplateHistoryVo> unregisterHistoryVos =
+                objectMapper.readValue(listUnregisterHistoryResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(1, unregisterHistoryVos.size());
+        assertEquals(unregisterChangeInfo.getChangeId(),
+                unregisterHistoryVos.getFirst().getChangeId());
 
         // Setup reRegister request
         // Run the test
         final MockHttpServletResponse reRegisterResponse =
                 reRegisterServiceTemplate(serviceTemplateId);
-        ServiceTemplateDetailVo reRegisteredServiceTemplateDetailVo =
-                objectMapper.readValue(reRegisterResponse.getContentAsString(),
-                        ServiceTemplateDetailVo.class);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), reRegisterResponse.getStatus());
-        assertEquals(reRegisteredServiceTemplateDetailVo.getAvailableInCatalog(), true);
+        ServiceTemplateChangeInfo reRegisterChangeInfo =
+                objectMapper.readValue(reRegisterResponse.getContentAsString(),
+                        ServiceTemplateChangeInfo.class);
+        ServiceTemplateDetailVo reRegisteredServiceTemplateDetailVo =
+                getServiceTemplateDetailsVo(reRegisterChangeInfo.getServiceTemplateId());
+        assertFalse(reRegisteredServiceTemplateDetailVo.getAvailableInCatalog());
 
-
+        // Setup listHistory request
+        final MockHttpServletResponse reRegisterHistoryResponse =
+                listServiceTemplateHistoryWithParams(serviceTemplateId,
+                        ServiceTemplateRequestType.RE_REGISTER.toValue(),
+                        ServiceTemplateChangeStatus.IN_REVIEW.toValue());
+        assertEquals(HttpStatus.OK.value(), reRegisterHistoryResponse.getStatus());
+        List<ServiceTemplateHistoryVo> reRegisterHistoryVos =
+                objectMapper.readValue(reRegisterHistoryResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(1, reRegisterHistoryVos.size());
+        assertEquals(reRegisterChangeInfo.getChangeId(),
+                reRegisterHistoryVos.getFirst().getChangeId());
         // Setup delete request
         unregister(serviceTemplateId);
         // Run the test
@@ -213,19 +256,26 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.getStatus());
     }
 
+    void updateServiceTemplateState(UUID id, ServiceTemplateRegistrationState state,
+                                    boolean availableInCatalog) {
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(id);
+        serviceTemplateEntity.setServiceTemplateRegistrationState(state);
+        serviceTemplateEntity.setAvailableInCatalog(availableInCatalog);
+        serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
+    }
+
     void testFetchApisWorkWell() throws Exception {
         // Setup fetch request
         URL url = URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL();
         Ocl ocl = oclLoader.getOcl(url);
         // Run the test
-        final MockHttpServletResponse fetchResponse = fetch(url.toString());
-        ServiceTemplateChangeInfo serviceTemplateChangeInfo = objectMapper.readValue(
-                fetchResponse.getContentAsString(), ServiceTemplateChangeInfo.class);
+        final MockHttpServletResponse fetchRegisterResponse = fetch(url.toString());
+        ServiceTemplateChangeInfo registerChangeInfo = objectMapper.readValue(
+                fetchRegisterResponse.getContentAsString(), ServiceTemplateChangeInfo.class);
         // Verify the results
-        assertEquals(HttpStatus.OK.value(), fetchResponse.getStatus());
-        assertNotNull(serviceTemplateChangeInfo.getServiceTemplateId());
-        assertNotNull(serviceTemplateChangeInfo.getChangeId());
-        UUID serviceTemplateId = serviceTemplateChangeInfo.getServiceTemplateId();
+        assertEquals(HttpStatus.OK.value(), fetchRegisterResponse.getStatus());
+        UUID serviceTemplateId = registerChangeInfo.getServiceTemplateId();
 
         // Setup detail request
         final MockHttpServletResponse detailResponse = detail(serviceTemplateId);
@@ -242,23 +292,49 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertFalse(serviceTemplateDetailVo.getIsUpdatePending());
         assertFalse(serviceTemplateDetailVo.getAvailableInCatalog());
 
+        // Setup listHistory request
+        final MockHttpServletResponse listRegisterHistoryResponse =
+                listServiceTemplateHistoryWithParams(serviceTemplateId,
+                        ServiceTemplateRequestType.REGISTER.toValue(),
+                        ServiceTemplateChangeStatus.IN_REVIEW.toValue());
+        assertEquals(HttpStatus.OK.value(), listRegisterHistoryResponse.getStatus());
+        List<ServiceTemplateHistoryVo> registerHistoryVos =
+                objectMapper.readValue(listRegisterHistoryResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(1, registerHistoryVos.size());
+        assertEquals(registerChangeInfo.getChangeId(), registerHistoryVos.getFirst().getChangeId());
+
+
         // Setup fetch update request
         URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL();
         // Run the test
         boolean isRemoveServiceTemplateUntilApproved = false;
-        final MockHttpServletResponse fetchUpdateResponse1 =
+        final MockHttpServletResponse fetchUpdateResponse =
                 fetchUpdate(serviceTemplateId, isRemoveServiceTemplateUntilApproved,
                         updateUrl.toString());
         // Verify the results
-        assertEquals(HttpStatus.OK.value(), fetchUpdateResponse1.getStatus());
-        ServiceTemplateChangeInfo updateChangeInfo1 =
-                objectMapper.readValue(fetchUpdateResponse1.getContentAsString(),
+        assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
+        ServiceTemplateChangeInfo updateChangeInfo =
+                objectMapper.readValue(fetchUpdateResponse.getContentAsString(),
                         ServiceTemplateChangeInfo.class);
-        ServiceTemplateDetailVo updatedServiceTemplateDetailVo1 =
-                getServiceTemplateDetailsVo(updateChangeInfo1.getServiceTemplateId());
-        assertTrue(updatedServiceTemplateDetailVo1.getIsUpdatePending());
-        assertFalse(updatedServiceTemplateDetailVo1.getAvailableInCatalog());
+        ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
+                getServiceTemplateDetailsVo(updateChangeInfo.getServiceTemplateId());
+        assertTrue(updatedServiceTemplateDetailVo.getIsUpdatePending());
+        assertFalse(updatedServiceTemplateDetailVo.getAvailableInCatalog());
 
+        // Setup listHistory request
+        final MockHttpServletResponse listUpdateHistoryResponse =
+                listServiceTemplateHistoryWithParams(serviceTemplateId,
+                        ServiceTemplateRequestType.UPDATE.toValue(),
+                        ServiceTemplateChangeStatus.IN_REVIEW.toValue());
+        assertEquals(HttpStatus.OK.value(), listUpdateHistoryResponse.getStatus());
+        List<ServiceTemplateHistoryVo> updateHistoryVos =
+                objectMapper.readValue(listUpdateHistoryResponse.getContentAsString(),
+                        new TypeReference<>() {
+                        });
+        assertEquals(1, updateHistoryVos.size());
+        assertEquals(updateChangeInfo.getChangeId(), updateHistoryVos.getFirst().getChangeId());
         deleteServiceTemplate(serviceTemplateId);
     }
 
@@ -267,21 +343,19 @@ class ServiceTemplateApiTest extends ApisTestCommon {
     void testManageApisThrowsException() throws Exception {
         testManageApisThrowsServiceTemplateNotRegistered();
         testManageApisThrowsAccessDeniedException();
+        testManageApisThrowsRequestChangeNotAllowedException();
 
         testRegisterThrowsMethodArgumentNotValidException();
         testRegisterThrowsPluginNotFoundException();
         testRegisterThrowsTerraformExecutionException();
         testRegisterThrowsInvalidValueSchemaException();
-        testRegisterThrowsServiceTemplateAlreadyRegistered();
         testRegisterThrowsInvalidServiceVersionException();
         testRegisterThrowsInvalidServiceFlavorsException();
         testRegisterThrowsInvalidBillingConfigException();
         testRegisterThrowsUnavailableServiceRegionsException();
-        testUpdateServiceTemplateThrowsNotAllowedException();
 
         testFetchThrowsRuntimeException();
         testListServiceTemplatesThrowsException();
-        testDeleteServiceTemplateThrowsException();
         testGetHistoryDetailsThrowsServiceTemplateRequestNotFound();
     }
 
@@ -606,30 +680,6 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 response3.getContentAsString());
     }
 
-    void testRegisterThrowsServiceTemplateAlreadyRegistered() throws Exception {
-        // Setup
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("serviceTemplateApiTest-03");
-        MockHttpServletResponse response = register(ocl);
-        ServiceTemplateChangeInfo serviceTemplateDetail =
-                objectMapper.readValue(response.getContentAsString(),
-                        ServiceTemplateChangeInfo.class);
-        String errorMsg = String.format("Service template already registered with id %s",
-                serviceTemplateDetail.getServiceTemplateId());
-        ErrorResponse expectedResponse =
-                ErrorResponse.errorResponse(ErrorType.SERVICE_TEMPLATE_ALREADY_REGISTERED,
-                        Collections.singletonList(errorMsg));
-        String result = objectMapper.writeValueAsString(expectedResponse);
-        // Run the test
-        final MockHttpServletResponse registerSameResponse = register(ocl);
-        // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), registerSameResponse.getStatus());
-        assertEquals(registerSameResponse.getContentAsString(), result);
-        unregister(serviceTemplateDetail.getServiceTemplateId());
-        deleteTemplate(serviceTemplateDetail.getServiceTemplateId());
-    }
-
     void testRegisterThrowsInvalidServiceVersionException() throws Exception {
         // Setup
         Ocl ocl = oclLoader.getOcl(
@@ -772,40 +822,102 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
     }
 
-
-    void testUpdateServiceTemplateThrowsNotAllowedException() throws Exception {
+    void testManageApisThrowsRequestChangeNotAllowedException() throws Exception {
         // Setup
         Ocl ocl = oclLoader.getOcl(
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl.setName(UUID.randomUUID().toString());
         // Run the test
         final MockHttpServletResponse registerResponse = register(ocl);
-        ServiceTemplateChangeInfo serviceTemplateChangeInfo =
+        ServiceTemplateChangeInfo registerChangeInfo =
                 objectMapper.readValue(registerResponse.getContentAsString(),
                         ServiceTemplateChangeInfo.class);
+        UUID serviceTemplateId = registerChangeInfo.getServiceTemplateId();
 
-        UUID serviceTemplateId = serviceTemplateChangeInfo.getServiceTemplateId();
+        // Set up the register same
+        String errorMsg = String.format("Service template already registered with id %s. "
+                + "The register request is not allowed.", serviceTemplateId);
+        // Run the test
+        final MockHttpServletResponse registerSameResponse = register(ocl);
+        ErrorResponse errorResponse = objectMapper.readValue(
+                registerSameResponse.getContentAsString(), ErrorResponse.class);
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST.value(), registerSameResponse.getStatus());
+        assertEquals(errorResponse.getErrorType(),
+                ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED);
+        assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
+
+        // Setup update request
         boolean isRemoveFromCatalogUtilApproved = false;
         ocl.setDescription("update-test-01");
         final MockHttpServletResponse updateResponse = update(serviceTemplateId,
                 isRemoveFromCatalogUtilApproved, ocl);
-        ServiceTemplateChangeInfo updateServiceTemplateChangeInfo =
+        ServiceTemplateChangeInfo updateChangeInfo =
                 objectMapper.readValue(updateResponse.getContentAsString(),
                         ServiceTemplateChangeInfo.class);
-        UUID changeId = updateServiceTemplateChangeInfo.getChangeId();
-
-        String errorMsg = String.format("The service template with id %s can not be updated"
-                        + " until the updating progress with change id %s is completed.",
-                serviceTemplateId, changeId);
+        errorMsg = String.format("The same type request with change id %s for "
+                        + "the service template with %s is waiting for review. "
+                        + "The %s request is not allowed.", serviceTemplateId,
+                updateChangeInfo.getChangeId(), ServiceTemplateRequestType.UPDATE.toValue());
         ocl.setDescription("update-test-01");
         // Update service template again.
-        final MockHttpServletResponse updateResponse2 = update(serviceTemplateId,
+        final MockHttpServletResponse updateResponse1 = update(serviceTemplateId,
                 isRemoveFromCatalogUtilApproved, ocl);
-        ErrorResponse response =
-                objectMapper.readValue(updateResponse2.getContentAsString(), ErrorResponse.class);
+        errorResponse =
+                objectMapper.readValue(updateResponse1.getContentAsString(), ErrorResponse.class);
         // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse2.getStatus());
-        assertEquals(response.getErrorType(), ErrorType.SERVICE_TEMPLATE_UPDATE_NOT_ALLOWED);
-        assertEquals(response.getDetails(), Collections.singletonList(errorMsg));
+        assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse1.getStatus());
+        assertEquals(errorResponse.getErrorType(),
+                ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED);
+        assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
+
+        errorMsg = String.format("Service template with id %s is not approved. The re-register "
+                + "request is not allowed.", serviceTemplateId);
+        // Run the reRegister test
+        final MockHttpServletResponse reRegisterResponse =
+                reRegisterServiceTemplate(serviceTemplateId);
+        errorResponse = objectMapper.readValue(reRegisterResponse.getContentAsString(),
+                ErrorResponse.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), reRegisterResponse.getStatus());
+        assertEquals(errorResponse.getErrorType(),
+                ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED);
+        assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
+
+
+        updateServiceTemplateState(serviceTemplateId, ServiceTemplateRegistrationState.APPROVED,
+                true);
+        // Run the delete test
+        errorMsg = String.format("Service template with id %s is not unregistered. "
+                + "The delete request is not allowed.", serviceTemplateId);
+        MockHttpServletResponse deleteResponse = deleteTemplate(serviceTemplateId);
+        errorResponse = objectMapper.readValue(deleteResponse.getContentAsString(),
+                ErrorResponse.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), reRegisterResponse.getStatus());
+        assertEquals(errorResponse.getErrorType(),
+                ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED);
+        assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
+
+        errorMsg = String.format("Service template with id %s is still in use."
+                + " The delete request is not allowed.", serviceTemplateId);
+        updateServiceTemplateState(serviceTemplateId, ServiceTemplateRegistrationState.APPROVED,
+                false);
+        when(mockDeployServiceStorage.listServices(any(ServiceQueryModel.class))).thenReturn(
+                List.of(new ServiceDeploymentEntity()));
+        MockHttpServletResponse deleteResponse2 = deleteTemplate(serviceTemplateId);
+        errorResponse = objectMapper.readValue(deleteResponse2.getContentAsString(),
+                ErrorResponse.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse2.getStatus());
+        assertEquals(errorResponse.getErrorType(),
+                ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED);
+        assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
+
+        // clear data
+        deleteTemplateById(serviceTemplateId);
+    }
+
+    private void deleteTemplateById(UUID serviceTemplateId) {
+        serviceTemplateStorage.deleteServiceTemplate(
+                serviceTemplateStorage.getServiceTemplateById(serviceTemplateId));
     }
 
 
@@ -849,39 +961,6 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), historyResponse.getStatus());
         assertEquals(expectedResponse.getErrorType(), resultResponse1.getErrorType());
-    }
-
-    void testDeleteServiceTemplateThrowsException() throws Exception {
-        // Setup
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.setName("serviceTemplateApiTest-05");
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-
-        UUID id = serviceTemplate.getServiceTemplateId();
-//        // Setup
-//        String errorMsg = String.format("Service template with id %s is not unregistered.", id);
-//        Response expectedResponse =
-//                Response.errorResponse(ResultType.SERVICE_TEMPLATE_STILL_IN_USE, List.of(errorMsg));
-//        MockHttpServletResponse deleteResponse = deleteTemplate(id);
-//
-//        assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse.getStatus());
-//        assertEquals(deleteResponse.getContentAsString(),
-//                objectMapper.writeValueAsString(expectedResponse));
-
-        String errorMsg2 = String.format("Service template with id %s is still in use.", id);
-        ErrorResponse expectedErrorResponse2 =
-                ErrorResponse.errorResponse(ErrorType.SERVICE_TEMPLATE_STILL_IN_USE,
-                        List.of(errorMsg2));
-        unregister(serviceTemplate.getServiceTemplateId());
-        when(mockDeployServiceStorage.listServices(any(ServiceQueryModel.class))).thenReturn(
-                List.of(new ServiceDeploymentEntity()));
-        MockHttpServletResponse deleteResponse2 = deleteTemplate(id);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse2.getStatus());
-        assertEquals(deleteResponse2.getContentAsString(),
-                objectMapper.writeValueAsString(expectedErrorResponse2));
-
-        deleteTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     MockHttpServletResponse register(Ocl ocl) throws Exception {

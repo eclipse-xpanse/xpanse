@@ -15,8 +15,8 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
@@ -94,9 +94,10 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
             ServiceTemplateDetailVo serviceTemplateDetailVo)
             throws Exception {
 
-        ErrorResponse accessDeniedErrorResponse = ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
-                Collections.singletonList("No permissions to review service template "
-                        + "belonging to other cloud service providers."));
+        ErrorResponse accessDeniedErrorResponse =
+                ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
+                        Collections.singletonList("No permissions to review service template "
+                                + "belonging to other cloud service providers."));
         // Setup detail request
         UUID id = serviceTemplateDetailVo.getServiceTemplateId();
         // Run the test detail
@@ -126,7 +127,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         request2.setReviewResult(ServiceReviewResult.REJECTED);
         request2.setReviewComment("reviewComment");
         ErrorResponse expectedErrorResponse2 =
-                ErrorResponse.errorResponse(ErrorType.SERVICE_TEMPLATE_ALREADY_REVIEWED,
+                ErrorResponse.errorResponse(ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED,
                         Collections.singletonList(
                                 String.format("Service template with id %s already reviewed.",
                                         id1)));
@@ -163,9 +164,10 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
             throws Exception {
 
         // Setup request
-        ErrorResponse accessDeniedErrorResponse = ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
-                Collections.singletonList("No permissions to review service template "
-                        + "belonging to other cloud service providers."));
+        ErrorResponse accessDeniedErrorResponse =
+                ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
+                        Collections.singletonList("No permissions to review service template "
+                                + "belonging to other cloud service providers."));
         UUID id = serviceTemplateDetailVo.getServiceTemplateId();
         ReviewRegistrationRequest request = new ReviewRegistrationRequest();
         request.setReviewResult(ServiceReviewResult.APPROVED);
