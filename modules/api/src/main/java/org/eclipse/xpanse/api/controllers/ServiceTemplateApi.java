@@ -300,7 +300,7 @@ public class ServiceTemplateApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
-    public ServiceTemplateDetailVo details(
+    public ServiceTemplateDetailVo getServiceTemplateDetailsById(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
             @PathVariable("serviceTemplateId") String serviceTemplateId) {
         ServiceTemplateEntity templateEntity = serviceTemplateManage.getServiceTemplateDetails(
