@@ -38,8 +38,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.introspection.SpringOpaqueTokenIntrospector;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
@@ -121,7 +121,7 @@ public class Oauth2WebSecurityFilter {
         if (Objects.nonNull(opaqueTokenAuthenticationConverter)) {
             // Config custom OpaqueTokenIntrospect
             http.oauth2ResourceServer(oauth2 -> oauth2.opaqueToken(opaque -> opaque.introspector(
-                            new NimbusOpaqueTokenIntrospector(
+                            new SpringOpaqueTokenIntrospector(
                                     introspectionUri, clientId, clientSecret))
                     .authenticationConverter(opaqueTokenAuthenticationConverter)
 
