@@ -502,13 +502,13 @@ class OpenstackTestlabOrchestratorPluginTest {
         mockGetAuthUrl();
         // Run the test
         final List<String> result =
-                plugin.getAvailabilityZonesOfRegion(userId, siteName, regionName, null);
+                plugin.getAvailabilityZonesOfRegion(userId, siteName, regionName, null, null);
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
 
         // Run the test
         final List<String> result2 =
-                plugin.getAvailabilityZonesOfRegion(userId, siteName, regionName, uuid);
+                plugin.getAvailabilityZonesOfRegion(userId, siteName, regionName, uuid, null);
         // Verify the results
         assertThat(result2).isEqualTo(Collections.emptyList());
     }

@@ -68,7 +68,8 @@ public class OpenstackServiceMetricsManager {
         String resourceId = request.getDeployResource().getResourceId();
         try {
             MonitorResourceType monitorResourceType = request.getMonitorResourceType();
-            providerAuthInfoResolver.getAuthenticatedClientForCsp(csp, siteName, userId, serviceId);
+            providerAuthInfoResolver.getAuthenticatedClientForCsp(
+                    csp, siteName, userId, serviceId, null);
             InstanceResource instanceResource =
                     this.resourcesService.getInstanceResourceInfoById(resourceId);
             if (Objects.nonNull(instanceResource)) {

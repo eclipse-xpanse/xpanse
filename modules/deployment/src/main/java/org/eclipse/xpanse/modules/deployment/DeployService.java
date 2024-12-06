@@ -209,11 +209,11 @@ public class DeployService {
      * @return List of availability zones.
      */
     public List<String> getAvailabilityZonesOfRegion(Csp csp, String siteName, String regionName,
-                                                     UUID serviceId) {
+                                                     UUID serviceId, UUID serviceTemplateId) {
         String currentUserId = this.userServiceHelper.getCurrentUserId();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
         return orchestratorPlugin.getAvailabilityZonesOfRegion(siteName, regionName, currentUserId,
-                serviceId);
+                serviceId, serviceTemplateId);
     }
 
 

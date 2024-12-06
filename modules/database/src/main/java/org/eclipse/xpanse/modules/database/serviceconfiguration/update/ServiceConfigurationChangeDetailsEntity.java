@@ -81,7 +81,7 @@ public class ServiceConfigurationChangeDetailsEntity implements Serializable {
     @Column(name = "STATUS")
     private ServiceConfigurationStatus status;
 
-    @Column(name = "TASK_RESULT ", columnDefinition = "json")
+    @Column(name = "TASK_RESULT", columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private List<AnsibleTaskResult> tasks;
