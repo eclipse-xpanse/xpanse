@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.deployment;
 
 import jakarta.annotation.Resource;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,13 +20,26 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
+import org.eclipse.xpanse.modules.database.serviceorder.DatabaseServiceOrderStorage;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerTaskResultHelper;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootTaskResultHelper;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
@@ -33,6 +47,10 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurati
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -52,6 +70,15 @@ public class ServiceDetailsViewManager {
     private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource
+    private TerraformBootTaskResultHelper terraformBootTaskResultHelper;
+    @Resource
+    private TofuMakerTaskResultHelper tofuMakerTaskResultHelper;
+
+    @Value("${max.service.order.processing.duration.in.seconds}")
+    private int maxServiceOrderProcessingDurationInSeconds;
+    @Autowired
+    private DatabaseServiceOrderStorage databaseServiceOrderStorage;
 
     /**
      * Get deploy service detail by id.
@@ -75,6 +102,7 @@ public class ServiceDetailsViewManager {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
+        updateServiceDeploymentStateAndServiceOrderByStoredTerraformResult(serviceDeploymentEntity);
         return EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
     }
 
@@ -97,6 +125,7 @@ public class ServiceDetailsViewManager {
         query.setUserId(currentUserId);
         List<ServiceDeploymentEntity> serviceDeploymentEntities =
                 serviceDeploymentStorage.listServices(query);
+        serviceDeploymentEntities.forEach(this::updateServiceDeploymentStateAndServiceOrderByStoredTerraformResult);
         return setServiceConfigurationForDeployedServiceList(serviceDeploymentEntities);
     }
 
@@ -155,6 +184,7 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
+        updateServiceDeploymentStateAndServiceOrderByStoredTerraformResult(serviceDeploymentEntity);
         DeployedServiceDetails details =
                 EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
         setServiceConfigurationDetailsForDeployedService(details);
@@ -210,6 +240,7 @@ public class ServiceDetailsViewManager {
         String namespace = userServiceHelper.getCurrentUserManageNamespace();
         query.setNamespace(namespace);
         List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
+        deployServices.forEach(this::updateServiceDeploymentStateAndServiceOrderByStoredTerraformResult);
         return setServiceConfigurationForDeployedServiceList(deployServices);
     }
 
@@ -298,5 +329,119 @@ public class ServiceDetailsViewManager {
         return query;
     }
 
+    private void updateServiceDeploymentStateAndServiceOrderByStoredTerraformResult(
+            ServiceDeploymentEntity serviceDeployment) {
+        ServiceOrderEntity serviceOrderEntity =
+                getServiceOrderEntityForDeployedService(serviceDeployment);
+        updateServiceDeploymentStateAndServiceOrder(serviceDeployment, serviceOrderEntity);
+    }
 
+    private ServiceOrderEntity getServiceOrderEntityForDeployedService(
+            ServiceDeploymentEntity serviceDeployment) {
+        List<ServiceOrderEntity> serviceOrderEntities = serviceDeployment.getServiceOrderList();
+        ServiceOrderEntity serviceOrderEntity = null;
+        if (serviceDeployment.getServiceDeploymentState().equals(ServiceDeploymentState.DEPLOYING)) {
+            serviceOrderEntity = serviceOrderEntities
+                    .stream()
+                    .filter(serviceOrder ->
+                            serviceOrder.getTaskType().equals(ServiceOrderType.DEPLOY)).findFirst()
+                    .orElseThrow(
+                            () -> new ServiceOrderNotFound(
+                                    "No ServiceOrderEntity found with ServiceOrderType DEPLOY"));
+        } else if (serviceDeployment.getServiceDeploymentState().equals(ServiceDeploymentState.DESTROYING)) {
+            serviceOrderEntity = serviceOrderEntities
+                    .stream()
+                    .filter(serviceOrder ->
+                            serviceOrder.getTaskType().equals(ServiceOrderType.DESTROY)).findFirst()
+                    .orElseThrow(() -> new ServiceOrderNotFound(
+                            "No ServiceOrderEntity found with ServiceOrderType DESTROY"));
+        } else if (serviceDeployment.getServiceDeploymentState().equals(ServiceDeploymentState.MODIFYING)) {
+            serviceOrderEntity = serviceOrderEntities
+                    .stream()
+                    .filter(serviceOrder ->
+                            serviceOrder.getTaskType().equals(ServiceOrderType.MODIFY)).findFirst()
+                    .orElseThrow(
+                            () -> new ServiceOrderNotFound(
+                                    "No ServiceOrderEntity found with ServiceOrderType MODIFY"));
+        } else {
+            return serviceOrderEntity;
+        }
+        return serviceOrderEntity;
+    }
+
+    private void updateServiceDeploymentStateAndServiceOrder(ServiceDeploymentEntity serviceDeployment,
+                                                             ServiceOrderEntity serviceOrderEntity) {
+        if (Objects.nonNull(serviceOrderEntity)) {
+            if (Duration.between(serviceOrderEntity.getStartedTime(), OffsetDateTime.now()).getSeconds() >
+                    maxServiceOrderProcessingDurationInSeconds) {
+                if (serviceOrderEntity.getHandler().equals(Handler.TERRAFORM_BOOT)) {
+                    try {
+                        ResponseEntity<TerraformResult> result = terraformBootTaskResultHelper
+                                .retrieveTerraformResult(String.valueOf(serviceOrderEntity.getOrderId()));
+                        if (result.getStatusCode() == HttpStatus.NO_CONTENT) {
+                            return;
+                        }
+                        if (Objects.nonNull(result.getBody())
+                                && result.getBody().getCommandSuccessful() != null) {
+                            updateServiceDeploymentState(result.getBody().getCommandSuccessful(),
+                                    serviceDeployment);
+                        }
+                    } catch (TerraformBootRequestFailedException e) {
+                        updateServiceDeploymentStateAndServiceOrder(serviceDeployment,
+                                serviceOrderEntity, ErrorType.TERRAFORM_BOOT_REQUEST_FAILED, e);
+                    }
+                }
+                if (serviceOrderEntity.getHandler().equals(Handler.TOFU_MAKER)) {
+                    try {
+                        ResponseEntity<OpenTofuResult> result = tofuMakerTaskResultHelper
+                                .retrieveOpenTofuResult(String.valueOf(serviceOrderEntity.getOrderId()));
+                        if (result.getStatusCode() == HttpStatus.NO_CONTENT) {
+                            return;
+                        }
+                        if (Objects.nonNull(result.getBody())
+                                && result.getBody().getCommandSuccessful() != null) {
+                            updateServiceDeploymentState(result.getBody().getCommandSuccessful(),
+                                    serviceDeployment);
+                        }
+                    } catch (TerraformBootRequestFailedException e) {
+                        updateServiceDeploymentStateAndServiceOrder(serviceDeployment,
+                                serviceOrderEntity, ErrorType.TOFU_MAKER_REQUEST_FAILED, e);
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateServiceDeploymentState(Boolean isSuccess, ServiceDeploymentEntity serviceDeployment) {
+        if (isSuccess) {
+            if (serviceDeployment.getServiceDeploymentState().equals(ServiceDeploymentState.DEPLOYING)) {
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
+            } else if (serviceDeployment.getServiceDeploymentState().equals(ServiceDeploymentState.DESTROYING)) {
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
+            } else if (serviceDeployment.getServiceDeploymentState().equals(ServiceDeploymentState.MODIFYING)) {
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.MODIFICATION_SUCCESSFUL);
+            }
+        } else {
+            if (serviceDeployment.getServiceDeploymentState().equals(ServiceDeploymentState.DEPLOYING)) {
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
+            } else if (serviceDeployment.getServiceDeploymentState().equals(ServiceDeploymentState.DESTROYING)) {
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
+            } else if (serviceDeployment.getServiceDeploymentState().equals(ServiceDeploymentState.MODIFYING)) {
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.MODIFICATION_FAILED);
+            }
+        }
+        serviceDeploymentStorage.storeAndFlush(serviceDeployment);
+    }
+
+    private void updateServiceDeploymentStateAndServiceOrder(ServiceDeploymentEntity serviceDeployment,
+                                                             ServiceOrderEntity serviceOrderEntity,
+                                                             ErrorType errorType,
+                                                             TerraformBootRequestFailedException e) {
+        serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
+        serviceOrderEntity.setTaskStatus(TaskStatus.FAILED);
+        serviceOrderEntity.setErrorResponse(ErrorResponse.errorResponse(
+                errorType, List.of(e.getMessage())));
+        serviceDeploymentStorage.storeAndFlush(serviceDeployment);
+        databaseServiceOrderStorage.storeAndFlush(serviceOrderEntity);
+    }
 }
