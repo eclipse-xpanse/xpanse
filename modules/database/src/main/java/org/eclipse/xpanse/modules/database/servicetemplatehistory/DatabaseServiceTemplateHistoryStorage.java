@@ -6,10 +6,16 @@
 
 package org.eclipse.xpanse.modules.database.servicetemplatehistory;
 
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.change.exceptions.ServiceTemplateChangeRequestNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,4 +49,32 @@ public class DatabaseServiceTemplateHistoryStorage implements ServiceTemplateHis
         );
     }
 
+    @Override
+    public List<ServiceTemplateHistoryEntity> listServiceTemplateHistoryByQueryModel(
+            ServiceTemplateHistoryQueryModel queryModel) {
+        Specification<ServiceTemplateHistoryEntity> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            if (Objects.nonNull(queryModel.getServiceTemplateId())) {
+                predicateList.add(criteriaBuilder.equal(root.get("serviceTemplate").get("id"),
+                        queryModel.getServiceTemplateId()));
+            }
+            if (Objects.nonNull(queryModel.getCsp())) {
+                predicateList.add(criteriaBuilder.equal(root.get("serviceTemplate").get("csp"),
+                        queryModel.getCsp()));
+            }
+            if (Objects.nonNull(queryModel.getRequestType())) {
+                predicateList.add(criteriaBuilder.equal(root.get("requestType"),
+                        queryModel.getRequestType()));
+            }
+            if (Objects.nonNull(queryModel.getStatus())) {
+                predicateList.add(
+                        criteriaBuilder.equal(root.get("status"), queryModel.getStatus()));
+            }
+            query.distinct(true);
+            query.orderBy(criteriaBuilder.asc(root.get("createTime")));
+            return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
+        };
+
+        return repository.findAll(spec);
+    }
 }
