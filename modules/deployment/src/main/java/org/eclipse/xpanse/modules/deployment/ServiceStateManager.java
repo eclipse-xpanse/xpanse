@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -87,7 +88,7 @@ public class ServiceStateManager {
         deployTask.setServiceId(service.getId());
         deployTask.setTaskType(taskType);
         deployTask.setUserId(getUserId());
-        return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service);
+        return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service, Handler.PLUGIN);
     }
 
     private void asyncStartService(ServiceOrderEntity serviceOrderTaskEntity,

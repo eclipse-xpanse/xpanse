@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.config
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.AdminApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.RetrieveOpenTofuResultApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlan;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -88,6 +89,8 @@ class TofuMakerDeploymentTest {
     TofuMakerScriptValidator tofuMakerScriptValidator;
     @MockitoBean
     OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
+    @MockitoBean
+    RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
     @Autowired
     TofuMakerServiceDeployer tofuMakerServiceDeployer;
     @Autowired

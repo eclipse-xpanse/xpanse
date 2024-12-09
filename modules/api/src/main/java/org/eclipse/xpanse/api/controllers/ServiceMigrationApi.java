@@ -35,6 +35,7 @@ import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
@@ -105,8 +106,8 @@ public class ServiceMigrationApi {
         }
         migrateRequest.setUserId(userId);
         DeployTask migrateTask = getMigrateTask(migrateRequest);
-        ServiceOrderEntity migrateOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(migrateTask, deployServiceEntity);
+        ServiceOrderEntity migrateOrderEntity = serviceOrderManager
+                .storeNewServiceOrderEntity(migrateTask, deployServiceEntity, Handler.WORKFLOW);
         Map<String, Object> variable =
                 getMigrateProcessVariable(migrateRequest, migrateOrderEntity);
         ProcessInstance instance =

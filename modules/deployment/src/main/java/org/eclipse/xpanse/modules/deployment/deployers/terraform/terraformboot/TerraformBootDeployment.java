@@ -7,6 +7,9 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.RetrieveTerraformResultApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
@@ -15,7 +18,9 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 
 /**
  * Implementation of the deployment with terraform-boot.
@@ -30,6 +35,7 @@ public class TerraformBootDeployment implements Deployer {
     private final TerraformBootServiceDeployer terraformBootServiceDeployer;
     private final TerraformBootServiceDestroyer terraformBootServiceDestroyer;
     private final TerraformBootServiceModifier terraformBootServiceModifier;
+    private final RetrieveTerraformResultApi retrieveTerraformResultApi;
 
     /**
      * Initializes the TerraformBoot deployer.
@@ -40,12 +46,14 @@ public class TerraformBootDeployment implements Deployer {
             TerraformBootDeploymentPlanManage terraformBootDeploymentPlanManage,
             TerraformBootServiceDeployer terraformBootServiceDeployer,
             TerraformBootServiceDestroyer terraformBootServiceDestroyer,
-            TerraformBootServiceModifier terraformBootServiceModifier) {
+            TerraformBootServiceModifier terraformBootServiceModifier,
+            RetrieveTerraformResultApi retrieveTerraformResultApi) {
         this.terraformBootServiceDestroyer = terraformBootServiceDestroyer;
         this.terraformBootScriptValidator = terraformBootScriptValidator;
         this.terraformBootDeploymentPlanManage = terraformBootDeploymentPlanManage;
         this.terraformBootServiceDeployer = terraformBootServiceDeployer;
         this.terraformBootServiceModifier = terraformBootServiceModifier;
+        this.retrieveTerraformResultApi = retrieveTerraformResultApi;
     }
 
     @Override
@@ -101,6 +109,19 @@ public class TerraformBootDeployment implements Deployer {
             return terraformBootDeploymentPlanManage.getTerraformPlanFromScripts(task).getPlan();
         }
         return terraformBootDeploymentPlanManage.getTerraformPlanFromGitRepo(task).getPlan();
+    }
+
+    /**
+     * retrieve terraform result.
+     */
+    public ResponseEntity<TerraformResult> retrieveTerraformResult(String requestId) {
+        try {
+            return retrieveTerraformResultApi.getStoredTaskResultByRequestIdWithHttpInfo(requestId);
+        } catch (RestClientException e) {
+            log.error("terraform-boot modify service failed. orderId: {} , error:{} ",
+                    requestId, e.getMessage());
+            throw new TerraformBootRequestFailedException(e.getMessage());
+        }
     }
 
 }
