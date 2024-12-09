@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateReque
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -127,6 +128,9 @@ public class AuditLogWriter {
                 case ServicePolicyCreateRequest servicePolicyCreateRequest ->
                         getCspInfoFromRequest.getCspFromServiceTemplateId(
                                 servicePolicyCreateRequest.getServiceTemplateId().toString());
+                case ReviewRegistrationRequest reviewRegistrationRequest ->
+                        getCspInfoFromRequest.getCspFromServiceTemplateChangeId(
+                                reviewRegistrationRequest.getChangeId().toString());
                 case Csp csp -> csp;
                 case null, default -> null;
             };

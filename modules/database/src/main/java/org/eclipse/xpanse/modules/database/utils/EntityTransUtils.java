@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurati
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateHistoryVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateRequestVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -167,8 +168,8 @@ public class EntityTransUtils {
      * @return Collection of ServiceConfigurationUpdateRequestOrderDetails.
      */
     public static List<ServiceConfigurationChangeOrderDetails>
-            transToServiceConfigurationChangeOrderDetails(
-                List<ServiceConfigurationChangeDetailsEntity> requests) {
+    transToServiceConfigurationChangeOrderDetails(
+            List<ServiceConfigurationChangeDetailsEntity> requests) {
 
         Map<UUID, List<ServiceConfigurationChangeDetailsEntity>> orderDetailsMap = requests.stream()
                 .collect(Collectors.groupingBy(
@@ -213,5 +214,21 @@ public class EntityTransUtils {
                 serviceTemplateHistoryEntity.getServiceTemplate().getId());
         BeanUtils.copyProperties(serviceTemplateHistoryEntity, serviceTemplateHistoryVo);
         return serviceTemplateHistoryVo;
+    }
+
+
+    /**
+     * ServiceTemplateHistoryEntity converted to ServiceTemplateRequestVo.
+     *
+     * @param serviceTemplateHistoryEntity ServiceTemplateHistoryEntity.
+     * @return serviceTemplateRequestVo
+     */
+    public static ServiceTemplateRequestVo convertToServiceTemplateRequestVo(
+            ServiceTemplateHistoryEntity serviceTemplateHistoryEntity) {
+        ServiceTemplateRequestVo requestVo = new ServiceTemplateRequestVo();
+        requestVo.setServiceTemplateId(
+                serviceTemplateHistoryEntity.getServiceTemplate().getId());
+        BeanUtils.copyProperties(serviceTemplateHistoryEntity, requestVo);
+        return requestVo;
     }
 }

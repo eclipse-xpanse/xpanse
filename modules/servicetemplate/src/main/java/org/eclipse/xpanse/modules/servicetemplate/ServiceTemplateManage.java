@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
+import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
@@ -35,6 +36,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateHistoryVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateRequestVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateChangeStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.change.exceptions.ServiceTemplateChangeRequestNotAllowed;
@@ -386,30 +388,44 @@ public class ServiceTemplateManage {
     /**
      * Review service template registration.
      *
-     * @param id      ID of service template.
      * @param request the request of review registration.
      */
-    public void reviewServiceTemplateRegistration(UUID id, ReviewRegistrationRequest request) {
-        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, false, true);
-        ServiceTemplateRegistrationState state =
-                existingTemplate.getServiceTemplateRegistrationState();
-        if (ServiceTemplateRegistrationState.APPROVED == state
-                || ServiceTemplateRegistrationState.REJECTED == state) {
-            String errMsg = String.format("Service template with id %s already reviewed.",
-                    existingTemplate.getId());
-            log.error(errMsg);
-            throw new ServiceTemplateChangeRequestNotAllowed(errMsg);
+    public void reviewServiceTemplateRegistration(ReviewRegistrationRequest request) {
+        ServiceTemplateHistoryEntity existingTemplateRequest =
+                serviceTemplateHistoryStorage.getEntityById(request.getChangeId());
+        ServiceTemplateEntity serviceTemplate = existingTemplateRequest.getServiceTemplate();
+        Csp csp = userServiceHelper.getCurrentUserManageCsp();
+        if (csp != serviceTemplate.getCsp()) {
+            throw new AccessDeniedException("No permissions to review service template request "
+                    + "belonging to other cloud service providers.");
         }
         if (ServiceReviewResult.APPROVED == request.getReviewResult()) {
-            existingTemplate.setServiceTemplateRegistrationState(
-                    ServiceTemplateRegistrationState.APPROVED);
-            existingTemplate.setAvailableInCatalog(true);
+            existingTemplateRequest.setStatus(ServiceTemplateChangeStatus.ACCEPTED);
+            serviceTemplate.setOcl(existingTemplateRequest.getOcl());
+            // when the request type is register, set registration state to approved.
+            if (ServiceTemplateRequestType.REGISTER == existingTemplateRequest.getRequestType()) {
+                serviceTemplate.setServiceTemplateRegistrationState(
+                        ServiceTemplateRegistrationState.APPROVED);
+            }
+            // when the request type is unregister, set availableInCatalog to false.
+            boolean availableInCatalog = ServiceTemplateRequestType.UNREGISTER
+                    != existingTemplateRequest.getRequestType();
+            serviceTemplate.setAvailableInCatalog(availableInCatalog);
         } else if (ServiceReviewResult.REJECTED == request.getReviewResult()) {
-            existingTemplate.setServiceTemplateRegistrationState(
-                    ServiceTemplateRegistrationState.REJECTED);
-            existingTemplate.setAvailableInCatalog(false);
+            existingTemplateRequest.setStatus(ServiceTemplateChangeStatus.REJECTED);
+            // when the request type is register, set registration state to rejected.
+            if (ServiceTemplateRequestType.REGISTER == existingTemplateRequest.getRequestType()) {
+                serviceTemplate.setServiceTemplateRegistrationState(
+                        ServiceTemplateRegistrationState.REJECTED);
+            }
         }
-        templateStorage.storeAndFlush(existingTemplate);
+        templateStorage.storeAndFlush(serviceTemplate);
+        if (Objects.nonNull(request.getReviewComment())) {
+            existingTemplateRequest.setReviewComment(request.getReviewComment());
+        } else {
+            existingTemplateRequest.setReviewComment(request.getReviewResult().toValue());
+        }
+        serviceTemplateHistoryStorage.storeAndFlush(existingTemplateRequest);
     }
 
 
@@ -526,6 +542,20 @@ public class ServiceTemplateManage {
         return historyList.stream()
                 .sorted(Comparator.comparing(ServiceTemplateHistoryEntity::getCreateTime)
                         .reversed()).map(EntityTransUtils::convertToServiceTemplateHistoryVo)
+                .toList();
+    }
+
+    /**
+     * List pending service template requests to review.
+     *
+     * @param queryModel query parameters.
+     * @return list of service template requests to review.
+     */
+    public List<ServiceTemplateRequestVo> listPendingServiceTemplateRequests(
+            ServiceTemplateHistoryQueryModel queryModel) {
+        List<ServiceTemplateHistoryEntity> historyList =
+                serviceTemplateHistoryStorage.listServiceTemplateHistoryByQueryModel(queryModel);
+        return historyList.stream().map(EntityTransUtils::convertToServiceTemplateRequestVo)
                 .toList();
     }
 
