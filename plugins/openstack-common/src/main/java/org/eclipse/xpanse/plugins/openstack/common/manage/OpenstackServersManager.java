@@ -165,7 +165,8 @@ public class OpenstackServersManager {
     }
 
     private OSClient.OSClientV3 getOsClient(Csp csp, String site, String userId, UUID serviceId) {
-        return providerAuthInfoResolver.getAuthenticatedClientForCsp(csp, site, userId, serviceId);
+        return providerAuthInfoResolver.getAuthenticatedClientForCsp(
+                csp, site, userId, serviceId, null);
     }
 }
 

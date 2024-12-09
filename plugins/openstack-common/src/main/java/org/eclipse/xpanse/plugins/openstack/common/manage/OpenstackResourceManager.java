@@ -79,10 +79,12 @@ public class OpenstackResourceManager {
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<String> getAvailabilityZonesOfRegion(Csp csp, String site, String region,
-                                                     String userId, UUID serviceId) {
+                                                     String userId, UUID serviceId,
+                                                     UUID serviceTemplateId) {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId);
+            OSClientV3 osClient = getOsClient(
+                    csp, site, region, userId, serviceId, serviceTemplateId);
             osClient.networking().availabilityzone().list().forEach(
                     availabilityZone -> availabilityZoneNames.add(availabilityZone.getName()));
         } catch (Exception e) {
@@ -98,7 +100,8 @@ public class OpenstackResourceManager {
                                     String userId, UUID serviceId) {
         List<String> vpcNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId);
+            OSClientV3 osClient = getOsClient(
+                    csp, site, region, userId, serviceId, null);
             osClient.networking().network().list()
                     .forEach(network -> vpcNames.add(network.getName()));
         } catch (Exception e) {
@@ -113,7 +116,8 @@ public class OpenstackResourceManager {
                                        String userId, UUID serviceId) {
         List<String> subnetNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId);
+            OSClientV3 osClient = getOsClient(
+                    csp, site, region, userId, serviceId, null);
             osClient.networking().subnet().list()
                     .forEach(subnet -> subnetNames.add(subnet.getName()));
         } catch (Exception e) {
@@ -128,7 +132,7 @@ public class OpenstackResourceManager {
                                                String userId, UUID serviceId) {
         List<String> securityGroupNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId);
+            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId, null);
             osClient.networking().securitygroup().list()
                     .forEach(securityGroup -> securityGroupNames.add(securityGroup.getName()));
         } catch (Exception e) {
@@ -143,7 +147,8 @@ public class OpenstackResourceManager {
                                                   String userId, UUID serviceId) {
         List<String> securityGroupRuleIds = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId);
+            OSClientV3 osClient = getOsClient(
+                    csp, site, region, userId, serviceId, null);
             osClient.networking().securityrule().list().forEach(
                     securityGroupRule -> securityGroupRuleIds.add(securityGroupRule.getId()));
         } catch (Exception e) {
@@ -158,7 +163,7 @@ public class OpenstackResourceManager {
                                          String userId, UUID serviceId) {
         List<String> publicIpAddresses = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId);
+            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId, null);
             osClient.networking().floatingip().list().forEach(
                     floatingIp -> publicIpAddresses.add(floatingIp.getFloatingIpAddress()));
         } catch (Exception e) {
@@ -173,7 +178,8 @@ public class OpenstackResourceManager {
                                        String userId, UUID serviceId) {
         List<String> volumeNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId);
+            OSClientV3 osClient = getOsClient(
+                    csp, site, region, userId, serviceId, null);
             osClient.blockStorage().volumes().list()
                     .forEach(volume -> volumeNames.add(volume.getName()));
         } catch (Exception e) {
@@ -188,7 +194,8 @@ public class OpenstackResourceManager {
                                          String userId, UUID serviceId) {
         List<String> keyPairNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId);
+            OSClientV3 osClient = getOsClient(
+                    csp, site, region, userId, serviceId, null);
             osClient.compute().keypairs().list()
                     .forEach(keyPair -> keyPairNames.add(keyPair.getName()));
         } catch (Exception e) {
@@ -200,9 +207,10 @@ public class OpenstackResourceManager {
     }
 
     private OSClient.OSClientV3 getOsClient(Csp csp, String site, String region,
-                                            String userId, UUID serviceId) {
+                                            String userId, UUID serviceId, UUID serviceTemplateId) {
         return providerAuthInfoResolver
-                .getAuthenticatedClientForCsp(csp, site, userId, serviceId).useRegion(region);
+                .getAuthenticatedClientForCsp(
+                        csp, site, userId, serviceId, serviceTemplateId).useRegion(region);
     }
 
     /**
