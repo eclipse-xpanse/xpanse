@@ -41,10 +41,13 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
+import org.eclipse.xpanse.modules.database.serviceorder.DatabaseServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerTaskResultHelper;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootTaskResultHelper;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -112,6 +115,12 @@ public class ApisTestCommon {
     protected ServiceOrderStorage serviceOrderStorage;
     @Resource
     protected MockMvc mockMvc;
+    @Resource
+    private TerraformBootTaskResultHelper terraformBootTaskResultHelper;
+    @Resource
+    private TofuMakerTaskResultHelper tofuMakerTaskResultHelper;
+    @Resource
+    private DatabaseServiceOrderStorage databaseServiceOrderStorage;
     @MockitoBean
     protected HuaweiCloudClient huaweiCloudClient;
     @MockitoBean

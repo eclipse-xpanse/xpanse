@@ -7,6 +7,9 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.RetrieveOpenTofuResultApi;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
@@ -15,7 +18,9 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 
 /**
  * Implementation of the deployment with tofu-maker.
@@ -30,6 +35,7 @@ public class TofuMakerDeployment implements Deployer {
     private final TofuMakerServiceDeployer tofuMakerServiceDeployer;
     private final TofuMakerServiceDestroyer tofuMakerServiceDestroyer;
     private final TofuMakerServiceModifier tofuMakerServiceModifier;
+    private final RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
 
     /**
      * Initializes the OpenTofuBoot deployer.
@@ -40,12 +46,14 @@ public class TofuMakerDeployment implements Deployer {
                                        tofuMakerDeploymentPlanManage,
                                TofuMakerServiceDeployer tofuMakerServiceDeployer,
                                TofuMakerServiceDestroyer tofuMakerServiceDestroyer,
-                               TofuMakerServiceModifier tofuMakerServiceModifier) {
+                               TofuMakerServiceModifier tofuMakerServiceModifier,
+                               RetrieveOpenTofuResultApi retrieveOpenTofuResultApi) {
         this.tofuMakerServiceDestroyer = tofuMakerServiceDestroyer;
         this.tofuMakerScriptValidator = tofuMakerScriptValidator;
         this.tofuMakerDeploymentPlanManage = tofuMakerDeploymentPlanManage;
         this.tofuMakerServiceDeployer = tofuMakerServiceDeployer;
         this.tofuMakerServiceModifier = tofuMakerServiceModifier;
+        this.retrieveOpenTofuResultApi = retrieveOpenTofuResultApi;
     }
 
     @Override
@@ -101,6 +109,19 @@ public class TofuMakerDeployment implements Deployer {
             return tofuMakerDeploymentPlanManage.getOpenTofuPlanFromScripts(task).getPlan();
         }
         return tofuMakerDeploymentPlanManage.getOpenTofuPlanFromGitRepo(task).getPlan();
+    }
+
+    /**
+     * retrieve openTofu result.
+     */
+    public ResponseEntity<OpenTofuResult> retrieveOpenTofuResult(String requestId) {
+        try {
+            return retrieveOpenTofuResultApi.getStoredTaskResultByRequestIdWithHttpInfo(requestId);
+        } catch (RestClientException e) {
+            log.error("terraform-boot modify service failed. orderId: {} , error:{} ",
+                    requestId, e.getMessage());
+            throw new OpenTofuMakerRequestFailedException(e.getMessage());
+        }
     }
 
 }
