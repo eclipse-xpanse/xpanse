@@ -7,5 +7,9 @@
   "urn:zitadel:iam:org:project:roles": {
     "isv": "isv"
   },
+  "urn:zitadel:iam:user:metadata": {
+    "csp": "SHVhd2VpQ2xvdWQ=",
+    "namespace": "SVNWLUE="
+  },
   "sub": "userId"
 }
