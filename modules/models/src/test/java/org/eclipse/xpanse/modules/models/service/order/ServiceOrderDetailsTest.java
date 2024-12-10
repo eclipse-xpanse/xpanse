@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ class ServiceOrderDetailsTest {
     private final ErrorResponse errorResponse = new ErrorResponse();
     private final String userId = "userId";
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
+    private final Handler handler = Handler.INTERNAL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
     @Mock
     private Object requestBody;
@@ -70,6 +72,7 @@ class ServiceOrderDetailsTest {
         test.setPreviousDeployedResources(mockPreviousDeployedResources);
         test.setPreviousDeployedResultProperties(mockPreviousDeployedResultProperties);
         test.setPreviousDeployedServiceProperties(mockPreviousDeployedServiceProperties);
+        test.setHandler(handler);
     }
 
     @Test
@@ -93,6 +96,7 @@ class ServiceOrderDetailsTest {
                 .isEqualTo(mockPreviousDeployedResultProperties);
         assertThat(test.getPreviousDeployedServiceProperties())
                 .isEqualTo(mockPreviousDeployedServiceProperties);
+        assertThat(test.getHandler()).isEqualTo(handler);
     }
 
     @Test
@@ -129,6 +133,7 @@ class ServiceOrderDetailsTest {
                 + ", previousDeployedResources=" + mockPreviousDeployedResources
                 + ", previousDeployedServiceProperties=" + mockPreviousDeployedServiceProperties
                 + ", previousDeployedResultProperties=" + mockPreviousDeployedResultProperties
+                + ", handler=" + handler
                 + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

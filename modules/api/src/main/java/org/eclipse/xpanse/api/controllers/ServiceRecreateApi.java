@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -118,7 +119,7 @@ public class ServiceRecreateApi {
         DeployTask recreateTask = getRecreateTask(serviceDeploymentEntity);
         ServiceOrderEntity recreateOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(recreateTask,
-                        serviceDeploymentEntity);
+                        serviceDeploymentEntity, Handler.WORKFLOW);
 
         // prepare recreate process variables
         Map<String, Object> variable =

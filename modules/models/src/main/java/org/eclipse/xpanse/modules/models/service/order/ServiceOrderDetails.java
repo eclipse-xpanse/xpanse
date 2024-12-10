@@ -19,6 +19,7 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 
@@ -86,4 +87,8 @@ public class ServiceOrderDetails {
 
     @Schema(description = "The properties of the deployed result before this service order.")
     private Map<String, String> previousDeployedResultProperties;
+
+    @NotNull
+    @Schema(description = " The service order handler.")
+    private Handler handler;
 }

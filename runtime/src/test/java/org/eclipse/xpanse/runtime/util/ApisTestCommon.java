@@ -46,6 +46,9 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
+import org.eclipse.xpanse.modules.deployment.ServiceResultReFetchManager;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerResultRefetchManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootResultRefetchManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -114,6 +117,12 @@ public class ApisTestCommon {
     protected ServiceOrderStorage serviceOrderStorage;
     @Resource
     protected MockMvc mockMvc;
+    @Resource
+    private TerraformBootResultRefetchManager terraformBootResultRefetchManager;
+    @Resource
+    private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
+    @Resource
+    private ServiceResultReFetchManager serviceResultReFetchManager;
     @MockitoBean
     protected HuaweiCloudClient huaweiCloudClient;
     @MockitoBean
