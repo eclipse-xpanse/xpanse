@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config.TerraformBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.AdminApi;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.RetrieveTerraformResultApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.TerraformFromScriptsApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformPlan;
@@ -87,6 +88,8 @@ class TerraformBootDeploymentTest {
     TerraformBootConfig terraformBootConfig;
     @MockitoBean
     ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @MockitoBean
+    RetrieveTerraformResultApi retrieveTerraformResultApi;
     @MockitoBean
     TerraformBootScriptValidator terraformBootScriptValidator;
     @Autowired

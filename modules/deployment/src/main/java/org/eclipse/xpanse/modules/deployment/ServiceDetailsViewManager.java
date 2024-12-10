@@ -52,6 +52,8 @@ public class ServiceDetailsViewManager {
     private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
     private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource
+    private ServiceResultReFetchManager serviceResultReFetchManager;
 
     /**
      * Get deploy service detail by id.
@@ -75,6 +77,8 @@ public class ServiceDetailsViewManager {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
+        serviceResultReFetchManager
+                .refetchDeploymentStateForMissingOrdersFromDeployers(serviceDeploymentEntity);
         return EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
     }
 
@@ -97,6 +101,11 @@ public class ServiceDetailsViewManager {
         query.setUserId(currentUserId);
         List<ServiceDeploymentEntity> serviceDeploymentEntities =
                 serviceDeploymentStorage.listServices(query);
+        serviceDeploymentEntities.forEach(
+                serviceDeployment
+                        -> serviceResultReFetchManager
+                            .refetchDeploymentStateForMissingOrdersFromDeployers(serviceDeployment)
+        );
         return setServiceConfigurationForDeployedServiceList(serviceDeploymentEntities);
     }
 
@@ -155,6 +164,8 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
+        serviceResultReFetchManager
+                .refetchDeploymentStateForMissingOrdersFromDeployers(serviceDeploymentEntity);
         DeployedServiceDetails details =
                 EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
         setServiceConfigurationDetailsForDeployedService(details);
@@ -210,6 +221,11 @@ public class ServiceDetailsViewManager {
         String namespace = userServiceHelper.getCurrentUserManageNamespace();
         query.setNamespace(namespace);
         List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
+        deployServices.forEach(
+                serviceDeployment
+                        -> serviceResultReFetchManager
+                        .refetchDeploymentStateForMissingOrdersFromDeployers(serviceDeployment)
+        );
         return setServiceConfigurationForDeployedServiceList(deployServices);
     }
 
@@ -297,6 +313,5 @@ public class ServiceDetailsViewManager {
         }
         return query;
     }
-
 
 }

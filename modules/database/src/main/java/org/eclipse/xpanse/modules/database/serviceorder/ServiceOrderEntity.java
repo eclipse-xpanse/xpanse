@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.hibernate.annotations.Type;
@@ -126,5 +127,9 @@ public class ServiceOrderEntity implements Serializable {
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private Object requestBody;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "HANDLER", nullable = false)
+    private Handler handler;
 
 }

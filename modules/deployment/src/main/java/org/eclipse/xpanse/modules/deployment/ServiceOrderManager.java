@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceOrderStatusChangePolling;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
@@ -61,7 +62,7 @@ public class ServiceOrderManager {
      * @param serviceDeploymentEntity service deployment entity
      */
     public ServiceOrderEntity storeNewServiceOrderEntity(
-            DeployTask task, ServiceDeploymentEntity serviceDeploymentEntity) {
+            DeployTask task, ServiceDeploymentEntity serviceDeploymentEntity, Handler handler) {
         ServiceOrderEntity orderTask = new ServiceOrderEntity();
         orderTask.setOrderId(task.getOrderId());
         orderTask.setParentOrderId(task.getParentOrderId());
@@ -87,6 +88,7 @@ public class ServiceOrderManager {
                         new HashMap<>(serviceDeploymentEntity.getOutputProperties()));
             }
         }
+        orderTask.setHandler(handler);
         return serviceOrderStorage.storeAndFlush(orderTask);
     }
 

@@ -12,6 +12,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,7 @@ class ServiceOrderEntityTest {
     private final ErrorResponse errorResponse = new ErrorResponse();
     private final String userId = "userId";
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
+    private final Handler handler = Handler.TERRAFORM_LOCAL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
     private final Map<String, Object> newConfigRequest = Map.of();
     @Mock
@@ -70,6 +72,7 @@ class ServiceOrderEntityTest {
         test.setPreviousDeployedResultProperties(mockPreviousDeployedResultProperties);
         test.setPreviousDeployedServiceProperties(mockPreviousDeployedServiceProperties);
         test.setNewConfigRequest(newConfigRequest);
+        test.setHandler(handler);
     }
 
     @Test
@@ -94,6 +97,7 @@ class ServiceOrderEntityTest {
                 .isEqualTo(mockPreviousDeployedServiceProperties);
         assertThat(test.getRequestBody()).isEqualTo(mockRequest);
         assertThat(this.test.getNewConfigRequest()).isEqualTo(newConfigRequest);
+        assertThat(test.getHandler()).isEqualTo(handler);
     }
 
     @Test
@@ -131,6 +135,7 @@ class ServiceOrderEntityTest {
                 + ", previousDeployedResultProperties=" + mockPreviousDeployedResultProperties
                 + ", newConfigRequest=" + newConfigRequest
                 + ", requestBody=" + mockRequest
+                + ", handler=" + handler
                 + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

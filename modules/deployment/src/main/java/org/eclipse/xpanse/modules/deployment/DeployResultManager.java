@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -44,6 +45,7 @@ import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * Bean to handle deployment result.
@@ -95,7 +97,7 @@ public class DeployResultManager {
      *
      * @param deployResult DeployResult.
      */
-    public void updateServiceWithDeployResult(DeployResult deployResult) {
+    public void updateServiceWithDeployResult(DeployResult deployResult, Handler handler) {
         if (Objects.isNull(deployResult) || Objects.isNull(deployResult.getOrderId())
                 || Objects.isNull(deployResult.getIsTaskSuccessful())) {
             log.warn("Could not update service data with unuseful deploy result {}.", deployResult);
@@ -120,7 +122,7 @@ public class DeployResultManager {
             rollbackTask.setParentOrderId(orderId);
             rollbackTask.setOriginalServiceId(storedOrderEntity.getOriginalServiceId());
             rollbackTask.setWorkflowId(storedOrderEntity.getWorkflowId());
-            rollbackOnDeploymentFailure(rollbackTask, updatedServiceEntity);
+            rollbackOnDeploymentFailure(rollbackTask, updatedServiceEntity, handler);
             return;
         }
         updateServiceOrderEntityWithDeployResult(deployResult, storedOrderEntity);
@@ -130,14 +132,14 @@ public class DeployResultManager {
      * Perform rollback when deployment fails and destroy the created resources.
      */
     public void rollbackOnDeploymentFailure(DeployTask rollbackTask,
-                                            ServiceDeploymentEntity serviceDeploymentEntity) {
+            ServiceDeploymentEntity serviceDeploymentEntity, Handler handler) {
         DeployResult rollbackResult;
         RuntimeException exception = null;
         log.info("Performing rollback of already provisioned resources.");
         rollbackTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         rollbackTask.setTaskType(ServiceOrderType.ROLLBACK);
         ServiceOrderEntity serviceOrderEntity = serviceOrderManager
-                .storeNewServiceOrderEntity(rollbackTask, serviceDeploymentEntity);
+                .storeNewServiceOrderEntity(rollbackTask, serviceDeploymentEntity, handler);
         Deployer deployer = deployerKindManager.getDeployment(
                 rollbackTask.getOcl().getDeployment().getDeployerTool().getKind());
         try {
@@ -156,7 +158,7 @@ public class DeployResultManager {
             exception = e;
             rollbackResult = getFailedDeployResult(rollbackTask, exception);
         }
-        updateServiceWithDeployResult(rollbackResult);
+        updateServiceWithDeployResult(rollbackResult, handler);
         if (Objects.nonNull(exception)) {
             throw exception;
         }
@@ -405,5 +407,54 @@ public class DeployResultManager {
             log.error("Failed to process the related workflow task of service order: {}",
                     serviceOrder.getOrderId(), e);
         }
+    }
+
+
+    /**
+     * update service state.
+     */
+    public void updateServiceDeploymentState(Boolean isSuccess,
+            ServiceDeploymentEntity serviceDeployment) {
+        if (isSuccess) {
+            if (serviceDeployment.getServiceDeploymentState()
+                    .equals(ServiceDeploymentState.DEPLOYING)) {
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
+            } else if (serviceDeployment.getServiceDeploymentState()
+                    .equals(ServiceDeploymentState.DESTROYING)) {
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
+            } else if (serviceDeployment.getServiceDeploymentState()
+                    .equals(ServiceDeploymentState.MODIFYING)) {
+                serviceDeployment
+                        .setServiceDeploymentState(ServiceDeploymentState.MODIFICATION_SUCCESSFUL);
+            }
+        } else {
+            if (serviceDeployment.getServiceDeploymentState()
+                    .equals(ServiceDeploymentState.DEPLOYING)) {
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
+            } else if (serviceDeployment.getServiceDeploymentState()
+                    .equals(ServiceDeploymentState.DESTROYING)) {
+                serviceDeployment
+                        .setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
+            } else if (serviceDeployment.getServiceDeploymentState()
+                    .equals(ServiceDeploymentState.MODIFYING)) {
+                serviceDeployment
+                        .setServiceDeploymentState(ServiceDeploymentState.MODIFICATION_FAILED);
+            }
+        }
+        serviceDeploymentStorage.storeAndFlush(serviceDeployment);
+    }
+
+    /**
+     * update service state and service order state by exception.
+     */
+    public void updateServiceDeploymentStateAndServiceOrder(ServiceDeploymentEntity serviceEntity,
+            ServiceOrderEntity serviceOrder, ErrorType errorType, HttpClientErrorException e) {
+        serviceEntity
+                .setServiceDeploymentState(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
+        serviceOrder.setTaskStatus(TaskStatus.FAILED);
+        serviceOrder.setErrorResponse(ErrorResponse.errorResponse(errorType,
+                List.of(e.getMessage())));
+        serviceDeploymentStorage.storeAndFlush(serviceEntity);
+        serviceOrderStorage.storeAndFlush(serviceOrder);
     }
 }
