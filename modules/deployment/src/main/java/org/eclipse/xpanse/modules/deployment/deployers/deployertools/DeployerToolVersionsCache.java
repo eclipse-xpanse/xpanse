@@ -12,6 +12,7 @@ import jakarta.annotation.Resource;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeployerToolVersionsCache {
 
+    @Value("${support.default.deployment.tool.versions.only:true}")
+    private boolean getDefaultVersionsOnly;
     @Resource
     private DeployerToolVersionsFetcher versionsFetcher;
 
@@ -33,6 +36,9 @@ public class DeployerToolVersionsCache {
      */
     @Cacheable(value = DEPLOYER_VERSIONS_CACHE_NAME, key = "#deployerKind")
     public Set<String> getVersionsCacheOfDeployerTool(DeployerKind deployerKind) {
+        if (getDefaultVersionsOnly) {
+            return versionsFetcher.getVersionsFromDefaultConfigOfDeployerTool(deployerKind);
+        }
         try {
             return versionsFetcher.fetchOfficialVersionsOfDeployerTool(deployerKind);
         } catch (Exception e) {
