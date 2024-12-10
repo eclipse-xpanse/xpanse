@@ -210,7 +210,23 @@ public class ServiceTemplateManage {
         newServiceTemplate.setOcl(ocl);
         newServiceTemplate.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
         validateServiceDeployment(ocl.getDeployment(), newServiceTemplate);
-        newServiceTemplate.setNamespace(userServiceHelper.getCurrentUserManageNamespace());
+
+        if (!userServiceHelper.isAuthEnable()) {
+            newServiceTemplate.setNamespace(ocl.getNamespace());
+        } else {
+            String userManageNamespace = userServiceHelper.getCurrentUserManageNamespace();
+            if (StringUtils.isEmpty(userManageNamespace)) {
+                throw new AccessDeniedException("Current user's namespace is null, please set it "
+                        + "first.");
+            }
+            if (StringUtils.isNotEmpty(userManageNamespace)
+                    && !StringUtils.equals(ocl.getNamespace(), userManageNamespace)) {
+                throw new AccessDeniedException("No permissions to view or manage service template "
+                        + "belonging to other namespaces.");
+            }
+            newServiceTemplate.setNamespace(ocl.getNamespace());
+        }
+
         return newServiceTemplate;
     }
 

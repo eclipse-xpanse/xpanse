@@ -124,8 +124,15 @@ public class UserServiceHelper {
         }
         CurrentUserInfo userInfo = getCurrentUserInfo();
         return StringUtils.isBlank(userInfo.getNamespace())
-                ? userInfo.getUserId()
+                ? ""
                 : userInfo.getNamespace();
+    }
+
+    /**
+     * Get the auth enable result.
+     */
+    public boolean isAuthEnable() {
+        return webSecurityIsEnabled;
     }
 
     /**

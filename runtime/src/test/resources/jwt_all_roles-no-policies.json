@@ -11,7 +11,8 @@
     "csp": "csp"
   },
   "urn:zitadel:iam:user:metadata": {
-    "csp": "SHVhd2VpQ2xvdWQ="
+    "csp": "SHVhd2VpQ2xvdWQ=",
+    "namespace": "SVNWLUE="
   },
   "sub": "userId-no-policies"
 }
