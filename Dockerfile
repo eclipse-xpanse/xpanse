@@ -44,7 +44,7 @@ RUN if [ ! -f "${XPANSE_HOME_DIR}/private_key.pem" ]; then \
     fi
 
 # Set start command
-ENTRYPOINT ["java", "-Ddeployer.terraform.install.dir=${TERRAFORM_INSTALL_PATH}", "-Ddeployer.terraform.versions=${TERRAFORM_VERSIONS}", \
-"-Ddeployer.opentofu.install.dir=${OPENTOFU_INSTALL_PATH}", "-Ddeployer.opentofu.version=${OPENTOFU_VERSIONS}", \
+ENTRYPOINT ["java", "-Ddeployer.terraform.install.dir=${TERRAFORM_INSTALL_PATH}", "-Ddeployer.terraform.default.supported.versions=${TERRAFORM_VERSIONS}", \
+"-Ddeployer.opentofu.install.dir=${OPENTOFU_INSTALL_PATH}", "-Ddeployer.opentofu.default.supported.versions=${OPENTOFU_VERSIONS}", \
  "-jar", "xpanse-runtime.jar"]
 
