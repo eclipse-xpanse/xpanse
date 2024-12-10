@@ -129,6 +129,13 @@ public class UserServiceHelper {
     }
 
     /**
+     * Get the auth enable result.
+     */
+    public boolean isAuthEnable() {
+        return webSecurityIsEnabled;
+    }
+
+    /**
      * Get the csp managed by the current user.
      */
     public Csp getCurrentUserManageCsp() {
