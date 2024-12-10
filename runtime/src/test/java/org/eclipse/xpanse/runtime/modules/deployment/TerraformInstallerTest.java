@@ -7,24 +7,38 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.annotation.Resource;
 import java.io.File;
+import java.util.Set;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolVersionsCache;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformInstaller;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.runtime.cache.redis.AbstractRedisIntegrationTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(properties = {"http.request.retry.max.attempts=1",
-        "enable.redis.distributed.cache=true"})
+        "enable.redis.distributed.cache=true",
+        "support.default.deployment.tool.versions.only=false"})
 class TerraformInstallerTest extends AbstractRedisIntegrationTest {
 
+    @Value("${deployer.terraform.default.supported.versions:1.6.0,1.7.0,1.8.0,1.9.0}")
+    private String terraformDefaultVersions;
     @Resource
     private TerraformInstaller installer;
     @Resource
     private DeployerToolUtils deployerToolUtils;
+    @Resource
+    private DeployerToolVersionsCache deployerToolVersionsCache;
 
     @Test
     void testGetExecutableTerraformByVersion() {
+
+        Set<String> defaultVersions = Set.of(terraformDefaultVersions.split(","));
+        Set<String> cachedVersions = deployerToolVersionsCache.getVersionsCacheOfDeployerTool(DeployerKind.TERRAFORM);
+        assertTrue(cachedVersions.containsAll(defaultVersions));
+        assertTrue(cachedVersions.size() >= defaultVersions.size());
 
         String requiredVersion = "";
         String terraformPath = installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion);

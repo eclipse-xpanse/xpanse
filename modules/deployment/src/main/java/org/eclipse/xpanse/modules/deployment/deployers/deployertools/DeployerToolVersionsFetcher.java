@@ -45,14 +45,14 @@ public class DeployerToolVersionsFetcher {
     private String terraformGithubApiEndpoint;
     @Value("${deployer.terraform.github.repository:hashicorp/terraform}")
     private String terraformGithubRepository;
-    @Value("${deployer.terraform.versions}")
+    @Value("${deployer.terraform.default.supported.versions}")
     private String terraformDefaultVersionsStr;
 
     @Value("${deployer.opentofu.github.api.endpoint:https//api.github.com}")
     private String openTofuGithubApiEndpoint;
     @Value("${deployer.opentofu.github.repository:opentofu/opentofu}")
     private String openTofuGithubRepository;
-    @Value("${deployer.opentofu.versions}")
+    @Value("${deployer.opentofu.default.supported.versions}")
     private String openTofuDefaultVersionsStr;
 
 
