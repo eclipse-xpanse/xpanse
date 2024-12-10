@@ -188,6 +188,10 @@ public class ServiceTemplateManage {
         String oldServiceHostingType = existingTemplate.getServiceHostingType().toValue();
         String newServiceHostingType = ocl.getServiceHostingType().toValue();
         compare(oldServiceHostingType, newServiceHostingType, "service hosting type");
+
+        String oldNamespace = existingTemplate.getNamespace();
+        String newNamespace = ocl.getNamespace();
+        compare(oldNamespace, newNamespace, "namespace");
     }
 
     private void compare(String oldParams, String newParams, String type) {
