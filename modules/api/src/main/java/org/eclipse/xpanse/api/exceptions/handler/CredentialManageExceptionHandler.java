@@ -23,56 +23,48 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Exception handler related to Credentials center for the REST API.
- */
+/** Exception handler related to Credentials center for the REST API. */
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class CredentialManageExceptionHandler {
 
-    /**
-     * Exception handler for CredentialCapabilityNotFound.
-     */
+    /** Exception handler for CredentialCapabilityNotFound. */
     @ExceptionHandler({CredentialCapabilityNotFound.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleCredentialCapabilityNotFound(CredentialCapabilityNotFound ex) {
-        return getErrorResponse(ErrorType.CREDENTIAL_CAPABILITY_NOT_FOUND,
+        return getErrorResponse(
+                ErrorType.CREDENTIAL_CAPABILITY_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for CredentialsNotFoundException.
-     */
+    /** Exception handler for CredentialsNotFoundException. */
     @ExceptionHandler({CredentialsNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleCredentialsNotFoundException(CredentialsNotFoundException ex) {
-        return getErrorResponse(ErrorType.CREDENTIALS_NOT_FOUND,
-                Collections.singletonList(ex.getMessage()));
+        return getErrorResponse(
+                ErrorType.CREDENTIALS_NOT_FOUND, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for CredentialVariablesNotComplete.
-     */
+    /** Exception handler for CredentialVariablesNotComplete. */
     @ExceptionHandler({CredentialVariablesNotComplete.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleCredentialVariablesNotComplete(CredentialVariablesNotComplete ex) {
-        return getErrorResponse(ErrorType.CREDENTIALS_VARIABLES_NOT_COMPLETE,
+        return getErrorResponse(
+                ErrorType.CREDENTIALS_VARIABLES_NOT_COMPLETE,
                 ex.getErrorReasons().stream().toList());
     }
 
-    /**
-     * Exception handler for NoCredentialDefinitionAvailable.
-     */
+    /** Exception handler for NoCredentialDefinitionAvailable. */
     @ExceptionHandler({NoCredentialDefinitionAvailable.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleNoCredentialDefinitionAvailable(
-            NoCredentialDefinitionAvailable ex) {
-        return getErrorResponse(ErrorType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
+    public ErrorResponse handleNoCredentialDefinitionAvailable(NoCredentialDefinitionAvailable ex) {
+        return getErrorResponse(
+                ErrorType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
                 Collections.singletonList(ex.getMessage()));
     }
 }

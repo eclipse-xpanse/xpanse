@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,48 +20,41 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * TerraformAsyncDeployFromDirectoryRequest
- */
+/** TerraformAsyncDeployFromDirectoryRequest */
 @JsonPropertyOrder({
-        TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_REQUEST_ID,
-        TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_TERRAFORM_VERSION,
-        TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
-        TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-        TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
-        TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
+    TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_REQUEST_ID,
+    TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_TERRAFORM_VERSION,
+    TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+    TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
+    TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
+    TerraformAsyncDeployFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformAsyncDeployFromDirectoryRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_TERRAFORM_VERSION = "terraformVersion";
-    @jakarta.annotation.Nonnull
-    private String terraformVersion;
+    @jakarta.annotation.Nonnull private String terraformVersion;
 
     public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
-    @jakarta.annotation.Nonnull
-    private Boolean isPlanOnly;
+    @jakarta.annotation.Nonnull private Boolean isPlanOnly;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
-    @jakarta.annotation.Nonnull
-    private WebhookConfig webhookConfig;
+    @jakarta.annotation.Nonnull private WebhookConfig webhookConfig;
 
-    public TerraformAsyncDeployFromDirectoryRequest() {
-    }
+    public TerraformAsyncDeployFromDirectoryRequest() {}
 
-    public TerraformAsyncDeployFromDirectoryRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
+    public TerraformAsyncDeployFromDirectoryRequest requestId(
+            @jakarta.annotation.Nullable UUID requestId) {
 
         this.requestId = requestId;
         return this;
@@ -76,11 +68,9 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -103,11 +93,9 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTerraformVersion() {
         return terraformVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -115,25 +103,25 @@ public class TerraformAsyncDeployFromDirectoryRequest {
         this.terraformVersion = terraformVersion;
     }
 
-    public TerraformAsyncDeployFromDirectoryRequest isPlanOnly(@jakarta.annotation.Nonnull Boolean isPlanOnly) {
+    public TerraformAsyncDeployFromDirectoryRequest isPlanOnly(
+            @jakarta.annotation.Nonnull Boolean isPlanOnly) {
 
         this.isPlanOnly = isPlanOnly;
         return this;
     }
 
     /**
-     * Flag to control if the deployment must only generate the terraform or it must also apply the changes.
+     * Flag to control if the deployment must only generate the terraform or it must also apply the
+     * changes.
      *
      * @return isPlanOnly
      */
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Boolean getIsPlanOnly() {
         return isPlanOnly;
     }
-
 
     @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -148,7 +136,8 @@ public class TerraformAsyncDeployFromDirectoryRequest {
         return this;
     }
 
-    public TerraformAsyncDeployFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
+    public TerraformAsyncDeployFromDirectoryRequest putVariablesItem(
+            String key, Object variablesItem) {
         this.variables.put(key, variablesItem);
         return this;
     }
@@ -161,11 +150,9 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -180,7 +167,8 @@ public class TerraformAsyncDeployFromDirectoryRequest {
         return this;
     }
 
-    public TerraformAsyncDeployFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public TerraformAsyncDeployFromDirectoryRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -189,18 +177,17 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to terraform process.
+     * Key-value pairs of variables that must be injected as environment variables to terraform
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -223,11 +210,9 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public WebhookConfig getWebhookConfig() {
         return webhookConfig;
     }
-
 
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -245,17 +230,24 @@ public class TerraformAsyncDeployFromDirectoryRequest {
         }
         TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest =
                 (TerraformAsyncDeployFromDirectoryRequest) o;
-        return Objects.equals(this.requestId, terraformAsyncDeployFromDirectoryRequest.requestId) &&
-                Objects.equals(this.terraformVersion, terraformAsyncDeployFromDirectoryRequest.terraformVersion) &&
-                Objects.equals(this.isPlanOnly, terraformAsyncDeployFromDirectoryRequest.isPlanOnly) &&
-                Objects.equals(this.variables, terraformAsyncDeployFromDirectoryRequest.variables) &&
-                Objects.equals(this.envVariables, terraformAsyncDeployFromDirectoryRequest.envVariables) &&
-                Objects.equals(this.webhookConfig, terraformAsyncDeployFromDirectoryRequest.webhookConfig);
+        return Objects.equals(this.requestId, terraformAsyncDeployFromDirectoryRequest.requestId)
+                && Objects.equals(
+                        this.terraformVersion,
+                        terraformAsyncDeployFromDirectoryRequest.terraformVersion)
+                && Objects.equals(
+                        this.isPlanOnly, terraformAsyncDeployFromDirectoryRequest.isPlanOnly)
+                && Objects.equals(
+                        this.variables, terraformAsyncDeployFromDirectoryRequest.variables)
+                && Objects.equals(
+                        this.envVariables, terraformAsyncDeployFromDirectoryRequest.envVariables)
+                && Objects.equals(
+                        this.webhookConfig, terraformAsyncDeployFromDirectoryRequest.webhookConfig);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, terraformVersion, isPlanOnly, variables, envVariables, webhookConfig);
+        return Objects.hash(
+                requestId, terraformVersion, isPlanOnly, variables, envVariables, webhookConfig);
     }
 
     @Override
@@ -273,8 +265,8 @@ public class TerraformAsyncDeployFromDirectoryRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -282,6 +274,4 @@ public class TerraformAsyncDeployFromDirectoryRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

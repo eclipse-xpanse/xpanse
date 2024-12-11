@@ -8,9 +8,7 @@ package org.eclipse.xpanse.modules.models.servicetemplate.exceptions;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Exception thrown when a deployment service version is invalid.
- */
+/** Exception thrown when a deployment service version is invalid. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class InvalidServiceVersionException extends RuntimeException {

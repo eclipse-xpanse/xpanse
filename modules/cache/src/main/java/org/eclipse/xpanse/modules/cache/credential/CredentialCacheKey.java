@@ -11,17 +11,12 @@ import java.util.Objects;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
-/**
- * Defines credential cache key.
- */
-public record CredentialCacheKey(Csp csp,
-                                 String site,
-                                 CredentialType credentialType,
-                                 String credentialName,
-                                 String userId) implements Serializable {
+/** Defines credential cache key. */
+public record CredentialCacheKey(
+        Csp csp, String site, CredentialType credentialType, String credentialName, String userId)
+        implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 9144354512858062247L;
+    @Serial private static final long serialVersionUID = 9144354512858062247L;
 
     @Override
     public boolean equals(Object obj) {

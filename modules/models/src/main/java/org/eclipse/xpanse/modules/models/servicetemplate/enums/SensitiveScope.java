@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Deploy variable sensitive scope.
- */
+/** Deploy variable sensitive scope. */
 public enum SensitiveScope {
     // Not sensitive.
     NONE("none"),
@@ -27,9 +25,7 @@ public enum SensitiveScope {
         this.scope = scope;
     }
 
-    /**
-     * For SensitiveScope serialize.
-     */
+    /** For SensitiveScope serialize. */
     @JsonCreator
     public SensitiveScope getByValue(String scope) {
         for (SensitiveScope sensitiveScope : values()) {
@@ -41,9 +37,7 @@ public enum SensitiveScope {
                 String.format("SensitiveScope value %s is not supported.", scope));
     }
 
-    /**
-     * For SensitiveScope deserialize.
-     */
+    /** For SensitiveScope deserialize. */
     @JsonValue
     public String toValue() {
         return this.scope;

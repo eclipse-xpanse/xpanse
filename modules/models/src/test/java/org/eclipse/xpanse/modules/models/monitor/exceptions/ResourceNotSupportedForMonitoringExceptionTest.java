@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of ResourceNotSupportedForMonitoringException.
- */
+/** Test of ResourceNotSupportedForMonitoringException. */
 class ResourceNotSupportedForMonitoringExceptionTest {
 
     private static final String message = "Resource not support";
@@ -28,5 +26,4 @@ class ResourceNotSupportedForMonitoringExceptionTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

@@ -15,17 +15,21 @@ class ServiceTemplateRegistrationStateTest {
 
     @Test
     void testGetByValue() {
-        assertEquals(ServiceTemplateRegistrationState.IN_REVIEW,
+        assertEquals(
+                ServiceTemplateRegistrationState.IN_REVIEW,
                 ServiceTemplateRegistrationState.getByValue("in-review"));
-        assertEquals(ServiceTemplateRegistrationState.APPROVED,
+        assertEquals(
+                ServiceTemplateRegistrationState.APPROVED,
                 ServiceTemplateRegistrationState.getByValue("approved"));
-        assertEquals(ServiceTemplateRegistrationState.REJECTED,
+        assertEquals(
+                ServiceTemplateRegistrationState.REJECTED,
                 ServiceTemplateRegistrationState.getByValue("rejected"));
-        assertThrows(UnsupportedEnumValueException.class,
+        assertThrows(
+                UnsupportedEnumValueException.class,
                 () -> ServiceTemplateRegistrationState.getByValue("error_value"));
-        assertThrows(UnsupportedEnumValueException.class,
+        assertThrows(
+                UnsupportedEnumValueException.class,
                 () -> ServiceTemplateRegistrationState.getByValue(null));
-
     }
 
     @Test

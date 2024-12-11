@@ -9,9 +9,7 @@ package org.eclipse.xpanse.modules.orchestrator.monitor;
 import java.util.List;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 
-/**
- * The interface for the monitor metrics exporter.
- */
+/** The interface for the monitor metrics exporter. */
 public interface ServiceMetricsExporter {
 
     /**
@@ -22,7 +20,6 @@ public interface ServiceMetricsExporter {
      */
     List<Metric> getMetricsForResource(ResourceMetricsRequest resourceMetricRequest);
 
-
     /**
      * Get metrics for service instance by the @serviceMetricRequest.
      *
@@ -30,5 +27,4 @@ public interface ServiceMetricsExporter {
      * @return Returns list of metric result.
      */
     List<Metric> getMetricsForService(ServiceMetricsRequest serviceMetricRequest);
-
 }

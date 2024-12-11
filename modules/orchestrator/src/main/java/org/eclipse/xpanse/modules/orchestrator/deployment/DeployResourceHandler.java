@@ -7,9 +7,8 @@
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
 /**
- * Handler for the processing the deployment result. The deployer output will
- * be parsed to extract the resources provisioned as part of the deployment
- * process.
+ * Handler for the processing the deployment result. The deployer output will be parsed to extract
+ * the resources provisioned as part of the deployment process.
  */
 public interface DeployResourceHandler {
 
@@ -19,5 +18,4 @@ public interface DeployResourceHandler {
      * @param deployResult the result of the deployment.
      */
     void handler(DeployResult deployResult);
-
 }

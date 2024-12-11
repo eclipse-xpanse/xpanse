@@ -25,9 +25,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperti
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.springframework.stereotype.Component;
 
-/**
- * Terraform resource handler for Openstack.
- */
+/** Terraform resource handler for Openstack. */
 @Component
 @Slf4j
 public class OpenstackTerraformResourceHandler implements DeployResourceHandler {
@@ -61,7 +59,8 @@ public class OpenstackTerraformResourceHandler implements DeployResourceHandler 
                     OpenstackTerraformResourceProperties.getTerraformResourceTypes();
             for (TfStateResource tfStateResource : tfState.getResources()) {
                 if (!supportTypes.contains(tfStateResource.getType())) {
-                    log.info("The resource type {} is unsupported to parse.",
+                    log.info(
+                            "The resource type {} is unsupported to parse.",
                             tfStateResource.getType());
                     continue;
                 }
@@ -73,7 +72,9 @@ public class OpenstackTerraformResourceHandler implements DeployResourceHandler 
                     deployResource.setGroupType(tfStateResource.getType());
                     deployResource.setGroupName(tfStateResource.getName());
                     deployResource.setResourceKind(deployResourceProperties.getResourceKind());
-                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                    TfResourceTransUtils.fillDeployResource(
+                            instance,
+                            deployResource,
                             deployResourceProperties.getResourceProperties());
                     deployResourceList.add(deployResource);
                 }

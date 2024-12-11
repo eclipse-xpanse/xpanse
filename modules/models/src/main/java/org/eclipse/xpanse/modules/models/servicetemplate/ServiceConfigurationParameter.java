@@ -16,14 +16,11 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDat
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 
-/**
- * Defines for the service config parameter.
- */
+/** Defines for the service config parameter. */
 @Data
 public class ServiceConfigurationParameter implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 4180720936204332216L;
+    @Serial private static final long serialVersionUID = 4180720936204332216L;
 
     @NotNull
     @NotBlank
@@ -46,17 +43,21 @@ public class ServiceConfigurationParameter implements Serializable {
     @Schema(description = "The description of the service config parameter")
     private String description;
 
-    @Schema(description = "The value of the service config parameter. "
-            + "Value can be provided for initial value")
+    @Schema(
+            description =
+                    "The value of the service config parameter. "
+                            + "Value can be provided for initial value")
     private String value;
 
     @NotNull
     @Schema(description = "The init value of the service config parameter")
     private String initialValue;
 
-    @Schema(description = "valueSchema of the service config parameter. "
-            + "The key be any keyword that is part of the JSON schema definition which can be "
-            + "found here https://json-schema.org/draft/2020-12/schema")
+    @Schema(
+            description =
+                    "valueSchema of the service config parameter. The key be any keyword that is"
+                            + " part of the JSON schema definition which can be found here"
+                            + " https://json-schema.org/draft/2020-12/schema")
     private Map<String, Object> valueSchema;
 
     @Schema(description = "Sensitive scope of service config parameter storage")
@@ -77,5 +78,4 @@ public class ServiceConfigurationParameter implements Serializable {
     @NotBlank
     @Schema(description = "Service component which manages this configuration parameter.")
     private String managedBy;
-
 }

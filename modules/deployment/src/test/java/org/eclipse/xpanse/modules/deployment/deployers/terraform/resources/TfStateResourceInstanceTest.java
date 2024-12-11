@@ -12,9 +12,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of TfStateResourceInstance.
- */
+/** Test of TfStateResourceInstance. */
 class TfStateResourceInstanceTest {
 
     public static Map<String, Object> attributes;
@@ -58,5 +56,4 @@ class TfStateResourceInstanceTest {
         assertEquals(tfStateResourceInstance.hashCode(), tfStateResourceInstance1.hashCode());
         assertNotEquals(tfStateResourceInstance1.hashCode(), tfStateResourceInstance2.hashCode());
     }
-
 }

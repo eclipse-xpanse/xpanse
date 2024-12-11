@@ -32,43 +32,51 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
-/**
- * Beans for fetching all available versions of the deployer tool.
- */
+/** Beans for fetching all available versions of the deployer tool. */
 @Slf4j
 @Component
 public class DeployerToolVersionsFetcher {
 
     private static final Pattern OFFICIAL_VERSION_PATTERN =
             Pattern.compile("^v(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})$");
+
     @Value("${deployer.terraform.github.api.endpoint:https//api.github.com}")
     private String terraformGithubApiEndpoint;
+
     @Value("${deployer.terraform.github.repository:hashicorp/terraform}")
     private String terraformGithubRepository;
+
     @Value("${deployer.terraform.default.supported.versions}")
     private String terraformDefaultVersionsStr;
 
     @Value("${deployer.opentofu.github.api.endpoint:https//api.github.com}")
     private String openTofuGithubApiEndpoint;
+
     @Value("${deployer.opentofu.github.repository:opentofu/opentofu}")
     private String openTofuGithubRepository;
+
     @Value("${deployer.opentofu.default.supported.versions}")
     private String openTofuDefaultVersionsStr;
-
 
     /**
      * Fetch all available versions from the website of deployer.
      *
      * @return all available versions.
      */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public Set<String> fetchOfficialVersionsOfDeployerTool(DeployerKind deployerKind) {
-        int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-        log.info("Start to fetch available versions from website for deployer tool {}."
-                + " Retry count: {}", deployerKind.toValue(), retryCount);
+        int retryCount =
+                Objects.isNull(RetrySynchronizationManager.getContext())
+                        ? 0
+                        : RetrySynchronizationManager.getContext().getRetryCount();
+        log.info(
+                "Start to fetch available versions from website for deployer tool {}."
+                        + " Retry count: {}",
+                deployerKind.toValue(),
+                retryCount);
         Set<String> allVersions = new HashSet<>();
         try {
             String apiEndpoint = getGithubApiEndpoint(deployerKind);
@@ -77,30 +85,40 @@ public class DeployerToolVersionsFetcher {
                         String.format("Endpoint %s is not reachable.", apiEndpoint));
             }
             String githubRepository = getGithubRepository(deployerKind);
-            GitHub gitHub = new GitHubBuilder()
-                    .withEndpoint(apiEndpoint)
-                    .withRateLimitHandler(getGithubRateLimitHandler())
-                    .build();
+            GitHub gitHub =
+                    new GitHubBuilder()
+                            .withEndpoint(apiEndpoint)
+                            .withRateLimitHandler(getGithubRateLimitHandler())
+                            .build();
             GHRepository repository = gitHub.getRepository(githubRepository);
             PagedIterable<GHTag> tags = repository.listTags();
-            tags.forEach(tag -> {
-                String version = tag.getName();
-                if (OFFICIAL_VERSION_PATTERN.matcher(version).matches()) {
-                    // remove the prefix 'v'
-                    allVersions.add(version.substring(1));
-                }
-            });
+            tags.forEach(
+                    tag -> {
+                        String version = tag.getName();
+                        if (OFFICIAL_VERSION_PATTERN.matcher(version).matches()) {
+                            // remove the prefix 'v'
+                            allVersions.add(version.substring(1));
+                        }
+                    });
         } catch (Exception e) {
-            String errorMsg = String.format("Failed to fetch available versions from website for "
-                    + "deployer tool %s.", deployerKind.toValue());
+            String errorMsg =
+                    String.format(
+                            "Failed to fetch available versions from website for "
+                                    + "deployer tool %s.",
+                            deployerKind.toValue());
             log.error(errorMsg + " Retry count: " + retryCount, e);
             throw new ClientApiCallFailedException(errorMsg);
         }
-        log.info("Get available versions {} from website for deployer tool {}."
-                + " Retry count: {}", allVersions, deployerKind.toValue(), retryCount);
+        log.info(
+                "Get available versions {} from website for deployer tool {}." + " Retry count: {}",
+                allVersions,
+                deployerKind.toValue(),
+                retryCount);
         if (allVersions.isEmpty()) {
-            String errorMsg = String.format("No available versions found from website for "
-                    + "deployer tool %s", deployerKind.toValue());
+            String errorMsg =
+                    String.format(
+                            "No available versions found from website for " + "deployer tool %s",
+                            deployerKind.toValue());
             throw new ClientApiCallFailedException(errorMsg);
         }
         return allVersions;
@@ -115,11 +133,13 @@ public class DeployerToolVersionsFetcher {
         String defaultVersionsString = getDefaultVersionsString(deployerKind);
         Set<String> defaultVersions =
                 Set.of(defaultVersionsString.replaceAll("//s+", "").split(","));
-        log.info("Get versions {} from default config value {} for deployer tool {}",
-                defaultVersions, defaultVersionsString, deployerKind.toValue());
+        log.info(
+                "Get versions {} from default config value {} for deployer tool {}",
+                defaultVersions,
+                defaultVersionsString,
+                deployerKind.toValue());
         return defaultVersions;
     }
-
 
     private String getGithubApiEndpoint(DeployerKind deployerKind) {
         return switch (deployerKind) {
@@ -140,7 +160,6 @@ public class DeployerToolVersionsFetcher {
             throw new IOException("Failed to connect to the endpoint: " + endpoint);
         }
     }
-
 
     private String getGithubRepository(DeployerKind deployerKind) {
         return switch (deployerKind) {
@@ -163,8 +182,11 @@ public class DeployerToolVersionsFetcher {
                 String limit = response.header("X-RateLimit-Limit");
                 String remaining = response.header("X-RateLimit-Remaining");
                 String reset = response.header("X-RateLimit-Reset");
-                String errorMsg = String.format("GitHub API rate limit exceeded. "
-                        + "Rate limit: %s, remaining: %s, reset time: %s", limit, remaining, reset);
+                String errorMsg =
+                        String.format(
+                                "GitHub API rate limit exceeded. "
+                                        + "Rate limit: %s, remaining: %s, reset time: %s",
+                                limit, remaining, reset);
                 throw new ClientApiCallFailedException(errorMsg);
             }
         };

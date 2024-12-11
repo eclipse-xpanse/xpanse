@@ -22,9 +22,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-/**
- * Component which acts as the gateway to monitor metric stored in cache.
- */
+/** Component which acts as the gateway to monitor metric stored in cache. */
 @Slf4j
 @Component
 public class MonitorMetricsStore {
@@ -36,15 +34,15 @@ public class MonitorMetricsStore {
     /**
      * Constructor for MonitorMetricsStore.
      *
-     * @param redisCacheEnabled           Enable redis  cache.
+     * @param redisCacheEnabled Enable redis cache.
      * @param monitorMetricsCacheDuration monitorMetricsCacheDuration.
-     * @param redisTemplate               redisTemplate.
+     * @param redisTemplate redisTemplate.
      */
     @Autowired
     public MonitorMetricsStore(
             @Value("${enable.redis.distributed.cache:false}") Boolean redisCacheEnabled,
             @Value("${service.monitor.metrics.cache.expire.time.in.minutes:60}")
-            long monitorMetricsCacheDuration,
+                    long monitorMetricsCacheDuration,
             @Nullable RedisTemplate<String, Object> redisTemplate) {
         this.redisCacheEnabled = redisCacheEnabled;
         this.monitorMetricsCacheDuration = monitorMetricsCacheDuration;
@@ -61,7 +59,6 @@ public class MonitorMetricsStore {
         log.info("Store monitor metric cache entry with key:{}", key);
         return metric;
     }
-
 
     /**
      * Methods to get monitor metric from store.
@@ -83,7 +80,6 @@ public class MonitorMetricsStore {
         log.info("Delete monitor metric cache entry with key:{}", key);
     }
 
-
     /**
      * Method to update the time-to-live of the metrics in the redis cache.
      *
@@ -94,17 +90,24 @@ public class MonitorMetricsStore {
             return;
         }
         String redisKey = MONITOR_METRICS_CACHE_NAME + "::" + cacheKey;
-        long timeToLive = monitorMetricsCacheDuration > 0 ? monitorMetricsCacheDuration
-                : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+        long timeToLive =
+                monitorMetricsCacheDuration > 0
+                        ? monitorMetricsCacheDuration
+                        : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         try {
             Boolean flag = redisTemplate.expire(redisKey, timeToLive, TimeUnit.MINUTES);
             if (Boolean.TRUE.equals(flag)) {
-                log.info("Updated expiration of the redis key:{} with the time:{} in minutes "
-                        + "successfully.", redisKey, timeToLive);
+                log.info(
+                        "Updated expiration of the redis key:{} with the time:{} in minutes "
+                                + "successfully.",
+                        redisKey,
+                        timeToLive);
             }
         } catch (Exception e) {
-            log.error("Updated expiration of the redis key:{} with the time:{} in minutes failed.",
-                    redisKey, timeToLive);
+            log.error(
+                    "Updated expiration of the redis key:{} with the time:{} in minutes failed.",
+                    redisKey,
+                    timeToLive);
         }
     }
 }

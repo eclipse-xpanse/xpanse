@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,31 +17,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Objects;
 
-/**
- * GIT Repo details from where the scripts can be fetched.
- */
+/** GIT Repo details from where the scripts can be fetched. */
 @JsonPropertyOrder({
-        OpenTofuScriptGitRepoDetails.JSON_PROPERTY_REPO_URL,
-        OpenTofuScriptGitRepoDetails.JSON_PROPERTY_BRANCH,
-        OpenTofuScriptGitRepoDetails.JSON_PROPERTY_SCRIPT_PATH
+    OpenTofuScriptGitRepoDetails.JSON_PROPERTY_REPO_URL,
+    OpenTofuScriptGitRepoDetails.JSON_PROPERTY_BRANCH,
+    OpenTofuScriptGitRepoDetails.JSON_PROPERTY_SCRIPT_PATH
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuScriptGitRepoDetails {
     public static final String JSON_PROPERTY_REPO_URL = "repoUrl";
-    @jakarta.annotation.Nonnull
-    private String repoUrl;
+    @jakarta.annotation.Nonnull private String repoUrl;
 
     public static final String JSON_PROPERTY_BRANCH = "branch";
-    @jakarta.annotation.Nonnull
-    private String branch;
+    @jakarta.annotation.Nonnull private String branch;
 
     public static final String JSON_PROPERTY_SCRIPT_PATH = "scriptPath";
-    @jakarta.annotation.Nullable
-    private String scriptPath;
+    @jakarta.annotation.Nullable private String scriptPath;
 
-    public OpenTofuScriptGitRepoDetails() {
-    }
+    public OpenTofuScriptGitRepoDetails() {}
 
     public OpenTofuScriptGitRepoDetails repoUrl(@jakarta.annotation.Nonnull String repoUrl) {
 
@@ -58,11 +52,9 @@ public class OpenTofuScriptGitRepoDetails {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_REPO_URL)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getRepoUrl() {
         return repoUrl;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REPO_URL)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -84,11 +76,9 @@ public class OpenTofuScriptGitRepoDetails {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_BRANCH)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getBranch() {
         return branch;
     }
-
 
     @JsonProperty(JSON_PROPERTY_BRANCH)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -103,18 +93,17 @@ public class OpenTofuScriptGitRepoDetails {
     }
 
     /**
-     * Location of the scripts. If not provided, the scripts will be executed from root folder of the repo.
+     * Location of the scripts. If not provided, the scripts will be executed from root folder of
+     * the repo.
      *
      * @return scriptPath
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_SCRIPT_PATH)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getScriptPath() {
         return scriptPath;
     }
-
 
     @JsonProperty(JSON_PROPERTY_SCRIPT_PATH)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -130,10 +119,11 @@ public class OpenTofuScriptGitRepoDetails {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        OpenTofuScriptGitRepoDetails openTofuScriptGitRepoDetails = (OpenTofuScriptGitRepoDetails) o;
-        return Objects.equals(this.repoUrl, openTofuScriptGitRepoDetails.repoUrl) &&
-                Objects.equals(this.branch, openTofuScriptGitRepoDetails.branch) &&
-                Objects.equals(this.scriptPath, openTofuScriptGitRepoDetails.scriptPath);
+        OpenTofuScriptGitRepoDetails openTofuScriptGitRepoDetails =
+                (OpenTofuScriptGitRepoDetails) o;
+        return Objects.equals(this.repoUrl, openTofuScriptGitRepoDetails.repoUrl)
+                && Objects.equals(this.branch, openTofuScriptGitRepoDetails.branch)
+                && Objects.equals(this.scriptPath, openTofuScriptGitRepoDetails.scriptPath);
     }
 
     @Override
@@ -153,8 +143,8 @@ public class OpenTofuScriptGitRepoDetails {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -162,6 +152,4 @@ public class OpenTofuScriptGitRepoDetails {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

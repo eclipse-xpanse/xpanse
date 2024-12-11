@@ -15,23 +15,24 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.hibernate.validator.constraints.UniqueElements;
 
-/**
- * Defines the billing model of the managed service.
- */
+/** Defines the billing model of the managed service. */
 @Data
 public class Billing implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 240913796673011260L;
+    @Serial private static final long serialVersionUID = 240913796673011260L;
 
     @NotNull
     @NotEmpty
     @UniqueElements
-    @Schema(description = "Supported billing modes by the managed service. "
-            + "The list elements must be unique.")
+    @Schema(
+            description =
+                    "Supported billing modes by the managed service. "
+                            + "The list elements must be unique.")
     private List<BillingMode> billingModes;
 
-    @Schema(description = " This is used only for display purposes. When provided, this "
-            + "billingMode will be selected in the frontends by default.")
+    @Schema(
+            description =
+                    " This is used only for display purposes. When provided, this "
+                            + "billingMode will be selected in the frontends by default.")
     private BillingMode defaultBillingMode;
 }

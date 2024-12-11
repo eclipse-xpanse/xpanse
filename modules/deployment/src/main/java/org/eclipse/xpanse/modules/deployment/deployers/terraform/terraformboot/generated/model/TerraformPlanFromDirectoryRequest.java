@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,36 +20,33 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * TerraformPlanFromDirectoryRequest
- */
-@JsonPropertyOrder({TerraformPlanFromDirectoryRequest.JSON_PROPERTY_REQUEST_ID,
-        TerraformPlanFromDirectoryRequest.JSON_PROPERTY_TERRAFORM_VERSION,
-        TerraformPlanFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-        TerraformPlanFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES})
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+/** TerraformPlanFromDirectoryRequest */
+@JsonPropertyOrder({
+    TerraformPlanFromDirectoryRequest.JSON_PROPERTY_REQUEST_ID,
+    TerraformPlanFromDirectoryRequest.JSON_PROPERTY_TERRAFORM_VERSION,
+    TerraformPlanFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
+    TerraformPlanFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
+})
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformPlanFromDirectoryRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_TERRAFORM_VERSION = "terraformVersion";
-    @jakarta.annotation.Nonnull
-    private String terraformVersion;
+    @jakarta.annotation.Nonnull private String terraformVersion;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
-    public TerraformPlanFromDirectoryRequest() {
-    }
+    public TerraformPlanFromDirectoryRequest() {}
 
-    public TerraformPlanFromDirectoryRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
+    public TerraformPlanFromDirectoryRequest requestId(
+            @jakarta.annotation.Nullable UUID requestId) {
 
         this.requestId = requestId;
         return this;
@@ -64,11 +60,9 @@ public class TerraformPlanFromDirectoryRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -76,7 +70,8 @@ public class TerraformPlanFromDirectoryRequest {
         this.requestId = requestId;
     }
 
-    public TerraformPlanFromDirectoryRequest terraformVersion(@jakarta.annotation.Nonnull String terraformVersion) {
+    public TerraformPlanFromDirectoryRequest terraformVersion(
+            @jakarta.annotation.Nonnull String terraformVersion) {
 
         this.terraformVersion = terraformVersion;
         return this;
@@ -90,11 +85,9 @@ public class TerraformPlanFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTerraformVersion() {
         return terraformVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -102,7 +95,8 @@ public class TerraformPlanFromDirectoryRequest {
         this.terraformVersion = terraformVersion;
     }
 
-    public TerraformPlanFromDirectoryRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public TerraformPlanFromDirectoryRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
@@ -121,11 +115,9 @@ public class TerraformPlanFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -140,7 +132,8 @@ public class TerraformPlanFromDirectoryRequest {
         return this;
     }
 
-    public TerraformPlanFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public TerraformPlanFromDirectoryRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -149,18 +142,17 @@ public class TerraformPlanFromDirectoryRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to terraform process.
+     * Key-value pairs of variables that must be injected as environment variables to terraform
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -176,11 +168,14 @@ public class TerraformPlanFromDirectoryRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        TerraformPlanFromDirectoryRequest terraformPlanFromDirectoryRequest = (TerraformPlanFromDirectoryRequest) o;
-        return Objects.equals(this.requestId, terraformPlanFromDirectoryRequest.requestId) &&
-                Objects.equals(this.terraformVersion, terraformPlanFromDirectoryRequest.terraformVersion) &&
-                Objects.equals(this.variables, terraformPlanFromDirectoryRequest.variables) &&
-                Objects.equals(this.envVariables, terraformPlanFromDirectoryRequest.envVariables);
+        TerraformPlanFromDirectoryRequest terraformPlanFromDirectoryRequest =
+                (TerraformPlanFromDirectoryRequest) o;
+        return Objects.equals(this.requestId, terraformPlanFromDirectoryRequest.requestId)
+                && Objects.equals(
+                        this.terraformVersion, terraformPlanFromDirectoryRequest.terraformVersion)
+                && Objects.equals(this.variables, terraformPlanFromDirectoryRequest.variables)
+                && Objects.equals(
+                        this.envVariables, terraformPlanFromDirectoryRequest.envVariables);
     }
 
     @Override
@@ -201,8 +196,8 @@ public class TerraformPlanFromDirectoryRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -210,6 +205,4 @@ public class TerraformPlanFromDirectoryRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

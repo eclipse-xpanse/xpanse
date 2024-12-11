@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.modules.security.common;
 
-/**
- * Role Constants.
- */
+/** Role Constants. */
 public class RoleConstants {
 
     public static final String ROLE_ADMIN = "admin";

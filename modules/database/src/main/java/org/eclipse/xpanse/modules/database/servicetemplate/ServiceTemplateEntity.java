@@ -35,13 +35,13 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRe
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.hibernate.annotations.Type;
 
-/**
- * Represents the SERVICE_TEMPLATE table in the database.
- */
-@Table(name = "SERVICE_TEMPLATE", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "NAME", "VERSION", "CSP", "CATEGORY", "SERVICE_HOSTING_TYPE"})
-})
+/** Represents the SERVICE_TEMPLATE table in the database. */
+@Table(
+        name = "SERVICE_TEMPLATE",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    columnNames = {"NAME", "VERSION", "CSP", "CATEGORY", "SERVICE_HOSTING_TYPE"})
+        })
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -104,5 +104,4 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @OneToMany(mappedBy = "serviceTemplate", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
     private List<ServiceTemplateRequestHistoryEntity> serviceTemplateHistory;
-
 }

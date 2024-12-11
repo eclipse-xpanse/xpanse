@@ -12,9 +12,7 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 
-/**
- * The model to query metrics.
- */
+/** The model to query metrics. */
 @Data
 @AllArgsConstructor
 @SuppressWarnings("UnnecessarilyFullyQualified")
@@ -35,5 +33,4 @@ public class MetricsRequest {
     private boolean onlyLastKnownMetric;
 
     private String userId;
-
 }

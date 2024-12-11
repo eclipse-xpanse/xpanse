@@ -14,9 +14,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to get terraform plan using terraform-boot.
- */
+/** Bean to get terraform plan using terraform-boot. */
 @Component
 @Profile("terraform-boot")
 public class TerraformBootDeploymentPlanManage {
@@ -25,27 +23,22 @@ public class TerraformBootDeploymentPlanManage {
     private final TerraformFromGitRepoApi terraformFromGitRepoApi;
     private final TerraformBootHelper terraformBootHelper;
 
-    /**
-     * constructor for TerraformBootDeploymentPlanManage.
-     */
-    public TerraformBootDeploymentPlanManage(TerraformFromScriptsApi terraformFromScriptsApi,
-                                             TerraformFromGitRepoApi terraformFromGitRepoApi,
-                                             TerraformBootHelper terraformBootHelper) {
+    /** constructor for TerraformBootDeploymentPlanManage. */
+    public TerraformBootDeploymentPlanManage(
+            TerraformFromScriptsApi terraformFromScriptsApi,
+            TerraformFromGitRepoApi terraformFromGitRepoApi,
+            TerraformBootHelper terraformBootHelper) {
         this.terraformFromScriptsApi = terraformFromScriptsApi;
         this.terraformFromGitRepoApi = terraformFromGitRepoApi;
         this.terraformBootHelper = terraformBootHelper;
     }
 
-    /**
-     * Method to get terraform plan from scripts provided in OCL.
-     */
+    /** Method to get terraform plan from scripts provided in OCL. */
     public TerraformPlan getTerraformPlanFromScripts(DeployTask deployTask) {
         return terraformFromScriptsApi.planWithScripts(getPlanWithScriptsRequest(deployTask));
     }
 
-    /**
-     * Method to get terraform plan from scripts provided in GIT repo.
-     */
+    /** Method to get terraform plan from scripts provided in GIT repo. */
     public TerraformPlan getTerraformPlanFromGitRepo(DeployTask deployTask) {
         return terraformFromGitRepoApi.planFromGitRepo(getPlanFromGitRepoRequest(deployTask));
     }

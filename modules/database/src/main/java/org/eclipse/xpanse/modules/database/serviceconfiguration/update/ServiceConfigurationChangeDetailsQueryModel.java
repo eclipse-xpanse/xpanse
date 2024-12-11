@@ -12,9 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 
-/**
- * The query model for ServiceConfigurationChangeDetailsEntity.
- */
+/** The query model for ServiceConfigurationChangeDetailsEntity. */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

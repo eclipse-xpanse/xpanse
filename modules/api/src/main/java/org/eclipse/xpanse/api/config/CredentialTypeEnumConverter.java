@@ -9,9 +9,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to CredentialType enum.
- */
+/** Bean for serializing string in request parameters to CredentialType enum. */
 @Component
 public class CredentialTypeEnumConverter implements Converter<String, CredentialType> {
 

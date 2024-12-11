@@ -11,9 +11,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Enumeration class for service running status.
- */
+/** Enumeration class for service running status. */
 public enum ServiceState {
     NOT_RUNNING("not running"),
     RUNNING("running"),
@@ -28,9 +26,7 @@ public enum ServiceState {
         this.value = value;
     }
 
-    /**
-     * For ServiceState deserialize.
-     */
+    /** For ServiceState deserialize. */
     @JsonCreator
     public static ServiceState getByValue(String value) {
         for (ServiceState entry : values()) {
@@ -42,12 +38,9 @@ public enum ServiceState {
                 String.format("ServiceState value %s is not supported.", value));
     }
 
-    /**
-     * For ServiceState serialize.
-     */
+    /** For ServiceState serialize. */
     @JsonValue
     public String toValue() {
         return this.value;
     }
-
 }

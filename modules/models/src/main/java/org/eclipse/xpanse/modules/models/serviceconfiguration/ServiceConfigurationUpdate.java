@@ -12,10 +12,7 @@ import jakarta.validation.constraints.Size;
 import java.util.Map;
 import lombok.Data;
 
-
-/**
- * ServiceConfigurationUpdate model.
- */
+/** ServiceConfigurationUpdate model. */
 @Data
 public class ServiceConfigurationUpdate {
 
@@ -23,5 +20,4 @@ public class ServiceConfigurationUpdate {
     @Size(min = 1)
     @Schema(description = "The service configuration to be modified")
     private Map<String, Object> configuration;
-
 }

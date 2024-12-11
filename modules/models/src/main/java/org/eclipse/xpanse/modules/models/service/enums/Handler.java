@@ -10,10 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-
-/**
- * The kind of the service order handler.
- */
+/** The kind of the service order handler. */
 public enum Handler {
     TERRAFORM_LOCAL("terraform-local"),
     TERRAFORM_BOOT("terraform-boot"),
@@ -30,9 +27,7 @@ public enum Handler {
         this.value = value;
     }
 
-    /**
-     * For Handler deserialize.
-     */
+    /** For Handler deserialize. */
     @JsonCreator
     public static Handler getByValue(String name) {
         for (Handler handler : values()) {
@@ -40,13 +35,11 @@ public enum Handler {
                 return handler;
             }
         }
-        throw new UnsupportedEnumValueException(String
-                .format("Handler value %s is not supported.", name));
+        throw new UnsupportedEnumValueException(
+                String.format("Handler value %s is not supported.", name));
     }
 
-    /**
-     * For Handler serialize.
-     */
+    /** For Handler serialize. */
     @JsonValue
     public String toValue() {
         return this.value;

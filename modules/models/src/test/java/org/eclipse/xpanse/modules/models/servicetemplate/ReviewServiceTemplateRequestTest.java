@@ -31,7 +31,6 @@ class ReviewServiceTemplateRequestTest {
         assertEquals(reviewResult, test.getReviewResult());
     }
 
-
     @Test
     void testEquals() {
         ReviewServiceTemplateRequest test1 = new ReviewServiceTemplateRequest();
@@ -55,14 +54,16 @@ class ReviewServiceTemplateRequestTest {
         ReviewServiceTemplateRequest test2 = new ReviewServiceTemplateRequest();
         BeanUtils.copyProperties(test, test2);
         assertEquals(test.hashCode(), test2.hashCode());
-
     }
 
     @Test
     void testToString() {
-        String result = "ReviewServiceTemplateRequest(reviewResult=" + reviewResult
-                + ", reviewComment=" + reviewComment
-                + ")";
+        String result =
+                "ReviewServiceTemplateRequest(reviewResult="
+                        + reviewResult
+                        + ", reviewComment="
+                        + reviewComment
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

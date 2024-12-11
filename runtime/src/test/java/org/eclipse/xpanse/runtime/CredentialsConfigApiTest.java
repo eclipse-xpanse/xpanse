@@ -16,8 +16,8 @@ import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.huaweicloud.HuaweiCloudOrchestratorPlugin;
@@ -41,20 +41,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 class CredentialsConfigApiTest extends ApisTestCommon {
 
-    @Resource
-    private HuaweiCloudOrchestratorPlugin huaweiCloudPlugin;
-    @Resource
-    private FlexibleEngineOrchestratorPlugin flexibleEnginePlugin;
-    @Resource
-    private OpenstackTestlabOrchestratorPlugin openstackPlugin;
-    @Resource
-    private PlusServerOrchestratorPlugin plusServerPlugin;
-    @Resource
-    private RegioCloudOrchestratorPlugin regioCloudPlugin;
-    @Resource
-    private CredentialCenter credentialsCenter;
-    @Resource
-    private PluginManager pluginManager;
+    @Resource private HuaweiCloudOrchestratorPlugin huaweiCloudPlugin;
+    @Resource private FlexibleEngineOrchestratorPlugin flexibleEnginePlugin;
+    @Resource private OpenstackTestlabOrchestratorPlugin openstackPlugin;
+    @Resource private PlusServerOrchestratorPlugin plusServerPlugin;
+    @Resource private RegioCloudOrchestratorPlugin regioCloudPlugin;
+    @Resource private CredentialCenter credentialsCenter;
+    @Resource private PluginManager pluginManager;
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
@@ -67,9 +60,8 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         final MockHttpServletResponse huaweiResponse = getCredentialTypes(huawei);
         // Verify the results
         assertThat(huaweiResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(huaweiResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(huaweiCredentialTypes));
-
+        assertThat(huaweiResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(huaweiCredentialTypes));
 
         // Setup
         Csp flexibleEngine = Csp.FLEXIBLE_ENGINE;
@@ -79,8 +71,8 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         final MockHttpServletResponse flexibleEngineResponse = getCredentialTypes(flexibleEngine);
         // Verify the results
         assertThat(flexibleEngineResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(flexibleEngineResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(flexibleEngineCredentialTypes));
+        assertThat(flexibleEngineResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(flexibleEngineCredentialTypes));
 
         // Setup
         Csp openstack = Csp.OPENSTACK_TESTLAB;
@@ -90,8 +82,8 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         final MockHttpServletResponse openstackResponse = getCredentialTypes(openstack);
         // Verify the results
         assertThat(openstackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(openstackResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(openstackCredentialTypes));
+        assertThat(openstackResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(openstackCredentialTypes));
 
         // Setup
         Csp plusServer = Csp.PLUS_SERVER;
@@ -101,8 +93,8 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         final MockHttpServletResponse plusServerResponse = getCredentialTypes(plusServer);
         // Verify the results
         assertThat(plusServerResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(plusServerResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(plusServerCredentialTypes));
+        assertThat(plusServerResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(plusServerCredentialTypes));
 
         // Setup
         Csp regioCloud = Csp.REGIO_CLOUD;
@@ -112,29 +104,34 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         final MockHttpServletResponse regioCloudResponse = getCredentialTypes(regioCloud);
         // Verify the results
         assertThat(regioCloudResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(regioCloudResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(regioCloudCredentialTypes));
+        assertThat(regioCloudResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(regioCloudCredentialTypes));
 
         // Setup
         Csp aws = Csp.AWS;
-        ErrorResponse awsResult = ErrorResponse.errorResponse(ErrorType.PLUGIN_NOT_FOUND,
-                Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s", aws.toValue())));
+        ErrorResponse awsResult =
+                ErrorResponse.errorResponse(
+                        ErrorType.PLUGIN_NOT_FOUND,
+                        Collections.singletonList(
+                                String.format(
+                                        "Can't find suitable plugin for the Csp %s",
+                                        aws.toValue())));
         // Run the test
         final MockHttpServletResponse awsResponse = getCredentialTypes(aws);
         // Verify the results
         assertThat(awsResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(awsResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(awsResult));
+        assertThat(awsResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(awsResult));
     }
 
     MockHttpServletResponse getCredentialTypes(Csp csp) throws Exception {
-        return mockMvc.perform(get("/xpanse/credential_types")
-                        .param("cspName", csp.toValue())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        return mockMvc.perform(
+                        get("/xpanse/credential_types")
+                                .param("cspName", csp.toValue())
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
-
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
@@ -145,16 +142,15 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp huawei = Csp.HUAWEI_CLOUD;
         List<AbstractCredentialInfo> huaweiResult = getCredentialCapabilities(huawei);
         // Run the test
-        final MockHttpServletResponse huaweiResponse = getCredentialCapabilities(huawei,
-                variablesType);
+        final MockHttpServletResponse huaweiResponse =
+                getCredentialCapabilities(huawei, variablesType);
         // Verify the results
         assertThat(huaweiResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(huaweiResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(huaweiResult));
+        assertThat(huaweiResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(huaweiResult));
 
         // Run the test
-        final MockHttpServletResponse huaweiResponse1 = getCredentialCapabilities(huawei,
-                httpType);
+        final MockHttpServletResponse huaweiResponse1 = getCredentialCapabilities(huawei, httpType);
         // Verify the results
         assertThat(huaweiResponse1.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(huaweiResponse1.getContentAsString()).isEqualTo("[]");
@@ -165,17 +161,15 @@ class CredentialsConfigApiTest extends ApisTestCommon {
                 getCredentialCapabilities(flexibleEngine);
         // Run the test
         final MockHttpServletResponse flexibleEngineResponse =
-                getCredentialCapabilities(flexibleEngine,
-                        variablesType);
+                getCredentialCapabilities(flexibleEngine, variablesType);
         // Verify the results
         assertThat(flexibleEngineResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(flexibleEngineResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(flexibleEngineResult));
+        assertThat(flexibleEngineResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(flexibleEngineResult));
 
         // Run the test
         final MockHttpServletResponse flexibleEngineResponse1 =
-                getCredentialCapabilities(flexibleEngine,
-                        httpType);
+                getCredentialCapabilities(flexibleEngine, httpType);
         // Verify the results
         assertThat(flexibleEngineResponse1.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(flexibleEngineResponse1.getContentAsString()).isEqualTo("[]");
@@ -184,16 +178,16 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp openstack = Csp.OPENSTACK_TESTLAB;
         List<AbstractCredentialInfo> openstackResult = getCredentialCapabilities(openstack);
         // Run the test
-        final MockHttpServletResponse openstackResponse = getCredentialCapabilities(openstack,
-                variablesType);
+        final MockHttpServletResponse openstackResponse =
+                getCredentialCapabilities(openstack, variablesType);
         // Verify the results
         assertThat(openstackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(openstackResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(openstackResult));
+        assertThat(openstackResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(openstackResult));
 
         // Run the test
-        final MockHttpServletResponse openstackResponse1 = getCredentialCapabilities(openstack,
-                httpType);
+        final MockHttpServletResponse openstackResponse1 =
+                getCredentialCapabilities(openstack, httpType);
         // Verify the results
         assertThat(openstackResponse1.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(openstackResponse1.getContentAsString()).isEqualTo("[]");
@@ -202,59 +196,63 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp plusServer = Csp.PLUS_SERVER;
         List<AbstractCredentialInfo> plusServerResult = getCredentialCapabilities(plusServer);
         // Run the test
-        final MockHttpServletResponse plusServerResponse = getCredentialCapabilities(plusServer,
-                variablesType);
+        final MockHttpServletResponse plusServerResponse =
+                getCredentialCapabilities(plusServer, variablesType);
         // Verify the results
         assertThat(plusServerResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(plusServerResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(plusServerResult));
+        assertThat(plusServerResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(plusServerResult));
         // Run the test
-        final MockHttpServletResponse plusServerResponse1 = getCredentialCapabilities(plusServer,
-                httpType);
+        final MockHttpServletResponse plusServerResponse1 =
+                getCredentialCapabilities(plusServer, httpType);
         // Verify the results
         assertThat(plusServerResponse1.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(plusServerResponse1.getContentAsString()).isEqualTo("[]");
-
 
         // Setup
         Csp regioCloud = Csp.REGIO_CLOUD;
         List<AbstractCredentialInfo> regioCloudResult = getCredentialCapabilities(regioCloud);
         // Run the test
-        final MockHttpServletResponse regioCloudResponse = getCredentialCapabilities(regioCloud,
-                variablesType);
+        final MockHttpServletResponse regioCloudResponse =
+                getCredentialCapabilities(regioCloud, variablesType);
         // Verify the results
         assertThat(regioCloudResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(regioCloudResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(regioCloudResult));
+        assertThat(regioCloudResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(regioCloudResult));
         // Run the test
-        final MockHttpServletResponse regioCloudResponse1 = getCredentialCapabilities(regioCloud,
-                httpType);
+        final MockHttpServletResponse regioCloudResponse1 =
+                getCredentialCapabilities(regioCloud, httpType);
         // Verify the results
         assertThat(regioCloudResponse1.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(regioCloudResponse1.getContentAsString()).isEqualTo("[]");
 
         // Setup
         Csp aliCloud = Csp.ALIBABA_CLOUD;
-        ErrorResponse aliCloudResult = ErrorResponse.errorResponse(ErrorType.PLUGIN_NOT_FOUND,
-                Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s",
-                                aliCloud.toValue())));
+        ErrorResponse aliCloudResult =
+                ErrorResponse.errorResponse(
+                        ErrorType.PLUGIN_NOT_FOUND,
+                        Collections.singletonList(
+                                String.format(
+                                        "Can't find suitable plugin for the Csp %s",
+                                        aliCloud.toValue())));
         // Run the test
         final MockHttpServletResponse aliCloudResponse =
                 getCredentialCapabilities(aliCloud, variablesType);
         // Verify the results
         assertThat(aliCloudResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(aliCloudResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(aliCloudResult));
+        assertThat(aliCloudResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(aliCloudResult));
     }
 
     MockHttpServletResponse getCredentialCapabilities(Csp csp, CredentialType type)
             throws Exception {
-        return mockMvc.perform(get("/xpanse/credentials/capabilities")
-                        .param("cspName", csp.toValue())
-                        .param("type", type.toValue())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        return mockMvc.perform(
+                        get("/xpanse/credentials/capabilities")
+                                .param("cspName", csp.toValue())
+                                .param("type", type.toValue())
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
 
     List<AbstractCredentialInfo> getCredentialCapabilities(Csp csp) {
@@ -282,10 +280,12 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         List<String> sites1 = pluginManager.getOrchestratorPlugin(csp).getSites();
 
         // Run the test
-        final MockHttpServletResponse response1 = mockMvc.perform(
-                        get("/xpanse/csps/{cspName}/sites", csp.toValue())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response1 =
+                mockMvc.perform(
+                                get("/xpanse/csps/{cspName}/sites", csp.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertEquals(response1.getStatus(), HttpStatus.OK.value());
@@ -302,26 +302,23 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp huawei = Csp.HUAWEI_CLOUD;
         Link huaweiResult = Link.of(getApiUrl(huawei, variablesType), "OpenApi");
         // Run the test
-        final MockHttpServletResponse huaweiResponse = getCredentialOpenApi(huawei,
-                variablesType);
+        final MockHttpServletResponse huaweiResponse = getCredentialOpenApi(huawei, variablesType);
         // Verify the results
         assertThat(huaweiResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(huaweiResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(huaweiResult));
+        assertThat(huaweiResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(huaweiResult));
         testGetCredentialCapabilitiesThrowsException(huawei);
-
 
         // Setup
         Csp flexibleEngine = Csp.FLEXIBLE_ENGINE;
         Link flexibleEngineResult = Link.of(getApiUrl(flexibleEngine, variablesType), "OpenApi");
         // Run the test
         final MockHttpServletResponse flexibleEngineResponse =
-                getCredentialOpenApi(flexibleEngine,
-                        variablesType);
+                getCredentialOpenApi(flexibleEngine, variablesType);
         // Verify the results
         assertThat(flexibleEngineResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(flexibleEngineResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(flexibleEngineResult));
+        assertThat(flexibleEngineResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(flexibleEngineResult));
 
         testGetCredentialCapabilitiesThrowsException(flexibleEngine);
 
@@ -329,12 +326,12 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp openstack = Csp.OPENSTACK_TESTLAB;
         Link openstackResult = Link.of(getApiUrl(openstack, variablesType), "OpenApi");
         // Run the test
-        final MockHttpServletResponse openstackResponse = getCredentialOpenApi(openstack,
-                variablesType);
+        final MockHttpServletResponse openstackResponse =
+                getCredentialOpenApi(openstack, variablesType);
         // Verify the results
         assertThat(openstackResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(openstackResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(openstackResult));
+        assertThat(openstackResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(openstackResult));
 
         testGetCredentialCapabilitiesThrowsException(openstack);
 
@@ -342,69 +339,72 @@ class CredentialsConfigApiTest extends ApisTestCommon {
         Csp plusServer = Csp.PLUS_SERVER;
         Link plusServerResult = Link.of(getApiUrl(plusServer, variablesType), "OpenApi");
         // Run the test
-        final MockHttpServletResponse plusServerResponse = getCredentialOpenApi(plusServer,
-                variablesType);
+        final MockHttpServletResponse plusServerResponse =
+                getCredentialOpenApi(plusServer, variablesType);
         // Verify the results
         assertThat(plusServerResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(plusServerResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(plusServerResult));
+        assertThat(plusServerResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(plusServerResult));
         testGetCredentialCapabilitiesThrowsException(plusServer);
-
 
         // Setup
         Csp regioCloud = Csp.REGIO_CLOUD;
         Link regioCloudResult = Link.of(getApiUrl(regioCloud, variablesType), "OpenApi");
         // Run the test
-        final MockHttpServletResponse regioCloudResponse = getCredentialOpenApi(regioCloud,
-                variablesType);
+        final MockHttpServletResponse regioCloudResponse =
+                getCredentialOpenApi(regioCloud, variablesType);
         // Verify the results
         assertThat(regioCloudResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(regioCloudResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(regioCloudResult));
+        assertThat(regioCloudResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(regioCloudResult));
         testGetCredentialCapabilitiesThrowsException(regioCloud);
 
         // Setup
         Csp aliCloud = Csp.ALIBABA_CLOUD;
-        ErrorResponse aliCloudResult = ErrorResponse.errorResponse(ErrorType.PLUGIN_NOT_FOUND,
-                Collections.singletonList(
-                        String.format("Can't find suitable plugin for the Csp %s",
-                                aliCloud.toValue())));
+        ErrorResponse aliCloudResult =
+                ErrorResponse.errorResponse(
+                        ErrorType.PLUGIN_NOT_FOUND,
+                        Collections.singletonList(
+                                String.format(
+                                        "Can't find suitable plugin for the Csp %s",
+                                        aliCloud.toValue())));
         // Run the test
         final MockHttpServletResponse aliCloudResponse =
                 getCredentialOpenApi(aliCloud, variablesType);
         // Verify the results
         assertThat(aliCloudResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(aliCloudResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(aliCloudResult));
+        assertThat(aliCloudResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(aliCloudResult));
     }
 
-    MockHttpServletResponse getCredentialOpenApi(Csp csp, CredentialType type)
-            throws Exception {
-        return mockMvc.perform(get("/xpanse/credentials/openapi/{csp}/{type}", csp, type)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+    MockHttpServletResponse getCredentialOpenApi(Csp csp, CredentialType type) throws Exception {
+        return mockMvc.perform(
+                        get("/xpanse/credentials/openapi/{csp}/{type}", csp, type)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
 
     void testGetCredentialCapabilitiesThrowsException(Csp csp) throws Exception {
         CredentialType httpType = CredentialType.HTTP_AUTHENTICATION;
-        ErrorResponse huaweiResult1 = ErrorResponse.errorResponse(
-                ErrorType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
-                Collections.singletonList(String.format("Not found credential definition with type"
-                                + " %s of the cloud service provider %s", httpType.toValue(),
-                        csp.toValue())));
+        ErrorResponse huaweiResult1 =
+                ErrorResponse.errorResponse(
+                        ErrorType.CREDENTIAL_DEFINITIONS_NOT_AVAILABLE,
+                        Collections.singletonList(
+                                String.format(
+                                        "Not found credential definition with type"
+                                                + " %s of the cloud service provider %s",
+                                        httpType.toValue(), csp.toValue())));
         // Run the test
         final MockHttpServletResponse errorResponse = getCredentialOpenApi(csp, httpType);
         // Verify the results
         assertThat(errorResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(errorResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(huaweiResult1));
-
+        assertThat(errorResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(huaweiResult1));
     }
 
     String getApiUrl(Csp csp, CredentialType type) {
-        return String.format("http://localhost/openapi/%s_%s_credentialApi.html",
-                csp.toValue(), type.toValue());
+        return String.format(
+                "http://localhost/openapi/%s_%s_credentialApi.html", csp.toValue(), type.toValue());
     }
-
-
 }

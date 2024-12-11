@@ -20,7 +20,6 @@ class ServiceLockConfigTest {
     void testGetters() {
         assertThat(test.isDestroyLocked()).isTrue();
         assertThat(test.isModifyLocked()).isTrue();
-
     }
 
     @Test

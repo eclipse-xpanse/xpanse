@@ -47,9 +47,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Admin services Api.
- */
+/** Admin services Api. */
 @Slf4j
 @CrossOrigin
 @RestController
@@ -61,22 +59,14 @@ public class AdminServicesApi {
     private final TerraformBootManager terraformBootManager;
     private final TofuMakerManager tofuMakerManager;
     private final RedisCacheConfig redisCacheConfig;
-    @Resource
-    private IdentityProviderManager identityProviderManager;
-    @Resource
-    private PluginManager pluginManager;
-    @Resource
-    private DatabaseManager databaseManager;
-    @Resource
-    private PolicyManager policyManager;
-    @Resource
-    private OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
-    @Resource
-    private UserServiceHelper userServiceHelper;
+    @Resource private IdentityProviderManager identityProviderManager;
+    @Resource private PluginManager pluginManager;
+    @Resource private DatabaseManager databaseManager;
+    @Resource private PolicyManager policyManager;
+    @Resource private OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
+    @Resource private UserServiceHelper userServiceHelper;
 
-    /**
-     * Constructor for AdminServicesApi bean.
-     */
+    /** Constructor for AdminServicesApi bean. */
     public AdminServicesApi(
             @Nullable TerraformBootManager terraformBootManager,
             @Nullable TofuMakerManager tofuMakerManager,
@@ -85,7 +75,6 @@ public class AdminServicesApi {
         this.tofuMakerManager = tofuMakerManager;
         this.redisCacheConfig = redisCacheConfig;
     }
-
 
     /**
      * Method to find out the current state of the system.
@@ -108,7 +97,6 @@ public class AdminServicesApi {
         return systemStatus;
     }
 
-
     /**
      * List supported cloud service provider.
      *
@@ -125,7 +113,6 @@ public class AdminServicesApi {
         log.info("Cloud service providers:{} with active plugins.", cspSet);
         return cspSet.stream().sorted().toList();
     }
-
 
     /**
      * Get status of all active backend systems.
@@ -210,5 +197,4 @@ public class AdminServicesApi {
             backendSystemStatus.setDetails(null);
         }
     }
-
 }

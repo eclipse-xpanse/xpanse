@@ -9,9 +9,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Exception thrown when a deployment service region is unavailable.
- */
+/** Exception thrown when a deployment service region is unavailable. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class UnavailableServiceRegionsException extends RuntimeException {

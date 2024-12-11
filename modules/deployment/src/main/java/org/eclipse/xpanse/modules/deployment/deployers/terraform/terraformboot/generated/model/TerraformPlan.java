@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,26 +17,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Objects;
 
-/**
- * TerraformPlan
- */
+/** TerraformPlan */
 @JsonPropertyOrder({
-        TerraformPlan.JSON_PROPERTY_PLAN,
-        TerraformPlan.JSON_PROPERTY_TERRAFORM_VERSION_USED
+    TerraformPlan.JSON_PROPERTY_PLAN,
+    TerraformPlan.JSON_PROPERTY_TERRAFORM_VERSION_USED
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformPlan {
     public static final String JSON_PROPERTY_PLAN = "plan";
-    @jakarta.annotation.Nonnull
-    private String plan;
+    @jakarta.annotation.Nonnull private String plan;
 
     public static final String JSON_PROPERTY_TERRAFORM_VERSION_USED = "terraformVersionUsed";
-    @jakarta.annotation.Nullable
-    private String terraformVersionUsed;
+    @jakarta.annotation.Nullable private String terraformVersionUsed;
 
-    public TerraformPlan() {
-    }
+    public TerraformPlan() {}
 
     public TerraformPlan plan(@jakarta.annotation.Nonnull String plan) {
 
@@ -53,11 +48,9 @@ public class TerraformPlan {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_PLAN)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getPlan() {
         return plan;
     }
-
 
     @JsonProperty(JSON_PROPERTY_PLAN)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -65,7 +58,8 @@ public class TerraformPlan {
         this.plan = plan;
     }
 
-    public TerraformPlan terraformVersionUsed(@jakarta.annotation.Nullable String terraformVersionUsed) {
+    public TerraformPlan terraformVersionUsed(
+            @jakarta.annotation.Nullable String terraformVersionUsed) {
 
         this.terraformVersionUsed = terraformVersionUsed;
         return this;
@@ -79,11 +73,9 @@ public class TerraformPlan {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION_USED)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getTerraformVersionUsed() {
         return terraformVersionUsed;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION_USED)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -100,8 +92,8 @@ public class TerraformPlan {
             return false;
         }
         TerraformPlan terraformPlan = (TerraformPlan) o;
-        return Objects.equals(this.plan, terraformPlan.plan) &&
-                Objects.equals(this.terraformVersionUsed, terraformPlan.terraformVersionUsed);
+        return Objects.equals(this.plan, terraformPlan.plan)
+                && Objects.equals(this.terraformVersionUsed, terraformPlan.terraformVersionUsed);
     }
 
     @Override
@@ -114,14 +106,16 @@ public class TerraformPlan {
         StringBuilder sb = new StringBuilder();
         sb.append("class TerraformPlan {\n");
         sb.append("    plan: ").append(toIndentedString(plan)).append("\n");
-        sb.append("    terraformVersionUsed: ").append(toIndentedString(terraformVersionUsed)).append("\n");
+        sb.append("    terraformVersionUsed: ")
+                .append(toIndentedString(terraformVersionUsed))
+                .append("\n");
         sb.append("}");
         return sb.toString();
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -129,6 +123,4 @@ public class TerraformPlan {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

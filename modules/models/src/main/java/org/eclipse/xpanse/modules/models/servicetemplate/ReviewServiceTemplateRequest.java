@@ -12,9 +12,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 
-/**
- * Defines the review request model for service template registration.
- */
+/** Defines the review request model for service template registration. */
 @Valid
 @Data
 @Slf4j

@@ -9,9 +9,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuration class of local open tofu env.
- */
+/** Configuration class of local open tofu env. */
 @Getter
 @Configuration
 public class OpenTofuLocalConfig {

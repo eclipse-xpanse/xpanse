@@ -11,11 +11,8 @@ import org.eclipse.xpanse.modules.database.CustomJpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-/**
- * Interface to access default JPA methods.
- */
+/** Interface to access default JPA methods. */
 @Repository
-public interface UserPolicyRepository extends CustomJpaRepository<UserPolicyEntity, UUID>,
-        JpaSpecificationExecutor<UserPolicyEntity> {
-
-}
+public interface UserPolicyRepository
+        extends CustomJpaRepository<UserPolicyEntity, UUID>,
+                JpaSpecificationExecutor<UserPolicyEntity> {}

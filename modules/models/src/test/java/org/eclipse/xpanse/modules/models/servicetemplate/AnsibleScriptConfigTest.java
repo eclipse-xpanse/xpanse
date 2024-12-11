@@ -6,14 +6,12 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Test of AnsibleScriptConfig.
- */
+/** Test of AnsibleScriptConfig. */
 public class AnsibleScriptConfigTest {
 
     private final String playbookName = "kafka-container-manage.yml";
@@ -27,7 +25,6 @@ public class AnsibleScriptConfigTest {
     private final Boolean ansibleInventoryRequired = Boolean.FALSE;
 
     private AnsibleScriptConfig test;
-
 
     @BeforeEach
     void setUp() throws Exception {
@@ -86,16 +83,26 @@ public class AnsibleScriptConfigTest {
 
     @Test
     void testToString() throws Exception {
-        String result = "AnsibleScriptConfig(playbookName=" + playbookName
-                + ", virtualEnv=" + virtualEnv
-                + ", pythonVersion=" + pythonVersion
-                + ", isPrepareAnsibleEnvironment=" + isPrepareAnsibleEnvironment
-                + ", repoUrl=" + repoUrl
-                + ", branch=" + branch
-                + ", requirementsFile=" + requirementsFile
-                + ", galaxyFile=" + galaxyFile
-                + ", ansibleInventoryRequired=" + ansibleInventoryRequired + ")";
+        String result =
+                "AnsibleScriptConfig(playbookName="
+                        + playbookName
+                        + ", virtualEnv="
+                        + virtualEnv
+                        + ", pythonVersion="
+                        + pythonVersion
+                        + ", isPrepareAnsibleEnvironment="
+                        + isPrepareAnsibleEnvironment
+                        + ", repoUrl="
+                        + repoUrl
+                        + ", branch="
+                        + branch
+                        + ", requirementsFile="
+                        + requirementsFile
+                        + ", galaxyFile="
+                        + galaxyFile
+                        + ", ansibleInventoryRequired="
+                        + ansibleInventoryRequired
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
-
 }

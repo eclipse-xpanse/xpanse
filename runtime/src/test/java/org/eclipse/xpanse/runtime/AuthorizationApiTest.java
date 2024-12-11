@@ -45,22 +45,24 @@ import org.springframework.web.client.RestTemplate;
 class AuthorizationApiTest extends ApisTestCommon {
 
     @RegisterExtension
-    static WireMockExtension wireMockExtension = WireMockExtension.newInstance()
-            .options(wireMockConfig()
-                    .dynamicPort()
-                    .extensions(
-                            new ResponseTemplateTransformer(TemplateEngine.defaultTemplateEngine(),
-                                    false, new ClasspathFileSource("src/test/resources/mappings"),
-                                    Collections.emptyList())))
-            .build();
-
+    static WireMockExtension wireMockExtension =
+            WireMockExtension.newInstance()
+                    .options(
+                            wireMockConfig()
+                                    .dynamicPort()
+                                    .extensions(
+                                            new ResponseTemplateTransformer(
+                                                    TemplateEngine.defaultTemplateEngine(),
+                                                    false,
+                                                    new ClasspathFileSource(
+                                                            "src/test/resources/mappings"),
+                                                    Collections.emptyList())))
+                    .build();
 
     @Value("${authorization.server.endpoint}")
     private String iamServiceEndpoint;
 
     @Qualifier("zitadelRestTemplate")
-
-
     @MockitoBean
     private RestTemplate restTemplate;
 
@@ -71,9 +73,10 @@ class AuthorizationApiTest extends ApisTestCommon {
         String redirectUrl = iamServiceEndpoint + "/oauth/v2/authorize?";
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/auth/authorize")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/auth/authorize").accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertEquals(HttpStatus.FOUND.value(), response.getStatus());
@@ -82,47 +85,59 @@ class AuthorizationApiTest extends ApisTestCommon {
         assertTrue(response.getRedirectedUrl().startsWith(redirectUrl));
     }
 
-
     @Test
     void testGetAccessToken() throws Exception {
 
         // Setup
-        when(restTemplate.postForEntity(anyString(), any(),
-                eq(TokenResponse.class))).thenReturn(getAccessToken(
-                wireMockExtension.getRuntimeInfo().getHttpBaseUrl() + "/oauth/v2/token"));
+        when(restTemplate.postForEntity(anyString(), any(), eq(TokenResponse.class)))
+                .thenReturn(
+                        getAccessToken(
+                                wireMockExtension.getRuntimeInfo().getHttpBaseUrl()
+                                        + "/oauth/v2/token"));
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/auth/token")
-                        .accept(MediaType.APPLICATION_JSON).param("code", "code"))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                get("/auth/token")
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .param("code", "code"))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
-
     @Test
     void testGetAccessTokenThrowsIllegalArgumentException() {
 
         // Run the test
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> mockMvc.perform(get("/auth/token")
-                                .accept(MediaType.APPLICATION_JSON).param("code", null))
-                        .andReturn().getResponse());
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        mockMvc.perform(
+                                        get("/auth/token")
+                                                .accept(MediaType.APPLICATION_JSON)
+                                                .param("code", null))
+                                .andReturn()
+                                .getResponse());
     }
 
     @Test
     void testCallApiUnauthorized() throws Exception {
         // SetUp
-        ErrorResponse errorResponseModel = ErrorResponse.errorResponse(ErrorType.UNAUTHORIZED,
-                Collections.singletonList(
-                        "Full authentication is required to access this resource"));
+        ErrorResponse errorResponseModel =
+                ErrorResponse.errorResponse(
+                        ErrorType.UNAUTHORIZED,
+                        Collections.singletonList(
+                                "Full authentication is required to access this resource"));
         String resBody = objectMapper.writeValueAsString(errorResponseModel);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/health")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/health").accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
@@ -135,13 +150,16 @@ class AuthorizationApiTest extends ApisTestCommon {
     @WithJwt(file = "jwt_isv.json")
     void testCallApiAccessDenied() throws Exception {
         // SetUp
-        ErrorResponse errorResponseModel = ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
-                Collections.singletonList(ErrorType.ACCESS_DENIED.toValue()));
+        ErrorResponse errorResponseModel =
+                ErrorResponse.errorResponse(
+                        ErrorType.ACCESS_DENIED,
+                        Collections.singletonList(ErrorType.ACCESS_DENIED.toValue()));
         String resBody = objectMapper.writeValueAsString(errorResponseModel);
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/services")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/services").accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
@@ -152,8 +170,7 @@ class AuthorizationApiTest extends ApisTestCommon {
 
     private ResponseEntity<TokenResponse> getAccessToken(String url) {
         TestRestTemplate testRestTemplate = new TestRestTemplate();
-        return new ResponseEntity<>(testRestTemplate.postForObject(url, "{}", TokenResponse.class),
-                HttpStatus.OK);
+        return new ResponseEntity<>(
+                testRestTemplate.postForObject(url, "{}", TokenResponse.class), HttpStatus.OK);
     }
-
 }

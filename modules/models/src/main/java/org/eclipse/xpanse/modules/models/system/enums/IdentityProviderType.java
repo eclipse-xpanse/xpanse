@@ -10,11 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Defines type of identity provider.
- */
+/** Defines type of identity provider. */
 public enum IdentityProviderType {
-
     ZITADEL("zitadel");
 
     private final String code;
@@ -23,9 +20,7 @@ public enum IdentityProviderType {
         this.code = code;
     }
 
-    /**
-     * For IdentityProviderType serialize.
-     */
+    /** For IdentityProviderType serialize. */
     @JsonCreator
     public static IdentityProviderType getByValue(String code) {
         for (IdentityProviderType providerType : values()) {
@@ -37,9 +32,7 @@ public enum IdentityProviderType {
                 String.format("IdentityProviderType value %s is not supported.", code));
     }
 
-    /**
-     * For IdentityProviderType deserialize.
-     */
+    /** For IdentityProviderType deserialize. */
     @JsonValue
     public String toValue() {
         return this.code;

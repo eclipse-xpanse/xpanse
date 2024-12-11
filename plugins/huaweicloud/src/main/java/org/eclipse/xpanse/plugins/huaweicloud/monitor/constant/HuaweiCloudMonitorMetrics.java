@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.monitor.constant;
 
-/**
- * Huawei Monitor Metric.
- */
+/** Huawei Monitor Metric. */
 public class HuaweiCloudMonitorMetrics {
 
     public static final String CPU_UTILIZED = "cpu_util";
@@ -26,5 +24,4 @@ public class HuaweiCloudMonitorMetrics {
     public static final String VM_NET_BIT_SENT = "net_bitSent";
 
     public static final String VM_NET_BIT_RECV = "net_bitRecv";
-
 }

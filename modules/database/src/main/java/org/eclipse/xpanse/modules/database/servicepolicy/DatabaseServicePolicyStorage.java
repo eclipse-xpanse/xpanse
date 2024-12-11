@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Implementation of the ServicePolicyStorage.
- */
+/** Implementation of the ServicePolicyStorage. */
 @Component
 @Transactional
 public class DatabaseServicePolicyStorage implements ServicePolicyStorage {

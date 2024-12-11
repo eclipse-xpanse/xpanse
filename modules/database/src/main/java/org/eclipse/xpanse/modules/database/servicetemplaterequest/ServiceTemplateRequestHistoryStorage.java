@@ -9,11 +9,8 @@ package org.eclipse.xpanse.modules.database.servicetemplaterequest;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Interface for persist of ServiceTemplateRequestHistory.
- */
+/** Interface for persist of ServiceTemplateRequestHistory. */
 public interface ServiceTemplateRequestHistoryStorage {
-
 
     /**
      * Store and flush serviceTemplateRequestHistoryEntity.
@@ -32,7 +29,6 @@ public interface ServiceTemplateRequestHistoryStorage {
      */
     ServiceTemplateRequestHistoryEntity getEntityByRequestId(UUID requestId);
 
-
     /**
      * List service template request history by query model.
      *
@@ -41,5 +37,4 @@ public interface ServiceTemplateRequestHistoryStorage {
      */
     List<ServiceTemplateRequestHistoryEntity> listServiceTemplateRequestHistoryByQueryModel(
             ServiceTemplateRequestHistoryQueryModel queryModel);
-
 }

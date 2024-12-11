@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,48 +20,41 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * OpenTofuAsyncDeployFromDirectoryRequest
- */
+/** OpenTofuAsyncDeployFromDirectoryRequest */
 @JsonPropertyOrder({
-        OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_REQUEST_ID,
-        OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
-        OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
-        OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-        OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
-        OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
+    OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_REQUEST_ID,
+    OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
+    OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+    OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
+    OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES,
+    OpenTofuAsyncDeployFromDirectoryRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuAsyncDeployFromDirectoryRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_OPEN_TOFU_VERSION = "openTofuVersion";
-    @jakarta.annotation.Nonnull
-    private String openTofuVersion;
+    @jakarta.annotation.Nonnull private String openTofuVersion;
 
     public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
-    @jakarta.annotation.Nonnull
-    private Boolean isPlanOnly;
+    @jakarta.annotation.Nonnull private Boolean isPlanOnly;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
-    @jakarta.annotation.Nonnull
-    private WebhookConfig webhookConfig;
+    @jakarta.annotation.Nonnull private WebhookConfig webhookConfig;
 
-    public OpenTofuAsyncDeployFromDirectoryRequest() {
-    }
+    public OpenTofuAsyncDeployFromDirectoryRequest() {}
 
-    public OpenTofuAsyncDeployFromDirectoryRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
+    public OpenTofuAsyncDeployFromDirectoryRequest requestId(
+            @jakarta.annotation.Nullable UUID requestId) {
 
         this.requestId = requestId;
         return this;
@@ -76,11 +68,9 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -88,7 +78,8 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
         this.requestId = requestId;
     }
 
-    public OpenTofuAsyncDeployFromDirectoryRequest openTofuVersion(@jakarta.annotation.Nonnull String openTofuVersion) {
+    public OpenTofuAsyncDeployFromDirectoryRequest openTofuVersion(
+            @jakarta.annotation.Nonnull String openTofuVersion) {
 
         this.openTofuVersion = openTofuVersion;
         return this;
@@ -102,11 +93,9 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getOpenTofuVersion() {
         return openTofuVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -114,25 +103,25 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
         this.openTofuVersion = openTofuVersion;
     }
 
-    public OpenTofuAsyncDeployFromDirectoryRequest isPlanOnly(@jakarta.annotation.Nonnull Boolean isPlanOnly) {
+    public OpenTofuAsyncDeployFromDirectoryRequest isPlanOnly(
+            @jakarta.annotation.Nonnull Boolean isPlanOnly) {
 
         this.isPlanOnly = isPlanOnly;
         return this;
     }
 
     /**
-     * Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes.
+     * Flag to control if the deployment must only generate the OpenTofu or it must also apply the
+     * changes.
      *
      * @return isPlanOnly
      */
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Boolean getIsPlanOnly() {
         return isPlanOnly;
     }
-
 
     @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -147,7 +136,8 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
         return this;
     }
 
-    public OpenTofuAsyncDeployFromDirectoryRequest putVariablesItem(String key, Object variablesItem) {
+    public OpenTofuAsyncDeployFromDirectoryRequest putVariablesItem(
+            String key, Object variablesItem) {
         this.variables.put(key, variablesItem);
         return this;
     }
@@ -160,11 +150,9 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -179,7 +167,8 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
         return this;
     }
 
-    public OpenTofuAsyncDeployFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public OpenTofuAsyncDeployFromDirectoryRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -188,18 +177,17 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to OpenTofu process.
+     * Key-value pairs of variables that must be injected as environment variables to OpenTofu
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -222,11 +210,9 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public WebhookConfig getWebhookConfig() {
         return webhookConfig;
     }
-
 
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -244,17 +230,23 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
         }
         OpenTofuAsyncDeployFromDirectoryRequest openTofuAsyncDeployFromDirectoryRequest =
                 (OpenTofuAsyncDeployFromDirectoryRequest) o;
-        return Objects.equals(this.requestId, openTofuAsyncDeployFromDirectoryRequest.requestId) &&
-                Objects.equals(this.openTofuVersion, openTofuAsyncDeployFromDirectoryRequest.openTofuVersion) &&
-                Objects.equals(this.isPlanOnly, openTofuAsyncDeployFromDirectoryRequest.isPlanOnly) &&
-                Objects.equals(this.variables, openTofuAsyncDeployFromDirectoryRequest.variables) &&
-                Objects.equals(this.envVariables, openTofuAsyncDeployFromDirectoryRequest.envVariables) &&
-                Objects.equals(this.webhookConfig, openTofuAsyncDeployFromDirectoryRequest.webhookConfig);
+        return Objects.equals(this.requestId, openTofuAsyncDeployFromDirectoryRequest.requestId)
+                && Objects.equals(
+                        this.openTofuVersion,
+                        openTofuAsyncDeployFromDirectoryRequest.openTofuVersion)
+                && Objects.equals(
+                        this.isPlanOnly, openTofuAsyncDeployFromDirectoryRequest.isPlanOnly)
+                && Objects.equals(this.variables, openTofuAsyncDeployFromDirectoryRequest.variables)
+                && Objects.equals(
+                        this.envVariables, openTofuAsyncDeployFromDirectoryRequest.envVariables)
+                && Objects.equals(
+                        this.webhookConfig, openTofuAsyncDeployFromDirectoryRequest.webhookConfig);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, openTofuVersion, isPlanOnly, variables, envVariables, webhookConfig);
+        return Objects.hash(
+                requestId, openTofuVersion, isPlanOnly, variables, envVariables, webhookConfig);
     }
 
     @Override
@@ -272,8 +264,8 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -281,6 +273,4 @@ public class OpenTofuAsyncDeployFromDirectoryRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,36 +20,30 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * OpenTofuPlanFromDirectoryRequest
- */
+/** OpenTofuPlanFromDirectoryRequest */
 @JsonPropertyOrder({
-        OpenTofuPlanFromDirectoryRequest.JSON_PROPERTY_REQUEST_ID,
-        OpenTofuPlanFromDirectoryRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
-        OpenTofuPlanFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
-        OpenTofuPlanFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
+    OpenTofuPlanFromDirectoryRequest.JSON_PROPERTY_REQUEST_ID,
+    OpenTofuPlanFromDirectoryRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
+    OpenTofuPlanFromDirectoryRequest.JSON_PROPERTY_VARIABLES,
+    OpenTofuPlanFromDirectoryRequest.JSON_PROPERTY_ENV_VARIABLES
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuPlanFromDirectoryRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_OPEN_TOFU_VERSION = "openTofuVersion";
-    @jakarta.annotation.Nonnull
-    private String openTofuVersion;
+    @jakarta.annotation.Nonnull private String openTofuVersion;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
-    public OpenTofuPlanFromDirectoryRequest() {
-    }
+    public OpenTofuPlanFromDirectoryRequest() {}
 
     public OpenTofuPlanFromDirectoryRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
 
@@ -66,11 +59,9 @@ public class OpenTofuPlanFromDirectoryRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -78,7 +69,8 @@ public class OpenTofuPlanFromDirectoryRequest {
         this.requestId = requestId;
     }
 
-    public OpenTofuPlanFromDirectoryRequest openTofuVersion(@jakarta.annotation.Nonnull String openTofuVersion) {
+    public OpenTofuPlanFromDirectoryRequest openTofuVersion(
+            @jakarta.annotation.Nonnull String openTofuVersion) {
 
         this.openTofuVersion = openTofuVersion;
         return this;
@@ -92,11 +84,9 @@ public class OpenTofuPlanFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getOpenTofuVersion() {
         return openTofuVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -104,7 +94,8 @@ public class OpenTofuPlanFromDirectoryRequest {
         this.openTofuVersion = openTofuVersion;
     }
 
-    public OpenTofuPlanFromDirectoryRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public OpenTofuPlanFromDirectoryRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
@@ -123,11 +114,9 @@ public class OpenTofuPlanFromDirectoryRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -142,7 +131,8 @@ public class OpenTofuPlanFromDirectoryRequest {
         return this;
     }
 
-    public OpenTofuPlanFromDirectoryRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public OpenTofuPlanFromDirectoryRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -151,18 +141,17 @@ public class OpenTofuPlanFromDirectoryRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to open tofu process.
+     * Key-value pairs of variables that must be injected as environment variables to open tofu
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -178,11 +167,13 @@ public class OpenTofuPlanFromDirectoryRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        OpenTofuPlanFromDirectoryRequest openTofuPlanFromDirectoryRequest = (OpenTofuPlanFromDirectoryRequest) o;
-        return Objects.equals(this.requestId, openTofuPlanFromDirectoryRequest.requestId) &&
-                Objects.equals(this.openTofuVersion, openTofuPlanFromDirectoryRequest.openTofuVersion) &&
-                Objects.equals(this.variables, openTofuPlanFromDirectoryRequest.variables) &&
-                Objects.equals(this.envVariables, openTofuPlanFromDirectoryRequest.envVariables);
+        OpenTofuPlanFromDirectoryRequest openTofuPlanFromDirectoryRequest =
+                (OpenTofuPlanFromDirectoryRequest) o;
+        return Objects.equals(this.requestId, openTofuPlanFromDirectoryRequest.requestId)
+                && Objects.equals(
+                        this.openTofuVersion, openTofuPlanFromDirectoryRequest.openTofuVersion)
+                && Objects.equals(this.variables, openTofuPlanFromDirectoryRequest.variables)
+                && Objects.equals(this.envVariables, openTofuPlanFromDirectoryRequest.envVariables);
     }
 
     @Override
@@ -203,8 +194,8 @@ public class OpenTofuPlanFromDirectoryRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -212,6 +203,4 @@ public class OpenTofuPlanFromDirectoryRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

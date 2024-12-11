@@ -1,16 +1,16 @@
 ![Xpanse logo](static/full-logo.png)
 <p align='center'>
 <a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/ci.yml" target="_blank">
-    <img src="https://github.com/eclipse-xpanse/xpanse/actions/workflows/ci.yml/badge.svg" alt="build">
+	<img src="https://github.com/eclipse-xpanse/xpanse/actions/workflows/ci.yml/badge.svg" alt="build">
 </a>
 
- <a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/coverage.yml" target="_blank">
-    <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/eclipse-xpanse-bot/3d9c022b98734fbf615c21136abe4add/raw/xpanse-coverage.json" alt="coverage">
-  </a>
+<a href="https://github.com/eclipse-xpanse/xpanse/actions/workflows/coverage.yml" target="_blank">
+	<img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/eclipse-xpanse-bot/3d9c022b98734fbf615c21136abe4add/raw/xpanse-coverage.json" alt="coverage">
+</a>
 
 <a href="https://opensource.org/licenses/Apache-2.0" target="_blank">
-    <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="coverage">
-  </a>
+	<img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="coverage">
+</a>
 </p>
 
 Xpanse is an Open Source project allowing to easily implement native-managed service on any cloud service provider. This
@@ -36,43 +36,43 @@ Details can be found on the project website [here](https://eclipse.dev/xpanse/do
 ## Generate terraform-boot client code
 
 1. Run the terraform-boot project with spring-profile `oauth` with methods mentioned here.
-   This is necessary even if the terraform-boot will be actually used without oauth enabled in production.
-   This will make the client to handle both with and without authentication usecases automatically.
+This is necessary even if the terraform-boot will be actually used without oauth enabled in production.
+This will make the client to handle both with and without authentication usecases automatically.
 2. Access http://localhost:9090/v3/api-docs to get the openapi json.
 3. Copy all the JSON content of the openapi json and replace all the content in the JSON file
-   [terraform-boot-openapi.json](modules/deployment/src/main/resources/terraform-boot-openapi.json).
+[terraform-boot-openapi.json](modules/deployment/src/main/resources/terraform-boot-openapi.json).
 4. Run the below maven command to generate the REST API client and data models for terraform-boot. The command can be
-   executed directly inside the `deployment` module.
+executed directly inside the `deployment` module.
 
 ```ssh
-  mvn clean generate-sources -DskipTerraformBootClientGeneration=false
+mvn clean generate-sources -DskipTerraformBootClientGeneration=false
 ```
 
 ## Generate tofu-maker client code
 
 1. Run the tofu-maker project with spring-profile `oauth` with methods mentioned here.
-   This is necessary even if the tofu-maker will be actually used without oauth enabled in production.
-   This will make the client to handle both with and without authentication usecases automatically.
+This is necessary even if the tofu-maker will be actually used without oauth enabled in production.
+This will make the client to handle both with and without authentication usecases automatically.
 2. Access http://localhost:9092/v3/api-docs to get the openapi json.
 3. Copy all the JSON content of the openapi json and replace all the content in the JSON file
-   [tofu-maker-openapi.json](modules/deployment/src/main/resources/tofu-maker-openapi.json).
-4. Run the below maven command to generate the REST API client and data models for tofu-maker. The 
-   command can be executed directly inside the `deployment` module.
+[tofu-maker-openapi.json](modules/deployment/src/main/resources/tofu-maker-openapi.json).
+4. Run the below maven command to generate the REST API client and data models for tofu-maker. The
+command can be executed directly inside the `deployment` module.
 
 ```ssh
-  mvn clean generate-sources -DskipTofuMakerClientGeneration=false
+mvn clean generate-sources -DskipTofuMakerClientGeneration=false
 ```
 
 ## Generate policy-man client code
 
 1. Run the policy-man project and access “http://localhost:8090/swagger/doc.json” to get the openapi json.
 2. Copy all the JSON content of the openapi json and replace all the content in the JSON file
-   [policy-man-openapi.json](modules/policy/src/main/resources/policy-man-openapi.json)
+[policy-man-openapi.json](modules/policy/src/main/resources/policy-man-openapi.json)
 3. Run the below maven command to generate the REST API client and data models for policy-man. The command can be
-   executed directly inside the `policy` module.
+executed directly inside the `policy` module.
 
 ```ssh
-  mvn clean generate-sources -DskipPolicyManClientGeneration=false
+mvn clean generate-sources -DskipPolicyManClientGeneration=false
 ```
 
 ## Static Code Analysis using CheckStyle
@@ -99,7 +99,7 @@ credential management, sensitive variable information during service deployment,
 
 * For local development, the AES private key file must exist in the project root path.
 * For environments where the application jar is directly executed, The Aes key file (aes_sec) must be
-  in the same directory as the project jar file (xpanse-runtime-x.x.x-SNAPSHOT.jar)
+in the same directory as the project jar file (xpanse-runtime-x.x.x-SNAPSHOT.jar)
 
 #### Generate AES Private Key
 
@@ -117,3 +117,19 @@ the JVM.
 ## Dependencies File
 
 All third-party related content is listed in the [DEPENDENCIES](DEPENDENCIES) file.
+
+## Code Formatter
+
+The project follows [google-code-format](https://github.com/google/google-java-format).
+We use the [spotless plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven#google-java-format) to format code and to validate code format.
+We can automatically format the code using the command below.
+
+```shell
+mvn spotless:apply
+```
+
+To validate errors we can run the command below.
+
+```shell
+mvn spotless:check &&  mvn checkstyle:check
+```

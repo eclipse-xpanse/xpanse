@@ -15,21 +15,19 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of JsonObjectSchema.
- */
+/** Test of JsonObjectSchema. */
 public class JsonObjectSchemaTest {
 
-    private static  Map<String, Map<String, Object>> properties;
+    private static Map<String, Map<String, Object>> properties;
     private static List<String> required;
     private static JsonObjectSchema jsonObjectSchema;
 
     @BeforeEach
     void setUp() {
-        Map<String,Object> validationProperties = new HashMap<>();
-        validationProperties.put("minLength",8);
+        Map<String, Object> validationProperties = new HashMap<>();
+        validationProperties.put("minLength", 8);
         properties = new HashMap<>();
-        properties.put("admin_passwd",validationProperties);
+        properties.put("admin_passwd", validationProperties);
 
         required = new ArrayList<>();
         required.add("admin_passwd");
@@ -75,18 +73,20 @@ public class JsonObjectSchemaTest {
         assertNotEquals(jsonObjectSchema1, jsonObjectSchema2);
         assertEquals(jsonObjectSchema.hashCode(), jsonObjectSchema1.hashCode());
         assertNotEquals(jsonObjectSchema1.hashCode(), jsonObjectSchema2.hashCode());
-
-
     }
 
     @Test
     void testToString() {
-        String expectedString = "JsonObjectSchema(" +
-                "type=object, " +
-                "properties=" + properties +
-                ", required=" + required +
-                ", additionalProperties=" + false +
-                ")";
+        String expectedString =
+                "JsonObjectSchema("
+                        + "type=object, "
+                        + "properties="
+                        + properties
+                        + ", required="
+                        + required
+                        + ", additionalProperties="
+                        + false
+                        + ")";
 
         assertEquals(expectedString, jsonObjectSchema.toString());
     }

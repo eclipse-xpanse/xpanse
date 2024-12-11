@@ -15,16 +15,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 public class GrantedAuthoritiesExtractorTest {
 
-    Oauth2GrantedAuthoritiesExtractor
-            grantedAuthoritiesExtractor = new Oauth2GrantedAuthoritiesExtractor();
+    Oauth2GrantedAuthoritiesExtractor grantedAuthoritiesExtractor =
+            new Oauth2GrantedAuthoritiesExtractor();
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(grantedAuthoritiesExtractor, "defaultRole",
-                "user");
-        ReflectionTestUtils.setField(grantedAuthoritiesExtractor, "userIdKey",
-                "sub");
-        ReflectionTestUtils.setField(grantedAuthoritiesExtractor, "grantedRolesScope",
+        ReflectionTestUtils.setField(grantedAuthoritiesExtractor, "defaultRole", "user");
+        ReflectionTestUtils.setField(grantedAuthoritiesExtractor, "userIdKey", "sub");
+        ReflectionTestUtils.setField(
+                grantedAuthoritiesExtractor,
+                "grantedRolesScope",
                 "urn:zitadel:iam:org:project:roles");
     }
 
@@ -69,5 +69,4 @@ public class GrantedAuthoritiesExtractorTest {
         assertNotNull(grantedAuthorities);
         assertTrue(grantedAuthorities.contains(grantedAuthority));
     }
-
 }

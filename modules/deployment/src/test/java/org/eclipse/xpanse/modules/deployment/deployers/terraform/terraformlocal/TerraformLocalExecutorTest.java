@@ -43,14 +43,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 class TerraformLocalExecutorTest {
 
     private static String workspace = "";
-    @Mock
-    private Map<String, String> mockEnv;
-    @Mock
-    private Map<String, Object> mockVariables;
-    @InjectMocks
-    private TerraformLocalExecutor terraformLocalExecutor;
-    @InjectMocks
-    private DeploymentScriptsHelper scriptsHelper;
+    @Mock private Map<String, String> mockEnv;
+    @Mock private Map<String, Object> mockVariables;
+    @InjectMocks private TerraformLocalExecutor terraformLocalExecutor;
+    @InjectMocks private DeploymentScriptsHelper scriptsHelper;
 
     @BeforeAll
     static void initTaskWorkspace() throws Exception {
@@ -61,8 +57,9 @@ class TerraformLocalExecutorTest {
         }
         workspace = taskWorkspace.getAbsolutePath();
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl =
+                oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         String script = ocl.getDeployment().getDeployer();
         String scriptPath = workspace + File.separator + TF_SCRIPT_FILE_NAME;
         try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
@@ -74,25 +71,23 @@ class TerraformLocalExecutorTest {
     void setUp() {
         ReflectionTestUtils.setField(scriptsHelper, "awaitAtMost", 60);
         ReflectionTestUtils.setField(scriptsHelper, "awaitPollingInterval", 1);
-        terraformLocalExecutor = new TerraformLocalExecutor("terraform",
-                mockEnv, mockVariables, workspace);
+        terraformLocalExecutor =
+                new TerraformLocalExecutor("terraform", mockEnv, mockVariables, workspace);
     }
 
     @Test
     @Order(1)
     void testTfValidate() {
         // Setup
-        final DeploymentScriptValidationResult
-                expectedResult = new DeploymentScriptValidationResult();
+        final DeploymentScriptValidationResult expectedResult =
+                new DeploymentScriptValidationResult();
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(Collections.emptyList());
         // Run the test
-        final DeploymentScriptValidationResult result =
-                terraformLocalExecutor.tfValidate();
+        final DeploymentScriptValidationResult result = terraformLocalExecutor.tfValidate();
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
     }
-
 
     @Test
     @Order(2)
@@ -119,7 +114,8 @@ class TerraformLocalExecutorTest {
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(),
+        assertEquals(
+                result.getCommandExecuted(),
                 "terraform plan -input=false -no-color  -var-file=variables.tfvars.json");
     }
 
@@ -132,8 +128,10 @@ class TerraformLocalExecutorTest {
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(),
-                "terraform plan -input=false -no-color --out tfplan.binary -var-file=variables.tfvars.json");
+        assertEquals(
+                result.getCommandExecuted(),
+                "terraform plan -input=false -no-color --out tfplan.binary"
+                        + " -var-file=variables.tfvars.json");
     }
 
     @Test
@@ -144,8 +142,10 @@ class TerraformLocalExecutorTest {
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(),
-                "terraform apply -auto-approve -input=false -no-color  -var-file=variables.tfvars.json");
+        assertEquals(
+                result.getCommandExecuted(),
+                "terraform apply -auto-approve -input=false -no-color "
+                        + " -var-file=variables.tfvars.json");
     }
 
     @Test
@@ -156,9 +156,10 @@ class TerraformLocalExecutorTest {
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(),
-                "terraform destroy -auto-approve -input=false -no-color  -var-file=variables.tfvars.json");
-
+        assertEquals(
+                result.getCommandExecuted(),
+                "terraform destroy -auto-approve -input=false -no-color "
+                        + " -var-file=variables.tfvars.json");
     }
 
     @Test
@@ -169,8 +170,8 @@ class TerraformLocalExecutorTest {
         terraformLocalExecutor.deploy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(scriptsHelper.getTaskTerraformState(workspace),
-                        TfState.class);
+                new ObjectMapper()
+                        .readValue(scriptsHelper.getTaskTerraformState(workspace), TfState.class);
         assertFalse(tfState.getOutputs().isEmpty());
     }
 
@@ -182,8 +183,8 @@ class TerraformLocalExecutorTest {
         terraformLocalExecutor.destroy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(scriptsHelper.getTaskTerraformState(workspace),
-                        TfState.class);
+                new ObjectMapper()
+                        .readValue(scriptsHelper.getTaskTerraformState(workspace), TfState.class);
         assertTrue(tfState.getOutputs().isEmpty());
     }
 }

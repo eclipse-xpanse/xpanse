@@ -14,20 +14,15 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequestBase;
 
-/**
- * MigrateRequest model.
- */
+/** MigrateRequest model. */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
 public class MigrateRequest extends DeployRequestBase {
 
-    @Serial
-    private static final long serialVersionUID = 204243455244611956L;
+    @Serial private static final long serialVersionUID = 204243455244611956L;
 
-    /**
-     * The id of the service to migrate.
-     */
+    /** The id of the service to migrate. */
     @NotNull
     @Schema(description = "The id of the service to migrate")
     private UUID originalServiceId;

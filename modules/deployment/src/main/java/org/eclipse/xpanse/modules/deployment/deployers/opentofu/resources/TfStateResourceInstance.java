@@ -10,13 +10,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Map;
 import lombok.Data;
 
-/**
- * TfStateResourceInstance class.
- */
+/** TfStateResourceInstance class. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class TfStateResourceInstance {
 
     public Map<String, Object> attributes;
-
 }

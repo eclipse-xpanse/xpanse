@@ -10,11 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Defines possible states of a managed service.
- */
+/** Defines possible states of a managed service. */
 public enum ServiceDeploymentState {
-
     DEPLOYING("deploying"),
     DEPLOY_SUCCESS("deployment successful"),
     DEPLOY_FAILED("deployment failed"),
@@ -27,16 +24,13 @@ public enum ServiceDeploymentState {
     MODIFICATION_FAILED("modification failed"),
     MODIFICATION_SUCCESSFUL("modification successful");
 
-
     private final String state;
 
     ServiceDeploymentState(String state) {
         this.state = state;
     }
 
-    /**
-     * For ServiceDeploymentState deserialize.
-     */
+    /** For ServiceDeploymentState deserialize. */
     @JsonCreator
     public static ServiceDeploymentState getByValue(String state) {
         for (ServiceDeploymentState serviceState : values()) {
@@ -48,9 +42,7 @@ public enum ServiceDeploymentState {
                 String.format("ServiceDeploymentState value %s is not supported.", state));
     }
 
-    /**
-     * For ServiceDeploymentState serialize.
-     */
+    /** For ServiceDeploymentState serialize. */
     @JsonValue
     public String toValue() {
         return this.state;

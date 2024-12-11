@@ -14,27 +14,19 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-/**
- * Annotation to validate CIDRs.
- */
+/** Annotation to validate CIDRs. */
 @Target({ElementType.FIELD})
 @Retention(RUNTIME)
 @Documented
 @Constraint(validatedBy = CidrValidator.class)
 public @interface Cidr {
 
-    /**
-     * Validator Tip messages.
-     */
+    /** Validator Tip messages. */
     String message() default "Cidr is invalid";
 
-    /**
-     * Groups.
-     */
+    /** Groups. */
     Class<?>[] groups() default {};
 
-    /**
-     * Payloads.
-     */
+    /** Payloads. */
     Class<? extends Payload>[] payload() default {};
 }

@@ -21,9 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Bean to manage all service task to database.
- */
+/** Bean to manage all service task to database. */
 @Slf4j
 @Component
 @Transactional
@@ -37,8 +35,7 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
     }
 
     @Override
-    public ServiceOrderEntity storeAndFlush(
-            ServiceOrderEntity serviceOrderEntity) {
+    public ServiceOrderEntity storeAndFlush(ServiceOrderEntity serviceOrderEntity) {
         return repository.saveAndFlush(serviceOrderEntity);
     }
 
@@ -52,25 +49,29 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(entity.getServiceDeploymentEntity())
                             && Objects.nonNull(entity.getServiceDeploymentEntity().getId())) {
-                        predicateList.add(criteriaBuilder.equal(root
-                                        .get("serviceDeploymentEntity").get("id"),
-                                entity.getServiceDeploymentEntity().getId()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("serviceDeploymentEntity").get("id"),
+                                        entity.getServiceDeploymentEntity().getId()));
                     }
                     if (Objects.nonNull(entity.getTaskType())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("taskType"),
-                                entity.getTaskType()));
+                        predicateList.add(
+                                criteriaBuilder.equal(root.get("taskType"), entity.getTaskType()));
                     }
                     if (Objects.nonNull(entity.getTaskStatus())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("taskStatus"),
-                                entity.getTaskStatus()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("taskStatus"), entity.getTaskStatus()));
                     }
                     if (Objects.nonNull(entity.getParentOrderId())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("parentOrderId"),
-                                entity.getParentOrderId()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("parentOrderId"), entity.getParentOrderId()));
                     }
                     if (Objects.nonNull(entity.getWorkflowId())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("workflowId"),
-                                entity.getWorkflowId()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("workflowId"), entity.getWorkflowId()));
                     }
                     query.orderBy(criteriaBuilder.desc(root.get("startedTime")));
                     query.distinct(true);
@@ -83,9 +84,10 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
     @Override
     public ServiceOrderEntity getEntityById(UUID uuid) {
         Optional<ServiceOrderEntity> optional = repository.findById(uuid);
-        return optional.orElseThrow(() -> new ServiceOrderNotFound(
-                String.format("Service order with id %s not found.", uuid)
-        ));
+        return optional.orElseThrow(
+                () ->
+                        new ServiceOrderNotFound(
+                                String.format("Service order with id %s not found.", uuid)));
     }
 
     @Override
@@ -93,13 +95,11 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
         Optional<ServiceOrderEntity> optional = repository.findById(uuid);
         if (optional.isEmpty()) {
             throw new ServiceOrderNotFound(
-                    String.format("Service order with id %s not found.", uuid)
-            );
+                    String.format("Service order with id %s not found.", uuid));
         }
         if (Objects.isNull(optional.get().getServiceDeploymentEntity())) {
             throw new ServiceNotDeployedException(
-                    String.format("No service related to order with id %s.", uuid)
-            );
+                    String.format("No service related to order with id %s.", uuid));
         }
         return optional.get().getServiceDeploymentEntity();
     }

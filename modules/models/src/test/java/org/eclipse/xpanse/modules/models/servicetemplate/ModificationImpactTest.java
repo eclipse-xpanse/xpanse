@@ -12,9 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of ModificationImpact.
- */
+/** Test of ModificationImpact. */
 public class ModificationImpactTest {
 
     private static final Boolean isDataLost = true;
@@ -70,10 +68,13 @@ public class ModificationImpactTest {
 
     @Test
     void testToString() {
-        String expectedString = "ModificationImpact(" +
-                "isDataLost=" + isDataLost +
-                ", isServiceInterrupted=" + isServiceInterrupted +
-                ")";
+        String expectedString =
+                "ModificationImpact("
+                        + "isDataLost="
+                        + isDataLost
+                        + ", isServiceInterrupted="
+                        + isServiceInterrupted
+                        + ")";
         assertEquals(expectedString, modificationImpact.toString());
     }
 }

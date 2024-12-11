@@ -24,21 +24,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-/**
- * The service implements policy common methods.
- */
+/** The service implements policy common methods. */
 @Slf4j
 @Component
 public class PolicyManager {
 
-    @Resource
-    private AdminApi adminApi;
+    @Resource private AdminApi adminApi;
 
-    @Resource
-    private PoliciesValidateApi policiesValidateApi;
+    @Resource private PoliciesValidateApi policiesValidateApi;
 
-    @Resource
-    private PoliciesEvaluationApi policiesEvaluationApi;
+    @Resource private PoliciesEvaluationApi policiesEvaluationApi;
 
     @Value("${policy.man.endpoint:http://localhost:8090}")
     private String policyManBaseUrl;
@@ -56,8 +51,8 @@ public class PolicyManager {
         try {
             org.eclipse.xpanse.modules.policy.policyman.generated.model.SystemStatus
                     policyManSystemStatus = adminApi.healthGet();
-            org.eclipse.xpanse.modules.policy.policyman.generated.model.HealthStatus
-                    healthStatus = policyManSystemStatus.getHealthStatus();
+            org.eclipse.xpanse.modules.policy.policyman.generated.model.HealthStatus healthStatus =
+                    policyManSystemStatus.getHealthStatus();
             policyManStatus.setHealthStatus(HealthStatus.valueOf(healthStatus.getValue()));
         } catch (RestClientException e) {
             log.error("Get status of policy-man error:{}", e.getMessage());
@@ -67,7 +62,6 @@ public class PolicyManager {
 
         return policyManStatus;
     }
-
 
     /**
      * Valid policy.
@@ -101,7 +95,7 @@ public class PolicyManager {
      * Evaluate input by polices.
      *
      * @param policies list of policies.
-     * @param input    input
+     * @param input input
      */
     public EvalResult evaluatePolicies(List<String> policies, String input) {
         try {
@@ -117,5 +111,4 @@ public class PolicyManager {
             throw new RestClientException(errorMsg);
         }
     }
-
 }

@@ -14,39 +14,44 @@ import java.util.List;
 import lombok.Data;
 import org.hibernate.validator.constraints.UniqueElements;
 
-/**
- * The contact details of the Cloud Service Provider.
- */
+/** The contact details of the Cloud Service Provider. */
 @Data
 public class ServiceProviderContactDetails implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -574682470837775837L;
+    @Serial private static final long serialVersionUID = -574682470837775837L;
 
     @Valid
     @Size(min = 1)
     @UniqueElements
-    @Schema(description = "List of the email details of the service provider. "
-            + "The list elements must be unique.")
+    @Schema(
+            description =
+                    "List of the email details of the service provider. "
+                            + "The list elements must be unique.")
     private List<String> emails;
 
     @Valid
     @Size(min = 1)
     @UniqueElements
-    @Schema(description = "List of the phone details of the service provider. "
-            + "The list elements must be unique.")
+    @Schema(
+            description =
+                    "List of the phone details of the service provider. "
+                            + "The list elements must be unique.")
     private List<String> phones;
 
     @Valid
     @Size(min = 1)
     @UniqueElements
-    @Schema(description = "List of the chat details of the service provider. "
-            + "The list elements must be unique.")
+    @Schema(
+            description =
+                    "List of the chat details of the service provider. "
+                            + "The list elements must be unique.")
     private List<String> chats;
 
     @Valid
     @Size(min = 1)
     @UniqueElements
-    @Schema(description = "List of the website details of the service provider. "
-            + "The list elements must be unique.")
+    @Schema(
+            description =
+                    "List of the website details of the service provider. "
+                            + "The list elements must be unique.")
     private List<String> websites;
 }

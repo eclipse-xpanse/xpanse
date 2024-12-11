@@ -9,9 +9,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Exception thrown when the billing config of service is invalid.
- */
+/** Exception thrown when the billing config of service is invalid. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class InvalidBillingConfigException extends RuntimeException {

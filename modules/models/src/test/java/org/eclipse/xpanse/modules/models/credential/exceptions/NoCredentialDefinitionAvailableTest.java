@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of NoCredentialDefinitionAvailable.
- */
+/** Test of NoCredentialDefinitionAvailable. */
 class NoCredentialDefinitionAvailableTest {
 
     private static final String message = "No credential definition available.";
@@ -28,5 +26,4 @@ class NoCredentialDefinitionAvailableTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

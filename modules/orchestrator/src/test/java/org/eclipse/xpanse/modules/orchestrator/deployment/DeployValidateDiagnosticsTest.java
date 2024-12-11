@@ -22,7 +22,6 @@ class DeployValidateDiagnosticsTest {
         assertEquals(detail, test.getDetail());
     }
 
-
     @Test
     void testEqualsAndHashCode() {
         assertEquals(test, test);
@@ -47,7 +46,6 @@ class DeployValidateDiagnosticsTest {
         assertNotEquals(test2, test3);
         assertNotEquals(test.hashCode(), test1.hashCode());
         assertNotEquals(test2.hashCode(), test3.hashCode());
-
     }
 
     @Test

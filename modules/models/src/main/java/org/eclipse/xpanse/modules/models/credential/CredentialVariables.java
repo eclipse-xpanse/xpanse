@@ -15,54 +15,54 @@ import lombok.Getter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
-/**
- * List credential definition that can be provided from end user.
- */
+/** List credential definition that can be provided from end user. */
 @Getter
 public class CredentialVariables extends AbstractCredentialInfo {
 
-    /**
-     * The variables list of the credential.
-     */
+    /** The variables list of the credential. */
     @NotNull
     @Size(min = 1)
     @Schema(description = "The variables list of the credential.")
     private final List<CredentialVariable> variables;
 
-    /**
-     * The constructor without filed timeToLive.
-     */
-    public CredentialVariables(Csp csp, String site, CredentialType type, String name,
-                               String description, String userId,
-                               List<CredentialVariable> variables) {
+    /** The constructor without filed timeToLive. */
+    public CredentialVariables(
+            Csp csp,
+            String site,
+            CredentialType type,
+            String name,
+            String description,
+            String userId,
+            List<CredentialVariable> variables) {
         super(csp, site, type, name, description, userId);
         this.variables = variables;
     }
 
-    /**
-     * The constructor with all fields.
-     */
+    /** The constructor with all fields. */
     @JsonCreator
-    public CredentialVariables(@JsonProperty("csp") Csp csp,
-                               @JsonProperty("site") String site,
-                               @JsonProperty("type") CredentialType type,
-                               @JsonProperty("name") String name,
-                               @JsonProperty("description") String description,
-                               @JsonProperty("userId") String userId,
-                               @JsonProperty("timeToLive") Integer timeToLive,
-                               @JsonProperty("variables") List<CredentialVariable> variables) {
+    public CredentialVariables(
+            @JsonProperty("csp") Csp csp,
+            @JsonProperty("site") String site,
+            @JsonProperty("type") CredentialType type,
+            @JsonProperty("name") String name,
+            @JsonProperty("description") String description,
+            @JsonProperty("userId") String userId,
+            @JsonProperty("timeToLive") Integer timeToLive,
+            @JsonProperty("variables") List<CredentialVariable> variables) {
         super(csp, site, type, name, description, userId);
         super.timeToLive = timeToLive;
         this.variables = variables;
     }
 
-    /**
-     * The constructor.
-     */
+    /** The constructor. */
     public CredentialVariables(CreateCredential createCredential) {
-        super(createCredential.getCsp(), createCredential.getSite(),
-                createCredential.getType(), createCredential.getName(),
-                createCredential.getDescription(), createCredential.getUserId());
+        super(
+                createCredential.getCsp(),
+                createCredential.getSite(),
+                createCredential.getType(),
+                createCredential.getName(),
+                createCredential.getDescription(),
+                createCredential.getUserId());
         super.timeToLive = createCredential.getTimeToLive();
         this.variables = createCredential.getVariables();
     }

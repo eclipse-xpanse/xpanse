@@ -13,16 +13,15 @@ import static org.mockito.Mockito.mock;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of CidrValidator.
- */
+/** Test of CidrValidator. */
 class CidrValidatorTest {
 
     @Test
     public void testValidCidr() {
         CidrValidator cidrValidator = new CidrValidator();
         String validCidr = "192.168.0.0/24";
-        ConstraintValidatorContext constraintValidatorContext = mock(ConstraintValidatorContext.class);
+        ConstraintValidatorContext constraintValidatorContext =
+                mock(ConstraintValidatorContext.class);
         boolean isValid = cidrValidator.isValid(validCidr, constraintValidatorContext);
         assertTrue(isValid);
     }
@@ -31,7 +30,8 @@ class CidrValidatorTest {
     public void testInvalidCidr() {
         CidrValidator cidrValidator = new CidrValidator();
         String invalidCidr = "192.168.0.0/33";
-        ConstraintValidatorContext constraintValidatorContext = mock(ConstraintValidatorContext.class);
+        ConstraintValidatorContext constraintValidatorContext =
+                mock(ConstraintValidatorContext.class);
         boolean isValid = cidrValidator.isValid(invalidCidr, constraintValidatorContext);
         assertFalse(isValid);
     }

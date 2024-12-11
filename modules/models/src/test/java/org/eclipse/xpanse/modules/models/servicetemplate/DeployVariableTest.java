@@ -16,9 +16,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of DeployVariable.
- */
+/** Test of DeployVariable. */
 class DeployVariableTest {
 
     private static final String name = "deployVariable_name";
@@ -28,7 +26,7 @@ class DeployVariableTest {
     private static final String description = "description";
     private static final String value = "value";
     private static final Boolean mandatory = true;
-    private static final Map<String,Object> validatorMap  = Map.of("minLength","10");
+    private static final Map<String, Object> validatorMap = Map.of("minLength", "10");
     private static final SensitiveScope sensitiveScope = SensitiveScope.ONCE;
     private static DeployVariable deployVariable;
     private static AutoFill autoFill = null;
@@ -152,20 +150,41 @@ class DeployVariableTest {
 
     @Test
     void testToString() {
-        String expectedString = "DeployVariable(" +
-                "name=" + name +
-                ", kind=" + kind + "" +
-                ", dataType=" + dataType + "" +
-                ", example=" + example + "" +
-                ", description=" + description + "" +
-                ", value=" + value + "" +
-                ", mandatory=" + mandatory + "" +
-                ", valueSchema=" + validatorMap + "" +
-                ", sensitiveScope=" + sensitiveScope + "" +
-                ", autoFill=" + autoFill + "" +
-                ", modificationImpact=" + modificationImpact + "" +
-                ")";
+        String expectedString =
+                "DeployVariable("
+                        + "name="
+                        + name
+                        + ", kind="
+                        + kind
+                        + ""
+                        + ", dataType="
+                        + dataType
+                        + ""
+                        + ", example="
+                        + example
+                        + ""
+                        + ", description="
+                        + description
+                        + ""
+                        + ", value="
+                        + value
+                        + ""
+                        + ", mandatory="
+                        + mandatory
+                        + ""
+                        + ", valueSchema="
+                        + validatorMap
+                        + ""
+                        + ", sensitiveScope="
+                        + sensitiveScope
+                        + ""
+                        + ", autoFill="
+                        + autoFill
+                        + ""
+                        + ", modificationImpact="
+                        + modificationImpact
+                        + ""
+                        + ")";
         assertEquals(expectedString, deployVariable.toString());
     }
-
 }

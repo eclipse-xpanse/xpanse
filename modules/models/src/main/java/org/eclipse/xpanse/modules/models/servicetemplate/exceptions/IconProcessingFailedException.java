@@ -5,14 +5,9 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate.exceptions;
 
-/**
- * Exception thrown while processing the icon in the registration request.
- */
+/** Exception thrown while processing the icon in the registration request. */
 public class IconProcessingFailedException extends RuntimeException {
     public IconProcessingFailedException(String message) {
         super(message);
     }
-
-
 }
-

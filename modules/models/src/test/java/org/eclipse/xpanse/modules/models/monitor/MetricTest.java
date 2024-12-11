@@ -17,9 +17,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of Metric.
- */
+/** Test of Metric. */
 class MetricTest {
 
     private static final String name = "name";
@@ -116,17 +114,28 @@ class MetricTest {
 
     @Test
     void testToString() {
-        String expectedString = "Metric(" +
-                "name=" + name +
-                ", description=" + description + "" +
-                ", type=" + type +
-                ", monitorResourceType=" + monitorResourceType + "" +
-                ", unit=" + unit + "" +
-                ", labels=" + labels +
-                ", metrics=" + metrics + "" +
-                ")";
+        String expectedString =
+                "Metric("
+                        + "name="
+                        + name
+                        + ", description="
+                        + description
+                        + ""
+                        + ", type="
+                        + type
+                        + ", monitorResourceType="
+                        + monitorResourceType
+                        + ""
+                        + ", unit="
+                        + unit
+                        + ""
+                        + ", labels="
+                        + labels
+                        + ", metrics="
+                        + metrics
+                        + ""
+                        + ")";
 
         assertEquals(expectedString, metric.toString());
     }
-
 }

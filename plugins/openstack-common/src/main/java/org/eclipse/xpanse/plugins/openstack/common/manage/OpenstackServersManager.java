@@ -25,21 +25,16 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Class to manage state of VMs for Openstack plugin.
- */
+/** Class to manage state of VMs for Openstack plugin. */
 @Slf4j
 @Component
 public class OpenstackServersManager {
 
-    @Resource
-    private ProviderAuthInfoResolver providerAuthInfoResolver;
+    @Resource private ProviderAuthInfoResolver providerAuthInfoResolver;
 
-
-    /**
-     * Start the OpenStack Nova VM.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** Start the OpenStack Nova VM. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean startService(Csp csp, ServiceStateManageRequest request) {
@@ -61,8 +56,10 @@ public class OpenstackServersManager {
                 if (actionResponse.isSuccess()) {
                     log.info("Start resource with id {} successfully.", resource.getResourceId());
                 } else {
-                    String errorMsg = String.format("Start resource %s failed, error: %s",
-                            resource.getResourceId(), actionResponse.getFault());
+                    String errorMsg =
+                            String.format(
+                                    "Start resource %s failed, error: %s",
+                                    resource.getResourceId(), actionResponse.getFault());
                     log.error(errorMsg);
                     errorMessages.add(errorMsg);
                 }
@@ -78,11 +75,9 @@ public class OpenstackServersManager {
         return true;
     }
 
-
-    /**
-     * Stop the OpenStack Nova VM.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** Stop the OpenStack Nova VM. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean stopService(Csp csp, ServiceStateManageRequest request) {
@@ -104,8 +99,10 @@ public class OpenstackServersManager {
                 if (actionResponse.isSuccess()) {
                     log.info("Stop resource {} successfully.", resource.getResourceId());
                 } else {
-                    String errorMsg = String.format("Stop resource %s failed, error: %s",
-                            resource.getResourceId(), actionResponse.getFault());
+                    String errorMsg =
+                            String.format(
+                                    "Stop resource %s failed, error: %s",
+                                    resource.getResourceId(), actionResponse.getFault());
                     log.error(errorMsg);
                     errorMessages.add(errorMsg);
                 }
@@ -121,10 +118,9 @@ public class OpenstackServersManager {
         }
     }
 
-    /**
-     * Restart the OpenStack Nova VM.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** Restart the OpenStack Nova VM. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean restartService(Csp csp, ServiceStateManageRequest request) {
@@ -138,17 +134,22 @@ public class OpenstackServersManager {
                 Server serverBeforeRestart =
                         osClient.compute().servers().get(resource.getResourceId());
                 if (!serverBeforeRestart.getStatus().equals(Server.Status.ACTIVE)) {
-                    log.error("Resource with id {} could not be restarted when it is inactive.",
+                    log.error(
+                            "Resource with id {} could not be restarted when it is inactive.",
                             resource.getResourceId());
                     continue;
                 }
-                ActionResponse actionResponse = osClient.compute().servers()
-                        .reboot(resource.getResourceId(), RebootType.SOFT);
+                ActionResponse actionResponse =
+                        osClient.compute()
+                                .servers()
+                                .reboot(resource.getResourceId(), RebootType.SOFT);
                 if (actionResponse.isSuccess()) {
                     log.info("Restart resource with id {} successfully.", resource.getResourceId());
                 } else {
-                    String errorMsg = String.format("Restart resource %s failed, error: %s",
-                            resource.getResourceId(), actionResponse.getFault());
+                    String errorMsg =
+                            String.format(
+                                    "Restart resource %s failed, error: %s",
+                                    resource.getResourceId(), actionResponse.getFault());
                     log.error(errorMsg);
                     errorMessages.add(errorMsg);
                 }
@@ -169,6 +170,3 @@ public class OpenstackServersManager {
                 csp, site, userId, serviceId, null);
     }
 }
-
-
-

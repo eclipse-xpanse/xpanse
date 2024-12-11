@@ -46,7 +46,7 @@ class PoliciesEvaluationFailedExceptionTest {
     @Test
     void testHashCode() {
         PoliciesEvaluationFailedException test = new PoliciesEvaluationFailedException("error");
-        assertThat(policiesEvaluationFailedExceptionUnderTest.hashCode()).isNotEqualTo(
-                test.hashCode());
+        assertThat(policiesEvaluationFailedExceptionUnderTest.hashCode())
+                .isNotEqualTo(test.hashCode());
     }
 }

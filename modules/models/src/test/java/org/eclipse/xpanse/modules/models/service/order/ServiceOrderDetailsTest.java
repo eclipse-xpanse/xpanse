@@ -23,10 +23,10 @@ import org.springframework.beans.BeanUtils;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceOrderDetailsTest {
-    private final OffsetDateTime startedTime = OffsetDateTime.of(LocalDateTime.now(),
-            ZoneOffset.UTC);
-    private final OffsetDateTime completedTime = OffsetDateTime.of(LocalDateTime.now(),
-            ZoneOffset.UTC);
+    private final OffsetDateTime startedTime =
+            OffsetDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
+    private final OffsetDateTime completedTime =
+            OffsetDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
     private final UUID serviceId = UUID.fromString("168b2be0-3535-4042-b53c-23cabd874a51");
     private final UUID orderId = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab61");
     private final UUID originalServiceId = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab62");
@@ -37,18 +37,12 @@ class ServiceOrderDetailsTest {
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
     private final Handler handler = Handler.INTERNAL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
-    @Mock
-    private Object requestBody;
-    @Mock
-    private DeployRequest mockPreviousDeployRequest;
-    @Mock
-    private DeployRequest mockNewDeployRequest;
-    @Mock
-    private List<DeployResource> mockPreviousDeployedResources;
-    @Mock
-    private Map<String, String> mockPreviousDeployedResultProperties;
-    @Mock
-    private Map<String, String> mockPreviousDeployedServiceProperties;
+    @Mock private Object requestBody;
+    @Mock private DeployRequest mockPreviousDeployRequest;
+    @Mock private DeployRequest mockNewDeployRequest;
+    @Mock private List<DeployResource> mockPreviousDeployedResources;
+    @Mock private Map<String, String> mockPreviousDeployedResultProperties;
+    @Mock private Map<String, String> mockPreviousDeployedServiceProperties;
 
     private ServiceOrderDetails test;
 
@@ -116,25 +110,44 @@ class ServiceOrderDetailsTest {
 
     @Test
     void testToString() {
-        String result = "ServiceOrderDetails(orderId=" + orderId
-                + ", serviceId=" + serviceId
-                + ", taskType=" + taskType
-                + ", taskStatus=" + taskStatus
-                + ", originalServiceId=" + originalServiceId
-                + ", parentOrderId=" + parentOrderId
-                + ", workflowId=" + workflowId
-                + ", errorResponse=" + errorResponse
-                + ", userId=" + userId
-                + ", startedTime=" + startedTime
-                + ", completedTime=" + completedTime
-                + ", requestBody=" + requestBody
-                + ", previousDeployRequest=" + mockPreviousDeployRequest
-                + ", newDeployRequest=" + mockNewDeployRequest
-                + ", previousDeployedResources=" + mockPreviousDeployedResources
-                + ", previousDeployedServiceProperties=" + mockPreviousDeployedServiceProperties
-                + ", previousDeployedResultProperties=" + mockPreviousDeployedResultProperties
-                + ", handler=" + handler
-                + ")";
+        String result =
+                "ServiceOrderDetails(orderId="
+                        + orderId
+                        + ", serviceId="
+                        + serviceId
+                        + ", taskType="
+                        + taskType
+                        + ", taskStatus="
+                        + taskStatus
+                        + ", originalServiceId="
+                        + originalServiceId
+                        + ", parentOrderId="
+                        + parentOrderId
+                        + ", workflowId="
+                        + workflowId
+                        + ", errorResponse="
+                        + errorResponse
+                        + ", userId="
+                        + userId
+                        + ", startedTime="
+                        + startedTime
+                        + ", completedTime="
+                        + completedTime
+                        + ", requestBody="
+                        + requestBody
+                        + ", previousDeployRequest="
+                        + mockPreviousDeployRequest
+                        + ", newDeployRequest="
+                        + mockNewDeployRequest
+                        + ", previousDeployedResources="
+                        + mockPreviousDeployedResources
+                        + ", previousDeployedServiceProperties="
+                        + mockPreviousDeployedServiceProperties
+                        + ", previousDeployedResultProperties="
+                        + mockPreviousDeployedResultProperties
+                        + ", handler="
+                        + handler
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

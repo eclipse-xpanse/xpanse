@@ -17,17 +17,17 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StreamUtils;
 
-/**
- * The class logs HTTP requests and responses made by RestTemplate.
- */
+/** The class logs HTTP requests and responses made by RestTemplate. */
 @Configuration
 @Slf4j
 public class RestTemplateLoggingInterceptor implements ClientHttpRequestInterceptor {
 
     @Override
     @NonNull
-    public ClientHttpResponse intercept(@NonNull HttpRequest request, @NonNull byte[] body,
-                                        @NonNull ClientHttpRequestExecution execution)
+    public ClientHttpResponse intercept(
+            @NonNull HttpRequest request,
+            @NonNull byte[] body,
+            @NonNull ClientHttpRequestExecution execution)
             throws IOException {
         long startTime = System.currentTimeMillis();
         ClientHttpResponse originalResponse = execution.execute(request, body);
@@ -36,8 +36,13 @@ public class RestTemplateLoggingInterceptor implements ClientHttpRequestIntercep
         return new CustomClientHttpResponse(originalResponse, responseBodyBytes);
     }
 
-    private void logRequestResponse(HttpRequest request, byte[] body, ClientHttpResponse response,
-                                    byte[] responseBodyBytes, long startTime) throws IOException {
+    private void logRequestResponse(
+            HttpRequest request,
+            byte[] body,
+            ClientHttpResponse response,
+            byte[] responseBodyBytes,
+            long startTime)
+            throws IOException {
         if (log.isInfoEnabled()) {
             String requestBody = new String(body, StandardCharsets.UTF_8);
             final StringBuilder requestResult = new StringBuilder(requestBody.length() + 2048);

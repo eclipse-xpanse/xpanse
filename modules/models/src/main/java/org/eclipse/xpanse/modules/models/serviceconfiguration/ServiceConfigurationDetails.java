@@ -9,9 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 import lombok.Data;
 
-/**
- * Details of the service configuration.
- */
+/** Details of the service configuration. */
 @Data
 public class ServiceConfigurationDetails {
     private Map<String, Object> configuration;

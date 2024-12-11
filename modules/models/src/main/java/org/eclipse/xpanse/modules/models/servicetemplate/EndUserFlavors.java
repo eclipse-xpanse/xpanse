@@ -14,16 +14,15 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Defines service flavors for end user.
- * we need a separate data model to end user since the original flavor data model is used by ISV
- * and CSP also have the pricing configuration info which should not be returned to the end user.
+ * Defines service flavors for end user. we need a separate data model to end user since the
+ * original flavor data model is used by ISV and CSP also have the pricing configuration info which
+ * should not be returned to the end user.
  */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class EndUserFlavors extends ServiceFlavor {
-    @Serial
-    private static final long serialVersionUID = 8791396314490350992L;
+    @Serial private static final long serialVersionUID = 8791396314490350992L;
 
     @NotNull
     @Schema(description = "The flavors of the orderable service.")

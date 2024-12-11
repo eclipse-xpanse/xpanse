@@ -24,25 +24,19 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Defines method to validate the service configuration parameter of deployment.
- */
+/** Defines method to validate the service configuration parameter of deployment. */
 @Slf4j
 @Component
 public class ServiceConfigurationParameterValidator {
 
     public static final String CSP_SCRIPT_FILE_NAME = "provider.tf";
-    @Resource
-    private PluginManager pluginManager;
-    @Resource
-    private DeploymentScriptsHelper deploymentScriptsHelper;
+    @Resource private PluginManager pluginManager;
+    @Resource private DeploymentScriptsHelper deploymentScriptsHelper;
 
-    /**
-     * validate service configuration parameters.
-     */
+    /** validate service configuration parameters. */
     public void validateServiceConfigurationParameters(Ocl ocl) {
-        OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(
-                ocl.getCloudServiceProvider().getName());
+        OrchestratorPlugin plugin =
+                pluginManager.getOrchestratorPlugin(ocl.getCloudServiceProvider().getName());
         List<File> scriptFiles = prepareDeployWorkspaceWithScripts(ocl);
         List<ServiceConfigurationParameter> configurationParameters =
                 ocl.getServiceConfigurationManage().getConfigurationParameters();
@@ -51,35 +45,43 @@ public class ServiceConfigurationParameterValidator {
             return;
         }
         List<String> errors = new ArrayList<>();
-        scriptFiles.forEach(scriptFile -> {
-            Map<String, String> resourceMap =
-                    plugin.getComputeResourcesInServiceDeployment(scriptFile);
-            if (!CollectionUtils.isEmpty(resourceMap)) {
-                configurationParameters.forEach(configurationParameter -> {
-                    if (!resourceMap.containsKey(configurationParameter.getManagedBy())) {
-                        String errorMsg = String.format(
-                                "managedBy field value %s of %s parameter is not valid",
-                                configurationParameter.getManagedBy(),
-                                configurationParameter.getName());
-                        log.error(errorMsg);
-                        errors.add(errorMsg);
+        scriptFiles.forEach(
+                scriptFile -> {
+                    Map<String, String> resourceMap =
+                            plugin.getComputeResourcesInServiceDeployment(scriptFile);
+                    if (!CollectionUtils.isEmpty(resourceMap)) {
+                        configurationParameters.forEach(
+                                configurationParameter -> {
+                                    if (!resourceMap.containsKey(
+                                            configurationParameter.getManagedBy())) {
+                                        String errorMsg =
+                                                String.format(
+                                                        "managedBy field value %s of %s parameter"
+                                                                + " is not valid",
+                                                        configurationParameter.getManagedBy(),
+                                                        configurationParameter.getName());
+                                        log.error(errorMsg);
+                                        errors.add(errorMsg);
+                                    }
+                                });
                     }
                 });
-            }
-        });
         if (!CollectionUtils.isEmpty(errors)) {
             throw new ServiceConfigurationInvalidException(errors);
         }
     }
 
     private List<File> prepareDeployWorkspaceWithScripts(Ocl ocl) {
-        String taskWorkspace = deploymentScriptsHelper.createWorkspaceForTask(
-                getBaseWorkspace(), UUID.randomUUID());
-        List<File> files = deploymentScriptsHelper.prepareDeploymentScripts(taskWorkspace,
-                ocl.getDeployment(), null);
+        String taskWorkspace =
+                deploymentScriptsHelper.createWorkspaceForTask(
+                        getBaseWorkspace(), UUID.randomUUID());
+        List<File> files =
+                deploymentScriptsHelper.prepareDeploymentScripts(
+                        taskWorkspace, ocl.getDeployment(), null);
         return files.stream()
                 .filter(file -> file.getName().endsWith(TF_SCRIPT_FILE_EXTENSION))
-                .filter(file -> !CSP_SCRIPT_FILE_NAME.equals(file.getName())).toList();
+                .filter(file -> !CSP_SCRIPT_FILE_NAME.equals(file.getName()))
+                .toList();
     }
 
     private String getBaseWorkspace() {

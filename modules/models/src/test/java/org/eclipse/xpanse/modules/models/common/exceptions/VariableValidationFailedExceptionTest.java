@@ -14,9 +14,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValid
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of VariableValidationFailedException.
- */
+/** Test of VariableValidationFailedException. */
 public class VariableValidationFailedExceptionTest {
 
     private static List<String> errorReasons;
@@ -82,5 +80,4 @@ public class VariableValidationFailedExceptionTest {
 
         assertEquals(expectedToString, exception.toString());
     }
-
 }

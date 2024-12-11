@@ -39,9 +39,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
-/**
- * Class for credentialApi generation.
- */
+/** Class for credentialApi generation. */
 @Slf4j
 @Component
 public class CredentialOpenApiGenerator implements ApplicationListener<ApplicationStartedEvent> {
@@ -55,12 +53,11 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
 
     @Value("${enable.web.security:false}")
     private Boolean webSecurityIsEnabled;
+
     @Value("${enable.role.protection:false}")
     private Boolean roleProtectionIsEnabled;
 
-    /**
-     * Constructor of CredentialOpenApiGenerator.
-     */
+    /** Constructor of CredentialOpenApiGenerator. */
     @Autowired
     public CredentialOpenApiGenerator(
             @Value("${app.version:1.0.0}") String appVersion,
@@ -87,7 +84,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
     /**
      * Get the work directory of the credentialApi.
      *
-     * @return workdir  The work directory of the credentialApi.
+     * @return workdir The work directory of the credentialApi.
      */
     private String getCredentialApiDir() {
         return this.openApiGeneratorJarManage.getOpenApiWorkdir();
@@ -101,21 +98,28 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                     entry.getValue().getCredentialDefinitions();
             if (Objects.nonNull(credentialDefinitions)) {
                 Map<CredentialType, AbstractCredentialInfo> typeCredentialInfoMap =
-                        credentialDefinitions.stream().filter(Objects::nonNull)
-                                .collect(Collectors.toMap(AbstractCredentialInfo::getType,
-                                        Function.identity(), (existing, replacement) -> existing));
-                typeCredentialInfoMap.keySet().forEach(type -> {
-                    CredentialVariables credentialVariables =
-                            (CredentialVariables) typeCredentialInfoMap.get(type);
-                    createCredentialApi(credentialVariables);
-                });
+                        credentialDefinitions.stream()
+                                .filter(Objects::nonNull)
+                                .collect(
+                                        Collectors.toMap(
+                                                AbstractCredentialInfo::getType,
+                                                Function.identity(),
+                                                (existing, replacement) -> existing));
+                typeCredentialInfoMap
+                        .keySet()
+                        .forEach(
+                                type -> {
+                                    CredentialVariables credentialVariables =
+                                            (CredentialVariables) typeCredentialInfoMap.get(type);
+                                    createCredentialApi(credentialVariables);
+                                });
             } else {
-                log.info("Not found credential definition of the cloud service provider:{}",
+                log.info(
+                        "Not found credential definition of the cloud service provider:{}",
                         entry.getKey().toValue());
             }
         }
     }
-
 
     /**
      * create credentialApi for plugins.
@@ -123,10 +127,12 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
      * @param credentialVariables credentialDefinition
      */
     public void createCredentialApi(CredentialVariables credentialVariables) {
-        String jsonFileName = getCredentialApiFileName(credentialVariables.getCsp(),
-                credentialVariables.getType(), ".json");
-        String htmlFileName = getCredentialApiFileName(credentialVariables.getCsp(),
-                credentialVariables.getType(), ".html");
+        String jsonFileName =
+                getCredentialApiFileName(
+                        credentialVariables.getCsp(), credentialVariables.getType(), ".json");
+        String htmlFileName =
+                getCredentialApiFileName(
+                        credentialVariables.getCsp(), credentialVariables.getType(), ".html");
         String credentialApiDir = getCredentialApiDir();
         File dir = new File(credentialApiDir);
         if (!dir.exists()) {
@@ -143,14 +149,16 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
             log.info("credentialApi jsonFile:{} creation successful.", jsonFile.getName());
             File jarPath = getJarPath();
             if (jsonFile.exists() && jarPath.exists()) {
-                String comm = String.format("java -jar %s generate -g html2 "
-                        + "-i %s -o %s", jarPath.getPath(), jsonFile.getPath(), credentialApiDir);
+                String comm =
+                        String.format(
+                                "java -jar %s generate -g html2 " + "-i %s -o %s",
+                                jarPath.getPath(), jsonFile.getPath(), credentialApiDir);
                 ProcessBuilder processBuilder = new ProcessBuilder(comm.split("\\s+"));
                 processBuilder.redirectErrorStream(true);
                 Process process = processBuilder.start();
                 StringBuilder stdErrOut = new StringBuilder();
-                try (BufferedReader outputReader = new BufferedReader(
-                        new InputStreamReader(process.getInputStream()))) {
+                try (BufferedReader outputReader =
+                        new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                     String line;
                     while ((line = outputReader.readLine()) != null) {
                         stdErrOut.append(line);
@@ -158,16 +166,18 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                 }
                 int exitCode = process.waitFor();
                 if (exitCode != 0) {
-                    log.error("credentialApi htmlFile:{} creation failed.{}",
-                            htmlFile.getName(), stdErrOut);
+                    log.error(
+                            "credentialApi htmlFile:{} creation failed.{}",
+                            htmlFile.getName(),
+                            stdErrOut);
                 }
                 File tempHtmlFile = new File(credentialApiDir, "index.html");
                 if (tempHtmlFile.exists() && (tempHtmlFile.renameTo(htmlFile))) {
                     log.info("credentialApi htmlFile:{} creation successful.", htmlFile.getName());
-
                 }
             } else {
-                log.error("Not generating {} file. Missing json or openapi-generator jar file",
+                log.error(
+                        "Not generating {} file. Missing json or openapi-generator jar file",
                         htmlFile.getName());
             }
         } catch (IOException | InterruptedException ex) {
@@ -180,7 +190,6 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                     log.info("Deleted temp json file:{} successfully.", jsonFile.getName());
                 } catch (IOException ioException) {
                     log.info("Deleting temp json file:{} failed.", jsonFile.getName(), ioException);
-
                 }
             }
         }
@@ -198,7 +207,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
     /**
      * Get credential openApi Url.
      *
-     * @param csp  The cloud service provider.
+     * @param csp The cloud service provider.
      * @param type The type of credential.
      * @return Returns credential openApi Url.
      */
@@ -212,27 +221,38 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
             List<AbstractCredentialInfo> credentialDefinitions =
                     orchestratorPlugin.getCredentialDefinitions();
             if (Objects.nonNull(credentialDefinitions)) {
-                AbstractCredentialInfo abstractCredentialInfo = credentialDefinitions.stream()
-                        .filter(credentialInfo -> Objects.equals(type, credentialInfo.getType()))
-                        .findFirst().orElse(null);
+                AbstractCredentialInfo abstractCredentialInfo =
+                        credentialDefinitions.stream()
+                                .filter(
+                                        credentialInfo ->
+                                                Objects.equals(type, credentialInfo.getType()))
+                                .findFirst()
+                                .orElse(null);
                 if (Objects.nonNull(abstractCredentialInfo)) {
                     findCredentialInfo = true;
                     createCredentialApi((CredentialVariables) abstractCredentialInfo);
                 }
             }
             if (!findCredentialInfo) {
-                String errorMsg = String.format(
-                        "Not found credential definition with type %s of the cloud service "
-                                + "provider %s", type.toValue(), csp.toValue());
+                String errorMsg =
+                        String.format(
+                                "Not found credential definition with type %s of the cloud service "
+                                        + "provider %s",
+                                type.toValue(), csp.toValue());
                 log.error(errorMsg);
                 throw new NoCredentialDefinitionAvailable(errorMsg);
             }
         }
         if (openApiGeneratorJarManage.getOpenapiPath().endsWith("/")) {
-            return getServiceUrl() + "/" + openApiGeneratorJarManage.getOpenapiPath()
+            return getServiceUrl()
+                    + "/"
+                    + openApiGeneratorJarManage.getOpenapiPath()
                     + htmlFileName;
         }
-        return getServiceUrl() + "/" + openApiGeneratorJarManage.getOpenapiPath() + "/"
+        return getServiceUrl()
+                + "/"
+                + openApiGeneratorJarManage.getOpenapiPath()
+                + "/"
                 + htmlFileName;
     }
 
@@ -241,8 +261,9 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
     }
 
     private String getVariablesExampleStr(List<CredentialVariable> variables) {
-        variables.forEach(credentialVariable -> credentialVariable.setValue(
-                credentialVariable.getDescription()));
+        variables.forEach(
+                credentialVariable ->
+                        credentialVariable.setValue(credentialVariable.getDescription()));
         String exampleString = "";
         try {
             exampleString = OBJECT_MAPPER.writeValueAsString(variables);
@@ -253,7 +274,8 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
     }
 
     private List<String> getActiveCspValues() {
-        return pluginManager.getPluginsMap().keySet().stream().map(Csp::toValue)
+        return pluginManager.getPluginsMap().keySet().stream()
+                .map(Csp::toValue)
                 .collect(Collectors.toList());
     }
 
@@ -269,8 +291,9 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
         String siteExample = siteValues.isEmpty() ? "default" : siteValues.getFirst();
         String type = credentialVariables.getType().toValue();
         String variablesExampleStr = getVariablesExampleStr(credentialVariables.getVariables());
-        //CHECKSTYLE OFF: LineLength
-        return String.format("""
+        // CHECKSTYLE OFF: LineLength
+        return String.format(
+                """
                         {
                             "openapi": "3.0.1",
                             "info": {
@@ -514,18 +537,28 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                             }
                         }
                         """,
-                csp, appVersion, serviceUrl, securityConfigList, getRequiredRolesDesc(),
-                csp, cspValuesStr, siteExample, siteValuesStr, type,
-                credentialVariables.getName(), credentialVariables.getDescription(),
-                variablesExampleStr, getSecuritySchemes());
+                csp,
+                appVersion,
+                serviceUrl,
+                securityConfigList,
+                getRequiredRolesDesc(),
+                csp,
+                cspValuesStr,
+                siteExample,
+                siteValuesStr,
+                type,
+                credentialVariables.getName(),
+                credentialVariables.getDescription(),
+                variablesExampleStr,
+                getSecuritySchemes());
     }
-
 
     private String getSecurityConfigList() {
         if (webSecurityIsEnabled) {
             String roleScopeStr =
                     roleProtectionIsEnabled ? "\"urn:zitadel:iam:org:project:roles\"," : "";
-            return String.format("""
+            return String.format(
+                    """
                     "security": [
                                 {
                                     "OAuth2Flow": [
@@ -536,11 +569,11 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                                     ]
                                 }
                             ],
-                    """, roleScopeStr);
+                    """,
+                    roleScopeStr);
         }
         return "";
     }
-
 
     private String getRequiredRolesDesc() {
         if (webSecurityIsEnabled && roleProtectionIsEnabled) {

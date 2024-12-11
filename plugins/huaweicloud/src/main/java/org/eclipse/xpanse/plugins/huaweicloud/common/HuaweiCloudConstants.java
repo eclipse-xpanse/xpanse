@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.common;
 
-/**
- * Huawei constant class.
- */
+/** Huawei constant class. */
 public class HuaweiCloudConstants {
 
     public static final String IAM = "AK_SK";

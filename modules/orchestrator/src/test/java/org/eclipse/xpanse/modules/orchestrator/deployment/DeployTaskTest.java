@@ -22,12 +22,9 @@ class DeployTaskTest {
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
     private final String userId = "userId";
     private final String namespace = "namespace";
-    @Mock
-    private DeployRequest mockDeployRequest;
-    @Mock
-    private Object mockRequest;
-    @Mock
-    private Ocl mockOcl;
+    @Mock private DeployRequest mockDeployRequest;
+    @Mock private Object mockRequest;
+    @Mock private Ocl mockOcl;
     private DeployTask test;
 
     @BeforeEach
@@ -80,18 +77,32 @@ class DeployTaskTest {
 
     @Test
     void testToString() {
-        String exceptedString = "DeployTask(orderId=" + uuid
-                + ", parentOrderId=" + uuid
-                + ", taskType=" + taskType
-                + ", userId=" + userId
-                + ", serviceId=" + uuid
-                + ", originalServiceId=" + uuid
-                + ", workflowId=" + uuid
-                + ", namespace=" + namespace
-                + ", deployRequest=" + mockDeployRequest
-                + ", request=" + mockRequest
-                + ", ocl=" + mockOcl
-                + ", serviceTemplateId=" + uuid + ")";
+        String exceptedString =
+                "DeployTask(orderId="
+                        + uuid
+                        + ", parentOrderId="
+                        + uuid
+                        + ", taskType="
+                        + taskType
+                        + ", userId="
+                        + userId
+                        + ", serviceId="
+                        + uuid
+                        + ", originalServiceId="
+                        + uuid
+                        + ", workflowId="
+                        + uuid
+                        + ", namespace="
+                        + namespace
+                        + ", deployRequest="
+                        + mockDeployRequest
+                        + ", request="
+                        + mockRequest
+                        + ", ocl="
+                        + mockOcl
+                        + ", serviceTemplateId="
+                        + uuid
+                        + ")";
         assertEquals(exceptedString, test.toString());
     }
 }

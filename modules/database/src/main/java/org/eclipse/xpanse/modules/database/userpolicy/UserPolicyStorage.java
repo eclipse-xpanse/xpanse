@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 
-/**
- * Interface for persist of UserPolicyManager.
- */
+/** Interface for persist of UserPolicyManager. */
 public interface UserPolicyStorage {
 
     /**
@@ -49,7 +47,7 @@ public interface UserPolicyStorage {
     /**
      * Delete stored policy entity using the id of policy.
      *
-     * @param id the id  of the policy.
+     * @param id the id of the policy.
      */
     void deletePolicyById(UUID id);
 }

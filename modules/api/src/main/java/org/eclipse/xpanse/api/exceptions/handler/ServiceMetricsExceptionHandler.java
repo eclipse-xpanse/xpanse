@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.api.exceptions.handler;
 
-
 import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.getErrorResponse;
 
 import java.util.Collections;
@@ -23,46 +22,39 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Exception handler related to monitoring requests.
- */
+/** Exception handler related to monitoring requests. */
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class ServiceMetricsExceptionHandler {
 
-    /**
-     * Exception handler for ResourceNotSupportedForMonitoringException.
-     */
+    /** Exception handler for ResourceNotSupportedForMonitoringException. */
     @ExceptionHandler({ResourceNotSupportedForMonitoringException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleResourceNotSupportedForMonitoringException(
             ResourceNotSupportedForMonitoringException ex) {
-        return getErrorResponse(ErrorType.RESOURCE_TYPE_INVALID_FOR_MONITORING,
+        return getErrorResponse(
+                ErrorType.RESOURCE_TYPE_INVALID_FOR_MONITORING,
                 Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for ResourceNotFoundException.
-     */
+    /** Exception handler for ResourceNotFoundException. */
     @ExceptionHandler({ResourceNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return getErrorResponse(ErrorType.RESOURCE_NOT_FOUND,
-                Collections.singletonList(ex.getMessage()));
+        return getErrorResponse(
+                ErrorType.RESOURCE_NOT_FOUND, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for MetricsDataNotYetAvailableException.
-     */
+    /** Exception handler for MetricsDataNotYetAvailableException. */
     @ExceptionHandler({MetricsDataNotYetAvailableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleMetricsDataNotYetAvailableException(
             MetricsDataNotYetAvailableException ex) {
-        return getErrorResponse(ErrorType.METRICS_DATA_NOT_READY,
-                Collections.singletonList(ex.getMessage()));
+        return getErrorResponse(
+                ErrorType.METRICS_DATA_NOT_READY, Collections.singletonList(ex.getMessage()));
     }
 }

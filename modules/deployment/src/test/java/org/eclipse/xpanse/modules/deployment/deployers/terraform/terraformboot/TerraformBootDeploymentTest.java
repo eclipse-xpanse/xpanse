@@ -49,17 +49,25 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for TerraformDeploy.
- */
-
-@ContextConfiguration(classes = {TerraformBootServiceDeployer.class,
-        TerraformBootServiceModifier.class, DeployEnvironments.class,
-        PluginManager.class, TerraformFromScriptsApi.class, TerraformBootConfig.class,
-        ServiceDeploymentEntityHandler.class, TerraformBootScriptValidator.class,
-        TerraformBootServiceDeployer.class, TerraformBootDeployment.class,
-        TerraformFromGitRepoApi.class, TerraformBootHelper.class, AdminApi.class,
-        TerraformBootDeploymentPlanManage.class, TerraformBootServiceDestroyer.class})
+/** Test for TerraformDeploy. */
+@ContextConfiguration(
+        classes = {
+            TerraformBootServiceDeployer.class,
+            TerraformBootServiceModifier.class,
+            DeployEnvironments.class,
+            PluginManager.class,
+            TerraformFromScriptsApi.class,
+            TerraformBootConfig.class,
+            ServiceDeploymentEntityHandler.class,
+            TerraformBootScriptValidator.class,
+            TerraformBootServiceDeployer.class,
+            TerraformBootDeployment.class,
+            TerraformFromGitRepoApi.class,
+            TerraformBootHelper.class,
+            AdminApi.class,
+            TerraformBootDeploymentPlanManage.class,
+            TerraformBootServiceDestroyer.class
+        })
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("terraform-boot")
 class TerraformBootDeploymentTest {
@@ -67,40 +75,29 @@ class TerraformBootDeploymentTest {
     private final UUID serviceId = UUID.randomUUID();
     private final UUID orderId = UUID.randomUUID();
     private final String errorDeployer = "error_deployer";
-    private final String invalidDeployer = """
+    private final String invalidDeployer =
+            """
             resource "random_id" "new" {
               byte_length = 4
             }
-                                    
+
             output "random_id" {
               value = resource.random_id_2.new.id
             }
             """;
-    @MockitoBean
-    DeployEnvironments deployEnvironments;
-    @MockitoBean
-    PluginManager pluginManager;
-    @MockitoBean
-    TerraformFromScriptsApi terraformApi;
-    @MockitoBean
-    TerraformFromGitRepoApi terraformFromGitRepoApi;
-    @MockitoBean
-    TerraformBootConfig terraformBootConfig;
-    @MockitoBean
-    ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @MockitoBean
-    RetrieveTerraformResultApi retrieveTerraformResultApi;
-    @MockitoBean
-    TerraformBootScriptValidator terraformBootScriptValidator;
-    @Autowired
-    TerraformBootServiceDeployer terraformBootServiceDeployer;
-    @Autowired
-    TerraformBootServiceModifier terraformBootServiceModifier;
-    @MockitoBean
-    AdminApi adminApi;
+    @MockitoBean DeployEnvironments deployEnvironments;
+    @MockitoBean PluginManager pluginManager;
+    @MockitoBean TerraformFromScriptsApi terraformApi;
+    @MockitoBean TerraformFromGitRepoApi terraformFromGitRepoApi;
+    @MockitoBean TerraformBootConfig terraformBootConfig;
+    @MockitoBean ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @MockitoBean RetrieveTerraformResultApi retrieveTerraformResultApi;
+    @MockitoBean TerraformBootScriptValidator terraformBootScriptValidator;
+    @Autowired TerraformBootServiceDeployer terraformBootServiceDeployer;
+    @Autowired TerraformBootServiceModifier terraformBootServiceModifier;
+    @MockitoBean AdminApi adminApi;
 
-    @Autowired
-    private TerraformBootDeployment terraformBootDeployment;
+    @Autowired private TerraformBootDeployment terraformBootDeployment;
 
     private DeployTask deployTask;
     private Ocl ocl;
@@ -109,8 +106,9 @@ class TerraformBootDeploymentTest {
     void setUp() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl =
+                oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
@@ -143,9 +141,10 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testModify() {
-        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
-                TfResourceTransUtils.class)) {
-            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils =
+                Mockito.mockStatic(TfResourceTransUtils.class)) {
+            tfResourceTransUtils
+                    .when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
 
             doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
@@ -158,9 +157,10 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testDestroy() {
-        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
-                TfResourceTransUtils.class)) {
-            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils =
+                Mockito.mockStatic(TfResourceTransUtils.class)) {
+            tfResourceTransUtils
+                    .when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
             deployTask.setTaskType(ServiceOrderType.DESTROY);
             DeployResult destroyResult = this.terraformBootDeployment.destroy(deployTask);
@@ -169,34 +169,39 @@ class TerraformBootDeploymentTest {
         }
     }
 
-
     @Test
     void testDeploy_ThrowsRestClientException() {
         ocl.getDeployment().setDeployer(errorDeployer);
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
-        Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
+        Mockito.doThrow(new TerraformBootRequestFailedException("IO error"))
+                .when(terraformApi)
                 .asyncDeployWithScripts(any());
 
         ocl.getDeployment().setDeployer(invalidDeployer);
 
-        Assertions.assertThrows(TerraformBootRequestFailedException.class,
+        Assertions.assertThrows(
+                TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.deploy(deployTask));
     }
 
     @Test
     void testDestroy_ThrowsRestClientException() {
-        Mockito.doThrow(new TerraformBootRequestFailedException("IO error")).when(terraformApi)
+        Mockito.doThrow(new TerraformBootRequestFailedException("IO error"))
+                .when(terraformApi)
                 .asyncDestroyWithScripts(any());
 
-        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
-                TfResourceTransUtils.class)) {
-            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils =
+                Mockito.mockStatic(TfResourceTransUtils.class)) {
+            tfResourceTransUtils
+                    .when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
             deployTask.setTaskType(ServiceOrderType.MODIFY);
-            Assertions.assertThrows(TerraformBootRequestFailedException.class,
+            Assertions.assertThrows(
+                    TerraformBootRequestFailedException.class,
                     () -> this.terraformBootDeployment.destroy(deployTask));
 
-            Assertions.assertThrows(TerraformBootRequestFailedException.class,
+            Assertions.assertThrows(
+                    TerraformBootRequestFailedException.class,
                     () -> this.terraformBootDeployment.destroy(deployTask));
         }
     }
@@ -215,18 +220,17 @@ class TerraformBootDeploymentTest {
 
         String deployPlanJson = terraformBootDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
-
     }
 
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
 
-        when(terraformApi.planWithScripts(any())).thenThrow(
-                new TerraformBootRequestFailedException("IO error"));
+        when(terraformApi.planWithScripts(any()))
+                .thenThrow(new TerraformBootRequestFailedException("IO error"));
 
-        Assertions.assertThrows(TerraformBootRequestFailedException.class,
+        Assertions.assertThrows(
+                TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.getDeploymentPlanAsJson(deployTask));
-
     }
 
     @Test
@@ -236,8 +240,8 @@ class TerraformBootDeploymentTest {
         expectedResult.setValid(true);
         expectedResult.setDiagnostics(Collections.emptyList());
 
-        when(terraformBootScriptValidator.validateTerraformScripts(any())).thenReturn(
-                expectedResult);
+        when(terraformBootScriptValidator.validateTerraformScripts(any()))
+                .thenReturn(expectedResult);
 
         // Run the test
         final DeploymentScriptValidationResult result =
@@ -255,12 +259,12 @@ class TerraformBootDeploymentTest {
         expectedResult.setValid(false);
         DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
         diagnostics.setDetail(
-                "A managed resource \"random_id_2\" \"new\" has not been declared in the root " +
-                        "module.");
+                "A managed resource \"random_id_2\" \"new\" has not been declared in the root "
+                        + "module.");
         expectedResult.setDiagnostics(List.of(diagnostics));
 
-        when(terraformBootScriptValidator.validateTerraformScripts(any())).thenReturn(
-                expectedResult);
+        when(terraformBootScriptValidator.validateTerraformScripts(any()))
+                .thenReturn(expectedResult);
 
         // Run the test
         final DeploymentScriptValidationResult result =
@@ -273,11 +277,11 @@ class TerraformBootDeploymentTest {
     @Test
     void testValidate_ThrowsTerraformExecutorException() {
         ocl.getDeployment().setDeployer(errorDeployer);
-        when(terraformBootScriptValidator.validateTerraformScripts(any())).thenThrow(
-                new TerraformBootRequestFailedException("IO error"));
+        when(terraformBootScriptValidator.validateTerraformScripts(any()))
+                .thenThrow(new TerraformBootRequestFailedException("IO error"));
 
-        Assertions.assertThrows(TerraformBootRequestFailedException.class,
+        Assertions.assertThrows(
+                TerraformBootRequestFailedException.class,
                 () -> this.terraformBootDeployment.validate(ocl.getDeployment()));
     }
-
 }

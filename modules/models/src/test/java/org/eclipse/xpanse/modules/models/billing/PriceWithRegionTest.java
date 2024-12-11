@@ -13,8 +13,7 @@ class PriceWithRegionTest {
 
     private final String siteName = "default";
 
-    @Mock
-    private Price mockPrice;
+    @Mock private Price mockPrice;
 
     private PriceWithRegion test;
 
@@ -32,7 +31,6 @@ class PriceWithRegionTest {
         assertThat(test.getSiteName()).isEqualTo(siteName);
         assertThat(test.getPrice()).isEqualTo(mockPrice);
     }
-
 
     @Test
     void testEqualsAndHashCode() {
@@ -52,11 +50,16 @@ class PriceWithRegionTest {
         assertThat(test.hashCode()).isEqualTo(test1.hashCode());
     }
 
-
     @Test
     void testToString() {
-        String result = "PriceWithRegion(regionName=" + regionName + ", siteName=" + siteName
-                + ", price=" + mockPrice + ")";
+        String result =
+                "PriceWithRegion(regionName="
+                        + regionName
+                        + ", siteName="
+                        + siteName
+                        + ", price="
+                        + mockPrice
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

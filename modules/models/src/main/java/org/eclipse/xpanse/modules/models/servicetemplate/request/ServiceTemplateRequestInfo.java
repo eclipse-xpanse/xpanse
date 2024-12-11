@@ -3,7 +3,6 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-
 package org.eclipse.xpanse.modules.models.servicetemplate.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,9 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Defines view object for service template request info.
- */
+/** Defines view object for service template request info. */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

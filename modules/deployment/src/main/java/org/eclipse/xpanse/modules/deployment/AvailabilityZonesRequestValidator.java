@@ -15,26 +15,26 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValid
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Check whether the input map of available zones meet the deployment requirements.
- */
+/** Check whether the input map of available zones meet the deployment requirements. */
 @Slf4j
 public class AvailabilityZonesRequestValidator {
 
     /**
      * Check whether the input map of available zones meet the deployment requirements.
      *
-     * @param inputMap    The map of input available zones.
+     * @param inputMap The map of input available zones.
      * @param zoneConfigs The list of availability zone configs.
      */
-    public static void validateAvailabilityZones(Map<String, String> inputMap,
-                                                 List<AvailabilityZoneConfig> zoneConfigs) {
+    public static void validateAvailabilityZones(
+            Map<String, String> inputMap, List<AvailabilityZoneConfig> zoneConfigs) {
         if (CollectionUtils.isEmpty(zoneConfigs)) {
             return;
         }
         List<String> requiredZoneVarNames =
-                zoneConfigs.stream().filter(AvailabilityZoneConfig::getMandatory)
-                        .map(AvailabilityZoneConfig::getVarName).toList();
+                zoneConfigs.stream()
+                        .filter(AvailabilityZoneConfig::getMandatory)
+                        .map(AvailabilityZoneConfig::getVarName)
+                        .toList();
         if (CollectionUtils.isEmpty(requiredZoneVarNames)) {
             return;
         }
@@ -42,7 +42,8 @@ public class AvailabilityZonesRequestValidator {
         if (CollectionUtils.isEmpty(inputMap)) {
             requiredZoneVarNames.forEach(varName -> errorMessages.add(getErrorMessage(varName)));
         } else {
-            requiredZoneVarNames.stream().filter(varName -> !inputMap.containsKey(varName))
+            requiredZoneVarNames.stream()
+                    .filter(varName -> !inputMap.containsKey(varName))
                     .forEach(varName -> errorMessages.add(getErrorMessage(varName)));
         }
         if (!errorMessages.isEmpty()) {
@@ -53,9 +54,11 @@ public class AvailabilityZonesRequestValidator {
         for (String zoneVarName : inputMap.keySet()) {
             if (requiredZoneVarNames.contains(zoneVarName)) {
                 if (requiredZoneVarValues.containsValue(inputMap.get(zoneVarName))) {
-                    String duplicatedValuesMessage = String.format("The values of required "
-                                    + "availability zones variables %s are duplicated.",
-                            inputMap.get(zoneVarName));
+                    String duplicatedValuesMessage =
+                            String.format(
+                                    "The values of required "
+                                            + "availability zones variables %s are duplicated.",
+                                    inputMap.get(zoneVarName));
                     throw new VariableValidationFailedException(List.of(duplicatedValuesMessage));
                 } else {
                     requiredZoneVarValues.put(zoneVarName, inputMap.get(zoneVarName));
@@ -67,5 +70,4 @@ public class AvailabilityZonesRequestValidator {
     private static String getErrorMessage(String varName) {
         return String.format("required availability zone property '%s' not found", varName);
     }
-
 }

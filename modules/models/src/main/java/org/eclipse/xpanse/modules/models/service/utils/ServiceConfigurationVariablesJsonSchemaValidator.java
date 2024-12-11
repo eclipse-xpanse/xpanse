@@ -26,9 +26,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * The class is used to validate service configuration variables.
- */
+/** The class is used to validate service configuration variables. */
 @Slf4j
 @Component
 public class ServiceConfigurationVariablesJsonSchemaValidator {
@@ -40,11 +38,12 @@ public class ServiceConfigurationVariablesJsonSchemaValidator {
      * registered service.
      *
      * @param configurationParameters list of serviceConfigurationParameter in registered service.
-     * @param configurations          service configuration map
+     * @param configurations service configuration map
      */
     public void validateServiceConfiguration(
             List<ServiceConfigurationParameter> configurationParameters,
-            Map<String, Object> configurations, JsonObjectSchema jsonObjectSchema) {
+            Map<String, Object> configurations,
+            JsonObjectSchema jsonObjectSchema) {
 
         if (CollectionUtils.isEmpty(configurationParameters) || Objects.isNull(jsonObjectSchema)) {
             return;
@@ -71,5 +70,4 @@ public class ServiceConfigurationVariablesJsonSchemaValidator {
             throw new ServiceConfigurationInvalidException(errors);
         }
     }
-
 }

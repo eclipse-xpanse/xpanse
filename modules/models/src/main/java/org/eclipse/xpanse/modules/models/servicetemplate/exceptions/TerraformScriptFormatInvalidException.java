@@ -9,9 +9,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Exception thrown when a Terraform script is invalid.
- */
+/** Exception thrown when a Terraform script is invalid. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TerraformScriptFormatInvalidException extends RuntimeException {

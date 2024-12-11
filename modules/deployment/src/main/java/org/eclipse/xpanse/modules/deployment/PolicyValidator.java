@@ -29,34 +29,32 @@ import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Bean to wrap all logic to validate policies during service deployment.
- */
+/** Bean to wrap all logic to validate policies during service deployment. */
 @Component
 @Slf4j
 public class PolicyValidator {
 
-    @Resource
-    private PolicyManager policyManager;
-    @Resource
-    private UserPolicyManager userPolicyManager;
-    @Resource
-    private ServicePolicyManager servicePolicyManager;
-    @Resource
-    private DatabaseServiceTemplateStorage serviceTemplateStorage;
-    @Resource
-    private DeployerKindManager deployerKindManager;
+    @Resource private PolicyManager policyManager;
+    @Resource private UserPolicyManager userPolicyManager;
+    @Resource private ServicePolicyManager servicePolicyManager;
+    @Resource private DatabaseServiceTemplateStorage serviceTemplateStorage;
+    @Resource private DeployerKindManager deployerKindManager;
 
     private List<ServicePolicy> getServicePolicies(UUID serviceTemplateId) {
         ServiceTemplateEntity existedServiceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
-        if (Objects.nonNull(existedServiceTemplate) && Objects.nonNull(
-                existedServiceTemplate.getServicePolicyList())) {
+        if (Objects.nonNull(existedServiceTemplate)
+                && Objects.nonNull(existedServiceTemplate.getServicePolicyList())) {
             return existedServiceTemplate.getServicePolicyList().stream()
-                    .filter(servicePolicyEntity -> servicePolicyEntity.getEnabled()
-                            && StringUtils.isNotBlank(servicePolicyEntity.getPolicy()))
-                    .map(servicePolicyEntity ->
-                            servicePolicyManager.conventToServicePolicy(servicePolicyEntity))
+                    .filter(
+                            servicePolicyEntity ->
+                                    servicePolicyEntity.getEnabled()
+                                            && StringUtils.isNotBlank(
+                                                    servicePolicyEntity.getPolicy()))
+                    .map(
+                            servicePolicyEntity ->
+                                    servicePolicyManager.conventToServicePolicy(
+                                            servicePolicyEntity))
                     .toList();
         }
         return Collections.emptyList();
@@ -88,19 +86,21 @@ public class PolicyValidator {
             log.info("No service or user policies found.");
             return;
         }
-        String planJson = deployerKindManager.getDeployment(
-                        deployTask.getOcl().getDeployment().getDeployerTool().getKind())
-                .getDeploymentPlanAsJson(deployTask);
+        String planJson =
+                deployerKindManager
+                        .getDeployment(
+                                deployTask.getOcl().getDeployment().getDeployerTool().getKind())
+                        .getDeploymentPlanAsJson(deployTask);
         if (StringUtils.isEmpty(planJson)) {
             return;
         }
-        evaluateDeploymentPlanWithServicePolicies(servicePolicies, planJson,
-                deployTask.getDeployRequest().getFlavor());
+        evaluateDeploymentPlanWithServicePolicies(
+                servicePolicies, planJson, deployTask.getDeployRequest().getFlavor());
         evaluateDeploymentPlanWithUserPolicies(userPolicies, planJson);
     }
 
-    private void evaluateDeploymentPlanWithServicePolicies(List<ServicePolicy> servicePolicies,
-                                                           String planJson, String flavorName) {
+    private void evaluateDeploymentPlanWithServicePolicies(
+            List<ServicePolicy> servicePolicies, String planJson, String flavorName) {
         if (!CollectionUtils.isEmpty(servicePolicies)) {
             List<String> policyList = new ArrayList<>();
             for (ServicePolicy servicePolicy : servicePolicies) {
@@ -114,17 +114,31 @@ public class PolicyValidator {
             String errMsg = "Evaluate deployment plan with service policies failed.";
             EvalResult evalResult = policyManager.evaluatePolicies(policyList, planJson);
             if (!evalResult.getIsSuccessful()) {
-                ServicePolicy failedServicePolicy = servicePolicies.stream()
-                        .filter(servicePolicy -> servicePolicy.getPolicy()
-                                .equals(evalResult.getPolicy())).findFirst().orElse(null);
+                ServicePolicy failedServicePolicy =
+                        servicePolicies.stream()
+                                .filter(
+                                        servicePolicy ->
+                                                servicePolicy
+                                                        .getPolicy()
+                                                        .equals(evalResult.getPolicy()))
+                                .findFirst()
+                                .orElse(null);
                 if (Objects.nonNull(failedServicePolicy)) {
-                    errMsg = String.format(errMsg + "\n Failed by the service policy with id: %s."
-                                    + "\n Deployment plan: %s",
-                            failedServicePolicy.getServicePolicyId(),
-                            planJson);
+                    errMsg =
+                            String.format(
+                                    errMsg
+                                            + "\n Failed by the service policy with id: %s."
+                                            + "\n Deployment plan: %s",
+                                    failedServicePolicy.getServicePolicyId(),
+                                    planJson);
                 } else {
-                    errMsg = String.format(errMsg + "\n Failed by the service policy with context"
-                            + ": %s.\"\nDeployment plan: %s", evalResult.getPolicy(), planJson);
+                    errMsg =
+                            String.format(
+                                    errMsg
+                                            + "\n Failed by the service policy with context"
+                                            + ": %s.\"\nDeployment plan: %s",
+                                    evalResult.getPolicy(),
+                                    planJson);
                 }
                 log.error(errMsg);
                 throw new PoliciesEvaluationFailedException(errMsg);
@@ -134,24 +148,38 @@ public class PolicyValidator {
         }
     }
 
-
-    private void evaluateDeploymentPlanWithUserPolicies(List<UserPolicy> userPolicies,
-                                                        String planJson) {
+    private void evaluateDeploymentPlanWithUserPolicies(
+            List<UserPolicy> userPolicies, String planJson) {
         if (!CollectionUtils.isEmpty(userPolicies)) {
             String errMsg = "Evaluate deployment plan with user policies failed.";
             List<String> userPolicyList = userPolicies.stream().map(UserPolicy::getPolicy).toList();
             EvalResult evalResult = policyManager.evaluatePolicies(userPolicyList, planJson);
             if (!evalResult.getIsSuccessful()) {
-                UserPolicy failedUserPolicy = userPolicies.stream()
-                        .filter(userPolicy -> userPolicy.getPolicy().equals(evalResult.getPolicy()))
-                        .findFirst().orElse(null);
+                UserPolicy failedUserPolicy =
+                        userPolicies.stream()
+                                .filter(
+                                        userPolicy ->
+                                                userPolicy
+                                                        .getPolicy()
+                                                        .equals(evalResult.getPolicy()))
+                                .findFirst()
+                                .orElse(null);
                 if (Objects.nonNull(failedUserPolicy)) {
-                    errMsg = String.format(errMsg + "\n Failed by the user policy with id: %s."
-                                    + "\n Deployment plan: %s", failedUserPolicy.getUserPolicyId(),
-                            planJson);
+                    errMsg =
+                            String.format(
+                                    errMsg
+                                            + "\n Failed by the user policy with id: %s."
+                                            + "\n Deployment plan: %s",
+                                    failedUserPolicy.getUserPolicyId(),
+                                    planJson);
                 } else {
-                    errMsg = String.format(errMsg + "\n Failed by the user policy with context: %s."
-                            + "\nDeployment plan: %s", evalResult.getPolicy(), planJson);
+                    errMsg =
+                            String.format(
+                                    errMsg
+                                            + "\n Failed by the user policy with context: %s."
+                                            + "\nDeployment plan: %s",
+                                    evalResult.getPolicy(),
+                                    planJson);
                 }
                 log.error(errMsg);
                 throw new PoliciesEvaluationFailedException(errMsg);

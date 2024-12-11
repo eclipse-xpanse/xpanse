@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Deployer kinds.
- */
+/** Deployer kinds. */
 public enum DeployerKind {
     TERRAFORM("terraform"),
     OPEN_TOFU("opentofu");
@@ -23,9 +21,7 @@ public enum DeployerKind {
         this.type = type;
     }
 
-    /**
-     * For DeployerType serialize.
-     */
+    /** For DeployerType serialize. */
     @JsonCreator
     public static DeployerKind getByValue(String type) {
         for (DeployerKind kind : values()) {
@@ -37,9 +33,7 @@ public enum DeployerKind {
                 String.format("DeployerKind value %s is not supported.", type));
     }
 
-    /**
-     * For DeployerType deserialize.
-     */
+    /** For DeployerType deserialize. */
     @JsonValue
     public String toValue() {
         return this.type;

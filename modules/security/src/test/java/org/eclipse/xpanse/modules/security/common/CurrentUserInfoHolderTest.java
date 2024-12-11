@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CurrentUserInfoHolderTest {
 
@@ -64,6 +63,4 @@ class CurrentUserInfoHolderTest {
         assertThat(CurrentUserInfoHolder.getCurrentUserInfo()).isNull();
         assertThat(CurrentUserInfoHolder.getToken()).isNull();
     }
-
-
 }

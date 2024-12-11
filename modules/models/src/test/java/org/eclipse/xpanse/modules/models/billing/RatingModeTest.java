@@ -14,10 +14,8 @@ import org.springframework.beans.BeanUtils;
 class RatingModeTest {
 
     private final boolean isPriceOnlyForManagementLayer = true;
-    @Mock
-    private ResourceUsage mockResourceUsage;
-    @Mock
-    private List<PriceWithRegion> mockFixedPrices;
+    @Mock private ResourceUsage mockResourceUsage;
+    @Mock private List<PriceWithRegion> mockFixedPrices;
     private RatingMode ratingModeUnderTest;
 
     @BeforeEach
@@ -34,7 +32,6 @@ class RatingModeTest {
         assertThat(ratingModeUnderTest.getFixedPrices()).isEqualTo(mockFixedPrices);
         assertThat(ratingModeUnderTest.getIsPriceOnlyForManagementLayer()).isTrue();
     }
-
 
     @Test
     void testEqualsAndHashCode() {
@@ -54,12 +51,16 @@ class RatingModeTest {
         assertThat(ratingModeUnderTest.hashCode()).isEqualTo(ratingMode.hashCode());
     }
 
-
     @Test
     void testToString() {
         String result =
-                "RatingMode(fixedPrices=" + mockFixedPrices + ", resourceUsage=" + mockResourceUsage
-                        + ", isPriceOnlyForManagementLayer=" + isPriceOnlyForManagementLayer + ")";
+                "RatingMode(fixedPrices="
+                        + mockFixedPrices
+                        + ", resourceUsage="
+                        + mockResourceUsage
+                        + ", isPriceOnlyForManagementLayer="
+                        + isPriceOnlyForManagementLayer
+                        + ")";
         assertThat(ratingModeUnderTest.toString()).isEqualTo(result);
     }
 }

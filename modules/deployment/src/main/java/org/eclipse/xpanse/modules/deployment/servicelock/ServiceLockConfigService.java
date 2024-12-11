@@ -25,51 +25,45 @@ import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
-
-/**
- * Implementation class of ServiceLockConfigService.
- */
+/** Implementation class of ServiceLockConfigService. */
 @Component
 public class ServiceLockConfigService {
 
-    @Resource
-    private ServiceOrderManager serviceOrderManager;
+    @Resource private ServiceOrderManager serviceOrderManager;
 
-    @Resource
-    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
-    @Resource
-    private DeployServiceEntityConverter deployServiceEntityConverter;
+    @Resource private DeployServiceEntityConverter deployServiceEntityConverter;
 
-    @Resource
-    private ServiceOrderStorage serviceOrderStorage;
+    @Resource private ServiceOrderStorage serviceOrderStorage;
 
-    @Resource
-    private UserServiceHelper userServiceHelper;
+    @Resource private UserServiceHelper userServiceHelper;
 
     /**
      * Method to change lock config of service.
      *
-     * @param serviceId  serviceId.
+     * @param serviceId serviceId.
      * @param lockConfig serviceLockConfig.
      */
-    public ServiceOrder changeServiceLockConfig(UUID serviceId,
-                                                ServiceLockConfig lockConfig) {
+    public ServiceOrder changeServiceLockConfig(UUID serviceId, ServiceLockConfig lockConfig) {
         ServiceDeploymentEntity deployedService =
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(deployedService.getUserId());
         if (!currentUserIsOwner) {
-            String errorMsg = "No permissions to change lock config of services "
-                    + "belonging to other users.";
+            String errorMsg =
+                    "No permissions to change lock config of services "
+                            + "belonging to other users.";
             throw new AccessDeniedException(errorMsg);
         }
 
-        DeployTask lockChangeTask = deployServiceEntityConverter.getDeployTaskByStoredService(
-                ServiceOrderType.LOCK_CHANGE, deployedService);
+        DeployTask lockChangeTask =
+                deployServiceEntityConverter.getDeployTaskByStoredService(
+                        ServiceOrderType.LOCK_CHANGE, deployedService);
         lockChangeTask.setRequest(lockConfig);
-        ServiceOrderEntity serviceOrder = serviceOrderManager
-                .storeNewServiceOrderEntity(lockChangeTask, deployedService, Handler.INTERNAL);
+        ServiceOrderEntity serviceOrder =
+                serviceOrderManager.storeNewServiceOrderEntity(
+                        lockChangeTask, deployedService, Handler.INTERNAL);
         serviceOrder.setStartedTime(OffsetDateTime.now());
         deployedService.setLockConfig(lockConfig);
         serviceDeploymentEntityHandler.storeAndFlush(deployedService);

@@ -28,9 +28,7 @@ public class Oauth2ClientAccessTokenProvider {
     @Resource
     private AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceAndManager;
 
-    /**
-     * Method to directly get the access token.
-     */
+    /** Method to directly get the access token. */
     public String authenticateClientAndGetAccessToken() {
         OAuth2AuthorizeRequest authorizeRequest =
                 OAuth2AuthorizeRequest.withClientRegistrationId(OAUTH_CLIENT_ID)

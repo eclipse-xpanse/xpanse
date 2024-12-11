@@ -26,9 +26,7 @@ import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Processing class for checking destroy status after destroy callback.
- */
+/** Processing class for checking destroy status after destroy callback. */
 @Slf4j
 @Component
 public class ProcessDestroyResult implements Serializable, JavaDelegate {
@@ -37,14 +35,12 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
     private final ServiceOrderManager serviceOrderManager;
     private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
-
-    /**
-     * Constructor for ProcessDestroyResult bean.
-     */
+    /** Constructor for ProcessDestroyResult bean. */
     @Autowired
-    public ProcessDestroyResult(RuntimeService runtimeService,
-                                ServiceOrderManager serviceOrderManager,
-                                ServiceDeploymentEntityHandler serviceDeploymentEntityHandler) {
+    public ProcessDestroyResult(
+            RuntimeService runtimeService,
+            ServiceOrderManager serviceOrderManager,
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler) {
         this.runtimeService = runtimeService;
         this.serviceOrderManager = serviceOrderManager;
         this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
@@ -56,44 +52,54 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
         UUID originalServiceId = (UUID) variables.get(MigrateConstants.ORIGINAL_SERVICE_ID);
         UUID migrateOrderId = (UUID) variables.get(MigrateConstants.MIGRATE_ORDER_ID);
-        log.info("Migration workflow of instance id : {} start check destroy status.",
+        log.info(
+                "Migration workflow of instance id : {} start check destroy status.",
                 processInstanceId);
         try {
             ServiceDeploymentEntity serviceDeploymentEntity =
                     serviceDeploymentEntityHandler.getServiceDeploymentEntity(originalServiceId);
             if (Objects.nonNull(serviceDeploymentEntity)
                     && serviceDeploymentEntity.getServiceDeploymentState()
-                    == ServiceDeploymentState.DESTROY_SUCCESS) {
-                runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
-                        true);
-                serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.SUCCESSFUL,
-                        null);
+                            == ServiceDeploymentState.DESTROY_SUCCESS) {
+                runtimeService.setVariable(
+                        processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS, true);
+                serviceOrderManager.completeOrderProgress(
+                        migrateOrderId, TaskStatus.SUCCESSFUL, null);
             } else {
                 int destroyRetryNum = getDestroyRetryNum(variables);
-                runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
-                        false);
-                runtimeService.setVariable(processInstanceId,
-                        MigrateConstants.DESTROY_RETRY_NUM, destroyRetryNum + 1);
-                log.info("Process failed destroy task of migration workflow with id:{}. "
-                        + "RetryCount:{}", processInstanceId, destroyRetryNum);
+                runtimeService.setVariable(
+                        processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS, false);
+                runtimeService.setVariable(
+                        processInstanceId, MigrateConstants.DESTROY_RETRY_NUM, destroyRetryNum + 1);
+                log.info(
+                        "Process failed destroy task of migration workflow with id:{}. "
+                                + "RetryCount:{}",
+                        processInstanceId,
+                        destroyRetryNum);
                 if (destroyRetryNum >= 1) {
                     String userId = (String) variables.get(MigrateConstants.USER_ID);
-                    runtimeService.setVariable(processInstanceId, MigrateConstants.ASSIGNEE,
-                            userId);
-                    serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.FAILED,
-                            ErrorResponse.errorResponse(ErrorType.DESTROY_FAILED_EXCEPTION,
+                    runtimeService.setVariable(
+                            processInstanceId, MigrateConstants.ASSIGNEE, userId);
+                    serviceOrderManager.completeOrderProgress(
+                            migrateOrderId,
+                            TaskStatus.FAILED,
+                            ErrorResponse.errorResponse(
+                                    ErrorType.DESTROY_FAILED_EXCEPTION,
                                     List.of(serviceDeploymentEntity.getResultMessage())));
                 }
             }
         } catch (Exception e) {
-            log.error("Failed to process destroy task of migration workflow with id:{}",
-                    processInstanceId, e);
-            runtimeService.setVariable(processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS,
-                    false);
-            serviceOrderManager.completeOrderProgress(migrateOrderId, TaskStatus.FAILED,
-                    ErrorResponse.errorResponse(ErrorType.DESTROY_FAILED_EXCEPTION,
-                            List.of(e.getMessage())));
-
+            log.error(
+                    "Failed to process destroy task of migration workflow with id:{}",
+                    processInstanceId,
+                    e);
+            runtimeService.setVariable(
+                    processInstanceId, MigrateConstants.IS_DESTROY_SUCCESS, false);
+            serviceOrderManager.completeOrderProgress(
+                    migrateOrderId,
+                    TaskStatus.FAILED,
+                    ErrorResponse.errorResponse(
+                            ErrorType.DESTROY_FAILED_EXCEPTION, List.of(e.getMessage())));
         }
     }
 
@@ -103,5 +109,4 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
         }
         return (int) variables.get(MigrateConstants.DESTROY_RETRY_NUM);
     }
-
 }

@@ -13,18 +13,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * Configuration class to create a RestTemplate bean for terraformBoot.
- */
+/** Configuration class to create a RestTemplate bean for terraformBoot. */
 @Configuration
 public class TerraformBootRestTemplateConfig {
 
-    @Resource
-    RestTemplateLoggingInterceptor restTemplateLoggingInterceptor;
+    @Resource RestTemplateLoggingInterceptor restTemplateLoggingInterceptor;
 
-    /**
-     * create a standard RestTemplate bean.
-     */
+    /** create a standard RestTemplate bean. */
     @Primary
     @Bean
     public RestTemplate restTemplate() {
@@ -32,5 +27,4 @@ public class TerraformBootRestTemplateConfig {
         restTemplate.setInterceptors(Collections.singletonList(restTemplateLoggingInterceptor));
         return restTemplate;
     }
-
 }

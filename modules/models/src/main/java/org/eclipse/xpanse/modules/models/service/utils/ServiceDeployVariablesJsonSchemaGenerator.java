@@ -21,9 +21,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * The Class is used to generate a JSONSchema for service variables.
- */
+/** The Class is used to generate a JSONSchema for service variables. */
 @Slf4j
 @Component
 public class ServiceDeployVariablesJsonSchemaGenerator {
@@ -69,8 +67,8 @@ public class ServiceDeployVariablesJsonSchemaGenerator {
                 }
 
                 if (!validationProperties.isEmpty()) {
-                    deployVariableJsonSchemaProperties.put(variable.getName(),
-                            validationProperties);
+                    deployVariableJsonSchemaProperties.put(
+                            variable.getName(), validationProperties);
                 }
             }
         }
@@ -83,17 +81,22 @@ public class ServiceDeployVariablesJsonSchemaGenerator {
     private void validateSchemaDefinition(JsonObjectSchema jsonObjectSchema) {
         Set<String> allowedKeys = JsonMetaSchema.getV202012().getKeywords().keySet();
         List<String> invalidKeys = new ArrayList<>();
-        jsonObjectSchema.getProperties().forEach((deployVariable, variableValueSchema) ->
-                variableValueSchema.forEach((schemaDefKey, schemaDefValue) -> {
-                    if (!allowedKeys.contains(schemaDefKey)) {
-                        invalidKeys.add(String.format(
-                                "Value schema key %s in deploy variable %s is invalid",
-                                schemaDefKey, deployVariable));
-                    }
-                }));
+        jsonObjectSchema
+                .getProperties()
+                .forEach(
+                        (deployVariable, variableValueSchema) ->
+                                variableValueSchema.forEach(
+                                        (schemaDefKey, schemaDefValue) -> {
+                                            if (!allowedKeys.contains(schemaDefKey)) {
+                                                invalidKeys.add(
+                                                        String.format(
+                                                                "Value schema key %s in deploy"
+                                                                        + " variable %s is invalid",
+                                                                schemaDefKey, deployVariable));
+                                            }
+                                        }));
         if (!invalidKeys.isEmpty()) {
             throw new InvalidValueSchemaException(invalidKeys);
         }
     }
-
 }

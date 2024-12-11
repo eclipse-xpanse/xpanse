@@ -14,4 +14,3 @@ public class ResourceNotSupportedForMonitoringException extends RuntimeException
         super(message);
     }
 }
-

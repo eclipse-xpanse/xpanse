@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to WorkFlowTaskStatus enum.
- */
+/** Bean for serializing string in request parameters to WorkFlowTaskStatus enum. */
 @Component
 public class WorkFlowTaskStatusEnumConverter implements Converter<String, WorkFlowTaskStatus> {
 

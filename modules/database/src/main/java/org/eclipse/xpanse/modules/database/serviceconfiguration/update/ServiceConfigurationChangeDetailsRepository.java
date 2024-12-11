@@ -17,12 +17,10 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.lang.Nullable;
 
-/**
- * Interface to access default JPA methods.
- */
-public interface ServiceConfigurationChangeDetailsRepository extends
-        CustomJpaRepository<ServiceConfigurationChangeDetailsEntity, UUID>,
-        JpaSpecificationExecutor<ServiceConfigurationChangeDetailsEntity> {
+/** Interface to access default JPA methods. */
+public interface ServiceConfigurationChangeDetailsRepository
+        extends CustomJpaRepository<ServiceConfigurationChangeDetailsEntity, UUID>,
+                JpaSpecificationExecutor<ServiceConfigurationChangeDetailsEntity> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     // it is not possible to read this config from spring properties.

@@ -21,8 +21,7 @@ class UserPolicyEntityTest {
     private final String policy = "policy";
     private final UUID id = UUID.fromString("8f06ca43-e699-424e-92d4-37b85f35134f");
     private final String userId = "userId";
-    @Mock
-    private Csp mockCsp;
+    @Mock private Csp mockCsp;
     private UserPolicyEntity test;
 
     @BeforeEach
@@ -84,8 +83,10 @@ class UserPolicyEntityTest {
 
     @Test
     void testToString() {
-        String result = String.format("UserPolicyEntity(id=%s, userId=%s, policy=%s, csp=%s, enabled=%s)",
-                id, userId, policy, mockCsp, enabled);
+        String result =
+                String.format(
+                        "UserPolicyEntity(id=%s, userId=%s, policy=%s, csp=%s, enabled=%s)",
+                        id, userId, policy, mockCsp, enabled);
         assertThat(test.toString()).isEqualTo(result);
     }
 }

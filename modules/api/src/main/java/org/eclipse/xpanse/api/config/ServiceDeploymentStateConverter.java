@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to ServiceDeploymentState.
- */
+/** Bean for serializing string in request parameters to ServiceDeploymentState. */
 @Component
 public class ServiceDeploymentStateConverter implements Converter<String, ServiceDeploymentState> {
 

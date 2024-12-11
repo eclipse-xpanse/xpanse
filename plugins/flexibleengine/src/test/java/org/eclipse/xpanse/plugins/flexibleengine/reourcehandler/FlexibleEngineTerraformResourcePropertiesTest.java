@@ -29,7 +29,6 @@ class FlexibleEngineTerraformResourcePropertiesTest {
         Assertions.assertEquals(volumeResult.getResourceKind(), DeployResourceKind.VOLUME);
         Assertions.assertFalse(volumeResult.getResourceProperties().isEmpty());
 
-
         // Run the test
         final DeployResourceProperties subnetResult =
                 FlexibleEngineTerraformResourceProperties.getDeployResourceProperties(
@@ -63,8 +62,8 @@ class FlexibleEngineTerraformResourcePropertiesTest {
                         "flexibleengine_networking_secgroup_v2");
         // Verify the results
         Assertions.assertNotNull(secGroupResult);
-        Assertions.assertEquals(secGroupResult.getResourceKind(),
-                DeployResourceKind.SECURITY_GROUP);
+        Assertions.assertEquals(
+                secGroupResult.getResourceKind(), DeployResourceKind.SECURITY_GROUP);
         Assertions.assertFalse(secGroupResult.getResourceProperties().isEmpty());
 
         // Run the test
@@ -73,8 +72,8 @@ class FlexibleEngineTerraformResourcePropertiesTest {
                         "flexibleengine_networking_secgroup_rule_v2");
         // Verify the results
         Assertions.assertNotNull(secGroupRuleResult);
-        Assertions.assertEquals(secGroupRuleResult.getResourceKind(),
-                DeployResourceKind.SECURITY_GROUP_RULE);
+        Assertions.assertEquals(
+                secGroupRuleResult.getResourceKind(), DeployResourceKind.SECURITY_GROUP_RULE);
         Assertions.assertFalse(secGroupRuleResult.getResourceProperties().isEmpty());
 
         // Run the test
@@ -101,15 +100,18 @@ class FlexibleEngineTerraformResourcePropertiesTest {
 
     @Test
     void testGetTerraformResourceTypes() {
-        Set<String> exceptedTypes = Set.of("flexibleengine_compute_instance_v2",
-                "flexibleengine_networking_secgroup_v2",
-                "flexibleengine_blockstorage_volume_v2",
-                "flexibleengine_vpc_v1",
-                "flexibleengine_vpc_subnet_v1",
-                "flexibleengine_vpc_eip",
-                "flexibleengine_compute_keypair_v2",
-                "flexibleengine_networking_secgroup_rule_v2");
-        Assertions.assertEquals(exceptedTypes,
+        Set<String> exceptedTypes =
+                Set.of(
+                        "flexibleengine_compute_instance_v2",
+                        "flexibleengine_networking_secgroup_v2",
+                        "flexibleengine_blockstorage_volume_v2",
+                        "flexibleengine_vpc_v1",
+                        "flexibleengine_vpc_subnet_v1",
+                        "flexibleengine_vpc_eip",
+                        "flexibleengine_compute_keypair_v2",
+                        "flexibleengine_networking_secgroup_rule_v2");
+        Assertions.assertEquals(
+                exceptedTypes,
                 FlexibleEngineTerraformResourceProperties.getTerraformResourceTypes());
     }
 }

@@ -27,18 +27,14 @@ import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.springframework.stereotype.Component;
 
-/**
- * Validate whether the plugin for csp is enabled.
- */
+/** Validate whether the plugin for csp is enabled. */
 @Slf4j
 @Aspect
 @Component
 public class CspPluginValidator {
 
-    @Resource
-    private PluginManager pluginManager;
-    @Resource
-    private OclLoader oclLoader;
+    @Resource private PluginManager pluginManager;
+    @Resource private OclLoader oclLoader;
 
     private void validatePluginForCspIsActive(Csp csp) {
         if (Objects.nonNull(csp)) {
@@ -46,13 +42,9 @@ public class CspPluginValidator {
         }
     }
 
-
-    /**
-     * Pointcut for all controller methods.
-     */
+    /** Pointcut for all controller methods. */
     @Pointcut("execution(* org.eclipse.xpanse.api.controllers.*.*(..))")
-    public void controllerMethods() {
-    }
+    public void controllerMethods() {}
 
     /**
      * Validate request parameters.
@@ -84,17 +76,19 @@ public class CspPluginValidator {
         validateOclInFetchMethods(joinPoint);
     }
 
-
     private void validateOclInFetchMethods(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
         log.info("Validate request parameters for method: {}", methodName);
         String fetchMethodName = null;
         String fetchUpdateMethodName = null;
         try {
-            fetchMethodName = ServiceTemplateApi.class.getDeclaredMethod("fetch", String.class)
-                    .getName();
-            fetchUpdateMethodName = ServiceTemplateApi.class.getDeclaredMethod("fetchUpdate",
-                    UUID.class, Boolean.class, String.class).getName();
+            fetchMethodName =
+                    ServiceTemplateApi.class.getDeclaredMethod("fetch", String.class).getName();
+            fetchUpdateMethodName =
+                    ServiceTemplateApi.class
+                            .getDeclaredMethod(
+                                    "fetchUpdate", UUID.class, Boolean.class, String.class)
+                            .getName();
         } catch (NoSuchMethodException e) {
             log.error("Failed to get fetch or fetchUpdate method name", e);
         }
@@ -119,6 +113,4 @@ public class CspPluginValidator {
             throw new RuntimeException(e);
         }
     }
-
-
 }

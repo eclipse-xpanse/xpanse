@@ -19,9 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of DeployResult.
- */
+/** Test of DeployResult. */
 class DeployResultTest {
 
     private final UUID orderId = UUID.fromString("f0dcb6ea-cbe7-4c88-9c94-a5d00e82a4f2");
@@ -33,8 +31,7 @@ class DeployResultTest {
     private final String tfStateContent = "tfStateContent";
     private final String deployerVersionUsed = "1.6.0";
 
-    @Mock
-    private List<DeployResource> resources;
+    @Mock private List<DeployResource> resources;
     private DeployResult test;
 
     @BeforeEach
@@ -79,16 +76,24 @@ class DeployResultTest {
 
     @Test
     void testToString() {
-        String expectedToString = "DeployResult(orderId=" + orderId
-                + ", isTaskSuccessful=" + isSuccessful
-                + ", message=" + message
-                + ", resources=" + resources
-                + ", outputProperties=" + outputProperties
-                + ", deploymentGeneratedFiles=" + generatedFileContentMap
-                + ", deployerVersionUsed=" + deployerVersionUsed
-                + ", tfStateContent=" + tfStateContent
-                + ")";
+        String expectedToString =
+                "DeployResult(orderId="
+                        + orderId
+                        + ", isTaskSuccessful="
+                        + isSuccessful
+                        + ", message="
+                        + message
+                        + ", resources="
+                        + resources
+                        + ", outputProperties="
+                        + outputProperties
+                        + ", deploymentGeneratedFiles="
+                        + generatedFileContentMap
+                        + ", deployerVersionUsed="
+                        + deployerVersionUsed
+                        + ", tfStateContent="
+                        + tfStateContent
+                        + ")";
         assertEquals(expectedToString, test.toString());
     }
-
 }

@@ -19,9 +19,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Service for managing tofu-maker.
- */
+/** Service for managing tofu-maker. */
 @Slf4j
 @Component
 @Profile("tofu-maker")
@@ -29,14 +27,15 @@ public class TofuMakerManager {
 
     private static final String TOFU_MAKER_PROFILE_NAME = "tofu-maker";
 
-    @Resource
-    private AdminApi openTofuAdminApi;
+    @Resource private AdminApi openTofuAdminApi;
+
     @Value("${spring.profiles.active}")
     private String springProfilesActive;
+
     @Value("${tofu-maker.endpoint:http://localhost:9090}")
     private String openTofuMakerBaseUrl;
-    @Resource
-    private TofuMakerHelper tofuMakerHelper;
+
+    @Resource private TofuMakerHelper tofuMakerHelper;
 
     /**
      * Get system status of TofuMaker.
@@ -54,8 +53,9 @@ public class TofuMakerManager {
             try {
                 OpenTofuMakerSystemStatus openTofuMakerSystemStatus =
                         openTofuAdminApi.healthCheck();
-                openTofuMakerStatus.setHealthStatus(HealthStatus.valueOf(
-                        openTofuMakerSystemStatus.getHealthStatus().getValue()));
+                openTofuMakerStatus.setHealthStatus(
+                        HealthStatus.valueOf(
+                                openTofuMakerSystemStatus.getHealthStatus().getValue()));
             } catch (RestClientException e) {
                 log.error("Get status of tofu-maker error:{}", e.getMessage());
                 openTofuMakerStatus.setHealthStatus(HealthStatus.NOK);

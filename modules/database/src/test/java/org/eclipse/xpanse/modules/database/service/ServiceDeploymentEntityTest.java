@@ -105,22 +105,47 @@ class ServiceDeploymentEntityTest {
     @Test
     void testToString() {
         String expectedToString =
-                "ServiceDeploymentEntity(id=" + ID + ", userId=" + USER_ID + ", category=" +
-                        CATEGORY
-                        + ", name=" + NAME + ", customerServiceName=" + CUSTOMER_SERVICE_NAME
-                        + ", version=" + VERSION + ", namespace=" + NAMESPACE + ", csp=" + CSP
-                        + ", flavor=" + FLAVOR + ", serviceDeploymentState=" + SERVICE_STATE
-                        + ", resultMessage=" + RESULT_MESSAGE + ", serviceState="
-                        + SERVICE_RUN_STATE + ", serviceTemplateId=" + SERVICE_TEMPLATE_ID
-                        + ", deployRequest=" + CREATE_REQUEST + ", outputProperties=" +
-                        OUTPUT_PROPERTIES
-                        + ", deploymentGeneratedFiles=" + DEPLOYMENT_GENERATED_FILES +
-                        ", lastStartedAt="
-                        + LAST_STARTED_AT + ", lastStoppedAt=" + LAST_STOPPED_AT + ", lockConfig="
-                        + LOCK_CONFIG + ")";
+                "ServiceDeploymentEntity(id="
+                        + ID
+                        + ", userId="
+                        + USER_ID
+                        + ", category="
+                        + CATEGORY
+                        + ", name="
+                        + NAME
+                        + ", customerServiceName="
+                        + CUSTOMER_SERVICE_NAME
+                        + ", version="
+                        + VERSION
+                        + ", namespace="
+                        + NAMESPACE
+                        + ", csp="
+                        + CSP
+                        + ", flavor="
+                        + FLAVOR
+                        + ", serviceDeploymentState="
+                        + SERVICE_STATE
+                        + ", resultMessage="
+                        + RESULT_MESSAGE
+                        + ", serviceState="
+                        + SERVICE_RUN_STATE
+                        + ", serviceTemplateId="
+                        + SERVICE_TEMPLATE_ID
+                        + ", deployRequest="
+                        + CREATE_REQUEST
+                        + ", outputProperties="
+                        + OUTPUT_PROPERTIES
+                        + ", deploymentGeneratedFiles="
+                        + DEPLOYMENT_GENERATED_FILES
+                        + ", lastStartedAt="
+                        + LAST_STARTED_AT
+                        + ", lastStoppedAt="
+                        + LAST_STOPPED_AT
+                        + ", lockConfig="
+                        + LOCK_CONFIG
+                        + ")";
         assertEquals(expectedToString, test.toString());
     }
-
 
     @Test
     void testEqualsAndHashCode() {

@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of HealthStatus.
- */
+/** Test of HealthStatus. */
 class HealthStatusTest {
 
     @Test
@@ -23,8 +21,8 @@ class HealthStatusTest {
         HealthStatus nokStatus = HealthStatus.NOK.getByValue("NOK");
         Assertions.assertEquals(HealthStatus.NOK, nokStatus);
 
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> HealthStatus.NOK.getByValue("null"));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> HealthStatus.NOK.getByValue("null"));
     }
 
     @Test
@@ -41,5 +39,4 @@ class HealthStatusTest {
         Assertions.assertEquals(HealthStatus.OK.toString(), "OK");
         Assertions.assertEquals(HealthStatus.OK.hashCode(), HealthStatus.OK.hashCode());
     }
-
 }

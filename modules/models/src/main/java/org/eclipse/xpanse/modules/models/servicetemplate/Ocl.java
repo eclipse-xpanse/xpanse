@@ -19,16 +19,13 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.validators.DeploymentScriptsConstraint;
 
-/**
- * Defines for OCLv2.
- */
+/** Defines for OCLv2. */
 @Valid
 @Data
 @Slf4j
 public class Ocl implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = -51411975788603138L;
+    @Serial private static final long serialVersionUID = -51411975788603138L;
 
     @Valid
     @NotNull
@@ -94,8 +91,10 @@ public class Ocl implements Serializable {
 
     @Valid
     @NotNull
-    @Schema(description = "Defines which cloud service account is used "
-            + "for deploying cloud resources.")
+    @Schema(
+            description =
+                    "Defines which cloud service account is used "
+                            + "for deploying cloud resources.")
     private ServiceHostingType serviceHostingType;
 
     @Valid

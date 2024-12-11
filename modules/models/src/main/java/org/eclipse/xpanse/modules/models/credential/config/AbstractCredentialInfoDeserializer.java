@@ -24,23 +24,19 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
 /**
- * Custom deserializer for AbstractCredentialInfo class.
- * This deserializer is used to deserialize JSON data into an instance of AbstractCredentialInfo,
- * this is needed because of the final fields which Jackson cannot handle.
+ * Custom deserializer for AbstractCredentialInfo class. This deserializer is used to deserialize
+ * JSON data into an instance of AbstractCredentialInfo, this is needed because of the final fields
+ * which Jackson cannot handle.
  */
 @Slf4j
 public class AbstractCredentialInfoDeserializer extends StdDeserializer<AbstractCredentialInfo> {
 
-    /**
-     * Default constructor.
-     */
+    /** Default constructor. */
     public AbstractCredentialInfoDeserializer() {
         this(AbstractCredentialInfo.class);
     }
 
-    /**
-     * The constructor with the class to be deserialized.
-     */
+    /** The constructor with the class to be deserialized. */
     public AbstractCredentialInfoDeserializer(Class<?> deserializedClass) {
         super(deserializedClass);
     }
@@ -73,8 +69,8 @@ public class AbstractCredentialInfoDeserializer extends StdDeserializer<Abstract
             Integer timeToLive = safeGet(node, "timeToLive", JsonNode::asInt);
             List<CredentialVariable> variables =
                     deserializeCredentialVariables(node.get("variables"));
-            return new CredentialVariables(csp, site, type, name, description, userId, timeToLive,
-                    variables);
+            return new CredentialVariables(
+                    csp, site, type, name, description, userId, timeToLive, variables);
         } catch (Exception e) {
             log.error("IllegalArgumentException: {}", e.getMessage());
         }
@@ -93,7 +89,6 @@ public class AbstractCredentialInfoDeserializer extends StdDeserializer<Abstract
         }
     }
 
-
     private List<CredentialVariable> deserializeCredentialVariables(JsonNode node) {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
@@ -102,9 +97,11 @@ public class AbstractCredentialInfoDeserializer extends StdDeserializer<Abstract
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         List<CredentialVariable> credentialVariable = null;
         try {
-            credentialVariable = mapper.convertValue(node,
-                    mapper.getTypeFactory().constructCollectionType(List.class,
-                            CredentialVariable.class));
+            credentialVariable =
+                    mapper.convertValue(
+                            node,
+                            mapper.getTypeFactory()
+                                    .constructCollectionType(List.class, CredentialVariable.class));
         } catch (IllegalArgumentException e) {
             log.error("Deserialize CredentialVariables with value:{} failed.", node, e);
         }

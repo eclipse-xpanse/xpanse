@@ -16,14 +16,11 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.hibernate.validator.constraints.UniqueElements;
 
-/**
- * Defines for the Cloud Service Provider.
- */
+/** Defines for the Cloud Service Provider. */
 @Data
 public class CloudServiceProvider implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = -7340645290453759942L;
+    @Serial private static final long serialVersionUID = -7340645290453759942L;
 
     @NotNull
     @Schema(description = "The Cloud Service Provider.")
@@ -33,7 +30,9 @@ public class CloudServiceProvider implements Serializable {
     @NotNull
     @NotEmpty
     @UniqueElements
-    @Schema(description = "The regions of the Cloud Service Provider. "
-            + "The list elements must be unique.")
+    @Schema(
+            description =
+                    "The regions of the Cloud Service Provider. "
+                            + "The list elements must be unique.")
     private List<Region> regions;
 }

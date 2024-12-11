@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,39 +20,34 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * TerraformPlanFromGitRepoRequest
- */
-@JsonPropertyOrder({TerraformPlanFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
-        TerraformPlanFromGitRepoRequest.JSON_PROPERTY_TERRAFORM_VERSION,
-        TerraformPlanFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
-        TerraformPlanFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
-        TerraformPlanFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS})
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+/** TerraformPlanFromGitRepoRequest */
+@JsonPropertyOrder({
+    TerraformPlanFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
+    TerraformPlanFromGitRepoRequest.JSON_PROPERTY_TERRAFORM_VERSION,
+    TerraformPlanFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
+    TerraformPlanFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
+    TerraformPlanFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS
+})
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformPlanFromGitRepoRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_TERRAFORM_VERSION = "terraformVersion";
-    @jakarta.annotation.Nonnull
-    private String terraformVersion;
+    @jakarta.annotation.Nonnull private String terraformVersion;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_GIT_REPO_DETAILS = "gitRepoDetails";
-    @jakarta.annotation.Nullable
-    private TerraformScriptGitRepoDetails gitRepoDetails;
+    @jakarta.annotation.Nullable private TerraformScriptGitRepoDetails gitRepoDetails;
 
-    public TerraformPlanFromGitRepoRequest() {
-    }
+    public TerraformPlanFromGitRepoRequest() {}
 
     public TerraformPlanFromGitRepoRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
 
@@ -69,11 +63,9 @@ public class TerraformPlanFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -81,7 +73,8 @@ public class TerraformPlanFromGitRepoRequest {
         this.requestId = requestId;
     }
 
-    public TerraformPlanFromGitRepoRequest terraformVersion(@jakarta.annotation.Nonnull String terraformVersion) {
+    public TerraformPlanFromGitRepoRequest terraformVersion(
+            @jakarta.annotation.Nonnull String terraformVersion) {
 
         this.terraformVersion = terraformVersion;
         return this;
@@ -95,11 +88,9 @@ public class TerraformPlanFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTerraformVersion() {
         return terraformVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -107,7 +98,8 @@ public class TerraformPlanFromGitRepoRequest {
         this.terraformVersion = terraformVersion;
     }
 
-    public TerraformPlanFromGitRepoRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public TerraformPlanFromGitRepoRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
@@ -126,11 +118,9 @@ public class TerraformPlanFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -138,13 +128,15 @@ public class TerraformPlanFromGitRepoRequest {
         this.variables = variables;
     }
 
-    public TerraformPlanFromGitRepoRequest envVariables(@jakarta.annotation.Nullable Map<String, String> envVariables) {
+    public TerraformPlanFromGitRepoRequest envVariables(
+            @jakarta.annotation.Nullable Map<String, String> envVariables) {
 
         this.envVariables = envVariables;
         return this;
     }
 
-    public TerraformPlanFromGitRepoRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public TerraformPlanFromGitRepoRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -153,18 +145,17 @@ public class TerraformPlanFromGitRepoRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to terraform process.
+     * Key-value pairs of variables that must be injected as environment variables to terraform
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -187,15 +178,14 @@ public class TerraformPlanFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public TerraformScriptGitRepoDetails getGitRepoDetails() {
         return gitRepoDetails;
     }
 
-
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setGitRepoDetails(@jakarta.annotation.Nullable TerraformScriptGitRepoDetails gitRepoDetails) {
+    public void setGitRepoDetails(
+            @jakarta.annotation.Nullable TerraformScriptGitRepoDetails gitRepoDetails) {
         this.gitRepoDetails = gitRepoDetails;
     }
 
@@ -207,12 +197,15 @@ public class TerraformPlanFromGitRepoRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        TerraformPlanFromGitRepoRequest terraformPlanFromGitRepoRequest = (TerraformPlanFromGitRepoRequest) o;
-        return Objects.equals(this.requestId, terraformPlanFromGitRepoRequest.requestId) &&
-                Objects.equals(this.terraformVersion, terraformPlanFromGitRepoRequest.terraformVersion) &&
-                Objects.equals(this.variables, terraformPlanFromGitRepoRequest.variables) &&
-                Objects.equals(this.envVariables, terraformPlanFromGitRepoRequest.envVariables) &&
-                Objects.equals(this.gitRepoDetails, terraformPlanFromGitRepoRequest.gitRepoDetails);
+        TerraformPlanFromGitRepoRequest terraformPlanFromGitRepoRequest =
+                (TerraformPlanFromGitRepoRequest) o;
+        return Objects.equals(this.requestId, terraformPlanFromGitRepoRequest.requestId)
+                && Objects.equals(
+                        this.terraformVersion, terraformPlanFromGitRepoRequest.terraformVersion)
+                && Objects.equals(this.variables, terraformPlanFromGitRepoRequest.variables)
+                && Objects.equals(this.envVariables, terraformPlanFromGitRepoRequest.envVariables)
+                && Objects.equals(
+                        this.gitRepoDetails, terraformPlanFromGitRepoRequest.gitRepoDetails);
     }
 
     @Override
@@ -234,8 +227,8 @@ public class TerraformPlanFromGitRepoRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -243,6 +236,4 @@ public class TerraformPlanFromGitRepoRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

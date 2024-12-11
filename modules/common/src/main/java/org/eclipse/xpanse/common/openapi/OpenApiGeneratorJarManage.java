@@ -20,14 +20,11 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-/**
- * Class to manage all methods related to Openapi generator jar.
- */
+/** Class to manage all methods related to Openapi generator jar. */
 @Getter
 @Component
 @Slf4j
-public class OpenApiGeneratorJarManage implements
-        ApplicationListener<ContextRefreshedEvent> {
+public class OpenApiGeneratorJarManage implements ApplicationListener<ContextRefreshedEvent> {
 
     private static final String OPENAPI_GENERATOR_FILE_NAME = "openapi-generator-cli.jar";
 
@@ -39,7 +36,7 @@ public class OpenApiGeneratorJarManage implements
      * Constructor for instantiating OpenApiGeneratorJarManage bean.
      *
      * @param clientDownLoadUrl URL for downloading openapi-generator jar from maven central.
-     * @param openapiPath       folder where the jar must be available.
+     * @param openapiPath folder where the jar must be available.
      */
     @Autowired
     public OpenApiGeneratorJarManage(
@@ -50,10 +47,9 @@ public class OpenApiGeneratorJarManage implements
     }
 
     /**
-     * OpenApiGeneratorJarManage
-     * Get the openapi-generator-cli.jar from Resources.
-     * The download part is only for local development and is not required when building a "jar"
-     * or using the Docker image of the application.
+     * OpenApiGeneratorJarManage Get the openapi-generator-cli.jar from Resources. The download part
+     * is only for local development and is not required when building a "jar" or using the Docker
+     * image of the application.
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -92,8 +88,10 @@ public class OpenApiGeneratorJarManage implements
             URL url = URI.create(clientDownLoadUrl).toURL();
             File cliJarFile = getCliFile();
             FileUtils.copyURLToFile(url, cliJarFile);
-            log.info("Downloading openapi generator client into path {} from URL {} successful.",
-                    cliJarFile.getPath(), clientDownLoadUrl);
+            log.info(
+                    "Downloading openapi generator client into path {} from URL {} successful.",
+                    cliJarFile.getPath(),
+                    clientDownLoadUrl);
             return true;
         } catch (IOException ioException) {
             log.error("Downloading openapi generator client jar from URL failed.", ioException);
@@ -101,9 +99,7 @@ public class OpenApiGeneratorJarManage implements
         }
     }
 
-    /**
-     * Method to determine the directory location where openapi files must be created.
-     */
+    /** Method to determine the directory location where openapi files must be created. */
     public String getOpenApiWorkdir() {
         String rootPath = System.getProperty("user.dir");
         try {
@@ -125,6 +121,5 @@ public class OpenApiGeneratorJarManage implements
             log.error("Create open API workdir failed!", e);
         }
         return rootPath;
-
     }
 }

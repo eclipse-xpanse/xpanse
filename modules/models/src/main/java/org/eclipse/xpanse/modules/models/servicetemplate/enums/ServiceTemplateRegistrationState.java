@@ -10,11 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Defines possible states of a managed service template registration.
- */
+/** Defines possible states of a managed service template registration. */
 public enum ServiceTemplateRegistrationState {
-
     IN_REVIEW("in-review"),
     APPROVED("approved"),
     REJECTED("rejected");
@@ -25,9 +22,7 @@ public enum ServiceTemplateRegistrationState {
         this.state = state;
     }
 
-    /**
-     * For ServiceTemplateRegistrationState deserialize.
-     */
+    /** For ServiceTemplateRegistrationState deserialize. */
     @JsonCreator
     public static ServiceTemplateRegistrationState getByValue(String state) {
         for (ServiceTemplateRegistrationState registrationState : values()) {
@@ -36,16 +31,13 @@ public enum ServiceTemplateRegistrationState {
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("ServiceTemplateRegistrationState value %s is not supported.",
-                        state));
+                String.format(
+                        "ServiceTemplateRegistrationState value %s is not supported.", state));
     }
 
-    /**
-     * For ServiceTemplateRegistrationState serialize.
-     */
+    /** For ServiceTemplateRegistrationState serialize. */
     @JsonValue
     public String toValue() {
         return this.state;
     }
 }
-

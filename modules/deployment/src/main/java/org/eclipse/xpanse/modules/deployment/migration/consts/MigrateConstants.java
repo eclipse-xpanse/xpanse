@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment.migration.consts;
 
-/**
- * Migrate constant classes.
- */
+/** Migrate constant classes. */
 public class MigrateConstants {
 
     public static final String PROCESS_KEY = "migrate";

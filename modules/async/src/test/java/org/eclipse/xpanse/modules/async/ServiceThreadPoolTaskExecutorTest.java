@@ -16,9 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of ServiceThreadPoolTaskExecutor.
- */
+/** Test of ServiceThreadPoolTaskExecutor. */
 class ServiceThreadPoolTaskExecutorTest {
 
     private static ServiceThreadPoolTaskExecutor executor;
@@ -38,10 +36,11 @@ class ServiceThreadPoolTaskExecutorTest {
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        executor.execute(() -> {
-            task.run();
-            latch.countDown();
-        });
+        executor.execute(
+                () -> {
+                    task.run();
+                    latch.countDown();
+                });
 
         assertTrue(latch.await(1, TimeUnit.SECONDS));
     }
@@ -54,18 +53,21 @@ class ServiceThreadPoolTaskExecutorTest {
         executor.setQueueCapacity(25);
         executor.initialize();
 
-        Callable<String> task = () -> {
-            System.out.println("Executing callable task...");
-            return "Task Result";
-        };
+        Callable<String> task =
+                () -> {
+                    System.out.println("Executing callable task...");
+                    return "Task Result";
+                };
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        Future<String> future = executor.submit(() -> {
-            String result = task.call();
-            latch.countDown();
-            return result;
-        });
+        Future<String> future =
+                executor.submit(
+                        () -> {
+                            String result = task.call();
+                            latch.countDown();
+                            return result;
+                        });
 
         assertTrue(latch.await(1, TimeUnit.SECONDS));
         assertEquals("Task Result", future.get());
@@ -83,13 +85,14 @@ class ServiceThreadPoolTaskExecutorTest {
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        Future<?> future = executor.submit(() -> {
-            task.run();
-            latch.countDown();
-        });
+        Future<?> future =
+                executor.submit(
+                        () -> {
+                            task.run();
+                            latch.countDown();
+                        });
 
         assertTrue(latch.await(1, TimeUnit.SECONDS));
         future.get();
     }
-
 }

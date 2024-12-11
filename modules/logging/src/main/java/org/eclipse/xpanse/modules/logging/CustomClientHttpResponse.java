@@ -17,8 +17,9 @@ import org.springframework.lang.NonNull;
 /**
  * The class wraps a ClientHttpResponse and provides easy access to its properties as a byte array.
  */
-public record CustomClientHttpResponse(ClientHttpResponse originalResponse,
-                                       byte[] responseBodyBytes) implements ClientHttpResponse {
+public record CustomClientHttpResponse(
+        ClientHttpResponse originalResponse, byte[] responseBodyBytes)
+        implements ClientHttpResponse {
 
     @NonNull
     @Override

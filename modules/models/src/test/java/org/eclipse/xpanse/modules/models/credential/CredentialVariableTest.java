@@ -13,9 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of CredentialVariable.
- */
+/** Test of CredentialVariable. */
 class CredentialVariableTest {
     private static final String name = "variable";
     private static final String description = "Test variable";
@@ -132,9 +130,8 @@ class CredentialVariableTest {
                 new CredentialVariable(name, description, isMandatory, isSensitive, value);
 
         String expectedToString =
-                "CredentialVariable(name=variable, description=Test variable, isMandatory=true, " +
-                        "isSensitive=true, value=value)";
+                "CredentialVariable(name=variable, description=Test variable, isMandatory=true, "
+                        + "isSensitive=true, value=value)";
         assertEquals(expectedToString, credentialVariable.toString());
     }
-
 }

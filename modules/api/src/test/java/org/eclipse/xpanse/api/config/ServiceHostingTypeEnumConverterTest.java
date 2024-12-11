@@ -12,11 +12,10 @@ class ServiceHostingTypeEnumConverterTest {
 
     @Test
     void testConvert() {
-        Assertions.assertEquals(ServiceHostingType.SELF,
-                converterTest.convert("self"));
-        Assertions.assertEquals(ServiceHostingType.SERVICE_VENDOR,
-                converterTest.convert("service-vendor"));
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> converterTest.convert("error_value"));
+        Assertions.assertEquals(ServiceHostingType.SELF, converterTest.convert("self"));
+        Assertions.assertEquals(
+                ServiceHostingType.SERVICE_VENDOR, converterTest.convert("service-vendor"));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> converterTest.convert("error_value"));
     }
 }

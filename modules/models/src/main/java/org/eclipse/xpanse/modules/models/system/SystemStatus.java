@@ -11,19 +11,19 @@ import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 
-/**
- * Describes health status of the system.
- */
+/** Describes health status of the system. */
 @Data
 public class SystemStatus {
 
     @NotNull
     @Schema(description = "The health status of Xpanse api service.")
-    private     HealthStatus healthStatus;
+    private HealthStatus healthStatus;
 
-    @Schema(description = "The health status of backend systems. "
-            + "This list contains status of identity provider and status of database."
-            + "The status of identity provider will return when authorization is enabled.")
+    @Schema(
+            description =
+                    "The health status of backend systems. This list contains status of identity"
+                        + " provider and status of database.The status of identity provider will"
+                        + " return when authorization is enabled.")
     @NotNull
     private List<BackendSystemStatus> backendSystemStatuses;
 }

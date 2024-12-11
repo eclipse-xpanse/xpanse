@@ -32,13 +32,12 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class DeployServiceEntityConverter {
 
-    @Resource
-    private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
      * Method to create a DeployTask from DeployServiceEntity.
      *
-     * @param orderType               ServiceOrderType.
+     * @param orderType ServiceOrderType.
      * @param serviceDeploymentEntity DeployServiceEntity object.
      * @return DeployTask object.
      */
@@ -52,8 +51,9 @@ public class DeployServiceEntityConverter {
         deployTask.setUserId(serviceDeploymentEntity.getUserId());
         deployTask.setDeployRequest(serviceDeploymentEntity.getDeployRequest());
         deployTask.setNamespace(serviceDeploymentEntity.getNamespace());
-        ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
-                serviceDeploymentEntity.getServiceTemplateId());
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(
+                        serviceDeploymentEntity.getServiceTemplateId());
         deployTask.setOcl(serviceTemplateEntity.getOcl());
         deployTask.setServiceTemplateId(serviceTemplateEntity.getId());
         return deployTask;
@@ -77,8 +77,8 @@ public class DeployServiceEntityConverter {
 
     private Map<String, Object> getServiceConfiguration(ServiceDeploymentEntity serviceDeployment) {
         Map<String, Object> configuration = new HashMap<>();
-        DeployTask deployTask = getDeployTaskByStoredService(ServiceOrderType.DEPLOY,
-                serviceDeployment);
+        DeployTask deployTask =
+                getDeployTaskByStoredService(ServiceOrderType.DEPLOY, serviceDeployment);
         ServiceConfigurationManage serviceConfigurationManage =
                 deployTask.getOcl().getServiceConfigurationManage();
         if (Objects.nonNull(serviceConfigurationManage)) {
@@ -88,19 +88,26 @@ public class DeployServiceEntityConverter {
                     deployTask.getOcl().getFlavors().getServiceFlavors();
             if (!CollectionUtils.isEmpty(configurationParameters)
                     && !CollectionUtils.isEmpty(serviceFlavors)) {
-                Map<String, String> properties = serviceFlavors.stream().filter(
-                                serviceFlavorWithPrice -> deployTask.getDeployRequest().getFlavor()
-                                        .equals(serviceFlavorWithPrice.getName()))
-                        .findFirst().map(ServiceFlavorWithPrice::getProperties)
-                        .orElse(new HashMap<>());
-                configurationParameters.forEach(config -> {
-                    String name = config.getName();
-                    if (!properties.isEmpty() && properties.containsKey(name)) {
-                        configuration.put(name, properties.get(name));
-                    } else {
-                        configuration.put(name, config.getInitialValue());
-                    }
-                });
+                Map<String, String> properties =
+                        serviceFlavors.stream()
+                                .filter(
+                                        serviceFlavorWithPrice ->
+                                                deployTask
+                                                        .getDeployRequest()
+                                                        .getFlavor()
+                                                        .equals(serviceFlavorWithPrice.getName()))
+                                .findFirst()
+                                .map(ServiceFlavorWithPrice::getProperties)
+                                .orElse(new HashMap<>());
+                configurationParameters.forEach(
+                        config -> {
+                            String name = config.getName();
+                            if (!properties.isEmpty() && properties.containsKey(name)) {
+                                configuration.put(name, properties.get(name));
+                            } else {
+                                configuration.put(name, config.getInitialValue());
+                            }
+                        });
             }
         }
         return configuration;

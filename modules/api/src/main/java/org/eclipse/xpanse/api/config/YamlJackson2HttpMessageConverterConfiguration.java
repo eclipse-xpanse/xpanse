@@ -12,9 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 
-/**
- * Converter configuration for the yaml.
- */
+/** Converter configuration for the yaml. */
 @Configuration
 public class YamlJackson2HttpMessageConverterConfiguration {
 
@@ -22,7 +20,9 @@ public class YamlJackson2HttpMessageConverterConfiguration {
             extends AbstractJackson2HttpMessageConverter {
 
         YamlJackson2HttpMessageConverter() {
-            super(new YAMLMapper(), MediaType.parseMediaType("application/x-yaml"),
+            super(
+                    new YAMLMapper(),
+                    MediaType.parseMediaType("application/x-yaml"),
                     MediaType.parseMediaType("application/yaml"),
                     MediaType.parseMediaType("application/yml"));
         }

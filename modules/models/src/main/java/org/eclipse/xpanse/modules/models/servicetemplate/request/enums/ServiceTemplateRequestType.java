@@ -10,11 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Defines types of request for managing service template.
- */
+/** Defines types of request for managing service template. */
 public enum ServiceTemplateRequestType {
-
     REGISTER("register"),
     UPDATE("update"),
     UNREGISTER("unregister"),
@@ -26,9 +23,7 @@ public enum ServiceTemplateRequestType {
         this.type = type;
     }
 
-    /**
-     * For ServiceTemplateRequestType deserialize.
-     */
+    /** For ServiceTemplateRequestType deserialize. */
     @JsonCreator
     public static ServiceTemplateRequestType getByValue(String type) {
         for (ServiceTemplateRequestType registrationState : values()) {
@@ -40,12 +35,9 @@ public enum ServiceTemplateRequestType {
                 String.format("ServiceTemplateRequestType value %s is not supported.", type));
     }
 
-    /**
-     * For ServiceTemplateRequestType serialize.
-     */
+    /** For ServiceTemplateRequestType serialize. */
     @JsonValue
     public String toValue() {
         return this.type;
     }
 }
-

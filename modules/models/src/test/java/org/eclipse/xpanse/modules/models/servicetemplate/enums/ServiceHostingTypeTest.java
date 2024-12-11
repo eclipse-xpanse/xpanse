@@ -12,17 +12,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of ServiceHostingType.
- */
+/** Test of ServiceHostingType. */
 class ServiceHostingTypeTest {
 
     @Test
     void testGetByValue() {
-        assertEquals(ServiceHostingType.SERVICE_VENDOR, ServiceHostingType.getByValue("service-vendor"));
+        assertEquals(
+                ServiceHostingType.SERVICE_VENDOR, ServiceHostingType.getByValue("service-vendor"));
         assertEquals(ServiceHostingType.SELF, ServiceHostingType.getByValue("self"));
-        assertThrows(UnsupportedEnumValueException.class,
-                () -> ServiceHostingType.getByValue("null"));
+        assertThrows(
+                UnsupportedEnumValueException.class, () -> ServiceHostingType.getByValue("null"));
     }
 
     @Test
@@ -30,5 +29,4 @@ class ServiceHostingTypeTest {
         assertEquals("service-vendor", ServiceHostingType.SERVICE_VENDOR.toValue());
         assertEquals("self", ServiceHostingType.SELF.toValue());
     }
-
 }

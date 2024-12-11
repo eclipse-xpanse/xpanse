@@ -60,32 +60,25 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * FlexibleEngine Resource Manager.
- */
+/** FlexibleEngine Resource Manager. */
 @Slf4j
 @Component
 public class FlexibleEngineResourceManager {
 
     public static final String RESOURCE = "resource";
-    public static final String FLEXIBLE_ENGINE_COMPUTE_INSTANCE
-            = "flexibleengine_compute_instance_v2";
-    @Resource
-    private CredentialCenter credentialCenter;
-    @Resource
-    private FlexibleEngineClient flexibleEngineClient;
-    @Resource
-    private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+    public static final String FLEXIBLE_ENGINE_COMPUTE_INSTANCE =
+            "flexibleengine_compute_instance_v2";
+    @Resource private CredentialCenter credentialCenter;
+    @Resource private FlexibleEngineClient flexibleEngineClient;
+    @Resource private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
 
-
-    /**
-     * List FlexibleEngine resource by the kind of ReusableCloudResource.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** List FlexibleEngine resource by the kind of ReusableCloudResource. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public List<String> getExistingResourceNamesWithKind(String siteName, String regionName,
-                                                         String userId, DeployResourceKind kind) {
+    public List<String> getExistingResourceNamesWithKind(
+            String siteName, String regionName, String userId, DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
             return getVpcList(siteName, regionName, userId);
         } else if (kind == DeployResourceKind.SUBNET) {
@@ -105,35 +98,40 @@ public class FlexibleEngineResourceManager {
         }
     }
 
-
     /**
      * Get available zones of the region.
      *
-     * @param siteName   siteName
+     * @param siteName siteName
      * @param regionName regionName
-     * @param userId     userId
+     * @param userId userId
      * @return List of available zones.
      */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public List<String> getAvailabilityZonesOfRegion(String siteName, String regionName,
-                                                     String userId) {
+    public List<String> getAvailabilityZonesOfRegion(
+            String siteName, String regionName, String userId) {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
             EcsClient ecsClient = getEcsClient(siteName, regionName, userId);
             NovaListAvailabilityZonesRequest request = new NovaListAvailabilityZonesRequest();
             NovaListAvailabilityZonesResponse response =
-                    ecsClient.novaListAvailabilityZonesInvoker(request)
+                    ecsClient
+                            .novaListAvailabilityZonesInvoker(request)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                            .backoffStrategy(flexibleEngineRetryStrategy).invoke();
+                            .backoffStrategy(flexibleEngineRetryStrategy)
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
-                availabilityZoneNames = response.getAvailabilityZoneInfo().stream()
-                        .map(NovaAvailabilityZone::getZoneName).toList();
+                availabilityZoneNames =
+                        response.getAvailabilityZoneInfo().stream()
+                                .map(NovaAvailabilityZone::getZoneName)
+                                .toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listAvailabilityZones with region {} failed.",
+            log.error(
+                    "FlexibleEngineClient listAvailabilityZones with region {} failed.",
                     regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
@@ -146,10 +144,13 @@ public class FlexibleEngineResourceManager {
         try {
             VpcClient vpcClient = getVpcClient(siteName, regionName, userId);
             ListVpcsRequest request = new ListVpcsRequest();
-            ListVpcsResponse response = vpcClient.listVpcsInvoker(request)
-                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
-                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
+            ListVpcsResponse response =
+                    vpcClient
+                            .listVpcsInvoker(request)
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
                 vpcNames = response.getVpcs().stream().map(Vpc::getName).toList();
             }
@@ -166,10 +167,13 @@ public class FlexibleEngineResourceManager {
         try {
             VpcClient vpcClient = getVpcClient(siteName, regionName, userId);
             ListSubnetsRequest request = new ListSubnetsRequest();
-            ListSubnetsResponse response = vpcClient.listSubnetsInvoker(request)
-                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
-                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
+            ListSubnetsResponse response =
+                    vpcClient
+                            .listSubnetsInvoker(request)
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
                 subnetNames = response.getSubnets().stream().map(Subnet::getName).toList();
             }
@@ -186,10 +190,13 @@ public class FlexibleEngineResourceManager {
         try {
             VpcClient vpcClient = getVpcClient(siteName, regionName, userId);
             ListSecurityGroupsRequest request = new ListSecurityGroupsRequest();
-            ListSecurityGroupsResponse response = vpcClient.listSecurityGroupsInvoker(request)
-                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
-                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
+            ListSecurityGroupsResponse response =
+                    vpcClient
+                            .listSecurityGroupsInvoker(request)
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
                 securityGroupNames =
                         response.getSecurityGroups().stream().map(SecurityGroup::getName).toList();
@@ -202,24 +209,28 @@ public class FlexibleEngineResourceManager {
         return securityGroupNames;
     }
 
-    private List<String> getSecurityGroupRuleList(String siteName, String regionName,
-                                                  String userId) {
+    private List<String> getSecurityGroupRuleList(
+            String siteName, String regionName, String userId) {
         List<String> securityGroupRuleIds = new ArrayList<>();
         try {
             VpcClient vpcClient = getVpcClient(siteName, regionName, userId);
             ListSecurityGroupRulesRequest request = new ListSecurityGroupRulesRequest();
             ListSecurityGroupRulesResponse response =
-                    vpcClient.listSecurityGroupRulesInvoker(request)
+                    vpcClient
+                            .listSecurityGroupRulesInvoker(request)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                            .backoffStrategy(flexibleEngineRetryStrategy).invoke();
+                            .backoffStrategy(flexibleEngineRetryStrategy)
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
                 securityGroupRuleIds =
-                        response.getSecurityGroupRules().stream().map(SecurityGroupRule::getId)
+                        response.getSecurityGroupRules().stream()
+                                .map(SecurityGroupRule::getId)
                                 .toList();
             }
         } catch (Exception e) {
-            log.error("FlexibleEngineClient listSecurityGroupRules with region {} failed.",
+            log.error(
+                    "FlexibleEngineClient listSecurityGroupRules with region {} failed.",
                     regionName);
             flexibleEngineRetryStrategy.handleAuthExceptionForSpringRetry(e);
             throw new ClientApiCallFailedException(e.getMessage());
@@ -232,13 +243,17 @@ public class FlexibleEngineResourceManager {
         try {
             EipClient eipClient = getEipClient(siteName, regionName, userId);
             ListPublicipsRequest request = new ListPublicipsRequest();
-            ListPublicipsResponse response = eipClient.listPublicipsInvoker(request)
-                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
-                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
+            ListPublicipsResponse response =
+                    eipClient
+                            .listPublicipsInvoker(request)
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
                 publicIpAddresses =
-                        response.getPublicips().stream().map(PublicipShowResp::getPublicIpAddress)
+                        response.getPublicips().stream()
+                                .map(PublicipShowResp::getPublicIpAddress)
                                 .toList();
             }
         } catch (Exception e) {
@@ -254,10 +269,13 @@ public class FlexibleEngineResourceManager {
         try {
             EvsClient evsClient = getEvsClient(siteName, regionName, userId);
             ListVolumesRequest request = new ListVolumesRequest();
-            ListVolumesResponse response = evsClient.listVolumesInvoker(request)
-                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
-                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
+            ListVolumesResponse response =
+                    evsClient
+                            .listVolumesInvoker(request)
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
                 volumeNames = response.getVolumes().stream().map(VolumeDetail::getName).toList();
             }
@@ -274,14 +292,19 @@ public class FlexibleEngineResourceManager {
         try {
             EcsClient ecsClient = getEcsClient(siteName, regionName, userId);
             NovaListKeypairsRequest request = new NovaListKeypairsRequest();
-            NovaListKeypairsResponse response = ecsClient.novaListKeypairsInvoker(request)
-                    .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
-                    .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(flexibleEngineRetryStrategy).invoke();
+            NovaListKeypairsResponse response =
+                    ecsClient
+                            .novaListKeypairsInvoker(request)
+                            .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(flexibleEngineRetryStrategy)
+                            .invoke();
             if (response.getHttpStatusCode() == 200) {
                 keyPairNames =
-                        response.getKeypairs().stream().map(NovaListKeypairsResult::getKeypair)
-                                .map(NovaSimpleKeypair::getName).toList();
+                        response.getKeypairs().stream()
+                                .map(NovaListKeypairsResult::getKeypair)
+                                .map(NovaSimpleKeypair::getName)
+                                .toList();
             }
         } catch (Exception e) {
             log.error("FlexibleEngineClient listKeyPairs with region {} failed.", regionName);
@@ -313,14 +336,12 @@ public class FlexibleEngineResourceManager {
 
     private ICredential getCredential(String siteName, String userId) {
         AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, siteName,
-                        CredentialType.VARIABLES, userId);
+                credentialCenter.getCredential(
+                        Csp.FLEXIBLE_ENGINE, siteName, CredentialType.VARIABLES, userId);
         return flexibleEngineClient.getCredential(credential);
     }
 
-    /**
-     * get resources name for service deployment.
-     */
+    /** get resources name for service deployment. */
     public Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile) {
         Map<String, Object> results;
         Map<String, String> resources = new HashMap<>();
@@ -334,15 +355,17 @@ public class FlexibleEngineResourceManager {
                             (Map<String, Object>) resourceMap.get(FLEXIBLE_ENGINE_COMPUTE_INSTANCE);
                     if (!CollectionUtils.isEmpty(resourceInfoMap)) {
                         Set<String> resourceNameSet = resourceInfoMap.keySet();
-                        resourceNameSet.forEach(resourceName -> {
-                            resources.put(resourceName, FLEXIBLE_ENGINE_COMPUTE_INSTANCE);
-                        });
+                        resourceNameSet.forEach(
+                                resourceName -> {
+                                    resources.put(resourceName, FLEXIBLE_ENGINE_COMPUTE_INSTANCE);
+                                });
                     }
                 }
             }
         } catch (HCLParserException | IOException e) {
-            String error = String.format("Hcl4j parse terraform.tf file error, error %s .",
-                    e.getMessage());
+            String error =
+                    String.format(
+                            "Hcl4j parse terraform.tf file error, error %s .", e.getMessage());
             log.error(error);
             throw new TerraformScriptFormatInvalidException(List.of(error));
         }

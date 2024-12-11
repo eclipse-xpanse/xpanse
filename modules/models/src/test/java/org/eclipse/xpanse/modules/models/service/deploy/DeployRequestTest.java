@@ -21,9 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of CreateRequest.
- */
+/** Test of CreateRequest. */
 class DeployRequestTest {
 
     private final UUID id = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
@@ -107,23 +105,37 @@ class DeployRequestTest {
 
     @Test
     void testToString() {
-        String expectedToString = "DeployRequest(super=DeployRequestBase(" +
-                "userId=" + userId +
-                ", category=" + category +
-                ", serviceName=" + serviceName +
-                ", customerServiceName=" + customerServiceName +
-                ", version=" + version +
-                ", region=" + region +
-                ", csp=" + csp +
-                ", flavor=" + flavor +
-                ", serviceHostingType=" + serviceHostingType +
-                ", serviceRequestProperties=" + properties +
-                ", availabilityZones=" + availabilityZones +
-                ", isEulaAccepted=" + IS_ACCEPT_EULA +
-                ", billingMode=" + billingMode +
-                "), serviceId=" + id
-                + ")";
+        String expectedToString =
+                "DeployRequest(super=DeployRequestBase("
+                        + "userId="
+                        + userId
+                        + ", category="
+                        + category
+                        + ", serviceName="
+                        + serviceName
+                        + ", customerServiceName="
+                        + customerServiceName
+                        + ", version="
+                        + version
+                        + ", region="
+                        + region
+                        + ", csp="
+                        + csp
+                        + ", flavor="
+                        + flavor
+                        + ", serviceHostingType="
+                        + serviceHostingType
+                        + ", serviceRequestProperties="
+                        + properties
+                        + ", availabilityZones="
+                        + availabilityZones
+                        + ", isEulaAccepted="
+                        + IS_ACCEPT_EULA
+                        + ", billingMode="
+                        + billingMode
+                        + "), serviceId="
+                        + id
+                        + ")";
         assertEquals(expectedToString, request.toString());
     }
-
 }

@@ -9,9 +9,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuration class of local terraform env.
- */
+/** Configuration class of local terraform env. */
 @Getter
 @Configuration
 public class TerraformLocalConfig {

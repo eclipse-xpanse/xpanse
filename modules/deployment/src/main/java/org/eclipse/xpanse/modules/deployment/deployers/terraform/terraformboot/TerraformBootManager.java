@@ -19,9 +19,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Service for managing terraform-boot.
- */
+/** Service for managing terraform-boot. */
 @Slf4j
 @Component
 @Profile("terraform-boot")
@@ -29,14 +27,15 @@ public class TerraformBootManager {
 
     private static final String TERRAFORM_BOOT_PROFILE_NAME = "terraform-boot";
 
-    @Resource
-    private AdminApi terraformAdminApi;
+    @Resource private AdminApi terraformAdminApi;
+
     @Value("${spring.profiles.active}")
     private String springProfilesActive;
+
     @Value("${terraform-boot.endpoint:http://localhost:9090}")
     private String terraformBootBaseUrl;
-    @Resource
-    private TerraformBootHelper terraformBootHelper;
+
+    @Resource private TerraformBootHelper terraformBootHelper;
 
     /**
      * Get system status of TerraformBoot.
@@ -54,8 +53,9 @@ public class TerraformBootManager {
             try {
                 TerraformBootSystemStatus terraformBootSystemStatus =
                         terraformAdminApi.healthCheck();
-                terraformBootStatus.setHealthStatus(HealthStatus.valueOf(
-                        terraformBootSystemStatus.getHealthStatus().getValue()));
+                terraformBootStatus.setHealthStatus(
+                        HealthStatus.valueOf(
+                                terraformBootSystemStatus.getHealthStatus().getValue()));
             } catch (RestClientException e) {
                 log.error("Get status of terraform-boot error:{}", e.getMessage());
                 terraformBootStatus.setHealthStatus(HealthStatus.NOK);

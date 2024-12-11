@@ -46,20 +46,20 @@ class ServiceTemplateEntityTest {
     private JsonObjectSchema jsonObjectSchema;
     private ServiceProviderContactDetails serviceProviderContactDetails;
     private ServiceTemplateEntity testEntity;
-    @Mock
-    private List<ServicePolicyEntity> mockServicePolicyList;
-    @Mock
-    private List<ServiceTemplateRequestHistoryEntity> mockServiceTemplateHistory;
+    @Mock private List<ServicePolicyEntity> mockServicePolicyList;
+    @Mock private List<ServiceTemplateRequestHistoryEntity> mockServiceTemplateHistory;
 
     @BeforeEach
     void setUp() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl =
+                oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator =
                 new ServiceDeployVariablesJsonSchemaGenerator();
-        jsonObjectSchema = serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
-                ocl.getDeployment().getVariables());
+        jsonObjectSchema =
+                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
+                        ocl.getDeployment().getVariables());
         category = ocl.getCategory();
         csp = ocl.getCloudServiceProvider().getName();
         name = ocl.getName();
@@ -93,8 +93,8 @@ class ServiceTemplateEntityTest {
         assertEquals(version, testEntity.getVersion());
         assertEquals(namespace, testEntity.getNamespace());
         assertEquals(serviceHostingType, testEntity.getServiceHostingType());
-        assertEquals(serviceTemplateRegistrationState,
-                testEntity.getServiceTemplateRegistrationState());
+        assertEquals(
+                serviceTemplateRegistrationState, testEntity.getServiceTemplateRegistrationState());
         assertEquals(true, testEntity.getAvailableInCatalog());
         assertEquals(false, testEntity.getIsUpdatePending());
         assertEquals(jsonObjectSchema, testEntity.getJsonObjectSchema());
@@ -123,20 +123,32 @@ class ServiceTemplateEntityTest {
 
     @Test
     void testToString() {
-        String expectedToString = "ServiceTemplateEntity(id=" + id
-                + ", name=" + name
-                + ", version=" + version
-                + ", csp=" + csp
-                + ", category=" + category
-                + ", namespace=" + namespace
-                + ", serviceHostingType=" + serviceHostingType
-                + ", ocl=" + ocl
-                + ", serviceTemplateRegistrationState=" + serviceTemplateRegistrationState
-                + ", isUpdatePending=false"
-                + ", availableInCatalog=true"
-                + ", serviceProviderContactDetails=" + serviceProviderContactDetails
-                + ", jsonObjectSchema=" + jsonObjectSchema
-                + ")";
+        String expectedToString =
+                "ServiceTemplateEntity(id="
+                        + id
+                        + ", name="
+                        + name
+                        + ", version="
+                        + version
+                        + ", csp="
+                        + csp
+                        + ", category="
+                        + category
+                        + ", namespace="
+                        + namespace
+                        + ", serviceHostingType="
+                        + serviceHostingType
+                        + ", ocl="
+                        + ocl
+                        + ", serviceTemplateRegistrationState="
+                        + serviceTemplateRegistrationState
+                        + ", isUpdatePending=false"
+                        + ", availableInCatalog=true"
+                        + ", serviceProviderContactDetails="
+                        + serviceProviderContactDetails
+                        + ", jsonObjectSchema="
+                        + jsonObjectSchema
+                        + ")";
         assertEquals(expectedToString, testEntity.toString());
     }
 }

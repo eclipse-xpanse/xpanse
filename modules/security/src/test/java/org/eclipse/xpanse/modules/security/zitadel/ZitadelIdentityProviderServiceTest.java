@@ -37,30 +37,30 @@ class ZitadelIdentityProviderServiceTest {
             "openid profile urn:zitadel:iam:org:projects:roles urn:zitadel:iam:user:metadata";
     private static final String CSP_KEY = "csp";
 
-    @InjectMocks
-    private ZitadelIdentityProviderService zitadelIdentityProviderServiceUnderTest;
+    @InjectMocks private ZitadelIdentityProviderService zitadelIdentityProviderServiceUnderTest;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "iamServerEndpoint",
+        ReflectionTestUtils.setField(
+                zitadelIdentityProviderServiceUnderTest,
+                "iamServerEndpoint",
                 "http://localhost:8081");
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "clientId",
-                "clientId");
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "restTemplate",
-                new RestTemplate());
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "cspKey",
-                CSP_KEY);
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "requiredScopes",
-                REQUIRED_SCOPES);
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "userIdKey",
-                USERID_KEY);
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "usernameKey",
-                USERNAME_KEY);
+        ReflectionTestUtils.setField(
+                zitadelIdentityProviderServiceUnderTest, "clientId", "clientId");
+        ReflectionTestUtils.setField(
+                zitadelIdentityProviderServiceUnderTest, "restTemplate", new RestTemplate());
+        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "cspKey", CSP_KEY);
+        ReflectionTestUtils.setField(
+                zitadelIdentityProviderServiceUnderTest, "requiredScopes", REQUIRED_SCOPES);
+        ReflectionTestUtils.setField(
+                zitadelIdentityProviderServiceUnderTest, "userIdKey", USERID_KEY);
+        ReflectionTestUtils.setField(
+                zitadelIdentityProviderServiceUnderTest, "usernameKey", USERNAME_KEY);
 
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "metadataKey",
-                METADATA_KEY);
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "namespaceKey",
-                NAMESPACE_KEY);
+        ReflectionTestUtils.setField(
+                zitadelIdentityProviderServiceUnderTest, "metadataKey", METADATA_KEY);
+        ReflectionTestUtils.setField(
+                zitadelIdentityProviderServiceUnderTest, "namespaceKey", NAMESPACE_KEY);
     }
 
     Map<String, Object> getAttributesMap(boolean putMetaData) {
@@ -83,8 +83,8 @@ class ZitadelIdentityProviderServiceTest {
         return roleSet;
     }
 
-    void mockBearerTokenAuthentication(Map<String, Object> attributes,
-                                       Collection<GrantedAuthority> authorities) {
+    void mockBearerTokenAuthentication(
+            Map<String, Object> attributes, Collection<GrantedAuthority> authorities) {
         XpanseAuthentication authentication = Mockito.mock(XpanseAuthentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(authentication.getClaims()).thenReturn(attributes);
@@ -93,8 +93,8 @@ class ZitadelIdentityProviderServiceTest {
         SecurityContextHolder.setContext(securityContext);
     }
 
-    void mockJwtTokenAuthentication(Map<String, Object> attributes,
-                                    Collection<GrantedAuthority> authorities) {
+    void mockJwtTokenAuthentication(
+            Map<String, Object> attributes, Collection<GrantedAuthority> authorities) {
         XpanseAuthentication authentication = Mockito.mock(XpanseAuthentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
 
@@ -114,8 +114,8 @@ class ZitadelIdentityProviderServiceTest {
     void testGetCurrentUserInfo() {
 
         Map<String, Object> attributesMap = getAttributesMap(true);
-        mockBearerTokenAuthentication(attributesMap,
-                getGrantedAuthorityList(RoleConstants.ROLE_ISV));
+        mockBearerTokenAuthentication(
+                attributesMap, getGrantedAuthorityList(RoleConstants.ROLE_ISV));
         // Setup
         final CurrentUserInfo expectedResult = new CurrentUserInfo();
         expectedResult.setUserId("userId");
@@ -131,7 +131,6 @@ class ZitadelIdentityProviderServiceTest {
         assertThat(result).isEqualTo(expectedResult);
     }
 
-
     @Test
     void testGetCurrentUserInfoWithNull() {
 
@@ -145,8 +144,8 @@ class ZitadelIdentityProviderServiceTest {
     @Test
     void testGetCurrentUserInfoWithNullNamespace() {
         Map<String, Object> attributesMap = getAttributesMap(false);
-        mockBearerTokenAuthentication(attributesMap,
-                getGrantedAuthorityList(RoleConstants.ROLE_USER));
+        mockBearerTokenAuthentication(
+                attributesMap, getGrantedAuthorityList(RoleConstants.ROLE_USER));
         // Setup
         final CurrentUserInfo expectedResult = new CurrentUserInfo();
         expectedResult.setUserId("userId");
@@ -164,8 +163,7 @@ class ZitadelIdentityProviderServiceTest {
     void testGetCurrentUserInfoWithJwtToken() {
 
         Map<String, Object> attributesMap = getAttributesMap(true);
-        mockJwtTokenAuthentication(attributesMap,
-                getGrantedAuthorityList(RoleConstants.ROLE_ISV));
+        mockJwtTokenAuthentication(attributesMap, getGrantedAuthorityList(RoleConstants.ROLE_ISV));
         // Setup
         final CurrentUserInfo expectedResult = new CurrentUserInfo();
         expectedResult.setUserId("userId");

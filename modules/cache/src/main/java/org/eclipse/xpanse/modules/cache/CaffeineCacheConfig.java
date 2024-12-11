@@ -28,9 +28,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Caffeine cache configuration class.
- */
+/** Caffeine cache configuration class. */
 @Slf4j
 @Configuration
 public class CaffeineCacheConfig {
@@ -53,8 +51,8 @@ public class CaffeineCacheConfig {
     public CacheManager caffeineCacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.registerCustomCache(REGION_AZS_CACHE_NAME, getRegionAzsCache());
-        cacheManager.registerCustomCache(SERVICE_FLAVOR_PRICE_CACHE_NAME,
-                getServiceFlavorPriceCache());
+        cacheManager.registerCustomCache(
+                SERVICE_FLAVOR_PRICE_CACHE_NAME, getServiceFlavorPriceCache());
         cacheManager.registerCustomCache(CREDENTIAL_CACHE_NAME, getCredentialsCache());
         cacheManager.registerCustomCache(MONITOR_METRICS_CACHE_NAME, getMonitorMetricsCache());
         cacheManager.registerCustomCache(DEPLOYER_VERSIONS_CACHE_NAME, getDeployerVersionsCache());
@@ -62,14 +60,18 @@ public class CaffeineCacheConfig {
     }
 
     private Cache<Object, Object> getRegionAzsCache() {
-        long duration = regionAzsCacheDuration > 0 ? regionAzsCacheDuration
-                : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+        long duration =
+                regionAzsCacheDuration > 0
+                        ? regionAzsCacheDuration
+                        : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return Caffeine.newBuilder().expireAfterWrite(duration, TimeUnit.MINUTES).build();
     }
 
     private Cache<Object, Object> getServiceFlavorPriceCache() {
-        long duration = flavorPriceCacheDuration > 0 ? flavorPriceCacheDuration
-                : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+        long duration =
+                flavorPriceCacheDuration > 0
+                        ? flavorPriceCacheDuration
+                        : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return Caffeine.newBuilder().expireAfterWrite(duration, TimeUnit.MINUTES).build();
     }
 
@@ -77,29 +79,35 @@ public class CaffeineCacheConfig {
         return Caffeine.newBuilder().build();
     }
 
-
     private Cache<Object, Object> getCredentialsCache() {
         return Caffeine.newBuilder()
                 .expireAfter(new CredentialCaffeineCacheExpiry())
-                .removalListener((Object key, Object value, RemovalCause cause) -> {
-                    if (Objects.nonNull(key) && key instanceof CredentialCacheKey) {
-                        log.info("Credential cache removed, key: {}, cause: {}", key, cause);
-                    }
-                })
+                .removalListener(
+                        (Object key, Object value, RemovalCause cause) -> {
+                            if (Objects.nonNull(key) && key instanceof CredentialCacheKey) {
+                                log.info(
+                                        "Credential cache removed, key: {}, cause: {}", key, cause);
+                            }
+                        })
                 .build();
     }
 
     private Cache<Object, Object> getMonitorMetricsCache() {
-        long duration = monitorMetricsCacheDuration > 0 ? monitorMetricsCacheDuration
-                : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+        long duration =
+                monitorMetricsCacheDuration > 0
+                        ? monitorMetricsCacheDuration
+                        : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return Caffeine.newBuilder()
                 .expireAfterWrite(duration, TimeUnit.MINUTES)
-                .removalListener((Object key, Object value, RemovalCause cause) -> {
-                    if (Objects.nonNull(key) && key instanceof MonitorMetricsCacheKey) {
-                        log.info("Monitor metrics cache removed, key: {}, cause: {}", key, cause);
-                    }
-                })
+                .removalListener(
+                        (Object key, Object value, RemovalCause cause) -> {
+                            if (Objects.nonNull(key) && key instanceof MonitorMetricsCacheKey) {
+                                log.info(
+                                        "Monitor metrics cache removed, key: {}, cause: {}",
+                                        key,
+                                        cause);
+                            }
+                        })
                 .build();
     }
-
 }

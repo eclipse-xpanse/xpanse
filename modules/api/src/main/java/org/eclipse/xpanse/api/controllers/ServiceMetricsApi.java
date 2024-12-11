@@ -32,9 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST API methods for monitoring deployed services.
- */
+/** REST API methods for monitoring deployed services. */
 @Slf4j
 @CrossOrigin
 @RestController
@@ -50,50 +48,63 @@ public class ServiceMetricsApi {
         this.serviceMetricsAdapter = serviceMetricsAdapter;
     }
 
-    /**
-     * Get metrics of a deployed service or a resource.
-     */
-    @Tag(name = "Monitor",
-            description = "APIs for getting metrics of deployed services.")
+    /** Get metrics of a deployed service or a resource. */
+    @Tag(name = "Monitor", description = "APIs for getting metrics of deployed services.")
     @Operation(description = "Get metrics of a deployed service or a resource.")
     @GetMapping(value = "/metrics", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public List<Metric> getMetrics(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
-            @RequestParam(name = "serviceId") String serviceId,
+                    @RequestParam(name = "serviceId")
+                    String serviceId,
             @Parameter(name = "resourceId", description = "Id of resource in the deployed service")
-            @RequestParam(name = "resourceId", required = false) String resourceId,
+                    @RequestParam(name = "resourceId", required = false)
+                    String resourceId,
             @Parameter(name = "monitorResourceType", description = "Types of the monitor resource.")
-            @RequestParam(name = "monitorResourceType", required = false)
+                    @RequestParam(name = "monitorResourceType", required = false)
                     MonitorResourceType monitorResourceType,
-            @Parameter(name = "from", description = "Start UNIX timestamp in milliseconds. "
-                    + "If no value filled,the default value is the UNIX timestamp in milliseconds"
-                    + " of the five minutes ago.")
-            @RequestParam(name = "from", required = false)
-            @Min(value = 0, message = "The value cannot be less than 0") Long from,
-            @Parameter(name = "to", description = "End UNIX timestamp in milliseconds. "
-                    + "If no value filled,the default value is the UNIX timestamp in milliseconds "
-                    + "of the current time.")
-            @RequestParam(name = "to", required = false)
-            @Min(value = 0, message = "The value cannot be less than 0") Long to,
-            @Parameter(name = "granularity",
-                    description = "Return metrics collected in provided time interval. This"
-                            + " depends on how the source systems have generated/collected"
-                            + " metrics.")
-            @RequestParam(name = "granularity", required = false)
+            @Parameter(
+                            name = "from",
+                            description =
+                                    "Start UNIX timestamp in milliseconds. If no value filled,the"
+                                        + " default value is the UNIX timestamp in milliseconds of"
+                                        + " the five minutes ago.")
+                    @RequestParam(name = "from", required = false)
+                    @Min(value = 0, message = "The value cannot be less than 0")
+                    Long from,
+            @Parameter(
+                            name = "to",
+                            description =
+                                    "End UNIX timestamp in milliseconds. If no value filled,the"
+                                        + " default value is the UNIX timestamp in milliseconds of"
+                                        + " the current time.")
+                    @RequestParam(name = "to", required = false)
+                    @Min(value = 0, message = "The value cannot be less than 0")
+                    Long to,
+            @Parameter(
+                            name = "granularity",
+                            description =
+                                    "Return metrics collected in provided time interval. This"
+                                            + " depends on how the source systems have"
+                                            + " generated/collected metrics.")
+                    @RequestParam(name = "granularity", required = false)
                     Integer granularity,
-            @Parameter(name = "onlyLastKnownMetric",
-                    description = "Returns only the last known metric. When this parameter is set "
-                            + "then all other query parameters are ignored.")
-            @RequestParam(name = "onlyLastKnownMetric", required = false, defaultValue = "false")
+            @Parameter(
+                            name = "onlyLastKnownMetric",
+                            description =
+                                    "Returns only the last known metric. When this parameter is set"
+                                            + " then all other query parameters are ignored.")
+                    @RequestParam(
+                            name = "onlyLastKnownMetric",
+                            required = false,
+                            defaultValue = "false")
                     boolean onlyLastKnownMetric) {
         if (StringUtils.isNotBlank(resourceId)) {
-            return serviceMetricsAdapter.getMetricsByResourceId(resourceId, monitorResourceType,
-                    from, to, granularity, onlyLastKnownMetric);
+            return serviceMetricsAdapter.getMetricsByResourceId(
+                    resourceId, monitorResourceType, from, to, granularity, onlyLastKnownMetric);
         }
-        return serviceMetricsAdapter.getMetricsByServiceId(serviceId, monitorResourceType, from, to,
-                granularity, onlyLastKnownMetric);
+        return serviceMetricsAdapter.getMetricsByServiceId(
+                serviceId, monitorResourceType, from, to, granularity, onlyLastKnownMetric);
     }
-
 }

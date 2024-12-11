@@ -34,24 +34,15 @@ class UserOrderableServiceVoTest {
     private final String name = "name";
     private final String version = "version";
     private final List<ServiceConfigurationParameter> configurationParameters = List.of();
-    @Mock
-    private Category mockCategory;
-    @Mock
-    private Csp mockCsp;
-    @Mock
-    private List<Region> mockRegions;
-    @Mock
-    private List<DeployVariable> mockVariables;
-    @Mock
-    private EndUserFlavors mockFlavors;
-    @Mock
-    private Billing mockBilling;
-    @Mock
-    private ServiceHostingType mockServiceHostingType;
-    @Mock
-    private ServiceProviderContactDetails mockServiceProviderContactDetails;
-    @Mock
-    private List<AvailabilityZoneConfig> mockserviceAvailabilityConfig;
+    @Mock private Category mockCategory;
+    @Mock private Csp mockCsp;
+    @Mock private List<Region> mockRegions;
+    @Mock private List<DeployVariable> mockVariables;
+    @Mock private EndUserFlavors mockFlavors;
+    @Mock private Billing mockBilling;
+    @Mock private ServiceHostingType mockServiceHostingType;
+    @Mock private ServiceProviderContactDetails mockServiceProviderContactDetails;
+    @Mock private List<AvailabilityZoneConfig> mockserviceAvailabilityConfig;
     private UserOrderableServiceVo test;
 
     @BeforeEach
@@ -91,13 +82,12 @@ class UserOrderableServiceVoTest {
         assertThat(test.getFlavors()).isEqualTo(mockFlavors);
         assertThat(test.getBilling()).isEqualTo(mockBilling);
         assertThat(test.getServiceHostingType()).isEqualTo(mockServiceHostingType);
-        assertThat(test.getServiceProviderContactDetails()).isEqualTo(
-                mockServiceProviderContactDetails);
+        assertThat(test.getServiceProviderContactDetails())
+                .isEqualTo(mockServiceProviderContactDetails);
         assertThat(test.getServiceAvailabilityConfig()).isEqualTo(mockserviceAvailabilityConfig);
         assertThat(test.getEula()).isEqualTo(eula);
         assertThat(test.getConfigurationParameters()).isEqualTo(configurationParameters);
     }
-
 
     @Test
     public void testEqualsAndHashCode() {
@@ -115,18 +105,42 @@ class UserOrderableServiceVoTest {
 
     @Test
     void testToString() {
-        String expectedToString = "UserOrderableServiceVo(serviceTemplateId=" + id
-                + ", category=" + mockCategory
-                + ", name=" + name + ", version=" + version + ", csp=" + mockCsp
-                + ", regions=" + mockRegions + ", namespace=" + namespace
-                + ", description=" + description
-                + ", icon=" + icon + ", variables=" + mockVariables
-                + ", flavors=" + mockFlavors + ", billing=" + mockBilling
-                + ", serviceHostingType=" + mockServiceHostingType
-                + ", serviceProviderContactDetails=" + mockServiceProviderContactDetails
-                + ", serviceAvailabilityConfig=" + mockserviceAvailabilityConfig
-                + ", eula=" + eula
-                + ", configurationParameters=" + configurationParameters + ")";
+        String expectedToString =
+                "UserOrderableServiceVo(serviceTemplateId="
+                        + id
+                        + ", category="
+                        + mockCategory
+                        + ", name="
+                        + name
+                        + ", version="
+                        + version
+                        + ", csp="
+                        + mockCsp
+                        + ", regions="
+                        + mockRegions
+                        + ", namespace="
+                        + namespace
+                        + ", description="
+                        + description
+                        + ", icon="
+                        + icon
+                        + ", variables="
+                        + mockVariables
+                        + ", flavors="
+                        + mockFlavors
+                        + ", billing="
+                        + mockBilling
+                        + ", serviceHostingType="
+                        + mockServiceHostingType
+                        + ", serviceProviderContactDetails="
+                        + mockServiceProviderContactDetails
+                        + ", serviceAvailabilityConfig="
+                        + mockserviceAvailabilityConfig
+                        + ", eula="
+                        + eula
+                        + ", configurationParameters="
+                        + configurationParameters
+                        + ")";
         assertEquals(expectedToString, test.toString());
     }
 }

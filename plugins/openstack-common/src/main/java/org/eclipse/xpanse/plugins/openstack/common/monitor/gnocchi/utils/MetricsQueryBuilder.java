@@ -9,9 +9,7 @@ import java.util.Objects;
 import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.filter.MetricsFilter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to handle query builder logic for metrics filter.
- */
+/** Bean to handle query builder logic for metrics filter. */
 @Component
 public class MetricsQueryBuilder {
 

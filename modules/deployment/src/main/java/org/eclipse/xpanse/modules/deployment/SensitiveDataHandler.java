@@ -19,18 +19,14 @@ import org.eclipse.xpanse.modules.security.common.AesUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Bean to manage service data which contains sensitive data.
- */
+/** Bean to manage service data which contains sensitive data. */
 @Slf4j
 @Component
 public class SensitiveDataHandler {
 
-    @Resource
-    private AesUtil aesUtil;
+    @Resource private AesUtil aesUtil;
 
-    @Resource
-    private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
      * Method to mask all sensitive data after deployment is completed.
@@ -39,20 +35,22 @@ public class SensitiveDataHandler {
      */
     public void maskSensitiveFields(ServiceDeploymentEntity serviceDeploymentEntity) {
         log.debug("masking sensitive input data after deployment");
-        if (Objects.nonNull(serviceDeploymentEntity
-                .getDeployRequest().getServiceRequestProperties())) {
+        if (Objects.nonNull(
+                serviceDeploymentEntity.getDeployRequest().getServiceRequestProperties())) {
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
                             serviceDeploymentEntity.getServiceTemplateId());
-            for (DeployVariable deployVariable
-                    : serviceTemplateEntity.getOcl().getDeployment()
-                    .getVariables()) {
+            for (DeployVariable deployVariable :
+                    serviceTemplateEntity.getOcl().getDeployment().getVariables()) {
                 if (deployVariable.getSensitiveScope() != SensitiveScope.NONE
-                        && (serviceDeploymentEntity.getDeployRequest().getServiceRequestProperties()
-                        .containsKey(deployVariable.getName()))) {
-                    serviceDeploymentEntity.getDeployRequest().getServiceRequestProperties()
+                        && (serviceDeploymentEntity
+                                .getDeployRequest()
+                                .getServiceRequestProperties()
+                                .containsKey(deployVariable.getName()))) {
+                    serviceDeploymentEntity
+                            .getDeployRequest()
+                            .getServiceRequestProperties()
                             .put(deployVariable.getName(), "********");
-
                 }
             }
         }
@@ -64,22 +62,31 @@ public class SensitiveDataHandler {
      * @param serviceTemplate service template of the deployment request.
      * @param serviceRequestProperties request properties sent by customer.
      */
-    public void encodeDeployVariable(ServiceTemplateEntity serviceTemplate,
-                                      Map<String, Object> serviceRequestProperties) {
+    public void encodeDeployVariable(
+            ServiceTemplateEntity serviceTemplate, Map<String, Object> serviceRequestProperties) {
         if (Objects.isNull(serviceTemplate.getOcl().getDeployment())
-                ||
-                CollectionUtils.isEmpty(serviceTemplate.getOcl().getDeployment().getVariables())
+                || CollectionUtils.isEmpty(serviceTemplate.getOcl().getDeployment().getVariables())
                 || Objects.isNull(serviceRequestProperties)) {
             return;
         }
-        serviceTemplate.getOcl().getDeployment().getVariables().forEach(variable -> {
-            if (Objects.nonNull(variable) && !SensitiveScope.NONE.toValue()
-                    .equals(variable.getSensitiveScope().toValue())
-                    && serviceRequestProperties.containsKey(variable.getName())) {
-                serviceRequestProperties.put(variable.getName(),
-                        aesUtil.encode(
-                                serviceRequestProperties.get(variable.getName()).toString()));
-            }
-        });
+        serviceTemplate
+                .getOcl()
+                .getDeployment()
+                .getVariables()
+                .forEach(
+                        variable -> {
+                            if (Objects.nonNull(variable)
+                                    && !SensitiveScope.NONE
+                                            .toValue()
+                                            .equals(variable.getSensitiveScope().toValue())
+                                    && serviceRequestProperties.containsKey(variable.getName())) {
+                                serviceRequestProperties.put(
+                                        variable.getName(),
+                                        aesUtil.encode(
+                                                serviceRequestProperties
+                                                        .get(variable.getName())
+                                                        .toString()));
+                            }
+                        });
     }
 }

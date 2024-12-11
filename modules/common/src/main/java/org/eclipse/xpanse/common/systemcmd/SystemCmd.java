@@ -23,9 +23,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
-/**
- * Executes operating system commands.
- */
+/** Executes operating system commands. */
 @Setter
 @Getter
 @Slf4j
@@ -42,7 +40,7 @@ public class SystemCmd {
     /**
      * Executes operating system command.
      *
-     * @param cmd        command to be executed.
+     * @param cmd command to be executed.
      * @param waitSecond time to wait for the command to be completed.
      * @return returns SystemCmdResult object which has all the execution details.
      */
@@ -93,17 +91,20 @@ public class SystemCmd {
     }
 
     private String readStream(BufferedReader bufferedReader, Map<String, String> contextMap) {
-        //copying MDC context of the main deployment thread to the stream reader thread.
+        // copying MDC context of the main deployment thread to the stream reader thread.
         MDC.setContextMap(contextMap);
         StringBuilder stringBuilder = new StringBuilder();
-        bufferedReader.lines().forEach(line -> {
-            log.info(line);
-            // skip adding new line for the first line.
-            if (!stringBuilder.isEmpty()) {
-                stringBuilder.append(System.lineSeparator());
-            }
-            stringBuilder.append(line);
-        });
+        bufferedReader
+                .lines()
+                .forEach(
+                        line -> {
+                            log.info(line);
+                            // skip adding new line for the first line.
+                            if (!stringBuilder.isEmpty()) {
+                                stringBuilder.append(System.lineSeparator());
+                            }
+                            stringBuilder.append(line);
+                        });
         return stringBuilder.toString();
     }
 
@@ -112,10 +113,11 @@ public class SystemCmd {
         if (Objects.isNull(process)) {
             return;
         }
-        final Map<String, String> contextMap = new HashMap<>(
-                Objects.nonNull(MDC.getCopyOfContextMap()) ? MDC.getCopyOfContextMap()
-                        : new HashMap<>());
-
+        final Map<String, String> contextMap =
+                new HashMap<>(
+                        Objects.nonNull(MDC.getCopyOfContextMap())
+                                ? MDC.getCopyOfContextMap()
+                                : new HashMap<>());
 
         // Starting threads in parallel to read stdout and stderr. This is needed because in
         // some cases reading stdout first works and in some cases reading stderr first works.
@@ -145,5 +147,4 @@ public class SystemCmd {
         threadToReadStdout.shutdown();
         threadToReadStdErr.shutdown();
     }
-
 }

@@ -10,16 +10,11 @@ class TaskStatusTest {
 
     @Test
     void testGetByValue() {
-        assertThat(TaskStatus.getByValue("created")).isEqualTo(
-                TaskStatus.CREATED);
-        assertThat(TaskStatus.getByValue("in-progress")).isEqualTo(
-                TaskStatus.IN_PROGRESS);
-        assertThat(TaskStatus.getByValue("successful")).isEqualTo(
-                TaskStatus.SUCCESSFUL);
-        assertThat(TaskStatus.getByValue("failed")).isEqualTo(
-                TaskStatus.FAILED);
-        assertThrows(UnsupportedEnumValueException.class, () ->
-                TaskStatus.getByValue("unknown"));
+        assertThat(TaskStatus.getByValue("created")).isEqualTo(TaskStatus.CREATED);
+        assertThat(TaskStatus.getByValue("in-progress")).isEqualTo(TaskStatus.IN_PROGRESS);
+        assertThat(TaskStatus.getByValue("successful")).isEqualTo(TaskStatus.SUCCESSFUL);
+        assertThat(TaskStatus.getByValue("failed")).isEqualTo(TaskStatus.FAILED);
+        assertThrows(UnsupportedEnumValueException.class, () -> TaskStatus.getByValue("unknown"));
     }
 
     @Test

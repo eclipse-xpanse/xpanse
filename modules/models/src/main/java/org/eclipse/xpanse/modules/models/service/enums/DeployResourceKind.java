@@ -11,10 +11,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-
-/**
- * The kind of the Resources.
- */
+/** The kind of the Resources. */
 public enum DeployResourceKind {
     VM("vm", null),
     CONTAINER("container", null),
@@ -29,22 +26,15 @@ public enum DeployResourceKind {
 
     private final String kind;
 
-    /**
-     *  For XpanseResourceKind deserialize.
-     */
-    @Getter
-    private final DeployResourceKind parent;
+    /** For XpanseResourceKind deserialize. */
+    @Getter private final DeployResourceKind parent;
 
-
-    DeployResourceKind(String kind,
-            DeployResourceKind parent) {
+    DeployResourceKind(String kind, DeployResourceKind parent) {
         this.kind = kind;
         this.parent = parent;
     }
 
-    /**
-     * For XpanseResourceKind serialize.
-     */
+    /** For XpanseResourceKind serialize. */
     @JsonCreator
     public static DeployResourceKind getByValue(String kind) {
         for (DeployResourceKind resourceKind : values()) {
@@ -56,12 +46,9 @@ public enum DeployResourceKind {
                 String.format("DeployResourceKind value %s is not supported.", kind));
     }
 
-    /**
-     * For XpanseResourceKind deserialize.
-     */
+    /** For XpanseResourceKind deserialize. */
     @JsonValue
     public String toValue() {
         return this.kind;
     }
-
 }

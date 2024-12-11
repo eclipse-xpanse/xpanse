@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of PluginNotFoundException.
- */
+/** Test of PluginNotFoundException. */
 class PluginNotFoundExceptionTest {
 
     private static final String message = "plugin not found.";
@@ -28,5 +26,4 @@ class PluginNotFoundExceptionTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

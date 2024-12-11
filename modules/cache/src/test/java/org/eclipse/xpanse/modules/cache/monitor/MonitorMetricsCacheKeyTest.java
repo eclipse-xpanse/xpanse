@@ -16,14 +16,13 @@ class MonitorMetricsCacheKeyTest {
         Assertions.assertNotEquals(testCacheKey, object);
         Assertions.assertNotEquals(testCacheKey.hashCode(), object.hashCode());
 
-        final MonitorMetricsCacheKey cacheKey1 =
-                new MonitorMetricsCacheKey(null, null, null);
+        final MonitorMetricsCacheKey cacheKey1 = new MonitorMetricsCacheKey(null, null, null);
         Assertions.assertNotEquals(testCacheKey, cacheKey1);
         Assertions.assertNotEquals(testCacheKey.hashCode(), cacheKey1.hashCode());
 
         final MonitorMetricsCacheKey cacheKey2 =
-                new MonitorMetricsCacheKey(Csp.HUAWEI_CLOUD, "resourceId1",
-                        MonitorResourceType.CPU);
+                new MonitorMetricsCacheKey(
+                        Csp.HUAWEI_CLOUD, "resourceId1", MonitorResourceType.CPU);
         Assertions.assertNotEquals(testCacheKey, cacheKey2);
         Assertions.assertNotEquals(testCacheKey.hashCode(), cacheKey2.hashCode());
 
@@ -35,8 +34,9 @@ class MonitorMetricsCacheKeyTest {
 
     @Test
     void testToString() {
-        String result = "MonitorMetricsCacheKey[csp=HUAWEI_CLOUD, monitorResourceId=resourceId, "
-                + "monitorResourceType=CPU]";
+        String result =
+                "MonitorMetricsCacheKey[csp=HUAWEI_CLOUD, monitorResourceId=resourceId, "
+                        + "monitorResourceType=CPU]";
         Assertions.assertEquals(result, testCacheKey.toString());
     }
 }

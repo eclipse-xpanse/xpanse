@@ -18,20 +18,17 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to wrap logic which decide which Deployment bean must be used for the service.
- */
+/** Bean to wrap logic which decide which Deployment bean must be used for the service. */
 @Component
-public class DeployerKindManager implements
-        ApplicationListener<ContextRefreshedEvent> {
+public class DeployerKindManager implements ApplicationListener<ContextRefreshedEvent> {
     private final Map<DeployerKind, Deployer> deploymentMap = new ConcurrentHashMap<>();
 
-    @Resource
-    private ApplicationContext applicationContext;
+    @Resource private ApplicationContext applicationContext;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        applicationContext.getBeansOfType(Deployer.class)
+        applicationContext
+                .getBeansOfType(Deployer.class)
                 .forEach((key, value) -> deploymentMap.put(value.getDeployerKind(), value));
     }
 

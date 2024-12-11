@@ -33,69 +33,98 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for AdminServicesApi.
- */
+/** Test for AdminServicesApi. */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,opentelemetry,test")
+@SpringBootTest(
+        properties =
+                "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,opentelemetry,test")
 @AutoConfigureMockMvc
 class AdminServicesApiTest extends ApisTestCommon {
 
     @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
     private String dataSourceUrl;
-    @Resource
-    private PluginManager pluginManager;
+
+    @Resource private PluginManager pluginManager;
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
     void testHealthCheck() throws Exception {
         // SetUp
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/health")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/health").accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        SystemStatus systemStatus = objectMapper.readValue(response.getContentAsString(),
-                SystemStatus.class);
+        SystemStatus systemStatus =
+                objectMapper.readValue(response.getContentAsString(), SystemStatus.class);
         assertEquals(systemStatus.getHealthStatus(), HealthStatus.OK);
         List<BackendSystemStatus> backendSystemStatuses = systemStatus.getBackendSystemStatuses();
         assertEquals(BackendSystemType.values().length, backendSystemStatuses.size());
 
-        assertTrue(backendSystemStatuses.stream()
-                .filter(status -> status.getHealthStatus().equals(HealthStatus.NOK))
-                .allMatch(status -> status.getDetails() != null && status.getEndpoint() != null));
+        assertTrue(
+                backendSystemStatuses.stream()
+                        .filter(status -> status.getHealthStatus().equals(HealthStatus.NOK))
+                        .allMatch(
+                                status ->
+                                        status.getDetails() != null
+                                                && status.getEndpoint() != null));
 
-        assertTrue(backendSystemStatuses.stream()
-                .filter(status -> status.getBackendSystemType().equals(BackendSystemType.CACHE_PROVIDER))
-                .allMatch(status -> status.getEndpoint().equals(CacheConstants.CACHE_PROVIDER_CAFFEINE_ENDPOINT)
-                        && status.getName().equals(CacheConstants.CACHE_PROVIDER_CAFFEINE)));
+        assertTrue(
+                backendSystemStatuses.stream()
+                        .filter(
+                                status ->
+                                        status.getBackendSystemType()
+                                                .equals(BackendSystemType.CACHE_PROVIDER))
+                        .allMatch(
+                                status ->
+                                        status.getEndpoint()
+                                                        .equals(
+                                                                CacheConstants
+                                                                        .CACHE_PROVIDER_CAFFEINE_ENDPOINT)
+                                                && status.getName()
+                                                        .equals(
+                                                                CacheConstants
+                                                                        .CACHE_PROVIDER_CAFFEINE)));
 
-        assertTrue(backendSystemStatuses.stream()
-                .filter(status -> status.getBackendSystemType().equals(BackendSystemType.DATABASE))
-                .allMatch(status -> status.getEndpoint().equals(dataSourceUrl)
-                        && status.getName().equals(DatabaseType.H2DB.toValue())));
+        assertTrue(
+                backendSystemStatuses.stream()
+                        .filter(
+                                status ->
+                                        status.getBackendSystemType()
+                                                .equals(BackendSystemType.DATABASE))
+                        .allMatch(
+                                status ->
+                                        status.getEndpoint().equals(dataSourceUrl)
+                                                && status.getName()
+                                                        .equals(DatabaseType.H2DB.toValue())));
     }
 
     @Test
     @WithJwt(file = "jwt_user.json")
     void testHealthCheckWithRoleNotAdmin() throws Exception {
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/health")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/health").accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        SystemStatus systemStatus = objectMapper.readValue(response.getContentAsString(),
-                SystemStatus.class);
+        SystemStatus systemStatus =
+                objectMapper.readValue(response.getContentAsString(), SystemStatus.class);
         assertEquals(systemStatus.getHealthStatus(), HealthStatus.OK);
         List<BackendSystemStatus> backendSystemStatuses = systemStatus.getBackendSystemStatuses();
         assertEquals(BackendSystemType.values().length, backendSystemStatuses.size());
-        assertTrue(backendSystemStatuses.stream()
-                .allMatch(status -> status.getDetails() == null && status.getEndpoint() == null));
+        assertTrue(
+                backendSystemStatuses.stream()
+                        .allMatch(
+                                status ->
+                                        status.getDetails() == null
+                                                && status.getEndpoint() == null));
     }
 
     @Test
@@ -105,14 +134,14 @@ class AdminServicesApiTest extends ApisTestCommon {
         List<Csp> activeCspList = pluginManager.getPluginsMap().keySet().stream().sorted().toList();
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(get("/xpanse/csps/active")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(get("/xpanse/csps/active").accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertEquals(response.getStatus(), HttpStatus.OK.value());
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(objectMapper.writeValueAsString(activeCspList), response.getContentAsString());
     }
-
 }

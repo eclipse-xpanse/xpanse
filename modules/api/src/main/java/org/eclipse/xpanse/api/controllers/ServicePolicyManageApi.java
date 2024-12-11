@@ -37,10 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-/**
- * REST interface methods for service managing policies of the cloud service provider.
- */
+/** REST interface methods for service managing policies of the cloud service provider. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -49,8 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServicePolicyManageApi {
 
-    @Resource
-    private ServicePolicyManager servicePolicyManager;
+    @Resource private ServicePolicyManager servicePolicyManager;
 
     /**
      * List the policies by the id of registered service template.
@@ -58,19 +54,22 @@ public class ServicePolicyManageApi {
      * @param serviceTemplateId the id of registered service template which the policy belongs to.
      * @return Returns list of the policies belongs to the registered service template.
      */
-    @Tag(name = "ServicePoliciesManagement",
+    @Tag(
+            name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
-    @GetMapping(value = "/service/policies",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/service/policies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the policies belongs to the service.")
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
-    public List<ServicePolicy> listServicePolicies(@Parameter(name = "serviceTemplateId",
-            description = "The id of registered service template which the policy belongs to.")
-                                                   String serviceTemplateId) {
+    public List<ServicePolicy> listServicePolicies(
+            @Parameter(
+                            name = "serviceTemplateId",
+                            description =
+                                    "The id of registered service template which the policy belongs"
+                                            + " to.")
+                    String serviceTemplateId) {
         return servicePolicyManager.listServicePolicies(serviceTemplateId);
     }
-
 
     /**
      * Get the details of the policy belongs to the registered service template.
@@ -78,10 +77,10 @@ public class ServicePolicyManageApi {
      * @param id The id of the policy.
      * @return Returns list of the policies defined by the service.
      */
-    @Tag(name = "ServicePoliciesManagement",
+    @Tag(
+            name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
-    @GetMapping(value = "/service/policies/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/service/policies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get details of policy belongs to the registered service template.")
     @AuditApiRequest(methodName = "getCspFromServicePolicyId")
@@ -89,16 +88,15 @@ public class ServicePolicyManageApi {
         return servicePolicyManager.getServicePolicyDetails(UUID.fromString(id));
     }
 
-
     /**
      * Add policy belongs to the registered service template.
      *
      * @param servicePolicyCreateRequest The policy to be created.
      */
-    @Tag(name = "ServicePoliciesManagement",
+    @Tag(
+            name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
-    @PostMapping(value = "/service/policies",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/service/policies", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Add policy for the registered service template.")
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public ServicePolicy addServicePolicy(
@@ -111,15 +109,16 @@ public class ServicePolicyManageApi {
      *
      * @param updateRequest The policy to be updated.
      */
-    @Tag(name = "ServicePoliciesManagement",
+    @Tag(
+            name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
-    @PutMapping(value = "/service/policies/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/service/policies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update the policy belongs to the registered service template.")
     @AuditApiRequest(methodName = "getCspFromServicePolicyId")
     public ServicePolicy updateServicePolicy(
             @Parameter(name = "id", description = "ID of the policy to be updated")
-            @PathVariable("id") String id,
+                    @PathVariable("id")
+                    String id,
             @Valid @RequestBody ServicePolicyUpdateRequest updateRequest) {
         return servicePolicyManager.updateServicePolicy(UUID.fromString(id), updateRequest);
     }
@@ -129,15 +128,14 @@ public class ServicePolicyManageApi {
      *
      * @param id The id of policy.
      */
-    @Tag(name = "ServicePoliciesManagement",
+    @Tag(
+            name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
-    @DeleteMapping(value = "/service/policies/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/service/policies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete the policy belongs to the registered service template.")
     @AuditApiRequest(methodName = "getCspFromServicePolicyId")
     public void deleteServicePolicy(@PathVariable("id") String id) {
         servicePolicyManager.deleteServicePolicy(UUID.fromString(id));
     }
-
 }

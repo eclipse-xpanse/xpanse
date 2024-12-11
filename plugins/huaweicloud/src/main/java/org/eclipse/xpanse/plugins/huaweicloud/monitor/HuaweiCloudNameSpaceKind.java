@@ -10,11 +10,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * Huawei Namespace.
- */
+/** Huawei Namespace. */
 public enum HuaweiCloudNameSpaceKind {
-
     ECS_SYS("SYS.ECS"),
     ECS_AGT("AGT.ECS");
 
@@ -24,17 +21,13 @@ public enum HuaweiCloudNameSpaceKind {
         this.nameSpace = nameSpace;
     }
 
-    /**
-     * For HuaweiResource deserialize.
-     */
+    /** For HuaweiResource deserialize. */
     @JsonValue
     public String toValue() {
         return this.nameSpace;
     }
 
-    /**
-     * For HuaweiResource serialize.
-     */
+    /** For HuaweiResource serialize. */
     @JsonCreator
     public HuaweiCloudNameSpaceKind getByValue(String nameSpace) {
         for (HuaweiCloudNameSpaceKind huaweiCloudNameSpaceKind : values()) {

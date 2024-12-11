@@ -8,9 +8,7 @@ package org.eclipse.xpanse.modules.database.resource;
 
 import java.util.UUID;
 
-/**
- * Interface for persist of ServiceResource.
- */
+/** Interface for persist of ServiceResource. */
 public interface ServiceResourceStorage {
 
     void deleteByDeployServiceId(UUID id);
@@ -22,7 +20,6 @@ public interface ServiceResourceStorage {
      * @return DeployResourceEntity
      */
     ServiceResourceEntity findServiceResourceById(UUID id);
-
 
     /**
      * Get detail of service resource using ID.

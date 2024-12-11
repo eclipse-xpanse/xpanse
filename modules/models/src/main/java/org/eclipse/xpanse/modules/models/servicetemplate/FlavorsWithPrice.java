@@ -14,14 +14,11 @@ import java.util.List;
 import lombok.Data;
 import org.hibernate.validator.constraints.UniqueElements;
 
-/**
- * Defines for service flavors with price.
- */
+/** Defines for service flavors with price. */
 @Data
 public class FlavorsWithPrice implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 6980257522875080048L;
+    @Serial private static final long serialVersionUID = 6980257522875080048L;
 
     @Valid
     @NotNull

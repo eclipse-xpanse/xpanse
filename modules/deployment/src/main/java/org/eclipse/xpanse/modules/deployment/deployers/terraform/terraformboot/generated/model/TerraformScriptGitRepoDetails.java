@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,28 +17,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Objects;
 
-/**
- * GIT Repo details from where the scripts can be fetched.
- */
-@JsonPropertyOrder({TerraformScriptGitRepoDetails.JSON_PROPERTY_REPO_URL,
-        TerraformScriptGitRepoDetails.JSON_PROPERTY_BRANCH, TerraformScriptGitRepoDetails.JSON_PROPERTY_SCRIPT_PATH})
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+/** GIT Repo details from where the scripts can be fetched. */
+@JsonPropertyOrder({
+    TerraformScriptGitRepoDetails.JSON_PROPERTY_REPO_URL,
+    TerraformScriptGitRepoDetails.JSON_PROPERTY_BRANCH,
+    TerraformScriptGitRepoDetails.JSON_PROPERTY_SCRIPT_PATH
+})
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformScriptGitRepoDetails {
     public static final String JSON_PROPERTY_REPO_URL = "repoUrl";
-    @jakarta.annotation.Nonnull
-    private String repoUrl;
+    @jakarta.annotation.Nonnull private String repoUrl;
 
     public static final String JSON_PROPERTY_BRANCH = "branch";
-    @jakarta.annotation.Nonnull
-    private String branch;
+    @jakarta.annotation.Nonnull private String branch;
 
     public static final String JSON_PROPERTY_SCRIPT_PATH = "scriptPath";
-    @jakarta.annotation.Nullable
-    private String scriptPath;
+    @jakarta.annotation.Nullable private String scriptPath;
 
-    public TerraformScriptGitRepoDetails() {
-    }
+    public TerraformScriptGitRepoDetails() {}
 
     public TerraformScriptGitRepoDetails repoUrl(@jakarta.annotation.Nonnull String repoUrl) {
 
@@ -55,11 +52,9 @@ public class TerraformScriptGitRepoDetails {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_REPO_URL)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getRepoUrl() {
         return repoUrl;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REPO_URL)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -81,11 +76,9 @@ public class TerraformScriptGitRepoDetails {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_BRANCH)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getBranch() {
         return branch;
     }
-
 
     @JsonProperty(JSON_PROPERTY_BRANCH)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -93,25 +86,25 @@ public class TerraformScriptGitRepoDetails {
         this.branch = branch;
     }
 
-    public TerraformScriptGitRepoDetails scriptPath(@jakarta.annotation.Nullable String scriptPath) {
+    public TerraformScriptGitRepoDetails scriptPath(
+            @jakarta.annotation.Nullable String scriptPath) {
 
         this.scriptPath = scriptPath;
         return this;
     }
 
     /**
-     * Location of the scripts. If not provided, the scripts will be executed from root folder of the repo.
+     * Location of the scripts. If not provided, the scripts will be executed from root folder of
+     * the repo.
      *
      * @return scriptPath
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_SCRIPT_PATH)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getScriptPath() {
         return scriptPath;
     }
-
 
     @JsonProperty(JSON_PROPERTY_SCRIPT_PATH)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -127,10 +120,11 @@ public class TerraformScriptGitRepoDetails {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        TerraformScriptGitRepoDetails terraformScriptGitRepoDetails = (TerraformScriptGitRepoDetails) o;
-        return Objects.equals(this.repoUrl, terraformScriptGitRepoDetails.repoUrl) &&
-                Objects.equals(this.branch, terraformScriptGitRepoDetails.branch) &&
-                Objects.equals(this.scriptPath, terraformScriptGitRepoDetails.scriptPath);
+        TerraformScriptGitRepoDetails terraformScriptGitRepoDetails =
+                (TerraformScriptGitRepoDetails) o;
+        return Objects.equals(this.repoUrl, terraformScriptGitRepoDetails.repoUrl)
+                && Objects.equals(this.branch, terraformScriptGitRepoDetails.branch)
+                && Objects.equals(this.scriptPath, terraformScriptGitRepoDetails.scriptPath);
     }
 
     @Override
@@ -150,8 +144,8 @@ public class TerraformScriptGitRepoDetails {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -159,6 +153,4 @@ public class TerraformScriptGitRepoDetails {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

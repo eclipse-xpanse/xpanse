@@ -23,60 +23,47 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Exception handler related to Credentials center for the REST API.
- */
+/** Exception handler related to Credentials center for the REST API. */
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class PolicyManageExceptionHandler {
 
-    /**
-     * Exception handler for PolicyNotFoundException.
-     */
+    /** Exception handler for PolicyNotFoundException. */
     @ExceptionHandler({PolicyNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handlePolicyNotFoundException(
-            PolicyNotFoundException ex) {
-        return getErrorResponse(ErrorType.POLICY_NOT_FOUND,
-                Collections.singletonList(ex.getMessage()));
+    public ErrorResponse handlePolicyNotFoundException(PolicyNotFoundException ex) {
+        return getErrorResponse(
+                ErrorType.POLICY_NOT_FOUND, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for PolicyDuplicateException.
-     */
+    /** Exception handler for PolicyDuplicateException. */
     @ExceptionHandler({PolicyDuplicateException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handlePolicyDuplicateException(
-            PolicyDuplicateException ex) {
-        return getErrorResponse(ErrorType.POLICY_DUPLICATE,
-                Collections.singletonList(ex.getMessage()));
+    public ErrorResponse handlePolicyDuplicateException(PolicyDuplicateException ex) {
+        return getErrorResponse(
+                ErrorType.POLICY_DUPLICATE, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for PoliciesValidationFailedException.
-     */
+    /** Exception handler for PoliciesValidationFailedException. */
     @ExceptionHandler({PoliciesValidationFailedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handlePoliciesValidationFailedException(
             PoliciesValidationFailedException ex) {
-        return getErrorResponse(ErrorType.POLICY_VALIDATION_FAILED,
-                Collections.singletonList(ex.getMessage()));
+        return getErrorResponse(
+                ErrorType.POLICY_VALIDATION_FAILED, Collections.singletonList(ex.getMessage()));
     }
 
-
-    /**
-     * Exception handler for PoliciesEvaluationFailedException.
-     */
+    /** Exception handler for PoliciesEvaluationFailedException. */
     @ExceptionHandler({PoliciesEvaluationFailedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handlePoliciesEvaluationFailedException(
             PoliciesEvaluationFailedException ex) {
-        return getErrorResponse(ErrorType.POLICY_EVALUATION_FAILED,
-                Collections.singletonList(ex.getMessage()));
+        return getErrorResponse(
+                ErrorType.POLICY_EVALUATION_FAILED, Collections.singletonList(ex.getMessage()));
     }
 }

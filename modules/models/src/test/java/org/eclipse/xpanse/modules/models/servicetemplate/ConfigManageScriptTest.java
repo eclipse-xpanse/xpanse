@@ -6,25 +6,20 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Test of ConfigManageScript.
- */
+/** Test of ConfigManageScript. */
 public class ConfigManageScriptTest {
-
 
     private final String configManager = "configManager";
     private final Boolean runOnlyOnce = Boolean.FALSE;
-    @Mock
-    private AnsibleScriptConfig ansibleScriptConfig;
+    @Mock private AnsibleScriptConfig ansibleScriptConfig;
 
     private ConfigManageScript test;
-
 
     @BeforeEach
     void setUp() throws Exception {
@@ -65,8 +60,14 @@ public class ConfigManageScriptTest {
 
     @Test
     void testToString() throws Exception {
-        String result = "ConfigManageScript(configManager=" + configManager
-                + ", runOnlyOnce=" + runOnlyOnce + ", ansibleScriptConfig=" + ansibleScriptConfig + ")";
+        String result =
+                "ConfigManageScript(configManager="
+                        + configManager
+                        + ", runOnlyOnce="
+                        + runOnlyOnce
+                        + ", ansibleScriptConfig="
+                        + ansibleScriptConfig
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

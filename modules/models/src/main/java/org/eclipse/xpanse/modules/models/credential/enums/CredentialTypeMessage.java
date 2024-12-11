@@ -7,11 +7,10 @@ package org.eclipse.xpanse.modules.models.credential.enums;
 
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * The credential type message.
- */
+/** The credential type message. */
 public enum CredentialTypeMessage {
-    VARIABLES_MESSAGE(CredentialType.VARIABLES,
+    VARIABLES_MESSAGE(
+            CredentialType.VARIABLES,
             "value to be provided by creating credential or adding environment variables."),
     HTTP_AUTHENTICATION_MESSAGE(CredentialType.HTTP_AUTHENTICATION, null),
     API_KEY_MESSAGE(CredentialType.API_KEY, null),
@@ -26,9 +25,7 @@ public enum CredentialTypeMessage {
         this.message = message;
     }
 
-    /**
-     * Get message by type.
-     */
+    /** Get message by type. */
     public static String getMessageByType(CredentialType type) {
         for (CredentialTypeMessage typeMessage : values()) {
             if (typeMessage.type == type) {
@@ -38,5 +35,4 @@ public enum CredentialTypeMessage {
         throw new UnsupportedEnumValueException(
                 String.format("CredentialTypeMessage value %s is not supported.", type));
     }
-
 }

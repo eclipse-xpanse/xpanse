@@ -15,9 +15,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.method.HandlerMethod;
 
-/**
- * Customizer for appending required role to description of Swagger Annotation operation.
- */
+/** Customizer for appending required role to description of Swagger Annotation operation. */
 @Profile("oauth")
 @Configuration
 @ConditionalOnProperty(name = "enable.role.protection", havingValue = "true", matchIfMissing = true)
@@ -32,10 +30,13 @@ public class RequiredRoleDescriptionCustomizer implements OperationCustomizer {
             securedAnnotation = handlerMethod.getBeanType().getAnnotation(Secured.class);
         }
         if (Objects.nonNull(securedAnnotation)) {
-            String description = operation.getDescription() == null ? ""
-                    : (operation.getDescription());
-            operation.setDescription(description + "<br> Required role: <b>"
-                    + String.join("</b> or <b>", securedAnnotation.value()) + "</b> </br>");
+            String description =
+                    operation.getDescription() == null ? "" : (operation.getDescription());
+            operation.setDescription(
+                    description
+                            + "<br> Required role: <b>"
+                            + String.join("</b> or <b>", securedAnnotation.value())
+                            + "</b> </br>");
         }
         return operation;
     }

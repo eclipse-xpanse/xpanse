@@ -14,23 +14,29 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(SpringExtension.class)
-@TestPropertySource(properties = {"aes.key.file.name=src/test/resources/aes_sec_test",
-        "aes.algorithm.type=AES",
-        "aes.key.vi=c558Gq0YQK2QUlMc", "aes.cipher.algorithm=AES/CBC/ISO10126Padding"})
+@TestPropertySource(
+        properties = {
+            "aes.key.file.name=src/test/resources/aes_sec_test",
+            "aes.algorithm.type=AES",
+            "aes.key.vi=c558Gq0YQK2QUlMc",
+            "aes.cipher.algorithm=AES/CBC/ISO10126Padding"
+        })
 @ContextConfiguration(classes = {AesUtil.class, String.class})
 class AesUtilTest {
 
     @Value("${aes.key.file.name}")
     private String aesKeyFileName;
+
     @Value("${aes.algorithm.type}")
     private String algorithmType;
+
     @Value("${aes.key.vi}")
     private String vi;
+
     @Value("${aes.cipher.algorithm}")
     private String cipherAlgorithm;
 
-    @InjectMocks
-    private AesUtil aesUtilTest;
+    @InjectMocks private AesUtil aesUtilTest;
 
     @BeforeEach
     void setUp() {
@@ -39,7 +45,6 @@ class AesUtilTest {
         ReflectionTestUtils.setField(aesUtilTest, "vi", vi);
         ReflectionTestUtils.setField(aesUtilTest, "cipherAlgorithm", cipherAlgorithm);
     }
-
 
     @Test
     void testEncode() {
@@ -53,7 +58,6 @@ class AesUtilTest {
         Assertions.assertNotEquals(string, encodedStr);
         Assertions.assertEquals(string, aesUtilTest.decode(encodedStr));
     }
-
 
     @Test
     void testDecode() {
@@ -89,16 +93,17 @@ class AesUtilTest {
         ReflectionTestUtils.setField(aesUtilTest, "cipherAlgorithm", "");
 
         // Verify the results
-        Assertions.assertThrows(SensitiveFieldEncryptionOrDecryptionFailedException.class, () ->
-                aesUtilTest.decode(encodedStr));
+        Assertions.assertThrows(
+                SensitiveFieldEncryptionOrDecryptionFailedException.class,
+                () -> aesUtilTest.decode(encodedStr));
     }
 
     @Test
     void testEncodeNotEnabled() {
         // SetUp
         String string = "content";
-        ReflectionTestUtils.setField(aesUtilTest, "aesKeyFileName",
-                "src/test/resources/aes_sec_not_existed");
+        ReflectionTestUtils.setField(
+                aesUtilTest, "aesKeyFileName", "src/test/resources/aes_sec_not_existed");
         // Run the test
         final String encodedStr = aesUtilTest.encode(string);
 
@@ -111,8 +116,9 @@ class AesUtilTest {
         // SetUp
         boolean bool = true;
         // Run the test
-        final Object decodedBoolResult = aesUtilTest.decodeBackToOriginalType(
-                DeployVariableDataType.BOOLEAN, aesUtilTest.encode(String.valueOf(bool)));
+        final Object decodedBoolResult =
+                aesUtilTest.decodeBackToOriginalType(
+                        DeployVariableDataType.BOOLEAN, aesUtilTest.encode(String.valueOf(bool)));
         // Verify the results
         Assertions.assertInstanceOf(Boolean.class, decodedBoolResult);
         Assertions.assertEquals(decodedBoolResult, bool);
@@ -123,8 +129,9 @@ class AesUtilTest {
         // SetUp
         String string = "hello";
         // Run the test
-        final Object decodedResult = aesUtilTest.decodeBackToOriginalType(
-                DeployVariableDataType.STRING, aesUtilTest.encode(string));
+        final Object decodedResult =
+                aesUtilTest.decodeBackToOriginalType(
+                        DeployVariableDataType.STRING, aesUtilTest.encode(string));
         // Verify the results
         Assertions.assertTrue(decodedResult instanceof String);
         Assertions.assertEquals(decodedResult, string);
@@ -135,8 +142,9 @@ class AesUtilTest {
         // SetUp
         int number = 111;
         // Run the test
-        final Object decodedResult = aesUtilTest.decodeBackToOriginalType(
-                DeployVariableDataType.NUMBER, aesUtilTest.encode(String.valueOf(number)));
+        final Object decodedResult =
+                aesUtilTest.decodeBackToOriginalType(
+                        DeployVariableDataType.NUMBER, aesUtilTest.encode(String.valueOf(number)));
         // Verify the results
         Assertions.assertTrue(decodedResult instanceof Integer);
         Assertions.assertEquals((Integer) decodedResult, number);

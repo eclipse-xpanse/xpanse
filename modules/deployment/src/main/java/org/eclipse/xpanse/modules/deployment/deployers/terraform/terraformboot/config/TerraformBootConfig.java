@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-/**
- * Configuration class of terraform-boot env.
- */
+/** Configuration class of terraform-boot env. */
 @Getter
 @Configuration
 @Profile("terraform-boot")
@@ -23,5 +21,4 @@ public class TerraformBootConfig {
 
     @Value("${webhook.terraform-boot.orderCallbackUri}")
     private String orderCallbackUri;
-
 }

@@ -40,21 +40,15 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Class to encapsulate all Metric related public methods for HuaweiCloud plugin.
- */
+/** Class to encapsulate all Metric related public methods for HuaweiCloud plugin. */
 @Slf4j
 @Component
 public class HuaweiCloudMetricsService {
 
-    @Resource
-    private HuaweiCloudClient huaweiCloudClient;
-    @Resource
-    private MonitorMetricsStore monitorMetricsStore;
-    @Resource
-    private HuaweiCloudDataModelConverter huaweiCloudDataModelConverter;
-    @Resource
-    private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
+    @Resource private HuaweiCloudClient huaweiCloudClient;
+    @Resource private MonitorMetricsStore monitorMetricsStore;
+    @Resource private HuaweiCloudDataModelConverter huaweiCloudDataModelConverter;
+    @Resource private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
 
     /**
      * Get metrics of the @deployResource.
@@ -62,7 +56,8 @@ public class HuaweiCloudMetricsService {
      * @param resourceMetricRequest The request model to query metrics.
      * @return Returns list of metric result.
      */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<Metric> getMetricsByResource(ResourceMetricsRequest resourceMetricRequest) {
@@ -79,8 +74,8 @@ public class HuaweiCloudMetricsService {
             CesClient client = huaweiCloudClient.getCesClient(icredential, regionName);
             Map<MonitorResourceType, MetricInfoList> targetMetricsMap =
                     getTargetMetricsMap(deployResource, monitorResourceType, client);
-            for (Map.Entry<MonitorResourceType, MetricInfoList> entry
-                    : targetMetricsMap.entrySet()) {
+            for (Map.Entry<MonitorResourceType, MetricInfoList> entry :
+                    targetMetricsMap.entrySet()) {
                 ShowMetricDataRequest showMetricDataRequest =
                         huaweiCloudDataModelConverter.buildShowMetricDataRequest(
                                 resourceMetricRequest, entry.getValue());
@@ -92,7 +87,9 @@ public class HuaweiCloudMetricsService {
                                 .invoke();
                 Metric metric =
                         huaweiCloudDataModelConverter.convertShowMetricDataResponseToMetric(
-                                deployResource, showMetricDataResponse, entry.getValue(),
+                                deployResource,
+                                showMetricDataResponse,
+                                entry.getValue(),
                                 resourceMetricRequest.isOnlyLastKnownMetric());
                 doCacheActionForResourceMetrics(resourceMetricRequest, entry.getKey(), metric);
                 metrics.add(metric);
@@ -105,14 +102,14 @@ public class HuaweiCloudMetricsService {
         }
     }
 
-
     /**
      * Get metrics of the @deployService.
      *
      * @param serviceMetricRequest The request model to query metrics.
      * @return Returns list of metric result.
      */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<Metric> getMetricsByService(ServiceMetricsRequest serviceMetricRequest) {
@@ -132,8 +129,8 @@ public class HuaweiCloudMetricsService {
                         getTargetMetricsMap(deployResource, monitorResourceType, client);
                 List<MetricInfoList> targetMetricInfoList =
                         targetMetricsMap.values().stream().toList();
-                deployResourceMetricInfoMap.put(deployResource.getResourceId(),
-                        targetMetricInfoList);
+                deployResourceMetricInfoMap.put(
+                        deployResource.getResourceId(), targetMetricInfoList);
             }
             BatchListMetricDataRequest batchListMetricDataRequest =
                     huaweiCloudDataModelConverter.buildBatchListMetricDataRequest(
@@ -146,11 +143,12 @@ public class HuaweiCloudMetricsService {
                             .invoke();
             List<Metric> metrics =
                     huaweiCloudDataModelConverter.convertBatchListMetricDataResponseToMetric(
-                            batchListMetricDataResponse, deployResourceMetricInfoMap,
+                            batchListMetricDataResponse,
+                            deployResourceMetricInfoMap,
                             deployResources,
                             serviceMetricRequest.isOnlyLastKnownMetric());
-            doCacheActionForServiceMetrics(serviceMetricRequest, deployResourceMetricInfoMap,
-                    metrics);
+            doCacheActionForServiceMetrics(
+                    serviceMetricRequest, deployResourceMetricInfoMap, metrics);
             return metrics;
         } catch (Exception e) {
             log.error("Get metrics of service {} failed.", serviceMetricRequest.getServiceId());
@@ -159,9 +157,10 @@ public class HuaweiCloudMetricsService {
         }
     }
 
-    private void doCacheActionForResourceMetrics(ResourceMetricsRequest resourceMetricRequest,
-                                                 MonitorResourceType monitorResourceType,
-                                                 Metric metric) {
+    private void doCacheActionForResourceMetrics(
+            ResourceMetricsRequest resourceMetricRequest,
+            MonitorResourceType monitorResourceType,
+            Metric metric) {
         if (resourceMetricRequest.isOnlyLastKnownMetric()) {
             String resourceId = resourceMetricRequest.getDeployResource().getResourceId();
             MonitorMetricsCacheKey cacheKey =
@@ -184,9 +183,10 @@ public class HuaweiCloudMetricsService {
         }
     }
 
-    private void doCacheActionForServiceMetrics(ServiceMetricsRequest serviceMetricRequest,
-                                                Map<String, List<MetricInfoList>> resourceMetricMap,
-                                                List<Metric> metrics) {
+    private void doCacheActionForServiceMetrics(
+            ServiceMetricsRequest serviceMetricRequest,
+            Map<String, List<MetricInfoList>> resourceMetricMap,
+            List<Metric> metrics) {
         if (serviceMetricRequest.isOnlyLastKnownMetric()) {
             if (metrics.isEmpty()) {
                 fetchAndAddMetricsFromCache(resourceMetricMap, metrics);
@@ -196,8 +196,8 @@ public class HuaweiCloudMetricsService {
         }
     }
 
-    private void fetchAndAddMetricsFromCache(Map<String, List<MetricInfoList>> resourceMetricMap,
-                                             List<Metric> metrics) {
+    private void fetchAndAddMetricsFromCache(
+            Map<String, List<MetricInfoList>> resourceMetricMap, List<Metric> metrics) {
         Map<String, Metric> metricCacheMap = new HashMap<>();
         for (Map.Entry<String, List<MetricInfoList>> entry : resourceMetricMap.entrySet()) {
             String resourceId = entry.getKey();
@@ -221,16 +221,17 @@ public class HuaweiCloudMetricsService {
         if (!CollectionUtils.isEmpty(metricCacheMap)) {
             metrics.addAll(metricCacheMap.values());
         } else {
-            log.error("No monitor metrics available for the service, "
-                    + "Please wait for 3-5 minutes and try again.");
+            log.error(
+                    "No monitor metrics available for the service, "
+                            + "Please wait for 3-5 minutes and try again.");
             throw new MetricsDataNotYetAvailableException(
                     "No monitor metrics available for the service, "
                             + "Please wait for 3-5 minutes and try again.");
         }
     }
 
-    private void updateMetricsFromCache(Map<String, List<MetricInfoList>> resourceMetricMap,
-                                        List<Metric> metrics) {
+    private void updateMetricsFromCache(
+            Map<String, List<MetricInfoList>> resourceMetricMap, List<Metric> metrics) {
         for (Map.Entry<String, List<MetricInfoList>> entry : resourceMetricMap.entrySet()) {
             String resourceId = entry.getKey();
             for (MetricInfoList metricInfo : entry.getValue()) {
@@ -239,13 +240,20 @@ public class HuaweiCloudMetricsService {
                                 metricInfo.getMetricName());
                 MonitorMetricsCacheKey cacheKey =
                         new MonitorMetricsCacheKey(Csp.HUAWEI_CLOUD, resourceId, type);
-                Metric metric = metrics.stream()
-                        .filter(m -> Objects.nonNull(m)
-                                && StringUtils.equals(m.getName(), metricInfo.getMetricName())
-                                && !CollectionUtils.isEmpty(m.getMetrics())
-                                && StringUtils.equals(resourceId, m.getLabels().get("id")))
-                        .findAny()
-                        .orElse(null);
+                Metric metric =
+                        metrics.stream()
+                                .filter(
+                                        m ->
+                                                Objects.nonNull(m)
+                                                        && StringUtils.equals(
+                                                                m.getName(),
+                                                                metricInfo.getMetricName())
+                                                        && !CollectionUtils.isEmpty(m.getMetrics())
+                                                        && StringUtils.equals(
+                                                                resourceId,
+                                                                m.getLabels().get("id")))
+                                .findAny()
+                                .orElse(null);
                 try {
                     if (Objects.isNull(metric)) {
                         Metric metricCache = monitorMetricsStore.getMonitorMetric(cacheKey);
@@ -271,12 +279,12 @@ public class HuaweiCloudMetricsService {
         Map<MonitorResourceType, MetricInfoList> targetMetricsMap = new HashMap<>();
         ListMetricsRequest request =
                 huaweiCloudDataModelConverter.buildListMetricsRequest(deployResource);
-        ListMetricsResponse listMetricsResponse = client.listMetricsInvoker(request)
-                .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
-                .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
-                .backoffStrategy(
-                        huaweiCloudRetryStrategy)
-                .invoke();
+        ListMetricsResponse listMetricsResponse =
+                client.listMetricsInvoker(request)
+                        .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                        .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                        .backoffStrategy(huaweiCloudRetryStrategy)
+                        .invoke();
         if (Objects.nonNull(listMetricsResponse)
                 && !CollectionUtils.isEmpty(listMetricsResponse.getMetrics())) {
             List<MetricInfoList> metricInfoLists = listMetricsResponse.getMetrics();
@@ -291,19 +299,21 @@ public class HuaweiCloudMetricsService {
                         log.error(
                                 "Could not get metrics of the resource. metricType:{},"
                                         + "resourceId:{}",
-                                type.toValue(), deployResource.getResourceId());
+                                type.toValue(),
+                                deployResource.getResourceId());
                     }
                 }
             } else {
                 MetricInfoList targetMetricInfo =
-                        huaweiCloudDataModelConverter.getTargetMetricInfo(metricInfoLists,
-                                monitorResourceType);
+                        huaweiCloudDataModelConverter.getTargetMetricInfo(
+                                metricInfoLists, monitorResourceType);
                 if (Objects.nonNull(targetMetricInfo)) {
                     targetMetricsMap.put(monitorResourceType, targetMetricInfo);
                 } else {
                     log.error(
                             "Could not get metrics of the resource. metricType:{}, resourceId:{}",
-                            monitorResourceType.toValue(), deployResource.getResourceId());
+                            monitorResourceType.toValue(),
+                            deployResource.getResourceId());
                 }
             }
             return targetMetricsMap;
@@ -316,5 +326,4 @@ public class HuaweiCloudMetricsService {
                             + "Please wait for 3-5 minutes and try again.");
         }
     }
-
 }

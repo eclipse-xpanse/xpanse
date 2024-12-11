@@ -5,12 +5,9 @@
 
 package org.eclipse.xpanse.modules.models.common.exceptions;
 
-/**
- * Exception thrown when the api client authentication failed.
- */
+/** Exception thrown when the api client authentication failed. */
 public class ClientAuthenticationFailedException extends RuntimeException {
     public ClientAuthenticationFailedException(String message) {
         super(message);
     }
 }
-

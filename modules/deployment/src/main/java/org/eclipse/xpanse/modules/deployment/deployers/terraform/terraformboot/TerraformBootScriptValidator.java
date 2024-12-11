@@ -28,9 +28,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Bean to validate terraform scripts via terraform-boot.
- */
+/** Bean to validate terraform scripts via terraform-boot. */
 @Slf4j
 @Component
 @Profile("terraform-boot")
@@ -41,20 +39,17 @@ public class TerraformBootScriptValidator {
     private final TerraformBootHelper terraformBootHelper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * constructor for TerraformBootScriptValidator.
-     */
-    public TerraformBootScriptValidator(TerraformFromScriptsApi terraformFromScriptsApi,
-                                        TerraformFromGitRepoApi terraformFromGitRepoApi,
-                                        TerraformBootHelper terraformBootHelper) {
+    /** constructor for TerraformBootScriptValidator. */
+    public TerraformBootScriptValidator(
+            TerraformFromScriptsApi terraformFromScriptsApi,
+            TerraformFromGitRepoApi terraformFromGitRepoApi,
+            TerraformBootHelper terraformBootHelper) {
         this.terraformFromScriptsApi = terraformFromScriptsApi;
         this.terraformFromGitRepoApi = terraformFromGitRepoApi;
         this.terraformBootHelper = terraformBootHelper;
     }
 
-    /**
-     * Validate scripts provided in the OCL.
-     */
+    /** Validate scripts provided in the OCL. */
     public DeploymentScriptValidationResult validateTerraformScripts(Deployment deployment) {
         DeploymentScriptValidationResult deploymentScriptValidationResult = null;
         try {
@@ -63,7 +58,8 @@ public class TerraformBootScriptValidator {
                             getValidateScriptsInOclRequest(deployment));
             try {
                 deploymentScriptValidationResult =
-                        objectMapper.readValue(objectMapper.writeValueAsString(validate),
+                        objectMapper.readValue(
+                                objectMapper.writeValueAsString(validate),
                                 DeploymentScriptValidationResult.class);
                 deploymentScriptValidationResult.setDeployerVersionUsed(
                         deployment.getDeployerTool().getVersion());
@@ -77,9 +73,7 @@ public class TerraformBootScriptValidator {
         return deploymentScriptValidationResult;
     }
 
-    /**
-     * Validate scripts in the GIT repo.
-     */
+    /** Validate scripts in the GIT repo. */
     public DeploymentScriptValidationResult validateTerraformScriptsFromGitRepo(
             Deployment deployment) {
         DeploymentScriptValidationResult deploymentScriptValidationResult = null;
@@ -89,7 +83,8 @@ public class TerraformBootScriptValidator {
                             getValidateScriptsInGitRepoRequest(deployment));
             try {
                 deploymentScriptValidationResult =
-                        objectMapper.readValue(objectMapper.writeValueAsString(validate),
+                        objectMapper.readValue(
+                                objectMapper.writeValueAsString(validate),
                                 DeploymentScriptValidationResult.class);
             } catch (JsonProcessingException e) {
                 log.error("JsonProcessingException", e);

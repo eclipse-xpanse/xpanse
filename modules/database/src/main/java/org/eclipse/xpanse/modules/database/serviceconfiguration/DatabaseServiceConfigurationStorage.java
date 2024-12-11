@@ -12,13 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Implementation of the ServiceConfigurationStorage.
- */
+/** Implementation of the ServiceConfigurationStorage. */
 @Component
 @Transactional
 public class DatabaseServiceConfigurationStorage implements ServiceConfigurationStorage {
-
 
     private final ServiceConfigurationRepository serviceConfigurationRepository;
 
@@ -27,7 +24,6 @@ public class DatabaseServiceConfigurationStorage implements ServiceConfiguration
             ServiceConfigurationRepository serviceConfigurationRepository) {
         this.serviceConfigurationRepository = serviceConfigurationRepository;
     }
-
 
     @Override
     public ServiceConfigurationEntity storeAndFlush(

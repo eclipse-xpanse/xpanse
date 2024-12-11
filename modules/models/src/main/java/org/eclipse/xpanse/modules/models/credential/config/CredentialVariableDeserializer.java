@@ -13,30 +13,26 @@ import java.io.IOException;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 
 /**
- * Custom deserializer for CredentialVariable class.
- * This deserializer is used to deserialize JSON data into an instance of CredentialVariable,
- * this is needed because of the final fields which Jackson cannot handle.
+ * Custom deserializer for CredentialVariable class. This deserializer is used to deserialize JSON
+ * data into an instance of CredentialVariable, this is needed because of the final fields which
+ * Jackson cannot handle.
  */
 public class CredentialVariableDeserializer extends StdDeserializer<CredentialVariable> {
 
-    /**
-     * Constructor for CredentialVariableDeserializer.
-     */
+    /** Constructor for CredentialVariableDeserializer. */
     public CredentialVariableDeserializer() {
         this(CredentialVariable.class);
     }
 
-    /**
-     * Constructor for CredentialVariableDeserializer.
-     */
+    /** Constructor for CredentialVariableDeserializer. */
     public CredentialVariableDeserializer(Class<?> deserializedClass) {
         super(deserializedClass);
     }
 
     @Override
-    public CredentialVariable deserialize(JsonParser jsonParser,
-                                          DeserializationContext deserializationContext) throws
-            IOException {
+    public CredentialVariable deserialize(
+            JsonParser jsonParser, DeserializationContext deserializationContext)
+            throws IOException {
 
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
 
@@ -49,7 +45,11 @@ public class CredentialVariableDeserializer extends StdDeserializer<CredentialVa
                 node.get("isSensitive").isNull() ? null : node.get("isSensitive").asBoolean();
         String value = node.get("value").isNull() ? null : node.get("value").asText();
 
-        return new CredentialVariable(name, description, Boolean.TRUE.equals(isMandatory),
-                Boolean.TRUE.equals(isSensitive), value);
+        return new CredentialVariable(
+                name,
+                description,
+                Boolean.TRUE.equals(isMandatory),
+                Boolean.TRUE.equals(isSensitive),
+                value);
     }
 }

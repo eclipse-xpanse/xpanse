@@ -8,9 +8,7 @@ package org.eclipse.xpanse.modules.models.serviceconfiguration;
 import java.util.List;
 import lombok.Data;
 
-/**
- * The result of Service Configuration change.
- */
+/** The result of Service Configuration change. */
 @Data
 public class ServiceConfigurationChangeResult {
 

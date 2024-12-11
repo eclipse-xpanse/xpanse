@@ -7,9 +7,7 @@ package org.eclipse.xpanse.common.systemcmd;
 
 import lombok.Data;
 
-/**
- * Encapsulates result of system command execution.
- */
+/** Encapsulates result of system command execution. */
 @Data
 public class SystemCmdResult {
 
@@ -17,5 +15,4 @@ public class SystemCmdResult {
     private boolean isCommandSuccessful;
     private String commandStdOutput;
     private String commandStdError;
-
 }

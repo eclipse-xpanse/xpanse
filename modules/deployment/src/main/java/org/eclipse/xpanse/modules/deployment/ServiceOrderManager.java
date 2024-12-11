@@ -38,27 +38,22 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.async.DeferredResult;
 
-/**
- * Bean to manage service order tasks.
- */
+/** Bean to manage service order tasks. */
 @Slf4j
 @Component
 public class ServiceOrderManager {
-    @Resource
-    private ServiceOrderStorage serviceOrderStorage;
-    @Resource
-    private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource
-    private UserServiceHelper userServiceHelper;
-    @Resource
-    private ServiceOrderStatusChangePolling serviceOrderStatusChangePolling;
+    @Resource private ServiceOrderStorage serviceOrderStorage;
+    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
+    @Resource private UserServiceHelper userServiceHelper;
+    @Resource private ServiceOrderStatusChangePolling serviceOrderStatusChangePolling;
+
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
 
     /**
      * Create service order entity and store into the database.
      *
-     * @param task                    task to be created
+     * @param task task to be created
      * @param serviceDeploymentEntity service deployment entity
      */
     public ServiceOrderEntity storeNewServiceOrderEntity(
@@ -107,15 +102,18 @@ public class ServiceOrderManager {
     /**
      * Complete order progress.
      *
-     * @param orderId    service order id.
+     * @param orderId service order id.
      * @param taskStatus task status.
      */
-    public void completeOrderProgress(UUID orderId, TaskStatus taskStatus,
-                                      ErrorResponse errorResponse) {
+    public void completeOrderProgress(
+            UUID orderId, TaskStatus taskStatus, ErrorResponse errorResponse) {
         ServiceOrderEntity serviceOrder = serviceOrderStorage.getEntityById(orderId);
         if (Objects.isNull(serviceOrder)) {
-            String errMsg = String.format("Service order with id %s not found "
-                            + "when try to complete order progress.", orderId);
+            String errMsg =
+                    String.format(
+                            "Service order with id %s not found "
+                                    + "when try to complete order progress.",
+                            orderId);
             log.error(errMsg);
             throw new ServiceOrderNotFound(errMsg);
         }
@@ -130,7 +128,7 @@ public class ServiceOrderManager {
     /**
      * List the service orders.
      *
-     * @param serviceId  service id.
+     * @param serviceId service id.
      * @param taskStatus order status.
      * @return list of service orders.
      */
@@ -146,34 +144,30 @@ public class ServiceOrderManager {
             query.setUserId(userServiceHelper.getCurrentUserId());
         }
         List<ServiceOrderEntity> orderEntities = serviceOrderStorage.queryEntities(query);
-        return orderEntities.stream()
-                .map(EntityTransUtils::transToServiceOrderDetails)
-                .toList();
+        return orderEntities.stream().map(EntityTransUtils::transToServiceOrderDetails).toList();
     }
-
 
     /**
      * Get the task status update of the service order.
      *
-     * @param orderId             if of the service order.
+     * @param orderId if of the service order.
      * @param lastKnownTaskStatus last known task status of the service order.
      * @return updated service order status.
      */
     public DeferredResult<ServiceOrderStatusUpdate> getLatestServiceOrderStatus(
             UUID orderId, TaskStatus lastKnownTaskStatus) {
         DeferredResult<ServiceOrderStatusUpdate> stateDeferredResult = new DeferredResult<>();
-        taskExecutor.execute(() -> {
-            try {
-                this.serviceOrderStatusChangePolling.fetchServiceOrderTaskStatusWithPolling(
-                        stateDeferredResult, orderId, lastKnownTaskStatus);
-            } catch (Exception exception) {
-                stateDeferredResult.setErrorResult(exception);
-            }
-        });
+        taskExecutor.execute(
+                () -> {
+                    try {
+                        this.serviceOrderStatusChangePolling.fetchServiceOrderTaskStatusWithPolling(
+                                stateDeferredResult, orderId, lastKnownTaskStatus);
+                    } catch (Exception exception) {
+                        stateDeferredResult.setErrorResult(exception);
+                    }
+                });
         return stateDeferredResult;
-
     }
-
 
     /**
      * Delete the service orders by the service id.
@@ -191,7 +185,6 @@ public class ServiceOrderManager {
         List<ServiceOrderEntity> orderEntities = serviceOrderStorage.queryEntities(query);
         serviceOrderStorage.deleteBatch(orderEntities);
     }
-
 
     /**
      * Get the service order details with the order id.
@@ -228,7 +221,6 @@ public class ServiceOrderManager {
             throw new ServiceNotDeployedException(errorMsg);
         }
     }
-
 
     /**
      * Get the service order entity with the order id.

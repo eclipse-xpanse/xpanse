@@ -14,11 +14,11 @@ class TerraformLocalConfigTest {
     @BeforeEach
     void setUp() {
         terraformLocalConfigUnderTest = new TerraformLocalConfig();
-        ReflectionTestUtils.setField(terraformLocalConfigUnderTest, "workspaceDirectory",
-                "xpanse_deploy_ws");
+        ReflectionTestUtils.setField(
+                terraformLocalConfigUnderTest, "workspaceDirectory", "xpanse_deploy_ws");
         ReflectionTestUtils.setField(terraformLocalConfigUnderTest, "isDebugEnabled", false);
-        ReflectionTestUtils.setField(terraformLocalConfigUnderTest, "debugLogLevel",
-                "debugLogLevel");
+        ReflectionTestUtils.setField(
+                terraformLocalConfigUnderTest, "debugLogLevel", "debugLogLevel");
     }
 
     @Test

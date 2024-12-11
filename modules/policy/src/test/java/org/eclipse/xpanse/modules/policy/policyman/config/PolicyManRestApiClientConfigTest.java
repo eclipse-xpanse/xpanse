@@ -14,16 +14,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class PolicyManRestApiClientConfigTest {
 
-    @Mock
-    private ApiClient mockApiClient;
+    @Mock private ApiClient mockApiClient;
 
-    @InjectMocks
-    private PolicyManRestApiClientConfig policyManRestApiClientConfigUnderTest;
+    @InjectMocks private PolicyManRestApiClientConfig policyManRestApiClientConfigUnderTest;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(policyManRestApiClientConfigUnderTest, "policyManBaseUrl",
-                "basePath");
+        ReflectionTestUtils.setField(
+                policyManRestApiClientConfigUnderTest, "policyManBaseUrl", "basePath");
     }
 
     @Test

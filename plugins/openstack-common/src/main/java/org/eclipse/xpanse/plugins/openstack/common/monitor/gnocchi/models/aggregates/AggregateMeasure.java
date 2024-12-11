@@ -12,13 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.measures.Measure;
 
-/**
- * Data model for AggregatedMeasure objects.
- */
+/** Data model for AggregatedMeasure objects. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "aggregated"
-})
+@JsonPropertyOrder({"aggregated"})
 public class AggregateMeasure {
 
     @JsonProperty("aggregated")
@@ -33,5 +29,4 @@ public class AggregateMeasure {
     public void setAggregated(List<Measure> aggregated) {
         this.aggregated = aggregated;
     }
-
 }

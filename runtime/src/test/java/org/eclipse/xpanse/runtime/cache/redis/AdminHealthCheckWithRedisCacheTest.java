@@ -27,24 +27,26 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for Health Check with Redis Cache and Database h2.
- */
+/** Test for Health Check with Redis Cache and Database h2. */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test",
-        "enable.redis.distributed.cache=true"})
+@SpringBootTest(
+        properties = {
+            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test",
+            "enable.redis.distributed.cache=true"
+        })
 @AutoConfigureMockMvc
 class AdminHealthCheckWithRedisCacheTest extends AbstractRedisIntegrationTest {
 
     @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
     private String dataSourceUrl;
+
     @Value("${spring.data.redis.host}")
     private String redisHost;
+
     @Value("${spring.data.redis.port}")
     private String redisPort;
-    @Resource
-    private AdminServicesApi adminServicesApi;
 
+    @Resource private AdminServicesApi adminServicesApi;
 
     @Test
     @WithJwt(file = "jwt_admin.json")
@@ -57,19 +59,32 @@ class AdminHealthCheckWithRedisCacheTest extends AbstractRedisIntegrationTest {
         List<BackendSystemStatus> backendSystemStatuses = systemStatus.getBackendSystemStatuses();
         assertEquals(4, backendSystemStatuses.size());
 
-        assertTrue(backendSystemStatuses.stream()
-                .allMatch(status -> status.getEndpoint() != null));
+        assertTrue(backendSystemStatuses.stream().allMatch(status -> status.getEndpoint() != null));
 
-        assertTrue(backendSystemStatuses.stream()
-                .filter(status -> status.getBackendSystemType()
-                        .equals(BackendSystemType.CACHE_PROVIDER))
-                .allMatch(status -> status.getEndpoint().equals(redisHost + ":" + redisPort)
-                        && status.getName().equals(CacheConstants.CACHE_PROVIDER_REDIS)));
+        assertTrue(
+                backendSystemStatuses.stream()
+                        .filter(
+                                status ->
+                                        status.getBackendSystemType()
+                                                .equals(BackendSystemType.CACHE_PROVIDER))
+                        .allMatch(
+                                status ->
+                                        status.getEndpoint().equals(redisHost + ":" + redisPort)
+                                                && status.getName()
+                                                        .equals(
+                                                                CacheConstants
+                                                                        .CACHE_PROVIDER_REDIS)));
 
-        assertTrue(backendSystemStatuses.stream()
-                .filter(status -> status.getBackendSystemType().equals(BackendSystemType.DATABASE))
-                .allMatch(status -> status.getEndpoint().equals(dataSourceUrl)
-                        && status.getName().equals(DatabaseType.H2DB.toValue())));
+        assertTrue(
+                backendSystemStatuses.stream()
+                        .filter(
+                                status ->
+                                        status.getBackendSystemType()
+                                                .equals(BackendSystemType.DATABASE))
+                        .allMatch(
+                                status ->
+                                        status.getEndpoint().equals(dataSourceUrl)
+                                                && status.getName()
+                                                        .equals(DatabaseType.H2DB.toValue())));
     }
-
 }

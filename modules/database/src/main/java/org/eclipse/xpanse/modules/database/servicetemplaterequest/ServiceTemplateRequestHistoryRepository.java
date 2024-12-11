@@ -11,12 +11,8 @@ import org.eclipse.xpanse.modules.database.CustomJpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-/**
- * Interface to access default JPA methods.
- */
+/** Interface to access default JPA methods. */
 @Repository
-public interface ServiceTemplateRequestHistoryRepository extends
-        CustomJpaRepository<ServiceTemplateRequestHistoryEntity, UUID>,
-        JpaSpecificationExecutor<ServiceTemplateRequestHistoryEntity> {
-
-}
+public interface ServiceTemplateRequestHistoryRepository
+        extends CustomJpaRepository<ServiceTemplateRequestHistoryEntity, UUID>,
+                JpaSpecificationExecutor<ServiceTemplateRequestHistoryEntity> {}

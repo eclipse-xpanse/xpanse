@@ -34,10 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-/**
- * REST interface methods for managing cloud resources.
- */
+/** REST interface methods for managing cloud resources. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -46,37 +43,38 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ExistingCloudResourcesApi {
 
-    @Resource
-    private PluginManager pluginManager;
+    @Resource private PluginManager pluginManager;
 
-    @Resource
-    private UserServiceHelper userServiceHelper;
+    @Resource private UserServiceHelper userServiceHelper;
 
-    /**
-     * List existing cloud resources based on type.
-     */
-    @Tag(name = "CloudResources",
-            description = "API to view cloud resources by type")
-    @GetMapping(value = "/csp/resources/{deployResourceKind}",
+    /** List existing cloud resources based on type. */
+    @Tag(name = "CloudResources", description = "API to view cloud resources by type")
+    @GetMapping(
+            value = "/csp/resources/{deployResourceKind}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List existing cloud resource names with kind")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<String> getExistingResourceNamesWithKind(
             @Parameter(name = "csp", description = "name of the cloud service provider")
-            @RequestParam(name = "csp") Csp csp,
+                    @RequestParam(name = "csp")
+                    Csp csp,
             @Parameter(name = "siteName", description = "the site of the service belongs to")
-            @RequestParam(name = "siteName") String siteName,
+                    @RequestParam(name = "siteName")
+                    String siteName,
             @Parameter(name = "regionName", description = "name of the region")
-            @RequestParam(name = "regionName") String regionName,
+                    @RequestParam(name = "regionName")
+                    String regionName,
             @Parameter(name = "deployResourceKind", description = "kind of the CloudResource")
-            @PathVariable("deployResourceKind") DeployResourceKind deployResourceKind,
+                    @PathVariable("deployResourceKind")
+                    DeployResourceKind deployResourceKind,
             @Parameter(name = "serviceId", description = "id of the deployed service")
-            @RequestParam(name = "serviceId", required = false) String serviceId) {
+                    @RequestParam(name = "serviceId", required = false)
+                    String serviceId) {
         UUID uuid = StringUtils.isBlank(serviceId) ? null : UUID.fromString(serviceId);
         String userId = userServiceHelper.getCurrentUserId();
         OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
-        return orchestratorPlugin.getExistingResourceNamesWithKind(siteName, regionName, userId,
-                deployResourceKind, uuid);
+        return orchestratorPlugin.getExistingResourceNamesWithKind(
+                siteName, regionName, userId, deployResourceKind, uuid);
     }
 }

@@ -10,11 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * The unit of the metric.
- */
+/** The unit of the metric. */
 public enum MetricUnit {
-
     MB("mb"),
     KB("kb"),
     PERCENTAGE("percentage"),
@@ -27,9 +24,7 @@ public enum MetricUnit {
         this.type = type;
     }
 
-    /**
-     * For MetricUnit deserialize.
-     */
+    /** For MetricUnit deserialize. */
     @JsonCreator
     public static MetricUnit getByValue(String type) {
         for (MetricUnit metricUnit : values()) {
@@ -41,9 +36,7 @@ public enum MetricUnit {
                 String.format("MetricUnit value %s is not supported.", type));
     }
 
-    /**
-     * For MetricUnit serialize.
-     */
+    /** For MetricUnit serialize. */
     @JsonValue
     public String toValue() {
         return this.type;

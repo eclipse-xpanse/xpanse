@@ -11,10 +11,8 @@ import org.springframework.beans.BeanUtils;
 class FlavorsWithPriceTest {
 
     private final boolean isDowngradeAllowed = false;
-    @Mock
-    private List<ServiceFlavorWithPrice> mockFlavorWithPriceList;
-    @Mock
-    private ModificationImpact mockModificationImpact;
+    @Mock private List<ServiceFlavorWithPrice> mockFlavorWithPriceList;
+    @Mock private ModificationImpact mockModificationImpact;
 
     private FlavorsWithPrice test;
 
@@ -32,7 +30,6 @@ class FlavorsWithPriceTest {
         assertThat(test.getModificationImpact()).isEqualTo(mockModificationImpact);
         assertThat(test.isDowngradeAllowed()).isEqualTo(isDowngradeAllowed);
     }
-
 
     @Test
     void testEqualsAndHashCode() {
@@ -53,9 +50,14 @@ class FlavorsWithPriceTest {
 
     @Test
     void testToString() throws Exception {
-        String result = "FlavorsWithPrice(serviceFlavors=" + mockFlavorWithPriceList
-                + ", modificationImpact=" + mockModificationImpact + ", isDowngradeAllowed="
-                + isDowngradeAllowed + ")";
+        String result =
+                "FlavorsWithPrice(serviceFlavors="
+                        + mockFlavorWithPriceList
+                        + ", modificationImpact="
+                        + mockModificationImpact
+                        + ", isDowngradeAllowed="
+                        + isDowngradeAllowed
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

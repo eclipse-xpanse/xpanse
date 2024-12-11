@@ -13,9 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Define view object of the service order.
- */
+/** Define view object of the service order. */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

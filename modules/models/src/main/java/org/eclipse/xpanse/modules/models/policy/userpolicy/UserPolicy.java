@@ -17,38 +17,28 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 
-/**
- * Define view object for detail of the policy entity.
- */
+/** Define view object for detail of the policy entity. */
 @Data
 public class UserPolicy {
 
-    /**
-     * The id of the entity.
-     */
+    /** The id of the entity. */
     @NotNull
     @Schema(description = "The id of the policy.")
     private UUID userPolicyId;
 
-    /**
-     * The valid policy created by the user.
-     */
+    /** The valid policy created by the user. */
     @NotNull
     @NotBlank
     @NotEmpty
     @Schema(description = "The valid policy created by the user.")
     private String policy;
 
-    /**
-     * The csp which the policy belongs to.
-     */
+    /** The csp which the policy belongs to. */
     @NotNull
     @Schema(description = "The csp which the policy belongs to.")
     private Csp csp;
 
-    /**
-     * Is the policy enabled.
-     */
+    /** Is the policy enabled. */
     @NotNull
     @Schema(description = "Is the policy enabled.")
     private Boolean enabled;

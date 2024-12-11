@@ -10,9 +10,7 @@ import java.security.Principal;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Class to hold the ID of the user.
- */
+/** Class to hold the ID of the user. */
 @Data
 @RequiredArgsConstructor
 public class SimplePrincipal implements Principal {

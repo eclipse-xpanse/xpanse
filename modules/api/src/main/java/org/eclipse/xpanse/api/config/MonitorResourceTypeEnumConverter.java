@@ -9,9 +9,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to MonitorResourceType enum.
- */
+/** Bean for serializing string in request parameters to MonitorResourceType enum. */
 @Component
 public class MonitorResourceTypeEnumConverter implements Converter<String, MonitorResourceType> {
 

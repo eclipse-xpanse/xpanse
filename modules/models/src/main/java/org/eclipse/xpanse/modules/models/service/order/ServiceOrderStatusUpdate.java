@@ -14,8 +14,8 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 
 /**
- * Data type to describe an order task status update.
- * Will only hold the changes related to task status.
+ * Data type to describe an order task status update. Will only hold the changes related to task
+ * status.
  */
 @Data
 @AllArgsConstructor

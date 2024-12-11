@@ -16,15 +16,12 @@ import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDep
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for grouping common methods for handling ServiceDeploymentEntity entities.
- */
+/** Bean for grouping common methods for handling ServiceDeploymentEntity entities. */
 @Slf4j
 @Component
 public class ServiceDeploymentEntityHandler {
 
-    @Resource
-    private ServiceDeploymentStorage serviceDeploymentStorage;
+    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
 
     /**
      * Get deploy service entity by id.
@@ -53,15 +50,14 @@ public class ServiceDeploymentEntityHandler {
         return serviceDeploymentStorage.storeAndFlush(serviceDeploymentEntity);
     }
 
-
     /**
      * Update service deployment status.
      *
      * @param serviceDeployment service deployment entity.
-     * @param state             deployment status
+     * @param state deployment status
      */
-    public void updateServiceDeploymentStatus(ServiceDeploymentEntity serviceDeployment,
-                                              ServiceDeploymentState state) {
+    public void updateServiceDeploymentStatus(
+            ServiceDeploymentEntity serviceDeployment, ServiceDeploymentState state) {
         serviceDeployment.setServiceDeploymentState(state);
         serviceDeploymentStorage.storeAndFlush(serviceDeployment);
     }

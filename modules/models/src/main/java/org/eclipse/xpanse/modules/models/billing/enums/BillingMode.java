@@ -10,12 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-
-/**
- * Enum of Billing Mode.
- */
+/** Enum of Billing Mode. */
 public enum BillingMode {
-
     FIXED("Fixed"),
     PAY_PER_USE("Pay per Use");
 
@@ -25,9 +21,7 @@ public enum BillingMode {
         this.value = value;
     }
 
-    /**
-     * For BillingMode serialize.
-     */
+    /** For BillingMode serialize. */
     @JsonCreator
     public static BillingMode getByValue(String value) {
         for (BillingMode enumeration : values()) {
@@ -39,9 +33,7 @@ public enum BillingMode {
                 String.format("BillingMode value %s is not supported.", value));
     }
 
-    /**
-     * For BillingMode deserialize.
-     */
+    /** For BillingMode deserialize. */
     @JsonValue
     public String toValue() {
         return this.value;

@@ -18,8 +18,8 @@ import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
-import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
@@ -52,37 +52,35 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ServiceDeployerApi.class, DeployService.class, WorkflowUtils.class,
-        DeploymentExceptionHandler.class, UserServiceHelper.class, IdentityProviderManager.class,
-        ServiceLockConfigService.class, ServiceOrderManager.class, CspPluginValidator.class,
-        DeployServiceEntityConverter.class, PluginManager.class})
+@ContextConfiguration(
+        classes = {
+            ServiceDeployerApi.class,
+            DeployService.class,
+            WorkflowUtils.class,
+            DeploymentExceptionHandler.class,
+            UserServiceHelper.class,
+            IdentityProviderManager.class,
+            ServiceLockConfigService.class,
+            ServiceOrderManager.class,
+            CspPluginValidator.class,
+            DeployServiceEntityConverter.class,
+            PluginManager.class
+        })
 @WebMvcTest
 class DeploymentExceptionHandlerTest {
     private MockMvc mockMvc;
-    @Autowired
-    private WebApplicationContext context;
-    @MockitoBean
-    private ServiceDetailsViewManager serviceDetailsViewManager;
-    @MockitoBean
-    private DeployService deployService;
-    @MockitoBean
-    private WorkflowUtils workflowUtils;
-    @MockitoBean
-    private DeployerKindManager deployerKindManager;
-    @MockitoBean
-    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @MockitoBean
-    private PluginManager pluginManager;
-    @MockitoBean
-    private CspPluginValidator cspPluginValidator;
-    @MockitoBean
-    private OrchestratorPlugin orchestratorPlugin;
-    @MockitoBean
-    private ServiceOrderManager serviceOrderManager;
-    @MockitoBean
-    private ServiceOrderStorage serviceOrderStorage;
-    @MockitoBean
-    private DeployServiceEntityConverter deployServiceEntityConverter;
+    @Autowired private WebApplicationContext context;
+    @MockitoBean private ServiceDetailsViewManager serviceDetailsViewManager;
+    @MockitoBean private DeployService deployService;
+    @MockitoBean private WorkflowUtils workflowUtils;
+    @MockitoBean private DeployerKindManager deployerKindManager;
+    @MockitoBean private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @MockitoBean private PluginManager pluginManager;
+    @MockitoBean private CspPluginValidator cspPluginValidator;
+    @MockitoBean private OrchestratorPlugin orchestratorPlugin;
+    @MockitoBean private ServiceOrderManager serviceOrderManager;
+    @MockitoBean private ServiceOrderStorage serviceOrderStorage;
+    @MockitoBean private DeployServiceEntityConverter deployServiceEntityConverter;
 
     @BeforeEach
     public void setup() {
@@ -91,60 +89,71 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testFlavorInvalidException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new FlavorInvalidException("test error"));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new FlavorInvalidException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Flavor Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
     @Test
     void testTerraformExecutorException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new TerraformExecutorException("test error"));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new TerraformExecutorException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(502))
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(502))
                 .andExpect(jsonPath("$.errorType").value("Terraform Execution Failed"))
                 .andExpect(jsonPath("$.details[0]").value("TFExecutor Exception: test error"));
     }
 
     @Test
     void testPluginNotFoundException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new PluginNotFoundException("test error"));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new PluginNotFoundException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Plugin Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
     @Test
     void testDeployerNotFoundException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new DeployerNotFoundException("test error"));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new DeployerNotFoundException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Deployer Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
     @Test
     void testInvalidServiceStateException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new InvalidServiceStateException("test error"));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new InvalidServiceStateException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Invalid Service State"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
     @Test
     void testServiceNotDeployedException() throws Exception {
-        when(serviceDetailsViewManager.getSelfHostedServiceDetailsByIdForEndUser(
-                any(UUID.class))).thenThrow(new ServiceNotDeployedException("test error"));
+        when(serviceDetailsViewManager.getSelfHostedServiceDetailsByIdForEndUser(any(UUID.class)))
+                .thenThrow(new ServiceNotDeployedException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services/details/self_hosted/{id}", UUID.randomUUID()))
+        this.mockMvc
+                .perform(get("/xpanse/services/details/self_hosted/{id}", UUID.randomUUID()))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Service Deployment Not Found"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -152,51 +161,61 @@ class DeploymentExceptionHandlerTest {
 
     @Test
     void testInvalidDeploymentVariableException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new InvalidDeploymentVariableException("test error"));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new InvalidDeploymentVariableException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Deployment Variable Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
     @Test
     void testVariableInvalidException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new VariableValidationFailedException(List.of("test error")));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new VariableValidationFailedException(List.of("test error")));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
-                .andExpect(jsonPath("$.errorType").value("Variable Validation Failed")).andExpect(
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.errorType").value("Variable Validation Failed"))
+                .andExpect(
                         jsonPath("$.details[0]").value("Variable validation failed: [test error]"));
     }
 
     @Test
     void testServiceIsLockedException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new ServiceLockedException("test error"));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new ServiceLockedException("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Service Locked"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
     @Test
     void testEulaNotAcceptedException() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new EulaNotAccepted("test error"));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new EulaNotAccepted("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Eula Not Accepted"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
-
     @Test
     void testServiceFlavorDowngradeNotAllowed() throws Exception {
-        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(),
-                any())).thenThrow(new ServiceFlavorDowngradeNotAllowed("test error"));
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new ServiceFlavorDowngradeNotAllowed("test error"));
 
-        this.mockMvc.perform(get("/xpanse/services")).andExpect(status().is(400))
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Service Flavor Downgrade Not Allowed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }

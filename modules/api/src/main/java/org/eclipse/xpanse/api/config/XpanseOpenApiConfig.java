@@ -15,14 +15,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * XpanseOpenApiConfig.
- */
+/** XpanseOpenApiConfig. */
 @Configuration
 public class XpanseOpenApiConfig implements WebMvcConfigurer {
 
-    public static final String PROJECT_PATH = "file:"
-            + System.getProperty("user.dir") + File.separator;
+    public static final String PROJECT_PATH =
+            "file:" + System.getProperty("user.dir") + File.separator;
 
     @Value("${openapi.path:openapi/}")
     private String openapiPath;
@@ -42,7 +40,8 @@ public class XpanseOpenApiConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(openapiUrl).addResourceLocations(openapiPath)
+        registry.addResourceHandler(openapiUrl)
+                .addResourceLocations(openapiPath)
                 .addResourceLocations(PROJECT_PATH + openapiPath);
     }
 
@@ -58,7 +57,5 @@ public class XpanseOpenApiConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .allowedMethods("GET")
                 .maxAge(3600 * 24);
-
     }
-
 }

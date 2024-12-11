@@ -78,10 +78,11 @@ class ServicePolicyTest {
 
     @Test
     void testToString() {
-        String result = String.format(
-                "ServicePolicy(servicePolicyId=%s, policy=%s, serviceTemplateId=%s, flavorNameList=%s, "
-                        + "enabled=%s, createTime=%s, lastModifiedTime=%s)",
-                id, policy, serviceTemplateId, flavorNameList, enabled, null, null);
+        String result =
+                String.format(
+                        "ServicePolicy(servicePolicyId=%s, policy=%s, serviceTemplateId=%s,"
+                            + " flavorNameList=%s, enabled=%s, createTime=%s, lastModifiedTime=%s)",
+                        id, policy, serviceTemplateId, flavorNameList, enabled, null, null);
 
         assertThat(test.toString()).isEqualTo(result);
     }

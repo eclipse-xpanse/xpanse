@@ -8,9 +8,7 @@ package org.eclipse.xpanse.modules.database.serviceconfiguration;
 
 import java.util.UUID;
 
-/**
- * Interface for persist of ServiceConfigurationEntity.
- */
+/** Interface for persist of ServiceConfigurationEntity. */
 public interface ServiceConfigurationStorage {
 
     /**
@@ -22,7 +20,7 @@ public interface ServiceConfigurationStorage {
     ServiceConfigurationEntity storeAndFlush(ServiceConfigurationEntity serviceConfigurationEntity);
 
     /**
-     * Get detail of  service configuration using ID.
+     * Get detail of service configuration using ID.
      *
      * @param id the ID of deployed service.
      * @return serviceConfigurationEntity the entity of service configuration.
@@ -35,5 +33,4 @@ public interface ServiceConfigurationStorage {
      * @param serviceConfigurationEntity the entity of service configuration.
      */
     void deleteServiceConfiguration(ServiceConfigurationEntity serviceConfigurationEntity);
-
 }

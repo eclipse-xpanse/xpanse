@@ -8,9 +8,7 @@ package org.eclipse.xpanse.modules.database.servicepolicy;
 
 import java.util.UUID;
 
-/**
- * Interface for persist of ServicePolicyManager.
- */
+/** Interface for persist of ServicePolicyManager. */
 public interface ServicePolicyStorage {
 
     /**
@@ -39,7 +37,7 @@ public interface ServicePolicyStorage {
     /**
      * Delete stored policy entity using the id of policy.
      *
-     * @param id the id  of the policy.
+     * @param id the id of the policy.
      */
     void deletePolicyById(UUID id);
 }

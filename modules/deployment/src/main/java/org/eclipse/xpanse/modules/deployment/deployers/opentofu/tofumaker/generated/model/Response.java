@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -22,20 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Response
- */
+/** Response */
 @JsonPropertyOrder({
-        Response.JSON_PROPERTY_RESULT_TYPE,
-        Response.JSON_PROPERTY_DETAILS,
-        Response.JSON_PROPERTY_SUCCESS
+    Response.JSON_PROPERTY_RESULT_TYPE,
+    Response.JSON_PROPERTY_DETAILS,
+    Response.JSON_PROPERTY_SUCCESS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class Response {
-    /**
-     * The result code of response.
-     */
+    /** The result code of response. */
     public enum ResultTypeEnum {
         PARAMETERS_INVALID(String.valueOf("Parameters Invalid")),
 
@@ -55,7 +51,8 @@ public class Response {
 
         INVALID_OPEN_TOFU_SCRIPTS(String.valueOf("Invalid OpenTofu Scripts")),
 
-        RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID(String.valueOf("Result Already Returned or RequestId Invalid"));
+        RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID(
+                String.valueOf("Result Already Returned or RequestId Invalid"));
 
         private String value;
 
@@ -85,19 +82,15 @@ public class Response {
     }
 
     public static final String JSON_PROPERTY_RESULT_TYPE = "resultType";
-    @jakarta.annotation.Nonnull
-    private ResultTypeEnum resultType;
+    @jakarta.annotation.Nonnull private ResultTypeEnum resultType;
 
     public static final String JSON_PROPERTY_DETAILS = "details";
-    @jakarta.annotation.Nonnull
-    private List<String> details = new ArrayList<>();
+    @jakarta.annotation.Nonnull private List<String> details = new ArrayList<>();
 
     public static final String JSON_PROPERTY_SUCCESS = "success";
-    @jakarta.annotation.Nonnull
-    private Boolean success;
+    @jakarta.annotation.Nonnull private Boolean success;
 
-    public Response() {
-    }
+    public Response() {}
 
     public Response resultType(@jakarta.annotation.Nonnull ResultTypeEnum resultType) {
 
@@ -113,7 +106,6 @@ public class Response {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_RESULT_TYPE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public ResultTypeEnum getResultType() {
         return resultType;
     }
@@ -146,7 +138,6 @@ public class Response {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_DETAILS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public List<String> getDetails() {
         return details;
     }
@@ -171,7 +162,6 @@ public class Response {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_SUCCESS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Boolean getSuccess() {
         return success;
     }
@@ -191,9 +181,9 @@ public class Response {
             return false;
         }
         Response response = (Response) o;
-        return Objects.equals(this.resultType, response.resultType) &&
-                Objects.equals(this.details, response.details) &&
-                Objects.equals(this.success, response.success);
+        return Objects.equals(this.resultType, response.resultType)
+                && Objects.equals(this.details, response.details)
+                && Objects.equals(this.success, response.success);
     }
 
     @Override
@@ -213,8 +203,8 @@ public class Response {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -222,6 +212,4 @@ public class Response {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

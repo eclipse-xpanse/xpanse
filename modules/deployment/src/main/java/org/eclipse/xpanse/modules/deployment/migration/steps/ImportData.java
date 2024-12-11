@@ -14,9 +14,7 @@ import org.activiti.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Migration process import data processing class.
- */
+/** Migration process import data processing class. */
 @Slf4j
 @Component
 public class ImportData implements Serializable, JavaDelegate {
@@ -28,13 +26,11 @@ public class ImportData implements Serializable, JavaDelegate {
         this.runtimeService = runtimeService;
     }
 
-    /**
-     * Migration process, import data link business logic(Not yet developed).
-     */
+    /** Migration process, import data link business logic(Not yet developed). */
     @Override
     public void execute(DelegateExecution delegateExecution) {
         String processInstanceId = delegateExecution.getProcessInstanceId();
         log.info("start import data.ProcessInstanceId:{}", processInstanceId);
-        //TODO Export data process not yet implemented. Skipping.
+        // TODO Export data process not yet implemented. Skipping.
     }
 }

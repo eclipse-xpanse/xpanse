@@ -17,9 +17,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Bean to manage service deployment via terraform-boot.
- */
+/** Bean to manage service deployment via terraform-boot. */
 @Slf4j
 @Component
 @Profile("terraform-boot")
@@ -29,20 +27,17 @@ public class TerraformBootServiceDeployer {
     private final TerraformFromGitRepoApi terraformFromGitRepoApi;
     private final TerraformBootHelper terraformBootHelper;
 
-    /**
-     * Constructor for TerraformBootServiceDeployer bean.
-     */
-    public TerraformBootServiceDeployer(TerraformFromScriptsApi terraformFromScriptsApi,
-                                        TerraformFromGitRepoApi terraformFromGitRepoApi,
-                                        TerraformBootHelper terraformBootHelper) {
+    /** Constructor for TerraformBootServiceDeployer bean. */
+    public TerraformBootServiceDeployer(
+            TerraformFromScriptsApi terraformFromScriptsApi,
+            TerraformFromGitRepoApi terraformFromGitRepoApi,
+            TerraformBootHelper terraformBootHelper) {
         this.terraformFromScriptsApi = terraformFromScriptsApi;
         this.terraformFromGitRepoApi = terraformFromGitRepoApi;
         this.terraformBootHelper = terraformBootHelper;
     }
 
-    /**
-     * method to perform service deployment using scripts provided in OCL.
-     */
+    /** method to perform service deployment using scripts provided in OCL. */
     public DeployResult deployFromScripts(DeployTask deployTask) {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromScriptsRequest request = getDeployFromScriptsRequest(deployTask);
@@ -51,15 +46,15 @@ public class TerraformBootServiceDeployer {
             result.setOrderId(deployTask.getOrderId());
             return result;
         } catch (RestClientException e) {
-            log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(), e.getMessage());
+            log.error(
+                    "terraform-boot deploy service failed. service id: {} , error:{} ",
+                    deployTask.getServiceId(),
+                    e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
 
-    /**
-     * method to perform service deployment using scripts form GIT repo.
-     */
+    /** method to perform service deployment using scripts form GIT repo. */
     public DeployResult deployFromGitRepo(DeployTask deployTask) {
         DeployResult result = new DeployResult();
         TerraformAsyncDeployFromGitRepoRequest request = getDeployFromGitRepoRequest(deployTask);
@@ -68,8 +63,10 @@ public class TerraformBootServiceDeployer {
             result.setOrderId(deployTask.getOrderId());
             return result;
         } catch (RestClientException e) {
-            log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(), e.getMessage());
+            log.error(
+                    "terraform-boot deploy service failed. service id: {} , error:{} ",
+                    deployTask.getServiceId(),
+                    e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
@@ -98,8 +95,7 @@ public class TerraformBootServiceDeployer {
         request.setWebhookConfig(terraformBootHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
                 terraformBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
-                        task.getOcl().getDeployment().getScriptsRepo())
-        );
+                        task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }
 }

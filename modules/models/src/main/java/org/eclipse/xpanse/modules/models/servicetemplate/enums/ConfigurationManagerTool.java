@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Defines the tool of  service configuration manage.
- */
+/** Defines the tool of service configuration manage. */
 public enum ConfigurationManagerTool {
     ANSIBLE("ansible");
 
@@ -22,10 +20,7 @@ public enum ConfigurationManagerTool {
         this.type = type;
     }
 
-
-    /**
-     * For ConfigurationManagerTool serialize.
-     */
+    /** For ConfigurationManagerTool serialize. */
     @JsonCreator
     public static ConfigurationManagerTool getByValue(String type) {
         for (ConfigurationManagerTool tool : values()) {
@@ -37,12 +32,9 @@ public enum ConfigurationManagerTool {
                 String.format("ConfigurationManagerTool value %s is not supported.", type));
     }
 
-    /**
-     * For ConfigurationManagerTool deserialize.
-     */
+    /** For ConfigurationManagerTool deserialize. */
     @JsonValue
     public String toValue() {
         return this.type;
     }
-
 }

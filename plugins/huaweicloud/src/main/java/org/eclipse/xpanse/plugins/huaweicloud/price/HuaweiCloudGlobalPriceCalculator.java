@@ -37,9 +37,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * Class that implements the price calculation for the global rest apis of HuaweiCloud.
- */
+/** Class that implements the price calculation for the global rest apis of HuaweiCloud. */
 @Slf4j
 @Component
 public class HuaweiCloudGlobalPriceCalculator {
@@ -54,7 +52,6 @@ public class HuaweiCloudGlobalPriceCalculator {
 
     @Value("${huaweicloud.european.price.calculator.url}")
     private String priceCalculatorRestApiUrlForEurope;
-
 
     /**
      * Get the price of the service with global rest api.
@@ -72,20 +69,27 @@ public class HuaweiCloudGlobalPriceCalculator {
         try {
             log.info("Calling the rest api with request body:{}.", requestBody);
             ResponseEntity<ListOnDemandResourceRatingsResponse> responseEntity =
-                    restTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity,
+                    restTemplate.exchange(
+                            requestUrl,
+                            HttpMethod.POST,
+                            requestEntity,
                             ListOnDemandResourceRatingsResponse.class);
-            log.info("Called the rest api in site: {} to calculate the price successfully. "
-                    + "Response Body: {}", site, responseEntity.getBody());
+            log.info(
+                    "Called the rest api in site: {} to calculate the price successfully. "
+                            + "Response Body: {}",
+                    site,
+                    responseEntity.getBody());
             return convertResourceRatingsResponseToRecurringPrice(responseEntity.getBody());
         } catch (Exception e) {
-            String errorMessage = String.format(
-                    "Called the rest api in site: %s to calculate the price failed. Error: %s",
-                    site, e.getMessage());
+            String errorMessage =
+                    String.format(
+                            "Called the rest api in site: %s to calculate the price failed. Error:"
+                                    + " %s",
+                            site, e.getMessage());
             log.error(errorMessage);
             throw new ClientApiCallFailedException(errorMessage);
         }
     }
-
 
     private String getPriceCalculatorUrlBySite(String site) {
         String requestUrl;
@@ -97,8 +101,8 @@ public class HuaweiCloudGlobalPriceCalculator {
             requestUrl = priceCalculatorRestApiUrlForInternational;
         }
         if (StringUtils.isBlank(requestUrl)) {
-            String errorMessage = String.format(
-                    "The price calculator rest api url for site: %s is empty.", site);
+            String errorMessage =
+                    String.format("The price calculator rest api url for site: %s is empty.", site);
             throw new ClientApiCallFailedException(errorMessage);
         }
         URLConnection urlConn = null;
@@ -109,18 +113,22 @@ public class HuaweiCloudGlobalPriceCalculator {
             urlConn.connect();
             return url.toString();
         } catch (MalformedURLException e) {
-            String errorMsg = String.format("The price calculator rest api url: %s for site: %s "
-                    + "is invalid.", requestUrl, site);
+            String errorMsg =
+                    String.format(
+                            "The price calculator rest api url: %s for site: %s " + "is invalid.",
+                            requestUrl, site);
             throw new ClientApiCallFailedException(errorMsg);
         } catch (IOException e) {
-            String errorMsg = String.format("Failed to connect to the price calculator rest api "
-                    + "url:%s for site: %s. Error: %s", requestUrl, site, e.getMessage());
+            String errorMsg =
+                    String.format(
+                            "Failed to connect to the price calculator rest api "
+                                    + "url:%s for site: %s. Error: %s",
+                            requestUrl, site, e.getMessage());
             throw new ClientApiCallFailedException(errorMsg);
         } finally {
             if (Objects.nonNull(urlConn) && urlConn instanceof HttpURLConnection httpConn) {
                 httpConn.disconnect();
             }
-
         }
     }
 
@@ -146,8 +154,8 @@ public class HuaweiCloudGlobalPriceCalculator {
         requestBody.put("periodType", 4);
         requestBody.put("periodNum", 1);
         requestBody.put("subscriptionNum", 1);
-        if (!StringUtils.equalsIgnoreCase(HuaweiCloudConstants.EUROPE_SITE,
-                request.getSiteName())) {
+        if (!StringUtils.equalsIgnoreCase(
+                HuaweiCloudConstants.EUROPE_SITE, request.getSiteName())) {
             requestBody.put("siteCode", getSiteCodeByRegionName(region));
         }
         List<Resource> resources = request.getFlavorRatingMode().getResourceUsage().getResources();

@@ -40,25 +40,20 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Bean to manage service state.
- */
+/** Bean to manage service state. */
 @Component
 @Slf4j
 public class ServiceStateManager {
 
-    @Resource
-    private ServiceDeploymentEntityHandler serviceHandler;
-    @Resource
-    private PluginManager pluginManager;
-    @Resource
-    private UserServiceHelper userServiceHelper;
-    @Resource
-    private DatabaseServiceOrderStorage serviceOrderStorage;
+    @Resource private ServiceDeploymentEntityHandler serviceHandler;
+    @Resource private PluginManager pluginManager;
+    @Resource private UserServiceHelper userServiceHelper;
+    @Resource private DatabaseServiceOrderStorage serviceOrderStorage;
+
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
-    @Resource
-    private ServiceOrderManager serviceOrderManager;
+
+    @Resource private ServiceOrderManager serviceOrderManager;
 
     /**
      * Start the service by the deployed service id.
@@ -91,9 +86,11 @@ public class ServiceStateManager {
         return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service, Handler.PLUGIN);
     }
 
-    private void asyncStartService(ServiceOrderEntity serviceOrderTaskEntity,
-                                   OrchestratorPlugin plugin, ServiceStateManageRequest request,
-                                   ServiceDeploymentEntity service) {
+    private void asyncStartService(
+            ServiceOrderEntity serviceOrderTaskEntity,
+            OrchestratorPlugin plugin,
+            ServiceStateManageRequest request,
+            ServiceDeploymentEntity service) {
         serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.STARTING);
         serviceHandler.storeAndFlush(service);
@@ -102,8 +99,8 @@ public class ServiceStateManager {
             result = plugin.startService(request);
         } catch (Exception e) {
             serviceOrderTaskEntity.setErrorResponse(
-                    ErrorResponse.errorResponse(ErrorType.ASYNC_START_SERVICE_ERROR,
-                            List.of(e.getMessage())));
+                    ErrorResponse.errorResponse(
+                            ErrorType.ASYNC_START_SERVICE_ERROR, List.of(e.getMessage())));
         }
         if (result) {
             serviceOrderTaskEntity.setTaskStatus(TaskStatus.SUCCESSFUL);
@@ -113,7 +110,8 @@ public class ServiceStateManager {
             serviceOrderTaskEntity.setTaskStatus(TaskStatus.FAILED);
             service.setServiceState(ServiceState.STOPPED);
         }
-        serviceOrderManager.completeOrderProgress(serviceOrderTaskEntity.getOrderId(),
+        serviceOrderManager.completeOrderProgress(
+                serviceOrderTaskEntity.getOrderId(),
                 serviceOrderTaskEntity.getTaskStatus(),
                 serviceOrderTaskEntity.getErrorResponse());
         serviceHandler.storeAndFlush(service);
@@ -140,9 +138,11 @@ public class ServiceStateManager {
         return serviceOrder;
     }
 
-    private void asyncStopService(ServiceOrderEntity serviceOrderTaskEntity,
-                                  OrchestratorPlugin plugin, ServiceStateManageRequest request,
-                                  ServiceDeploymentEntity service) {
+    private void asyncStopService(
+            ServiceOrderEntity serviceOrderTaskEntity,
+            OrchestratorPlugin plugin,
+            ServiceStateManageRequest request,
+            ServiceDeploymentEntity service) {
         serviceOrderTaskEntity.setTaskStatus(TaskStatus.IN_PROGRESS);
         serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.STOPPING);
@@ -152,8 +152,8 @@ public class ServiceStateManager {
             result = plugin.stopService(request);
         } catch (Exception e) {
             serviceOrderTaskEntity.setErrorResponse(
-                    ErrorResponse.errorResponse(ErrorType.ASYNC_STOP_SERVICE_ERROR,
-                            List.of(e.getMessage())));
+                    ErrorResponse.errorResponse(
+                            ErrorType.ASYNC_STOP_SERVICE_ERROR, List.of(e.getMessage())));
         }
         if (result) {
             serviceOrderTaskEntity.setTaskStatus(TaskStatus.SUCCESSFUL);
@@ -163,7 +163,8 @@ public class ServiceStateManager {
             serviceOrderTaskEntity.setTaskStatus(TaskStatus.FAILED);
             service.setServiceState(ServiceState.RUNNING);
         }
-        serviceOrderManager.completeOrderProgress(serviceOrderTaskEntity.getOrderId(),
+        serviceOrderManager.completeOrderProgress(
+                serviceOrderTaskEntity.getOrderId(),
                 serviceOrderTaskEntity.getTaskStatus(),
                 serviceOrderTaskEntity.getErrorResponse());
         serviceHandler.storeAndFlush(service);
@@ -190,9 +191,11 @@ public class ServiceStateManager {
         return serviceOrder;
     }
 
-    private void asyncRestartService(ServiceOrderEntity serviceOrderTaskEntity,
-                                     OrchestratorPlugin plugin, ServiceStateManageRequest request,
-                                     ServiceDeploymentEntity service) {
+    private void asyncRestartService(
+            ServiceOrderEntity serviceOrderTaskEntity,
+            OrchestratorPlugin plugin,
+            ServiceStateManageRequest request,
+            ServiceDeploymentEntity service) {
         serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.RESTARTING);
         serviceHandler.storeAndFlush(service);
@@ -201,8 +204,8 @@ public class ServiceStateManager {
             result = plugin.restartService(request);
         } catch (Exception e) {
             serviceOrderTaskEntity.setErrorResponse(
-                    ErrorResponse.errorResponse(ErrorType.ASYNC_RESTART_SERVICE_ERROR,
-                            List.of(e.getMessage())));
+                    ErrorResponse.errorResponse(
+                            ErrorType.ASYNC_RESTART_SERVICE_ERROR, List.of(e.getMessage())));
         }
         if (result) {
             serviceOrderTaskEntity.setTaskStatus(TaskStatus.SUCCESSFUL);
@@ -212,7 +215,8 @@ public class ServiceStateManager {
             serviceOrderTaskEntity.setTaskStatus(TaskStatus.FAILED);
             service.setServiceState(ServiceState.RUNNING);
         }
-        serviceOrderManager.completeOrderProgress(serviceOrderTaskEntity.getOrderId(),
+        serviceOrderManager.completeOrderProgress(
+                serviceOrderTaskEntity.getOrderId(),
                 serviceOrderTaskEntity.getTaskStatus(),
                 serviceOrderTaskEntity.getErrorResponse());
         serviceHandler.storeAndFlush(service);
@@ -225,9 +229,11 @@ public class ServiceStateManager {
         if (service.getServiceState() == ServiceState.STARTING
                 || service.getServiceState() == ServiceState.STOPPING
                 || service.getServiceState() == ServiceState.RESTARTING) {
-            throw new InvalidServiceStateException(String.format(
-                    "Task %s: Service %s with a running management task, please try again later.",
-                    orderId, serviceId));
+            throw new InvalidServiceStateException(
+                    String.format(
+                            "Task %s: Service %s with a running management task, please try again"
+                                    + " later.",
+                            orderId, serviceId));
         }
         if (taskType == ServiceOrderType.SERVICE_START) {
             validateStartActionForService(service, orderId);
@@ -243,7 +249,8 @@ public class ServiceStateManager {
         if (!(service.getServiceState() == ServiceState.STOPPED
                 || service.getServiceState() == ServiceState.NOT_RUNNING)) {
             throw new InvalidServiceStateException(
-                    String.format("Task %s: Service %s with state %s is not supported to start.",
+                    String.format(
+                            "Task %s: Service %s with state %s is not supported to start.",
                             orderId, service.getId(), service.getServiceState()));
         }
     }
@@ -251,7 +258,8 @@ public class ServiceStateManager {
     private void validateStopActionForService(ServiceDeploymentEntity service, UUID orderId) {
         if (service.getServiceState() != ServiceState.RUNNING) {
             throw new InvalidServiceStateException(
-                    String.format("Task %s: Service %s with state %s is not supported to stop.",
+                    String.format(
+                            "Task %s: Service %s with state %s is not supported to stop.",
                             orderId, service.getId(), service.getServiceState()));
         }
     }
@@ -259,7 +267,8 @@ public class ServiceStateManager {
     private void validateRestartActionForService(ServiceDeploymentEntity service, UUID orderId) {
         if (service.getServiceState() != ServiceState.RUNNING) {
             throw new InvalidServiceStateException(
-                    String.format("Task %s: Service %s with state %s is not supported to restart.",
+                    String.format(
+                            "Task %s: Service %s with state %s is not supported to restart.",
                             orderId, service.getId(), service.getServiceState()));
         }
     }
@@ -282,27 +291,32 @@ public class ServiceStateManager {
                 || serviceDeploymentState == ServiceDeploymentState.MODIFICATION_SUCCESSFUL
                 || serviceDeploymentState == ServiceDeploymentState.MODIFICATION_FAILED)) {
             String errorMsg =
-                    String.format("Task %s: Service %s with deployment state %s is not supported"
-                                    + " to manage status.", orderId, service.getId(),
-                            serviceDeploymentState);
+                    String.format(
+                            "Task %s: Service %s with deployment state %s is not supported"
+                                    + " to manage status.",
+                            orderId, service.getId(), serviceDeploymentState);
             log.error(errorMsg);
             throw new InvalidServiceStateException(errorMsg);
         }
     }
 
-    private ServiceStateManageRequest getServiceManagerRequest(ServiceDeploymentEntity service,
-                                                               UUID orderId) {
+    private ServiceStateManageRequest getServiceManagerRequest(
+            ServiceDeploymentEntity service, UUID orderId) {
         ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setServiceId(service.getId());
         List<ServiceResourceEntity> vmResources =
-                CollectionUtils.isEmpty(service.getDeployResourceList()) ? Collections.emptyList()
+                CollectionUtils.isEmpty(service.getDeployResourceList())
+                        ? Collections.emptyList()
                         : service.getDeployResourceList().stream()
-                        .filter(resource -> resource.getResourceKind() == DeployResourceKind.VM)
-                        .toList();
+                                .filter(
+                                        resource ->
+                                                resource.getResourceKind() == DeployResourceKind.VM)
+                                .toList();
         if (CollectionUtils.isEmpty(vmResources)) {
             String errorMsg =
-                    String.format("Task %s: Service with id %s has no vm resources.", orderId,
-                            service.getId());
+                    String.format(
+                            "Task %s: Service with id %s has no vm resources.",
+                            orderId, service.getId());
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }

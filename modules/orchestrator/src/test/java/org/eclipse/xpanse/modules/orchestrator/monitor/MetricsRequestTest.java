@@ -17,14 +17,14 @@ class MetricsRequestTest {
 
     private final UUID serviceId = UUID.fromString("16e6e050-8933-4383-9e56-6131c8666d0c");
     private final String userId = "userId";
-    @Mock
-    private Region region;
+    @Mock private Region region;
     private MetricsRequest test;
 
     @BeforeEach
     void setUp() {
-        test = new MetricsRequest(serviceId, region, MonitorResourceType.CPU, 0L, 0L, 1, false,
-                userId);
+        test =
+                new MetricsRequest(
+                        serviceId, region, MonitorResourceType.CPU, 0L, 0L, 1, false, userId);
     }
 
     @Test
@@ -60,10 +60,17 @@ class MetricsRequestTest {
     @Test
     void testToString() {
         assertNotEquals(test.toString(), null);
-        String exceptedString = "MetricsRequest(serviceId=" + serviceId + ", region=" + region
-                + ", monitorResourceType=" + MonitorResourceType.CPU
-                + ", from=0, to=0, granularity=1,"
-                + " onlyLastKnownMetric=false, userId=" + userId + ")";
+        String exceptedString =
+                "MetricsRequest(serviceId="
+                        + serviceId
+                        + ", region="
+                        + region
+                        + ", monitorResourceType="
+                        + MonitorResourceType.CPU
+                        + ", from=0, to=0, granularity=1,"
+                        + " onlyLastKnownMetric=false, userId="
+                        + userId
+                        + ")";
         assertEquals(exceptedString, test.toString());
     }
 }

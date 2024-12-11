@@ -10,28 +10,27 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated;
 
 import java.util.Map;
 
-/**
- * Representing a Server configuration.
- */
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+/** Representing a Server configuration. */
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class ServerConfiguration {
     public String URL;
     public String description;
     public Map<String, ServerVariable> variables;
 
     /**
-     * @param URL         A URL to the target host.
+     * @param URL A URL to the target host.
      * @param description A description of the host designated by the URL.
-     * @param variables   A map between a variable name and its value. The value is used for substitution in the
-     *                    server's URL template.
+     * @param variables A map between a variable name and its value. The value is used for
+     *     substitution in the server's URL template.
      */
-    public ServerConfiguration(String URL, String description, Map<String, ServerVariable> variables) {
+    public ServerConfiguration(
+            String URL, String description, Map<String, ServerVariable> variables) {
         this.URL = URL;
         this.description = description;
         this.variables = variables;
@@ -54,9 +53,14 @@ public class ServerConfiguration {
 
             if (variables != null && variables.containsKey(name)) {
                 value = variables.get(name);
-                if (serverVariable.enumValues.size() > 0 && !serverVariable.enumValues.contains(value)) {
+                if (serverVariable.enumValues.size() > 0
+                        && !serverVariable.enumValues.contains(value)) {
                     throw new IllegalArgumentException(
-                            "The variable " + name + " in the server URL has invalid value " + value + ".");
+                            "The variable "
+                                    + name
+                                    + " in the server URL has invalid value "
+                                    + value
+                                    + ".");
                 }
             }
             url = url.replace("{" + name + "}", value);

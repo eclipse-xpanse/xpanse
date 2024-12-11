@@ -10,11 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Defines type of Database.
- */
+/** Defines type of Database. */
 public enum DatabaseType {
-
     H2DB("h2"),
     MYSQL("mysql");
 
@@ -24,9 +21,7 @@ public enum DatabaseType {
         this.code = code;
     }
 
-    /**
-     * For DatabaseType serialize.
-     */
+    /** For DatabaseType serialize. */
     @JsonCreator
     public static DatabaseType getByValue(String code) {
         for (DatabaseType providerType : values()) {
@@ -38,9 +33,7 @@ public enum DatabaseType {
                 String.format("DatabaseType value %s is not supported.", code));
     }
 
-    /**
-     * For DatabaseType deserialize.
-     */
+    /** For DatabaseType deserialize. */
     @JsonValue
     public String toValue() {
         return this.code;

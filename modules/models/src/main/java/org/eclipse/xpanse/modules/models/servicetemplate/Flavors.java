@@ -10,9 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 
-/**
- * Defines for service flavors.
- */
+/** Defines for service flavors. */
 @Data
 public class Flavors {
 

@@ -22,8 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -43,44 +43,43 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for ServicePolicyManageApi.
- */
+/** Test for ServicePolicyManageApi. */
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServicePolicyManageApiTest extends ApisTestCommon {
 
-    @MockitoBean
-    private PoliciesValidateApi mockPoliciesValidateApi;
+    @MockitoBean private PoliciesValidateApi mockPoliciesValidateApi;
 
     void mockPoliciesValidateRequest(boolean valid) {
         ValidateResponse validateResponse = new ValidateResponse();
         validateResponse.setIsSuccessful(valid);
-        when(mockPoliciesValidateApi.validatePoliciesPost(
-                any(ValidatePolicyList.class))).thenReturn(validateResponse);
+        when(mockPoliciesValidateApi.validatePoliciesPost(any(ValidatePolicyList.class)))
+                .thenReturn(validateResponse);
     }
-
 
     @Test
     @WithJwt(file = "jwt_isv.json")
     void testServicePoliciesManageApis() throws Exception {
-        Ocl ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl =
+                new OclLoader()
+                        .getOcl(
+                                URI.create("file:src/test/resources/ocl_terraform_test.yml")
+                                        .toURL());
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         testServicePoliciesManageApisWell(serviceTemplate);
         testServicePoliciesManage_ThrowsExceptions(serviceTemplate);
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
-
     void testServicePoliciesManageApisWell(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
 
         List<String> flavorNames =
                 serviceTemplate.getFlavors().getServiceFlavors().stream()
-                        .map(ServiceFlavor::getName).toList();
+                        .map(ServiceFlavor::getName)
+                        .toList();
         testListServicePoliciesReturnsEmptyList(serviceTemplate.getServiceTemplateId());
         ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
         createRequest.setFlavorNameList(flavorNames);
@@ -92,7 +91,6 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         testUpdateServicePolicy(servicePolicy);
         testDeleteServicePolicy(servicePolicy.getServicePolicyId());
         testListServicePoliciesReturnsEmptyList(serviceTemplate.getServiceTemplateId());
-
     }
 
     void testServicePoliciesManage_ThrowsExceptions(ServiceTemplateDetailVo serviceTemplate)
@@ -100,7 +98,8 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
 
         List<String> flavorNames =
                 serviceTemplate.getFlavors().getServiceFlavors().stream()
-                        .map(ServiceFlavor::getName).toList();
+                        .map(ServiceFlavor::getName)
+                        .toList();
         ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
         createRequest.setFlavorNameList(flavorNames);
         createRequest.setServiceTemplateId(serviceTemplate.getServiceTemplateId());
@@ -113,19 +112,23 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         testGetServicePolicyDetails_ThrowsPolicyNotFoundException(UUID.randomUUID());
         testDeleteServicePolicy_ThrowsPolicyNotFoundException();
         testDeleteServicePolicy(servicePolicy.getServicePolicyId());
-        testGetServicePolicyDetails_ThrowsPolicyNotFoundException(servicePolicy.getServicePolicyId());
+        testGetServicePolicyDetails_ThrowsPolicyNotFoundException(
+                servicePolicy.getServicePolicyId());
     }
-
 
     ServicePolicy addServicePolicy(ServicePolicyCreateRequest createRequest) throws Exception {
         // Setup
         mockPoliciesValidateRequest(true);
         String requestBody = objectMapper.writeValueAsString(createRequest);
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        post("/xpanse/service/policies").content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                post("/xpanse/service/policies")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
         ServicePolicy servicePolicy =
                 objectMapper.readValue(response.getContentAsString(), ServicePolicy.class);
 
@@ -144,9 +147,14 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String exceptedResult = objectMapper.writeValueAsString(servicePolicy);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                get("/xpanse/service/policies/{id}", servicePolicy.getServicePolicyId()).accept(
-                        MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                get(
+                                                "/xpanse/service/policies/{id}",
+                                                servicePolicy.getServicePolicyId())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -156,13 +164,17 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
     void testGetServicePolicyDetails_ThrowsPolicyNotFoundException(UUID uuid) throws Exception {
         // Setup
         String errMsg = String.format("The service policy with id %s not found.", uuid);
-        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result =
+                ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/service/policies/{id}", uuid).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                get("/xpanse/service/policies/{id}", uuid)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
@@ -175,10 +187,15 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String exceptedResult = objectMapper.writeValueAsString(servicePolicyList);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                get("/xpanse/service/policies").param("serviceTemplateId",
-                                servicePolicy.getServiceTemplateId().toString())
-                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                get("/xpanse/service/policies")
+                                        .param(
+                                                "serviceTemplateId",
+                                                servicePolicy.getServiceTemplateId().toString())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -189,11 +206,13 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         // Setup
         String exceptedResult = "[]";
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/service/policies")
-                                .param("serviceTemplateId", serviceTemplateId.toString())
-                                .accept(MediaType.APPLICATION_JSON)).andReturn()
-                .getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                get("/xpanse/service/policies")
+                                        .param("serviceTemplateId", serviceTemplateId.toString())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -207,12 +226,17 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String requestBody = objectMapper.writeValueAsString(createRequest);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        post("/xpanse/service/policies").content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                post("/xpanse/service/policies")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
-        ErrorResponse result = objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
+        ErrorResponse result =
+                objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
@@ -220,16 +244,17 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
     }
 
     void testAddServicePolicy_ThrowsFlavorInValidationException(
-            ServiceTemplateDetailVo serviceTemplate)
-            throws Exception {
+            ServiceTemplateDetailVo serviceTemplate) throws Exception {
 
         // Setup
         mockPoliciesValidateRequest(true);
         String errorFlavorName = "error_flavor_name";
-        String errMsg = String.format(
-                "Flavor name %s is not valid for service template with id %s.", errorFlavorName,
-                serviceTemplate.getServiceTemplateId());
-        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.FLAVOR_NOT_FOUND, List.of(errMsg));
+        String errMsg =
+                String.format(
+                        "Flavor name %s is not valid for service template with id %s.",
+                        errorFlavorName, serviceTemplate.getServiceTemplateId());
+        ErrorResponse result =
+                ErrorResponse.errorResponse(ErrorType.FLAVOR_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
@@ -239,10 +264,14 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String requestBody = objectMapper.writeValueAsString(createRequest);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        post("/xpanse/service/policies").content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                post("/xpanse/service/policies")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
@@ -254,10 +283,13 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
 
         // Setup
         mockPoliciesValidateRequest(true);
-        String errMsg = String.format("The same policy already exists with id: %s for "
-                        + "the registered service template with id: %s.",
-                servicePolicy.getServicePolicyId(), servicePolicy.getServiceTemplateId());
-        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_DUPLICATE, List.of(errMsg));
+        String errMsg =
+                String.format(
+                        "The same policy already exists with id: %s for "
+                                + "the registered service template with id: %s.",
+                        servicePolicy.getServicePolicyId(), servicePolicy.getServiceTemplateId());
+        ErrorResponse result =
+                ErrorResponse.errorResponse(ErrorType.POLICY_DUPLICATE, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
@@ -266,10 +298,14 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String requestBody = objectMapper.writeValueAsString(createRequest);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        post("/xpanse/service/policies").content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                post("/xpanse/service/policies")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
@@ -287,17 +323,24 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String requestBody = objectMapper.writeValueAsString(updateRequest);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        put("/xpanse/service/policies/{id}", servicePolicy.getServicePolicyId()).content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                put(
+                                                "/xpanse/service/policies/{id}",
+                                                servicePolicy.getServicePolicyId())
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         ServicePolicy updatedServicePolicy =
                 objectMapper.readValue(response.getContentAsString(), ServicePolicy.class);
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
-        Assertions.assertEquals(updatedServicePolicy.getServicePolicyId(), servicePolicy.getServicePolicyId());
+        Assertions.assertEquals(
+                updatedServicePolicy.getServicePolicyId(), servicePolicy.getServicePolicyId());
         Assertions.assertEquals(updatedServicePolicy.getPolicy(), "servicePolicyUpdate");
         Assertions.assertTrue(updatedServicePolicy.getEnabled());
     }
@@ -306,7 +349,8 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         // Setup
         mockPoliciesValidateRequest(true);
         String errMsg = String.format("The service policy with id %s not found.", uuid);
-        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result =
+                ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
@@ -314,23 +358,29 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         String requestBody = objectMapper.writeValueAsString(updateRequest);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        put("/xpanse/service/policies/{id}", uuid).content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                put("/xpanse/service/policies/{id}", uuid)
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
         Assertions.assertEquals(response.getContentAsString(), exceptedResult);
     }
 
-
     void testDeleteServicePolicy(UUID policyId) throws Exception {
         // Setup
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                delete("/xpanse/service/policies/{id}", policyId).accept(
-                        MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                delete("/xpanse/service/policies/{id}", policyId)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.NO_CONTENT.value());
@@ -340,17 +390,20 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         // Setup
         UUID uuid = UUID.randomUUID();
         String errMsg = String.format("The service policy with id %s not found.", uuid);
-        ErrorResponse result = ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
+        ErrorResponse result =
+                ErrorResponse.errorResponse(ErrorType.POLICY_NOT_FOUND, List.of(errMsg));
         String exceptedResult = objectMapper.writeValueAsString(result);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        delete("/xpanse/service/policies/{id}", uuid).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                delete("/xpanse/service/policies/{id}", uuid)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
         Assertions.assertEquals(response.getContentAsString(), exceptedResult);
     }
-
 }

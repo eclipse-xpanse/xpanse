@@ -54,10 +54,16 @@ class AvailabilityZoneConfigTest {
 
     @Test
     void testToString() throws Exception {
-        String result = "AvailabilityZoneConfig(displayName=" + displayName
-                + ", varName=" + varName + ", mandatory=" + mandatory
-                + ", description=" + description
-                + ")";
+        String result =
+                "AvailabilityZoneConfig(displayName="
+                        + displayName
+                        + ", varName="
+                        + varName
+                        + ", mandatory="
+                        + mandatory
+                        + ", description="
+                        + description
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

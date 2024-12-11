@@ -28,15 +28,11 @@ import org.springframework.web.client.RestClientException;
 @ExtendWith(MockitoExtension.class)
 class PolicyManagerTest {
 
-    @Mock
-    private AdminApi mockAdminApi;
-    @Mock
-    private PoliciesValidateApi mockPoliciesValidateApi;
-    @Mock
-    private PoliciesEvaluationApi mockPoliciesEvaluationApi;
+    @Mock private AdminApi mockAdminApi;
+    @Mock private PoliciesValidateApi mockPoliciesValidateApi;
+    @Mock private PoliciesEvaluationApi mockPoliciesEvaluationApi;
 
-    @InjectMocks
-    private PolicyManager policyManagerUnderTest;
+    @InjectMocks private PolicyManager policyManagerUnderTest;
 
     @BeforeEach
     void setUp() {
@@ -94,11 +90,11 @@ class PolicyManagerTest {
         cmdList.setPolicyList(List.of("policy"));
         when(mockPoliciesEvaluationApi.evaluatePoliciesPost(cmdList)).thenReturn(evalResult);
         // Run the test
-        EvalResult result = policyManagerUnderTest.evaluatePolicies(cmdList.getPolicyList(),
-                cmdList.getInput());
+        EvalResult result =
+                policyManagerUnderTest.evaluatePolicies(
+                        cmdList.getPolicyList(), cmdList.getInput());
         verify(mockPoliciesEvaluationApi).evaluatePoliciesPost(cmdList);
         Assertions.assertEquals(evalResult, result);
-
     }
 
     @Test
@@ -116,8 +112,9 @@ class PolicyManagerTest {
         when(mockPoliciesEvaluationApi.evaluatePoliciesPost(cmdList)).thenReturn(exceptionResult);
 
         // Run the test
-        EvalResult evalResult = policyManagerUnderTest.evaluatePolicies(cmdList.getPolicyList(),
-                cmdList.getInput());
+        EvalResult evalResult =
+                policyManagerUnderTest.evaluatePolicies(
+                        cmdList.getPolicyList(), cmdList.getInput());
 
         verify(mockPoliciesEvaluationApi).evaluatePoliciesPost(cmdList);
 
@@ -135,7 +132,8 @@ class PolicyManagerTest {
                 .thenThrow(new RestClientException("error"));
 
         // Run the test
-        Assertions.assertThrows(RestClientException.class,
+        Assertions.assertThrows(
+                RestClientException.class,
                 () -> policyManagerUnderTest.evaluatePolicies(List.of("value"), "input"));
     }
 }

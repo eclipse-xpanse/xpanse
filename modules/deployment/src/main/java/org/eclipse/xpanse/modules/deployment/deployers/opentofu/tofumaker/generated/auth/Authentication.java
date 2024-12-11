@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.auth;
 
 import org.springframework.http.HttpHeaders;
@@ -20,10 +19,12 @@ public interface Authentication {
     /**
      * Apply authentication settings to header and / or query parameters.
      *
-     * @param queryParams  The query parameters for the request
+     * @param queryParams The query parameters for the request
      * @param headerParams The header parameters for the request
      * @param cookieParams The cookie parameters for the request
      */
-    public void applyToParams(MultiValueMap<String, String> queryParams, HttpHeaders headerParams,
-                              MultiValueMap<String, String> cookieParams);
+    public void applyToParams(
+            MultiValueMap<String, String> queryParams,
+            HttpHeaders headerParams,
+            MultiValueMap<String, String> cookieParams);
 }

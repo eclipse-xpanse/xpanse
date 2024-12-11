@@ -23,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-
 @ContextConfiguration(classes = {OpenApiUrlManage.class, OpenApiGeneratorJarManage.class})
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=test"})
@@ -32,14 +31,15 @@ class OpenApiCommonTest {
 
     @Value("${openapi.path}")
     private String openApiPath;
+
     @Value("${openapi.generator.client.download-url}")
     private String clientDownloadUrl;
+
     @Value("${server.port}")
     private Integer serverPort;
-    @Autowired
-    private OpenApiGeneratorJarManage openApiGeneratorJarManage;
-    @Autowired
-    private OpenApiUrlManage openApiUrlManage;
+
+    @Autowired private OpenApiGeneratorJarManage openApiGeneratorJarManage;
+    @Autowired private OpenApiUrlManage openApiUrlManage;
 
     @BeforeEach
     void setUp() {
@@ -89,7 +89,6 @@ class OpenApiCommonTest {
             // Verify the results
             Assertions.assertTrue(result);
         }
-
     }
 
     @Test
@@ -106,8 +105,7 @@ class OpenApiCommonTest {
     void testGetOpenApiUrl() {
         // SetUp
         String id = UUID.randomUUID().toString();
-        String openApiUrl =
-                openApiUrlManage.getServiceUrl() + "/" + openApiPath + id + ".html";
+        String openApiUrl = openApiUrlManage.getServiceUrl() + "/" + openApiPath + id + ".html";
         // Run the test
         String result = openApiUrlManage.getOpenApiUrl(id);
         // Verify the results

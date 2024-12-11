@@ -18,16 +18,12 @@ import org.zalando.logbook.HttpRequest;
 import org.zalando.logbook.Logbook;
 import org.zalando.logbook.core.DefaultSink;
 
-/**
- * Bean to auto configure Logbook configuration.
- */
+/** Bean to auto configure Logbook configuration. */
 @Configuration
 @DependsOn(value = "httpLoggingConfig")
 public class LogbookConfiguration {
 
-    /**
-     * Method to instantiate Logbook bean.
-     */
+    /** Method to instantiate Logbook bean. */
     @Bean
     public Logbook logbook() {
         return Logbook.builder()

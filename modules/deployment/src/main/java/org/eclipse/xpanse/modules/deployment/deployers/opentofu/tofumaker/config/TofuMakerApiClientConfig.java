@@ -12,15 +12,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-/**
- * Configure ApiClient for communication with tofu-maker service.
- */
+/** Configure ApiClient for communication with tofu-maker service. */
 @Profile("tofu-maker")
 @Configuration
 public class TofuMakerApiClientConfig {
 
-    @Resource
-    private ApiClient apiClient;
+    @Resource private ApiClient apiClient;
 
     @Value("${tofu-maker.endpoint}")
     private String openTofuMakerBaseUrl;

@@ -11,21 +11,14 @@ import java.util.Map;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
-/**
- * Interface to be implemented by CSP plugins to define its authentication mechanisms.
- */
+/** Interface to be implemented by CSP plugins to define its authentication mechanisms. */
 public interface AuthenticationCapabilities {
 
-    /**
-     * Get the available credential types.
-     */
+    /** Get the available credential types. */
     List<CredentialType> getAvailableCredentialTypes();
 
-    /**
-     * Get the credential definitions.
-     */
+    /** Get the credential definitions. */
     List<AbstractCredentialInfo> getCredentialDefinitions();
-
 
     /**
      * Get the env var keys mapping properties.

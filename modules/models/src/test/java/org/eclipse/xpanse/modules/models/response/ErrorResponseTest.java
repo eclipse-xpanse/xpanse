@@ -53,11 +53,9 @@ class ErrorResponseTest {
         assertThat(test.hashCode()).isEqualTo(test2.hashCode());
     }
 
-
     @Test
     void testToString() {
-        String result =
-                "ErrorResponse(errorType=ACCESS_DENIED, details=[Access Denied])";
+        String result = "ErrorResponse(errorType=ACCESS_DENIED, details=[Access Denied])";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

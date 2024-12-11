@@ -50,11 +50,11 @@ class HuaweiCloudDataModelConverterTest {
         final MetricInfoList result2 =
                 dataModelConverter.getTargetMetricInfo(metricList, MonitorResourceType.MEM);
         final MetricInfoList result3 =
-                dataModelConverter.getTargetMetricInfo(metricList,
-                        MonitorResourceType.VM_NETWORK_OUTGOING);
+                dataModelConverter.getTargetMetricInfo(
+                        metricList, MonitorResourceType.VM_NETWORK_OUTGOING);
         final MetricInfoList result4 =
-                dataModelConverter.getTargetMetricInfo(metricList,
-                        MonitorResourceType.VM_NETWORK_INCOMING);
+                dataModelConverter.getTargetMetricInfo(
+                        metricList, MonitorResourceType.VM_NETWORK_INCOMING);
 
         // Verify the results
         Assertions.assertFalse(Objects.isNull(result1));
@@ -63,13 +63,11 @@ class HuaweiCloudDataModelConverterTest {
         Assertions.assertTrue(Objects.isNull(result2));
 
         Assertions.assertFalse(Objects.isNull(result3));
-        Assertions.assertEquals(result3.getMetricName(),
-                HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT);
+        Assertions.assertEquals(
+                result3.getMetricName(), HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT);
 
         Assertions.assertFalse(Objects.isNull(result4));
-        Assertions.assertEquals(result4.getMetricName(),
-                HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN);
+        Assertions.assertEquals(
+                result4.getMetricName(), HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN);
     }
-
-
 }

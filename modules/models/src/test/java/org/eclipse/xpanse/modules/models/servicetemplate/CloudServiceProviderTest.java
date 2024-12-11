@@ -14,9 +14,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of CloudServiceProvider.
- */
+/** Test of CloudServiceProvider. */
 class CloudServiceProviderTest {
 
     private static final Csp name = Csp.HUAWEI_CLOUD;
@@ -75,12 +73,9 @@ class CloudServiceProviderTest {
 
     @Test
     void testToString() {
-        String expectedString = "CloudServiceProvider(" +
-                "name=" + name +
-                ", regions=" + regions + "" +
-                ")";
+        String expectedString =
+                "CloudServiceProvider(" + "name=" + name + ", regions=" + regions + "" + ")";
 
         assertEquals(expectedString, cloudServiceProvider.toString());
     }
-
 }

@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * The service helper provider methods to get all info of the current user.
- */
+/** The service helper provider methods to get all info of the current user. */
 @Slf4j
 @Component
 public class UserServiceHelper {
@@ -29,10 +27,11 @@ public class UserServiceHelper {
 
     @Value("${enable.web.security:true}")
     private Boolean webSecurityIsEnabled;
+
     @Value("${enable.role.protection:true}")
     private Boolean roleProtectionIsEnabled;
-    @Resource
-    private IdentityProviderManager identityProviderManager;
+
+    @Resource private IdentityProviderManager identityProviderManager;
 
     /**
      * Check if the current user has the role.
@@ -48,8 +47,9 @@ public class UserServiceHelper {
             return true;
         }
         CurrentUserInfo currentUserInfo = getCurrentUserInfo();
-        return Objects.nonNull(currentUserInfo) && !CollectionUtils.isEmpty(
-                currentUserInfo.getRoles()) && currentUserInfo.getRoles().contains(role);
+        return Objects.nonNull(currentUserInfo)
+                && !CollectionUtils.isEmpty(currentUserInfo.getRoles())
+                && currentUserInfo.getRoles().contains(role);
     }
 
     /**
@@ -64,7 +64,6 @@ public class UserServiceHelper {
         }
         return StringUtils.equals(ownerId, getCurrentUserId());
     }
-
 
     /**
      * Check if the current user can manage the namespace.
@@ -92,9 +91,7 @@ public class UserServiceHelper {
         return Objects.equals(ownerCsp, getCurrentUserManageCsp());
     }
 
-    /**
-     * Get the current user id.
-     */
+    /** Get the current user id. */
     public String getCurrentUserId() {
         if (!webSecurityIsEnabled) {
             return NO_AUTH_DEFAULT_USER_ID;
@@ -115,29 +112,21 @@ public class UserServiceHelper {
         return currentUserInfo;
     }
 
-    /**
-     * Get the namespace managed by the current user .
-     */
+    /** Get the namespace managed by the current user . */
     public String getCurrentUserManageNamespace() {
         if (!webSecurityIsEnabled) {
             return null;
         }
         CurrentUserInfo userInfo = getCurrentUserInfo();
-        return StringUtils.isBlank(userInfo.getNamespace())
-                ? ""
-                : userInfo.getNamespace();
+        return StringUtils.isBlank(userInfo.getNamespace()) ? "" : userInfo.getNamespace();
     }
 
-    /**
-     * Get the auth enable result.
-     */
+    /** Get the auth enable result. */
     public boolean isAuthEnable() {
         return webSecurityIsEnabled;
     }
 
-    /**
-     * Get the csp managed by the current user.
-     */
+    /** Get the csp managed by the current user. */
     public Csp getCurrentUserManageCsp() {
         if (!webSecurityIsEnabled) {
             return null;
@@ -153,6 +142,4 @@ public class UserServiceHelper {
         }
         return null;
     }
-
-
 }

@@ -26,9 +26,9 @@ class OpenTofuExecutorExceptionTest {
         assertEquals("OpenTofuExecutor Exception: " + message, exception1.getMessage());
         assertEquals(cause, exception2.getCause());
         assertEquals(
-                "OpenTofuExecutor Exception:OpenTofuExecutor exception." + System.lineSeparator()
+                "OpenTofuExecutor Exception:OpenTofuExecutor exception."
+                        + System.lineSeparator()
                         + output,
                 exception3.getMessage());
     }
-
 }

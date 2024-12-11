@@ -50,25 +50,18 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * OrchestratorPlugin implementation for the provider OpenstackTestlab.
- */
+/** OrchestratorPlugin implementation for the provider OpenstackTestlab. */
 @Slf4j
 @Component
 public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     private static final String DEFAULT_SITE = "default";
-    @Resource
-    private OpenstackTerraformResourceHandler terraformResourceHandler;
-    @Resource
-    private OpenstackServiceMetricsManager metricsManager;
-    @Resource
-    private OpenstackServersManager serversManager;
-    @Resource
-    private OpenstackResourceManager resourceManager;
-    @Resource
-    private OpenstackServicePriceCalculator priceCalculator;
-    @Resource
-    private ProviderAuthInfoResolver providerAuthInfoResolver;
+    @Resource private OpenstackTerraformResourceHandler terraformResourceHandler;
+    @Resource private OpenstackServiceMetricsManager metricsManager;
+    @Resource private OpenstackServersManager serversManager;
+    @Resource private OpenstackResourceManager resourceManager;
+    @Resource private OpenstackServicePriceCalculator priceCalculator;
+    @Resource private ProviderAuthInfoResolver providerAuthInfoResolver;
+
     @Value("${openstacktestlab.auto.approve.service.template.enabled:false}")
     private boolean autoApproveServiceTemplateEnabled;
 
@@ -110,13 +103,19 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public boolean validateRegionsOfService(Ocl ocl) {
         List<String> errors = new ArrayList<>();
-        ocl.getCloudServiceProvider().getRegions().forEach(region -> {
-            if (!getSites().contains(region.getSite())) {
-                String errorMsg = String.format("Region with site %s is unavailable in Csp %s. "
-                        + "Available sites %s", region.getName(), getCsp().toValue(), getSites());
-                errors.add(errorMsg);
-            }
-        });
+        ocl.getCloudServiceProvider()
+                .getRegions()
+                .forEach(
+                        region -> {
+                            if (!getSites().contains(region.getSite())) {
+                                String errorMsg =
+                                        String.format(
+                                                "Region with site %s is unavailable in Csp %s. "
+                                                        + "Available sites %s",
+                                                region.getName(), getCsp().toValue(), getSites());
+                                errors.add(errorMsg);
+                            }
+                        });
         if (CollectionUtils.isEmpty(errors)) {
             return true;
         }
@@ -139,35 +138,54 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT,
-                        "The Name of the Tenant or Project to use.", true, false));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackCommonEnvironmentConstants.USERNAME,
-                        "The Username to login with.", true, false));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackCommonEnvironmentConstants.PASSWORD,
-                        "The Password to login with.", true, true));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackCommonEnvironmentConstants.USER_DOMAIN,
-                        "The domain to which the openstack user is linked to.", true, false));
-        credentialVariables.add(
-                new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT_DOMAIN,
-                        "The domain to which the openstack project is linked to.", true,
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.PROJECT,
+                        "The Name of the Tenant or Project to use.",
+                        true,
                         false));
-        CredentialVariables httpAuth = new CredentialVariables(getCsp(), DEFAULT_SITE,
-                CredentialType.VARIABLES, "USERNAME_PASSWORD",
-                "Authenticate at the specified URL using an account and password.",
-                null, credentialVariables);
+        credentialVariables.add(
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.USERNAME,
+                        "The Username to login with.",
+                        true,
+                        false));
+        credentialVariables.add(
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.PASSWORD,
+                        "The Password to login with.",
+                        true,
+                        true));
+        credentialVariables.add(
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.USER_DOMAIN,
+                        "The domain to which the openstack user is linked to.",
+                        true,
+                        false));
+        credentialVariables.add(
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.PROJECT_DOMAIN,
+                        "The domain to which the openstack project is linked to.",
+                        true,
+                        false));
+        CredentialVariables httpAuth =
+                new CredentialVariables(
+                        getCsp(),
+                        DEFAULT_SITE,
+                        CredentialType.VARIABLES,
+                        "USERNAME_PASSWORD",
+                        "Authenticate at the specified URL using an account and password.",
+                        null,
+                        credentialVariables);
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(httpAuth);
 
         /* In the credential definition, object CredentialVariables. The value of fields joined like
-           csp-type-name must be unique. It means when you want to add a new CredentialVariables
-           with type VARIABLES for this csp, the value of filed name in the new CredentialVariables
-           must be different from the value of filed name in others CredentialVariables
-           with the same type VARIABLES. Otherwise, it will throw an exception at the application
-           startup.
-           */
+        csp-type-name must be unique. It means when you want to add a new CredentialVariables
+        with type VARIABLES for this csp, the value of filed name in the new CredentialVariables
+        must be different from the value of filed name in others CredentialVariables
+        with the same type VARIABLES. Otherwise, it will throw an exception at the application
+        startup.
+        */
         return credentialInfos;
     }
 
@@ -186,7 +204,6 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
                 getCsp(), site, region, userId, serviceId, serviceTemplateId);
     }
 
-
     @Override
     public List<Metric> getMetricsForResource(ResourceMetricsRequest resourceMetricRequest) {
         return this.metricsManager.getMetrics(getCsp(), resourceMetricRequest);
@@ -197,11 +214,13 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
         List<Metric> metrics = new ArrayList<>();
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
             ResourceMetricsRequest resourceMetricRequest =
-                    new ResourceMetricsRequest(serviceMetricRequest.getServiceId(),
+                    new ResourceMetricsRequest(
+                            serviceMetricRequest.getServiceId(),
                             serviceMetricRequest.getRegion(),
                             deployResource,
                             serviceMetricRequest.getMonitorResourceType(),
-                            serviceMetricRequest.getFrom(), serviceMetricRequest.getTo(),
+                            serviceMetricRequest.getFrom(),
+                            serviceMetricRequest.getTo(),
                             serviceMetricRequest.getGranularity(),
                             serviceMetricRequest.isOnlyLastKnownMetric(),
                             serviceMetricRequest.getUserId());

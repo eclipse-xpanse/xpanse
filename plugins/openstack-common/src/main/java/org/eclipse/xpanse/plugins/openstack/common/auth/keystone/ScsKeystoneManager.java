@@ -24,9 +24,7 @@ import org.openstack4j.openstack.OSFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to manage keystone based authentication to SCS APIs.
- */
+/** Bean to manage keystone based authentication to SCS APIs. */
 @Component
 public class ScsKeystoneManager {
 
@@ -42,8 +40,8 @@ public class ScsKeystoneManager {
      *
      * @param credential Credential information available for Openstack in the runtime.
      */
-    public OSClient.OSClientV3 getAuthenticatedClient(String authUrl,
-                                                      AbstractCredentialInfo credential) {
+    public OSClient.OSClientV3 getAuthenticatedClient(
+            String authUrl, AbstractCredentialInfo credential) {
 
         String userName = null;
         String password = null;
@@ -70,7 +68,9 @@ public class ScsKeystoneManager {
                 }
             }
         }
-        if (Objects.isNull(userName) || Objects.isNull(password) || Objects.isNull(tenant)
+        if (Objects.isNull(userName)
+                || Objects.isNull(password)
+                || Objects.isNull(tenant)
                 || Objects.isNull(domain)) {
             throw new CredentialsNotFoundException(
                     "Values for all openstack credential"
@@ -79,12 +79,9 @@ public class ScsKeystoneManager {
         OSFactory.enableHttpLoggingFilter(true);
         // there is no need to return the authenticated client because the below method already sets
         // the authentication details in the thread context.
-        return OSFactory
-                .builderV3()
+        return OSFactory.builderV3()
                 .credentials(userName, password, Identifier.byName(domain))
-                .scopeToProject(
-                        Identifier.byName(tenant),
-                        Identifier.byName(domain))
+                .scopeToProject(Identifier.byName(tenant), Identifier.byName(domain))
                 .endpoint(authUrl)
                 .withConfig(createProxyConfig(authUrl))
                 .authenticate();
@@ -97,26 +94,47 @@ public class ScsKeystoneManager {
             URI uri = URI.create(url);
             if ("http".equalsIgnoreCase(uri.getScheme())
                     && Objects.nonNull(proxyConfigurationManager.getHttpProxyDetails())) {
-                config = Config.newConfig()
-                        .withProxy(ProxyHost.of(
-                                // bug in openstack4J. It expects full URL for the host argument.
-                                proxyConfigurationManager.getHttpProxyDetails().getProxyUrl(),
-                                proxyConfigurationManager.getHttpProxyDetails().getProxyPort(),
-                                proxyConfigurationManager.getHttpProxyDetails().getProxyUsername(),
-                                proxyConfigurationManager.getHttpProxyDetails()
-                                        .getProxyPassword()));
+                config =
+                        Config.newConfig()
+                                .withProxy(
+                                        ProxyHost.of(
+                                                // bug in openstack4J. It expects full URL for the
+                                                // host argument.
+                                                proxyConfigurationManager
+                                                        .getHttpProxyDetails()
+                                                        .getProxyUrl(),
+                                                proxyConfigurationManager
+                                                        .getHttpProxyDetails()
+                                                        .getProxyPort(),
+                                                proxyConfigurationManager
+                                                        .getHttpProxyDetails()
+                                                        .getProxyUsername(),
+                                                proxyConfigurationManager
+                                                        .getHttpProxyDetails()
+                                                        .getProxyPassword()));
             }
             if ("https".equalsIgnoreCase(uri.getScheme())
                     && Objects.nonNull(proxyConfigurationManager.getHttpsProxyDetails())) {
-                config = Config.newConfig()
-                        .withProxy(ProxyHost.of(
-                                // bug in openstack4J. It expects full URL for the host argument.
-                                // bug in openstack4J. It expects full URL for the host argument.
-                                proxyConfigurationManager.getHttpsProxyDetails().getProxyUrl(),
-                                proxyConfigurationManager.getHttpsProxyDetails().getProxyPort(),
-                                proxyConfigurationManager.getHttpsProxyDetails().getProxyUsername(),
-                                proxyConfigurationManager.getHttpsProxyDetails()
-                                        .getProxyPassword()));
+                config =
+                        Config.newConfig()
+                                .withProxy(
+                                        ProxyHost.of(
+                                                // bug in openstack4J. It expects full URL for the
+                                                // host argument.
+                                                // bug in openstack4J. It expects full URL for the
+                                                // host argument.
+                                                proxyConfigurationManager
+                                                        .getHttpsProxyDetails()
+                                                        .getProxyUrl(),
+                                                proxyConfigurationManager
+                                                        .getHttpsProxyDetails()
+                                                        .getProxyPort(),
+                                                proxyConfigurationManager
+                                                        .getHttpsProxyDetails()
+                                                        .getProxyUsername(),
+                                                proxyConfigurationManager
+                                                        .getHttpsProxyDetails()
+                                                        .getProxyPassword()));
             }
         }
         if (Objects.isNull(config)) {

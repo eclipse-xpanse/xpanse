@@ -13,15 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of CredentialTypeMessage.
- */
+/** Test of CredentialTypeMessage. */
 class CredentialTypeMessageTest {
 
     @Test
     public void testGetMessageByType_VariablesMessage() {
         String message = CredentialTypeMessage.getMessageByType(CredentialType.VARIABLES);
-        assertEquals("value to be provided by creating credential or adding environment variables.",
+        assertEquals(
+                "value to be provided by creating credential or adding environment variables.",
                 message);
     }
 
@@ -45,8 +44,8 @@ class CredentialTypeMessageTest {
 
     @Test
     public void testGetMessageByType_WithEmpty() {
-        assertThrows(UnsupportedEnumValueException.class,
+        assertThrows(
+                UnsupportedEnumValueException.class,
                 () -> CredentialTypeMessage.getMessageByType(CredentialType.getByValue("null")));
     }
-
 }

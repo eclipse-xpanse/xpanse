@@ -3,7 +3,6 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-
 package org.eclipse.xpanse.modules.models.servicetemplate.view;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -32,9 +31,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.springframework.hateoas.RepresentationModel;
 
-/**
- * Defines view object for query registered service.
- */
+/** Defines view object for query registered service. */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplateDetailVo> {
@@ -99,8 +96,10 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
 
     @Valid
     @NotNull
-    @Schema(description = "Defines which cloud service account is used "
-            + "for deploying cloud resources.")
+    @Schema(
+            description =
+                    "Defines which cloud service account is used "
+                            + "for deploying cloud resources.")
     private ServiceHostingType serviceHostingType;
 
     @NotNull

@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Class to handle all Gnocchi measures services -
- * <a href="https://gnocchi.osci.io/rest.html#measures">Measures</a>.
+ * Class to handle all Gnocchi measures services - <a
+ * href="https://gnocchi.osci.io/rest.html#measures">Measures</a>.
  */
 @Component
 public class MeasuresService extends BaseGnocchiServices {
@@ -32,13 +32,11 @@ public class MeasuresService extends BaseGnocchiServices {
      * @param resourceMetricId metric ID for the resource.
      * @return returns all the recorded measures for the requested metric of the resource.
      */
-    public List<Measure> getMeasurementsForResourceByMetricId(String resourceMetricId,
-                                                              MetricsFilter metricsFilter) {
-        String requestUri = "/v1/metric/%s/measures"
-                + this.metricsQueryBuilder.build(metricsFilter);
-        Measure[] meters =
-                get(Measure[].class, uri(requestUri, resourceMetricId)).execute();
+    public List<Measure> getMeasurementsForResourceByMetricId(
+            String resourceMetricId, MetricsFilter metricsFilter) {
+        String requestUri =
+                "/v1/metric/%s/measures" + this.metricsQueryBuilder.build(metricsFilter);
+        Measure[] meters = get(Measure[].class, uri(requestUri, resourceMetricId)).execute();
         return wrapList(meters);
-
     }
 }

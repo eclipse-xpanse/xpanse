@@ -23,16 +23,14 @@ class UserServiceHelperTest {
     private final String namespace = "namespace";
     private final Csp csp = Csp.HUAWEI_CLOUD;
     private final List<String> roles = List.of("admin", "csp", "isv", "user");
-    @Mock
-    private IdentityProviderManager mockIdentityProviderManager;
-    @InjectMocks
-    private UserServiceHelper userServiceHelperUnderTest;
+    @Mock private IdentityProviderManager mockIdentityProviderManager;
+    @InjectMocks private UserServiceHelper userServiceHelperUnderTest;
 
     void setUpSecurityConfig(boolean webSecurityIsEnabled, boolean roleProtectionIsEnabled) {
-        ReflectionTestUtils.setField(userServiceHelperUnderTest, "webSecurityIsEnabled",
-                webSecurityIsEnabled);
-        ReflectionTestUtils.setField(userServiceHelperUnderTest, "roleProtectionIsEnabled",
-                roleProtectionIsEnabled);
+        ReflectionTestUtils.setField(
+                userServiceHelperUnderTest, "webSecurityIsEnabled", webSecurityIsEnabled);
+        ReflectionTestUtils.setField(
+                userServiceHelperUnderTest, "roleProtectionIsEnabled", roleProtectionIsEnabled);
     }
 
     CurrentUserInfo getMockCurrentUserInfo() {
@@ -61,7 +59,6 @@ class UserServiceHelperTest {
         // Verify the results
         assertThat(result1).isTrue();
 
-
         // Setup
         setUpSecurityConfig(true, true);
         final CurrentUserInfo currentUserInfo = new CurrentUserInfo();
@@ -87,7 +84,6 @@ class UserServiceHelperTest {
         final boolean result = userServiceHelperUnderTest.currentUserIsOwner("userId");
         // Verify the results
         assertThat(result).isTrue();
-
 
         // Setup
         setUpSecurityConfig(true, true);
@@ -127,8 +123,7 @@ class UserServiceHelperTest {
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final boolean result =
-                userServiceHelperUnderTest.currentUserCanManageNamespace(namespace);
+        final boolean result = userServiceHelperUnderTest.currentUserCanManageNamespace(namespace);
         // Verify the results
         assertThat(result).isTrue();
 
@@ -138,13 +133,11 @@ class UserServiceHelperTest {
         // Verify the results
         assertThat(result1).isTrue();
 
-
         // Setup
         setUpSecurityConfig(true, true);
         when(mockIdentityProviderManager.getCurrentUserInfo()).thenReturn(getMockCurrentUserInfo());
         // Run the test
-        final boolean result2 =
-                userServiceHelperUnderTest.currentUserCanManageNamespace(namespace);
+        final boolean result2 = userServiceHelperUnderTest.currentUserCanManageNamespace(namespace);
         // Verify the results
         assertThat(result2).isTrue();
         // Run the test
@@ -160,23 +153,21 @@ class UserServiceHelperTest {
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final boolean result = userServiceHelperUnderTest.currentUserCanManageNamespace(
-                namespace);
+        final boolean result = userServiceHelperUnderTest.currentUserCanManageNamespace(namespace);
         // Verify the results
         assertThat(result).isTrue();
         // Run the test
-        final boolean result1 = userServiceHelperUnderTest.currentUserCanManageNamespace(
-                "namespace1");
+        final boolean result1 =
+                userServiceHelperUnderTest.currentUserCanManageNamespace("namespace1");
         // Verify the results
         assertThat(result1).isTrue();
 
         // Setup without auth
         setUpSecurityConfig(true, true);
         // Run the test
-        assertThatThrownBy(() ->
-                userServiceHelperUnderTest.currentUserCanManageNamespace(namespace))
+        assertThatThrownBy(
+                        () -> userServiceHelperUnderTest.currentUserCanManageNamespace(namespace))
                 .isInstanceOf(UserNotLoggedInException.class);
-
     }
 
     @Test
@@ -189,18 +180,21 @@ class UserServiceHelperTest {
         // Verify the results
         assertThat(result).isTrue();
         // Run the test
-        final boolean result1 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK_TESTLAB);
+        final boolean result1 =
+                userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK_TESTLAB);
         // Verify the results
         assertThat(result1).isTrue();
 
         // Setup without auth
         setUpSecurityConfig(true, true);
         // Run the test
-        final boolean result2 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI_CLOUD);
+        final boolean result2 =
+                userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI_CLOUD);
         // Verify the results
         assertThat(result2).isTrue();
         // Run the test
-        final boolean result3 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK_TESTLAB);
+        final boolean result3 =
+                userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK_TESTLAB);
         // Verify the results
         assertThat(result3).isFalse();
     }
@@ -215,16 +209,17 @@ class UserServiceHelperTest {
         // Verify the results
         assertThat(result).isTrue();
         // Run the test
-        final boolean result1 = userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK_TESTLAB);
+        final boolean result1 =
+                userServiceHelperUnderTest.currentUserCanManageCsp(Csp.OPENSTACK_TESTLAB);
         // Verify the results
         assertThat(result1).isTrue();
 
         // Setup without auth
         setUpSecurityConfig(true, true);
         // Run the test
-        assertThatThrownBy(() -> userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI_CLOUD))
+        assertThatThrownBy(
+                        () -> userServiceHelperUnderTest.currentUserCanManageCsp(Csp.HUAWEI_CLOUD))
                 .isInstanceOf(UserNotLoggedInException.class);
-
     }
 
     @Test
@@ -258,7 +253,6 @@ class UserServiceHelperTest {
         // Verify the results
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo("no-auth-user-id");
-
 
         // Setup
         setUpSecurityConfig(true, true);
@@ -298,12 +292,10 @@ class UserServiceHelperTest {
         // Verify the results
         assertThat(result).isNull();
 
-
         // Setup
         setUpSecurityConfig(true, true);
         // Run the test
-        assertThatThrownBy(() ->
-                userServiceHelperUnderTest.getCurrentUserManageNamespace())
+        assertThatThrownBy(() -> userServiceHelperUnderTest.getCurrentUserManageNamespace())
                 .isInstanceOf(UserNotLoggedInException.class);
     }
 
@@ -338,7 +330,6 @@ class UserServiceHelperTest {
         final Csp result = userServiceHelperUnderTest.getCurrentUserManageCsp();
         // Verify the results
         assertThat(result).isNull();
-
 
         // Setup
         setUpSecurityConfig(true, true);

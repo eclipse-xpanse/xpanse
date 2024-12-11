@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of Csp.
- */
+/** Test of Csp. */
 class CspTest {
 
     @Test
@@ -39,5 +37,4 @@ class CspTest {
         Assertions.assertEquals("azure", Csp.AZURE.toValue());
         Assertions.assertEquals("GoogleCloudPlatform", Csp.GCP.toValue());
     }
-
 }

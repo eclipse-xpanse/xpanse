@@ -32,9 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * HuaweiCloud Service Client.
- */
+/** HuaweiCloud Service Client. */
 @Slf4j
 @Component
 public class HuaweiCloudClient extends HuaweiCloudCredentials {
@@ -42,8 +40,7 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
     @Value("${huaweicloud.sdk.enable.http.debug.logs:false}")
     private boolean sdkHttpDebugLogsEnabled;
 
-    @Autowired
-    private ProxyConfigurationManager proxyConfigurationManager;
+    @Autowired private ProxyConfigurationManager proxyConfigurationManager;
 
     /**
      * Get HuaweiCloud CES Client.
@@ -118,7 +115,7 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
      * Get HuaweiCloud Iam Client.
      *
      * @param globalCredential ICredential
-     * @param regionName       region.
+     * @param regionName region.
      */
     public IamClient getIamClient(ICredential globalCredential, String regionName) {
         return IamClient.newBuilder()
@@ -159,8 +156,7 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
     private HttpConfig getHttpConfig() {
         HttpConfig httpConfig = HttpConfig.getDefaultHttpConfig();
         if (sdkHttpDebugLogsEnabled) {
-            HttpListener requestListener =
-                    HttpListener.forRequestListener(this::outputRequestInfo);
+            HttpListener requestListener = HttpListener.forRequestListener(this::outputRequestInfo);
             httpConfig.addHttpListener(requestListener);
 
             HttpListener responseListener =
@@ -181,32 +177,56 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
     }
 
     private void outputRequestInfo(HttpListener.RequestListener listener) {
-        String requestInfo = "> Request " + listener.httpMethod() + " " + listener.uri()
-                + System.lineSeparator()
-                + "> Headers:" + System.lineSeparator() + getRequestHeadersString(listener)
-                + System.lineSeparator() + "> Body:" + listener.body().orElse("")
-                + System.lineSeparator();
+        String requestInfo =
+                "> Request "
+                        + listener.httpMethod()
+                        + " "
+                        + listener.uri()
+                        + System.lineSeparator()
+                        + "> Headers:"
+                        + System.lineSeparator()
+                        + getRequestHeadersString(listener)
+                        + System.lineSeparator()
+                        + "> Body:"
+                        + listener.body().orElse("")
+                        + System.lineSeparator();
         log.info(requestInfo);
     }
 
     private void outputResponseInfo(HttpListener.ResponseListener listener) {
-        String responseInfo = "< Response " + listener.httpMethod() + " " + listener.uri() + " "
-                + listener.statusCode() + System.lineSeparator()
-                + "< Headers:" + System.lineSeparator() + getResponseHeadersString(listener)
-                + System.lineSeparator() + "< Body:" + listener.body().orElse("")
-                + System.lineSeparator();
+        String responseInfo =
+                "< Response "
+                        + listener.httpMethod()
+                        + " "
+                        + listener.uri()
+                        + " "
+                        + listener.statusCode()
+                        + System.lineSeparator()
+                        + "< Headers:"
+                        + System.lineSeparator()
+                        + getResponseHeadersString(listener)
+                        + System.lineSeparator()
+                        + "< Body:"
+                        + listener.body().orElse("")
+                        + System.lineSeparator();
         log.info(responseInfo);
     }
 
     private String getRequestHeadersString(HttpListener.RequestListener listener) {
-        return listener.headers().entrySet().stream().flatMap(entry -> entry.getValue().stream()
-                        .map(value -> "\t" + entry.getKey() + ": " + value))
+        return listener.headers().entrySet().stream()
+                .flatMap(
+                        entry ->
+                                entry.getValue().stream()
+                                        .map(value -> "\t" + entry.getKey() + ": " + value))
                 .collect(Collectors.joining("\n"));
     }
 
     private String getResponseHeadersString(HttpListener.ResponseListener listener) {
-        return listener.headers().entrySet().stream().flatMap(entry -> entry.getValue().stream()
-                        .map(value -> "\t" + entry.getKey() + ": " + value))
+        return listener.headers().entrySet().stream()
+                .flatMap(
+                        entry ->
+                                entry.getValue().stream()
+                                        .map(value -> "\t" + entry.getKey() + ": " + value))
                 .collect(Collectors.joining("\n"));
     }
 }

@@ -13,13 +13,10 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of TfState.
- */
+/** Test of TfState. */
 class TfStateTest {
 
-    private static TfState
-            tfState;
+    private static TfState tfState;
 
     private static Map<String, TfOutput> outputs;
 
@@ -27,14 +24,12 @@ class TfStateTest {
 
     @BeforeEach
     void setUp() {
-        TfOutput
-                tfOutput = new TfOutput();
+        TfOutput tfOutput = new TfOutput();
         tfOutput.setType("type");
         tfOutput.setValue("value");
         outputs = Map.of("key", tfOutput);
 
-        TfStateResource
-                tfStateResource = new TfStateResource();
+        TfStateResource tfStateResource = new TfStateResource();
         tfStateResource.setType("type");
         tfStateResource.setName("name");
         resources = List.of(tfStateResource);
@@ -60,10 +55,8 @@ class TfStateTest {
         assertNotEquals(tfState, null);
         assertNotEquals(tfState.hashCode(), obj.hashCode());
 
-        TfState
-                tfState1 = new TfState();
-        TfState
-                tfState2 = new TfState();
+        TfState tfState1 = new TfState();
+        TfState tfState2 = new TfState();
         assertNotEquals(tfState, tfState1);
         assertNotEquals(tfState, tfState2);
         assertEquals(tfState1, tfState2);
@@ -86,10 +79,8 @@ class TfStateTest {
 
     @Test
     void testToString() {
-        String expectedToString = "TfState(" +
-                "outputs=" + outputs + ", " +
-                "resources=" + resources + ")";
+        String expectedToString =
+                "TfState(" + "outputs=" + outputs + ", " + "resources=" + resources + ")";
         assertEquals(expectedToString, tfState.toString());
     }
-
 }

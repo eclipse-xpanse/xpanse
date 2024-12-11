@@ -5,13 +5,9 @@
 
 package org.eclipse.xpanse.modules.models.service.deploy.exceptions;
 
-/**
- * Exception thrown when the service flavor not allowed to be downgraded.
- */
+/** Exception thrown when the service flavor not allowed to be downgraded. */
 public class ServiceFlavorDowngradeNotAllowed extends RuntimeException {
     public ServiceFlavorDowngradeNotAllowed(String message) {
         super(message);
     }
-
 }
-

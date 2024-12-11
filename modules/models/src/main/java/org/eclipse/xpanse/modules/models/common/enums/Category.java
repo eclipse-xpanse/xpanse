@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Service Category enums.
- */
+/** Service Category enums. */
 public enum Category {
     AI("ai"),
     COMPUTE("compute"),
@@ -31,9 +29,7 @@ public enum Category {
         this.catalog = catalog;
     }
 
-    /**
-     * For Category deserialize.
-     */
+    /** For Category deserialize. */
     @JsonCreator
     public static Category getByValue(String catalog) {
         for (Category category : values()) {
@@ -45,9 +41,7 @@ public enum Category {
                 String.format("Category value %s is not supported.", catalog));
     }
 
-    /**
-     * For Category serialize.
-     */
+    /** For Category serialize. */
     @JsonValue
     public String toValue() {
         return this.catalog;

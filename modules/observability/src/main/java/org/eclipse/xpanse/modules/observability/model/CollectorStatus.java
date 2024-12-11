@@ -9,11 +9,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * Defines possible status from otel-collector health-check extension.
- */
+/** Defines possible status from otel-collector health-check extension. */
 public enum CollectorStatus {
-
     SERVER_AVAILABLE("Server available"),
     SERVER_NOT_AVAILABLE("Server not available");
 
@@ -23,17 +20,13 @@ public enum CollectorStatus {
         this.value = value;
     }
 
-    /**
-     * For CollectorStatus deserialize.
-     */
+    /** For CollectorStatus deserialize. */
     @JsonValue
     public String toValue() {
         return this.value;
     }
 
-    /**
-     * For CollectorStatus serialize.
-     */
+    /** For CollectorStatus serialize. */
     @JsonCreator
     public CollectorStatus getByValue(String value) {
         for (CollectorStatus collectorStatus : values()) {

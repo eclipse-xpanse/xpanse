@@ -19,9 +19,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServi
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 
-/**
- * ServiceTemplateEntityConverter.
- */
+/** ServiceTemplateEntityConverter. */
 public class ServiceTemplateEntityConverter {
 
     /**
@@ -38,31 +36,31 @@ public class ServiceTemplateEntityConverter {
             BeanUtils.copyProperties(serviceTemplateEntity, serviceTemplateDetailVo);
             serviceTemplateDetailVo.setServiceTemplateId(serviceTemplateEntity.getId());
             serviceTemplateDetailVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
-            serviceTemplateDetailVo.setDescription(
-                    serviceTemplateEntity.getOcl().getDescription());
+            serviceTemplateDetailVo.setDescription(serviceTemplateEntity.getOcl().getDescription());
             if (StringUtils.isNotEmpty(serviceTemplateEntity.getNamespace())) {
                 serviceTemplateDetailVo.setNamespace(serviceTemplateEntity.getNamespace());
             } else {
                 serviceTemplateDetailVo.setNamespace(serviceTemplateEntity.getOcl().getNamespace());
             }
             serviceTemplateDetailVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
-            serviceTemplateDetailVo.setFlavors(
-                    serviceTemplateEntity.getOcl().getFlavors());
+            serviceTemplateDetailVo.setFlavors(serviceTemplateEntity.getOcl().getFlavors());
             serviceTemplateDetailVo.setDeployment(serviceTemplateEntity.getOcl().getDeployment());
             serviceTemplateDetailVo.setVariables(
                     serviceTemplateEntity.getOcl().getDeployment().getVariables());
             serviceTemplateDetailVo.setRegions(
                     serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
             serviceTemplateDetailVo.add(
-                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
-                            .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
+                    WebMvcLinkBuilder.linkTo(
+                                    WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
+                                            .openApi(serviceTemplateEntity.getId().toString()))
+                            .withRel("openApi"));
             serviceTemplateDetailVo.setServiceHostingType(
                     serviceTemplateEntity.getOcl().getServiceHostingType());
             serviceTemplateDetailVo.setServiceProviderContactDetails(
                     serviceTemplateEntity.getOcl().getServiceProviderContactDetails());
             serviceTemplateDetailVo.setEula(serviceTemplateEntity.getOcl().getEula());
-            serviceTemplateDetailVo.setServiceConfigurationManage(serviceTemplateEntity
-                    .getOcl().getServiceConfigurationManage());
+            serviceTemplateDetailVo.setServiceConfigurationManage(
+                    serviceTemplateEntity.getOcl().getServiceConfigurationManage());
             return serviceTemplateDetailVo;
         }
         return null;
@@ -82,20 +80,21 @@ public class ServiceTemplateEntityConverter {
             BeanUtils.copyProperties(serviceTemplateEntity, userOrderableServiceVo);
             userOrderableServiceVo.setServiceTemplateId(serviceTemplateEntity.getId());
             userOrderableServiceVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
-            userOrderableServiceVo.setDescription(
-                    serviceTemplateEntity.getOcl().getDescription());
+            userOrderableServiceVo.setDescription(serviceTemplateEntity.getOcl().getDescription());
             userOrderableServiceVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
 
-            setFlavorsWithoutPricing(userOrderableServiceVo,
-                    serviceTemplateEntity.getOcl().getFlavors());
+            setFlavorsWithoutPricing(
+                    userOrderableServiceVo, serviceTemplateEntity.getOcl().getFlavors());
 
             userOrderableServiceVo.setVariables(
                     serviceTemplateEntity.getOcl().getDeployment().getVariables());
             userOrderableServiceVo.setRegions(
                     serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
             userOrderableServiceVo.add(
-                    WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
-                            .openApi(serviceTemplateEntity.getId().toString())).withRel("openApi"));
+                    WebMvcLinkBuilder.linkTo(
+                                    WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
+                                            .openApi(serviceTemplateEntity.getId().toString()))
+                            .withRel("openApi"));
             userOrderableServiceVo.setServiceHostingType(
                     serviceTemplateEntity.getOcl().getServiceHostingType());
             userOrderableServiceVo.setServiceProviderContactDetails(
@@ -114,18 +113,21 @@ public class ServiceTemplateEntityConverter {
         return null;
     }
 
-    private static void setFlavorsWithoutPricing(UserOrderableServiceVo serviceVo,
-                                                 FlavorsWithPrice flavors) {
-        List<ServiceFlavor> flavorBasics = flavors.getServiceFlavors().stream().map(flavor -> {
-            ServiceFlavor flavorBasic = new ServiceFlavor();
-            BeanUtils.copyProperties(flavor, flavorBasic);
-            return flavorBasic;
-        }).toList();
+    private static void setFlavorsWithoutPricing(
+            UserOrderableServiceVo serviceVo, FlavorsWithPrice flavors) {
+        List<ServiceFlavor> flavorBasics =
+                flavors.getServiceFlavors().stream()
+                        .map(
+                                flavor -> {
+                                    ServiceFlavor flavorBasic = new ServiceFlavor();
+                                    BeanUtils.copyProperties(flavor, flavorBasic);
+                                    return flavorBasic;
+                                })
+                        .toList();
         EndUserFlavors endUserFlavors = new EndUserFlavors();
         endUserFlavors.setServiceFlavors(flavorBasics);
         endUserFlavors.setDowngradeAllowed(flavors.getIsDowngradeAllowed());
         endUserFlavors.setModificationImpact(flavors.getModificationImpact());
         serviceVo.setFlavors(endUserFlavors);
     }
-
 }

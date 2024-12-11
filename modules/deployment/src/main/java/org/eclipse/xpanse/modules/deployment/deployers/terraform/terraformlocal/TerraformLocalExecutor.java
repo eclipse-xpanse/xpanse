@@ -22,9 +22,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenT
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 
-/**
- * An executor for terraform.
- */
+/** An executor for terraform. */
 @Slf4j
 public class TerraformLocalExecutor {
 
@@ -34,31 +32,32 @@ public class TerraformLocalExecutor {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
-    @Getter
-    private final String executorPath;
-    @Getter
-    private final String taskWorkspace;
+    @Getter private final String executorPath;
+    @Getter private final String taskWorkspace;
     private final Map<String, String> env;
     private final Map<String, Object> variables;
 
     /**
      * Constructor for terraformExecutor.
      *
-     * @param executorPath  path of the terraform executor.
-     * @param env           environment for the terraform command line.
-     * @param variables     variables for the terraform command line.
+     * @param executorPath path of the terraform executor.
+     * @param env environment for the terraform command line.
+     * @param variables variables for the terraform command line.
      * @param taskWorkspace taskWorkspace for the terraform command line.
      */
-    TerraformLocalExecutor(String executorPath,
-                           Map<String, String> env,
-                           Map<String, Object> variables,
-                           String taskWorkspace) {
+    TerraformLocalExecutor(
+            String executorPath,
+            Map<String, String> env,
+            Map<String, Object> variables,
+            String taskWorkspace) {
         this.executorPath = executorPath;
         this.env = env;
         this.variables = variables;
         this.taskWorkspace = taskWorkspace;
-        log.info("Created TerraformLocalExecutor with executorPath: {} and taskWorkspace: {}",
-                executorPath, taskWorkspace);
+        log.info(
+                "Created TerraformLocalExecutor with executorPath: {} and taskWorkspace: {}",
+                executorPath,
+                taskWorkspace);
     }
 
     /**
@@ -86,8 +85,9 @@ public class TerraformLocalExecutor {
      * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfPlanWithOutput() {
-        return executeWithVariables(new StringBuilder(
-                this.executorPath + " plan -input=false -no-color --out tfplan.binary"));
+        return executeWithVariables(
+                new StringBuilder(
+                        this.executorPath + " plan -input=false -no-color --out tfplan.binary"));
     }
 
     /**
@@ -96,8 +96,9 @@ public class TerraformLocalExecutor {
      * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfApply() {
-        return executeWithVariables(new StringBuilder(
-                this.executorPath + " apply -auto-approve -input=false -no-color "));
+        return executeWithVariables(
+                new StringBuilder(
+                        this.executorPath + " apply -auto-approve -input=false -no-color "));
     }
 
     /**
@@ -106,8 +107,9 @@ public class TerraformLocalExecutor {
      * @return Returns result of SystemCmd executed.
      */
     public SystemCmdResult tfDestroy() {
-        return executeWithVariables(new StringBuilder(
-                this.executorPath + " destroy -auto-approve -input=false -no-color "));
+        return executeWithVariables(
+                new StringBuilder(
+                        this.executorPath + " destroy -auto-approve -input=false -no-color "));
     }
 
     /**
@@ -156,79 +158,72 @@ public class TerraformLocalExecutor {
         return systemCmd.execute(cmd);
     }
 
-    /**
-     * Deploy source by terraform.
-     */
+    /** Deploy source by terraform. */
     public void deploy() {
         SystemCmdResult initResult = tfInit();
         if (!initResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfInit failed.");
-            throw new TerraformExecutorException("TFExecutor.tfInit failed.",
-                    initResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "TFExecutor.tfInit failed.", initResult.getCommandStdError());
         }
         SystemCmdResult planResult = tfPlan();
         if (!planResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfPlan failed.");
-            throw new TerraformExecutorException("TFExecutor.tfPlan failed.",
-                    planResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "TFExecutor.tfPlan failed.", planResult.getCommandStdError());
         }
         SystemCmdResult applyResult = tfApply();
         if (!applyResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfApply failed.");
-            throw new TerraformExecutorException("TFExecutor.tfApply failed.",
-                    applyResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "TFExecutor.tfApply failed.", applyResult.getCommandStdError());
         }
     }
 
-    /**
-     * Destroy resource of the service.
-     */
+    /** Destroy resource of the service. */
     public void destroy() {
         SystemCmdResult initResult = tfInit();
         if (!initResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfInit failed.");
-            throw new TerraformExecutorException("TFExecutor.tfInit failed.",
-                    initResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "TFExecutor.tfInit failed.", initResult.getCommandStdError());
         }
         SystemCmdResult planResult = tfPlan();
         if (!planResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfPlan failed.");
-            throw new TerraformExecutorException("TFExecutor.tfPlan failed.",
-                    planResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "TFExecutor.tfPlan failed.", planResult.getCommandStdError());
         }
         SystemCmdResult destroyResult = tfDestroy();
         if (!destroyResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfDestroy failed.");
-            throw new TerraformExecutorException("TFExecutor.tfDestroy failed.",
-                    destroyResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "TFExecutor.tfDestroy failed.", destroyResult.getCommandStdError());
         }
     }
 
-    /**
-     * Method to execute terraform plan and get the plan as a json string.
-     */
+    /** Method to execute terraform plan and get the plan as a json string. */
     public String getTerraformPlanAsJson() {
         SystemCmdResult initResult = tfInit();
         if (!initResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfInit failed.");
-            throw new TerraformExecutorException("TFExecutor.tfInit failed.",
-                    initResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "TFExecutor.tfInit failed.", initResult.getCommandStdError());
         }
         SystemCmdResult tfPlanResult = tfPlanWithOutput();
         if (!tfPlanResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfPlan failed.");
-            throw new TerraformExecutorException("TFExecutor.tfPlan failed.",
-                    tfPlanResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "TFExecutor.tfPlan failed.", tfPlanResult.getCommandStdError());
         }
         SystemCmdResult planJsonResult = execute(this.executorPath + " show -json tfplan.binary");
         if (!planJsonResult.isCommandSuccessful()) {
             log.error("Reading Terraform plan as JSON failed.");
-            throw new TerraformExecutorException("Reading Terraform plan as JSON failed.",
-                    planJsonResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "Reading Terraform plan as JSON failed.", planJsonResult.getCommandStdError());
         }
         return planJsonResult.getCommandStdOutput();
     }
-
 
     /**
      * Executes terraform validate command.
@@ -239,16 +234,17 @@ public class TerraformLocalExecutor {
         SystemCmdResult initResult = tfInit();
         if (!initResult.isCommandSuccessful()) {
             log.error("TFExecutor.tfInit failed.");
-            throw new TerraformExecutorException("TFExecutor.tfInit failed.",
-                    initResult.getCommandStdError());
+            throw new TerraformExecutorException(
+                    "TFExecutor.tfInit failed.", initResult.getCommandStdError());
         }
         SystemCmdResult systemCmdResult = execute(this.executorPath + " validate -json -no-color");
         try {
-            return new ObjectMapper().readValue(systemCmdResult.getCommandStdOutput(),
-                    DeploymentScriptValidationResult.class);
+            return new ObjectMapper()
+                    .readValue(
+                            systemCmdResult.getCommandStdOutput(),
+                            DeploymentScriptValidationResult.class);
         } catch (JsonProcessingException ex) {
             throw new IllegalStateException("Serialising string to object failed.", ex);
         }
     }
-
 }

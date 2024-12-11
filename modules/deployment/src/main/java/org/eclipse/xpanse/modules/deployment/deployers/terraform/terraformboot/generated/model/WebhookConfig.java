@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -20,20 +19,16 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Objects;
 
-/**
- * Configuration information of webhook.
- */
+/** Configuration information of webhook. */
 @JsonPropertyOrder({WebhookConfig.JSON_PROPERTY_URL, WebhookConfig.JSON_PROPERTY_AUTH_TYPE})
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class WebhookConfig {
     public static final String JSON_PROPERTY_URL = "url";
-    @jakarta.annotation.Nonnull
-    private String url;
+    @jakarta.annotation.Nonnull private String url;
 
-    /**
-     * The permission type when calling back.
-     */
+    /** The permission type when calling back. */
     public enum AuthTypeEnum {
         NONE(String.valueOf("NONE")),
 
@@ -67,11 +62,9 @@ public class WebhookConfig {
     }
 
     public static final String JSON_PROPERTY_AUTH_TYPE = "authType";
-    @jakarta.annotation.Nonnull
-    private AuthTypeEnum authType;
+    @jakarta.annotation.Nonnull private AuthTypeEnum authType;
 
-    public WebhookConfig() {
-    }
+    public WebhookConfig() {}
 
     public WebhookConfig url(@jakarta.annotation.Nonnull String url) {
 
@@ -87,7 +80,6 @@ public class WebhookConfig {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_URL)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getUrl() {
         return url;
     }
@@ -112,7 +104,6 @@ public class WebhookConfig {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_AUTH_TYPE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public AuthTypeEnum getAuthType() {
         return authType;
     }
@@ -132,7 +123,8 @@ public class WebhookConfig {
             return false;
         }
         WebhookConfig webhookConfig = (WebhookConfig) o;
-        return Objects.equals(this.url, webhookConfig.url) && Objects.equals(this.authType, webhookConfig.authType);
+        return Objects.equals(this.url, webhookConfig.url)
+                && Objects.equals(this.authType, webhookConfig.authType);
     }
 
     @Override
@@ -151,8 +143,8 @@ public class WebhookConfig {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -160,6 +152,4 @@ public class WebhookConfig {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

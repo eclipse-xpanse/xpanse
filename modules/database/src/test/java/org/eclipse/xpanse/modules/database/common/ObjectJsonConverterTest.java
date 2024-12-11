@@ -21,9 +21,7 @@ class ObjectJsonConverterTest {
     void testConvertToDatabaseColumn() {
         assertNull(test.convertToDatabaseColumn(null));
         assertInstanceOf(String.class, test.convertToDatabaseColumn(new Date()));
-        assertThrows(IllegalStateException.class, () ->
-            test.convertToDatabaseColumn(new Object())
-        );
+        assertThrows(IllegalStateException.class, () -> test.convertToDatabaseColumn(new Object()));
     }
 
     @Test
@@ -31,7 +29,6 @@ class ObjectJsonConverterTest {
         assertNull(test.convertToEntityAttribute(null));
         String s = test.convertToDatabaseColumn(new Date());
         assertInstanceOf(Long.class, test.convertToEntityAttribute(s));
-        assertThrows(IllegalStateException.class, () ->
-            test.convertToEntityAttribute("errorJson"));
+        assertThrows(IllegalStateException.class, () -> test.convertToEntityAttribute("errorJson"));
     }
 }

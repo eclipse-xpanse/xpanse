@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of Category.
- */
+/** Test of Category. */
 class CategoryTest {
 
     @Test
@@ -27,8 +25,8 @@ class CategoryTest {
         Assertions.assertEquals(Category.SECURITY, Category.getByValue("security"));
         Assertions.assertEquals(Category.MIDDLEWARE, Category.getByValue("middleware"));
         Assertions.assertEquals(Category.OTHERS, Category.getByValue("others"));
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> Category.getByValue("null"));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> Category.getByValue("null"));
     }
 
     @Test
@@ -44,5 +42,4 @@ class CategoryTest {
         Assertions.assertEquals("middleware", Category.MIDDLEWARE.toValue());
         Assertions.assertEquals("others", Category.OTHERS.toValue());
     }
-
 }

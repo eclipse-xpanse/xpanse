@@ -15,9 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of ResponseInvalidException.
- */
+/** Test of ResponseInvalidException. */
 class ResponseInvalidExceptionTest {
 
     private static List<String> errorReasons;
@@ -85,5 +83,4 @@ class ResponseInvalidExceptionTest {
 
         assertEquals(expectedToString, exception.toString());
     }
-
 }

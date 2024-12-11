@@ -9,9 +9,7 @@ package org.eclipse.xpanse.plugins.huaweicloud.price.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-/**
- * Defines data model for price calculation with the global rest apis of HuaweiCloud.
- */
+/** Defines data model for price calculation with the global rest apis of HuaweiCloud. */
 @Data
 public class ProductInfo {
     @JsonProperty("cloudServiceType")

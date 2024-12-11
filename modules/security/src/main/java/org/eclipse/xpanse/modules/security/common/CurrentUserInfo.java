@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 
-/**
- * Model of current user info.
- */
+/** Model of current user info. */
 @Data
 public class CurrentUserInfo {
 

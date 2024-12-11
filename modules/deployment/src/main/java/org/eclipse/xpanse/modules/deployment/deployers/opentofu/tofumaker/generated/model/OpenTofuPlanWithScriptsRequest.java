@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,41 +22,34 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * OpenTofuPlanWithScriptsRequest
- */
+/** OpenTofuPlanWithScriptsRequest */
 @JsonPropertyOrder({
-        OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_REQUEST_ID,
-        OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
-        OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_VARIABLES,
-        OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
-        OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_SCRIPTS
+    OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_REQUEST_ID,
+    OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
+    OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_VARIABLES,
+    OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
+    OpenTofuPlanWithScriptsRequest.JSON_PROPERTY_SCRIPTS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuPlanWithScriptsRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_OPEN_TOFU_VERSION = "openTofuVersion";
-    @jakarta.annotation.Nonnull
-    private String openTofuVersion;
+    @jakarta.annotation.Nonnull private String openTofuVersion;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_SCRIPTS = "scripts";
-    @jakarta.annotation.Nonnull
-    private List<String> scripts = new ArrayList<>();
+    @jakarta.annotation.Nonnull private List<String> scripts = new ArrayList<>();
 
-    public OpenTofuPlanWithScriptsRequest() {
-    }
+    public OpenTofuPlanWithScriptsRequest() {}
 
     public OpenTofuPlanWithScriptsRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
 
@@ -73,11 +65,9 @@ public class OpenTofuPlanWithScriptsRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -85,7 +75,8 @@ public class OpenTofuPlanWithScriptsRequest {
         this.requestId = requestId;
     }
 
-    public OpenTofuPlanWithScriptsRequest openTofuVersion(@jakarta.annotation.Nonnull String openTofuVersion) {
+    public OpenTofuPlanWithScriptsRequest openTofuVersion(
+            @jakarta.annotation.Nonnull String openTofuVersion) {
 
         this.openTofuVersion = openTofuVersion;
         return this;
@@ -99,11 +90,9 @@ public class OpenTofuPlanWithScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getOpenTofuVersion() {
         return openTofuVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -111,7 +100,8 @@ public class OpenTofuPlanWithScriptsRequest {
         this.openTofuVersion = openTofuVersion;
     }
 
-    public OpenTofuPlanWithScriptsRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public OpenTofuPlanWithScriptsRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
@@ -130,11 +120,9 @@ public class OpenTofuPlanWithScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -142,7 +130,8 @@ public class OpenTofuPlanWithScriptsRequest {
         this.variables = variables;
     }
 
-    public OpenTofuPlanWithScriptsRequest envVariables(@jakarta.annotation.Nullable Map<String, String> envVariables) {
+    public OpenTofuPlanWithScriptsRequest envVariables(
+            @jakarta.annotation.Nullable Map<String, String> envVariables) {
 
         this.envVariables = envVariables;
         return this;
@@ -157,18 +146,17 @@ public class OpenTofuPlanWithScriptsRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to open tofu process.
+     * Key-value pairs of variables that must be injected as environment variables to open tofu
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -176,7 +164,8 @@ public class OpenTofuPlanWithScriptsRequest {
         this.envVariables = envVariables;
     }
 
-    public OpenTofuPlanWithScriptsRequest scripts(@jakarta.annotation.Nonnull List<String> scripts) {
+    public OpenTofuPlanWithScriptsRequest scripts(
+            @jakarta.annotation.Nonnull List<String> scripts) {
 
         this.scripts = scripts;
         return this;
@@ -198,11 +187,9 @@ public class OpenTofuPlanWithScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_SCRIPTS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public List<String> getScripts() {
         return scripts;
     }
-
 
     @JsonProperty(JSON_PROPERTY_SCRIPTS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -218,12 +205,14 @@ public class OpenTofuPlanWithScriptsRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        OpenTofuPlanWithScriptsRequest openTofuPlanWithScriptsRequest = (OpenTofuPlanWithScriptsRequest) o;
-        return Objects.equals(this.requestId, openTofuPlanWithScriptsRequest.requestId) &&
-                Objects.equals(this.openTofuVersion, openTofuPlanWithScriptsRequest.openTofuVersion) &&
-                Objects.equals(this.variables, openTofuPlanWithScriptsRequest.variables) &&
-                Objects.equals(this.envVariables, openTofuPlanWithScriptsRequest.envVariables) &&
-                Objects.equals(this.scripts, openTofuPlanWithScriptsRequest.scripts);
+        OpenTofuPlanWithScriptsRequest openTofuPlanWithScriptsRequest =
+                (OpenTofuPlanWithScriptsRequest) o;
+        return Objects.equals(this.requestId, openTofuPlanWithScriptsRequest.requestId)
+                && Objects.equals(
+                        this.openTofuVersion, openTofuPlanWithScriptsRequest.openTofuVersion)
+                && Objects.equals(this.variables, openTofuPlanWithScriptsRequest.variables)
+                && Objects.equals(this.envVariables, openTofuPlanWithScriptsRequest.envVariables)
+                && Objects.equals(this.scripts, openTofuPlanWithScriptsRequest.scripts);
     }
 
     @Override
@@ -245,8 +234,8 @@ public class OpenTofuPlanWithScriptsRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -254,6 +243,4 @@ public class OpenTofuPlanWithScriptsRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

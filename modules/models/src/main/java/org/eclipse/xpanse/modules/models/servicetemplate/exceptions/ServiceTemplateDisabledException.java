@@ -5,13 +5,9 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate.exceptions;
 
-/**
- * Exception thrown when the deployer mentioned in the service template is not available.
- */
+/** Exception thrown when the deployer mentioned in the service template is not available. */
 public class ServiceTemplateDisabledException extends RuntimeException {
     public ServiceTemplateDisabledException(String message) {
         super(message);
     }
-
 }
-

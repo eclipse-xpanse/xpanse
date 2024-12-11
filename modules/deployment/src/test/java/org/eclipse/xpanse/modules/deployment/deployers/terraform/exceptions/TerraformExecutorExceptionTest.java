@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of TerraformExecutorException.
- */
+/** Test of TerraformExecutorException. */
 class TerraformExecutorExceptionTest {
 
     private static final String message = "terraformExecutor exception.";
@@ -34,9 +32,10 @@ class TerraformExecutorExceptionTest {
     void testConstructorAndGetMessage() {
         assertEquals("TFExecutor Exception: " + message, exception1.getMessage());
         assertEquals(cause, exception2.getCause());
-        assertEquals("TFExecutor Exception:terraformExecutor exception." + System.lineSeparator()
+        assertEquals(
+                "TFExecutor Exception:terraformExecutor exception."
+                        + System.lineSeparator()
                         + output,
                 exception3.getMessage());
     }
-
 }

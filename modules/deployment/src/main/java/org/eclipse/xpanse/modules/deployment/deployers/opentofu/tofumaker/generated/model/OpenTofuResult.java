@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,51 +20,44 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * OpenTofuResult
- */
+/** OpenTofuResult */
 @JsonPropertyOrder({
-        OpenTofuResult.JSON_PROPERTY_REQUEST_ID,
-        OpenTofuResult.JSON_PROPERTY_COMMAND_STD_OUTPUT,
-        OpenTofuResult.JSON_PROPERTY_COMMAND_STD_ERROR,
-        OpenTofuResult.JSON_PROPERTY_TERRAFORM_STATE,
-        OpenTofuResult.JSON_PROPERTY_GENERATED_FILE_CONTENT_MAP,
-        OpenTofuResult.JSON_PROPERTY_OPEN_TOFU_VERSION_USED,
-        OpenTofuResult.JSON_PROPERTY_COMMAND_SUCCESSFUL
+    OpenTofuResult.JSON_PROPERTY_REQUEST_ID,
+    OpenTofuResult.JSON_PROPERTY_COMMAND_STD_OUTPUT,
+    OpenTofuResult.JSON_PROPERTY_COMMAND_STD_ERROR,
+    OpenTofuResult.JSON_PROPERTY_TERRAFORM_STATE,
+    OpenTofuResult.JSON_PROPERTY_GENERATED_FILE_CONTENT_MAP,
+    OpenTofuResult.JSON_PROPERTY_OPEN_TOFU_VERSION_USED,
+    OpenTofuResult.JSON_PROPERTY_COMMAND_SUCCESSFUL
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuResult {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_COMMAND_STD_OUTPUT = "commandStdOutput";
-    @jakarta.annotation.Nullable
-    private String commandStdOutput;
+    @jakarta.annotation.Nullable private String commandStdOutput;
 
     public static final String JSON_PROPERTY_COMMAND_STD_ERROR = "commandStdError";
-    @jakarta.annotation.Nullable
-    private String commandStdError;
+    @jakarta.annotation.Nullable private String commandStdError;
 
     public static final String JSON_PROPERTY_TERRAFORM_STATE = "terraformState";
-    @jakarta.annotation.Nullable
-    private String terraformState;
+    @jakarta.annotation.Nullable private String terraformState;
 
     public static final String JSON_PROPERTY_GENERATED_FILE_CONTENT_MAP = "generatedFileContentMap";
+
     @jakarta.annotation.Nullable
     private Map<String, String> generatedFileContentMap = new HashMap<>();
 
     public static final String JSON_PROPERTY_OPEN_TOFU_VERSION_USED = "openTofuVersionUsed";
-    @jakarta.annotation.Nullable
-    private String openTofuVersionUsed;
+    @jakarta.annotation.Nullable private String openTofuVersionUsed;
 
     public static final String JSON_PROPERTY_COMMAND_SUCCESSFUL = "commandSuccessful";
-    @jakarta.annotation.Nullable
-    private Boolean commandSuccessful;
+    @jakarta.annotation.Nullable private Boolean commandSuccessful;
 
-    public OpenTofuResult() {
-    }
+    public OpenTofuResult() {}
 
     public OpenTofuResult requestId(@jakarta.annotation.Nullable UUID requestId) {
 
@@ -81,11 +73,9 @@ public class OpenTofuResult {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -107,11 +97,9 @@ public class OpenTofuResult {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_COMMAND_STD_OUTPUT)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getCommandStdOutput() {
         return commandStdOutput;
     }
-
 
     @JsonProperty(JSON_PROPERTY_COMMAND_STD_OUTPUT)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -133,11 +121,9 @@ public class OpenTofuResult {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_COMMAND_STD_ERROR)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getCommandStdError() {
         return commandStdError;
     }
-
 
     @JsonProperty(JSON_PROPERTY_COMMAND_STD_ERROR)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -159,11 +145,9 @@ public class OpenTofuResult {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_TERRAFORM_STATE)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getTerraformState() {
         return terraformState;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TERRAFORM_STATE)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -178,7 +162,8 @@ public class OpenTofuResult {
         return this;
     }
 
-    public OpenTofuResult putGeneratedFileContentMapItem(String key, String generatedFileContentMapItem) {
+    public OpenTofuResult putGeneratedFileContentMapItem(
+            String key, String generatedFileContentMapItem) {
         if (this.generatedFileContentMap == null) {
             this.generatedFileContentMap = new HashMap<>();
         }
@@ -187,27 +172,27 @@ public class OpenTofuResult {
     }
 
     /**
-     * Data of all other files generated by the openTofu execution.The map key contains the file name and value is
-     * the file contents as string.
+     * Data of all other files generated by the openTofu execution.The map key contains the file
+     * name and value is the file contents as string.
      *
      * @return generatedFileContentMap
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_GENERATED_FILE_CONTENT_MAP)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getGeneratedFileContentMap() {
         return generatedFileContentMap;
     }
 
-
     @JsonProperty(JSON_PROPERTY_GENERATED_FILE_CONTENT_MAP)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setGeneratedFileContentMap(@jakarta.annotation.Nullable Map<String, String> generatedFileContentMap) {
+    public void setGeneratedFileContentMap(
+            @jakarta.annotation.Nullable Map<String, String> generatedFileContentMap) {
         this.generatedFileContentMap = generatedFileContentMap;
     }
 
-    public OpenTofuResult openTofuVersionUsed(@jakarta.annotation.Nullable String openTofuVersionUsed) {
+    public OpenTofuResult openTofuVersionUsed(
+            @jakarta.annotation.Nullable String openTofuVersionUsed) {
 
         this.openTofuVersionUsed = openTofuVersionUsed;
         return this;
@@ -221,11 +206,9 @@ public class OpenTofuResult {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION_USED)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getOpenTofuVersionUsed() {
         return openTofuVersionUsed;
     }
-
 
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION_USED)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -233,7 +216,8 @@ public class OpenTofuResult {
         this.openTofuVersionUsed = openTofuVersionUsed;
     }
 
-    public OpenTofuResult commandSuccessful(@jakarta.annotation.Nullable Boolean commandSuccessful) {
+    public OpenTofuResult commandSuccessful(
+            @jakarta.annotation.Nullable Boolean commandSuccessful) {
 
         this.commandSuccessful = commandSuccessful;
         return this;
@@ -247,11 +231,9 @@ public class OpenTofuResult {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_COMMAND_SUCCESSFUL)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Boolean getCommandSuccessful() {
         return commandSuccessful;
     }
-
 
     @JsonProperty(JSON_PROPERTY_COMMAND_SUCCESSFUL)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -268,19 +250,26 @@ public class OpenTofuResult {
             return false;
         }
         OpenTofuResult openTofuResult = (OpenTofuResult) o;
-        return Objects.equals(this.requestId, openTofuResult.requestId) &&
-                Objects.equals(this.commandStdOutput, openTofuResult.commandStdOutput) &&
-                Objects.equals(this.commandStdError, openTofuResult.commandStdError) &&
-                Objects.equals(this.terraformState, openTofuResult.terraformState) &&
-                Objects.equals(this.generatedFileContentMap, openTofuResult.generatedFileContentMap) &&
-                Objects.equals(this.openTofuVersionUsed, openTofuResult.openTofuVersionUsed) &&
-                Objects.equals(this.commandSuccessful, openTofuResult.commandSuccessful);
+        return Objects.equals(this.requestId, openTofuResult.requestId)
+                && Objects.equals(this.commandStdOutput, openTofuResult.commandStdOutput)
+                && Objects.equals(this.commandStdError, openTofuResult.commandStdError)
+                && Objects.equals(this.terraformState, openTofuResult.terraformState)
+                && Objects.equals(
+                        this.generatedFileContentMap, openTofuResult.generatedFileContentMap)
+                && Objects.equals(this.openTofuVersionUsed, openTofuResult.openTofuVersionUsed)
+                && Objects.equals(this.commandSuccessful, openTofuResult.commandSuccessful);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, commandStdOutput, commandStdError, terraformState, generatedFileContentMap,
-                openTofuVersionUsed, commandSuccessful);
+        return Objects.hash(
+                requestId,
+                commandStdOutput,
+                commandStdError,
+                terraformState,
+                generatedFileContentMap,
+                openTofuVersionUsed,
+                commandSuccessful);
     }
 
     @Override
@@ -291,16 +280,22 @@ public class OpenTofuResult {
         sb.append("    commandStdOutput: ").append(toIndentedString(commandStdOutput)).append("\n");
         sb.append("    commandStdError: ").append(toIndentedString(commandStdError)).append("\n");
         sb.append("    terraformState: ").append(toIndentedString(terraformState)).append("\n");
-        sb.append("    generatedFileContentMap: ").append(toIndentedString(generatedFileContentMap)).append("\n");
-        sb.append("    openTofuVersionUsed: ").append(toIndentedString(openTofuVersionUsed)).append("\n");
-        sb.append("    commandSuccessful: ").append(toIndentedString(commandSuccessful)).append("\n");
+        sb.append("    generatedFileContentMap: ")
+                .append(toIndentedString(generatedFileContentMap))
+                .append("\n");
+        sb.append("    openTofuVersionUsed: ")
+                .append(toIndentedString(openTofuVersionUsed))
+                .append("\n");
+        sb.append("    commandSuccessful: ")
+                .append(toIndentedString(commandSuccessful))
+                .append("\n");
         sb.append("}");
         return sb.toString();
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -308,6 +303,4 @@ public class OpenTofuResult {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

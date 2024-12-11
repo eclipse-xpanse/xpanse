@@ -5,14 +5,11 @@
 
 package org.eclipse.xpanse.modules.models.response;
 
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * Result codes for the REST API.
- */
+/** Result codes for the REST API. */
 public enum ErrorType {
     RUNTIME_ERROR("Runtime Error"),
     BAD_PARAMETERS("Parameters Invalid"),
@@ -46,8 +43,8 @@ public enum ErrorType {
     DEPLOYMENT_VARIABLE_INVALID("Deployment Variable Invalid"),
     UNAUTHORIZED("Unauthorized"),
     ACCESS_DENIED("Access Denied"),
-    SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION("Sensitive "
-            + "Field Encryption Or Decryption Failed Exception"),
+    SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION(
+            "Sensitive " + "Field Encryption Or Decryption Failed Exception"),
     UNSUPPORTED_ENUM_VALUE("Unsupported Enum Value"),
     TERRAFORM_BOOT_REQUEST_FAILED("Terraform Boot Request Failed"),
     TOFU_MAKER_REQUEST_FAILED("Tofu Maker Request Failed"),
@@ -104,17 +101,13 @@ public enum ErrorType {
         return null;
     }
 
-    /**
-     * For ResultType deserialize.
-     */
+    /** For ResultType deserialize. */
     @JsonValue
     public String toValue() {
         return this.value;
     }
 
-    /**
-     * For ResultType serialize.
-     */
+    /** For ResultType serialize. */
     @JsonCreator
     public ErrorType getByValue(String value) {
         for (ErrorType errorType : values()) {
@@ -125,4 +118,3 @@ public enum ErrorType {
         return null;
     }
 }
-

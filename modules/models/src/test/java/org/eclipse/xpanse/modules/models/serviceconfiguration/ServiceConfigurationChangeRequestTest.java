@@ -15,8 +15,9 @@ public class ServiceConfigurationChangeRequestTest {
     public static final UUID CHANGE_ID = UUID.randomUUID();
     public static final Map<String, Object> configParameters = Map.of("changeId", CHANGE_ID);
     public static final Map<String, Object> ansibleInventory = Map.of("changeId", CHANGE_ID);
-    public static final AnsibleScriptConfig ansibleScriptConfig= new AnsibleScriptConfig();
-    private final ServiceConfigurationChangeRequest changeRequestForAgent = new ServiceConfigurationChangeRequest();
+    public static final AnsibleScriptConfig ansibleScriptConfig = new AnsibleScriptConfig();
+    private final ServiceConfigurationChangeRequest changeRequestForAgent =
+            new ServiceConfigurationChangeRequest();
 
     @BeforeEach
     void setUp() {
@@ -52,16 +53,22 @@ public class ServiceConfigurationChangeRequestTest {
     @Test
     void testCanEqual() {
         assertThat(changeRequestForAgent.canEqual("other")).isFalse();
-        assertThat(changeRequestForAgent.canEqual(new ServiceConfigurationChangeRequest())).isTrue();
+        assertThat(changeRequestForAgent.canEqual(new ServiceConfigurationChangeRequest()))
+                .isTrue();
     }
 
     @Test
     void testToString() {
-        String result = "ServiceConfigurationChangeRequest(changeId=" + CHANGE_ID
-                + ", configParameters=" + configParameters
-                + ", ansibleScriptConfig=" + ansibleScriptConfig
-                + ", ansibleInventory=" + ansibleInventory
-                + ")";
+        String result =
+                "ServiceConfigurationChangeRequest(changeId="
+                        + CHANGE_ID
+                        + ", configParameters="
+                        + configParameters
+                        + ", ansibleScriptConfig="
+                        + ansibleScriptConfig
+                        + ", ansibleInventory="
+                        + ansibleInventory
+                        + ")";
         assertThat(changeRequestForAgent.toString()).isEqualTo(result);
     }
 }

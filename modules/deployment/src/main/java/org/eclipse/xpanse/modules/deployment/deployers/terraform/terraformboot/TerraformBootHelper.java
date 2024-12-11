@@ -24,9 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for all helpers methods to interact with terraform-boot.
- */
+/** Bean for all helpers methods to interact with terraform-boot. */
 @Component
 @Slf4j
 @Profile("terraform-boot")
@@ -39,18 +37,14 @@ public class TerraformBootHelper {
     @Value("${server.port}")
     private String port;
 
-    /**
-     * Constructor for TerraformBootHelper.
-     */
-    public TerraformBootHelper(TerraformBootConfig terraformBootConfig,
-                               DeployEnvironments deployEnvironments) {
+    /** Constructor for TerraformBootHelper. */
+    public TerraformBootHelper(
+            TerraformBootConfig terraformBootConfig, DeployEnvironments deployEnvironments) {
         this.terraformBootConfig = terraformBootConfig;
         this.deployEnvironments = deployEnvironments;
     }
 
-    /**
-     * Converts OCL DeployFromGitRepo type to terraform-boot TerraformScriptGitRepoDetails type.
-     */
+    /** Converts OCL DeployFromGitRepo type to terraform-boot TerraformScriptGitRepoDetails type. */
     public TerraformScriptGitRepoDetails convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
             ScriptsRepo scriptsRepo) {
         TerraformScriptGitRepoDetails terraformScriptGitRepoDetails =
@@ -61,32 +55,26 @@ public class TerraformBootHelper {
         return terraformScriptGitRepoDetails;
     }
 
-    /**
-     * Returns all terraform script files.
-     */
+    /** Returns all terraform script files. */
     public List<String> getFiles(DeployTask task) {
         String deployer = task.getOcl().getDeployment().getDeployer();
         return Collections.singletonList(deployer);
     }
 
-    /**
-     * Builds a map of all variables that must be passed to terraform executor.
-     */
+    /** Builds a map of all variables that must be passed to terraform executor. */
     public Map<String, Object> getInputVariables(DeployTask deployTask, boolean isDeployRequest) {
         return this.deployEnvironments.getInputVariables(deployTask, isDeployRequest);
     }
 
     /**
-     * Builds a map of all variables that must be set as environment variables to the
-     * terraform executor.
+     * Builds a map of all variables that must be set as environment variables to the terraform
+     * executor.
      */
     public Map<String, String> getEnvironmentVariables(DeployTask deployTask) {
         return this.deployEnvironments.getEnvironmentVariables(deployTask);
     }
 
-    /**
-     * generates webhook config.
-     */
+    /** generates webhook config. */
     public WebhookConfig getWebhookConfigWithTask(DeployTask deployTask) {
         WebhookConfig webhookConfig = new WebhookConfig();
         String callbackUrl =
@@ -100,8 +88,8 @@ public class TerraformBootHelper {
         try {
             String clientBaseUri = terraformBootConfig.getClientBaseUri();
             if (StringUtils.isBlank(clientBaseUri)) {
-                return String.format("http://%s:%s", InetAddress.getLocalHost().getHostAddress(),
-                        port);
+                return String.format(
+                        "http://%s:%s", InetAddress.getLocalHost().getHostAddress(), port);
             } else {
                 return clientBaseUri;
             }
@@ -110,5 +98,4 @@ public class TerraformBootHelper {
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
-
 }

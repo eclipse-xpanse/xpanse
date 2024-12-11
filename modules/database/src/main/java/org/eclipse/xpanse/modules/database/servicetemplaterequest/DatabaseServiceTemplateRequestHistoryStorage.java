@@ -18,9 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Implements methods of ServiceTemplateRequestHistoryStorage interface.
- */
+/** Implements methods of ServiceTemplateRequestHistoryStorage interface. */
 @Slf4j
 @Component
 @Transactional
@@ -43,38 +41,47 @@ public class DatabaseServiceTemplateRequestHistoryStorage
 
     @Override
     public ServiceTemplateRequestHistoryEntity getEntityByRequestId(UUID requestId) {
-        return repository.findById(requestId).orElseThrow(() ->
-                new ServiceTemplateRequestNotFound(
-                        "Service template request with id " + requestId + " not found.")
-        );
+        return repository
+                .findById(requestId)
+                .orElseThrow(
+                        () ->
+                                new ServiceTemplateRequestNotFound(
+                                        "Service template request with id "
+                                                + requestId
+                                                + " not found."));
     }
 
     @Override
     public List<ServiceTemplateRequestHistoryEntity> listServiceTemplateRequestHistoryByQueryModel(
             ServiceTemplateRequestHistoryQueryModel queryModel) {
-        Specification<ServiceTemplateRequestHistoryEntity> spec = (root, query, criteriaBuilder)
-                -> {
-            List<Predicate> predicateList = new ArrayList<>();
-            if (Objects.nonNull(queryModel.getServiceTemplateId())) {
-                predicateList.add(criteriaBuilder.equal(root.get("serviceTemplate").get("id"),
-                        queryModel.getServiceTemplateId()));
-            }
-            if (Objects.nonNull(queryModel.getCsp())) {
-                predicateList.add(criteriaBuilder.equal(root.get("serviceTemplate").get("csp"),
-                        queryModel.getCsp()));
-            }
-            if (Objects.nonNull(queryModel.getRequestType())) {
-                predicateList.add(criteriaBuilder.equal(root.get("requestType"),
-                        queryModel.getRequestType()));
-            }
-            if (Objects.nonNull(queryModel.getStatus())) {
-                predicateList.add(
-                        criteriaBuilder.equal(root.get("status"), queryModel.getStatus()));
-            }
-            query.distinct(true);
-            query.orderBy(criteriaBuilder.asc(root.get("createTime")));
-            return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
-        };
+        Specification<ServiceTemplateRequestHistoryEntity> spec =
+                (root, query, criteriaBuilder) -> {
+                    List<Predicate> predicateList = new ArrayList<>();
+                    if (Objects.nonNull(queryModel.getServiceTemplateId())) {
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("serviceTemplate").get("id"),
+                                        queryModel.getServiceTemplateId()));
+                    }
+                    if (Objects.nonNull(queryModel.getCsp())) {
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("serviceTemplate").get("csp"),
+                                        queryModel.getCsp()));
+                    }
+                    if (Objects.nonNull(queryModel.getRequestType())) {
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("requestType"), queryModel.getRequestType()));
+                    }
+                    if (Objects.nonNull(queryModel.getStatus())) {
+                        predicateList.add(
+                                criteriaBuilder.equal(root.get("status"), queryModel.getStatus()));
+                    }
+                    query.distinct(true);
+                    query.orderBy(criteriaBuilder.asc(root.get("createTime")));
+                    return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
+                };
 
         return repository.findAll(spec);
     }

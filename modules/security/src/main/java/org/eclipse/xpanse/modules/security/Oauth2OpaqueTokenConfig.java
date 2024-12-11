@@ -19,9 +19,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenAuthenticationConverter;
 
-/**
- * Beans necessary to manage Oauth2 with OpaqueToken.
- */
+/** Beans necessary to manage Oauth2 with OpaqueToken. */
 @Configuration
 @Profile("oauth")
 public class Oauth2OpaqueTokenConfig {
@@ -30,9 +28,9 @@ public class Oauth2OpaqueTokenConfig {
     private String userIdKey;
 
     /*
-    * OpaqueTokenAuthenticationConverter must be exposed as a bean to be
-    * picked by @WithOpaqueToken in tests.
-    */
+     * OpaqueTokenAuthenticationConverter must be exposed as a bean to be
+     * picked by @WithOpaqueToken in tests.
+     */
     @Bean
     @ConditionalOnProperty(name = "authorization.token.type", havingValue = "OpaqueToken")
     OpaqueTokenAuthenticationConverter opaqueTokenAuthenticationConverter(
@@ -41,8 +39,11 @@ public class Oauth2OpaqueTokenConfig {
             final var username = (String) authenticatedPrincipal.getAttributes().get(userIdKey);
             final var authorities =
                     authoritiesConverter.convert(authenticatedPrincipal.getAttributes());
-            return new XpanseAuthentication(username, authorities,
-                    authenticatedPrincipal.getAttributes(), introspectedToken);
+            return new XpanseAuthentication(
+                    username,
+                    authorities,
+                    authenticatedPrincipal.getAttributes(),
+                    introspectedToken);
         };
     }
 }

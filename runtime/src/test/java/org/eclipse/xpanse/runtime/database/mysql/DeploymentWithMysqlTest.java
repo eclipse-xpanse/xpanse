@@ -68,22 +68,17 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
-    @Resource
-    private ServiceDeployerApi serviceDeployerApi;
-    @Resource
-    private UserCloudCredentialsApi userCloudCredentialsApi;
-    @Resource
-    private ServiceOrderManageApi serviceOrderManageApi;
-    @Resource
-    private ServiceTemplateApi serviceTemplateApi;
+    @Resource private ServiceDeployerApi serviceDeployerApi;
+    @Resource private UserCloudCredentialsApi userCloudCredentialsApi;
+    @Resource private ServiceOrderManageApi serviceOrderManageApi;
+    @Resource private ServiceTemplateApi serviceTemplateApi;
+
     @Resource
     private ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator;
-    @Resource
-    private OclLoader oclLoader;
-    @Resource
-    private ServiceMigrationApi serviceMigrationApi;
-    @Resource
-    private ServiceTemplateStorage serviceTemplateStorage;
+
+    @Resource private OclLoader oclLoader;
+    @Resource private ServiceMigrationApi serviceMigrationApi;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
@@ -92,8 +87,9 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         if (Objects.isNull(serviceTemplateHistory)) {
             return;
         }
-        ServiceTemplateDetailVo serviceTemplate = serviceTemplateApi.getServiceTemplateDetailsById(
-                serviceTemplateHistory.getServiceTemplateId());
+        ServiceTemplateDetailVo serviceTemplate =
+                serviceTemplateApi.getServiceTemplateDetailsById(
+                        serviceTemplateHistory.getServiceTemplateId());
         approveServiceTemplateRegistration(serviceTemplate);
         addCredentialForHuaweiCloud();
         ServiceOrder serviceOrder = deployService(serviceTemplate);
@@ -105,7 +101,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
             UserOrderableServiceVo orderableServiceDetails =
                     serviceDeployerApi.getOrderableServiceDetailsByServiceId(serviceId.toString());
-            assertEquals(orderableServiceDetails.getServiceTemplateId(),
+            assertEquals(
+                    orderableServiceDetails.getServiceTemplateId(),
                     serviceTemplateHistory.getServiceTemplateId());
             ServiceDeploymentState serviceDeploymentState =
                     deployedServiceDetails.getServiceDeploymentState();
@@ -114,8 +111,9 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
                 testModifyAndGetDetails(serviceId, serviceTemplate);
                 ServiceOrder migrateOrder = migrateService(serviceId, serviceTemplate);
                 if (waitServiceOrderIsCompleted(migrateOrder.getOrderId())) {
-                    ServiceOrderDetails serviceOrderDetails = serviceOrderManageApi
-                            .getOrderDetailsByOrderId(migrateOrder.getOrderId().toString());
+                    ServiceOrderDetails serviceOrderDetails =
+                            serviceOrderManageApi.getOrderDetailsByOrderId(
+                                    migrateOrder.getOrderId().toString());
                     testDestroyAndGetDetails(serviceOrderDetails.getServiceId());
                     testListServiceOrders(serviceId);
                     testDeleteServiceOrders(serviceId);
@@ -154,7 +152,6 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return serviceDeployerApi.getSelfHostedServiceDetailsById(serviceId.toString());
     }
 
-
     private boolean waitServiceOrderIsCompleted(UUID orderId) throws Exception {
         final long endTime = System.nanoTime() + TimeUnit.MINUTES.toNanos(2);
         boolean isCompleted = false;
@@ -177,7 +174,6 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return false;
     }
 
-
     DeployRequestBase getDeployRequestBase(ServiceTemplateDetailVo serviceTemplate) {
         DeployRequestBase deployRequestBase = new DeployRequestBase();
         deployRequestBase.setServiceName(serviceTemplate.getName());
@@ -197,16 +193,19 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         List<AvailabilityZoneConfig> availabilityZoneConfigs =
                 serviceTemplate.getDeployment().getServiceAvailabilityConfig();
         Map<String, String> availabilityZones = new HashMap<>();
-        availabilityZoneConfigs.forEach(availabilityZoneConfig ->
-                availabilityZones.put(availabilityZoneConfig.getVarName(),
-                        availabilityZoneConfig.getDisplayName()));
+        availabilityZoneConfigs.forEach(
+                availabilityZoneConfig ->
+                        availabilityZones.put(
+                                availabilityZoneConfig.getVarName(),
+                                availabilityZoneConfig.getDisplayName()));
         deployRequestBase.setAvailabilityZones(availabilityZones);
         return deployRequestBase;
     }
 
     ServiceTemplateRequestInfo registerServiceTemplate() throws Exception {
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl =
+                oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName(UUID.randomUUID().toString());
         return serviceTemplateApi.register(ocl);
     }
@@ -237,11 +236,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
             ServiceOrderDetails serviceOrderDetails =
                     serviceOrderManageApi.getOrderDetailsByOrderId(
                             serviceOrder.getOrderId().toString());
-            assertEquals(serviceOrderDetails.getTaskStatus(),
-                    TaskStatus.SUCCESSFUL);
-            assertEquals(serviceOrderDetails.getTaskType(),
-                    ServiceOrderType.MODIFY);
-
+            assertEquals(serviceOrderDetails.getTaskStatus(), TaskStatus.SUCCESSFUL);
+            assertEquals(serviceOrderDetails.getTaskType(), ServiceOrderType.MODIFY);
         }
     }
 
@@ -253,10 +249,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
             ServiceOrderDetails serviceOrderDetails =
                     serviceOrderManageApi.getOrderDetailsByOrderId(
                             serviceOrder.getOrderId().toString());
-            assertEquals(serviceOrderDetails.getTaskStatus(),
-                    TaskStatus.SUCCESSFUL);
-            assertEquals(serviceOrderDetails.getTaskType(),
-                    ServiceOrderType.DESTROY);
+            assertEquals(serviceOrderDetails.getTaskStatus(), TaskStatus.SUCCESSFUL);
+            assertEquals(serviceOrderDetails.getTaskType(), ServiceOrderType.DESTROY);
         }
     }
 
@@ -291,10 +285,19 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY, "The access key.",
-                        true, false, "AK_VALUE"));
-        credentialVariables.add(new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                "The security key.", true, false, "SK_VALUE"));
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.",
+                        true,
+                        false,
+                        "AK_VALUE"));
+        credentialVariables.add(
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.",
+                        true,
+                        false,
+                        "SK_VALUE"));
         createCredential.setVariables(credentialVariables);
         createCredential.setTimeToLive(300);
         userCloudCredentialsApi.addUserCloudCredential(createCredential);

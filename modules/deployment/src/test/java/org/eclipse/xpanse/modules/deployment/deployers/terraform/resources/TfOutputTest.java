@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of TfOutput.
- */
+/** Test of TfOutput. */
 class TfOutputTest {
 
     private static final String type = "type";
@@ -67,10 +65,7 @@ class TfOutputTest {
 
     @Test
     void testToString() {
-        String expectedToString = "TfOutput(" +
-                "type=" + type + ", " +
-                "value=" + value + ")";
+        String expectedToString = "TfOutput(" + "type=" + type + ", " + "value=" + value + ")";
         assertEquals(expectedToString, tfOutput.toString());
     }
-
 }

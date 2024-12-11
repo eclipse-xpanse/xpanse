@@ -46,9 +46,7 @@ import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonito
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Resource conversion.
- */
+/** Resource conversion. */
 @Slf4j
 @Component
 public class HuaweiCloudDataModelConverter {
@@ -56,45 +54,45 @@ public class HuaweiCloudDataModelConverter {
     private final Map<String, MonitorResourceType> metricNameToResourceTypeMap = new HashMap<>();
 
     /**
-     * The constructor.
-     * Initializes the metricNameToResourceTypeMap with the mapping of metric names to monitor
-     * resource types.
+     * The constructor. Initializes the metricNameToResourceTypeMap with the mapping of metric names
+     * to monitor resource types.
      */
     public HuaweiCloudDataModelConverter() {
-        metricNameToResourceTypeMap.putAll(Map.of(
-                HuaweiCloudMonitorMetrics.CPU_USAGE, MonitorResourceType.CPU,
-                HuaweiCloudMonitorMetrics.CPU_UTILIZED, MonitorResourceType.CPU,
-                HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE, MonitorResourceType.MEM,
-                HuaweiCloudMonitorMetrics.MEM_UTILIZED, MonitorResourceType.MEM,
-                HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN,
-                MonitorResourceType.VM_NETWORK_INCOMING,
-                HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT, MonitorResourceType.VM_NETWORK_INCOMING,
-                HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT,
-                MonitorResourceType.VM_NETWORK_OUTGOING,
-                HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV, MonitorResourceType.VM_NETWORK_OUTGOING
-        ));
+        metricNameToResourceTypeMap.putAll(
+                Map.of(
+                        HuaweiCloudMonitorMetrics.CPU_USAGE,
+                        MonitorResourceType.CPU,
+                        HuaweiCloudMonitorMetrics.CPU_UTILIZED,
+                        MonitorResourceType.CPU,
+                        HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE,
+                        MonitorResourceType.MEM,
+                        HuaweiCloudMonitorMetrics.MEM_UTILIZED,
+                        MonitorResourceType.MEM,
+                        HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN,
+                        MonitorResourceType.VM_NETWORK_INCOMING,
+                        HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT,
+                        MonitorResourceType.VM_NETWORK_INCOMING,
+                        HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT,
+                        MonitorResourceType.VM_NETWORK_OUTGOING,
+                        HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV,
+                        MonitorResourceType.VM_NETWORK_OUTGOING));
     }
 
-    /**
-     * Build ListMetricsRequest for HuaweiCloud Monitor client.
-     */
-    public ListMetricsRequest buildListMetricsRequest(
-            DeployResource deployResource) {
+    /** Build ListMetricsRequest for HuaweiCloud Monitor client. */
+    public ListMetricsRequest buildListMetricsRequest(DeployResource deployResource) {
         String resourceId = deployResource.getResourceId();
         return new ListMetricsRequest()
                 .withDim0(HuaweiCloudMonitorConstants.DIM0_PREFIX + resourceId);
     }
 
-    /**
-     * Build ShowMetricDataRequest for HuaweiCloud Monitor client.
-     */
+    /** Build ShowMetricDataRequest for HuaweiCloud Monitor client. */
     public ShowMetricDataRequest buildShowMetricDataRequest(
-            ResourceMetricsRequest resourceMetricRequest,
-            MetricInfoList metricInfoList) {
+            ResourceMetricsRequest resourceMetricRequest, MetricInfoList metricInfoList) {
         checkNullParamAndFillValue(resourceMetricRequest);
         return new ShowMetricDataRequest()
-                .withDim0(HuaweiCloudMonitorConstants.DIM0_PREFIX
-                        + resourceMetricRequest.getDeployResource().getResourceId())
+                .withDim0(
+                        HuaweiCloudMonitorConstants.DIM0_PREFIX
+                                + resourceMetricRequest.getDeployResource().getResourceId())
                 .withFilter(FilterEnum.valueOf(HuaweiCloudMonitorConstants.FILTER_AVERAGE))
                 .withPeriod(resourceMetricRequest.getGranularity())
                 .withFrom(resourceMetricRequest.getFrom())
@@ -103,12 +101,9 @@ public class HuaweiCloudDataModelConverter {
                 .withMetricName(metricInfoList.getMetricName());
     }
 
-    /**
-     * Build BatchListMetricDataRequest for HuaweiCloud Monitor client.
-     */
+    /** Build BatchListMetricDataRequest for HuaweiCloud Monitor client. */
     public BatchListMetricDataRequest buildBatchListMetricDataRequest(
-            ServiceMetricsRequest serviceMetricRequest,
-            Map<String, List<MetricInfoList>> map) {
+            ServiceMetricsRequest serviceMetricRequest, Map<String, List<MetricInfoList>> map) {
         checkNullParamAndFillValue(serviceMetricRequest);
         List<MetricInfo> metricInfos = new ArrayList<>();
         buildMetricsDimension(serviceMetricRequest, map, metricInfos);
@@ -123,16 +118,14 @@ public class HuaweiCloudDataModelConverter {
         return batchListMetricDataRequest;
     }
 
-    /**
-     * ShowMetricDataResponse conversion to Metric.
-     */
-    public Metric convertShowMetricDataResponseToMetric(DeployResource deployResource,
-                                                        ShowMetricDataResponse response,
-                                                        MetricInfoList metricInfoList,
-                                                        boolean onlyLastKnownMetric) {
+    /** ShowMetricDataResponse conversion to Metric. */
+    public Metric convertShowMetricDataResponseToMetric(
+            DeployResource deployResource,
+            ShowMetricDataResponse response,
+            MetricInfoList metricInfoList,
+            boolean onlyLastKnownMetric) {
         Metric metric =
-                createMetric(metricInfoList.getMetricName(), deployResource,
-                        metricInfoList);
+                createMetric(metricInfoList.getMetricName(), deployResource, metricInfoList);
         if (Objects.nonNull(response) && !CollectionUtils.isEmpty(response.getDatapoints())) {
             List<Datapoint> datapointList = response.getDatapoints();
             metric.setMetrics(convertDataPointToMetricItem(datapointList, onlyLastKnownMetric));
@@ -140,8 +133,8 @@ public class HuaweiCloudDataModelConverter {
         return metric;
     }
 
-    private List<MetricItem> convertDataPointToMetricItem(List<Datapoint> datapointList,
-                                                          boolean onlyLastKnownMetric) {
+    private List<MetricItem> convertDataPointToMetricItem(
+            List<Datapoint> datapointList, boolean onlyLastKnownMetric) {
         List<MetricItem> metricItems = new ArrayList<>();
         if (onlyLastKnownMetric) {
             MetricItem metricItem = new MetricItem();
@@ -161,10 +154,7 @@ public class HuaweiCloudDataModelConverter {
         return metricItems;
     }
 
-
-    /**
-     * BatchListMetricDataResponse conversion to Metrics.
-     */
+    /** BatchListMetricDataResponse conversion to Metrics. */
     public List<Metric> convertBatchListMetricDataResponseToMetric(
             BatchListMetricDataResponse batchListMetricDataResponse,
             Map<String, List<MetricInfoList>> deployResourceMetricInfoMap,
@@ -173,15 +163,20 @@ public class HuaweiCloudDataModelConverter {
         List<Metric> metrics = new ArrayList<>();
         for (DeployResource deployResource : deployResources) {
             for (BatchMetricData batchMetricData : batchListMetricDataResponse.getMetrics()) {
-                if (Objects.nonNull(batchMetricData) && deployResource.getResourceId()
-                        .equals(batchMetricData.getDimensions().getFirst().getValue())) {
+                if (Objects.nonNull(batchMetricData)
+                        && deployResource
+                                .getResourceId()
+                                .equals(batchMetricData.getDimensions().getFirst().getValue())) {
                     List<MetricInfoList> metricInfoLists =
                             deployResourceMetricInfoMap.get(deployResource.getResourceId());
                     for (MetricInfoList metricInfoList : metricInfoLists) {
-                        if (metricInfoList.getMetricName()
+                        if (metricInfoList
+                                .getMetricName()
                                 .equals(batchMetricData.getMetricName())) {
                             Metric metric =
-                                    createMetric(metricInfoList.getMetricName(), deployResource,
+                                    createMetric(
+                                            metricInfoList.getMetricName(),
+                                            deployResource,
                                             metricInfoList);
                             if (!CollectionUtils.isEmpty(batchMetricData.getDatapoints())) {
                                 List<DatapointForBatchMetric> datapointForBatchMetrics =
@@ -221,8 +216,8 @@ public class HuaweiCloudDataModelConverter {
         return metricItems;
     }
 
-    private Metric createMetric(String metricName, DeployResource deployResource,
-                                MetricInfoList metricInfo) {
+    private Metric createMetric(
+            String metricName, DeployResource deployResource, MetricInfoList metricInfo) {
         Metric metric = new Metric();
         metric.setName(metricName);
         if (metricNameToResourceTypeMap.containsKey(metricName)) {
@@ -241,23 +236,22 @@ public class HuaweiCloudDataModelConverter {
         return metric;
     }
 
-    private void buildMetricsDimension(ServiceMetricsRequest serviceMetricRequest,
-                                       Map<String, List<MetricInfoList>> map,
-                                       List<MetricInfo> metricInfos) {
+    private void buildMetricsDimension(
+            ServiceMetricsRequest serviceMetricRequest,
+            Map<String, List<MetricInfoList>> map,
+            List<MetricInfo> metricInfos) {
         for (DeployResource deployResource : serviceMetricRequest.getDeployResources()) {
             List<MetricsDimension> metricsDimensions = new ArrayList<>();
             metricsDimensions.add(
                     new MetricsDimension()
                             .withName(HuaweiCloudMonitorConstants.VM_DIMENSION_NAME)
-                            .withValue(deployResource.getResourceId())
-            );
+                            .withValue(deployResource.getResourceId()));
             for (MetricInfoList metricInfoList : map.get(deployResource.getResourceId())) {
                 metricInfos.add(
                         new MetricInfo()
                                 .withNamespace(metricInfoList.getNamespace())
                                 .withMetricName(metricInfoList.getMetricName())
-                                .withDimensions(metricsDimensions)
-                );
+                                .withDimensions(metricsDimensions));
             }
         }
     }
@@ -265,8 +259,9 @@ public class HuaweiCloudDataModelConverter {
     private <T extends MetricsRequest> void checkNullParamAndFillValue(T metricRequest) {
 
         if (Objects.isNull(metricRequest.getFrom())) {
-            metricRequest.setFrom(System.currentTimeMillis()
-                    - HuaweiCloudMonitorConstants.FIVE_MINUTES_MILLISECONDS);
+            metricRequest.setFrom(
+                    System.currentTimeMillis()
+                            - HuaweiCloudMonitorConstants.FIVE_MINUTES_MILLISECONDS);
         }
         if (Objects.isNull(metricRequest.getTo())) {
             metricRequest.setTo(System.currentTimeMillis());
@@ -278,11 +273,9 @@ public class HuaweiCloudDataModelConverter {
             if (to - from <= FOUR_HOUR_MILLISECONDS) {
                 metricRequest.setGranularity(HuaweiCloudMonitorConstants.PERIOD_REAL_TIME_INT);
             } else if (to - from > FOUR_HOUR_MILLISECONDS && to - from <= ONE_DAY_MILLISECONDS) {
-                metricRequest.setGranularity(
-                        HuaweiCloudMonitorConstants.PERIOD_FIVE_MINUTES_INT);
+                metricRequest.setGranularity(HuaweiCloudMonitorConstants.PERIOD_FIVE_MINUTES_INT);
             } else if (to - from > ONE_DAY_MILLISECONDS && to - from <= THREE_DAY_MILLISECONDS) {
-                metricRequest.setGranularity(
-                        HuaweiCloudMonitorConstants.PERIOD_TWENTY_MINUTES_INT);
+                metricRequest.setGranularity(HuaweiCloudMonitorConstants.PERIOD_TWENTY_MINUTES_INT);
             } else if (to - from > THREE_DAY_MILLISECONDS && to - from <= TEN_DAY_MILLISECONDS) {
                 metricRequest.setGranularity(HuaweiCloudMonitorConstants.PERIOD_ONE_HOUR_INT);
             } else if (to - from > TEN_DAY_MILLISECONDS && to - from <= ONE_MONTH_MILLISECONDS) {
@@ -297,11 +290,11 @@ public class HuaweiCloudDataModelConverter {
      * Get target MetricInfoList object by type.
      *
      * @param metrics list of MetricInfoList
-     * @param type    MonitorResourceType
+     * @param type MonitorResourceType
      * @return MetricInfoList object
      */
-    public MetricInfoList getTargetMetricInfo(List<MetricInfoList> metrics,
-                                              MonitorResourceType type) {
+    public MetricInfoList getTargetMetricInfo(
+            List<MetricInfoList> metrics, MonitorResourceType type) {
         if (MonitorResourceType.CPU.equals(type)) {
             for (MetricInfoList metricInfoList : metrics) {
                 if (isAgentCpuMetrics(metricInfoList)) {
@@ -357,19 +350,18 @@ public class HuaweiCloudDataModelConverter {
     public MonitorResourceType getMonitorResourceTypeByMetricName(String metricName) {
         MonitorResourceType type = null;
         switch (metricName) {
-            case HuaweiCloudMonitorMetrics.CPU_USAGE,
-                    HuaweiCloudMonitorMetrics.CPU_UTILIZED -> type = MonitorResourceType.CPU;
+            case HuaweiCloudMonitorMetrics.CPU_USAGE, HuaweiCloudMonitorMetrics.CPU_UTILIZED ->
+                    type = MonitorResourceType.CPU;
             case HuaweiCloudMonitorMetrics.MEM_UTILIZED,
-                    HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE -> type =
-                    MonitorResourceType.MEM;
+                            HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE ->
+                    type = MonitorResourceType.MEM;
             case HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV,
-                    HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN -> type =
-                    MonitorResourceType.VM_NETWORK_INCOMING;
+                            HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_IN ->
+                    type = MonitorResourceType.VM_NETWORK_INCOMING;
             case HuaweiCloudMonitorMetrics.VM_NET_BIT_SENT,
-                    HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT -> type =
-                    MonitorResourceType.VM_NETWORK_OUTGOING;
-            default -> {
-            }
+                            HuaweiCloudMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT ->
+                    type = MonitorResourceType.VM_NETWORK_OUTGOING;
+            default -> {}
         }
         return type;
     }
@@ -382,7 +374,7 @@ public class HuaweiCloudDataModelConverter {
     private boolean isAgentMemMetrics(MetricInfoList metricInfo) {
         return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
                 && HuaweiCloudMonitorMetrics.MEM_USED_IN_PERCENTAGE.equals(
-                metricInfo.getMetricName());
+                        metricInfo.getMetricName());
     }
 
     private boolean isAgentVmNetworkInMetrics(MetricInfoList metricInfo) {
@@ -394,5 +386,4 @@ public class HuaweiCloudDataModelConverter {
         return HuaweiCloudNameSpaceKind.ECS_AGT.toValue().equals(metricInfo.getNamespace())
                 && HuaweiCloudMonitorMetrics.VM_NET_BIT_RECV.equals(metricInfo.getMetricName());
     }
-
 }

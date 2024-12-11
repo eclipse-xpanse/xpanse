@@ -23,29 +23,22 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Migration process deployment service processing class.
- */
+/** Migration process deployment service processing class. */
 @Slf4j
 @Component
 public class StartDeploy implements Serializable, JavaDelegate {
 
-
     private final DeployService deployService;
     private final RuntimeService runtimeService;
 
-    /**
-     * Constructor for StartDeploy bean.
-     */
+    /** Constructor for StartDeploy bean. */
     @Autowired
     public StartDeploy(DeployService deployService, RuntimeService runtimeService) {
         this.deployService = deployService;
         this.runtimeService = runtimeService;
     }
 
-    /**
-     * Methods when performing deployment tasks.
-     */
+    /** Methods when performing deployment tasks. */
     @SneakyThrows
     @Override
     public void execute(DelegateExecution execution) {
@@ -58,12 +51,16 @@ public class StartDeploy implements Serializable, JavaDelegate {
         BeanUtils.copyProperties(migrateRequest, deployRequest);
         deployRequest.setServiceId(newServiceId);
         int retryTimes = (int) variables.get(MigrateConstants.DEPLOY_RETRY_NUM);
-        log.info("Start deploy task in migration workflow with id:{}. Request:{}. Retry times:{}",
-                processInstanceId, deployRequest, retryTimes);
+        log.info(
+                "Start deploy task in migration workflow with id:{}. Request:{}. Retry times:{}",
+                processInstanceId,
+                deployRequest,
+                retryTimes);
         UUID originalServiceId = (UUID) variables.get(MigrateConstants.ORIGINAL_SERVICE_ID);
         UUID migrateOrderId = (UUID) variables.get(MigrateConstants.MIGRATE_ORDER_ID);
-        ServiceOrder serviceOrder = deployService.deployServiceByWorkflow(originalServiceId,
-                processInstanceId, migrateOrderId, deployRequest);
+        ServiceOrder serviceOrder =
+                deployService.deployServiceByWorkflow(
+                        originalServiceId, processInstanceId, migrateOrderId, deployRequest);
         log.info("Started new deploy task with order: {} successfully.", serviceOrder.toString());
     }
 }

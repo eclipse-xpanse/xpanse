@@ -20,8 +20,8 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 
 /**
- * Bean to create an authorized client which can be used by any other method
- * within the application to fetch authorization tokens.
+ * Bean to create an authorized client which can be used by any other method within the application
+ * to fetch authorization tokens.
  */
 @Configuration
 @Profile("oauth")
@@ -34,10 +34,8 @@ public class Oauth2ClientConfiguration {
     ClientRegistration oauthClientRegistration(
             @Value("${oauth.token.url}") String tokenUri,
             @Value("${oauth.protected.api.client.id}") String clientId,
-            @Value("${oauth.protected.api.client.secret}") String clientSecret
-    ) {
-        return ClientRegistration
-                .withRegistrationId(OAUTH_CLIENT_ID)
+            @Value("${oauth.protected.api.client.secret}") String clientSecret) {
+        return ClientRegistration.withRegistrationId(OAUTH_CLIENT_ID)
                 .tokenUri(tokenUri)
                 .clientId(clientId)
                 .clientSecret(clientSecret)
@@ -60,8 +58,8 @@ public class Oauth2ClientConfiguration {
     }
 
     /**
-     * Create the authorized client manager and service manager using the
-     * beans created and configured above.
+     * Create the authorized client manager and service manager using the beans created and
+     * configured above.
      */
     @Bean
     public AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceAndManager(
@@ -69,9 +67,7 @@ public class Oauth2ClientConfiguration {
             OAuth2AuthorizedClientService authorizedClientService) {
 
         OAuth2AuthorizedClientProvider authorizedClientProvider =
-                OAuth2AuthorizedClientProviderBuilder.builder()
-                        .clientCredentials()
-                        .build();
+                OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build();
 
         AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
                 new AuthorizedClientServiceOAuth2AuthorizedClientManager(
@@ -80,5 +76,4 @@ public class Oauth2ClientConfiguration {
 
         return authorizedClientManager;
     }
-
 }

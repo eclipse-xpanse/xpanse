@@ -10,9 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * Exception throw when variables validation fails.
- */
+/** Exception throw when variables validation fails. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class VariableValidationFailedException extends RuntimeException {
@@ -22,5 +20,4 @@ public class VariableValidationFailedException extends RuntimeException {
         super(String.format("Variable validation failed: %s", StringUtils.join(errorReasons)));
         this.errorReasons = errorReasons;
     }
-
 }

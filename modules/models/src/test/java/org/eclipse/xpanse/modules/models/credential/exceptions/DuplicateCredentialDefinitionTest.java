@@ -24,5 +24,4 @@ class DuplicateCredentialDefinitionTest {
     void testConstructorAndGetMessage() {
         assertEquals("message", duplicateCredentialDefinitionUnderTest.getMessage());
     }
-
 }

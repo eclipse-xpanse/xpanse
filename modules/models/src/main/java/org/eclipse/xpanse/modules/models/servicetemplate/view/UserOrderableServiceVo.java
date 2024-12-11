@@ -3,7 +3,6 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-
 package org.eclipse.xpanse.modules.models.servicetemplate.view;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,9 +27,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.hateoas.RepresentationModel;
 
-/**
- * The view model for the end-user to query the orderable services.
- */
+/** The view model for the end-user to query the orderable services. */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UserOrderableServiceVo extends RepresentationModel<UserOrderableServiceVo> {
@@ -90,8 +87,10 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
 
     @Valid
     @NotNull
-    @Schema(description = "Defines which cloud service account is used "
-            + "for deploying cloud resources.")
+    @Schema(
+            description =
+                    "Defines which cloud service account is used "
+                            + "for deploying cloud resources.")
     private ServiceHostingType serviceHostingType;
 
     @NotNull

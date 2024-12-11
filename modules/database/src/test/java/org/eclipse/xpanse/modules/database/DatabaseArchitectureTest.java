@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-
 @Slf4j
 public class DatabaseArchitectureTest {
 
@@ -46,8 +45,10 @@ public class DatabaseArchitectureTest {
                 if (file.isDirectory()) {
                     scanDirectoryForClasses(file, packageName + "." + file.getName());
                 } else if (file.getName().endsWith(".class")) {
-                    String className = packageName + '.' + file.getName()
-                            .substring(0, file.getName().length() - 6);
+                    String className =
+                            packageName
+                                    + '.'
+                                    + file.getName().substring(0, file.getName().length() - 6);
                     try {
                         Class<?> clazz = Class.forName(className);
                         checkClazzHasFindAllMethod(clazz, className);
@@ -64,15 +65,21 @@ public class DatabaseArchitectureTest {
             Class<?>[] interfaces = clazz.getInterfaces();
             for (Class<?> face : interfaces) {
                 if (hasMethodFindAll(face)) {
-                    Assertions.fail("Class " + subClassName + " should not implement the interface "
-                            + face.getName() + " which declare the method findAll().");
+                    Assertions.fail(
+                            "Class "
+                                    + subClassName
+                                    + " should not implement the interface "
+                                    + face.getName()
+                                    + " which declare the method findAll().");
                 }
             }
             Class<?> superclass = clazz.getSuperclass();
             if (superclass != null && superclass != Object.class) {
                 if (hasMethodFindAll(superclass)) {
                     Assertions.fail(
-                            "Class " + subClassName + " should not extend the class "
+                            "Class "
+                                    + subClassName
+                                    + " should not extend the class "
                                     + clazz.getName()
                                     + " which declare the method findAll().");
                 }
@@ -90,4 +97,3 @@ public class DatabaseArchitectureTest {
         }
     }
 }
-

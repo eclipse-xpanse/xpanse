@@ -34,25 +34,18 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
-/**
- * Class that encapsulates all Manager-related public methods of the FlexibleEngine plugin.
- */
+/** Class that encapsulates all Manager-related public methods of the FlexibleEngine plugin. */
 @Slf4j
 @Component
 public class FlexibleEngineVmStateManager {
-    @Resource
-    private CredentialCenter credentialCenter;
-    @Resource
-    private FlexibleEngineClient flexibleEngineClient;
-    @Resource
-    private FlexibleEngineServerManageRequestConverter requestConverter;
-    @Resource
-    private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+    @Resource private CredentialCenter credentialCenter;
+    @Resource private FlexibleEngineClient flexibleEngineClient;
+    @Resource private FlexibleEngineServerManageRequestConverter requestConverter;
+    @Resource private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
 
-    /**
-     * Start the FlexibleEngine Ecs server.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** Start the FlexibleEngine Ecs server. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
@@ -62,7 +55,8 @@ public class FlexibleEngineVmStateManager {
                     requestConverter.buildBatchStartServersRequest(
                             serviceStateManageRequest.getServiceResourceEntityList());
             BatchStartServersResponse response =
-                    ecsClient.batchStartServersInvoker(request)
+                    ecsClient
+                            .batchStartServersInvoker(request)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
                             .backoffStrategy(flexibleEngineRetryStrategy)
@@ -75,10 +69,9 @@ public class FlexibleEngineVmStateManager {
         }
     }
 
-    /**
-     * Stop the FlexibleEngine Ecs server.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** Stop the FlexibleEngine Ecs server. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
@@ -88,7 +81,8 @@ public class FlexibleEngineVmStateManager {
                     requestConverter.buildBatchStopServersRequest(
                             serviceStateManageRequest.getServiceResourceEntityList());
             BatchStopServersResponse response =
-                    ecsClient.batchStopServersInvoker(batchStopServersRequest)
+                    ecsClient
+                            .batchStopServersInvoker(batchStopServersRequest)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
                             .backoffStrategy(flexibleEngineRetryStrategy)
@@ -101,10 +95,9 @@ public class FlexibleEngineVmStateManager {
         }
     }
 
-    /**
-     * Restart the FlexibleEngine Ecs server.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** Restart the FlexibleEngine Ecs server. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
@@ -114,7 +107,8 @@ public class FlexibleEngineVmStateManager {
                     requestConverter.buildBatchRebootServersRequest(
                             serviceStateManageRequest.getServiceResourceEntityList());
             BatchRebootServersResponse response =
-                    ecsClient.batchRebootServersInvoker(request)
+                    ecsClient
+                            .batchRebootServersInvoker(request)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
                             .backoffStrategy(flexibleEngineRetryStrategy)
@@ -131,7 +125,9 @@ public class FlexibleEngineVmStateManager {
         String siteName = serviceStateManageRequest.getRegion().getSite();
         String regionName = serviceStateManageRequest.getRegion().getName();
         AbstractCredentialInfo credential =
-                credentialCenter.getCredential(Csp.FLEXIBLE_ENGINE, siteName,
+                credentialCenter.getCredential(
+                        Csp.FLEXIBLE_ENGINE,
+                        siteName,
                         CredentialType.VARIABLES,
                         serviceStateManageRequest.getUserId());
         ICredential icredential = flexibleEngineClient.getCredential(credential);
@@ -140,15 +136,18 @@ public class FlexibleEngineVmStateManager {
 
     private boolean checkEcsExecResultByJobId(EcsClient ecsClient, String jobId) {
         ShowJobRequest jobRequest = new ShowJobRequest().withJobId(jobId);
-        ShowJobResponse response = ecsClient.showJobInvoker(jobRequest)
-                .retryTimes(WAITING_JOB_SUCCESS_RETRY_TIMES)
-                .retryCondition(this::jobIsNotSuccess)
-                .backoffStrategy(flexibleEngineRetryStrategy)
-                .invoke();
+        ShowJobResponse response =
+                ecsClient
+                        .showJobInvoker(jobRequest)
+                        .retryTimes(WAITING_JOB_SUCCESS_RETRY_TIMES)
+                        .retryCondition(this::jobIsNotSuccess)
+                        .backoffStrategy(flexibleEngineRetryStrategy)
+                        .invoke();
         if (response.getStatus().equals(StatusEnum.FAIL)) {
-            String errorMsg = String.format(
-                    "Manage vm operation failed. JobId: %s reason: %s " + " message: %s", jobId,
-                    response.getFailReason(), response.getMessage());
+            String errorMsg =
+                    String.format(
+                            "Manage vm operation failed. JobId: %s reason: %s " + " message: %s",
+                            jobId, response.getFailReason(), response.getMessage());
             throw new ClientApiCallFailedException(errorMsg);
         }
         return response.getStatus().equals(StatusEnum.SUCCESS);
@@ -160,5 +159,4 @@ public class FlexibleEngineVmStateManager {
         }
         return response.getStatus() != StatusEnum.SUCCESS;
     }
-
 }

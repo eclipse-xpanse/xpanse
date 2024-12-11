@@ -19,9 +19,7 @@ import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Utils Define methods to transform TfResource into DeployResource.
- */
+/** Utils Define methods to transform TfResource into DeployResource. */
 @Slf4j
 public class TfResourceTransUtils {
 
@@ -32,13 +30,14 @@ public class TfResourceTransUtils {
     /**
      * Fill DeployResource by getting the value of key property from TfStateResourceInstance.
      *
-     * @param instance       TfStateResourceInstance
+     * @param instance TfStateResourceInstance
      * @param deployResource DeployResource
-     * @param keyProperties  important properties from the instanceAttributes that must be recorded.
+     * @param keyProperties important properties from the instanceAttributes that must be recorded.
      */
-    public static void fillDeployResource(TfStateResourceInstance instance,
-                                          DeployResource deployResource,
-                                          Map<String, String> keyProperties) {
+    public static void fillDeployResource(
+            TfStateResourceInstance instance,
+            DeployResource deployResource,
+            Map<String, String> keyProperties) {
         Map<String, Object> instanceAttributes = instance.getAttributes();
         if (Objects.isNull(instanceAttributes) || instanceAttributes.isEmpty()) {
             return;
@@ -53,10 +52,10 @@ public class TfResourceTransUtils {
         }
         deployResource.setProperties(new HashMap<>());
         if (Objects.nonNull(keyProperties) && !keyProperties.isEmpty()) {
-            keyProperties.forEach((k, v) ->
-                    deployResource.getProperties().put(k, getValue(instanceAttributes, v)));
+            keyProperties.forEach(
+                    (k, v) ->
+                            deployResource.getProperties().put(k, getValue(instanceAttributes, v)));
         }
-
     }
 
     private static String getValue(Map<String, Object> instanceAttributes, String key) {
@@ -73,12 +72,13 @@ public class TfResourceTransUtils {
      * @param serviceDeploymentEntity DeployServiceEntity of the deployed service.
      * @return returns the resource state stored in the database.
      */
-
     public static String getStoredStateContent(ServiceDeploymentEntity serviceDeploymentEntity) {
         if (Objects.isNull(serviceDeploymentEntity)
                 || CollectionUtils.isEmpty(serviceDeploymentEntity.getDeploymentGeneratedFiles())
                 || StringUtils.isEmpty(
-                serviceDeploymentEntity.getDeploymentGeneratedFiles().get(TF_STATE_FILE_NAME))) {
+                        serviceDeploymentEntity
+                                .getDeploymentGeneratedFiles()
+                                .get(TF_STATE_FILE_NAME))) {
             throw new ServiceNotDeployedException(
                     "Can't find valid state context in stored deployed service.");
         }

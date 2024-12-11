@@ -12,9 +12,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Specific Response when request the service order failed.
- */
+/** Specific Response when request the service order failed. */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(Include.NON_NULL)
@@ -34,11 +32,11 @@ public class OrderFailedErrorResponse extends ErrorResponse {
      * Create error response with resultCode and errorMessage.
      *
      * @param resultCode error result code
-     * @param errMsg     error message
+     * @param errMsg error message
      * @return errorResponse
      */
-    public static OrderFailedErrorResponse errorResponse(ErrorType resultCode,
-                                                         List<String> errMsg) {
+    public static OrderFailedErrorResponse errorResponse(
+            ErrorType resultCode, List<String> errMsg) {
         OrderFailedErrorResponse response = new OrderFailedErrorResponse();
         response.setErrorType(resultCode);
         response.setDetails(errMsg);

@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of SystemCmdResult.
- */
+/** Test of SystemCmdResult. */
 class SystemCmdResultTest {
 
     private static final String commandExecuted = "commandExecuted";
@@ -84,12 +82,20 @@ class SystemCmdResultTest {
 
     @Test
     void testToString() {
-        String expectedToString = "SystemCmdResult(" +
-                "commandExecuted=" + commandExecuted + ", " +
-                "isCommandSuccessful=" + isCommandSuccessful + ", " +
-                "commandStdOutput=" + commandStdOutput + ", " +
-                "commandStdError=" + commandStdError + ")";
+        String expectedToString =
+                "SystemCmdResult("
+                        + "commandExecuted="
+                        + commandExecuted
+                        + ", "
+                        + "isCommandSuccessful="
+                        + isCommandSuccessful
+                        + ", "
+                        + "commandStdOutput="
+                        + commandStdOutput
+                        + ", "
+                        + "commandStdError="
+                        + commandStdError
+                        + ")";
         assertEquals(expectedToString, systemCmdResult.toString());
     }
-
 }

@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-/**
- * Bean to provide helper methods for generating OpenAPI files.
- */
+/** Bean to provide helper methods for generating OpenAPI files. */
 @Slf4j
 @Component
 public class OpenApiUrlManage {
@@ -23,13 +21,11 @@ public class OpenApiUrlManage {
     private final String openapiPath;
     private final Integer port;
 
-    /**
-     * OpenApiUrlManage constructor.
-     */
+    /** OpenApiUrlManage constructor. */
     @Autowired
     public OpenApiUrlManage(
             @Value("${openapi.path:openapi/}") String openapiPath,
-                       @Value("${server.port:8080}") Integer port) {
+            @Value("${server.port:8080}") Integer port) {
         this.openapiPath = openapiPath;
         this.port = port;
     }
@@ -53,7 +49,6 @@ public class OpenApiUrlManage {
             }
             return "http://" + host + ":" + port;
         }
-
     }
 
     /**
@@ -67,5 +62,4 @@ public class OpenApiUrlManage {
         }
         return getServiceUrl() + "/" + openapiPath + "/" + id + ".html";
     }
-
 }

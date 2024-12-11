@@ -15,9 +15,7 @@ import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.servicetemplate.price.BillingCommonUtils;
 import org.springframework.stereotype.Component;
 
-/**
- * Class that implements the price calculation for Openstack.
- */
+/** Class that implements the price calculation for Openstack. */
 @Slf4j
 @Component
 public class OpenstackServicePriceCalculator {
@@ -42,12 +40,18 @@ public class OpenstackServicePriceCalculator {
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
         // TODO Get recurring price with resource usage in future.
         // Add markup price if not null
-        Price markUpPrice = BillingCommonUtils.getSpecificPriceByRegionAndSite(
-                resourceUsage.getMarkUpPrices(), request.getRegionName(), request.getSiteName());
+        Price markUpPrice =
+                BillingCommonUtils.getSpecificPriceByRegionAndSite(
+                        resourceUsage.getMarkUpPrices(),
+                        request.getRegionName(),
+                        request.getSiteName());
         BillingCommonUtils.addExtraPaymentPrice(flavorPriceResult, markUpPrice);
         // Add license price if not null
-        Price licensePrice = BillingCommonUtils.getSpecificPriceByRegionAndSite(
-                resourceUsage.getLicensePrices(), request.getRegionName(), request.getSiteName());
+        Price licensePrice =
+                BillingCommonUtils.getSpecificPriceByRegionAndSite(
+                        resourceUsage.getLicensePrices(),
+                        request.getRegionName(),
+                        request.getSiteName());
         BillingCommonUtils.addExtraPaymentPrice(flavorPriceResult, licensePrice);
         flavorPriceResult.setFlavorName(request.getFlavorName());
         flavorPriceResult.setBillingMode(request.getBillingMode());
@@ -55,11 +59,12 @@ public class OpenstackServicePriceCalculator {
         return flavorPriceResult;
     }
 
-
     private FlavorPriceResult getServiceFlavorPriceWithFixed(ServiceFlavorPriceRequest request) {
-        Price fixedPrice = BillingCommonUtils.getSpecificPriceByRegionAndSite(
-                request.getFlavorRatingMode().getFixedPrices(),
-                request.getRegionName(), request.getSiteName());
+        Price fixedPrice =
+                BillingCommonUtils.getSpecificPriceByRegionAndSite(
+                        request.getFlavorRatingMode().getFixedPrices(),
+                        request.getRegionName(),
+                        request.getSiteName());
         FlavorPriceResult flavorPriceResult = new FlavorPriceResult();
         flavorPriceResult.setRecurringPrice(fixedPrice);
         flavorPriceResult.setFlavorName(request.getFlavorName());

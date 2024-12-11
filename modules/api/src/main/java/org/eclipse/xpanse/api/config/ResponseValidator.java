@@ -19,9 +19,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.ResponseInvalidExcept
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Response bean validation based on AspectJ.
- */
+/** Response bean validation based on AspectJ. */
 @Aspect
 @Component
 @Slf4j
@@ -44,15 +42,21 @@ public class ResponseValidator {
         if (!Objects.isNull(object)) {
             List<String> errors = new ArrayList<>();
             if (object instanceof Collection<?>) {
-                ((Collection<?>) object).forEach(item -> {
-                    Set<ConstraintViolation<Object>> validationResults = validator.validate(item);
-                    if (!validationResults.isEmpty()) {
-                        for (ConstraintViolation<Object> error : validationResults) {
-                            errors.add(error.getPropertyPath() + ":" + error.getMessage());
-                        }
-                    }
-
-                });
+                ((Collection<?>) object)
+                        .forEach(
+                                item -> {
+                                    Set<ConstraintViolation<Object>> validationResults =
+                                            validator.validate(item);
+                                    if (!validationResults.isEmpty()) {
+                                        for (ConstraintViolation<Object> error :
+                                                validationResults) {
+                                            errors.add(
+                                                    error.getPropertyPath()
+                                                            + ":"
+                                                            + error.getMessage());
+                                        }
+                                    }
+                                });
             } else {
                 Set<ConstraintViolation<Object>> validationResults = validator.validate(object);
                 if (!validationResults.isEmpty()) {

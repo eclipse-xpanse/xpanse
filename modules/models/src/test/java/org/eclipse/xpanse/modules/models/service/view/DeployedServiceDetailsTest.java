@@ -25,9 +25,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of DeployedServiceDetails.
- */
+/** Test of DeployedServiceDetails. */
 class DeployedServiceDetailsTest {
     private final String userId = "userId";
     private final Category category = Category.COMPUTE;
@@ -115,8 +113,8 @@ class DeployedServiceDetailsTest {
 
         assertEquals(deployRequest, deployedServiceDetails.getDeployRequest());
         assertEquals(deployResources, deployedServiceDetails.getDeployResources());
-        assertEquals(deployedServiceProperties,
-                deployedServiceDetails.getDeployedServiceProperties());
+        assertEquals(
+                deployedServiceProperties, deployedServiceDetails.getDeployedServiceProperties());
         assertEquals(resultSuccessMessage, deployedServiceDetails.getResultMessage());
     }
 
@@ -166,12 +164,16 @@ class DeployedServiceDetailsTest {
     @Test
     void testToString() {
         String expectedToString =
-                "DeployedServiceDetails(deployRequest=" + deployRequest + ", deployResources="
-                        + deployResources + ", deployedServiceProperties="
-                        + deployedServiceProperties + ", resultMessage=" + resultSuccessMessage
+                "DeployedServiceDetails(deployRequest="
+                        + deployRequest
+                        + ", deployResources="
+                        + deployResources
+                        + ", deployedServiceProperties="
+                        + deployedServiceProperties
+                        + ", resultMessage="
+                        + resultSuccessMessage
                         + ")";
 
         assertEquals(expectedToString, deployedServiceDetails.toString());
     }
-
 }

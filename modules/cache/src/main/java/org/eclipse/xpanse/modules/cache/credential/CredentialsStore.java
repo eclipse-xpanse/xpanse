@@ -22,9 +22,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-/**
- * Component for managing credentials stored in cache using Spring Cache annotations.
- */
+/** Component for managing credentials stored in cache using Spring Cache annotations. */
 @Slf4j
 @Component
 public class CredentialsStore {
@@ -35,7 +33,7 @@ public class CredentialsStore {
     /**
      * Constructor for CredentialsStore.
      *
-     * @param redisCacheEnabled       Enable redis distributed cache.
+     * @param redisCacheEnabled Enable redis distributed cache.
      * @param credentialRedisTemplate credentialRedisTemplate.
      */
     @Autowired
@@ -52,8 +50,8 @@ public class CredentialsStore {
      * @param credentialInfo Complete credential configuration object.
      */
     @CachePut(cacheNames = CREDENTIAL_CACHE_NAME, key = "#key")
-    public AbstractCredentialInfo storeCredential(CredentialCacheKey key,
-                                                  AbstractCredentialInfo credentialInfo) {
+    public AbstractCredentialInfo storeCredential(
+            CredentialCacheKey key, AbstractCredentialInfo credentialInfo) {
         log.info("Store credential cache entry with key:{}", key);
         return credentialInfo;
     }
@@ -80,14 +78,14 @@ public class CredentialsStore {
         log.info("Delete credential cache entry with key:{}", key.toString());
     }
 
-
     /**
      * Method to update the time-to-live of the credential in the redis cache.
      *
      * @param cacheKey CredentialCacheKey.
      */
     public void updateCredentialCacheTimeToLive(CredentialCacheKey cacheKey) {
-        if (!redisCacheEnabled || Objects.isNull(credentialRedisTemplate)
+        if (!redisCacheEnabled
+                || Objects.isNull(credentialRedisTemplate)
                 || Objects.isNull(cacheKey)) {
             return;
         }
@@ -101,14 +99,18 @@ public class CredentialsStore {
                 Boolean flag =
                         credentialRedisTemplate.expire(redisKey, timeToLive, TimeUnit.SECONDS);
                 if (Boolean.TRUE.equals(flag)) {
-                    log.info("Updated expiration of the redis key:{} with the time:{} in seconds "
-                            + "successfully.", redisKey, timeToLive);
+                    log.info(
+                            "Updated expiration of the redis key:{} with the time:{} in seconds "
+                                    + "successfully.",
+                            redisKey,
+                            timeToLive);
                 }
             }
         } catch (Exception e) {
-            log.error("Updated expiration of the redis key:{} with the time:{} in minutes failed.",
-                    redisKey, timeToLive);
+            log.error(
+                    "Updated expiration of the redis key:{} with the time:{} in minutes failed.",
+                    redisKey,
+                    timeToLive);
         }
     }
-
 }

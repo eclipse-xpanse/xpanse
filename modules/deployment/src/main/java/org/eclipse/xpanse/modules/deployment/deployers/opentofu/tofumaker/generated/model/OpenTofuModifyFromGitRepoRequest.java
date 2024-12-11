@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,51 +20,42 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * OpenTofuModifyFromGitRepoRequest
- */
+/** OpenTofuModifyFromGitRepoRequest */
 @JsonPropertyOrder({
-        OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
-        OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
-        OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_IS_PLAN_ONLY,
-        OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
-        OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
-        OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
-        OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_TF_STATE
+    OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
+    OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
+    OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+    OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
+    OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
+    OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
+    OpenTofuModifyFromGitRepoRequest.JSON_PROPERTY_TF_STATE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuModifyFromGitRepoRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_OPEN_TOFU_VERSION = "openTofuVersion";
-    @jakarta.annotation.Nonnull
-    private String openTofuVersion;
+    @jakarta.annotation.Nonnull private String openTofuVersion;
 
     public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
-    @jakarta.annotation.Nonnull
-    private Boolean isPlanOnly;
+    @jakarta.annotation.Nonnull private Boolean isPlanOnly;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_GIT_REPO_DETAILS = "gitRepoDetails";
-    @jakarta.annotation.Nullable
-    private OpenTofuScriptGitRepoDetails gitRepoDetails;
+    @jakarta.annotation.Nullable private OpenTofuScriptGitRepoDetails gitRepoDetails;
 
     public static final String JSON_PROPERTY_TF_STATE = "tfState";
-    @jakarta.annotation.Nonnull
-    private String tfState;
+    @jakarta.annotation.Nonnull private String tfState;
 
-    public OpenTofuModifyFromGitRepoRequest() {
-    }
+    public OpenTofuModifyFromGitRepoRequest() {}
 
     public OpenTofuModifyFromGitRepoRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
 
@@ -81,11 +71,9 @@ public class OpenTofuModifyFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -93,7 +81,8 @@ public class OpenTofuModifyFromGitRepoRequest {
         this.requestId = requestId;
     }
 
-    public OpenTofuModifyFromGitRepoRequest openTofuVersion(@jakarta.annotation.Nonnull String openTofuVersion) {
+    public OpenTofuModifyFromGitRepoRequest openTofuVersion(
+            @jakarta.annotation.Nonnull String openTofuVersion) {
 
         this.openTofuVersion = openTofuVersion;
         return this;
@@ -107,11 +96,9 @@ public class OpenTofuModifyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getOpenTofuVersion() {
         return openTofuVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -119,25 +106,25 @@ public class OpenTofuModifyFromGitRepoRequest {
         this.openTofuVersion = openTofuVersion;
     }
 
-    public OpenTofuModifyFromGitRepoRequest isPlanOnly(@jakarta.annotation.Nonnull Boolean isPlanOnly) {
+    public OpenTofuModifyFromGitRepoRequest isPlanOnly(
+            @jakarta.annotation.Nonnull Boolean isPlanOnly) {
 
         this.isPlanOnly = isPlanOnly;
         return this;
     }
 
     /**
-     * Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes.
+     * Flag to control if the deployment must only generate the OpenTofu or it must also apply the
+     * changes.
      *
      * @return isPlanOnly
      */
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Boolean getIsPlanOnly() {
         return isPlanOnly;
     }
-
 
     @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -145,7 +132,8 @@ public class OpenTofuModifyFromGitRepoRequest {
         this.isPlanOnly = isPlanOnly;
     }
 
-    public OpenTofuModifyFromGitRepoRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public OpenTofuModifyFromGitRepoRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
@@ -164,11 +152,9 @@ public class OpenTofuModifyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -183,7 +169,8 @@ public class OpenTofuModifyFromGitRepoRequest {
         return this;
     }
 
-    public OpenTofuModifyFromGitRepoRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public OpenTofuModifyFromGitRepoRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -192,18 +179,17 @@ public class OpenTofuModifyFromGitRepoRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to OpenTofu process.
+     * Key-value pairs of variables that must be injected as environment variables to OpenTofu
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -226,15 +212,14 @@ public class OpenTofuModifyFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public OpenTofuScriptGitRepoDetails getGitRepoDetails() {
         return gitRepoDetails;
     }
 
-
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setGitRepoDetails(@jakarta.annotation.Nullable OpenTofuScriptGitRepoDetails gitRepoDetails) {
+    public void setGitRepoDetails(
+            @jakarta.annotation.Nullable OpenTofuScriptGitRepoDetails gitRepoDetails) {
         this.gitRepoDetails = gitRepoDetails;
     }
 
@@ -252,11 +237,9 @@ public class OpenTofuModifyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTfState() {
         return tfState;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -272,19 +255,29 @@ public class OpenTofuModifyFromGitRepoRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest = (OpenTofuModifyFromGitRepoRequest) o;
-        return Objects.equals(this.requestId, openTofuModifyFromGitRepoRequest.requestId) &&
-                Objects.equals(this.openTofuVersion, openTofuModifyFromGitRepoRequest.openTofuVersion) &&
-                Objects.equals(this.isPlanOnly, openTofuModifyFromGitRepoRequest.isPlanOnly) &&
-                Objects.equals(this.variables, openTofuModifyFromGitRepoRequest.variables) &&
-                Objects.equals(this.envVariables, openTofuModifyFromGitRepoRequest.envVariables) &&
-                Objects.equals(this.gitRepoDetails, openTofuModifyFromGitRepoRequest.gitRepoDetails) &&
-                Objects.equals(this.tfState, openTofuModifyFromGitRepoRequest.tfState);
+        OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest =
+                (OpenTofuModifyFromGitRepoRequest) o;
+        return Objects.equals(this.requestId, openTofuModifyFromGitRepoRequest.requestId)
+                && Objects.equals(
+                        this.openTofuVersion, openTofuModifyFromGitRepoRequest.openTofuVersion)
+                && Objects.equals(this.isPlanOnly, openTofuModifyFromGitRepoRequest.isPlanOnly)
+                && Objects.equals(this.variables, openTofuModifyFromGitRepoRequest.variables)
+                && Objects.equals(this.envVariables, openTofuModifyFromGitRepoRequest.envVariables)
+                && Objects.equals(
+                        this.gitRepoDetails, openTofuModifyFromGitRepoRequest.gitRepoDetails)
+                && Objects.equals(this.tfState, openTofuModifyFromGitRepoRequest.tfState);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, openTofuVersion, isPlanOnly, variables, envVariables, gitRepoDetails, tfState);
+        return Objects.hash(
+                requestId,
+                openTofuVersion,
+                isPlanOnly,
+                variables,
+                envVariables,
+                gitRepoDetails,
+                tfState);
     }
 
     @Override
@@ -303,8 +296,8 @@ public class OpenTofuModifyFromGitRepoRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -312,6 +305,4 @@ public class OpenTofuModifyFromGitRepoRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

@@ -27,13 +27,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {XpanseApplication.class, WorkFlowApiTest.class, WorkflowUtils.class},
+@SpringBootTest(
+        classes = {XpanseApplication.class, WorkFlowApiTest.class, WorkflowUtils.class},
         properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class WorkFlowApiTest extends ApisTestCommon {
 
-    @MockitoBean
-    private WorkflowUtils mockWorkflowUtils;
+    @MockitoBean private WorkflowUtils mockWorkflowUtils;
 
     @Test
     @WithJwt("jwt_user.json")
@@ -69,37 +69,45 @@ class WorkFlowApiTest extends ApisTestCommon {
                 .thenReturn(List.of(doneTask));
         when(mockWorkflowUtils.queryAllTasks(WorkFlowTaskStatus.FAILED, userId))
                 .thenReturn(List.of(todoTask));
-        when(mockWorkflowUtils.queryAllTasks(null, userId))
-                .thenReturn(List.of(doneTask, todoTask));
+        when(mockWorkflowUtils.queryAllTasks(null, userId)).thenReturn(List.of(doneTask, todoTask));
         // Run the test
-        final MockHttpServletResponse taskResponse = mockMvc.perform(
-                get("/xpanse/workflow/tasks").param("status", "DONE")
-                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        final MockHttpServletResponse taskResponse =
+                mockMvc.perform(
+                                get("/xpanse/workflow/tasks")
+                                        .param("status", "DONE")
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertThat(taskResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(taskResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(List.of(doneTask)));
+        assertThat(taskResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(List.of(doneTask)));
 
         // Run the test
-        final MockHttpServletResponse todoTaskResponse = mockMvc.perform(
-                get("/xpanse/workflow/tasks").param("status", "failed")
-                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        final MockHttpServletResponse todoTaskResponse =
+                mockMvc.perform(
+                                get("/xpanse/workflow/tasks")
+                                        .param("status", "failed")
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertThat(todoTaskResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(todoTaskResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(List.of(todoTask)));
+        assertThat(todoTaskResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(List.of(todoTask)));
 
         // Run the test
-        final MockHttpServletResponse allTaskResponse = mockMvc.perform(
-                        get("/xpanse/workflow/tasks").accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse allTaskResponse =
+                mockMvc.perform(get("/xpanse/workflow/tasks").accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertThat(allTaskResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(allTaskResponse.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(List.of(doneTask, todoTask)));
+        assertThat(allTaskResponse.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(List.of(doneTask, todoTask)));
     }
 
     void testCompleteTask() throws Exception {
@@ -108,11 +116,13 @@ class WorkFlowApiTest extends ApisTestCommon {
         Map<String, Object> variables = Map.ofEntries(Map.entry("key", "value"));
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(put("/xpanse/workflow/complete/task/{id}", taskId)
-                                .content(objectMapper.writeValueAsString(variables))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                put("/xpanse/workflow/complete/task/{id}", taskId)
+                                        .content(objectMapper.writeValueAsString(variables))
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -125,15 +135,18 @@ class WorkFlowApiTest extends ApisTestCommon {
         String taskId = UUID.randomUUID().toString();
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(put("/xpanse/workflow/task/{id}", taskId)
-                        .param("retryOrder", "true")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+                mockMvc.perform(
+                                put("/xpanse/workflow/task/{id}", taskId)
+                                        .param("retryOrder", "true")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo("");
-        verify(mockWorkflowUtils).completeTask(taskId,
-                Map.ofEntries(Map.entry(IS_RETRY_TASK, true)));
+        verify(mockWorkflowUtils)
+                .completeTask(taskId, Map.ofEntries(Map.entry(IS_RETRY_TASK, true)));
     }
 }

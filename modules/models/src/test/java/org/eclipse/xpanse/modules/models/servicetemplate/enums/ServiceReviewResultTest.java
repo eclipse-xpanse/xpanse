@@ -10,16 +10,16 @@ class ServiceReviewResultTest {
 
     @Test
     void testGetByValue() {
-        Assertions.assertEquals(ServiceReviewResult.APPROVED,
-                ServiceReviewResult.getByValue("approved"));
-        Assertions.assertEquals(ServiceReviewResult.REJECTED,
-                ServiceReviewResult.getByValue("rejected"));
+        Assertions.assertEquals(
+                ServiceReviewResult.APPROVED, ServiceReviewResult.getByValue("approved"));
+        Assertions.assertEquals(
+                ServiceReviewResult.REJECTED, ServiceReviewResult.getByValue("rejected"));
 
-        assertThrows(UnsupportedEnumValueException.class,
+        assertThrows(
+                UnsupportedEnumValueException.class,
                 () -> ServiceReviewResult.getByValue("error_value"));
-        assertThrows(UnsupportedEnumValueException.class,
-                () -> ServiceReviewResult.getByValue(null));
-
+        assertThrows(
+                UnsupportedEnumValueException.class, () -> ServiceReviewResult.getByValue(null));
     }
 
     @Test

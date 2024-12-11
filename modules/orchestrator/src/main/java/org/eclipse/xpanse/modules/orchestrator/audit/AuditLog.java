@@ -17,9 +17,7 @@ import lombok.Data;
 import lombok.ToString;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 
-/**
- * Audit log object.
- */
+/** Audit log object. */
 @Data
 @ToString(callSuper = true)
 public class AuditLog {
@@ -59,5 +57,4 @@ public class AuditLog {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime operatingTime;
-
 }

@@ -10,11 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Defines review result for service template registration.
- */
+/** Defines review result for service template registration. */
 public enum ServiceReviewResult {
-
     APPROVED("approved"),
     REJECTED("rejected");
 
@@ -24,9 +21,7 @@ public enum ServiceReviewResult {
         this.result = result;
     }
 
-    /**
-     * For ServiceReviewResult deserialize.
-     */
+    /** For ServiceReviewResult deserialize. */
     @JsonCreator
     public static ServiceReviewResult getByValue(String result) {
         for (ServiceReviewResult serviceState : values()) {
@@ -38,12 +33,9 @@ public enum ServiceReviewResult {
                 String.format("ServiceReviewResult value %s is not supported.", result));
     }
 
-    /**
-     * For ServiceReviewResult serialize.
-     */
+    /** For ServiceReviewResult serialize. */
     @JsonValue
     public String toValue() {
         return this.result;
     }
 }
-

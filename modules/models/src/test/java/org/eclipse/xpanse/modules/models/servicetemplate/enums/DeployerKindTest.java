@@ -12,9 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of DeployerKind.
- */
+/** Test of DeployerKind. */
 class DeployerKindTest {
 
     @Test
@@ -29,5 +27,4 @@ class DeployerKindTest {
         assertEquals("terraform", DeployerKind.TERRAFORM.toValue());
         assertEquals("opentofu", DeployerKind.OPEN_TOFU.toValue());
     }
-
 }

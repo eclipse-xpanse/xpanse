@@ -17,17 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ConfigurationManagerTool;
 import org.hibernate.validator.constraints.UniqueElements;
 
-/**
- * Defines the service config manage of the service.
- */
-
+/** Defines the service config manage of the service. */
 @Valid
 @Data
 @Slf4j
 public class ServiceConfigurationManage implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @NotNull
     @Schema(description = "the tool used to manage the service configuration.")
@@ -46,6 +42,4 @@ public class ServiceConfigurationManage implements Serializable {
     @UniqueElements
     @Schema(description = "The collection of service configuration parameters.")
     private List<ServiceConfigurationParameter> configurationParameters;
-
-
 }

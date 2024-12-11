@@ -12,15 +12,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-/**
- * Configure ApiClient for communication with Terraform-boot service.
- */
+/** Configure ApiClient for communication with Terraform-boot service. */
 @Profile("terraform-boot")
 @Configuration
 public class TerraformBootApiClientConfig {
 
-    @Resource
-    private ApiClient apiClient;
+    @Resource private ApiClient apiClient;
 
     @Value("${terraform-boot.endpoint}")
     private String terraformBootBaseUrl;

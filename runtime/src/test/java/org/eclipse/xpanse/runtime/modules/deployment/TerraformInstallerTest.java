@@ -18,25 +18,27 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(properties = {"http.request.retry.max.attempts=1",
-        "enable.redis.distributed.cache=true",
-        "support.default.deployment.tool.versions.only=false"})
+@SpringBootTest(
+        properties = {
+            "http.request.retry.max.attempts=1",
+            "enable.redis.distributed.cache=true",
+            "support.default.deployment.tool.versions.only=false"
+        })
 class TerraformInstallerTest extends AbstractRedisIntegrationTest {
 
     @Value("${deployer.terraform.default.supported.versions:1.6.0,1.7.0,1.8.0,1.9.0}")
     private String terraformDefaultVersions;
-    @Resource
-    private TerraformInstaller installer;
-    @Resource
-    private DeployerToolUtils deployerToolUtils;
-    @Resource
-    private DeployerToolVersionsCache deployerToolVersionsCache;
+
+    @Resource private TerraformInstaller installer;
+    @Resource private DeployerToolUtils deployerToolUtils;
+    @Resource private DeployerToolVersionsCache deployerToolVersionsCache;
 
     @Test
     void testGetExecutableTerraformByVersion() {
 
         Set<String> defaultVersions = Set.of(terraformDefaultVersions.split(","));
-        Set<String> cachedVersions = deployerToolVersionsCache.getVersionsCacheOfDeployerTool(DeployerKind.TERRAFORM);
+        Set<String> cachedVersions =
+                deployerToolVersionsCache.getVersionsCacheOfDeployerTool(DeployerKind.TERRAFORM);
         assertTrue(cachedVersions.containsAll(defaultVersions));
         assertTrue(cachedVersions.size() >= defaultVersions.size());
 
@@ -49,29 +51,40 @@ class TerraformInstallerTest extends AbstractRedisIntegrationTest {
                 deployerToolUtils.getOperatorAndNumberFromRequiredVersion(requiredVersion1);
         String terraformPath1 =
                 installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion1);
-        assertTrue(deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(new File(terraformPath1),
-                TERRAFORM_VERSION_OUTPUT_PATTERN, operatorAndNumber1[0], operatorAndNumber1[1]));
+        assertTrue(
+                deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(
+                        new File(terraformPath1),
+                        TERRAFORM_VERSION_OUTPUT_PATTERN,
+                        operatorAndNumber1[0],
+                        operatorAndNumber1[1]));
 
         String requiredVersion2 = "= 1.6.0";
-        String[] operatorAndNumber2 = deployerToolUtils.getOperatorAndNumberFromRequiredVersion(
-                requiredVersion2);
+        String[] operatorAndNumber2 =
+                deployerToolUtils.getOperatorAndNumberFromRequiredVersion(requiredVersion2);
         String terraformPath2 =
                 installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion2);
-        assertTrue(deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(new File(terraformPath2),
-                TERRAFORM_VERSION_OUTPUT_PATTERN, operatorAndNumber2[0], operatorAndNumber2[1]));
+        assertTrue(
+                deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(
+                        new File(terraformPath2),
+                        TERRAFORM_VERSION_OUTPUT_PATTERN,
+                        operatorAndNumber2[0],
+                        operatorAndNumber2[1]));
 
         String requiredVersion3 = ">= v1.8.0";
-        String[] operatorAndNumber3 = deployerToolUtils.getOperatorAndNumberFromRequiredVersion(
-                requiredVersion3);
+        String[] operatorAndNumber3 =
+                deployerToolUtils.getOperatorAndNumberFromRequiredVersion(requiredVersion3);
         String terraformPath3 =
                 installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion3);
-        assertTrue(deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(new File(terraformPath3),
-                TERRAFORM_VERSION_OUTPUT_PATTERN, operatorAndNumber3[0], operatorAndNumber3[1]));
+        assertTrue(
+                deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(
+                        new File(terraformPath3),
+                        TERRAFORM_VERSION_OUTPUT_PATTERN,
+                        operatorAndNumber3[0],
+                        operatorAndNumber3[1]));
 
         String requiredVersion4 = ">= 100.0.0";
-        assertThrows(InvalidDeployerToolException.class, () ->
-                installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion4));
-
-
+        assertThrows(
+                InvalidDeployerToolException.class,
+                () -> installer.getExecutorPathThatMatchesRequiredVersion(requiredVersion4));
     }
 }

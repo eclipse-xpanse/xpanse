@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -20,31 +19,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * OpenTofuValidationResult
- */
+/** OpenTofuValidationResult */
 @JsonPropertyOrder({
-        OpenTofuValidationResult.JSON_PROPERTY_VALID,
-        OpenTofuValidationResult.JSON_PROPERTY_OPEN_TOFU_VERSION_USED,
-        OpenTofuValidationResult.JSON_PROPERTY_DIAGNOSTICS
+    OpenTofuValidationResult.JSON_PROPERTY_VALID,
+    OpenTofuValidationResult.JSON_PROPERTY_OPEN_TOFU_VERSION_USED,
+    OpenTofuValidationResult.JSON_PROPERTY_DIAGNOSTICS
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuValidationResult {
     public static final String JSON_PROPERTY_VALID = "valid";
-    @jakarta.annotation.Nonnull
-    private Boolean valid;
+    @jakarta.annotation.Nonnull private Boolean valid;
 
     public static final String JSON_PROPERTY_OPEN_TOFU_VERSION_USED = "openTofuVersionUsed";
-    @jakarta.annotation.Nullable
-    private String openTofuVersionUsed;
+    @jakarta.annotation.Nullable private String openTofuVersionUsed;
 
     public static final String JSON_PROPERTY_DIAGNOSTICS = "diagnostics";
+
     @jakarta.annotation.Nullable
     private List<OpenTofuValidateDiagnostics> diagnostics = new ArrayList<>();
 
-    public OpenTofuValidationResult() {
-    }
+    public OpenTofuValidationResult() {}
 
     public OpenTofuValidationResult valid(@jakarta.annotation.Nonnull Boolean valid) {
 
@@ -60,11 +56,9 @@ public class OpenTofuValidationResult {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VALID)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Boolean getValid() {
         return valid;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VALID)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -72,7 +66,8 @@ public class OpenTofuValidationResult {
         this.valid = valid;
     }
 
-    public OpenTofuValidationResult openTofuVersionUsed(@jakarta.annotation.Nullable String openTofuVersionUsed) {
+    public OpenTofuValidationResult openTofuVersionUsed(
+            @jakarta.annotation.Nullable String openTofuVersionUsed) {
 
         this.openTofuVersionUsed = openTofuVersionUsed;
         return this;
@@ -86,11 +81,9 @@ public class OpenTofuValidationResult {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION_USED)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getOpenTofuVersionUsed() {
         return openTofuVersionUsed;
     }
-
 
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION_USED)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -105,7 +98,8 @@ public class OpenTofuValidationResult {
         return this;
     }
 
-    public OpenTofuValidationResult addDiagnosticsItem(OpenTofuValidateDiagnostics diagnosticsItem) {
+    public OpenTofuValidationResult addDiagnosticsItem(
+            OpenTofuValidateDiagnostics diagnosticsItem) {
         if (this.diagnostics == null) {
             this.diagnostics = new ArrayList<>();
         }
@@ -121,15 +115,14 @@ public class OpenTofuValidationResult {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_DIAGNOSTICS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public List<OpenTofuValidateDiagnostics> getDiagnostics() {
         return diagnostics;
     }
 
-
     @JsonProperty(JSON_PROPERTY_DIAGNOSTICS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setDiagnostics(@jakarta.annotation.Nullable List<OpenTofuValidateDiagnostics> diagnostics) {
+    public void setDiagnostics(
+            @jakarta.annotation.Nullable List<OpenTofuValidateDiagnostics> diagnostics) {
         this.diagnostics = diagnostics;
     }
 
@@ -142,9 +135,10 @@ public class OpenTofuValidationResult {
             return false;
         }
         OpenTofuValidationResult openTofuValidationResult = (OpenTofuValidationResult) o;
-        return Objects.equals(this.valid, openTofuValidationResult.valid) &&
-                Objects.equals(this.openTofuVersionUsed, openTofuValidationResult.openTofuVersionUsed) &&
-                Objects.equals(this.diagnostics, openTofuValidationResult.diagnostics);
+        return Objects.equals(this.valid, openTofuValidationResult.valid)
+                && Objects.equals(
+                        this.openTofuVersionUsed, openTofuValidationResult.openTofuVersionUsed)
+                && Objects.equals(this.diagnostics, openTofuValidationResult.diagnostics);
     }
 
     @Override
@@ -157,15 +151,17 @@ public class OpenTofuValidationResult {
         StringBuilder sb = new StringBuilder();
         sb.append("class OpenTofuValidationResult {\n");
         sb.append("    valid: ").append(toIndentedString(valid)).append("\n");
-        sb.append("    openTofuVersionUsed: ").append(toIndentedString(openTofuVersionUsed)).append("\n");
+        sb.append("    openTofuVersionUsed: ")
+                .append(toIndentedString(openTofuVersionUsed))
+                .append("\n");
         sb.append("    diagnostics: ").append(toIndentedString(diagnostics)).append("\n");
         sb.append("}");
         return sb.toString();
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -173,6 +169,4 @@ public class OpenTofuValidationResult {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

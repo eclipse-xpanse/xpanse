@@ -16,9 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Implementation of the ServiceResourceStorage.
- */
+/** Implementation of the ServiceResourceStorage. */
 @Component
 @Transactional
 public class DatabaseServiceResourceStorage implements ServiceResourceStorage {
@@ -64,8 +62,7 @@ public class DatabaseServiceResourceStorage implements ServiceResourceStorage {
         Specification<ServiceResourceEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
-                    predicateList.add(criteriaBuilder.equal(root.get("resourceId"),
-                            resourceId));
+                    predicateList.add(criteriaBuilder.equal(root.get("resourceId"), resourceId));
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
                 };
@@ -77,6 +74,4 @@ public class DatabaseServiceResourceStorage implements ServiceResourceStorage {
         }
         return null;
     }
-
-
 }

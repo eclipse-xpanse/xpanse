@@ -9,7 +9,6 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import java.util.List;
 import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -18,9 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of Ocl.
- */
+/** Test of Ocl. */
 class OclTest {
 
     private final Category category = Category.COMPUTE;
@@ -32,18 +29,12 @@ class OclTest {
     private final String icon = "icon";
     private final String eula = "eula";
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
-    @Mock
-    private CloudServiceProvider cloudServiceProvider;
-    @Mock
-    private Deployment deployment;
-    @Mock
-    private FlavorsWithPrice flavors;
-    @Mock
-    private Billing billing;
-    @Mock
-    private ServiceProviderContactDetails serviceProviderContactDetails;
-    @Mock
-    private ServiceConfigurationManage serviceConfigurationManage;
+    @Mock private CloudServiceProvider cloudServiceProvider;
+    @Mock private Deployment deployment;
+    @Mock private FlavorsWithPrice flavors;
+    @Mock private Billing billing;
+    @Mock private ServiceProviderContactDetails serviceProviderContactDetails;
+    @Mock private ServiceConfigurationManage serviceConfigurationManage;
 
     private Ocl ocl;
 
@@ -104,15 +95,39 @@ class OclTest {
     @Test
     void testToString() {
         String expectedString =
-                "Ocl(" + "category=" + category + ", version=" + version + ", name=" + name
-                        + ", serviceVersion=" + serviceVersion + ", description=" + description
-                        + ", namespace=" + namespace + ", icon=" + icon + ", cloudServiceProvider="
-                        + cloudServiceProvider + ", deployment=" + deployment + ", flavors="
-                        + flavors + ", billing=" + billing + ", serviceHostingType="
-                        + serviceHostingType + ", serviceProviderContactDetails="
-                        + serviceProviderContactDetails + ", eula=" + eula + ", "
-                        + "serviceConfigurationManage=" + serviceConfigurationManage + ")";
+                "Ocl("
+                        + "category="
+                        + category
+                        + ", version="
+                        + version
+                        + ", name="
+                        + name
+                        + ", serviceVersion="
+                        + serviceVersion
+                        + ", description="
+                        + description
+                        + ", namespace="
+                        + namespace
+                        + ", icon="
+                        + icon
+                        + ", cloudServiceProvider="
+                        + cloudServiceProvider
+                        + ", deployment="
+                        + deployment
+                        + ", flavors="
+                        + flavors
+                        + ", billing="
+                        + billing
+                        + ", serviceHostingType="
+                        + serviceHostingType
+                        + ", serviceProviderContactDetails="
+                        + serviceProviderContactDetails
+                        + ", eula="
+                        + eula
+                        + ", "
+                        + "serviceConfigurationManage="
+                        + serviceConfigurationManage
+                        + ")";
         assertEquals(expectedString, ocl.toString());
     }
-
 }

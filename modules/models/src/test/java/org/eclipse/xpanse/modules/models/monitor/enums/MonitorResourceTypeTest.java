@@ -10,31 +10,30 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of MonitorResourceType.
- */
+/** Test of MonitorResourceType. */
 class MonitorResourceTypeTest {
 
     @Test
     void testToValue() {
         Assertions.assertEquals("cpu", MonitorResourceType.CPU.toValue());
         Assertions.assertEquals("mem", MonitorResourceType.MEM.toValue());
-        Assertions.assertEquals("vm_network_incoming",
-                MonitorResourceType.VM_NETWORK_INCOMING.toValue());
-        Assertions.assertEquals("vm_network_outgoing",
-                MonitorResourceType.VM_NETWORK_OUTGOING.toValue());
+        Assertions.assertEquals(
+                "vm_network_incoming", MonitorResourceType.VM_NETWORK_INCOMING.toValue());
+        Assertions.assertEquals(
+                "vm_network_outgoing", MonitorResourceType.VM_NETWORK_OUTGOING.toValue());
     }
 
     @Test
     void testGetByValue() {
         Assertions.assertEquals(MonitorResourceType.CPU, MonitorResourceType.getByValue("cpu"));
         Assertions.assertEquals(MonitorResourceType.MEM, MonitorResourceType.getByValue("mem"));
-        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING,
+        Assertions.assertEquals(
+                MonitorResourceType.VM_NETWORK_INCOMING,
                 MonitorResourceType.getByValue("vm_network_incoming"));
-        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING,
+        Assertions.assertEquals(
+                MonitorResourceType.VM_NETWORK_OUTGOING,
                 MonitorResourceType.getByValue("vm_network_outgoing"));
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> MonitorResourceType.getByValue("null"));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> MonitorResourceType.getByValue("null"));
     }
-
 }

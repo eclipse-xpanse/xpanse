@@ -15,9 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of Deployment.
- */
+/** Test of Deployment. */
 class DeploymentTest {
     private final String deployer = "deployer";
     private final CredentialType credentialType = CredentialType.API_KEY;
@@ -88,17 +86,22 @@ class DeploymentTest {
         assertThat(test.canEqual(new Deployment())).isTrue();
     }
 
-
     @Test
     void testToString() {
-        String expectedString = "Deployment(deployerTool=" + deployerTool +
-                ", variables=" + variables +
-                ", credentialType=" + credentialType +
-                ", serviceAvailabilityConfig=" + availabilityZoneConfig +
-                ", deployer=" + deployer +
-                ", scriptsRepo=" + scriptsRepo +
-                ")";
+        String expectedString =
+                "Deployment(deployerTool="
+                        + deployerTool
+                        + ", variables="
+                        + variables
+                        + ", credentialType="
+                        + credentialType
+                        + ", serviceAvailabilityConfig="
+                        + availabilityZoneConfig
+                        + ", deployer="
+                        + deployer
+                        + ", scriptsRepo="
+                        + scriptsRepo
+                        + ")";
         assertEquals(expectedString, test.toString());
     }
-
 }

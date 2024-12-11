@@ -31,43 +31,33 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Exception handler related to service registration requests.
- */
+/** Exception handler related to service registration requests. */
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class RegistrationExceptionHandler {
 
-    /**
-     * Exception handler for IconProcessingFailedException.
-     */
+    /** Exception handler for IconProcessingFailedException. */
     @ExceptionHandler({IconProcessingFailedException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleIconProcessingFailedException(
-            IconProcessingFailedException ex) {
-        return getErrorResponse(ErrorType.ICON_PROCESSING_FAILED,
-                Collections.singletonList(ex.getMessage()));
-
+    public ErrorResponse handleIconProcessingFailedException(IconProcessingFailedException ex) {
+        return getErrorResponse(
+                ErrorType.ICON_PROCESSING_FAILED, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for ServiceRequestedNotFoundException.
-     */
+    /** Exception handler for ServiceRequestedNotFoundException. */
     @ExceptionHandler({ServiceTemplateNotRegistered.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleServiceTemplateNotRegisteredException(
             ServiceTemplateNotRegistered ex) {
-        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED,
+        return getErrorResponse(
+                ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED,
                 Collections.singletonList(ex.getMessage()));
-
     }
 
-    /**
-     * Exception handler for TerraformScriptFormatInvalidException.
-     */
+    /** Exception handler for TerraformScriptFormatInvalidException. */
     @ExceptionHandler({TerraformScriptFormatInvalidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -76,68 +66,54 @@ public class RegistrationExceptionHandler {
         return getErrorResponse(ErrorType.TERRAFORM_SCRIPT_INVALID, ex.getErrorReasons());
     }
 
-    /**
-     * Exception handler for ServiceTemplateRequestNotAllowed.
-     */
+    /** Exception handler for ServiceTemplateRequestNotAllowed. */
     @ExceptionHandler({ServiceTemplateRequestNotAllowed.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleServiceTemplateRequestNotAllowed(
             ServiceTemplateRequestNotAllowed ex) {
-        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED,
+        return getErrorResponse(
+                ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED,
                 Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for ServiceTemplateRequestNotAllowed.
-     */
+    /** Exception handler for ServiceTemplateRequestNotAllowed. */
     @ExceptionHandler({InvalidValueSchemaException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleInvalidValueSchemaException(
-            InvalidValueSchemaException ex) {
-        return getErrorResponse(ErrorType.VARIABLE_SCHEMA_DEFINITION_INVALID,
-                ex.getInvalidValueSchemaKeys());
+    public ErrorResponse handleInvalidValueSchemaException(InvalidValueSchemaException ex) {
+        return getErrorResponse(
+                ErrorType.VARIABLE_SCHEMA_DEFINITION_INVALID, ex.getInvalidValueSchemaKeys());
     }
 
-    /**
-     * Exception handler for ServiceTemplateDisabledException.
-     */
+    /** Exception handler for ServiceTemplateDisabledException. */
     @ExceptionHandler({ServiceTemplateDisabledException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleServiceTemplateDisabledException(
             ServiceTemplateDisabledException ex) {
-        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_DISABLED,
-                Collections.singletonList(ex.getMessage()));
+        return getErrorResponse(
+                ErrorType.SERVICE_TEMPLATE_DISABLED, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for InvalidServiceVersionException.
-     */
+    /** Exception handler for InvalidServiceVersionException. */
     @ExceptionHandler({InvalidServiceVersionException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleInvalidServiceVersionException(
-            InvalidServiceVersionException ex) {
-        return getErrorResponse(ErrorType.INVALID_SERVICE_VERSION,
-                Collections.singletonList(ex.getMessage()));
+    public ErrorResponse handleInvalidServiceVersionException(InvalidServiceVersionException ex) {
+        return getErrorResponse(
+                ErrorType.INVALID_SERVICE_VERSION, Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for InvalidServiceFlavorsException.
-     */
+    /** Exception handler for InvalidServiceFlavorsException. */
     @ExceptionHandler({InvalidServiceFlavorsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleInvalidServiceFlavorsException(
-            InvalidServiceFlavorsException ex) {
+    public ErrorResponse handleInvalidServiceFlavorsException(InvalidServiceFlavorsException ex) {
         return getErrorResponse(ErrorType.INVALID_SERVICE_FLAVORS, ex.getErrorReasons());
     }
 
-    /**
-     * Exception handler for UnavailableServiceRegionsException.
-     */
+    /** Exception handler for UnavailableServiceRegionsException. */
     @ExceptionHandler({UnavailableServiceRegionsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -146,38 +122,33 @@ public class RegistrationExceptionHandler {
         return getErrorResponse(ErrorType.UNAVAILABLE_SERVICE_REGIONS, ex.getErrorReasons());
     }
 
-    /**
-     * Exception handler for InvalidBillingConfigException.
-     */
+    /** Exception handler for InvalidBillingConfigException. */
     @ExceptionHandler({InvalidBillingConfigException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleInvalidBillingConfigException(
-            InvalidBillingConfigException ex) {
+    public ErrorResponse handleInvalidBillingConfigException(InvalidBillingConfigException ex) {
         return getErrorResponse(ErrorType.INVALID_BILLING_CONFIG, ex.getErrorReasons());
     }
 
-    /**
-     * Exception handler for ServiceTemplateRequestNotFound.
-     */
+    /** Exception handler for ServiceTemplateRequestNotFound. */
     @ExceptionHandler({ServiceTemplateRequestNotFound.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleServiceTemplateRequestNotFoundException(
             ServiceTemplateRequestNotFound ex) {
-        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_FOUND,
+        return getErrorResponse(
+                ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for ServiceTemplateRequestAlreadyReviewed.
-     */
+    /** Exception handler for ServiceTemplateRequestAlreadyReviewed. */
     @ExceptionHandler({ServiceTemplateRequestAlreadyReviewed.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleServiceTemplateRequestAlreadyReviewed(
             ServiceTemplateRequestAlreadyReviewed ex) {
-        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_REQUEST_ALREADY_REVIEWED,
+        return getErrorResponse(
+                ErrorType.SERVICE_TEMPLATE_REQUEST_ALREADY_REVIEWED,
                 Collections.singletonList(ex.getMessage()));
     }
 }

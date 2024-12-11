@@ -39,21 +39,24 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ServiceTemplateApi.class, ServiceTemplateManage.class,
-        IdentityProviderManager.class, CommonExceptionHandler.class, OclLoader.class,
-        CspPluginValidator.class, PluginManager.class})
+@ContextConfiguration(
+        classes = {
+            ServiceTemplateApi.class,
+            ServiceTemplateManage.class,
+            IdentityProviderManager.class,
+            CommonExceptionHandler.class,
+            OclLoader.class,
+            CspPluginValidator.class,
+            PluginManager.class
+        })
 @WebMvcTest
 class CommonExceptionHandlerTest {
 
     private final String oclLocation = "file:src/test/resources/ocl_terraform_test.yml";
-    @MockitoBean
-    private ServiceTemplateManage serviceTemplateManage;
-    @MockitoBean
-    private PluginManager pluginManager;
-    @MockitoBean
-    private CspPluginValidator cspPluginValidator;
-    @Autowired
-    private WebApplicationContext context;
+    @MockitoBean private ServiceTemplateManage serviceTemplateManage;
+    @MockitoBean private PluginManager pluginManager;
+    @MockitoBean private CspPluginValidator cspPluginValidator;
+    @Autowired private WebApplicationContext context;
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -63,11 +66,11 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testHttpMessageConversionException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new HttpMessageConversionException("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any()))
+                .thenThrow(new HttpMessageConversionException("test error"));
 
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+        this.mockMvc
+                .perform(post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Parameters Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -75,11 +78,11 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testIllegalArgumentException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new IllegalArgumentException("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any()))
+                .thenThrow(new IllegalArgumentException("test error"));
 
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+        this.mockMvc
+                .perform(post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Parameters Invalid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -87,11 +90,11 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testResponseInvalidException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new ResponseInvalidException(List.of("test error")));
+        when(serviceTemplateManage.registerServiceTemplate(any()))
+                .thenThrow(new ResponseInvalidException(List.of("test error")));
 
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+        this.mockMvc
+                .perform(post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.errorType").value("Response Not Valid"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -99,24 +102,23 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testXpanseUnhandledException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new XpanseUnhandledException("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any()))
+                .thenThrow(new XpanseUnhandledException("test error"));
 
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+        this.mockMvc
+                .perform(post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(500))
                 .andExpect(jsonPath("$.errorType").value("Unhandled Exception"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
-
     @Test
     void testHandleAccessDeniedException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new AccessDeniedException("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any()))
+                .thenThrow(new AccessDeniedException("test error"));
 
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+        this.mockMvc
+                .perform(post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(403))
                 .andExpect(jsonPath("$.errorType").value("Access Denied"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -124,23 +126,27 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testSensitiveFieldEncryptionOrDecryptionFailedException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new SensitiveFieldEncryptionOrDecryptionFailedException("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any()))
+                .thenThrow(new SensitiveFieldEncryptionOrDecryptionFailedException("test error"));
 
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
-                .andExpect(status().is(400)).andExpect(jsonPath("$.errorType").value(
-                        "Sensitive " + "Field Encryption Or Decryption Failed Exception"))
+        this.mockMvc
+                .perform(post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+                .andExpect(status().is(400))
+                .andExpect(
+                        jsonPath("$.errorType")
+                                .value(
+                                        "Sensitive Field Encryption Or Decryption Failed"
+                                                + " Exception"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 
     @Test
     void testUnsupportedEnumValueException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new UnsupportedEnumValueException("test error"));
+        when(serviceTemplateManage.registerServiceTemplate(any()))
+                .thenThrow(new UnsupportedEnumValueException("test error"));
 
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+        this.mockMvc
+                .perform(post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.errorType").value("Unsupported Enum Value"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
@@ -148,16 +154,20 @@ class CommonExceptionHandlerTest {
 
     @Test
     void testMethodArgumentTypeMismatchException() throws Exception {
-        when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new MethodArgumentTypeMismatchException("errorValue", Csp.class, null, null, null));
+        when(serviceTemplateManage.registerServiceTemplate(any()))
+                .thenThrow(
+                        new MethodArgumentTypeMismatchException(
+                                "errorValue", Csp.class, null, null, null));
 
-        this.mockMvc.perform(
-                        post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
+        this.mockMvc
+                .perform(post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(422))
-                .andExpect(jsonPath("$.errorType").value("Unprocessable Entity")).andExpect(
-                        jsonPath("$.details[0]").value(
-                                "Method parameter 'null': Failed to convert value of type" +
-                                        " 'java.lang.String' to required type 'org.eclipse.xpanse.modules.models.common.enums.Csp'"));
+                .andExpect(jsonPath("$.errorType").value("Unprocessable Entity"))
+                .andExpect(
+                        jsonPath("$.details[0]")
+                                .value(
+                                        "Method parameter 'null': Failed to convert value of type"
+                                            + " 'java.lang.String' to required type"
+                                            + " 'org.eclipse.xpanse.modules.models.common.enums.Csp'"));
     }
-
 }

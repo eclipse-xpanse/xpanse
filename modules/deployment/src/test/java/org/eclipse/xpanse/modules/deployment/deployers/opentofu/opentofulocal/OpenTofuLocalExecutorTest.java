@@ -34,14 +34,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class OpenTofuLocalExecutorTest {
     private static String workspace = "";
-    @Mock
-    private Map<String, String> mockEnv;
-    @Mock
-    private Map<String, Object> mockVariables;
-    @InjectMocks
-    private OpenTofuLocalExecutor openTofuLocalExecutor;
-    @InjectMocks
-    private DeploymentScriptsHelper deploymentScriptsHelper;
+    @Mock private Map<String, String> mockEnv;
+    @Mock private Map<String, Object> mockVariables;
+    @InjectMocks private OpenTofuLocalExecutor openTofuLocalExecutor;
+    @InjectMocks private DeploymentScriptsHelper deploymentScriptsHelper;
 
     @BeforeAll
     static void initTaskWorkspace() throws Exception {
@@ -52,8 +48,9 @@ class OpenTofuLocalExecutorTest {
         }
         workspace = taskWorkspace.getAbsolutePath();
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl =
+                oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         String script = ocl.getDeployment().getDeployer();
         String scriptPath = workspace + File.separator + TF_SCRIPT_FILE_NAME;
         try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
@@ -94,7 +91,8 @@ class OpenTofuLocalExecutorTest {
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(),
+        assertEquals(
+                result.getCommandExecuted(),
                 "tofu plan -input=false -no-color  -var-file=variables.tfvars.json");
     }
 
@@ -107,8 +105,10 @@ class OpenTofuLocalExecutorTest {
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(),
-                "tofu plan -input=false -no-color --out tfplan.binary -var-file=variables.tfvars.json");
+        assertEquals(
+                result.getCommandExecuted(),
+                "tofu plan -input=false -no-color --out tfplan.binary"
+                        + " -var-file=variables.tfvars.json");
     }
 
     @Test
@@ -119,7 +119,8 @@ class OpenTofuLocalExecutorTest {
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(),
+        assertEquals(
+                result.getCommandExecuted(),
                 "tofu apply -auto-approve -input=false -no-color  -var-file=variables.tfvars.json");
     }
 
@@ -131,9 +132,10 @@ class OpenTofuLocalExecutorTest {
         // Verify the results
         assertTrue(result.isCommandSuccessful());
         assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(),
-                "tofu destroy -auto-approve -input=false -no-color  -var-file=variables.tfvars.json");
-
+        assertEquals(
+                result.getCommandExecuted(),
+                "tofu destroy -auto-approve -input=false -no-color "
+                        + " -var-file=variables.tfvars.json");
     }
 
     @Test
@@ -144,9 +146,10 @@ class OpenTofuLocalExecutorTest {
         openTofuLocalExecutor.deploy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(
-                        deploymentScriptsHelper.getTaskTerraformState(workspace),
-                        TfState.class);
+                new ObjectMapper()
+                        .readValue(
+                                deploymentScriptsHelper.getTaskTerraformState(workspace),
+                                TfState.class);
         assertFalse(tfState.getOutputs().isEmpty());
     }
 
@@ -158,11 +161,10 @@ class OpenTofuLocalExecutorTest {
         openTofuLocalExecutor.destroy();
         // Verify the results
         TfState tfState =
-                new ObjectMapper().readValue(
-                        deploymentScriptsHelper.getTaskTerraformState(workspace),
-                        TfState.class);
+                new ObjectMapper()
+                        .readValue(
+                                deploymentScriptsHelper.getTaskTerraformState(workspace),
+                                TfState.class);
         assertTrue(tfState.getOutputs().isEmpty());
     }
-
-
 }

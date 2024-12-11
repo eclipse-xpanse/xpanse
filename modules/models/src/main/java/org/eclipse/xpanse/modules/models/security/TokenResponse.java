@@ -13,18 +13,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/**
- * Data model of token response.
- */
+/** Data model of token response. */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "access_token",
-        "token_type",
-        "expires_in",
-        "id_token",
-        "scopes"
-})
+@JsonPropertyOrder({"access_token", "token_type", "expires_in", "id_token", "scopes"})
 public class TokenResponse {
 
     @NotNull
@@ -50,5 +42,4 @@ public class TokenResponse {
     @Schema(description = "Scopes of the access_token.")
     @JsonProperty("scopes")
     private String scopes;
-
 }

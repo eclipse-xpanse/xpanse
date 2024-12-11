@@ -10,10 +10,12 @@ class BillingModeTest {
 
     @Test
     void testGetByValue() {
-        assertThat(BillingMode.getByValue(BillingMode.FIXED.toValue())).isEqualTo(BillingMode.FIXED);
-        assertThat(BillingMode.getByValue(BillingMode.PAY_PER_USE.toValue())).isEqualTo(BillingMode.PAY_PER_USE);
-        assertThrows(UnsupportedEnumValueException.class,
-                () -> BillingMode.getByValue("error_value"));
+        assertThat(BillingMode.getByValue(BillingMode.FIXED.toValue()))
+                .isEqualTo(BillingMode.FIXED);
+        assertThat(BillingMode.getByValue(BillingMode.PAY_PER_USE.toValue()))
+                .isEqualTo(BillingMode.PAY_PER_USE);
+        assertThrows(
+                UnsupportedEnumValueException.class, () -> BillingMode.getByValue("error_value"));
     }
 
     @Test

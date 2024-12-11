@@ -19,10 +19,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-/**
- * HTTP Filter to set tracking ID to the thread.
- * This filter runs first.
- */
+/** HTTP Filter to set tracking ID to the thread. This filter runs first. */
 @Component
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -41,5 +38,4 @@ public class LoggingWebFilter implements Filter {
             MDC.clear();
         }
     }
-
 }

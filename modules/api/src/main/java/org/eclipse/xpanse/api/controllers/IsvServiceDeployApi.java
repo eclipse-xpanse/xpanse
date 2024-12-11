@@ -34,9 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST interface methods for processing OCL.
- */
+/** REST interface methods for processing OCL. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -45,8 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class IsvServiceDeployApi {
 
-    @Resource
-    private ServiceDetailsViewManager serviceDetailsViewManager;
+    @Resource private ServiceDetailsViewManager serviceDetailsViewManager;
 
     /**
      * List all deployed services by a user of ISV.
@@ -55,22 +52,25 @@ public class IsvServiceDeployApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "List all deployed services by a user.")
-    @GetMapping(value = "/services/isv",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/services/isv", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<DeployedService> listDeployedServicesOfIsv(
             @Parameter(name = "categoryName", description = "category of the service")
-            @RequestParam(name = "categoryName", required = false) Category category,
+                    @RequestParam(name = "categoryName", required = false)
+                    Category category,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
-            @RequestParam(name = "cspName", required = false) Csp csp,
+                    @RequestParam(name = "cspName", required = false)
+                    Csp csp,
             @Parameter(name = "serviceName", description = "name of the service")
-            @RequestParam(name = "serviceName", required = false) String serviceName,
+                    @RequestParam(name = "serviceName", required = false)
+                    String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
-            @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
+                    @RequestParam(name = "serviceVersion", required = false)
+                    String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
-            @RequestParam(name = "serviceState", required = false)
-            ServiceDeploymentState serviceState) {
+                    @RequestParam(name = "serviceState", required = false)
+                    ServiceDeploymentState serviceState) {
         return this.serviceDetailsViewManager.listDeployedServicesOfIsv(
                 category, csp, serviceName, serviceVersion, serviceState);
     }
@@ -82,13 +82,15 @@ public class IsvServiceDeployApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Get the details of the deployed service by service id.")
-    @GetMapping(value = "/services/isv/details/vendor_hosted/{serviceId}",
+    @GetMapping(
+            value = "/services/isv/details/vendor_hosted/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public DeployedServiceDetails getServiceDetailsByIdForIsv(
             @Parameter(name = "serviceId", description = "Id of deployed service")
-            @PathVariable("serviceId") String serviceId) {
+                    @PathVariable("serviceId")
+                    String serviceId) {
         return this.serviceDetailsViewManager.getServiceDetailsByIdForIsv(
                 UUID.fromString(serviceId));
     }

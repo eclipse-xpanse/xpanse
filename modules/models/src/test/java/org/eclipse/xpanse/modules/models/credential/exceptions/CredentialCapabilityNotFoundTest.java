@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of CredentialCapabilityNotFound.
- */
+/** Test of CredentialCapabilityNotFound. */
 class CredentialCapabilityNotFoundTest {
 
     private static final String message = "Credential capability not found.";
@@ -28,5 +26,4 @@ class CredentialCapabilityNotFoundTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

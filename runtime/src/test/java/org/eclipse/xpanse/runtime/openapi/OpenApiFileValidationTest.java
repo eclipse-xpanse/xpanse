@@ -23,7 +23,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {"spring.profiles.active=generate-openapi-doc,noauth,test"})
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 public class OpenApiFileValidationTest {
@@ -31,14 +32,12 @@ public class OpenApiFileValidationTest {
     private static final String API_DOCS_PATH = "/v3/api-docs";
     private static final String DOWNLOAD_OPENAPI_JSON_PATH = "target/openapi.json";
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
     @Test
     void validateOpenApiDoc() throws Exception {
-        final MvcResult response = mockMvc.perform(get(API_DOCS_PATH))
-                .andExpect(status().isOk())
-                .andReturn();
+        final MvcResult response =
+                mockMvc.perform(get(API_DOCS_PATH)).andExpect(status().isOk()).andReturn();
 
         assertNotNull(response);
         assertNotNull(response.getResponse());
@@ -47,8 +46,10 @@ public class OpenApiFileValidationTest {
         try (final FileOutputStream fos = new FileOutputStream(DOWNLOAD_OPENAPI_JSON_PATH)) {
             fos.write(file);
         }
-        SwaggerParseResult result = new OpenAPIV3Parser().readLocation(DOWNLOAD_OPENAPI_JSON_PATH, null, null);
-        assertTrue(Objects.isNull(result.getMessages()) || result.getMessages().isEmpty() ,
+        SwaggerParseResult result =
+                new OpenAPIV3Parser().readLocation(DOWNLOAD_OPENAPI_JSON_PATH, null, null);
+        assertTrue(
+                Objects.isNull(result.getMessages()) || result.getMessages().isEmpty(),
                 String.join(",", result.getMessages()));
     }
 }

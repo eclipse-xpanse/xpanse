@@ -24,20 +24,22 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,test"})
+@SpringBootTest(
+        properties = {
+            "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,test"
+        })
 @AutoConfigureMockMvc
 class PluginManagerTest {
 
-    @Resource
-    private PluginManager pluginManager;
-    @Resource
-    private ApplicationContext applicationContext;
+    @Resource private PluginManager pluginManager;
+    @Resource private ApplicationContext applicationContext;
     private List<OrchestratorPlugin> plugins;
 
     @BeforeEach
     void setup() {
-        plugins = applicationContext.getBeansOfType(OrchestratorPlugin.class).values().stream()
-                .toList();
+        plugins =
+                applicationContext.getBeansOfType(OrchestratorPlugin.class).values().stream()
+                        .toList();
     }
 
     @Test
@@ -47,7 +49,7 @@ class PluginManagerTest {
     }
 
     void testGetPluginsMap() {
-        //Setup
+        // Setup
         Set<Csp> activatedCspSet =
                 new HashSet<>(plugins.stream().map(OrchestratorPlugin::getCsp).toList());
         // run test
@@ -67,10 +69,10 @@ class PluginManagerTest {
         Assertions.assertInstanceOf(plugins.getFirst().getClass(), result);
 
         // Run the test
-        Assertions.assertThrows(PluginNotFoundException.class, () -> {
-            pluginManager.getOrchestratorPlugin(Csp.AWS);
-        });
+        Assertions.assertThrows(
+                PluginNotFoundException.class,
+                () -> {
+                    pluginManager.getOrchestratorPlugin(Csp.AWS);
+                });
     }
-
-
 }

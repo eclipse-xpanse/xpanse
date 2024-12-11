@@ -5,14 +5,11 @@
 
 package org.eclipse.xpanse.modules.logging;
 
-
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Reads HTTP logging related configuration from spring context.
- */
+/** Reads HTTP logging related configuration from spring context. */
 @Configuration
 public class HttpLoggingConfig {
     private static boolean isHttpLoggingEnabled;

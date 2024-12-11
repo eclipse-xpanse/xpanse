@@ -14,13 +14,17 @@ class InstanceNetworkResourceTest {
     @Test
     void testSettersAndGetters() throws Exception {
         InstanceNetworkResource test = getInstanceByJson();
-        assertEquals("91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5", test.getCreator());
+        assertEquals(
+                "91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5",
+                test.getCreator());
         assertEquals("2023-06-05T11:10:18.130486+00:00", test.getStartedAt());
         assertEquals("2023-06-05T11:10:18.130492+00:00", test.getRevisionStart());
         assertNull(test.getEndedAt());
         assertEquals("08ad2f8d537349ee9862c55398fc3b29", test.getUserId());
         assertEquals("1c190e0a4fc14e72a871810b1fc08788", test.getProjectId());
-        assertEquals("instance-00000005-7b5b6ee6-cab4-4e72-be6e-854a67c6d381-tapffdde028-eb", test.getOriginalResourceId());
+        assertEquals(
+                "instance-00000005-7b5b6ee6-cab4-4e72-be6e-854a67c6d381-tapffdde028-eb",
+                test.getOriginalResourceId());
         assertEquals("f4b607a9-ff04-5566-a5a4-399ad0cadd26", test.getId());
         assertEquals("instance_network_interface", test.getType());
         assertEquals("tapffdde028-eb", test.getName());
@@ -28,11 +32,11 @@ class InstanceNetworkResourceTest {
         assertEquals(8, test.getMetrics().size());
         assertEquals("91ac6b28dc5f4a519422f3154bc4d14d", test.getCreatedByUserId());
         assertEquals("2c2c51522b0342fc94254c1b3afb95b5", test.getCreatedByProjectId());
-
     }
 
     InstanceNetworkResource getInstanceByJson() throws Exception {
-        String json = """
+        String json =
+                """
                 {
                     "creator": "91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5",
                     "started_at": "2023-06-05T11:10:18.130486+00:00",
@@ -61,6 +65,5 @@ class InstanceNetworkResourceTest {
                 }
                 """;
         return mapper.readValue(json, InstanceNetworkResource.class);
-
     }
 }

@@ -16,9 +16,11 @@ class AvailabilityZonesRequestValidatorTest {
         // Setup
         final Map<String, String> inputMap = new HashMap<>();
         final List<AvailabilityZoneConfig> zoneConfigs = new ArrayList<>();
-        Assertions.assertDoesNotThrow(() -> {
-            AvailabilityZonesRequestValidator.validateAvailabilityZones(inputMap, zoneConfigs);
-        });
+        Assertions.assertDoesNotThrow(
+                () -> {
+                    AvailabilityZonesRequestValidator.validateAvailabilityZones(
+                            inputMap, zoneConfigs);
+                });
     }
 
     @Test
@@ -32,9 +34,11 @@ class AvailabilityZonesRequestValidatorTest {
         final List<AvailabilityZoneConfig> zoneConfigs = List.of(availabilityZoneConfig);
         final Map<String, String> inputMap = Map.ofEntries(Map.entry("value", "value"));
         // Run the test
-        Assertions.assertDoesNotThrow(() -> {
-            AvailabilityZonesRequestValidator.validateAvailabilityZones(inputMap, zoneConfigs);
-        });
+        Assertions.assertDoesNotThrow(
+                () -> {
+                    AvailabilityZonesRequestValidator.validateAvailabilityZones(
+                            inputMap, zoneConfigs);
+                });
     }
 
     @Test
@@ -48,9 +52,12 @@ class AvailabilityZonesRequestValidatorTest {
         final List<AvailabilityZoneConfig> zoneConfigs = List.of(availabilityZoneConfig);
         final Map<String, String> inputMap = Map.ofEntries(Map.entry("value", "value"));
         // Run the test
-        Assertions.assertThrows(VariableValidationFailedException.class, () -> {
-            AvailabilityZonesRequestValidator.validateAvailabilityZones(inputMap, zoneConfigs);
-        });
+        Assertions.assertThrows(
+                VariableValidationFailedException.class,
+                () -> {
+                    AvailabilityZonesRequestValidator.validateAvailabilityZones(
+                            inputMap, zoneConfigs);
+                });
     }
 
     @Test
@@ -66,13 +73,16 @@ class AvailabilityZonesRequestValidatorTest {
         availabilityZoneConfig1.setVarName("varName1");
         availabilityZoneConfig1.setMandatory(true);
         availabilityZoneConfig1.setDescription("description1");
-        final List<AvailabilityZoneConfig> zoneConfigs = List.of(availabilityZoneConfig,
-                availabilityZoneConfig1);
-        final Map<String, String> inputMap = Map.ofEntries(
-                Map.entry("varName", "value"), Map.entry("varName1", "value"));
+        final List<AvailabilityZoneConfig> zoneConfigs =
+                List.of(availabilityZoneConfig, availabilityZoneConfig1);
+        final Map<String, String> inputMap =
+                Map.ofEntries(Map.entry("varName", "value"), Map.entry("varName1", "value"));
         // Run the test
-        Assertions.assertThrows(VariableValidationFailedException.class, () -> {
-            AvailabilityZonesRequestValidator.validateAvailabilityZones(inputMap, zoneConfigs);
-        });
+        Assertions.assertThrows(
+                VariableValidationFailedException.class,
+                () -> {
+                    AvailabilityZonesRequestValidator.validateAvailabilityZones(
+                            inputMap, zoneConfigs);
+                });
     }
 }

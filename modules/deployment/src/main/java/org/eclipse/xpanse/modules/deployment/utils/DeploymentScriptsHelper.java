@@ -37,9 +37,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to manage deployment scripts.
- */
+/** Bean to manage deployment scripts. */
 @Slf4j
 @Component
 public class DeploymentScriptsHelper {
@@ -54,18 +52,20 @@ public class DeploymentScriptsHelper {
 
     @Value("${wait.time.for.deploy.result.file.lock.in.seconds}")
     private int awaitAtMost;
+
     @Value("${polling.interval.for.deploy.result.file.lock.check.in.seconds}")
     private int awaitPollingInterval;
+
     @Value("${clean.workspace.after.deployment.enabled:true}")
     private boolean cleanWorkspaceAfterDeploymentEnabled;
-    @Resource
-    private ScriptsGitRepoManage scriptsGitRepoManage;
+
+    @Resource private ScriptsGitRepoManage scriptsGitRepoManage;
 
     /**
      * Create workspace directory for a deployment task.
      *
      * @param configWorkspaceDir config workspace directory.
-     * @param orderId            id of the deployment order task.
+     * @param orderId id of the deployment order task.
      * @return absolute path of the taskWorkspace.
      */
     public String createWorkspaceForTask(String configWorkspaceDir, UUID orderId) {
@@ -79,17 +79,16 @@ public class DeploymentScriptsHelper {
         return taskWorkspace.getAbsolutePath();
     }
 
-
     /**
      * Prepare the deployment script files for a deployment task.
      *
      * @param taskWorkspace workspace directory for the task.
-     * @param deployment    deployment object containing the scripts to be used for deployment.
-     * @param tfState       tf state file content.
+     * @param deployment deployment object containing the scripts to be used for deployment.
+     * @param tfState tf state file content.
      * @return list of files created for deployment.
      */
-    public List<File> prepareDeploymentScripts(String taskWorkspace, Deployment deployment,
-                                               String tfState) {
+    public List<File> prepareDeploymentScripts(
+            String taskWorkspace, Deployment deployment, String tfState) {
         File ws = new File(taskWorkspace);
         if (!ws.exists() && !ws.mkdirs()) {
             throw new DeploymentScriptsCreationFailedException(
@@ -105,19 +104,21 @@ public class DeploymentScriptsHelper {
             }
 
         } else if (Objects.nonNull(deployment.getScriptsRepo())) {
-            List<File> scriptFiles = scriptsGitRepoManage.checkoutScripts(taskWorkspace,
-                    deployment.getScriptsRepo());
+            List<File> scriptFiles =
+                    scriptsGitRepoManage.checkoutScripts(
+                            taskWorkspace, deployment.getScriptsRepo());
             files.addAll(scriptFiles);
             if (StringUtils.isNotBlank(tfState)) {
-                String scriptPath = taskWorkspace + File.separator
-                        + deployment.getScriptsRepo().getScriptsPath();
+                String scriptPath =
+                        taskWorkspace
+                                + File.separator
+                                + deployment.getScriptsRepo().getScriptsPath();
                 File stateFile = createServiceStateFile(scriptPath, tfState);
                 files.add(stateFile);
             }
         }
         return files;
     }
-
 
     /**
      * Reads the contents of the "terraform.tfstate" file in the workspace for the task.
@@ -144,25 +145,27 @@ public class DeploymentScriptsHelper {
      *
      * @return Map fileName as key, contents as value.
      */
-    public Map<String, String> getGeneratedFileContents(String taskWorkspace,
-                                                        List<File> preparedFiles) {
+    public Map<String, String> getGeneratedFileContents(
+            String taskWorkspace, List<File> preparedFiles) {
         Map<String, String> fileContentMap = new HashMap<>();
         File workPath = new File(taskWorkspace);
         if (workPath.isDirectory() && workPath.exists()) {
             File[] files = workPath.listFiles();
             if (Objects.nonNull(files)) {
-                Arrays.stream(files).forEach(file -> {
-                    if (file.isFile() && !isExcludedFile(file.getName())
-                            && !preparedFiles.contains(file)) {
-                        String content = readFileContent(file);
-                        fileContentMap.put(file.getName(), content);
-                    }
-                });
+                Arrays.stream(files)
+                        .forEach(
+                                file -> {
+                                    if (file.isFile()
+                                            && !isExcludedFile(file.getName())
+                                            && !preparedFiles.contains(file)) {
+                                        String content = readFileContent(file);
+                                        fileContentMap.put(file.getName(), content);
+                                    }
+                                });
             }
         }
         return fileContentMap;
     }
-
 
     /**
      * Delete all files in the workspace for the task.
@@ -173,12 +176,17 @@ public class DeploymentScriptsHelper {
         if (cleanWorkspaceAfterDeploymentEnabled) {
             Path path = Paths.get(taskWorkspace);
             try (Stream<Path> pathStream = Files.walk(path)) {
-                pathStream.sorted(Comparator.reverseOrder()).map(Path::toFile)
-                        .forEach(file -> {
-                            if (!file.delete()) {
-                                log.error("Failed to delete file: {}", file.getAbsolutePath());
-                            }
-                        });
+                pathStream
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(
+                                file -> {
+                                    if (!file.delete()) {
+                                        log.error(
+                                                "Failed to delete file: {}",
+                                                file.getAbsolutePath());
+                                    }
+                                });
             } catch (Exception e) {
                 log.error("Delete workspace:{} for the task error.", taskWorkspace, e);
             }
@@ -189,13 +197,14 @@ public class DeploymentScriptsHelper {
      * Get the scripts location in the workspace for the deployment task.
      *
      * @param taskWorkspace workspace directory for the deployment task.
-     * @param deployment    deployment object.
+     * @param deployment deployment object.
      * @return scripts location path in the workspace for the deployment task.
      */
     @Nullable
     public String getScriptsLocationInWorkspace(String taskWorkspace, Deployment deployment) {
         if (Objects.nonNull(deployment.getScriptsRepo())) {
-            log.info("Deployment scripts are from git repo. Scripts path:{}",
+            log.info(
+                    "Deployment scripts are from git repo. Scripts path:{}",
                     deployment.getScriptsRepo().getScriptsPath());
             return taskWorkspace + File.separator + deployment.getScriptsRepo().getScriptsPath();
         }
@@ -241,7 +250,6 @@ public class DeploymentScriptsHelper {
         return null;
     }
 
-
     /**
      * Method to await for the tfstate file to be unlocked.
      *
@@ -255,8 +263,8 @@ public class DeploymentScriptsHelper {
                     .pollDelay(0, TimeUnit.SECONDS)
                     .until(() -> !isTfStateFileLocked(tfStateFilePath));
         } catch (ConditionTimeoutException e) {
-            String errorMsg = String.format(
-                    "Timeout waiting for file to be unlocked, %s", e.getMessage());
+            String errorMsg =
+                    String.format("Timeout waiting for file to be unlocked, %s", e.getMessage());
             log.info(errorMsg);
             throw new FileLockedException(errorMsg);
         }
@@ -276,5 +284,4 @@ public class DeploymentScriptsHelper {
         }
         return true;
     }
-
 }

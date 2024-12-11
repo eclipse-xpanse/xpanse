@@ -24,7 +24,6 @@ class MetricsFilterTest {
         assertEquals(1, test.getGranularity());
     }
 
-
     @Test
     void testEqualsAndHashCode() {
 
@@ -40,7 +39,6 @@ class MetricsFilterTest {
         assertEquals(test, test1);
         assertEquals(test.hashCode(), test1.hashCode());
     }
-
 
     @Test
     void testToString() {

@@ -37,9 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST API methods for workflow.
- */
+/** REST API methods for workflow. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -48,15 +46,11 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class WorkFlowApi {
 
-    @Resource
-    private WorkflowUtils workflowUtils;
+    @Resource private WorkflowUtils workflowUtils;
 
-    @Resource
-    private UserServiceHelper userServiceHelper;
+    @Resource private UserServiceHelper userServiceHelper;
 
-    /**
-     * Query tasks of the given user by status.
-     */
+    /** Query tasks of the given user by status. */
     @Tag(name = "Workflow", description = "APIs to manage the Workflow")
     @Operation(description = "Query all tasks of the given user")
     @GetMapping(value = "/workflow/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,46 +58,48 @@ public class WorkFlowApi {
     @AuditApiRequest(enabled = false)
     public List<WorkFlowTask> queryTasks(
             @Parameter(name = "status", description = "the status of task")
-            @RequestParam(name = "status", required = false) WorkFlowTaskStatus status) {
+                    @RequestParam(name = "status", required = false)
+                    WorkFlowTaskStatus status) {
         String currentUserId = userServiceHelper.getCurrentUserId();
         return workflowUtils.queryAllTasks(status, currentUserId);
     }
 
-    /**
-     * Complete tasks based on task ID and set global process variables.
-     */
+    /** Complete tasks based on task ID and set global process variables. */
     @Tag(name = "Workflow", description = "APIs to manage the Workflow")
     @Operation(description = "Complete tasks by task ID and set global process variables .")
     @PutMapping(value = "/workflow/complete/task/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCsFromWorkflowTaskId")
     public void completeTask(
-            @Parameter(name = "id",
-                    description = "ID of the workflow task that needs to be handled")
-            @PathVariable("id") String taskId,
+            @Parameter(
+                            name = "id",
+                            description = "ID of the workflow task that needs to be handled")
+                    @PathVariable("id")
+                    String taskId,
             @RequestBody Map<String, Object> variables) {
         workflowUtils.completeTask(taskId, variables);
     }
 
-    /**
-     * Manage failed workflow tasks.
-     */
+    /** Manage failed workflow tasks. */
     @Tag(name = "Workflow", description = "APIs to manage the Workflow")
     @Operation(description = "Manage failed task orders.")
-    @PutMapping(value = "/workflow/task/{id}", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/workflow/task/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCsFromWorkflowTaskId")
     public void manageFailedOrder(
-            @Parameter(name = "id",
-                    description = "ID of the workflow task that needs to be handled")
-            @PathVariable("id") String taskId,
-            @Parameter(name = "retryOrder",
-                    description = "Controls if the order must be retried again or simply closed.")
-            @RequestParam(name = "retryOrder") boolean retryOrder) {
+            @Parameter(
+                            name = "id",
+                            description = "ID of the workflow task that needs to be handled")
+                    @PathVariable("id")
+                    String taskId,
+            @Parameter(
+                            name = "retryOrder",
+                            description =
+                                    "Controls if the order must be retried again or simply closed.")
+                    @RequestParam(name = "retryOrder")
+                    boolean retryOrder) {
         Map<String, Object> variables = new HashMap<>();
         variables.put(MigrateConstants.IS_RETRY_TASK, retryOrder);
         workflowUtils.completeTask(taskId, variables);
     }
-
 }

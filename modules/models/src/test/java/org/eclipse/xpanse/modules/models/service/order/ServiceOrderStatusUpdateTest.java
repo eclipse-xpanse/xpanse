@@ -25,14 +25,12 @@ class ServiceOrderStatusUpdateTest {
         test = new ServiceOrderStatusUpdate(taskStatus, isOrderCompleted, error);
     }
 
-
     @Test
     void testGetters() {
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
         assertThat(test.getIsOrderCompleted()).isEqualTo(isOrderCompleted);
         assertThat(test.getError()).isEqualTo(error);
     }
-
 
     @Test
     void testHashCodeAndEquals() {
@@ -51,9 +49,16 @@ class ServiceOrderStatusUpdateTest {
 
     @Test
     void testToString() {
-        String expected = "ServiceOrderStatusUpdate(taskStatus=" + taskStatus + ", "
-                + "isOrderCompleted=" + isOrderCompleted + ", "
-                + "error=" + error + ")";
+        String expected =
+                "ServiceOrderStatusUpdate(taskStatus="
+                        + taskStatus
+                        + ", "
+                        + "isOrderCompleted="
+                        + isOrderCompleted
+                        + ", "
+                        + "error="
+                        + error
+                        + ")";
         assertThat(test.toString()).isEqualTo(expected);
     }
 }

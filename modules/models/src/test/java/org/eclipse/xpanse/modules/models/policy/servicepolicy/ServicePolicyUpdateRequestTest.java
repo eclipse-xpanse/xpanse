@@ -11,7 +11,7 @@ import org.springframework.beans.BeanUtils;
 class ServicePolicyUpdateRequestTest {
 
     final UUID id = UUID.fromString("0ebfecbc-3907-45c7-b9c6-36d42ec0efa1");
-    final List<String> flavorNameList = List.of("flavor1","flavor2");
+    final List<String> flavorNameList = List.of("flavor1", "flavor2");
     final String policy = "policy";
     final Boolean enabled = false;
     private ServicePolicyUpdateRequest test;
@@ -54,9 +54,10 @@ class ServicePolicyUpdateRequestTest {
 
     @Test
     void testToString() {
-        String result = String.format("ServicePolicyUpdateRequest(flavorNameList=%s, "
-                        + "policy=%s, enabled=%s)",
-                flavorNameList, policy, enabled);
+        String result =
+                String.format(
+                        "ServicePolicyUpdateRequest(flavorNameList=%s, " + "policy=%s, enabled=%s)",
+                        flavorNameList, policy, enabled);
         assertThat(test.toString()).isEqualTo(result);
     }
 }

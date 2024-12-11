@@ -10,9 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 
-/**
- * Define autofill properties for deployment variables.
- */
+/** Define autofill properties for deployment variables. */
 @Data
 public class AutoFill {
 
@@ -21,7 +19,9 @@ public class AutoFill {
     private DeployResourceKind deployResourceKind;
 
     @NotNull
-    @Schema(description = " defines if the required cloud resource can be newly created "
-            + "or should the existing resources must only be used.")
+    @Schema(
+            description =
+                    " defines if the required cloud resource can be newly created "
+                            + "or should the existing resources must only be used.")
     private Boolean isAllowCreate;
 }

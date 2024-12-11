@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,53 +20,45 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * TerraformAsyncDestroyFromGitRepoRequest
- */
+/** TerraformAsyncDestroyFromGitRepoRequest */
 @JsonPropertyOrder({
-        TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
-        TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_TERRAFORM_VERSION,
-        TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
-        TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
-        TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
-        TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_TF_STATE,
-        TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_WEBHOOK_CONFIG
+    TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
+    TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_TERRAFORM_VERSION,
+    TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
+    TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
+    TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
+    TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_TF_STATE,
+    TerraformAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformAsyncDestroyFromGitRepoRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_TERRAFORM_VERSION = "terraformVersion";
-    @jakarta.annotation.Nonnull
-    private String terraformVersion;
+    @jakarta.annotation.Nonnull private String terraformVersion;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_GIT_REPO_DETAILS = "gitRepoDetails";
-    @jakarta.annotation.Nullable
-    private TerraformScriptGitRepoDetails gitRepoDetails;
+    @jakarta.annotation.Nullable private TerraformScriptGitRepoDetails gitRepoDetails;
 
     public static final String JSON_PROPERTY_TF_STATE = "tfState";
-    @jakarta.annotation.Nonnull
-    private String tfState;
+    @jakarta.annotation.Nonnull private String tfState;
 
     public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
-    @jakarta.annotation.Nonnull
-    private WebhookConfig webhookConfig;
+    @jakarta.annotation.Nonnull private WebhookConfig webhookConfig;
 
-    public TerraformAsyncDestroyFromGitRepoRequest() {
-    }
+    public TerraformAsyncDestroyFromGitRepoRequest() {}
 
-    public TerraformAsyncDestroyFromGitRepoRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
+    public TerraformAsyncDestroyFromGitRepoRequest requestId(
+            @jakarta.annotation.Nullable UUID requestId) {
 
         this.requestId = requestId;
         return this;
@@ -81,11 +72,9 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -108,11 +97,9 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTerraformVersion() {
         return terraformVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -127,7 +114,8 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
         return this;
     }
 
-    public TerraformAsyncDestroyFromGitRepoRequest putVariablesItem(String key, Object variablesItem) {
+    public TerraformAsyncDestroyFromGitRepoRequest putVariablesItem(
+            String key, Object variablesItem) {
         this.variables.put(key, variablesItem);
         return this;
     }
@@ -140,11 +128,9 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -159,7 +145,8 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
         return this;
     }
 
-    public TerraformAsyncDestroyFromGitRepoRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public TerraformAsyncDestroyFromGitRepoRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -168,18 +155,17 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to terraform process.
+     * Key-value pairs of variables that must be injected as environment variables to terraform
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -202,19 +188,19 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public TerraformScriptGitRepoDetails getGitRepoDetails() {
         return gitRepoDetails;
     }
 
-
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setGitRepoDetails(@jakarta.annotation.Nullable TerraformScriptGitRepoDetails gitRepoDetails) {
+    public void setGitRepoDetails(
+            @jakarta.annotation.Nullable TerraformScriptGitRepoDetails gitRepoDetails) {
         this.gitRepoDetails = gitRepoDetails;
     }
 
-    public TerraformAsyncDestroyFromGitRepoRequest tfState(@jakarta.annotation.Nonnull String tfState) {
+    public TerraformAsyncDestroyFromGitRepoRequest tfState(
+            @jakarta.annotation.Nonnull String tfState) {
 
         this.tfState = tfState;
         return this;
@@ -228,11 +214,9 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTfState() {
         return tfState;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -255,11 +239,9 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public WebhookConfig getWebhookConfig() {
         return webhookConfig;
     }
-
 
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -277,18 +259,29 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
         }
         TerraformAsyncDestroyFromGitRepoRequest terraformAsyncDestroyFromGitRepoRequest =
                 (TerraformAsyncDestroyFromGitRepoRequest) o;
-        return Objects.equals(this.requestId, terraformAsyncDestroyFromGitRepoRequest.requestId) &&
-                Objects.equals(this.terraformVersion, terraformAsyncDestroyFromGitRepoRequest.terraformVersion) &&
-                Objects.equals(this.variables, terraformAsyncDestroyFromGitRepoRequest.variables) &&
-                Objects.equals(this.envVariables, terraformAsyncDestroyFromGitRepoRequest.envVariables) &&
-                Objects.equals(this.gitRepoDetails, terraformAsyncDestroyFromGitRepoRequest.gitRepoDetails) &&
-                Objects.equals(this.tfState, terraformAsyncDestroyFromGitRepoRequest.tfState) &&
-                Objects.equals(this.webhookConfig, terraformAsyncDestroyFromGitRepoRequest.webhookConfig);
+        return Objects.equals(this.requestId, terraformAsyncDestroyFromGitRepoRequest.requestId)
+                && Objects.equals(
+                        this.terraformVersion,
+                        terraformAsyncDestroyFromGitRepoRequest.terraformVersion)
+                && Objects.equals(this.variables, terraformAsyncDestroyFromGitRepoRequest.variables)
+                && Objects.equals(
+                        this.envVariables, terraformAsyncDestroyFromGitRepoRequest.envVariables)
+                && Objects.equals(
+                        this.gitRepoDetails, terraformAsyncDestroyFromGitRepoRequest.gitRepoDetails)
+                && Objects.equals(this.tfState, terraformAsyncDestroyFromGitRepoRequest.tfState)
+                && Objects.equals(
+                        this.webhookConfig, terraformAsyncDestroyFromGitRepoRequest.webhookConfig);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, terraformVersion, variables, envVariables, gitRepoDetails, tfState,
+        return Objects.hash(
+                requestId,
+                terraformVersion,
+                variables,
+                envVariables,
+                gitRepoDetails,
+                tfState,
                 webhookConfig);
     }
 
@@ -308,8 +301,8 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -317,6 +310,4 @@ public class TerraformAsyncDestroyFromGitRepoRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

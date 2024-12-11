@@ -9,9 +9,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Exception thrown when a deployment variable schema definition is invalid.
- */
+/** Exception thrown when a deployment variable schema definition is invalid. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class InvalidValueSchemaException extends RuntimeException {

@@ -19,8 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CredentialVariablesNotCompleteTest {
 
-    @Mock
-    private Set<String> mockErrorReasons;
+    @Mock private Set<String> mockErrorReasons;
 
     private CredentialVariablesNotComplete credentialVariablesNotCompleteUnderTest;
 
@@ -55,7 +54,7 @@ class CredentialVariablesNotCompleteTest {
     @Test
     void testHashCode() {
         CredentialVariablesNotComplete test = new CredentialVariablesNotComplete(new HashSet<>());
-        assertThat(credentialVariablesNotCompleteUnderTest.hashCode()).isNotEqualTo(
-                test.hashCode());
+        assertThat(credentialVariablesNotCompleteUnderTest.hashCode())
+                .isNotEqualTo(test.hashCode());
     }
 }

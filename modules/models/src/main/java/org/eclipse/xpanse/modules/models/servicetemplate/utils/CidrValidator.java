@@ -9,9 +9,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.apache.commons.net.util.SubnetUtils;
 
-/**
- * Cidr validator.
- */
+/** Cidr validator. */
 public class CidrValidator implements ConstraintValidator<Cidr, String> {
 
     @Override
@@ -24,5 +22,4 @@ public class CidrValidator implements ConstraintValidator<Cidr, String> {
 
         return true;
     }
-
 }

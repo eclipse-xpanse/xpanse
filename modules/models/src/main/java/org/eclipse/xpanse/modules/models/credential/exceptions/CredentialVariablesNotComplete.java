@@ -9,9 +9,7 @@ import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Exception thrown when check credential completeness.
- */
+/** Exception thrown when check credential completeness. */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuppressWarnings("UnnecessarilyFullyQualified")
@@ -23,6 +21,4 @@ public class CredentialVariablesNotComplete extends RuntimeException {
         super(String.format("Credential Variables Not Complete. Error reasons: %s", errorReasons));
         this.errorReasons = errorReasons;
     }
-
-
 }

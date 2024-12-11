@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 class DeployVariableSchemaValidatorTest {
 
-
     @Test
     void testValidateDeployVariable() {
         // Setup
@@ -28,8 +27,8 @@ class DeployVariableSchemaValidatorTest {
         final List<DeployVariable> deployVariables = List.of(deployVariable);
 
         // Run the test
-        Assertions.assertDoesNotThrow(() ->
-                DeployVariableSchemaValidator.validateDeployVariable(deployVariables));
+        Assertions.assertDoesNotThrow(
+                () -> DeployVariableSchemaValidator.validateDeployVariable(deployVariables));
     }
 
     @Test
@@ -47,9 +46,9 @@ class DeployVariableSchemaValidatorTest {
         final List<DeployVariable> deployVariables = List.of(deployVariable);
 
         // Run the test
-        Assertions.assertThrows(InvalidValueSchemaException.class, () ->
-                DeployVariableSchemaValidator.validateDeployVariable(
-                        deployVariables));
+        Assertions.assertThrows(
+                InvalidValueSchemaException.class,
+                () -> DeployVariableSchemaValidator.validateDeployVariable(deployVariables));
     }
 
     @Test
@@ -70,8 +69,8 @@ class DeployVariableSchemaValidatorTest {
         final List<DeployVariable> deployVariables = List.of(deployVariable, deployVariable1);
 
         // Run the test
-        Assertions.assertThrows(InvalidValueSchemaException.class, () ->
-                DeployVariableSchemaValidator.validateDeployVariable(
-                        deployVariables));
+        Assertions.assertThrows(
+                InvalidValueSchemaException.class,
+                () -> DeployVariableSchemaValidator.validateDeployVariable(deployVariables));
     }
 }
