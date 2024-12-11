@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.junit.jupiter.api.Test;
 
 class ServiceTemplateRequestTypeEnumConverterTest {

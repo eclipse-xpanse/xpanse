@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResu
 @Valid
 @Data
 @Slf4j
-public class ReviewRegistrationRequest {
+public class ReviewServiceTemplateRequest {
 
     @NotNull
     @Schema(description = "The result of review registration.")

@@ -6,7 +6,7 @@
 package org.eclipse.xpanse.api.config;
 
 import javax.annotation.Nonnull;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

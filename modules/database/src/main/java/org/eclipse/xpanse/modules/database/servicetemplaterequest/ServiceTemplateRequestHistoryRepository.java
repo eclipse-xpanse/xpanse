@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.servicetemplatehistory;
+package org.eclipse.xpanse.modules.database.servicetemplaterequest;
 
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.CustomJpaRepository;
@@ -15,8 +15,8 @@ import org.springframework.stereotype.Repository;
  * Interface to access default JPA methods.
  */
 @Repository
-public interface ServiceTemplateHistoryRepository extends
-        CustomJpaRepository<ServiceTemplateHistoryEntity, UUID>,
-        JpaSpecificationExecutor<ServiceTemplateHistoryEntity> {
+public interface ServiceTemplateRequestHistoryRepository extends
+        CustomJpaRepository<ServiceTemplateRequestHistoryEntity, UUID>,
+        JpaSpecificationExecutor<ServiceTemplateRequestHistoryEntity> {
 
 }

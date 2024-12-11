@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.servicetemplatehistory;
+package org.eclipse.xpanse.modules.database.servicetemplaterequest;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
@@ -25,22 +25,22 @@ import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateChangeStatus;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.hibernate.annotations.Type;
 
 /**
- * Represents the SERVICE_TEMPLATE_HISTORY table in the database.
+ * Represents the SERVICE_TEMPLATE_REQUEST_HISTORY table in the database.
  */
-@Table(name = "SERVICE_TEMPLATE_HISTORY")
+@Table(name = "SERVICE_TEMPLATE_REQUEST_HISTORY")
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ServiceTemplateHistoryEntity extends CreateModifiedTime {
+public class ServiceTemplateRequestHistoryEntity extends CreateModifiedTime {
 
     @Id
-    @Column(name = "CHANGE_ID", nullable = false)
-    private UUID changeId;
+    @Column(name = "REQUEST_ID", nullable = false)
+    private UUID requestId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SERVICE_TEMPLATE_ID", nullable = false)
@@ -53,7 +53,7 @@ public class ServiceTemplateHistoryEntity extends CreateModifiedTime {
 
     @Column(name = "STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ServiceTemplateChangeStatus status;
+    private ServiceTemplateRequestStatus status;
 
     @Column(name = "SERVICE_TEMPLATE_REQUEST", columnDefinition = "json")
     @Type(value = JsonType.class)

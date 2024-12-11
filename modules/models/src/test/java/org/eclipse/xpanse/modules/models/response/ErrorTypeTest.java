@@ -45,8 +45,8 @@ class ErrorTypeTest {
         assertEquals("Resource Invalid For Monitoring",
                 ErrorType.RESOURCE_TYPE_INVALID_FOR_MONITORING.toValue());
         assertEquals("Unhandled Exception", ErrorType.UNHANDLED_EXCEPTION.toValue());
-        assertEquals("Service Template Change Request Not Allowed",
-                ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED.toValue());
+        assertEquals("Service Template Request Not Allowed",
+                ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED.toValue());
         assertEquals("Icon Processing Failed",
                 ErrorType.ICON_PROCESSING_FAILED.toValue());
         assertEquals("Service Template Not Registered",
@@ -92,8 +92,8 @@ class ErrorTypeTest {
                 ErrorType.getResultTypeByValue("Resource Invalid For Monitoring"));
         assertEquals(ErrorType.UNHANDLED_EXCEPTION,
                 ErrorType.getResultTypeByValue("Unhandled Exception"));
-        assertEquals(ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED,
-                ErrorType.getResultTypeByValue("Service Template Change Request Not Allowed"));
+        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED,
+                ErrorType.getResultTypeByValue("Service Template Request Not Allowed"));
         assertEquals(ErrorType.ICON_PROCESSING_FAILED,
                 ErrorType.getResultTypeByValue("Icon Processing Failed"));
         assertEquals(ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED,
@@ -143,8 +143,8 @@ class ErrorTypeTest {
                 test.getByValue("Resource Invalid For Monitoring"));
         assertEquals(ErrorType.UNHANDLED_EXCEPTION,
                 test.getByValue("Unhandled Exception"));
-        assertEquals(ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED,
-                test.getByValue("Service Template Change Request Not Allowed"));
+        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED,
+                test.getByValue("Service Template Request Not Allowed"));
         assertEquals(ErrorType.ICON_PROCESSING_FAILED,
                 test.getByValue("Icon Processing Failed"));
         assertEquals(ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED,

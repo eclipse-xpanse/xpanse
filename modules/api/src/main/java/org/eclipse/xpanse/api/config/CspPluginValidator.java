@@ -8,6 +8,7 @@ package org.eclipse.xpanse.api.config;
 import jakarta.annotation.Resource;
 import java.net.URI;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -93,7 +94,7 @@ public class CspPluginValidator {
             fetchMethodName = ServiceTemplateApi.class.getDeclaredMethod("fetch", String.class)
                     .getName();
             fetchUpdateMethodName = ServiceTemplateApi.class.getDeclaredMethod("fetchUpdate",
-                    String.class, Boolean.class, String.class).getName();
+                    UUID.class, Boolean.class, String.class).getName();
         } catch (NoSuchMethodException e) {
             log.error("Failed to get fetch or fetchUpdate method name", e);
         }

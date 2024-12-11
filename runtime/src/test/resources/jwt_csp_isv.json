@@ -10,11 +10,12 @@
     "csp"
   ],
   "urn:zitadel:iam:org:project:roles": {
-    "admin": "admin",
-    "csp": "csp"
+    "csp": "csp",
+    "isv": "isv"
   },
   "urn:zitadel:iam:user:metadata": {
-    "csp": "SHVhd2VpQ2xvdWQ="
+    "csp": "SHVhd2VpQ2xvdWQ=",
+    "namespace": "SVNWLUE="
   },
   "sub": "userId"
 }

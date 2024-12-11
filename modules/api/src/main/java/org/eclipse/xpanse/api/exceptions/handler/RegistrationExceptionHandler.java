@@ -12,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.billing.exceptions.InvalidBillingConfigException;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.exceptions.ServiceTemplateChangeRequestNotAllowed;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.exceptions.ServiceTemplateChangeRequestNotFound;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
@@ -22,6 +20,9 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestAlreadyReviewed;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotAllowed;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotFound;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -76,19 +77,19 @@ public class RegistrationExceptionHandler {
     }
 
     /**
-     * Exception handler for ServiceTemplateChangeRequestNotAllowed.
+     * Exception handler for ServiceTemplateRequestNotAllowed.
      */
-    @ExceptionHandler({ServiceTemplateChangeRequestNotAllowed.class})
+    @ExceptionHandler({ServiceTemplateRequestNotAllowed.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleServiceTemplateChangeRequestNotAllowed(
-            ServiceTemplateChangeRequestNotAllowed ex) {
-        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_ALLOWED,
+    public ErrorResponse handleServiceTemplateRequestNotAllowed(
+            ServiceTemplateRequestNotAllowed ex) {
+        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED,
                 Collections.singletonList(ex.getMessage()));
     }
 
     /**
-     * Exception handler for ServiceTemplateChangeRequestNotAllowed.
+     * Exception handler for ServiceTemplateRequestNotAllowed.
      */
     @ExceptionHandler({InvalidValueSchemaException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -157,14 +158,26 @@ public class RegistrationExceptionHandler {
     }
 
     /**
-     * Exception handler for ServiceTemplateChangeRequestNotFound.
+     * Exception handler for ServiceTemplateRequestNotFound.
      */
-    @ExceptionHandler({ServiceTemplateChangeRequestNotFound.class})
+    @ExceptionHandler({ServiceTemplateRequestNotFound.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleServiceTemplateChangeRequestNotFoundException(
-            ServiceTemplateChangeRequestNotFound ex) {
-        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_CHANGE_REQUEST_NOT_FOUND,
+    public ErrorResponse handleServiceTemplateRequestNotFoundException(
+            ServiceTemplateRequestNotFound ex) {
+        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_FOUND,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /**
+     * Exception handler for ServiceTemplateRequestAlreadyReviewed.
+     */
+    @ExceptionHandler({ServiceTemplateRequestAlreadyReviewed.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleServiceTemplateRequestAlreadyReviewed(
+            ServiceTemplateRequestAlreadyReviewed ex) {
+        return getErrorResponse(ErrorType.SERVICE_TEMPLATE_REQUEST_ALREADY_REVIEWED,
                 Collections.singletonList(ex.getMessage()));
     }
 }
