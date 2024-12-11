@@ -8,7 +8,6 @@ package org.eclipse.xpanse.runtime;
 
 import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.HEADER_TRACKING_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -27,8 +26,8 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
@@ -108,10 +107,8 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
                 deployedServiceDetails.getServiceDeploymentState());
         if (waitServiceDeploymentIsCompleted(serviceId)) {
             testListDeployedServicesOfIsv();
-            // destroyService(serviceId);
-        }
-        if (waitServiceDeploymentIsCompleted(serviceId)) {
-            // purgeService(serviceId);
+            destroyService(serviceId);
+            purgeService(serviceId);
         }
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
         deleteIsvCredential();
@@ -152,13 +149,12 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
     void purgeService(UUID serviceId) throws Exception {
         // Run the test
         final MockHttpServletResponse purgeResponse =
-                mockMvc.perform(delete("/xpanse/services/purge/{id}", serviceId)).andReturn()
+                mockMvc.perform(delete("/xpanse/services/purge/{serviceId}", serviceId)).andReturn()
                         .getResponse();
         assertEquals(HttpStatus.ACCEPTED.value(), purgeResponse.getStatus());
-        ServiceOrder serviceOrder = objectMapper.readValue(purgeResponse.getContentAsString(),
-                ServiceOrder.class);
-        assertNotNull(serviceOrder.getOrderId());
-        assertTrue(waitServiceOrderIsCompleted(serviceOrder.getOrderId()));
+
+
+
         // SetUp
         String refuseMsg = String.format("Service with id %s not found.", serviceId);
         final MockHttpServletResponse detailsResponse =

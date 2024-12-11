@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -42,7 +43,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
@@ -60,10 +60,10 @@ import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateChangeInfo;
+import org.eclipse.xpanse.modules.models.servicetemplate.ReviewServiceTemplateRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
@@ -95,6 +95,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.context.request.async.DeferredResult;
 
 /**
@@ -250,6 +251,7 @@ public class ApisTestCommon {
                     return true;
                 }
             }
+            Thread.sleep(5000);
         }
         return false;
     }
@@ -277,6 +279,7 @@ public class ApisTestCommon {
                     return true;
                 }
             }
+            Thread.sleep(5000);
         }
         return false;
     }
@@ -382,9 +385,9 @@ public class ApisTestCommon {
                 .andReturn().getResponse();
         assertNotNull(registerResponse.getHeader(HEADER_TRACKING_ID));
         if (registerResponse.getStatus() == HttpStatus.OK.value()) {
-            ServiceTemplateChangeInfo serviceTemplateChangeInfo = objectMapper.readValue(
-                    registerResponse.getContentAsString(), ServiceTemplateChangeInfo.class);
-            return getServiceTemplateDetailsVo(serviceTemplateChangeInfo.getServiceTemplateId());
+            ServiceTemplateRequestInfo serviceTemplateRequestInfo = objectMapper.readValue(
+                    registerResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+            return getServiceTemplateDetailsVo(serviceTemplateRequestInfo.getServiceTemplateId());
         } else {
             ErrorResponse errorResponse =
                     objectMapper.readValue(registerResponse.getContentAsString(),
@@ -402,13 +405,38 @@ public class ApisTestCommon {
         return objectMapper.readValue(response.getContentAsString(), ServiceTemplateDetailVo.class);
     }
 
-    protected void approveServiceTemplateRegistration(UUID id) throws Exception {
-        ReviewRegistrationRequest request = new ReviewRegistrationRequest();
+
+    protected List<ServiceTemplateRequestToReview> listPendingServiceTemplateRequests(
+            UUID serviceTemplateId)
+            throws Exception {
+        MockHttpServletRequestBuilder getRequestBuilder =
+                get("/xpanse/csp/service_templates/requests/pending");
+        if (Objects.nonNull(serviceTemplateId)) {
+            getRequestBuilder =
+                    getRequestBuilder.param("serviceTemplateId", serviceTemplateId.toString());
+        }
+        MockHttpServletResponse response =
+                mockMvc.perform(getRequestBuilder.accept(MediaType.APPLICATION_JSON))
+                        .andReturn().getResponse();
+        return objectMapper.readValue(response.getContentAsString(),
+                new TypeReference<>() {
+                });
+    }
+
+    protected void approveServiceTemplateRegistration(UUID serviceTemplateId) throws Exception {
+        List<ServiceTemplateRequestToReview> serviceTemplateRequestToReviews =
+                listPendingServiceTemplateRequests(serviceTemplateId);
+        if (serviceTemplateRequestToReviews.isEmpty()) {
+            return;
+        }
+        UUID requestId = serviceTemplateRequestToReviews.getFirst().getRequestId();
+        ReviewServiceTemplateRequest request = new ReviewServiceTemplateRequest();
         request.setReviewResult(ServiceReviewResult.APPROVED);
         request.setReviewComment("Approved");
         String requestBody = objectMapper.writeValueAsString(request);
         MockHttpServletResponse response = mockMvc.perform(
-                        put("/xpanse/service_templates/review/{id}", id).content(requestBody)
+                        put("/xpanse/csp/service_templates/requests/review/{requestId}", requestId).
+                                content(requestBody)
                                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
         assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());

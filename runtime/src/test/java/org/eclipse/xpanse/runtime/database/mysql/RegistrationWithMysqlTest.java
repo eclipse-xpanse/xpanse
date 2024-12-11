@@ -20,12 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateChangeInfo;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateHistoryVo;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateChangeStatus;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.junit.jupiter.api.Test;
@@ -57,11 +57,12 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                 URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.setName(UUID.randomUUID().toString());
         // Run the test
-        ServiceTemplateChangeInfo registerChangeInfo = serviceTemplateApi.register(ocl);
+        ServiceTemplateRequestInfo registerChangeInfo = serviceTemplateApi.register(ocl);
         // Verify the results
         assertNotNull(registerChangeInfo.getServiceTemplateId());
-        assertNotNull(registerChangeInfo.getChangeId());
-        String serviceTemplateId = registerChangeInfo.getServiceTemplateId().toString();
+        assertNotNull(registerChangeInfo.getRequestId());
+        assertFalse(registerChangeInfo.isRequestSubmittedForReview());
+        UUID serviceTemplateId = registerChangeInfo.getServiceTemplateId();
         ServiceTemplateDetailVo serviceTemplateDetailVo =
                 serviceTemplateApi.getServiceTemplateDetailsById(serviceTemplateId);
         assertEquals(ocl.getCategory(), serviceTemplateDetailVo.getCategory());
@@ -75,13 +76,13 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
         assertTrue(serviceTemplateDetailVo.getAvailableInCatalog());
 
         // Run listChangeHistory request
-        List<ServiceTemplateHistoryVo> registeredHistoryVos =
+        List<ServiceTemplateRequestHistory> registeredHistoryVos =
                 serviceTemplateApi.getServiceTemplateHistoryByServiceTemplateId(
                         serviceTemplateId, ServiceTemplateRequestType.REGISTER,
-                        ServiceTemplateChangeStatus.ACCEPTED);
+                        ServiceTemplateRequestStatus.ACCEPTED);
         assertEquals(registeredHistoryVos.size(), 1);
-        assertEquals(registeredHistoryVos.getFirst().getChangeId(),
-                registerChangeInfo.getChangeId());
+        assertEquals(registeredHistoryVos.getFirst().getRequestId(),
+                registerChangeInfo.getRequestId());
 
         // Setup list request
         List<ServiceTemplateDetailVo> serviceTemplateDetailVos =
@@ -97,10 +98,11 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
         ocl.setDescription("update-test");
         // Run the update test with 'isRemoveServiceTemplateUntilApproved' is true
         boolean isRemoveServiceTemplateUntilApproved = true;
-        ServiceTemplateChangeInfo updateChangeInfo = serviceTemplateApi.
+        ServiceTemplateRequestInfo updateChangeInfo = serviceTemplateApi.
                 update(serviceTemplateId, isRemoveServiceTemplateUntilApproved, ocl);
         // Verify the results
-        assertEquals(serviceTemplateId, updateChangeInfo.getServiceTemplateId().toString());
+        assertEquals(serviceTemplateId, updateChangeInfo.getServiceTemplateId());
+        assertFalse(updateChangeInfo.isRequestSubmittedForReview());
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
                 serviceTemplateApi.getServiceTemplateDetailsById(serviceTemplateId);
         assertFalse(updatedServiceTemplateDetailVo.getIsUpdatePending());
@@ -109,52 +111,54 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
 
         // Run listChangeHistory request
-        List<ServiceTemplateHistoryVo> updateHistoryVos =
+        List<ServiceTemplateRequestHistory> updateHistoryVos =
                 serviceTemplateApi.getServiceTemplateHistoryByServiceTemplateId(
                         serviceTemplateId, ServiceTemplateRequestType.UPDATE,
-                        ServiceTemplateChangeStatus.ACCEPTED);
+                        ServiceTemplateRequestStatus.ACCEPTED);
         assertEquals(updateHistoryVos.size(), 1);
-        assertEquals(updateHistoryVos.getFirst().getChangeId(),
-                updateChangeInfo.getChangeId());
+        assertEquals(updateHistoryVos.getFirst().getRequestId(),
+                updateChangeInfo.getRequestId());
 
 
         // Setup unregister request
         // Run the test
-        ServiceTemplateChangeInfo unregisterRequest =
+        ServiceTemplateRequestInfo unregisterRequest =
                 serviceTemplateApi.unregister(serviceTemplateId);
         // Verify the results
-        assertEquals(serviceTemplateId, unregisterRequest.getServiceTemplateId().toString());
+        assertEquals(serviceTemplateId, unregisterRequest.getServiceTemplateId());
+        assertFalse(unregisterRequest.isRequestSubmittedForReview());
         ServiceTemplateDetailVo unregisteredServiceTemplateDetailVo =
                 serviceTemplateApi.getServiceTemplateDetailsById(serviceTemplateId);
         assertFalse(unregisteredServiceTemplateDetailVo.getAvailableInCatalog());
 
         // Run listChangeHistory request
-        List<ServiceTemplateHistoryVo> unregisterHistoryVos =
+        List<ServiceTemplateRequestHistory> unregisterHistoryVos =
                 serviceTemplateApi.getServiceTemplateHistoryByServiceTemplateId(
                         serviceTemplateId, ServiceTemplateRequestType.UNREGISTER,
-                        ServiceTemplateChangeStatus.ACCEPTED);
+                        ServiceTemplateRequestStatus.ACCEPTED);
         assertEquals(unregisterHistoryVos.size(), 1);
-        assertEquals(unregisterHistoryVos.getFirst().getChangeId(),
-                unregisterRequest.getChangeId());
+        assertEquals(unregisterHistoryVos.getFirst().getRequestId(),
+                unregisterRequest.getRequestId());
 
         // Setup reRegister request
         // Run the test
-        ServiceTemplateChangeInfo reRegisterRequest =
+        ServiceTemplateRequestInfo reRegisterRequest =
                 serviceTemplateApi.reRegisterServiceTemplate(serviceTemplateId);
         // Verify the results
-        assertEquals(serviceTemplateId, reRegisterRequest.getServiceTemplateId().toString());
+        assertEquals(serviceTemplateId, reRegisterRequest.getServiceTemplateId());
+        assertFalse(reRegisterRequest.isRequestSubmittedForReview());
         ServiceTemplateDetailVo reRegisteredServiceTemplateDetailVo =
                 serviceTemplateApi.getServiceTemplateDetailsById(serviceTemplateId);
         assertTrue(reRegisteredServiceTemplateDetailVo.getAvailableInCatalog());
 
         // Run listChangeHistory request
-        List<ServiceTemplateHistoryVo> reRegisterHistoryVos =
+        List<ServiceTemplateRequestHistory> reRegisterHistoryVos =
                 serviceTemplateApi.getServiceTemplateHistoryByServiceTemplateId(
                         serviceTemplateId, ServiceTemplateRequestType.RE_REGISTER,
-                        ServiceTemplateChangeStatus.ACCEPTED);
+                        ServiceTemplateRequestStatus.ACCEPTED);
         assertEquals(reRegisterHistoryVos.size(), 1);
-        assertEquals(reRegisterHistoryVos.getFirst().getChangeId(),
-                reRegisterRequest.getChangeId());
+        assertEquals(reRegisterHistoryVos.getFirst().getRequestId(),
+                reRegisterRequest.getRequestId());
 
         // Setup delete request
         serviceTemplateApi.unregister(serviceTemplateId);

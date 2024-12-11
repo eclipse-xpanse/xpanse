@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.servicetemplate.change.enums;
+package org.eclipse.xpanse.modules.models.servicetemplate.request.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -11,9 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /**
- * Defines status enumerations for change of service template.
+ * Defines status enumerations for request of service template.
  */
-public enum ServiceTemplateChangeStatus {
+public enum ServiceTemplateRequestStatus {
 
     IN_REVIEW("in-review"),
     ACCEPTED("accepted"),
@@ -21,27 +21,27 @@ public enum ServiceTemplateChangeStatus {
 
     private final String state;
 
-    ServiceTemplateChangeStatus(String state) {
+    ServiceTemplateRequestStatus(String state) {
         this.state = state;
     }
 
     /**
-     * For ServiceTemplateChangeStatus deserialize.
+     * For ServiceTemplateRequestStatus deserialize.
      */
     @JsonCreator
-    public static ServiceTemplateChangeStatus getByValue(String state) {
-        for (ServiceTemplateChangeStatus registrationState : values()) {
+    public static ServiceTemplateRequestStatus getByValue(String state) {
+        for (ServiceTemplateRequestStatus registrationState : values()) {
             if (StringUtils.equalsIgnoreCase(registrationState.state, state)) {
                 return registrationState;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("ServiceTemplateChangeStatus value %s is not supported.",
+                String.format("ServiceTemplateRequestStatus value %s is not supported.",
                         state));
     }
 
     /**
-     * For ServiceTemplateChangeStatus serialize.
+     * For ServiceTemplateRequestStatus serialize.
      */
     @JsonValue
     public String toValue() {

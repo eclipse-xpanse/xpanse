@@ -126,7 +126,7 @@ public class AuditLogWriter {
                         userPolicyUpdateRequest.getCsp();
                 case ServicePolicyCreateRequest servicePolicyCreateRequest ->
                         getCspInfoFromRequest.getCspFromServiceTemplateId(
-                                servicePolicyCreateRequest.getServiceTemplateId().toString());
+                                servicePolicyCreateRequest.getServiceTemplateId());
                 case Csp csp -> csp;
                 case null, default -> null;
             };

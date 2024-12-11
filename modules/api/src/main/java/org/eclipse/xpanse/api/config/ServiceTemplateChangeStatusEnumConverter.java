@@ -6,19 +6,19 @@
 package org.eclipse.xpanse.api.config;
 
 import jakarta.annotation.Nonnull;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateChangeStatus;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * Bean for serializing string in request parameters to ServiceTemplateChangeStatus enum.
+ * Bean for serializing string in request parameters to ServiceTemplateRequestStatus enum.
  */
 @Component
 public class ServiceTemplateChangeStatusEnumConverter
-        implements Converter<String, ServiceTemplateChangeStatus> {
+        implements Converter<String, ServiceTemplateRequestStatus> {
 
     @Override
-    public ServiceTemplateChangeStatus convert(@Nonnull String type) {
-        return ServiceTemplateChangeStatus.getByValue(type);
+    public ServiceTemplateRequestStatus convert(@Nonnull String type) {
+        return ServiceTemplateRequestStatus.getByValue(type);
     }
 }

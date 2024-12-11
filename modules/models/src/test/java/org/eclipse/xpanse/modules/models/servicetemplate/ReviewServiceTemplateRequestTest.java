@@ -12,15 +12,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.BeanUtils;
 
 @ExtendWith(MockitoExtension.class)
-class ReviewRegistrationRequestTest {
+class ReviewServiceTemplateRequestTest {
 
     private final ServiceReviewResult reviewResult = ServiceReviewResult.APPROVED;
     private final String reviewComment = "reviewComment";
-    private ReviewRegistrationRequest test;
+    private ReviewServiceTemplateRequest test;
 
     @BeforeEach
     void setUp() {
-        test = new ReviewRegistrationRequest();
+        test = new ReviewServiceTemplateRequest();
         test.setReviewResult(reviewResult);
         test.setReviewComment(reviewComment);
     }
@@ -34,10 +34,10 @@ class ReviewRegistrationRequestTest {
 
     @Test
     void testEquals() {
-        ReviewRegistrationRequest test1 = new ReviewRegistrationRequest();
+        ReviewServiceTemplateRequest test1 = new ReviewServiceTemplateRequest();
         assertNotEquals(test, test1);
 
-        ReviewRegistrationRequest test2 = new ReviewRegistrationRequest();
+        ReviewServiceTemplateRequest test2 = new ReviewServiceTemplateRequest();
         BeanUtils.copyProperties(test, test2);
         assertEquals(test, test2);
     }
@@ -49,10 +49,10 @@ class ReviewRegistrationRequestTest {
 
     @Test
     void testHashCode() {
-        ReviewRegistrationRequest test1 = new ReviewRegistrationRequest();
+        ReviewServiceTemplateRequest test1 = new ReviewServiceTemplateRequest();
         assertNotEquals(test.hashCode(), test1.hashCode());
 
-        ReviewRegistrationRequest test2 = new ReviewRegistrationRequest();
+        ReviewServiceTemplateRequest test2 = new ReviewServiceTemplateRequest();
         BeanUtils.copyProperties(test, test2);
         assertEquals(test.hashCode(), test2.hashCode());
 
@@ -60,7 +60,7 @@ class ReviewRegistrationRequestTest {
 
     @Test
     void testToString() {
-        String result = "ReviewRegistrationRequest(reviewResult=" + reviewResult
+        String result = "ReviewServiceTemplateRequest(reviewResult=" + reviewResult
                 + ", reviewComment=" + reviewComment
                 + ")";
         assertThat(test.toString()).isEqualTo(result);

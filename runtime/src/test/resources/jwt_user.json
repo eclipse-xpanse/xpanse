@@ -12,9 +12,5 @@
   "urn:zitadel:iam:org:project:roles": {
     "user": "user"
   },
-  "urn:zitadel:iam:user:metadata": {
-    "csp": "SHVhd2VpQ2xvdWQ=",
-    "namespace": "SVNWLUE="
-  },
   "sub": "userId"
 }

@@ -14,7 +14,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
-import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
+import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
@@ -49,7 +49,7 @@ class ServiceTemplateEntityTest {
     @Mock
     private List<ServicePolicyEntity> mockServicePolicyList;
     @Mock
-    private List<ServiceTemplateHistoryEntity> mockServiceTemplateHistory;
+    private List<ServiceTemplateRequestHistoryEntity> mockServiceTemplateHistory;
 
     @BeforeEach
     void setUp() throws Exception {

@@ -19,7 +19,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
-import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
+import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
@@ -28,7 +28,8 @@ import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServic
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateHistoryVo;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -168,7 +169,7 @@ public class EntityTransUtils {
      */
     public static List<ServiceConfigurationChangeOrderDetails>
             transToServiceConfigurationChangeOrderDetails(
-                List<ServiceConfigurationChangeDetailsEntity> requests) {
+            List<ServiceConfigurationChangeDetailsEntity> requests) {
 
         Map<UUID, List<ServiceConfigurationChangeDetailsEntity>> orderDetailsMap = requests.stream()
                 .collect(Collectors.groupingBy(
@@ -201,17 +202,35 @@ public class EntityTransUtils {
 
 
     /**
-     * ServiceTemplateHistoryEntity converted to ServiceTemplateHistoryVo.
+     * ServiceTemplateRequestHistoryEntity converted to ServiceTemplateRequestHistory.
      *
-     * @param serviceTemplateHistoryEntity ServiceTemplateHistoryEntity.
+     * @param serviceTemplateRequestHistoryEntity ServiceTemplateRequestHistoryEntity.
      * @return serviceTemplateHistoryVo
      */
-    public static ServiceTemplateHistoryVo convertToServiceTemplateHistoryVo(
-            ServiceTemplateHistoryEntity serviceTemplateHistoryEntity) {
-        ServiceTemplateHistoryVo serviceTemplateHistoryVo = new ServiceTemplateHistoryVo();
-        serviceTemplateHistoryVo.setServiceTemplateId(
-                serviceTemplateHistoryEntity.getServiceTemplate().getId());
-        BeanUtils.copyProperties(serviceTemplateHistoryEntity, serviceTemplateHistoryVo);
-        return serviceTemplateHistoryVo;
+    public static ServiceTemplateRequestHistory convertToServiceTemplateHistoryVo(
+            ServiceTemplateRequestHistoryEntity serviceTemplateRequestHistoryEntity) {
+        ServiceTemplateRequestHistory
+                serviceTemplateRequestHistory = new ServiceTemplateRequestHistory();
+        serviceTemplateRequestHistory.setServiceTemplateId(
+                serviceTemplateRequestHistoryEntity.getServiceTemplate().getId());
+        BeanUtils.copyProperties(serviceTemplateRequestHistoryEntity,
+                serviceTemplateRequestHistory);
+        return serviceTemplateRequestHistory;
+    }
+
+
+    /**
+     * ServiceTemplateRequestHistoryEntity converted to ServiceTemplateRequestToReview.
+     *
+     * @param serviceTemplateRequestHistoryEntity ServiceTemplateRequestHistoryEntity.
+     * @return serviceTemplateRequestVo
+     */
+    public static ServiceTemplateRequestToReview convertToServiceTemplateRequestVo(
+            ServiceTemplateRequestHistoryEntity serviceTemplateRequestHistoryEntity) {
+        ServiceTemplateRequestToReview requestVo = new ServiceTemplateRequestToReview();
+        requestVo.setServiceTemplateId(
+                serviceTemplateRequestHistoryEntity.getServiceTemplate().getId());
+        BeanUtils.copyProperties(serviceTemplateRequestHistoryEntity, requestVo);
+        return requestVo;
     }
 }

@@ -19,7 +19,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.exceptions.ServiceTemplateChangeRequestNotAllowed;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateDisabledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
@@ -114,12 +114,12 @@ class RegistrationExceptionHandlerTest {
     @Test
     void testServiceTemplateChangeRequestNotAllowed() throws Exception {
         when(serviceTemplateManage.registerServiceTemplate(any())).thenThrow(
-                new ServiceTemplateChangeRequestNotAllowed("test error"));
+                new ServiceTemplateRequestNotAllowed("test error"));
 
         this.mockMvc.perform(
                         post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.errorType").value("Service Template Change Request Not Allowed"))
+                .andExpect(jsonPath("$.errorType").value("Service Template Request Not Allowed"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 

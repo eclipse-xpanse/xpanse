@@ -25,7 +25,7 @@ import lombok.ToString;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
-import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
+import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -103,6 +103,6 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
 
     @OneToMany(mappedBy = "serviceTemplate", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @ToString.Exclude
-    private List<ServiceTemplateHistoryEntity> serviceTemplateHistory;
+    private List<ServiceTemplateRequestHistoryEntity> serviceTemplateHistory;
 
 }

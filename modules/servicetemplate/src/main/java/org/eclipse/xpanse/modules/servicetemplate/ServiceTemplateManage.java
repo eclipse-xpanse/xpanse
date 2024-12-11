@@ -23,8 +23,9 @@ import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
-import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
-import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryStorage;
+import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
+import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryQueryModel;
+import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -32,12 +33,8 @@ import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGeneration
 import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.ReviewRegistrationRequest;
+import org.eclipse.xpanse.modules.models.servicetemplate.ReviewServiceTemplateRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.ServiceTemplateHistoryVo;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateChangeStatus;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.enums.ServiceTemplateRequestType;
-import org.eclipse.xpanse.modules.models.servicetemplate.change.exceptions.ServiceTemplateChangeRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
@@ -45,6 +42,12 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestAlreadyReviewed;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -75,7 +78,7 @@ public class ServiceTemplateManage {
     @Resource
     private ServiceTemplateStorage templateStorage;
     @Resource
-    private ServiceTemplateHistoryStorage serviceTemplateHistoryStorage;
+    private ServiceTemplateRequestHistoryStorage templateRequestStorage;
     @Resource
     private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource
@@ -102,30 +105,20 @@ public class ServiceTemplateManage {
      *                                         until the updated one is approved.
      * @return Returns service template history entity.
      */
-    public ServiceTemplateHistoryEntity updateServiceTemplate(
+    public ServiceTemplateRequestHistoryEntity updateServiceTemplate(
             UUID id, Ocl ocl, boolean isRemoveFromCatalogUntilApproved) {
         ServiceTemplateEntity existingServiceTemplate = getServiceTemplateDetails(id, true, false);
         ServiceTemplateRequestType requestType = ServiceTemplateRequestType.UPDATE;
         if (existingServiceTemplate.getIsUpdatePending()) {
             checkAnyInProgressRequestForServiceTemplate(existingServiceTemplate, requestType);
         }
-        ServiceTemplateEntity serviceTemplateToUpdate = new ServiceTemplateEntity();
-        BeanUtils.copyProperties(existingServiceTemplate, serviceTemplateToUpdate);
-        iconUpdate(serviceTemplateToUpdate, ocl);
-        checkParams(serviceTemplateToUpdate, ocl);
-        validateRegions(ocl);
-        validateFlavors(ocl);
-        validateServiceDeployment(ocl.getDeployment(), serviceTemplateToUpdate);
-        billingConfigValidator.validateBillingConfig(ocl);
-        if (Objects.nonNull(serviceTemplateToUpdate.getOcl().getServiceConfigurationManage())
-                && Objects.nonNull(ocl.getServiceConfigurationManage())) {
-            serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
-        }
-        serviceTemplateToUpdate.setOcl(ocl);
+        ServiceTemplateEntity serviceTemplateToUpdate =
+                getServiceTemplateEntityToUpdate(ocl, existingServiceTemplate);
         boolean isAutoApprovedEnabled =
                 isAutoApproveEnabledForCsp(ocl.getCloudServiceProvider().getName());
-        final ServiceTemplateHistoryEntity storedUpdateHistory = createServiceTemplateHistory(
-                isAutoApprovedEnabled, requestType, serviceTemplateToUpdate);
+        final ServiceTemplateRequestHistoryEntity storedUpdateHistory =
+                createServiceTemplateHistory(
+                        isAutoApprovedEnabled, requestType, serviceTemplateToUpdate);
         // if auto approved is enabled by CSP, approved service template with new ocl directly
         if (isAutoApprovedEnabled) {
             serviceTemplateToUpdate.setAvailableInCatalog(true);
@@ -144,26 +137,44 @@ public class ServiceTemplateManage {
         return storedUpdateHistory;
     }
 
+    private ServiceTemplateEntity getServiceTemplateEntityToUpdate(
+            Ocl ocl, ServiceTemplateEntity existingServiceTemplate) {
+        validateRegions(ocl);
+        validateFlavors(ocl);
+        ServiceTemplateEntity serviceTemplateToUpdate = new ServiceTemplateEntity();
+        BeanUtils.copyProperties(existingServiceTemplate, serviceTemplateToUpdate);
+        iconUpdate(serviceTemplateToUpdate, ocl);
+        checkParams(serviceTemplateToUpdate, ocl);
+        validateServiceDeployment(ocl.getDeployment(), serviceTemplateToUpdate);
+        billingConfigValidator.validateBillingConfig(ocl);
+        if (Objects.nonNull(serviceTemplateToUpdate.getOcl().getServiceConfigurationManage())
+                && Objects.nonNull(ocl.getServiceConfigurationManage())) {
+            serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
+        }
+        serviceTemplateToUpdate.setOcl(ocl);
+        return serviceTemplateToUpdate;
+    }
+
 
     private void checkAnyInProgressRequestForServiceTemplate(
             ServiceTemplateEntity serviceTemplate, ServiceTemplateRequestType requestType) {
         if (CollectionUtils.isEmpty(serviceTemplate.getServiceTemplateHistory())) {
             return;
         }
-        ServiceTemplateHistoryEntity inProgressHistory =
+        ServiceTemplateRequestHistoryEntity inProgressHistory =
                 serviceTemplate.getServiceTemplateHistory().stream()
                         .filter(history -> requestType == history.getRequestType()
-                                && ServiceTemplateChangeStatus.IN_REVIEW == history.getStatus())
+                                && ServiceTemplateRequestStatus.IN_REVIEW == history.getStatus())
                         .findFirst()
                         .orElse(null);
         if (Objects.nonNull(inProgressHistory)) {
             String errorMsg = String.format("The same type request with change id %s for "
                             + "the service template with %s is waiting for review. "
                             + "The %s request is not allowed.",
-                    serviceTemplate.getId(), inProgressHistory.getChangeId(),
+                    serviceTemplate.getId(), inProgressHistory.getRequestId(),
                     requestType.toValue());
             log.error(errorMsg);
-            throw new ServiceTemplateChangeRequestNotAllowed(errorMsg);
+            throw new ServiceTemplateRequestNotAllowed(errorMsg);
         }
     }
 
@@ -199,7 +210,7 @@ public class ServiceTemplateManage {
             String errorMsg = String.format("Update service failed, Value of %s cannot be "
                     + "changed with an update request", type);
             log.error(errorMsg);
-            throw new ServiceTemplateChangeRequestNotAllowed(errorMsg);
+            throw new ServiceTemplateRequestNotAllowed(errorMsg);
         }
     }
 
@@ -234,22 +245,23 @@ public class ServiceTemplateManage {
         return newServiceTemplate;
     }
 
-    private ServiceTemplateHistoryEntity createServiceTemplateHistory(
+    private ServiceTemplateRequestHistoryEntity createServiceTemplateHistory(
             boolean isAutoApproveEnabled, ServiceTemplateRequestType requestType,
             ServiceTemplateEntity serviceTemplate) {
-        ServiceTemplateHistoryEntity serviceTemplateHistory = new ServiceTemplateHistoryEntity();
-        serviceTemplateHistory.setChangeId(UUID.randomUUID());
+        ServiceTemplateRequestHistoryEntity
+                serviceTemplateHistory = new ServiceTemplateRequestHistoryEntity();
+        serviceTemplateHistory.setRequestId(UUID.randomUUID());
         serviceTemplateHistory.setServiceTemplate(serviceTemplate);
         serviceTemplateHistory.setOcl(serviceTemplate.getOcl());
         serviceTemplateHistory.setRequestType(requestType);
         serviceTemplateHistory.setBlockTemplateUntilReviewed(false);
         if (isAutoApproveEnabled) {
-            serviceTemplateHistory.setStatus(ServiceTemplateChangeStatus.ACCEPTED);
+            serviceTemplateHistory.setStatus(ServiceTemplateRequestStatus.ACCEPTED);
             serviceTemplateHistory.setReviewComment(AUTO_APPROVED_REVIEW_COMMENT);
         } else {
-            serviceTemplateHistory.setStatus(ServiceTemplateChangeStatus.IN_REVIEW);
+            serviceTemplateHistory.setStatus(ServiceTemplateRequestStatus.IN_REVIEW);
         }
-        return serviceTemplateHistoryStorage.storeAndFlush(serviceTemplateHistory);
+        return templateRequestStorage.storeAndFlush(serviceTemplateHistory);
     }
 
     private boolean isAutoApproveEnabledForCsp(Csp csp) {
@@ -298,7 +310,7 @@ public class ServiceTemplateManage {
      * @param ocl the Ocl model describing the service template.
      * @return Returns service template history entity.
      */
-    public ServiceTemplateHistoryEntity registerServiceTemplate(Ocl ocl) {
+    public ServiceTemplateRequestHistoryEntity registerServiceTemplate(Ocl ocl) {
         Semver newServiceVersion = getSemverVersion(ocl.getServiceVersion());
         ServiceTemplateQueryModel queryModel =
                 ServiceTemplateQueryModel.builder().category(ocl.getCategory())
@@ -313,10 +325,9 @@ public class ServiceTemplateManage {
             String errorMsg = String.format("Service template already registered with id %s. "
                     + "The register request is not allowed.", existingTemplate.getId());
             log.error(errorMsg);
-            throw new ServiceTemplateChangeRequestNotAllowed(errorMsg);
+            throw new ServiceTemplateRequestNotAllowed(errorMsg);
         }
         validateServiceVersion(newServiceVersion, existingServiceTemplates);
-        ocl.setIcon(IconProcessorUtil.processImage(ocl));
         validateRegions(ocl);
         validateFlavors(ocl);
         billingConfigValidator.validateBillingConfig(ocl);
@@ -337,7 +348,7 @@ public class ServiceTemplateManage {
         serviceTemplateToRegister.setAvailableInCatalog(isAutoApprovedEnabled);
         ServiceTemplateEntity registeredServiceTemplate =
                 templateStorage.storeAndFlush(serviceTemplateToRegister);
-        ServiceTemplateHistoryEntity storedRegisterHistory =
+        ServiceTemplateRequestHistoryEntity storedRegisterHistory =
                 createServiceTemplateHistory(isAutoApprovedEnabled,
                         ServiceTemplateRequestType.REGISTER, registeredServiceTemplate);
         serviceTemplateOpenApiGenerator.generateServiceApi(registeredServiceTemplate);
@@ -378,16 +389,17 @@ public class ServiceTemplateManage {
     }
 
     /**
-     * Get detail of service template using ID.
+     * Get details of service template using id.
      *
-     * @param id             the ID of
-     * @param checkNamespace check the namespace of the service template belonging to.
-     * @param checkCsp       check the cloud service provider of the service template.
+     * @param serviceTemplateId the id of service template.
+     * @param checkNamespace    check the namespace of the service template belonging to.
+     * @param checkCsp          check the cloud service provider of the service template.
      * @return Returns service template DB newTemplate.
      */
-    public ServiceTemplateEntity getServiceTemplateDetails(UUID id, boolean checkNamespace,
+    public ServiceTemplateEntity getServiceTemplateDetails(UUID serviceTemplateId,
+                                                           boolean checkNamespace,
                                                            boolean checkCsp) {
-        ServiceTemplateEntity existingTemplate = getServiceTemplateById(id);
+        ServiceTemplateEntity existingTemplate = getServiceTemplateById(serviceTemplateId);
         checkPermission(existingTemplate, checkNamespace, checkCsp);
         return existingTemplate;
     }
@@ -406,30 +418,64 @@ public class ServiceTemplateManage {
     /**
      * Review service template registration.
      *
-     * @param id      ID of service template.
-     * @param request the request of review registration.
+     * @param requestId the ID of service template request.
+     * @param review    the review.
      */
-    public void reviewServiceTemplateRegistration(UUID id, ReviewRegistrationRequest request) {
-        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, false, true);
-        ServiceTemplateRegistrationState state =
-                existingTemplate.getServiceTemplateRegistrationState();
-        if (ServiceTemplateRegistrationState.APPROVED == state
-                || ServiceTemplateRegistrationState.REJECTED == state) {
-            String errMsg = String.format("Service template with id %s already reviewed.",
-                    existingTemplate.getId());
-            log.error(errMsg);
-            throw new ServiceTemplateChangeRequestNotAllowed(errMsg);
+    public void reviewServiceTemplateRequest(UUID requestId, ReviewServiceTemplateRequest review) {
+        ServiceTemplateRequestHistoryEntity existingTemplateRequest =
+                templateRequestStorage.getEntityByRequestId(requestId);
+        ServiceTemplateEntity serviceTemplate = existingTemplateRequest.getServiceTemplate();
+        Csp csp = userServiceHelper.getCurrentUserManageCsp();
+        if (csp != serviceTemplate.getCsp()) {
+            throw new AccessDeniedException("No permissions to review service template request "
+                    + "belonging to other cloud service providers.");
         }
-        if (ServiceReviewResult.APPROVED == request.getReviewResult()) {
-            existingTemplate.setServiceTemplateRegistrationState(
-                    ServiceTemplateRegistrationState.APPROVED);
-            existingTemplate.setAvailableInCatalog(true);
-        } else if (ServiceReviewResult.REJECTED == request.getReviewResult()) {
-            existingTemplate.setServiceTemplateRegistrationState(
-                    ServiceTemplateRegistrationState.REJECTED);
-            existingTemplate.setAvailableInCatalog(false);
+        if (ServiceTemplateRequestStatus.IN_REVIEW != existingTemplateRequest.getStatus()) {
+            throw new ServiceTemplateRequestAlreadyReviewed(
+                    "Service template request is already reviewed.");
         }
-        templateStorage.storeAndFlush(existingTemplate);
+        if (ServiceReviewResult.APPROVED == review.getReviewResult()) {
+            existingTemplateRequest.setStatus(ServiceTemplateRequestStatus.ACCEPTED);
+            serviceTemplate.setOcl(existingTemplateRequest.getOcl());
+            // when the request type is register, set registration state to approved.
+            if (ServiceTemplateRequestType.REGISTER == existingTemplateRequest.getRequestType()) {
+                serviceTemplate.setServiceTemplateRegistrationState(
+                        ServiceTemplateRegistrationState.APPROVED);
+            } else if (ServiceTemplateRequestType.UPDATE
+                    == existingTemplateRequest.getRequestType()) {
+                // when the request type is update, set isUpdatePending to false, copy ocl in
+                // request into service template.
+                ServiceTemplateEntity serviceTemplateToUpdate =
+                        getServiceTemplateEntityToUpdate(existingTemplateRequest.getOcl(),
+                                serviceTemplate);
+                serviceTemplateToUpdate.setIsUpdatePending(false);
+                ServiceTemplateEntity updatedServiceTemplate =
+                        templateStorage.storeAndFlush(serviceTemplateToUpdate);
+                serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
+            }
+            // when the request type is unregister, set availableInCatalog to false.
+            boolean availableInCatalog = ServiceTemplateRequestType.UNREGISTER
+                    != existingTemplateRequest.getRequestType();
+            serviceTemplate.setAvailableInCatalog(availableInCatalog);
+        } else if (ServiceReviewResult.REJECTED == review.getReviewResult()) {
+            existingTemplateRequest.setStatus(ServiceTemplateRequestStatus.REJECTED);
+            // when the request type is register, set registration state to rejected.
+            if (ServiceTemplateRequestType.REGISTER == existingTemplateRequest.getRequestType()) {
+                serviceTemplate.setServiceTemplateRegistrationState(
+                        ServiceTemplateRegistrationState.REJECTED);
+            } else if (ServiceTemplateRequestType.UPDATE
+                    == existingTemplateRequest.getRequestType()) {
+                // when the request type is update, set isUpdatePending to false.
+                serviceTemplate.setIsUpdatePending(false);
+            }
+        }
+        templateStorage.storeAndFlush(serviceTemplate);
+        if (Objects.nonNull(review.getReviewComment())) {
+            existingTemplateRequest.setReviewComment(review.getReviewComment());
+        } else {
+            existingTemplateRequest.setReviewComment(review.getReviewResult().toValue());
+        }
+        templateRequestStorage.storeAndFlush(existingTemplateRequest);
     }
 
 
@@ -439,13 +485,13 @@ public class ServiceTemplateManage {
      * @param id ID of service template.
      * @return Returns updated service template.
      */
-    public ServiceTemplateHistoryEntity unregisterServiceTemplate(UUID id) {
+    public ServiceTemplateRequestHistoryEntity unregisterServiceTemplate(UUID id) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
         if (existingTemplate.getServiceTemplateRegistrationState()
                 != ServiceTemplateRegistrationState.APPROVED) {
             String errMsg = String.format("Service template with id %s is not approved. "
                     + "The unregister request is not allowed.", existingTemplate.getId());
-            throw new ServiceTemplateChangeRequestNotAllowed(errMsg);
+            throw new ServiceTemplateRequestNotAllowed(errMsg);
         }
         ServiceTemplateRequestType requestType = ServiceTemplateRequestType.UNREGISTER;
         checkAnyInProgressRequestForServiceTemplate(existingTemplate, requestType);
@@ -462,13 +508,13 @@ public class ServiceTemplateManage {
      * @param id ID of service template.
      * @return Returns updated service template.
      */
-    public ServiceTemplateHistoryEntity reRegisterServiceTemplate(UUID id) {
+    public ServiceTemplateRequestHistoryEntity reRegisterServiceTemplate(UUID id) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
         if (existingTemplate.getServiceTemplateRegistrationState()
                 != ServiceTemplateRegistrationState.APPROVED) {
             String errMsg = String.format("Service template with id %s is not approved. "
                     + "The re-register request is not allowed.", existingTemplate.getId());
-            throw new ServiceTemplateChangeRequestNotAllowed(errMsg);
+            throw new ServiceTemplateRequestNotAllowed(errMsg);
         }
         ServiceTemplateRequestType requestType = ServiceTemplateRequestType.RE_REGISTER;
         checkAnyInProgressRequestForServiceTemplate(existingTemplate, requestType);
@@ -490,7 +536,7 @@ public class ServiceTemplateManage {
         if (existingTemplate.getAvailableInCatalog()) {
             String errMsg = String.format("Service template with id %s is not unregistered. "
                     + "The delete request is not allowed.", id);
-            throw new ServiceTemplateChangeRequestNotAllowed(errMsg);
+            throw new ServiceTemplateRequestNotAllowed(errMsg);
         }
         List<ServiceDeploymentEntity> deployServiceEntities =
                 listDeployServicesByTemplateId(existingTemplate.getId());
@@ -498,7 +544,7 @@ public class ServiceTemplateManage {
             String errMsg = String.format("Service template with id %s is still in use. "
                     + "The delete request is not allowed.", id);
             log.error(errMsg);
-            throw new ServiceTemplateChangeRequestNotAllowed(errMsg);
+            throw new ServiceTemplateRequestNotAllowed(errMsg);
         }
         templateStorage.deleteServiceTemplate(existingTemplate);
         serviceTemplateOpenApiGenerator.deleteServiceApi(id.toString());
@@ -526,12 +572,12 @@ public class ServiceTemplateManage {
      * @param changeStatus      status of service template request.
      * @return list of service template history.
      */
-    public List<ServiceTemplateHistoryVo> getServiceTemplateHistoryByServiceTemplateId(
+    public List<ServiceTemplateRequestHistory> getServiceTemplateHistoryByServiceTemplateId(
             UUID serviceTemplateId, ServiceTemplateRequestType requestType,
-            ServiceTemplateChangeStatus changeStatus) {
+            ServiceTemplateRequestStatus changeStatus) {
         ServiceTemplateEntity existingTemplate =
                 getServiceTemplateDetails(serviceTemplateId, true, false);
-        List<ServiceTemplateHistoryEntity> historyList =
+        List<ServiceTemplateRequestHistoryEntity> historyList =
                 existingTemplate.getServiceTemplateHistory();
         if (Objects.nonNull(requestType)) {
             historyList =
@@ -544,21 +590,35 @@ public class ServiceTemplateManage {
                             .toList();
         }
         return historyList.stream()
-                .sorted(Comparator.comparing(ServiceTemplateHistoryEntity::getCreateTime)
+                .sorted(Comparator.comparing(ServiceTemplateRequestHistoryEntity::getCreateTime)
                         .reversed()).map(EntityTransUtils::convertToServiceTemplateHistoryVo)
+                .toList();
+    }
+
+    /**
+     * List pending service template requests to review.
+     *
+     * @param queryModel query parameters.
+     * @return list of service template requests to review.
+     */
+    public List<ServiceTemplateRequestToReview> getPendingServiceTemplateRequests(
+            ServiceTemplateRequestHistoryQueryModel queryModel) {
+        List<ServiceTemplateRequestHistoryEntity> historyList =
+                templateRequestStorage.listServiceTemplateRequestHistoryByQueryModel(queryModel);
+        return historyList.stream().map(EntityTransUtils::convertToServiceTemplateRequestVo)
                 .toList();
     }
 
 
     /**
-     * Get ocl of service template request by changeId.
+     * Get ocl of service template request by requestId.
      *
-     * @param changeId changeId of service template history.
+     * @param requestId requestId of service template history.
      * @return ocl of service template request.
      */
-    public Ocl getRequestedOclByChangeId(UUID changeId) {
-        ServiceTemplateHistoryEntity history =
-                serviceTemplateHistoryStorage.getEntityById(changeId);
+    public Ocl getRequestedOclByRequestId(UUID requestId) {
+        ServiceTemplateRequestHistoryEntity history =
+                templateRequestStorage.getEntityByRequestId(requestId);
         checkPermission(history.getServiceTemplate(), true, false);
         return history.getOcl();
     }

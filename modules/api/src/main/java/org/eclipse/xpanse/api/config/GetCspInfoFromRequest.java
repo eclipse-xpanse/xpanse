@@ -25,8 +25,8 @@ import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicySt
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryEntity;
-import org.eclipse.xpanse.modules.database.servicetemplatehistory.ServiceTemplateHistoryStorage;
+import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
+import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryStorage;
 import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
 import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -55,7 +55,7 @@ public class GetCspInfoFromRequest {
     @Resource
     private DatabaseServiceOrderStorage serviceOrderTaskStorage;
     @Resource
-    private ServiceTemplateHistoryStorage serviceTemplateHistoryStorage;
+    private ServiceTemplateRequestHistoryStorage serviceTemplateHistoryStorage;
 
     /**
      * Get Csp with the URL of Ocl.
@@ -78,18 +78,18 @@ public class GetCspInfoFromRequest {
     /**
      * Get Csp with id of service template.
      *
-     * @param id id of service template.
+     * @param serviceTemplateId id of service template.
      * @return csp.
      */
-    public Csp getCspFromServiceTemplateId(String id) {
+    public Csp getCspFromServiceTemplateId(UUID serviceTemplateId) {
         try {
             ServiceTemplateEntity serviceTemplate =
-                    serviceTemplateStorage.getServiceTemplateById(UUID.fromString(id));
+                    serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
             if (Objects.nonNull(serviceTemplate)) {
                 return serviceTemplate.getCsp();
             }
         } catch (Exception e) {
-            log.error("Get csp with service template id:{} failed.", id, e);
+            log.error("Get csp with service template id:{} failed.", serviceTemplateId, e);
         }
         return null;
     }
@@ -205,21 +205,21 @@ public class GetCspInfoFromRequest {
 
 
     /**
-     * Get Csp with service template change id.
+     * Get Csp with service template request id.
      *
-     * @param changeId id of service template change.
+     * @param requestId id of service template request.
      * @return csp.
      */
-    public Csp getCspFromServiceTemplateChangeId(String changeId) {
+    public Csp getCspFromServiceTemplateRequestId(UUID requestId) {
         try {
-            ServiceTemplateHistoryEntity serviceTemplateHistory =
-                    serviceTemplateHistoryStorage.getEntityById(UUID.fromString(changeId));
+            ServiceTemplateRequestHistoryEntity serviceTemplateHistory =
+                    serviceTemplateHistoryStorage.getEntityByRequestId(requestId);
             if (Objects.nonNull(serviceTemplateHistory) && Objects.nonNull(
                     serviceTemplateHistory.getServiceTemplate())) {
                 return serviceTemplateHistory.getServiceTemplate().getCsp();
             }
         } catch (Exception e) {
-            log.error("Get csp with service template change id:{} failed.", changeId, e);
+            log.error("Get csp with service template request id:{} failed.", requestId, e);
         }
         return null;
     }
