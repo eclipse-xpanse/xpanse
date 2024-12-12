@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
@@ -26,7 +25,6 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
@@ -76,14 +74,6 @@ public class OpenTofuLocalDeployment implements Deployer {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(task.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
-        if (StringUtils.isBlank(resourceState)) {
-            String errorMsg =
-                    String.format(
-                            "tfState of deployed service with id %s not found.",
-                            task.getServiceId());
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
-        }
         DeployResult destroyResult = new DeployResult();
         destroyResult.setOrderId(task.getOrderId());
         asyncExecDestroy(task, resourceState);
@@ -100,14 +90,6 @@ public class OpenTofuLocalDeployment implements Deployer {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(task.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
-        if (StringUtils.isBlank(resourceState)) {
-            String errorMsg =
-                    String.format(
-                            "tfState of service deployment with id %s not found.",
-                            task.getServiceId());
-            log.error(errorMsg);
-            throw new ServiceNotDeployedException(errorMsg);
-        }
         DeployResult modifyResult = new DeployResult();
         modifyResult.setOrderId(task.getOrderId());
         asyncExecModify(task, resourceState);
