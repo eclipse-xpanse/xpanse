@@ -50,7 +50,7 @@ class ServiceTemplateDetailVoTest {
     private final ServiceTemplateRegistrationState serviceTemplateRegistrationState =
             ServiceTemplateRegistrationState.APPROVED;
     private final Boolean availableInCatalog = true;
-    private final Boolean isUpdatePending = false;
+    private final Boolean reviewInProgress = false;
     private final ServiceConfigurationManage serviceConfigurationManage =
             new ServiceConfigurationManage();
     @Mock private ServiceProviderContactDetails serviceProviderContactDetails;
@@ -98,7 +98,7 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setServiceTemplateRegistrationState(
                 serviceTemplateRegistrationState);
         serviceTemplateDetailVo.setAvailableInCatalog(availableInCatalog);
-        serviceTemplateDetailVo.setIsUpdatePending(isUpdatePending);
+        serviceTemplateDetailVo.setReviewInProgress(reviewInProgress);
         serviceTemplateDetailVo.setServiceHostingType(serviceHostingType);
         serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
         serviceTemplateDetailVo.setEula(eula);
@@ -125,7 +125,7 @@ class ServiceTemplateDetailVoTest {
                 serviceTemplateRegistrationState,
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
         assertEquals(availableInCatalog, serviceTemplateDetailVo.getAvailableInCatalog());
-        assertEquals(isUpdatePending, serviceTemplateDetailVo.getIsUpdatePending());
+        assertEquals(reviewInProgress, serviceTemplateDetailVo.getReviewInProgress());
         assertEquals(serviceHostingType, serviceTemplateDetailVo.getServiceHostingType());
         assertEquals(
                 serviceProviderContactDetails,
@@ -187,8 +187,8 @@ class ServiceTemplateDetailVoTest {
                         + lastModifiedTime
                         + ", serviceTemplateRegistrationState="
                         + serviceTemplateRegistrationState
-                        + ", isUpdatePending="
-                        + isUpdatePending
+                        + ", reviewInProgress="
+                        + reviewInProgress
                         + ", availableInCatalog="
                         + availableInCatalog
                         + ", serviceProviderContactDetails="

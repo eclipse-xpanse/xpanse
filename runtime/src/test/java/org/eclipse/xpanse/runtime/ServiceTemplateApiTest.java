@@ -123,7 +123,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(
                 ServiceTemplateRegistrationState.IN_REVIEW,
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
-        assertFalse(serviceTemplateDetailVo.getIsUpdatePending());
+        assertTrue(serviceTemplateDetailVo.getReviewInProgress());
         assertFalse(serviceTemplateDetailVo.getAvailableInCatalog());
 
         // Setup listHistory request
@@ -194,7 +194,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertTrue(updateChangeInfo.isRequestSubmittedForReview());
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
                 getServiceTemplateDetailsVo(updateChangeInfo.getServiceTemplateId());
-        assertTrue(updatedServiceTemplateDetailVo.getIsUpdatePending());
+        assertTrue(updatedServiceTemplateDetailVo.getReviewInProgress());
         assertFalse(updatedServiceTemplateDetailVo.getAvailableInCatalog());
         assertEquals(
                 ServiceTemplateRegistrationState.IN_REVIEW,
@@ -232,7 +232,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         final MockHttpServletResponse listUnregisterHistoryResponse =
                 listServiceTemplateHistoryWithParams(
                         serviceTemplateId,
-                        ServiceTemplateRequestType.UNREGISTER.toValue(),
+                        ServiceTemplateRequestType.REMOVE_FROM_CATALOG.toValue(),
                         ServiceTemplateRequestStatus.ACCEPTED.toValue());
         assertEquals(HttpStatus.OK.value(), listUnregisterHistoryResponse.getStatus());
         List<ServiceTemplateRequestHistory> unregisterHistoryVos =
@@ -246,8 +246,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         // Setup reRegister request
         // Run the test
-        final MockHttpServletResponse reRegisterResponse =
-                reRegisterServiceTemplate(serviceTemplateId);
+        final MockHttpServletResponse reRegisterResponse = reAddToCatalog(serviceTemplateId);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), reRegisterResponse.getStatus());
         ServiceTemplateRequestInfo reRegisterChangeInfo =
@@ -262,7 +261,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         final MockHttpServletResponse reRegisterHistoryResponse =
                 listServiceTemplateHistoryWithParams(
                         serviceTemplateId,
-                        ServiceTemplateRequestType.RE_REGISTER.toValue(),
+                        ServiceTemplateRequestType.RE_ADD_TO_CATALOG.toValue(),
                         ServiceTemplateRequestStatus.IN_REVIEW.toValue());
         assertEquals(HttpStatus.OK.value(), reRegisterHistoryResponse.getStatus());
         List<ServiceTemplateRequestHistory> reRegisterHistoryVos =
@@ -318,7 +317,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(ocl.getCloudServiceProvider().getName(), serviceTemplateDetailVo.getCsp());
         assertEquals(ocl.getName().toLowerCase(Locale.ROOT), serviceTemplateDetailVo.getName());
         assertEquals(ocl.getServiceVersion(), serviceTemplateDetailVo.getVersion());
-        assertFalse(serviceTemplateDetailVo.getIsUpdatePending());
+        assertFalse(serviceTemplateDetailVo.getReviewInProgress());
         assertFalse(serviceTemplateDetailVo.getAvailableInCatalog());
 
         // Setup listHistory request
@@ -352,7 +351,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertTrue(updateChangeInfo.isRequestSubmittedForReview());
         ServiceTemplateDetailVo updatedServiceTemplateDetailVo =
                 getServiceTemplateDetailsVo(updateChangeInfo.getServiceTemplateId());
-        assertTrue(updatedServiceTemplateDetailVo.getIsUpdatePending());
+        assertTrue(updatedServiceTemplateDetailVo.getReviewInProgress());
         assertFalse(updatedServiceTemplateDetailVo.getAvailableInCatalog());
 
         // Setup listHistory request
@@ -535,7 +534,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 unregisterResponse.getContentAsString());
 
         // Run the test re-register
-        final MockHttpServletResponse reRegisterResponse = reRegisterServiceTemplate(id);
+        final MockHttpServletResponse reRegisterResponse = reAddToCatalog(id);
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), reRegisterResponse.getStatus());
         assertEquals(
@@ -980,8 +979,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                                 + "request is not allowed.",
                         serviceTemplateId);
         // Run the reRegister test
-        final MockHttpServletResponse reRegisterResponse =
-                reRegisterServiceTemplate(serviceTemplateId);
+        final MockHttpServletResponse reRegisterResponse = reAddToCatalog(serviceTemplateId);
         errorResponse =
                 objectMapper.readValue(
                         reRegisterResponse.getContentAsString(), ErrorResponse.class);
@@ -1134,15 +1132,15 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
     MockHttpServletResponse unregister(UUID id) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/unregister/{id}", id)
+                        put("/xpanse/service_templates/remove_from_catalog/{id}", id)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
     }
 
-    MockHttpServletResponse reRegisterServiceTemplate(UUID id) throws Exception {
+    MockHttpServletResponse reAddToCatalog(UUID id) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/re-register/{id}", id)
+                        put("/xpanse/service_templates/re-add_to_catalog/{id}", id)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -1164,7 +1162,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
             String serviceHostingType,
             String serviceTemplateRegistrationState,
             Boolean availableInCatalog,
-            Boolean isUpdatePending)
+            Boolean reviewInProgress)
             throws Exception {
         MockHttpServletRequestBuilder getRequestBuilder = get("/xpanse/service_templates");
         if (StringUtils.isNotBlank(categoryName)) {
@@ -1191,9 +1189,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
             getRequestBuilder =
                     getRequestBuilder.param("availableInCatalog", availableInCatalog.toString());
         }
-        if (Objects.nonNull(isUpdatePending)) {
+        if (Objects.nonNull(reviewInProgress)) {
             getRequestBuilder =
-                    getRequestBuilder.param("isUpdatePending", isUpdatePending.toString());
+                    getRequestBuilder.param("reviewInProgress", reviewInProgress.toString());
         }
         return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
     }
@@ -1201,7 +1199,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
     MockHttpServletResponse listServiceTemplateHistoryWithParams(
             UUID serviceTemplateId, String requestType, String changeStatus) throws Exception {
         MockHttpServletRequestBuilder getRequestBuilder =
-                get("/xpanse/service_templates/{serviceTemplateId}/history", serviceTemplateId);
+                get("/xpanse/service_templates/{serviceTemplateId}/requests", serviceTemplateId);
         if (Objects.nonNull(changeStatus)) {
             getRequestBuilder = getRequestBuilder.param("changeStatus", changeStatus);
         }
@@ -1213,7 +1211,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
     MockHttpServletResponse getServiceTemplateRequestByRequestId(UUID RequestId) throws Exception {
         return mockMvc.perform(
-                        get("/xpanse/service_templates/request/{RequestId}", RequestId)
+                        get("/xpanse/service_templates/requests/{requestId}", RequestId)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();

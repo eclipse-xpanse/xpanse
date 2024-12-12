@@ -77,7 +77,7 @@ class ServiceTemplateEntityTest {
         testEntity.setOcl(ocl);
         testEntity.setServiceHostingType(serviceHostingType);
         testEntity.setServiceTemplateRegistrationState(serviceTemplateRegistrationState);
-        testEntity.setIsUpdatePending(false);
+        testEntity.setReviewInProgress(false);
         testEntity.setAvailableInCatalog(true);
         testEntity.setJsonObjectSchema(jsonObjectSchema);
         testEntity.setServiceProviderContactDetails(serviceProviderContactDetails);
@@ -96,7 +96,7 @@ class ServiceTemplateEntityTest {
         assertEquals(
                 serviceTemplateRegistrationState, testEntity.getServiceTemplateRegistrationState());
         assertEquals(true, testEntity.getAvailableInCatalog());
-        assertEquals(false, testEntity.getIsUpdatePending());
+        assertEquals(false, testEntity.getReviewInProgress());
         assertEquals(jsonObjectSchema, testEntity.getJsonObjectSchema());
         assertEquals(ocl, testEntity.getOcl());
         assertEquals(id, testEntity.getId());

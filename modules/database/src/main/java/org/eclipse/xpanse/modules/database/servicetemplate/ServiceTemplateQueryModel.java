@@ -31,7 +31,7 @@ public class ServiceTemplateQueryModel {
 
     private Boolean availableInCatalog;
 
-    private Boolean isUpdatePending;
+    private Boolean reviewInProgress;
 
     private Boolean checkNamespace;
 

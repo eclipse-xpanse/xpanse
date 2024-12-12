@@ -102,7 +102,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
 
     MockHttpServletResponse unregister(UUID id) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/unregister/{id}", id)
+                        put("/xpanse/service_templates/remove_from_catalog/{id}", id)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -110,7 +110,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
 
     MockHttpServletResponse reRegister(UUID id) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/re-register/{id}", id)
+                        put("/xpanse/service_templates/re-add_to_catalog/{id}", id)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -201,7 +201,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         serviceTemplate = getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
         assertFalse(serviceTemplate.getAvailableInCatalog());
 
-        // Re-register service template
+        // re-add_to_catalog service template
         MockHttpServletResponse reRegisterResponse = reRegister(serviceTemplateId);
         ServiceTemplateRequestInfo reRegisterChangeInfo =
                 objectMapper.readValue(
@@ -212,15 +212,16 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(1, pendingServiceTemplateRequests3.size());
         ServiceTemplateRequestToReview reRegisterRequest =
                 pendingServiceTemplateRequests3.getFirst();
-        assertEquals(ServiceTemplateRequestType.RE_REGISTER, reRegisterRequest.getRequestType());
+        assertEquals(
+                ServiceTemplateRequestType.RE_ADD_TO_CATALOG, reRegisterRequest.getRequestType());
         assertEquals(
                 reRegisterChangeInfo.getServiceTemplateId(),
                 reRegisterRequest.getServiceTemplateId());
         assertEquals(reRegisterChangeInfo.getRequestId(), reRegisterRequest.getRequestId());
 
-        // review service template re-register request
+        // review service template re-add_to_catalog request
         reviewRequest.setReviewResult(ServiceReviewResult.REJECTED);
-        reviewRequest.setReviewComment("reject the re-register");
+        reviewRequest.setReviewComment("reject the re-add_to_catalog");
         reviewResponse =
                 reviewServiceTemplateRequest(reRegisterRequest.getRequestId(), reviewRequest);
         assertEquals(HttpStatus.NO_CONTENT.value(), reviewResponse.getStatus());
