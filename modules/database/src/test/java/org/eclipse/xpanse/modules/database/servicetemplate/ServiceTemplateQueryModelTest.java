@@ -31,7 +31,7 @@ class ServiceTemplateQueryModelTest {
     private final Boolean checkNamespace = true;
     private final String namespace = "HuaweiCloud";
     private final Boolean availableInCatalog = true;
-    private final Boolean isUpdatePending = false;
+    private final Boolean reviewInProgress = false;
     private ServiceTemplateQueryModel testModel;
 
     @BeforeEach
@@ -46,7 +46,7 @@ class ServiceTemplateQueryModelTest {
                         .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
                         .checkNamespace(checkNamespace)
                         .availableInCatalog(availableInCatalog)
-                        .isUpdatePending(isUpdatePending)
+                        .reviewInProgress(reviewInProgress)
                         .namespace(namespace)
                         .build();
     }
@@ -63,7 +63,7 @@ class ServiceTemplateQueryModelTest {
                 serviceTemplateRegistrationState, testModel.getServiceTemplateRegistrationState());
         assertEquals(checkNamespace, testModel.getCheckNamespace());
         assertEquals(availableInCatalog, testModel.getAvailableInCatalog());
-        assertEquals(isUpdatePending, testModel.getIsUpdatePending());
+        assertEquals(reviewInProgress, testModel.getReviewInProgress());
     }
 
     @Test
@@ -101,8 +101,8 @@ class ServiceTemplateQueryModelTest {
                         + serviceTemplateRegistrationState
                         + ", availableInCatalog="
                         + availableInCatalog
-                        + ", isUpdatePending="
-                        + isUpdatePending
+                        + ", reviewInProgress="
+                        + reviewInProgress
                         + ", checkNamespace="
                         + checkNamespace
                         + ", namespace="

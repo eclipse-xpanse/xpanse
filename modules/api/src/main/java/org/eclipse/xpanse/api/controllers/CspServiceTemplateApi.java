@@ -97,9 +97,9 @@ public class CspServiceTemplateApi {
             @Parameter(name = "availableInCatalog", description = "is available in catalog")
                     @RequestParam(name = "availableInCatalog", required = false)
                     Boolean availableInCatalog,
-            @Parameter(name = "isUpdatePending", description = "is service template updating")
-                    @RequestParam(name = "isUpdatePending", required = false)
-                    Boolean isUpdatePending) {
+            @Parameter(name = "reviewInProgress", description = "is any request in review progress")
+                    @RequestParam(name = "reviewInProgress", required = false)
+                    Boolean reviewInProgress) {
         Csp csp = userServiceHelper.getCurrentUserManageCsp();
         ServiceTemplateQueryModel queryRequest =
                 ServiceTemplateQueryModel.builder()
@@ -110,7 +110,7 @@ public class CspServiceTemplateApi {
                         .serviceHostingType(serviceHostingType)
                         .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
                         .availableInCatalog(availableInCatalog)
-                        .isUpdatePending(isUpdatePending)
+                        .reviewInProgress(reviewInProgress)
                         .checkNamespace(false)
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =

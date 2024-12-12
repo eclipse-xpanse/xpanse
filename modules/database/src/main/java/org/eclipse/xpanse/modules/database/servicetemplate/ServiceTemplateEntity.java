@@ -81,8 +81,8 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Enumerated(EnumType.STRING)
     private ServiceTemplateRegistrationState serviceTemplateRegistrationState;
 
-    @Column(name = "IS_UPDATE_PENDING", nullable = false)
-    private Boolean isUpdatePending;
+    @Column(name = "IS_REVIEW_INPROGRESS", nullable = false)
+    private Boolean reviewInProgress = false;
 
     @Column(name = "AVAILABLE_IN_CATALOG", nullable = false)
     private Boolean availableInCatalog;
