@@ -3,7 +3,6 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-
 package org.eclipse.xpanse.modules.database.servicetemplate;
 
 import lombok.Builder;
@@ -13,9 +12,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 
-/**
- * The query model for search register services.
- */
+/** The query model for search register services. */
 @Data
 @Builder
 public class ServiceTemplateQueryModel {

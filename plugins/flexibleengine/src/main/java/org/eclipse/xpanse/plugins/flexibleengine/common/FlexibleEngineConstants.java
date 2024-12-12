@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.plugins.flexibleengine.common;
 
-/**
- * FlexibleEngine Constants Class.
- */
+/** FlexibleEngine Constants Class. */
 public class FlexibleEngineConstants {
 
     public static final String OS_ACCESS_KEY = "OS_ACCESS_KEY";

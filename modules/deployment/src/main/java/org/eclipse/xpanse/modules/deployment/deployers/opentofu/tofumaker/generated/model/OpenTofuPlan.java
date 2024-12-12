@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,26 +17,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Objects;
 
-/**
- * OpenTofuPlan
- */
+/** OpenTofuPlan */
 @JsonPropertyOrder({
-        OpenTofuPlan.JSON_PROPERTY_PLAN,
-        OpenTofuPlan.JSON_PROPERTY_OPEN_TOFU_VERSION_USED
+    OpenTofuPlan.JSON_PROPERTY_PLAN,
+    OpenTofuPlan.JSON_PROPERTY_OPEN_TOFU_VERSION_USED
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuPlan {
     public static final String JSON_PROPERTY_PLAN = "plan";
-    @jakarta.annotation.Nonnull
-    private String plan;
+    @jakarta.annotation.Nonnull private String plan;
 
     public static final String JSON_PROPERTY_OPEN_TOFU_VERSION_USED = "openTofuVersionUsed";
-    @jakarta.annotation.Nullable
-    private String openTofuVersionUsed;
+    @jakarta.annotation.Nullable private String openTofuVersionUsed;
 
-    public OpenTofuPlan() {
-    }
+    public OpenTofuPlan() {}
 
     public OpenTofuPlan plan(@jakarta.annotation.Nonnull String plan) {
 
@@ -53,11 +48,9 @@ public class OpenTofuPlan {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_PLAN)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getPlan() {
         return plan;
     }
-
 
     @JsonProperty(JSON_PROPERTY_PLAN)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -65,7 +58,8 @@ public class OpenTofuPlan {
         this.plan = plan;
     }
 
-    public OpenTofuPlan openTofuVersionUsed(@jakarta.annotation.Nullable String openTofuVersionUsed) {
+    public OpenTofuPlan openTofuVersionUsed(
+            @jakarta.annotation.Nullable String openTofuVersionUsed) {
 
         this.openTofuVersionUsed = openTofuVersionUsed;
         return this;
@@ -79,11 +73,9 @@ public class OpenTofuPlan {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION_USED)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getOpenTofuVersionUsed() {
         return openTofuVersionUsed;
     }
-
 
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION_USED)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -100,8 +92,8 @@ public class OpenTofuPlan {
             return false;
         }
         OpenTofuPlan openTofuPlan = (OpenTofuPlan) o;
-        return Objects.equals(this.plan, openTofuPlan.plan) &&
-                Objects.equals(this.openTofuVersionUsed, openTofuPlan.openTofuVersionUsed);
+        return Objects.equals(this.plan, openTofuPlan.plan)
+                && Objects.equals(this.openTofuVersionUsed, openTofuPlan.openTofuVersionUsed);
     }
 
     @Override
@@ -114,14 +106,16 @@ public class OpenTofuPlan {
         StringBuilder sb = new StringBuilder();
         sb.append("class OpenTofuPlan {\n");
         sb.append("    plan: ").append(toIndentedString(plan)).append("\n");
-        sb.append("    openTofuVersionUsed: ").append(toIndentedString(openTofuVersionUsed)).append("\n");
+        sb.append("    openTofuVersionUsed: ")
+                .append(toIndentedString(openTofuVersionUsed))
+                .append("\n");
         sb.append("}");
         return sb.toString();
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -129,6 +123,4 @@ public class OpenTofuPlan {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

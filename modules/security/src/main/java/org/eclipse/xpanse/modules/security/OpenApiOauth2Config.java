@@ -19,10 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-
-/**
- * Configuration springdoc security oauth2.
- */
+/** Configuration springdoc security oauth2. */
 @Profile({"oauth"})
 @Configuration
 public class OpenApiOauth2Config {
@@ -60,8 +57,11 @@ public class OpenApiOauth2Config {
     public OpenAPI customOpenApi() {
 
         OAuthFlows oauthFlows = new OAuthFlows();
-        OAuthFlow oauthFlow = new OAuthFlow().authorizationUrl(authorizationUrl).tokenUrl(tokenUrl)
-                .scopes(getScopes());
+        OAuthFlow oauthFlow =
+                new OAuthFlow()
+                        .authorizationUrl(authorizationUrl)
+                        .tokenUrl(tokenUrl)
+                        .scopes(getScopes());
         oauthFlows.authorizationCode(oauthFlow);
 
         SecurityScheme securityScheme = new SecurityScheme();
@@ -72,8 +72,11 @@ public class OpenApiOauth2Config {
         SecurityRequirement securityRequirement = new SecurityRequirement();
         securityRequirement.addList(securityName);
 
-        Info info = new Info().title("XpanseAPI").version(appVersion)
-                .description("RESTful Services to interact with Xpanse runtime.");
+        Info info =
+                new Info()
+                        .title("XpanseAPI")
+                        .version(appVersion)
+                        .description("RESTful Services to interact with Xpanse runtime.");
 
         return new OpenAPI().info(info).components(components).addSecurityItem(securityRequirement);
     }

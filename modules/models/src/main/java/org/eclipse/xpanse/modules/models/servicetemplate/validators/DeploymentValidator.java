@@ -10,12 +10,9 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.Objects;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 
-/**
- * Validator for Deployment scripts source.
- */
-public class DeploymentValidator implements
-        ConstraintValidator<DeploymentScriptsConstraint, Deployment> {
-
+/** Validator for Deployment scripts source. */
+public class DeploymentValidator
+        implements ConstraintValidator<DeploymentScriptsConstraint, Deployment> {
 
     @Override
     public boolean isValid(Deployment deployment, ConstraintValidatorContext context) {

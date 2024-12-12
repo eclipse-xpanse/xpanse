@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.auth;
 
 import java.util.Optional;
@@ -18,11 +17,10 @@ import java.util.function.Supplier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
-/**
- * Provides support for RFC 6750 - Bearer Token usage for OAUTH 2.0 Authorization.
- */
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+/** Provides support for RFC 6750 - Bearer Token usage for OAUTH 2.0 Authorization. */
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OAuth implements Authentication {
     private Supplier<String> tokenSupplier;
 
@@ -54,10 +52,15 @@ public class OAuth implements Authentication {
     }
 
     @Override
-    public void applyToParams(MultiValueMap<String, String> queryParams, HttpHeaders headerParams,
-                              MultiValueMap<String, String> cookieParams) {
-        Optional.ofNullable(tokenSupplier).map(Supplier::get).ifPresent(accessToken ->
-                headerParams.add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-        );
+    public void applyToParams(
+            MultiValueMap<String, String> queryParams,
+            HttpHeaders headerParams,
+            MultiValueMap<String, String> cookieParams) {
+        Optional.ofNullable(tokenSupplier)
+                .map(Supplier::get)
+                .ifPresent(
+                        accessToken ->
+                                headerParams.add(
+                                        HttpHeaders.AUTHORIZATION, "Bearer " + accessToken));
     }
 }

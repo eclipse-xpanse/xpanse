@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.deployertools;
 
-
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEPLOYER_VERSIONS_CACHE_NAME;
 
 import jakarta.annotation.Resource;
@@ -17,17 +16,15 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to update the cache of versions of OpenTofu.
- */
+/** Bean to update the cache of versions of OpenTofu. */
 @Slf4j
 @Component
 public class DeployerToolVersionsCache {
 
     @Value("${support.default.deployment.tool.versions.only:true}")
     private boolean getDefaultVersionsOnly;
-    @Resource
-    private DeployerToolVersionsFetcher versionsFetcher;
+
+    @Resource private DeployerToolVersionsFetcher versionsFetcher;
 
     /**
      * Get the available versions of OpenTofu.
@@ -42,8 +39,11 @@ public class DeployerToolVersionsCache {
         try {
             return versionsFetcher.fetchOfficialVersionsOfDeployerTool(deployerKind);
         } catch (Exception e) {
-            log.error("Failed to fetch versions from website for deploy tool {}, get "
-                    + "versions from default config.", deployerKind.toValue(), e);
+            log.error(
+                    "Failed to fetch versions from website for deploy tool {}, get "
+                            + "versions from default config.",
+                    deployerKind.toValue(),
+                    e);
             return versionsFetcher.getVersionsFromDefaultConfigOfDeployerTool(deployerKind);
         }
     }
@@ -54,11 +54,11 @@ public class DeployerToolVersionsCache {
      * @param versions List of available versions.
      */
     @CachePut(value = DEPLOYER_VERSIONS_CACHE_NAME, key = "#deployerKind")
-    public void updateCachedVersionsOfDeployerTool(DeployerKind deployerKind,
-                                                   Set<String> versions) {
-        log.info("Updated versions cache of deployer:{} with versions:{}.",
-                deployerKind.toValue(), versions);
+    public void updateCachedVersionsOfDeployerTool(
+            DeployerKind deployerKind, Set<String> versions) {
+        log.info(
+                "Updated versions cache of deployer:{} with versions:{}.",
+                deployerKind.toValue(),
+                versions);
     }
-
-
 }

@@ -98,57 +98,38 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.context.request.async.DeferredResult;
 
-/**
- * Test base class.
- */
+/** Test base class. */
 @Slf4j
 public class ApisTestCommon {
 
     protected static final ObjectMapper objectMapper = new ObjectMapper();
     protected final OclLoader oclLoader = new OclLoader();
-    @Resource
-    public DeployService deployService;
-    @Resource
-    public ServiceOrderManager serviceOrderManager;
-    @Resource
-    protected ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource
-    protected ServiceTemplateStorage serviceTemplateStorage;
-    @Resource
-    protected ServiceOrderStorage serviceOrderStorage;
-    @Resource
-    protected MockMvc mockMvc;
-    @Resource
-    private TerraformBootResultRefetchManager terraformBootResultRefetchManager;
-    @Resource
-    private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
-    @Resource
-    private ServiceResultReFetchManager serviceResultReFetchManager;
-    @MockitoBean
-    protected HuaweiCloudClient huaweiCloudClient;
-    @MockitoBean
-    protected FlexibleEngineClient flexibleEngineClient;
-    @MockitoBean
-    protected EcsClient mockEcsClient;
-    @MockitoBean
-    protected VpcClient mockVpcClient;
-    @MockitoBean
-    protected EipClient mockEipClient;
-    @MockitoBean
-    protected EvsClient mockEvsClient;
-    @MockitoBean
-    protected IamClient mockIamClient;
-    @MockitoBean
-    protected BssClient mockBssClient;
-    @MockitoBean
-    protected BssintlClient mockBssintlClient;
+    @Resource public DeployService deployService;
+    @Resource public ServiceOrderManager serviceOrderManager;
+    @Resource protected ServiceDeploymentStorage serviceDeploymentStorage;
+    @Resource protected ServiceTemplateStorage serviceTemplateStorage;
+    @Resource protected ServiceOrderStorage serviceOrderStorage;
+    @Resource protected MockMvc mockMvc;
+    @Resource private TerraformBootResultRefetchManager terraformBootResultRefetchManager;
+    @Resource private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
+    @Resource private ServiceResultReFetchManager serviceResultReFetchManager;
+    @MockitoBean protected HuaweiCloudClient huaweiCloudClient;
+    @MockitoBean protected FlexibleEngineClient flexibleEngineClient;
+    @MockitoBean protected EcsClient mockEcsClient;
+    @MockitoBean protected VpcClient mockVpcClient;
+    @MockitoBean protected EipClient mockEipClient;
+    @MockitoBean protected EvsClient mockEvsClient;
+    @MockitoBean protected IamClient mockIamClient;
+    @MockitoBean protected BssClient mockBssClient;
+    @MockitoBean protected BssintlClient mockBssintlClient;
     protected MockedStatic<OSFactory> mockOsFactory;
 
     @BeforeAll
     static void configureObjectMapper() {
         objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new SimpleModule().addSerializer(OffsetDateTime.class,
-                OffsetDateTimeSerializer.INSTANCE));
+        objectMapper.registerModule(
+                new SimpleModule()
+                        .addSerializer(OffsetDateTime.class, OffsetDateTimeSerializer.INSTANCE));
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
     }
@@ -182,10 +163,10 @@ public class ApisTestCommon {
         IOSClientBuilder.V3 osClientBuilder = mock(IOSClientBuilder.V3.class);
         when(OSFactory.builderV3()).thenReturn(osClientBuilder);
         when(osClientBuilder.withConfig(any())).thenReturn(osClientBuilder);
-        when(osClientBuilder.credentials(anyString(), anyString(),
-                any(Identifier.class))).thenReturn(osClientBuilder);
-        when(osClientBuilder.scopeToProject(any(Identifier.class),
-                any(Identifier.class))).thenReturn(osClientBuilder);
+        when(osClientBuilder.credentials(anyString(), anyString(), any(Identifier.class)))
+                .thenReturn(osClientBuilder);
+        when(osClientBuilder.scopeToProject(any(Identifier.class), any(Identifier.class)))
+                .thenReturn(osClientBuilder);
         when(osClientBuilder.endpoint(any())).thenReturn(osClientBuilder);
         OSClient.OSClientV3 osClient = mock(OSClient.OSClientV3.class);
         when(osClientBuilder.authenticate()).thenReturn(osClient);
@@ -198,16 +179,16 @@ public class ApisTestCommon {
         // mock mockSubnetServiceImpl for osClient.networking().subnet()
         when(osClient.networking().subnet()).thenReturn(mock(SubnetServiceImpl.class));
         // mock SecurityGroupServiceImpl for osClient.networking().securitygroup()
-        when(osClient.networking().securitygroup()).thenReturn(
-                mock(SecurityGroupServiceImpl.class));
+        when(osClient.networking().securitygroup())
+                .thenReturn(mock(SecurityGroupServiceImpl.class));
         // mock SecurityGroupRuleServiceImpl for osClient.networking().securityrule()
-        when(osClient.networking().securityrule()).thenReturn(
-                mock(SecurityGroupRuleServiceImpl.class));
+        when(osClient.networking().securityrule())
+                .thenReturn(mock(SecurityGroupRuleServiceImpl.class));
         // mock NetFloatingIPServiceImpl for osClient.networking().floatingip()
         when(osClient.networking().floatingip()).thenReturn(mock(NetFloatingIPService.class));
         // mock AvailabilityZoneServiceImpl for osClient.networking().availabilityzone()
-        when(osClient.networking().availabilityzone()).thenReturn(
-                mock(AvailabilityZoneServiceImpl.class));
+        when(osClient.networking().availabilityzone())
+                .thenReturn(mock(AvailabilityZoneServiceImpl.class));
 
         // mock BlockStorageServiceImpl for osClient.blockStorage()
         when(osClient.blockStorage()).thenReturn(mock(BlockStorageServiceImpl.class));
@@ -223,17 +204,19 @@ public class ApisTestCommon {
         return osClient;
     }
 
-    protected ServiceOrder deployService(ServiceTemplateDetailVo serviceTemplate)
-            throws Exception {
+    protected ServiceOrder deployService(ServiceTemplateDetailVo serviceTemplate) throws Exception {
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         // Run the test
-        final MockHttpServletResponse deployResponse = mockMvc.perform(
-                        post("/xpanse/services").contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(deployRequest))).andReturn()
-                .getResponse();
-        ServiceOrder serviceOrder = objectMapper.readValue(deployResponse.getContentAsString(),
-                ServiceOrder.class);
+        final MockHttpServletResponse deployResponse =
+                mockMvc.perform(
+                                post("/xpanse/services")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(deployRequest)))
+                        .andReturn()
+                        .getResponse();
+        ServiceOrder serviceOrder =
+                objectMapper.readValue(deployResponse.getContentAsString(), ServiceOrder.class);
         // Verify the results
         assertEquals(HttpStatus.ACCEPTED.value(), deployResponse.getStatus());
         Assertions.assertNotNull(serviceOrder.getServiceId());
@@ -284,9 +267,8 @@ public class ApisTestCommon {
         return false;
     }
 
-    protected ServiceOrderStatusUpdate getLatestServiceOrderStatus(UUID orderId,
-                                                                   TaskStatus taskStatus)
-            throws InterruptedException {
+    protected ServiceOrderStatusUpdate getLatestServiceOrderStatus(
+            UUID orderId, TaskStatus taskStatus) throws InterruptedException {
         DeferredResult<ServiceOrderStatusUpdate> deferredResult =
                 serviceOrderManager.getLatestServiceOrderStatus(orderId, taskStatus);
         while (Objects.isNull(deferredResult.getResult())) {
@@ -307,10 +289,19 @@ public class ApisTestCommon {
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY, "The access key.",
-                        true, false, "AK_VALUE"));
-        credentialVariables.add(new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                "The security key.", true, false, "SK_VALUE"));
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.",
+                        true,
+                        false,
+                        "AK_VALUE"));
+        credentialVariables.add(
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.",
+                        true,
+                        false,
+                        "SK_VALUE"));
         createCredential.setVariables(credentialVariables);
         createCredential.setTimeToLive(300);
         addUserCredential(createCredential);
@@ -324,10 +315,20 @@ public class ApisTestCommon {
         createCredential.setName("AK_SK");
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(new CredentialVariable(FlexibleEngineMonitorConstants.OS_ACCESS_KEY,
-                "The access key.", true, false, "AK_VALUE"));
-        credentialVariables.add(new CredentialVariable(FlexibleEngineMonitorConstants.OS_SECRET_KEY,
-                "The security key.", true, false, "SK_VALUE"));
+        credentialVariables.add(
+                new CredentialVariable(
+                        FlexibleEngineMonitorConstants.OS_ACCESS_KEY,
+                        "The access key.",
+                        true,
+                        false,
+                        "AK_VALUE"));
+        credentialVariables.add(
+                new CredentialVariable(
+                        FlexibleEngineMonitorConstants.OS_SECRET_KEY,
+                        "The security key.",
+                        true,
+                        false,
+                        "SK_VALUE"));
         createCredential.setVariables(credentialVariables);
         createCredential.setTimeToLive(300);
         addUserCredential(createCredential);
@@ -342,23 +343,47 @@ public class ApisTestCommon {
         createCredential.setName("USERNAME_PASSWORD");
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
-        credentialVariables.add(new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT,
-                "The Name of the Tenant or Project to use.", true, false, "PROJECT"));
-        credentialVariables.add(new CredentialVariable(OpenstackCommonEnvironmentConstants.USERNAME,
-                "The Username to login with.", true, false, "USERNAME"));
-        credentialVariables.add(new CredentialVariable(OpenstackCommonEnvironmentConstants.PASSWORD,
-                "The Password to login with.", true, true, "PASSWORD"));
         credentialVariables.add(
-                new CredentialVariable(OpenstackCommonEnvironmentConstants.DOMAIN,
-                        "The domain to which the openstack user is linked to.", true, false,
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.PROJECT,
+                        "The Name of the Tenant or Project to use.",
+                        true,
+                        false,
+                        "PROJECT"));
+        credentialVariables.add(
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.USERNAME,
+                        "The Username to login with.",
+                        true,
+                        false,
+                        "USERNAME"));
+        credentialVariables.add(
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.PASSWORD,
+                        "The Password to login with.",
+                        true,
+                        true,
+                        "PASSWORD"));
+        credentialVariables.add(
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.DOMAIN,
+                        "The domain to which the openstack user is linked to.",
+                        true,
+                        false,
                         "DOMAIN"));
         credentialVariables.add(
-                new CredentialVariable(OpenstackCommonEnvironmentConstants.USER_DOMAIN,
-                        "The domain to which the openstack user is linked to.", true, false,
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.USER_DOMAIN,
+                        "The domain to which the openstack user is linked to.",
+                        true,
+                        false,
                         "USER_DOMAIN"));
         credentialVariables.add(
-                new CredentialVariable(OpenstackCommonEnvironmentConstants.PROJECT_DOMAIN,
-                        "The domain to which the openstack project is linked to.", true, false,
+                new CredentialVariable(
+                        OpenstackCommonEnvironmentConstants.PROJECT_DOMAIN,
+                        "The domain to which the openstack project is linked to.",
+                        true,
+                        false,
                         "PROJECT_DOMAIN"));
         createCredential.setVariables(credentialVariables);
         createCredential.setTimeToLive(300);
@@ -366,10 +391,14 @@ public class ApisTestCommon {
     }
 
     protected void addUserCredential(CreateCredential createCredential) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(post("/xpanse/user/credentials").content(
-                                objectMapper.writeValueAsString(createCredential))
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        MockHttpServletResponse response =
+                mockMvc.perform(
+                                post("/xpanse/user/credentials")
+                                        .content(objectMapper.writeValueAsString(createCredential))
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
         assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
     }
@@ -379,36 +408,44 @@ public class ApisTestCommon {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         ocl.setName(UUID.randomUUID().toString());
         String requestBody = yamlMapper.writeValueAsString(ocl);
-        final MockHttpServletResponse registerResponse = mockMvc.perform(
-                        post("/xpanse/service_templates").content(requestBody)
-                                .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse registerResponse =
+                mockMvc.perform(
+                                post("/xpanse/service_templates")
+                                        .content(requestBody)
+                                        .contentType("application/x-yaml")
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
         assertNotNull(registerResponse.getHeader(HEADER_TRACKING_ID));
         if (registerResponse.getStatus() == HttpStatus.OK.value()) {
-            ServiceTemplateRequestInfo serviceTemplateRequestInfo = objectMapper.readValue(
-                    registerResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+            ServiceTemplateRequestInfo serviceTemplateRequestInfo =
+                    objectMapper.readValue(
+                            registerResponse.getContentAsString(),
+                            ServiceTemplateRequestInfo.class);
             return getServiceTemplateDetailsVo(serviceTemplateRequestInfo.getServiceTemplateId());
         } else {
             ErrorResponse errorResponse =
-                    objectMapper.readValue(registerResponse.getContentAsString(),
-                            ErrorResponse.class);
+                    objectMapper.readValue(
+                            registerResponse.getContentAsString(), ErrorResponse.class);
             log.error("Register service template failed. Error: " + errorResponse.getDetails());
             return null;
         }
     }
 
     protected ServiceTemplateDetailVo getServiceTemplateDetailsVo(UUID id) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(get("/xpanse/service_templates/{id}", id)
-                .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        MockHttpServletResponse response =
+                mockMvc.perform(
+                                get("/xpanse/service_templates/{id}", id)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
         return objectMapper.readValue(response.getContentAsString(), ServiceTemplateDetailVo.class);
     }
 
-
     protected List<ServiceTemplateRequestToReview> listPendingServiceTemplateRequests(
-            UUID serviceTemplateId)
-            throws Exception {
+            UUID serviceTemplateId) throws Exception {
         MockHttpServletRequestBuilder getRequestBuilder =
                 get("/xpanse/csp/service_templates/requests/pending");
         if (Objects.nonNull(serviceTemplateId)) {
@@ -417,10 +454,9 @@ public class ApisTestCommon {
         }
         MockHttpServletResponse response =
                 mockMvc.perform(getRequestBuilder.accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
-        return objectMapper.readValue(response.getContentAsString(),
-                new TypeReference<>() {
-                });
+                        .andReturn()
+                        .getResponse();
+        return objectMapper.readValue(response.getContentAsString(), new TypeReference<>() {});
     }
 
     protected void approveServiceTemplateRegistration(UUID serviceTemplateId) throws Exception {
@@ -434,11 +470,16 @@ public class ApisTestCommon {
         request.setReviewResult(ServiceReviewResult.APPROVED);
         request.setReviewComment("Approved");
         String requestBody = objectMapper.writeValueAsString(request);
-        MockHttpServletResponse response = mockMvc.perform(
-                        put("/xpanse/csp/service_templates/requests/review/{requestId}", requestId).
-                                content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        MockHttpServletResponse response =
+                mockMvc.perform(
+                                put(
+                                                "/xpanse/csp/service_templates/requests/review/{requestId}",
+                                                requestId)
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
         assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
     }
@@ -469,31 +510,42 @@ public class ApisTestCommon {
         deployRequest.setBillingMode(serviceTemplate.getBilling().getBillingModes().getFirst());
 
         Map<String, Object> serviceRequestProperties = new HashMap<>();
-        serviceTemplate.getDeployment().getVariables().forEach(
-                variable -> serviceRequestProperties.put(variable.getName(),
-                        variable.getExample()));
+        serviceTemplate
+                .getDeployment()
+                .getVariables()
+                .forEach(
+                        variable ->
+                                serviceRequestProperties.put(
+                                        variable.getName(), variable.getExample()));
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
 
         Map<String, String> availabilityZones = new HashMap<>();
-        serviceTemplate.getDeployment().getServiceAvailabilityConfig().forEach(
-                availabilityZoneConfig -> availabilityZones.put(availabilityZoneConfig.getVarName(),
-                        availabilityZoneConfig.getDisplayName()));
+        serviceTemplate
+                .getDeployment()
+                .getServiceAvailabilityConfig()
+                .forEach(
+                        availabilityZoneConfig ->
+                                availabilityZones.put(
+                                        availabilityZoneConfig.getVarName(),
+                                        availabilityZoneConfig.getDisplayName()));
         deployRequest.setAvailabilityZones(availabilityZones);
         return deployRequest;
     }
 
     protected void deleteCredential(Csp csp, String site, CredentialType type, String name)
             throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(delete("/xpanse/user/credentials")
-                .param("cspName", csp.toValue())
-                .param("siteName", site)
-                .param("type", type.toValue())
-                .param("name", name)
-                .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        MockHttpServletResponse response =
+                mockMvc.perform(
+                                delete("/xpanse/user/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("siteName", site)
+                                        .param("type", type.toValue())
+                                        .param("name", name)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
         assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
     }
 }
-
-

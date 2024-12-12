@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 
 /**
- * Data type to describe an order status update.
- * Will only hold the changes related to deployment status.
+ * Data type to describe an order status update. Will only hold the changes related to deployment
+ * status.
  */
 @Data
 @AllArgsConstructor

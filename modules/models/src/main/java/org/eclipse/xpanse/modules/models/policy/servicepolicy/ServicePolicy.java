@@ -17,46 +17,36 @@ import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 
-/**
- * Define view object for detail of the service policy entity.
- */
+/** Define view object for detail of the service policy entity. */
 @Data
 public class ServicePolicy {
 
-    /**
-     * The id of the entity.
-     */
+    /** The id of the entity. */
     @NotNull
     @Schema(description = "The id of the policy.")
     private UUID servicePolicyId;
 
-    /**
-     * The valid policy created by the user.
-     */
+    /** The valid policy created by the user. */
     @NotNull
     @NotBlank
     @NotEmpty
     @Schema(description = "The valid policy belongs to the service.")
     private String policy;
 
-    /**
-     * The id of registered service template which the policy belongs to.
-     */
+    /** The id of registered service template which the policy belongs to. */
     @NotNull
     @Schema(description = "The id of registered service template which the policy belongs to.")
     private UUID serviceTemplateId;
 
-    /**
-     * The flavor name list which the policy belongs to.
-     */
-    @Schema(description =
-            "The flavor name list which the policy belongs to. If the list is empty, then the "
-                    + "policy will be executed for during service deployment of all flavors.")
+    /** The flavor name list which the policy belongs to. */
+    @Schema(
+            description =
+                    "The flavor name list which the policy belongs to. If the list is empty, then"
+                            + " the policy will be executed for during service deployment of all"
+                            + " flavors.")
     private List<String> flavorNameList;
 
-    /**
-     * Is the policy enabled.
-     */
+    /** Is the policy enabled. */
     @NotNull
     @Schema(description = "Is the policy enabled.")
     private Boolean enabled;

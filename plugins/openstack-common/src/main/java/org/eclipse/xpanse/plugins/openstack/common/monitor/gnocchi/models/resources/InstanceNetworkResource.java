@@ -10,58 +10,69 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Map;
 
-/**
- * Data model for Resource objects.
- */
+/** Data model for Resource objects. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "creator",
-        "started_at",
-        "revision_start",
-        "ended_at",
-        "user_id",
-        "project_id",
-        "original_resource_id",
-        "id",
-        "type",
-        "name",
-        "instance_id",
-        "revision_end",
-        "metrics",
-        "created_by_user_id",
-        "created_by_project_id"
+    "creator",
+    "started_at",
+    "revision_start",
+    "ended_at",
+    "user_id",
+    "project_id",
+    "original_resource_id",
+    "id",
+    "type",
+    "name",
+    "instance_id",
+    "revision_end",
+    "metrics",
+    "created_by_user_id",
+    "created_by_project_id"
 })
 public class InstanceNetworkResource {
 
     @JsonProperty("creator")
     private String creator;
+
     @JsonProperty("started_at")
     private String startedAt;
+
     @JsonProperty("revision_start")
     private String revisionStart;
+
     @JsonProperty("ended_at")
     private Object endedAt;
+
     @JsonProperty("user_id")
     private String userId;
+
     @JsonProperty("project_id")
     private String projectId;
+
     @JsonProperty("original_resource_id")
     private String originalResourceId;
+
     @JsonProperty("id")
     private String id;
+
     @JsonProperty("type")
     private String type;
 
     @JsonProperty("name")
     private String name;
+
     @JsonProperty("instance_id")
     private String instanceId;
+
     @JsonProperty("revision_end")
     private String revisionEnd;
+
     @JsonProperty("metrics")
     private Map<String, String> metrics;
+
     @JsonProperty("created_by_user_id")
     private String createdByUserId;
+
     @JsonProperty("created_by_project_id")
     private String createdByProjectId;
 
@@ -214,5 +225,4 @@ public class InstanceNetworkResource {
     public void setRevisionEnd(String revisionEnd) {
         this.revisionEnd = revisionEnd;
     }
-
 }

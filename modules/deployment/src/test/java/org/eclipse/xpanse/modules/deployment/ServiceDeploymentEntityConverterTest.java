@@ -31,10 +31,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceDeploymentEntityConverterTest {
-    @Mock
-    private ServiceTemplateStorage serviceTemplateStorage;
-    @InjectMocks
-    private DeployServiceEntityConverter converter;
+    @Mock private ServiceTemplateStorage serviceTemplateStorage;
+    @InjectMocks private DeployServiceEntityConverter converter;
     private ServiceDeploymentEntity serviceDeploymentEntity;
     private ServiceTemplateEntity serviceTemplateEntity;
 
@@ -67,14 +65,15 @@ class ServiceDeploymentEntityConverterTest {
         serviceTemplateEntity.setOcl(ocl);
 
         when(serviceTemplateStorage.getServiceTemplateById(
-                serviceDeploymentEntity.getServiceTemplateId()))
+                        serviceDeploymentEntity.getServiceTemplateId()))
                 .thenReturn(serviceTemplateEntity);
     }
 
     @Test
     void testGetDeployTaskByStoredService() {
-        DeployTask deployTask = converter.getDeployTaskByStoredService(
-                ServiceOrderType.DEPLOY, serviceDeploymentEntity);
+        DeployTask deployTask =
+                converter.getDeployTaskByStoredService(
+                        ServiceOrderType.DEPLOY, serviceDeploymentEntity);
 
         assertNotNull(deployTask);
         assertEquals(ServiceOrderType.DEPLOY, deployTask.getTaskType());
@@ -90,9 +89,9 @@ class ServiceDeploymentEntityConverterTest {
                 converter.getInitialServiceConfiguration(serviceDeploymentEntity);
 
         assertNotNull(serviceConfigurationEntity);
-        assertEquals(serviceDeploymentEntity, serviceConfigurationEntity.getServiceDeploymentEntity());
+        assertEquals(
+                serviceDeploymentEntity, serviceConfigurationEntity.getServiceDeploymentEntity());
         assertNotNull(serviceConfigurationEntity.getCreatedTime());
         assertNotNull(serviceConfigurationEntity.getConfiguration());
     }
-
 }

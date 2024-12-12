@@ -25,21 +25,17 @@ import org.springframework.web.client.RestClientException;
 @ExtendWith(MockitoExtension.class)
 class TofuMakerManagerTest {
 
-    @Mock
-    private AdminApi mockOpenTofuApi;
+    @Mock private AdminApi mockOpenTofuApi;
 
-    @Mock
-    private TofuMakerHelper tofuMakerHelper;
+    @Mock private TofuMakerHelper tofuMakerHelper;
 
-    @InjectMocks
-    private TofuMakerManager tofuMakerManagerUnderTest;
+    @InjectMocks private TofuMakerManager tofuMakerManagerUnderTest;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(tofuMakerManagerUnderTest, "springProfilesActive",
-                "tofu-maker");
-        ReflectionTestUtils.setField(tofuMakerManagerUnderTest, "openTofuMakerBaseUrl",
-                "endpoint");
+        ReflectionTestUtils.setField(
+                tofuMakerManagerUnderTest, "springProfilesActive", "tofu-maker");
+        ReflectionTestUtils.setField(tofuMakerManagerUnderTest, "openTofuMakerBaseUrl", "endpoint");
     }
 
     @Test
@@ -90,7 +86,6 @@ class TofuMakerManagerTest {
         expectedResult.setHealthStatus(HealthStatus.NOK);
         expectedResult.setEndpoint("endpoint");
 
-
         // Configure OpenTofuApi.healthCheck(...).
         final OpenTofuMakerSystemStatus openTofuMakerSystemStatus = new OpenTofuMakerSystemStatus();
         openTofuMakerSystemStatus.setHealthStatus(OpenTofuMakerSystemStatus.HealthStatusEnum.NOK);
@@ -103,11 +98,9 @@ class TofuMakerManagerTest {
         assertThat(result).isEqualTo(expectedResult);
     }
 
-
     @Test
     void testGetOpenTofuMakerStatus_WhenOpenTofuMakerNotActive() {
-        ReflectionTestUtils.setField(tofuMakerManagerUnderTest, "springProfilesActive",
-                "oauth");
+        ReflectionTestUtils.setField(tofuMakerManagerUnderTest, "springProfilesActive", "oauth");
 
         // Run the test
         final BackendSystemStatus result = tofuMakerManagerUnderTest.getOpenTofuMakerStatus();

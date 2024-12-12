@@ -14,9 +14,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 
-/**
- * One kind of metric.
- */
+/** One kind of metric. */
 @Data
 public class Metric {
 
@@ -44,5 +42,4 @@ public class Metric {
 
     @Schema(description = "The list of the metric items.")
     List<MetricItem> metrics;
-
 }

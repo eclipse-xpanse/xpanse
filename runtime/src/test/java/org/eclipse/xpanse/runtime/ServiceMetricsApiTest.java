@@ -28,12 +28,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for MonitorApiTest.
- */
+/** Test for MonitorApiTest. */
 @Transactional
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {XpanseApplication.class, ServiceMetricsApi.class},
+@SpringBootTest(
+        classes = {XpanseApplication.class, ServiceMetricsApi.class},
         properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceMetricsApiTest {
@@ -46,8 +45,7 @@ class ServiceMetricsApiTest {
 
     private final String resourceId = "e034af0c-be03-453e-92cd-fd69acbfe526";
 
-    @MockitoBean
-    private ServiceMetricsAdapter mockServiceMetricsAdapter;
+    @MockitoBean private ServiceMetricsAdapter mockServiceMetricsAdapter;
 
     private ServiceMetricsApi serviceMetricsApiUnderTest;
 
@@ -79,13 +77,14 @@ class ServiceMetricsApiTest {
         final MetricItem metricItem1 = new MetricItem();
         metric1.setMetrics(List.of(metricItem1));
         final List<Metric> metrics = List.of(metric1);
-        when(mockServiceMetricsAdapter.getMetricsByResourceId(serviceId,
-                MonitorResourceType.CPU, from, to, 1, false)).thenReturn(metrics);
+        when(mockServiceMetricsAdapter.getMetricsByResourceId(
+                        serviceId, MonitorResourceType.CPU, from, to, 1, false))
+                .thenReturn(metrics);
 
         // Run the test
         final List<Metric> result =
-                serviceMetricsApiUnderTest.getMetrics(serviceId, resourceId,
-                        MonitorResourceType.CPU, from, to, 1, false);
+                serviceMetricsApiUnderTest.getMetrics(
+                        serviceId, resourceId, MonitorResourceType.CPU, from, to, 1, false);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -94,13 +93,14 @@ class ServiceMetricsApiTest {
     @Test
     void testGetMetricsByResourceIdReturnsNoItems() {
         // Setup
-        when(mockServiceMetricsAdapter.getMetricsByResourceId(resourceId,
-                MonitorResourceType.CPU, from, to, 1, false)).thenReturn(Collections.emptyList());
+        when(mockServiceMetricsAdapter.getMetricsByResourceId(
+                        resourceId, MonitorResourceType.CPU, from, to, 1, false))
+                .thenReturn(Collections.emptyList());
 
         // Run the test
         final List<Metric> result =
-                serviceMetricsApiUnderTest.getMetrics(serviceId, resourceId,
-                        MonitorResourceType.CPU, from, to, 1, false);
+                serviceMetricsApiUnderTest.getMetrics(
+                        serviceId, resourceId, MonitorResourceType.CPU, from, to, 1, false);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -128,13 +128,14 @@ class ServiceMetricsApiTest {
         final MetricItem metricItem1 = new MetricItem();
         metric1.setMetrics(List.of(metricItem1));
         final List<Metric> metrics = List.of(metric1);
-        when(mockServiceMetricsAdapter.getMetricsByServiceId(serviceId,
-                MonitorResourceType.CPU, from, to, 1, false)).thenReturn(metrics);
+        when(mockServiceMetricsAdapter.getMetricsByServiceId(
+                        serviceId, MonitorResourceType.CPU, from, to, 1, false))
+                .thenReturn(metrics);
 
         // Run the test
         final List<Metric> result =
-                serviceMetricsApiUnderTest.getMetrics(serviceId, null,
-                        MonitorResourceType.CPU, from, to, 1, false);
+                serviceMetricsApiUnderTest.getMetrics(
+                        serviceId, null, MonitorResourceType.CPU, from, to, 1, false);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -143,13 +144,14 @@ class ServiceMetricsApiTest {
     @Test
     void testGetMetricsByServiceIdReturnsNoItems() {
         // Setup
-        when(mockServiceMetricsAdapter.getMetricsByServiceId(serviceId,
-                MonitorResourceType.CPU, from, to, 1, false)).thenReturn(Collections.emptyList());
+        when(mockServiceMetricsAdapter.getMetricsByServiceId(
+                        serviceId, MonitorResourceType.CPU, from, to, 1, false))
+                .thenReturn(Collections.emptyList());
 
         // Run the test
         final List<Metric> result =
-                serviceMetricsApiUnderTest.getMetrics(serviceId, null,
-                        MonitorResourceType.CPU, from, to, 1, false);
+                serviceMetricsApiUnderTest.getMetrics(
+                        serviceId, null, MonitorResourceType.CPU, from, to, 1, false);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());

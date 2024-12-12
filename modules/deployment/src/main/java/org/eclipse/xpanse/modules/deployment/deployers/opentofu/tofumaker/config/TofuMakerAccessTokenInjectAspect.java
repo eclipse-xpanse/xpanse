@@ -17,9 +17,7 @@ import org.eclipse.xpanse.common.oauth2.client.Oauth2ClientAccessTokenProvider;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient;
 import org.springframework.stereotype.Component;
 
-/**
- * Aspect for inserting bearer token implicitly to all API calls.
- */
+/** Aspect for inserting bearer token implicitly to all API calls. */
 @Slf4j
 @Aspect
 @Component
@@ -33,11 +31,13 @@ public class TofuMakerAccessTokenInjectAspect {
     }
 
     /**
-     * This method automatically catches all calls to the methods in the API package and
-     * insert token to the request header.
+     * This method automatically catches all calls to the methods in the API package and insert
+     * token to the request header.
      */
-    //CHECKSTYLE OFF: LineLength
-    @Before("execution(* org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api..*(..))")
+    // CHECKSTYLE OFF: LineLength
+    @Before(
+            "execution(*"
+                + " org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api..*(..))")
     public void insertOauthToken(JoinPoint joinPoint)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Object targetObject = joinPoint.getTarget();

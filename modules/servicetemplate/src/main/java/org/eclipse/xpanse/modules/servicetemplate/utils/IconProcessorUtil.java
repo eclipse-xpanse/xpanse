@@ -18,17 +18,14 @@ import javax.imageio.ImageIO;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessingFailedException;
 
-/**
- * IconProcessorUtil.
- */
+/** IconProcessorUtil. */
 public class IconProcessorUtil {
 
-    private static final String URL_REGEX = "^(http|https|ftp)://[\\w-]+(\\.[\\w-]+)+([\\w-.,"
-            + "@?^=%&:/~+#]*[\\w@?^=%&/~+#])?$";
+    private static final String URL_REGEX =
+            "^(http|https|ftp)://[\\w-]+(\\.[\\w-]+)+([\\w-.," + "@?^=%&:/~+#]*[\\w@?^=%&/~+#])?$";
     private static final int MAX_SIZE = 200;
     private static final int MAX_WIDTH = 100;
     private static final int MAX_HEIGHT = 100;
-
 
     /**
      * This method get the base64 icon.
@@ -56,12 +53,16 @@ public class IconProcessorUtil {
                 if (width <= MAX_WIDTH && height <= MAX_HEIGHT && size <= MAX_SIZE * 1024) {
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     ImageIO.write(image, "png", out);
-                    return "data:image/png;base64," + Base64.getEncoder().withoutPadding()
-                            .encodeToString(out.toByteArray());
+                    return "data:image/png;base64,"
+                            + Base64.getEncoder()
+                                    .withoutPadding()
+                                    .encodeToString(out.toByteArray());
                 } else {
-                    throw new IconProcessingFailedException(String.format(
-                            "The icon does not exceed %sx%spx, and the size does not exceed %skb",
-                            MAX_WIDTH, MAX_HEIGHT, MAX_SIZE));
+                    throw new IconProcessingFailedException(
+                            String.format(
+                                    "The icon does not exceed %sx%spx, and the size does not exceed"
+                                            + " %skb",
+                                    MAX_WIDTH, MAX_HEIGHT, MAX_SIZE));
                 }
             } catch (IOException e) {
                 throw new IconProcessingFailedException(
@@ -69,7 +70,6 @@ public class IconProcessorUtil {
             }
         }
         return icon;
-
     }
 
     private static int getImageSizeInBytes(BufferedImage image) throws IOException {
@@ -80,5 +80,4 @@ public class IconProcessorUtil {
         out.close();
         return size;
     }
-
 }

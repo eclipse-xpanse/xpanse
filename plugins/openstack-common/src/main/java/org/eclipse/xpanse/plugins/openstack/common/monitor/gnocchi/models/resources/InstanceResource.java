@@ -10,81 +10,101 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Map;
 
-/**
- * Data model for Resource objects.
- */
+/** Data model for Resource objects. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "creator",
-        "started_at",
-        "revision_start",
-        "ended_at",
-        "user_id",
-        "project_id",
-        "original_resource_id",
-        "id",
-        "type",
-        "flavor_id",
-        "image_ref",
-        "host",
-        "display_name",
-        "server_group",
-        "flavor_name",
-        "launched_at",
-        "created_at",
-        "deleted_at",
-        "availability_zone",
-        "revision_end",
-        "metrics",
-        "created_by_user_id",
-        "created_by_project_id"
+    "creator",
+    "started_at",
+    "revision_start",
+    "ended_at",
+    "user_id",
+    "project_id",
+    "original_resource_id",
+    "id",
+    "type",
+    "flavor_id",
+    "image_ref",
+    "host",
+    "display_name",
+    "server_group",
+    "flavor_name",
+    "launched_at",
+    "created_at",
+    "deleted_at",
+    "availability_zone",
+    "revision_end",
+    "metrics",
+    "created_by_user_id",
+    "created_by_project_id"
 })
 public class InstanceResource {
 
     @JsonProperty("creator")
     private String creator;
+
     @JsonProperty("started_at")
     private String startedAt;
+
     @JsonProperty("revision_start")
     private String revisionStart;
+
     @JsonProperty("ended_at")
     private Object endedAt;
+
     @JsonProperty("user_id")
     private String userId;
+
     @JsonProperty("project_id")
     private String projectId;
+
     @JsonProperty("original_resource_id")
     private String originalResourceId;
+
     @JsonProperty("id")
     private String id;
+
     @JsonProperty("type")
     private String type;
+
     @JsonProperty("flavor_id")
     private String flavorId;
+
     @JsonProperty("image_ref")
     private String imageRef;
+
     @JsonProperty("host")
     private String host;
+
     @JsonProperty("display_name")
     private String displayName;
+
     @JsonProperty("server_group")
     private Object serverGroup;
+
     @JsonProperty("flavor_name")
     private String flavorName;
+
     @JsonProperty("launched_at")
     private String launchedAt;
+
     @JsonProperty("created_at")
     private String createdAt;
+
     @JsonProperty("deleted_at")
     private Object deletedAt;
+
     @JsonProperty("availability_zone")
     private Object availabilityZone;
+
     @JsonProperty("revision_end")
     private Object revisionEnd;
+
     @JsonProperty("metrics")
     private Map<String, String> metrics;
+
     @JsonProperty("created_by_user_id")
     private String createdByUserId;
+
     @JsonProperty("created_by_project_id")
     private String createdByProjectId;
 
@@ -317,5 +337,4 @@ public class InstanceResource {
     public void setCreatedByProjectId(String createdByProjectId) {
         this.createdByProjectId = createdByProjectId;
     }
-
 }

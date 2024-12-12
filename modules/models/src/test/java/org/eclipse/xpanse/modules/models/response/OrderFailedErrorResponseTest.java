@@ -10,7 +10,6 @@ import org.springframework.beans.BeanUtils;
 
 class OrderFailedErrorResponseTest {
 
-
     private final ErrorType errorType = ErrorType.ACCESS_DENIED;
     private final List<String> details = List.of(ErrorType.ACCESS_DENIED.toValue());
     private final String id = UUID.randomUUID().toString();
@@ -22,7 +21,6 @@ class OrderFailedErrorResponseTest {
         test.setServiceId(id);
         test.setOrderId(id);
     }
-
 
     @Test
     void testGetters() {
@@ -49,7 +47,6 @@ class OrderFailedErrorResponseTest {
         assertThat(test.equals(test2)).isTrue();
         assertThat(test.hashCode()).isEqualTo(test2.hashCode());
     }
-
 
     @Test
     void testToString() {

@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of FlavorInvalidException.
- */
+/** Test of FlavorInvalidException. */
 class FlavorInvalidExceptionTest {
 
     private static final String message = "flavor is invalid.";
@@ -28,5 +26,4 @@ class FlavorInvalidExceptionTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

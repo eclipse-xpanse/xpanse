@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Workflow Task Status enums.
- */
+/** Workflow Task Status enums. */
 public enum WorkFlowTaskStatus {
     DONE("done"),
     FAILED("failed");
@@ -23,9 +21,7 @@ public enum WorkFlowTaskStatus {
         this.status = status;
     }
 
-    /**
-     * For Category deserialize.
-     */
+    /** For Category deserialize. */
     @JsonCreator
     public static WorkFlowTaskStatus getByValue(String status) {
         for (WorkFlowTaskStatus workflowTaskStatus : values()) {
@@ -37,9 +33,7 @@ public enum WorkFlowTaskStatus {
                 String.format("Category value %s is not supported.", status));
     }
 
-    /**
-     * For Category serialize.
-     */
+    /** For Category serialize. */
     @JsonValue
     public String toValue() {
         return this.status;

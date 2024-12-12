@@ -16,9 +16,7 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 
-/**
- * The result of the deployment.
- */
+/** The result of the deployment. */
 @Data
 public class DeployResult {
 
@@ -45,11 +43,8 @@ public class DeployResult {
     @Schema(description = "The deployment generated files of the service instance deployment.")
     private Map<String, String> deploymentGeneratedFiles = new HashMap<>();
 
-
     @Schema(description = "The version of deployer tool used to execute deployment scripts.")
     private String deployerVersionUsed;
 
-    @Hidden
-    private String tfStateContent;
-
+    @Hidden private String tfStateContent;
 }

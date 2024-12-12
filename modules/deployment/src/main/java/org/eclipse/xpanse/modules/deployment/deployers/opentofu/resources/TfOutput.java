@@ -13,15 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * TfOutput class.
- */
+/** TfOutput class. */
 @Slf4j
 @Data
 public class TfOutput {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    private static final ObjectMapper MAPPER =
+            new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
     private String type;
     private String value;
@@ -39,7 +37,6 @@ public class TfOutput {
             this.type = getJsonString(typeObject);
         }
     }
-
 
     /**
      * Convert value object to string.

@@ -5,9 +5,7 @@
 
 package org.eclipse.xpanse.modules.models.common.exceptions;
 
-/**
- * Defines exception when the deployer tool is invalid or installed failed.
- */
+/** Defines exception when the deployer tool is invalid or installed failed. */
 public class InvalidDeployerToolException extends RuntimeException {
     public InvalidDeployerToolException(String message) {
         super(message);

@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Webhook class for tofu-maker. These API methods are not exposed to the end user.
- * They are only for machine-to-machine communication.
- * This class implements the callback methods described in the tofu-maker specifications.
+ * Webhook class for tofu-maker. These API methods are not exposed to the end user. They are only
+ * for machine-to-machine communication. This class implements the callback methods described in the
+ * tofu-maker specifications.
  */
 @Slf4j
 @RestController
@@ -39,22 +39,20 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class OpenTofuMakerWebhookApi {
 
-
     @Resource
     private OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
 
-    /**
-     * Webhook methods to receive openTofu execution result.
-     */
+    /** Webhook methods to receive openTofu execution result. */
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result of the order task from tofu-maker")
-    @PostMapping(value = "${webhook.tofu-maker.orderCallbackUri}/{orderId}",
+    @PostMapping(
+            value = "${webhook.tofu-maker.orderCallbackUri}/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(enabled = false)
     public void orderCallback(
-            @Parameter(name = "orderId", description = "Id of the order.")
-            @PathVariable("orderId") String orderId,
+            @Parameter(name = "orderId", description = "Id of the order.") @PathVariable("orderId")
+                    String orderId,
             @Valid @RequestBody OpenTofuResult result) {
         openTofuDeploymentResultCallbackManager.orderCallback(UUID.fromString(orderId), result);
     }

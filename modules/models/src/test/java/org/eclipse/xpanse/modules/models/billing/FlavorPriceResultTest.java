@@ -18,11 +18,8 @@ class FlavorPriceResultTest {
     private final BillingMode billingMode = BillingMode.FIXED;
     private final String errorMessage = "errorMessage";
 
-
-    @Mock
-    private Price mockRecurringPrice;
-    @Mock
-    private Price mockOneTimePaymentPrice;
+    @Mock private Price mockRecurringPrice;
+    @Mock private Price mockOneTimePaymentPrice;
 
     private FlavorPriceResult test;
 
@@ -66,14 +63,21 @@ class FlavorPriceResultTest {
 
     @Test
     void testToString() {
-        String result = "FlavorPriceResult("
-                + "flavorName=" + flavorName
-                + ", billingMode=" + billingMode
-                + ", recurringPrice=" + mockRecurringPrice
-                + ", oneTimePaymentPrice=" + mockOneTimePaymentPrice
-                + ", isSuccessful=" + isSuccessful
-                + ", errorMessage=" + errorMessage
-                + ")";
+        String result =
+                "FlavorPriceResult("
+                        + "flavorName="
+                        + flavorName
+                        + ", billingMode="
+                        + billingMode
+                        + ", recurringPrice="
+                        + mockRecurringPrice
+                        + ", oneTimePaymentPrice="
+                        + mockOneTimePaymentPrice
+                        + ", isSuccessful="
+                        + isSuccessful
+                        + ", errorMessage="
+                        + errorMessage
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

@@ -10,19 +10,18 @@ class MonitorResourceTypeEnumConverterTest {
     private final MonitorResourceTypeEnumConverter converterTest =
             new MonitorResourceTypeEnumConverter();
 
-
     @Test
     void testConvert() {
 
-        Assertions.assertEquals(MonitorResourceType.CPU,
-                converterTest.convert("cpu"));
-        Assertions.assertEquals(MonitorResourceType.MEM,
-                converterTest.convert("mem"));
-        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_INCOMING,
+        Assertions.assertEquals(MonitorResourceType.CPU, converterTest.convert("cpu"));
+        Assertions.assertEquals(MonitorResourceType.MEM, converterTest.convert("mem"));
+        Assertions.assertEquals(
+                MonitorResourceType.VM_NETWORK_INCOMING,
                 converterTest.convert("vm_network_incoming"));
-        Assertions.assertEquals(MonitorResourceType.VM_NETWORK_OUTGOING,
+        Assertions.assertEquals(
+                MonitorResourceType.VM_NETWORK_OUTGOING,
                 converterTest.convert("vm_network_outgoing"));
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> converterTest.convert("error_value"));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> converterTest.convert("error_value"));
     }
 }

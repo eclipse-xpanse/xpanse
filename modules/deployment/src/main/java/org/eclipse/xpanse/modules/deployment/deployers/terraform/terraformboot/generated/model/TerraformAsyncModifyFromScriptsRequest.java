@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,63 +22,53 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * TerraformAsyncModifyFromScriptsRequest
- */
+/** TerraformAsyncModifyFromScriptsRequest */
 @JsonPropertyOrder({
-        TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_REQUEST_ID,
-        TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_TERRAFORM_VERSION,
-        TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_IS_PLAN_ONLY,
-        TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_VARIABLES,
-        TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
-        TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_TASK_ID,
-        TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_SCRIPTS,
-        TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_TF_STATE,
-        TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_WEBHOOK_CONFIG
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_REQUEST_ID,
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_TERRAFORM_VERSION,
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_IS_PLAN_ONLY,
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_VARIABLES,
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_TASK_ID,
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_SCRIPTS,
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_TF_STATE,
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformAsyncModifyFromScriptsRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_TERRAFORM_VERSION = "terraformVersion";
-    @jakarta.annotation.Nonnull
-    private String terraformVersion;
+    @jakarta.annotation.Nonnull private String terraformVersion;
 
     public static final String JSON_PROPERTY_IS_PLAN_ONLY = "isPlanOnly";
-    @jakarta.annotation.Nonnull
-    private Boolean isPlanOnly;
+    @jakarta.annotation.Nonnull private Boolean isPlanOnly;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_TASK_ID = "taskId";
-    @jakarta.annotation.Nullable
-    private UUID taskId;
+    @jakarta.annotation.Nullable private UUID taskId;
 
     public static final String JSON_PROPERTY_SCRIPTS = "scripts";
-    @jakarta.annotation.Nonnull
-    private List<String> scripts = new ArrayList<>();
+    @jakarta.annotation.Nonnull private List<String> scripts = new ArrayList<>();
 
     public static final String JSON_PROPERTY_TF_STATE = "tfState";
-    @jakarta.annotation.Nonnull
-    private String tfState;
+    @jakarta.annotation.Nonnull private String tfState;
 
     public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
-    @jakarta.annotation.Nonnull
-    private WebhookConfig webhookConfig;
+    @jakarta.annotation.Nonnull private WebhookConfig webhookConfig;
 
-    public TerraformAsyncModifyFromScriptsRequest() {
-    }
+    public TerraformAsyncModifyFromScriptsRequest() {}
 
-    public TerraformAsyncModifyFromScriptsRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
+    public TerraformAsyncModifyFromScriptsRequest requestId(
+            @jakarta.annotation.Nullable UUID requestId) {
 
         this.requestId = requestId;
         return this;
@@ -93,11 +82,9 @@ public class TerraformAsyncModifyFromScriptsRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -120,11 +107,9 @@ public class TerraformAsyncModifyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTerraformVersion() {
         return terraformVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -132,25 +117,25 @@ public class TerraformAsyncModifyFromScriptsRequest {
         this.terraformVersion = terraformVersion;
     }
 
-    public TerraformAsyncModifyFromScriptsRequest isPlanOnly(@jakarta.annotation.Nonnull Boolean isPlanOnly) {
+    public TerraformAsyncModifyFromScriptsRequest isPlanOnly(
+            @jakarta.annotation.Nonnull Boolean isPlanOnly) {
 
         this.isPlanOnly = isPlanOnly;
         return this;
     }
 
     /**
-     * Flag to control if the deployment must only generate the terraform or it must also apply the changes.
+     * Flag to control if the deployment must only generate the terraform or it must also apply the
+     * changes.
      *
      * @return isPlanOnly
      */
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Boolean getIsPlanOnly() {
         return isPlanOnly;
     }
-
 
     @JsonProperty(JSON_PROPERTY_IS_PLAN_ONLY)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -158,13 +143,15 @@ public class TerraformAsyncModifyFromScriptsRequest {
         this.isPlanOnly = isPlanOnly;
     }
 
-    public TerraformAsyncModifyFromScriptsRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public TerraformAsyncModifyFromScriptsRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
     }
 
-    public TerraformAsyncModifyFromScriptsRequest putVariablesItem(String key, Object variablesItem) {
+    public TerraformAsyncModifyFromScriptsRequest putVariablesItem(
+            String key, Object variablesItem) {
         this.variables.put(key, variablesItem);
         return this;
     }
@@ -177,11 +164,9 @@ public class TerraformAsyncModifyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -196,7 +181,8 @@ public class TerraformAsyncModifyFromScriptsRequest {
         return this;
     }
 
-    public TerraformAsyncModifyFromScriptsRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public TerraformAsyncModifyFromScriptsRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -205,18 +191,17 @@ public class TerraformAsyncModifyFromScriptsRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to terraform process.
+     * Key-value pairs of variables that must be injected as environment variables to terraform
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -238,11 +223,9 @@ public class TerraformAsyncModifyFromScriptsRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_TASK_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getTaskId() {
         return taskId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TASK_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -250,7 +233,8 @@ public class TerraformAsyncModifyFromScriptsRequest {
         this.taskId = taskId;
     }
 
-    public TerraformAsyncModifyFromScriptsRequest scripts(@jakarta.annotation.Nonnull List<String> scripts) {
+    public TerraformAsyncModifyFromScriptsRequest scripts(
+            @jakarta.annotation.Nonnull List<String> scripts) {
 
         this.scripts = scripts;
         return this;
@@ -272,11 +256,9 @@ public class TerraformAsyncModifyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_SCRIPTS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public List<String> getScripts() {
         return scripts;
     }
-
 
     @JsonProperty(JSON_PROPERTY_SCRIPTS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -284,7 +266,8 @@ public class TerraformAsyncModifyFromScriptsRequest {
         this.scripts = scripts;
     }
 
-    public TerraformAsyncModifyFromScriptsRequest tfState(@jakarta.annotation.Nonnull String tfState) {
+    public TerraformAsyncModifyFromScriptsRequest tfState(
+            @jakarta.annotation.Nonnull String tfState) {
 
         this.tfState = tfState;
         return this;
@@ -298,11 +281,9 @@ public class TerraformAsyncModifyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTfState() {
         return tfState;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -325,11 +306,9 @@ public class TerraformAsyncModifyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public WebhookConfig getWebhookConfig() {
         return webhookConfig;
     }
-
 
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -347,20 +326,33 @@ public class TerraformAsyncModifyFromScriptsRequest {
         }
         TerraformAsyncModifyFromScriptsRequest terraformAsyncModifyFromScriptsRequest =
                 (TerraformAsyncModifyFromScriptsRequest) o;
-        return Objects.equals(this.requestId, terraformAsyncModifyFromScriptsRequest.requestId) &&
-                Objects.equals(this.terraformVersion, terraformAsyncModifyFromScriptsRequest.terraformVersion) &&
-                Objects.equals(this.isPlanOnly, terraformAsyncModifyFromScriptsRequest.isPlanOnly) &&
-                Objects.equals(this.variables, terraformAsyncModifyFromScriptsRequest.variables) &&
-                Objects.equals(this.envVariables, terraformAsyncModifyFromScriptsRequest.envVariables) &&
-                Objects.equals(this.taskId, terraformAsyncModifyFromScriptsRequest.taskId) &&
-                Objects.equals(this.scripts, terraformAsyncModifyFromScriptsRequest.scripts) &&
-                Objects.equals(this.tfState, terraformAsyncModifyFromScriptsRequest.tfState) &&
-                Objects.equals(this.webhookConfig, terraformAsyncModifyFromScriptsRequest.webhookConfig);
+        return Objects.equals(this.requestId, terraformAsyncModifyFromScriptsRequest.requestId)
+                && Objects.equals(
+                        this.terraformVersion,
+                        terraformAsyncModifyFromScriptsRequest.terraformVersion)
+                && Objects.equals(
+                        this.isPlanOnly, terraformAsyncModifyFromScriptsRequest.isPlanOnly)
+                && Objects.equals(this.variables, terraformAsyncModifyFromScriptsRequest.variables)
+                && Objects.equals(
+                        this.envVariables, terraformAsyncModifyFromScriptsRequest.envVariables)
+                && Objects.equals(this.taskId, terraformAsyncModifyFromScriptsRequest.taskId)
+                && Objects.equals(this.scripts, terraformAsyncModifyFromScriptsRequest.scripts)
+                && Objects.equals(this.tfState, terraformAsyncModifyFromScriptsRequest.tfState)
+                && Objects.equals(
+                        this.webhookConfig, terraformAsyncModifyFromScriptsRequest.webhookConfig);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, terraformVersion, isPlanOnly, variables, envVariables, taskId, scripts, tfState,
+        return Objects.hash(
+                requestId,
+                terraformVersion,
+                isPlanOnly,
+                variables,
+                envVariables,
+                taskId,
+                scripts,
+                tfState,
                 webhookConfig);
     }
 
@@ -382,8 +374,8 @@ public class TerraformAsyncModifyFromScriptsRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -391,6 +383,4 @@ public class TerraformAsyncModifyFromScriptsRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

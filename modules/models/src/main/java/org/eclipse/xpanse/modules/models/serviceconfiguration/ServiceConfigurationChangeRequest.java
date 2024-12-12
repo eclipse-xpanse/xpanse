@@ -10,9 +10,7 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.servicetemplate.AnsibleScriptConfig;
 
-/**
- * Request object to update service configuration.
- */
+/** Request object to update service configuration. */
 @Data
 public class ServiceConfigurationChangeRequest {
 

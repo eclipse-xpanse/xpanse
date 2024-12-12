@@ -18,9 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Implementation of the ServiceDeploymentStorage.
- */
+/** Implementation of the ServiceDeploymentStorage. */
 @Component
 @Transactional
 public class DatabaseServiceDeploymentStorage implements ServiceDeploymentStorage {
@@ -50,49 +48,58 @@ public class DatabaseServiceDeploymentStorage implements ServiceDeploymentStorag
      * @return Returns the database entry for the provided arguments.
      */
     @Override
-    public List<ServiceDeploymentEntity> listServices(
-            ServiceQueryModel serviceQuery) {
+    public List<ServiceDeploymentEntity> listServices(ServiceQueryModel serviceQuery) {
 
         Specification<ServiceDeploymentEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(serviceQuery.getServiceTemplateId())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("serviceTemplateId"),
-                                serviceQuery.getServiceTemplateId()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("serviceTemplateId"),
+                                        serviceQuery.getServiceTemplateId()));
                     }
                     if (Objects.nonNull(serviceQuery.getCategory())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("category"),
-                                serviceQuery.getCategory()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("category"), serviceQuery.getCategory()));
                     }
                     if (Objects.nonNull(serviceQuery.getCsp())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("csp"),
-                                serviceQuery.getCsp()));
+                        predicateList.add(
+                                criteriaBuilder.equal(root.get("csp"), serviceQuery.getCsp()));
                     }
                     if (StringUtils.isNotBlank(serviceQuery.getServiceName())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("name"),
-                                StringUtils.lowerCase(serviceQuery.getServiceName())));
-
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("name"),
+                                        StringUtils.lowerCase(serviceQuery.getServiceName())));
                     }
                     if (StringUtils.isNotBlank(serviceQuery.getServiceVersion())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("version"),
-                                StringUtils.lowerCase(serviceQuery.getServiceVersion())));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("version"),
+                                        StringUtils.lowerCase(serviceQuery.getServiceVersion())));
                     }
 
                     if (Objects.nonNull(serviceQuery.getServiceState())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("serviceDeploymentState"),
-                                serviceQuery.getServiceState()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("serviceDeploymentState"),
+                                        serviceQuery.getServiceState()));
                     }
                     predicateList.add(
                             criteriaBuilder.isNotNull(root.get("serviceDeploymentState")));
 
                     if (Objects.nonNull(serviceQuery.getUserId())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("userId"),
-                                serviceQuery.getUserId()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("userId"), serviceQuery.getUserId()));
                     }
 
                     if (Objects.nonNull(serviceQuery.getNamespace())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("namespace"),
-                                serviceQuery.getNamespace()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("namespace"), serviceQuery.getNamespace()));
                     }
 
                     query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
@@ -114,8 +121,7 @@ public class DatabaseServiceDeploymentStorage implements ServiceDeploymentStorag
      */
     @Override
     public ServiceDeploymentEntity findServiceDeploymentById(UUID id) {
-        Optional<ServiceDeploymentEntity> optional =
-                this.serviceDeploymentRepository.findById(id);
+        Optional<ServiceDeploymentEntity> optional = this.serviceDeploymentRepository.findById(id);
         return optional.orElse(null);
     }
 

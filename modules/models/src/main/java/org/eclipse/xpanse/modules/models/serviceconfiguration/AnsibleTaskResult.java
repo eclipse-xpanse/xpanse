@@ -7,9 +7,7 @@ package org.eclipse.xpanse.modules.models.serviceconfiguration;
 
 import lombok.Data;
 
-/**
- * The result of ansible task.
- */
+/** The result of ansible task. */
 @Data
 public class AnsibleTaskResult {
     private String name;

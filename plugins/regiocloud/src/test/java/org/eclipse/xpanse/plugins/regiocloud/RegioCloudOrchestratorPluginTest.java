@@ -59,26 +59,18 @@ class RegioCloudOrchestratorPluginTest {
     private final String siteName = "default";
     private final String regionName = "RegionOne";
     private final UUID uuid = UUID.randomUUID();
-    @Mock
-    private OpenstackTerraformResourceHandler mockTerraformResourceHandler;
-    @Mock
-    private OpenstackServersManager mockServersManager;
-    @Mock
-    private OpenstackResourceManager mockResourceManager;
-    @Mock
-    private OpenstackServicePriceCalculator mockPricingCalculator;
-    @Mock
-    private ProviderAuthInfoResolver mockProviderAuthInfoResolver;
-    @Mock
-    private Environment mockEnvironment;
+    @Mock private OpenstackTerraformResourceHandler mockTerraformResourceHandler;
+    @Mock private OpenstackServersManager mockServersManager;
+    @Mock private OpenstackResourceManager mockResourceManager;
+    @Mock private OpenstackServicePriceCalculator mockPricingCalculator;
+    @Mock private ProviderAuthInfoResolver mockProviderAuthInfoResolver;
+    @Mock private Environment mockEnvironment;
 
-    @InjectMocks
-    private RegioCloudOrchestratorPlugin plugin;
+    @InjectMocks private RegioCloudOrchestratorPlugin plugin;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(plugin,
-                "autoApproveServiceTemplateEnabled", false);
+        ReflectionTestUtils.setField(plugin, "autoApproveServiceTemplateEnabled", false);
     }
 
     @Test
@@ -114,9 +106,10 @@ class RegioCloudOrchestratorPluginTest {
         // Run the test
         final Map<DeployerKind, DeployResourceHandler> result = plugin.resourceHandlers();
         // Verify the results
-        result.forEach((key, value) -> {
-            assertThat(value).isInstanceOf(OpenstackTerraformResourceHandler.class);
-        });
+        result.forEach(
+                (key, value) -> {
+                    assertThat(value).isInstanceOf(OpenstackTerraformResourceHandler.class);
+                });
     }
 
     @Test
@@ -167,8 +160,7 @@ class RegioCloudOrchestratorPluginTest {
     void testGetCredentialDefinitions() {
         // Setup
         // Run the test
-        final List<AbstractCredentialInfo> result =
-                plugin.getCredentialDefinitions();
+        final List<AbstractCredentialInfo> result = plugin.getCredentialDefinitions();
         // Verify the results
         assertThat(result).isNotEmpty();
         assertThat(result.getFirst().getCsp()).isEqualTo(csp);
@@ -178,12 +170,14 @@ class RegioCloudOrchestratorPluginTest {
     @Test
     void testGetExistingResourceNamesWithKind() {
         // Setup
-        when(mockResourceManager.getExistingResourceNamesWithKind(csp, siteName, regionName, userId,
-                DeployResourceKind.VM, uuid)).thenReturn(List.of("value"));
+        when(mockResourceManager.getExistingResourceNamesWithKind(
+                        csp, siteName, regionName, userId, DeployResourceKind.VM, uuid))
+                .thenReturn(List.of("value"));
 
         // Run the test
-        final List<String> result = plugin.getExistingResourceNamesWithKind(
-                siteName, regionName, userId, DeployResourceKind.VM, uuid);
+        final List<String> result =
+                plugin.getExistingResourceNamesWithKind(
+                        siteName, regionName, userId, DeployResourceKind.VM, uuid);
 
         // Verify the results
         assertThat(result).isEqualTo(List.of("value"));
@@ -192,12 +186,14 @@ class RegioCloudOrchestratorPluginTest {
     @Test
     void testGetExistingResourceNamesWithKind_OpenstackResourceManagerReturnsNoItems() {
         // Setup
-        when(mockResourceManager.getExistingResourceNamesWithKind(csp, siteName, regionName, userId,
-                DeployResourceKind.VM, uuid)).thenReturn(Collections.emptyList());
+        when(mockResourceManager.getExistingResourceNamesWithKind(
+                        csp, siteName, regionName, userId, DeployResourceKind.VM, uuid))
+                .thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<String> result = plugin.getExistingResourceNamesWithKind(
-                siteName, regionName, userId, DeployResourceKind.VM, uuid);
+        final List<String> result =
+                plugin.getExistingResourceNamesWithKind(
+                        siteName, regionName, userId, DeployResourceKind.VM, uuid);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -207,11 +203,12 @@ class RegioCloudOrchestratorPluginTest {
     void testGetAvailabilityZonesOfRegion() {
         // Setup
         when(mockResourceManager.getAvailabilityZonesOfRegion(
-                csp, siteName, regionName, userId, uuid, null)).thenReturn(List.of("value"));
+                        csp, siteName, regionName, userId, uuid, null))
+                .thenReturn(List.of("value"));
 
         // Run the test
-        final List<String> result = plugin.getAvailabilityZonesOfRegion(
-                siteName, regionName, userId, uuid, null);
+        final List<String> result =
+                plugin.getAvailabilityZonesOfRegion(siteName, regionName, userId, uuid, null);
 
         // Verify the results
         assertThat(result).isEqualTo(List.of("value"));
@@ -221,11 +218,12 @@ class RegioCloudOrchestratorPluginTest {
     void testGetAvailabilityZonesOfRegion_OpenstackResourceManagerReturnsNoItems() {
         // Setup
         when(mockResourceManager.getAvailabilityZonesOfRegion(
-                csp, siteName, regionName, userId, uuid, null)).thenReturn(Collections.emptyList());
+                        csp, siteName, regionName, userId, uuid, null))
+                .thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<String> result = plugin.getAvailabilityZonesOfRegion(
-                siteName, regionName, userId, uuid, null);
+        final List<String> result =
+                plugin.getAvailabilityZonesOfRegion(siteName, regionName, userId, uuid, null);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -233,16 +231,36 @@ class RegioCloudOrchestratorPluginTest {
 
     @Test
     void testGetMetricsForResource() {
-        assertThat(plugin.getMetricsForResource(new ResourceMetricsRequest(uuid, getRegion(),
-                new DeployResource(), MonitorResourceType.CPU, 0L, 0L, 0, false,
-                userId))).isEqualTo(Collections.emptyList());
+        assertThat(
+                        plugin.getMetricsForResource(
+                                new ResourceMetricsRequest(
+                                        uuid,
+                                        getRegion(),
+                                        new DeployResource(),
+                                        MonitorResourceType.CPU,
+                                        0L,
+                                        0L,
+                                        0,
+                                        false,
+                                        userId)))
+                .isEqualTo(Collections.emptyList());
     }
 
     @Test
     void testGetMetricsForService() {
-        assertThat(plugin.getMetricsForService(new ServiceMetricsRequest(uuid, getRegion(),
-                List.of(new DeployResource()), MonitorResourceType.CPU, 0L, 0L, 0, false,
-                userId))).isEqualTo(Collections.emptyList());
+        assertThat(
+                        plugin.getMetricsForService(
+                                new ServiceMetricsRequest(
+                                        uuid,
+                                        getRegion(),
+                                        List.of(new DeployResource()),
+                                        MonitorResourceType.CPU,
+                                        0L,
+                                        0L,
+                                        0,
+                                        false,
+                                        userId)))
+                .isEqualTo(Collections.emptyList());
     }
 
     @Test
@@ -267,8 +285,7 @@ class RegioCloudOrchestratorPluginTest {
         when(mockServersManager.startService(csp, request)).thenReturn(false);
 
         // Run the test
-        final boolean result =
-                plugin.startService(serviceStateManageRequest);
+        final boolean result = plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -296,8 +313,7 @@ class RegioCloudOrchestratorPluginTest {
         when(mockServersManager.startService(csp, request)).thenReturn(true);
 
         // Run the test
-        final boolean result =
-                plugin.startService(serviceStateManageRequest);
+        final boolean result = plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -325,8 +341,7 @@ class RegioCloudOrchestratorPluginTest {
         when(mockServersManager.stopService(csp, request)).thenReturn(false);
 
         // Run the test
-        final boolean result =
-                plugin.stopService(serviceStateManageRequest);
+        final boolean result = plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -354,8 +369,7 @@ class RegioCloudOrchestratorPluginTest {
         when(mockServersManager.stopService(csp, request)).thenReturn(true);
 
         // Run the test
-        final boolean result =
-                plugin.stopService(serviceStateManageRequest);
+        final boolean result = plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -383,8 +397,7 @@ class RegioCloudOrchestratorPluginTest {
         when(mockServersManager.restartService(csp, request)).thenReturn(false);
 
         // Run the test
-        final boolean result =
-                plugin.restartService(serviceStateManageRequest);
+        final boolean result = plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -412,8 +425,7 @@ class RegioCloudOrchestratorPluginTest {
         when(mockServersManager.restartService(csp, request)).thenReturn(true);
 
         // Run the test
-        final boolean result =
-                plugin.restartService(serviceStateManageRequest);
+        final boolean result = plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -474,8 +486,7 @@ class RegioCloudOrchestratorPluginTest {
         when(mockPricingCalculator.getServiceFlavorPrice(request1)).thenReturn(flavorPriceResult);
 
         // Run the test
-        final FlavorPriceResult result =
-                plugin.getServiceFlavorPrice(request);
+        final FlavorPriceResult result = plugin.getServiceFlavorPrice(request);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);

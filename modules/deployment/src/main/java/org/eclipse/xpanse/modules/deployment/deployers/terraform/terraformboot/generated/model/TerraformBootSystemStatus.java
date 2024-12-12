@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -20,18 +19,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Objects;
 
-/**
- * TerraformBootSystemStatus
- */
-@JsonPropertyOrder({
-        TerraformBootSystemStatus.JSON_PROPERTY_HEALTH_STATUS
-})
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+/** TerraformBootSystemStatus */
+@JsonPropertyOrder({TerraformBootSystemStatus.JSON_PROPERTY_HEALTH_STATUS})
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformBootSystemStatus {
-    /**
-     * The health status of Xpanse api service.
-     */
+    /** The health status of Xpanse api service. */
     public enum HealthStatusEnum {
         OK(String.valueOf("OK")),
 
@@ -65,13 +59,12 @@ public class TerraformBootSystemStatus {
     }
 
     public static final String JSON_PROPERTY_HEALTH_STATUS = "healthStatus";
-    @jakarta.annotation.Nonnull
-    private HealthStatusEnum healthStatus;
+    @jakarta.annotation.Nonnull private HealthStatusEnum healthStatus;
 
-    public TerraformBootSystemStatus() {
-    }
+    public TerraformBootSystemStatus() {}
 
-    public TerraformBootSystemStatus healthStatus(@jakarta.annotation.Nonnull HealthStatusEnum healthStatus) {
+    public TerraformBootSystemStatus healthStatus(
+            @jakarta.annotation.Nonnull HealthStatusEnum healthStatus) {
 
         this.healthStatus = healthStatus;
         return this;
@@ -85,7 +78,6 @@ public class TerraformBootSystemStatus {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_HEALTH_STATUS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public HealthStatusEnum getHealthStatus() {
         return healthStatus;
     }
@@ -123,8 +115,8 @@ public class TerraformBootSystemStatus {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -132,6 +124,4 @@ public class TerraformBootSystemStatus {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

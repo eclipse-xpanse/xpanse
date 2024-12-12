@@ -37,23 +37,16 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Bean to manage all methods used for viewing deployed service details.
- */
+/** Bean to manage all methods used for viewing deployed service details. */
 @Slf4j
 @Component
 public class ServiceDetailsViewManager {
 
-    @Resource
-    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Resource
-    private UserServiceHelper userServiceHelper;
-    @Resource
-    private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource
-    private ServiceTemplateStorage serviceTemplateStorage;
-    @Resource
-    private ServiceResultReFetchManager serviceResultReFetchManager;
+    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @Resource private UserServiceHelper userServiceHelper;
+    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource private ServiceResultReFetchManager serviceResultReFetchManager;
 
     /**
      * Get deploy service detail by id.
@@ -71,30 +64,34 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        boolean isManagedByCurrentUser = userServiceHelper
-                .currentUserCanManageNamespace(serviceDeploymentEntity.getNamespace());
+        boolean isManagedByCurrentUser =
+                userServiceHelper.currentUserCanManageNamespace(
+                        serviceDeploymentEntity.getNamespace());
         if (!isManagedByCurrentUser) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
-        serviceResultReFetchManager
-                .refetchDeploymentStateForMissingOrdersFromDeployers(serviceDeploymentEntity);
+        serviceResultReFetchManager.refetchDeploymentStateForMissingOrdersFromDeployers(
+                serviceDeploymentEntity);
         return EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
     }
 
     /**
      * List deploy services with query model.
      *
-     * @param category       of the services to be filtered.
-     * @param csp            of the services to be filtered.
-     * @param serviceName    of the services to be filtered.
+     * @param category of the services to be filtered.
+     * @param csp of the services to be filtered.
+     * @param serviceName of the services to be filtered.
      * @param serviceVersion of the services to be filtered.
-     * @param state          of the services to be filtered.
+     * @param state of the services to be filtered.
      * @return serviceVos
      */
-    public List<DeployedService> listDeployedServices(Category category, Csp csp,
-                                                      String serviceName, String serviceVersion,
-                                                      ServiceDeploymentState state) {
+    public List<DeployedService> listDeployedServices(
+            Category category,
+            Csp csp,
+            String serviceName,
+            String serviceVersion,
+            ServiceDeploymentState state) {
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
         String currentUserId = userServiceHelper.getCurrentUserId();
@@ -102,26 +99,28 @@ public class ServiceDetailsViewManager {
         List<ServiceDeploymentEntity> serviceDeploymentEntities =
                 serviceDeploymentStorage.listServices(query);
         serviceDeploymentEntities.forEach(
-                serviceDeployment
-                        -> serviceResultReFetchManager
-                            .refetchDeploymentStateForMissingOrdersFromDeployers(serviceDeployment)
-        );
+                serviceDeployment ->
+                        serviceResultReFetchManager
+                                .refetchDeploymentStateForMissingOrdersFromDeployers(
+                                        serviceDeployment));
         return setServiceConfigurationForDeployedServiceList(serviceDeploymentEntities);
     }
 
     /**
      * List all deployed services details.
      *
-     * @param category       of the services to be filtered.
-     * @param csp            of the services to be filtered.
-     * @param serviceName    of the services to be filtered.
+     * @param category of the services to be filtered.
+     * @param csp of the services to be filtered.
+     * @param serviceName of the services to be filtered.
      * @param serviceVersion of the services to be filtered.
      * @return serviceVos
      */
-    public List<DeployedService> listDeployedServicesDetails(Category category, Csp csp,
-                                                             String serviceName,
-                                                             String serviceVersion,
-                                                             ServiceDeploymentState serviceState) {
+    public List<DeployedService> listDeployedServicesDetails(
+            Category category,
+            Csp csp,
+            String serviceName,
+            String serviceVersion,
+            ServiceDeploymentState serviceState) {
         List<DeployedService> servicesDetails = new ArrayList<>();
         List<DeployedService> services =
                 listDeployedServices(category, csp, serviceName, serviceVersion, serviceState);
@@ -159,13 +158,15 @@ public class ServiceDetailsViewManager {
         ServiceHostingType serviceHostingType =
                 serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SELF != serviceHostingType) {
-            String errorMsg = String.format(
-                    "details of non service-self hosted with id %s is not " + "accessible", id);
+            String errorMsg =
+                    String.format(
+                            "details of non service-self hosted with id %s is not " + "accessible",
+                            id);
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        serviceResultReFetchManager
-                .refetchDeploymentStateForMissingOrdersFromDeployers(serviceDeploymentEntity);
+        serviceResultReFetchManager.refetchDeploymentStateForMissingOrdersFromDeployers(
+                serviceDeploymentEntity);
         DeployedServiceDetails details =
                 EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
         setServiceConfigurationDetailsForDeployedService(details);
@@ -190,8 +191,10 @@ public class ServiceDetailsViewManager {
         ServiceHostingType serviceHostingType =
                 serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
-            String errorMsg = String.format(
-                    "details of non service-vendor hosted with id %s is not accessible", id);
+            String errorMsg =
+                    String.format(
+                            "details of non service-vendor hosted with id %s is not accessible",
+                            id);
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
@@ -204,17 +207,19 @@ public class ServiceDetailsViewManager {
     /**
      * Use query model to list SV deployment services.
      *
-     * @param category       of the services to be filtered.
-     * @param csp            of the services to be filtered.
-     * @param serviceName    of the services to be filtered.
+     * @param category of the services to be filtered.
+     * @param csp of the services to be filtered.
+     * @param serviceName of the services to be filtered.
      * @param serviceVersion of the services to be filtered.
-     * @param state          of the services to be filtered.
+     * @param state of the services to be filtered.
      * @return serviceVos
      */
-    public List<DeployedService> listDeployedServicesOfIsv(Category category, Csp csp,
-                                                           String serviceName,
-                                                           String serviceVersion,
-                                                           ServiceDeploymentState state) {
+    public List<DeployedService> listDeployedServicesOfIsv(
+            Category category,
+            Csp csp,
+            String serviceName,
+            String serviceVersion,
+            ServiceDeploymentState state) {
 
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
@@ -222,69 +227,76 @@ public class ServiceDetailsViewManager {
         query.setNamespace(namespace);
         List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
         deployServices.forEach(
-                serviceDeployment
-                        -> serviceResultReFetchManager
-                        .refetchDeploymentStateForMissingOrdersFromDeployers(serviceDeployment)
-        );
+                serviceDeployment ->
+                        serviceResultReFetchManager
+                                .refetchDeploymentStateForMissingOrdersFromDeployers(
+                                        serviceDeployment));
         return setServiceConfigurationForDeployedServiceList(deployServices);
     }
 
     private List<DeployedService> setServiceConfigurationForDeployedServiceList(
             List<ServiceDeploymentEntity> deployServices) {
         return deployServices.stream()
-                .map(serviceDeployment -> {
-                    DeployedService deployedService =
-                            EntityTransUtils.convertToDeployedService(serviceDeployment);
-                    if (Objects.nonNull(deployedService)) {
-                        setServiceConfigurationDetailsForDeployedService(deployedService);
-                    }
-                    return deployedService;
-                }).toList();
+                .map(
+                        serviceDeployment -> {
+                            DeployedService deployedService =
+                                    EntityTransUtils.convertToDeployedService(serviceDeployment);
+                            if (Objects.nonNull(deployedService)) {
+                                setServiceConfigurationDetailsForDeployedService(deployedService);
+                            }
+                            return deployedService;
+                        })
+                .toList();
     }
 
     private void setServiceConfigurationDetailsForDeployedService(DeployedService deployedService) {
-        ServiceTemplateEntity serviceTemplate = serviceTemplateStorage
-                .getServiceTemplateById(deployedService.getServiceTemplateId());
+        ServiceTemplateEntity serviceTemplate =
+                serviceTemplateStorage.getServiceTemplateById(
+                        deployedService.getServiceTemplateId());
         if (Objects.nonNull(serviceTemplate)
-                && Objects.nonNull(serviceTemplate
-                .getOcl().getServiceConfigurationManage())) {
+                && Objects.nonNull(serviceTemplate.getOcl().getServiceConfigurationManage())) {
             List<ServiceConfigurationParameter> configurationParameters =
-                    serviceTemplate.getOcl()
+                    serviceTemplate
+                            .getOcl()
                             .getServiceConfigurationManage()
                             .getConfigurationParameters();
             Map<String, Object> configuration =
                     Objects.isNull(deployedService.getServiceConfigurationDetails())
                             ? null
-                            : deployedService.getServiceConfigurationDetails()
-                            .getConfiguration();
+                            : deployedService.getServiceConfigurationDetails().getConfiguration();
             ServiceConfigurationDetails details =
                     mergeConfigurationParametersFromTemplate(
-                            configurationParameters, configuration,
+                            configurationParameters,
+                            configuration,
                             serviceTemplate.getLastModifiedTime());
             deployedService.setServiceConfigurationDetails(details);
         }
     }
 
     /**
-     * Method to dynamically merge and generate the current configuration of
-     * a service in case the service configuration parameters have been updated
-     * in the template by the ISV after a service was deployed.
+     * Method to dynamically merge and generate the current configuration of a service in case the
+     * service configuration parameters have been updated in the template by the ISV after a service
+     * was deployed.
      */
     private ServiceConfigurationDetails mergeConfigurationParametersFromTemplate(
-            List<ServiceConfigurationParameter> parameters, Map<String, Object> configuration,
+            List<ServiceConfigurationParameter> parameters,
+            Map<String, Object> configuration,
             OffsetDateTime updateTime) {
         Map<String, Object> configurationParameterMap = new HashMap<>();
-        parameters.forEach(configurationParameter -> {
-            configurationParameterMap.put(configurationParameter.getName(),
-                    configurationParameter.getInitialValue());
-        });
+        parameters.forEach(
+                configurationParameter -> {
+                    configurationParameterMap.put(
+                            configurationParameter.getName(),
+                            configurationParameter.getInitialValue());
+                });
         if (!CollectionUtils.isEmpty(configuration)) {
-            configurationParameterMap.forEach((k, v) -> {
-                if (configuration.containsKey(k)) {
-                    // override the value with the configuration table value.
-                    configurationParameterMap.put(k, configuration.get(k));
-                }
-            });
+            configurationParameterMap.forEach(
+                    (k, v) -> {
+                        if (configuration.containsKey(k)) {
+                            // override the value with the configuration table value.
+                            configurationParameterMap.put(k, configuration.get(k));
+                        }
+                    });
         }
         ServiceConfigurationDetails details = new ServiceConfigurationDetails();
         details.setConfiguration(configurationParameterMap);
@@ -292,9 +304,12 @@ public class ServiceDetailsViewManager {
         return details;
     }
 
-    private ServiceQueryModel getServiceQueryModel(Category category, Csp csp, String serviceName,
-                                                   String serviceVersion,
-                                                   ServiceDeploymentState state) {
+    private ServiceQueryModel getServiceQueryModel(
+            Category category,
+            Csp csp,
+            String serviceName,
+            String serviceVersion,
+            ServiceDeploymentState state) {
         ServiceQueryModel query = new ServiceQueryModel();
         if (Objects.nonNull(category)) {
             query.setCategory(category);
@@ -313,5 +328,4 @@ public class ServiceDetailsViewManager {
         }
         return query;
     }
-
 }

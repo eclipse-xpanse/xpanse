@@ -12,9 +12,7 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 
-/**
- * Service management request class.
- */
+/** Service management request class. */
 @Data
 public class ServiceStateManageRequest {
 
@@ -22,5 +20,4 @@ public class ServiceStateManageRequest {
     private Region region;
     private List<ServiceResourceEntity> serviceResourceEntityList;
     private UUID serviceId;
-
 }

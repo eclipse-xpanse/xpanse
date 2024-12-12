@@ -12,35 +12,42 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of ServiceDeploymentStateTest.
- */
+/** Test of ServiceDeploymentStateTest. */
 class ServiceDeploymentStateTest {
     @Test
     void testGetByValue() {
-        assertEquals(ServiceDeploymentState.DEPLOYING,
-                ServiceDeploymentState.getByValue("deploying"));
-        assertEquals(ServiceDeploymentState.DEPLOY_SUCCESS,
+        assertEquals(
+                ServiceDeploymentState.DEPLOYING, ServiceDeploymentState.getByValue("deploying"));
+        assertEquals(
+                ServiceDeploymentState.DEPLOY_SUCCESS,
                 ServiceDeploymentState.getByValue("deployment successful"));
-        assertEquals(ServiceDeploymentState.DEPLOY_FAILED,
+        assertEquals(
+                ServiceDeploymentState.DEPLOY_FAILED,
                 ServiceDeploymentState.getByValue("deployment failed"));
-        assertEquals(ServiceDeploymentState.MODIFYING,
-                ServiceDeploymentState.getByValue("modifying"));
-        assertEquals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL,
+        assertEquals(
+                ServiceDeploymentState.MODIFYING, ServiceDeploymentState.getByValue("modifying"));
+        assertEquals(
+                ServiceDeploymentState.MODIFICATION_SUCCESSFUL,
                 ServiceDeploymentState.getByValue("modification successful"));
-        assertEquals(ServiceDeploymentState.MODIFICATION_FAILED,
+        assertEquals(
+                ServiceDeploymentState.MODIFICATION_FAILED,
                 ServiceDeploymentState.getByValue("modification failed"));
-        assertEquals(ServiceDeploymentState.DESTROYING,
-                ServiceDeploymentState.getByValue("destroying"));
-        assertEquals(ServiceDeploymentState.DESTROY_SUCCESS,
+        assertEquals(
+                ServiceDeploymentState.DESTROYING, ServiceDeploymentState.getByValue("destroying"));
+        assertEquals(
+                ServiceDeploymentState.DESTROY_SUCCESS,
                 ServiceDeploymentState.getByValue("destroy successful"));
-        assertEquals(ServiceDeploymentState.DESTROY_FAILED,
+        assertEquals(
+                ServiceDeploymentState.DESTROY_FAILED,
                 ServiceDeploymentState.getByValue("destroy failed"));
-        assertEquals(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED,
+        assertEquals(
+                ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED,
                 ServiceDeploymentState.getByValue("manual cleanup required"));
-        assertEquals(ServiceDeploymentState.ROLLBACK_FAILED,
+        assertEquals(
+                ServiceDeploymentState.ROLLBACK_FAILED,
                 ServiceDeploymentState.getByValue("rollback failed"));
-        assertThrows(UnsupportedEnumValueException.class,
+        assertThrows(
+                UnsupportedEnumValueException.class,
                 () -> ServiceDeploymentState.getByValue("unavailable"));
     }
 
@@ -50,15 +57,16 @@ class ServiceDeploymentStateTest {
         assertEquals("deployment successful", ServiceDeploymentState.DEPLOY_SUCCESS.toValue());
         assertEquals("deployment failed", ServiceDeploymentState.DEPLOY_FAILED.toValue());
         assertEquals("modifying", ServiceDeploymentState.MODIFYING.toValue());
-        assertEquals("modification successful",
+        assertEquals(
+                "modification successful",
                 ServiceDeploymentState.MODIFICATION_SUCCESSFUL.toValue());
         assertEquals("modification failed", ServiceDeploymentState.MODIFICATION_FAILED.toValue());
         assertEquals("destroying", ServiceDeploymentState.DESTROYING.toValue());
         assertEquals("destroy successful", ServiceDeploymentState.DESTROY_SUCCESS.toValue());
         assertEquals("destroy failed", ServiceDeploymentState.DESTROY_FAILED.toValue());
-        assertEquals("manual cleanup required",
+        assertEquals(
+                "manual cleanup required",
                 ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED.toValue());
         assertEquals("rollback failed", ServiceDeploymentState.ROLLBACK_FAILED.toValue());
     }
-
 }

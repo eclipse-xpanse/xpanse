@@ -29,25 +29,24 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDat
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * AES encryption tool class.
- */
+/** AES encryption tool class. */
 @Slf4j
 @Component
 public class AesUtil {
 
     @Value("${aes.key.file.name}")
     private String aesKeyFileName;
+
     @Value("${aes.algorithm.type}")
     private String algorithmType;
+
     @Value("${aes.key.vi}")
     private String vi;
+
     @Value("${aes.cipher.algorithm}")
     private String cipherAlgorithm;
 
-    /**
-     * AES encryption.
-     */
+    /** AES encryption. */
     public String encode(String content) {
         try {
             if (aesIsDisabled()) {
@@ -68,9 +67,7 @@ public class AesUtil {
         return content;
     }
 
-    /**
-     * AES decryption.
-     */
+    /** AES decryption. */
     public String decode(String content) {
         try {
             if (aesIsDisabled()) {
@@ -96,12 +93,11 @@ public class AesUtil {
      * back to its actual type.
      *
      * @param deployVariableDataType type of the data variable that is encoded.
-     * @param content                encoded string
+     * @param content encoded string
      * @return returns decoded value and the type converted based on the original data.
      */
-
-    public Object decodeBackToOriginalType(DeployVariableDataType deployVariableDataType,
-                                           String content) {
+    public Object decodeBackToOriginalType(
+            DeployVariableDataType deployVariableDataType, String content) {
         String decodedContent = decode(content);
         switch (deployVariableDataType) {
             case NUMBER -> {
@@ -118,27 +114,27 @@ public class AesUtil {
 
     private Cipher getCipher(int mode) {
         Cipher cipher;
-        try (InputStream is = new FileInputStream(
-                System.getProperty("user.dir") + File.separator + aesKeyFileName)) {
+        try (InputStream is =
+                new FileInputStream(
+                        System.getProperty("user.dir") + File.separator + aesKeyFileName)) {
             byte[] bytes = new byte[is.available()];
             SecretKey secretKey = new SecretKeySpec(bytes, algorithmType);
             cipher = Cipher.getInstance(cipherAlgorithm);
             cipher.init(mode, secretKey, new IvParameterSpec(vi.getBytes()));
             return cipher;
-        } catch (IOException | InvalidAlgorithmParameterException | NoSuchPaddingException
-                 | NoSuchAlgorithmException | InvalidKeyException e) {
+        } catch (IOException
+                | InvalidAlgorithmParameterException
+                | NoSuchPaddingException
+                | NoSuchAlgorithmException
+                | InvalidKeyException e) {
             log.error("get Cipher error ", e);
         }
         return null;
     }
 
-    /**
-     * Whether to enable AES encryption and decryption.
-     */
+    /** Whether to enable AES encryption and decryption. */
     private boolean aesIsDisabled() {
-        File file = new File(System.getProperty("user.dir")
-                + File.separator + aesKeyFileName);
+        File file = new File(System.getProperty("user.dir") + File.separator + aesKeyFileName);
         return !file.exists() || file.length() == 0;
     }
-
 }

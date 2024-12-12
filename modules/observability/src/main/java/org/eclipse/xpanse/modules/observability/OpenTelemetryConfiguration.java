@@ -14,8 +14,8 @@ import org.springframework.core.ParameterNameDiscoverer;
 
 /**
  * Configuration to workaround issues with ParameterNameDiscoverer bean which is instantiated by
- * multiple libraries. Hence, this class defines a primary bean which will solve the duplicate
- * bean exception.
+ * multiple libraries. Hence, this class defines a primary bean which will solve the duplicate bean
+ * exception.
  */
 @Configuration
 public class OpenTelemetryConfiguration {
@@ -26,5 +26,4 @@ public class OpenTelemetryConfiguration {
     ParameterNameDiscoverer parameterNameDiscoverer() {
         return new DefaultParameterNameDiscoverer();
     }
-
 }

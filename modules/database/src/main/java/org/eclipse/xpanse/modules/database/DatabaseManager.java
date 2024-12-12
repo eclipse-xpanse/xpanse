@@ -12,9 +12,7 @@ import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * Service for managing database.
- */
+/** Service for managing database. */
 @Component
 public class DatabaseManager {
 

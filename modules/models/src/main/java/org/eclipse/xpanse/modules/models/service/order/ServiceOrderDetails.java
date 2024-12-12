@@ -23,9 +23,7 @@ import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 
-/**
- * Define view object for details of the service order.
- */
+/** Define view object for details of the service order. */
 @Data
 public class ServiceOrderDetails {
 

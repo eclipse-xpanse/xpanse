@@ -5,13 +5,10 @@
 
 package org.eclipse.xpanse.modules.models.billing.exceptions;
 
-/**
- * Exception thrown when calculating the service price failed.
- */
+/** Exception thrown when calculating the service price failed. */
 public class ServicePriceCalculationFailed extends RuntimeException {
 
     public ServicePriceCalculationFailed(String message) {
         super(message);
     }
 }
-

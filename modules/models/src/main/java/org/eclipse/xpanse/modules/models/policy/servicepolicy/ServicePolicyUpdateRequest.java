@@ -3,7 +3,6 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-
 package org.eclipse.xpanse.modules.models.policy.servicepolicy;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,30 +10,23 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Data;
 
-/**
- * The model for updating the policy.
- */
+/** The model for updating the policy. */
 @Data
 public class ServicePolicyUpdateRequest {
-    /**
-     * The flavor name list which the policy belongs to.
-     */
+    /** The flavor name list which the policy belongs to. */
     @Size(min = 1)
-    @Schema(description =
-            "The flavor name list which the policy belongs to. If the list is empty, then the "
-                    + "policy will be executed for during service deployment of all flavors.")
+    @Schema(
+            description =
+                    "The flavor name list which the policy belongs to. If the list is empty, then"
+                            + " the policy will be executed for during service deployment of all"
+                            + " flavors.")
     private List<String> flavorNameList;
 
-    /**
-     * The policy.
-     */
+    /** The policy. */
     @Schema(description = "The policy.")
     private String policy;
 
-    /**
-     * Is the policy enabled.
-     */
+    /** Is the policy enabled. */
     @Schema(description = "Is the policy enabled. true:enabled;false:disabled.")
     private Boolean enabled;
-
 }

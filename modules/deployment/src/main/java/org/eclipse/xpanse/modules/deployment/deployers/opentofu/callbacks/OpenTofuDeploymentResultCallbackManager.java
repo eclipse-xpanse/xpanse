@@ -17,27 +17,23 @@ import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for managing deployment and destroy callback functions.
- */
+/** Bean for managing deployment and destroy callback functions. */
 @Slf4j
 @Component
 public class OpenTofuDeploymentResultCallbackManager {
-    @Resource
-    private DeployResultManager deployResultManager;
+    @Resource private DeployResultManager deployResultManager;
 
     /**
      * Handle the callback of the order task.
      *
      * @param orderId the orderId of the task.
-     * @param result  execution result of the task.
+     * @param result execution result of the task.
      */
     public void orderCallback(UUID orderId, OpenTofuResult result) {
         DeployResult deployResult = getDeployResult(result);
         deployResult.setOrderId(orderId);
         deployResultManager.updateServiceWithDeployResult(deployResult, Handler.TOFU_MAKER);
     }
-
 
     private DeployResult getDeployResult(OpenTofuResult result) {
         DeployResult deployResult = new DeployResult();
@@ -53,8 +49,7 @@ public class OpenTofuDeploymentResultCallbackManager {
             deployResult.setTfStateContent(result.getTerraformState());
         }
         if (Objects.nonNull(result.getGeneratedFileContentMap())) {
-            deployResult.getDeploymentGeneratedFiles()
-                    .putAll(result.getGeneratedFileContentMap());
+            deployResult.getDeploymentGeneratedFiles().putAll(result.getGeneratedFileContentMap());
         }
         return deployResult;
     }

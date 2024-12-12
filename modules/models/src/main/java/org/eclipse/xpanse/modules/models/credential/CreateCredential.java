@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.models.credential;
 
-
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -17,9 +16,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.hibernate.validator.constraints.UniqueElements;
 
-/**
- * Create credential model.
- */
+/** Create credential model. */
 @Data
 public class CreateCredential {
 
@@ -28,8 +25,7 @@ public class CreateCredential {
     @Schema(description = "The name of the credential")
     private String name;
 
-    @Hidden
-    private String userId;
+    @Hidden private String userId;
 
     @NotNull
     @Schema(description = "The cloud service provider of the credential.")
@@ -56,5 +52,4 @@ public class CreateCredential {
     @NotNull
     @Schema(description = "The time in seconds to live of the credential", defaultValue = "3600")
     private Integer timeToLive = 3600;
-
 }

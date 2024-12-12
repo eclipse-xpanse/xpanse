@@ -14,9 +14,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricItemType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of MetricItem.
- */
+/** Test of MetricItem. */
 class MetricItemTest {
 
     public static final Map<String, String> labels = Map.of("key", "value");
@@ -88,12 +86,19 @@ class MetricItemTest {
 
     @Test
     void testToString() {
-        String expectedString = "MetricItem(" +
-                "labels=" + labels +
-                ", type=" + type +
-                ", timeStamp=" + timeStamp + "" +
-                ", value=" + value + "" +
-                ")";
+        String expectedString =
+                "MetricItem("
+                        + "labels="
+                        + labels
+                        + ", type="
+                        + type
+                        + ", timeStamp="
+                        + timeStamp
+                        + ""
+                        + ", value="
+                        + value
+                        + ""
+                        + ")";
 
         assertEquals(expectedString, metricItem.toString());
     }

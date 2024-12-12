@@ -22,8 +22,7 @@ class UserPolicyQueryRequestTest {
     private final Boolean enabled = true;
     private final String policy = "policy";
     private final String userId = "userId";
-    @Mock
-    private Csp mockCsp;
+    @Mock private Csp mockCsp;
     private UserPolicyQueryRequest test;
 
     @BeforeEach
@@ -67,7 +66,8 @@ class UserPolicyQueryRequestTest {
     @Test
     void testToString() {
         String result =
-                String.format("UserPolicyQueryRequest(enabled=%s, userId=%s, csp=%s, policy=%s)",
+                String.format(
+                        "UserPolicyQueryRequest(enabled=%s, userId=%s, csp=%s, policy=%s)",
                         enabled, userId, mockCsp, policy);
         assertThat(test.toString()).isEqualTo(result);
     }

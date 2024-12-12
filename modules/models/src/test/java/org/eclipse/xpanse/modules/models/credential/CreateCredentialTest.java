@@ -19,9 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of CreateCredential.
- */
+/** Test of CreateCredential. */
 class CreateCredentialTest {
 
     private final String name = "credential";
@@ -31,8 +29,7 @@ class CreateCredentialTest {
     private final String description = "Test credential";
     private final CredentialType type = CredentialType.VARIABLES;
     private final Integer timeToLive = 36000;
-    @Mock
-    private List<CredentialVariable> variables;
+    @Mock private List<CredentialVariable> variables;
     private CreateCredential test;
 
     @BeforeEach
@@ -76,20 +73,35 @@ class CreateCredentialTest {
         assertTrue(test.canEqual(test1));
         assertEquals(test, test1);
         assertEquals(test.hashCode(), test1.hashCode());
-
     }
 
     @Test
     void testToString() {
-        String expectedToString = "CreateCredential(name=" + name + ", "
-                + "userId=" + userId + ", "
-                + "csp=" + csp + ", "
-                + "site=" + site + ", "
-                + "description=" + description + ", "
-                + "type=" + type + ", "
-                + "variables=" + variables + ", "
-                + "timeToLive=" + timeToLive + ")";
+        String expectedToString =
+                "CreateCredential(name="
+                        + name
+                        + ", "
+                        + "userId="
+                        + userId
+                        + ", "
+                        + "csp="
+                        + csp
+                        + ", "
+                        + "site="
+                        + site
+                        + ", "
+                        + "description="
+                        + description
+                        + ", "
+                        + "type="
+                        + type
+                        + ", "
+                        + "variables="
+                        + variables
+                        + ", "
+                        + "timeToLive="
+                        + timeToLive
+                        + ")";
         assertEquals(expectedToString, test.toString());
     }
-
 }

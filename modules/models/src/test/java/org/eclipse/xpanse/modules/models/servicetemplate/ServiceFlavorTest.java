@@ -17,9 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of FlavorBasic.
- */
+/** Test of FlavorBasic. */
 class ServiceFlavorTest {
 
     private final String name = "flavor";
@@ -27,7 +25,6 @@ class ServiceFlavorTest {
     private final Map<String, String> properties = Map.of("key", "value");
     private ServiceFlavor serviceFlavor;
     private List<String> features = List.of("feature1", "feature2");
-
 
     @BeforeEach
     void setUp() {
@@ -67,11 +64,16 @@ class ServiceFlavorTest {
 
     @Test
     void testToString() {
-        String expectedString = "ServiceFlavor(name=" + name
-                + ", properties=" + properties
-                + ", priority=" + priority
-                + ", features=" + features + ")";
+        String expectedString =
+                "ServiceFlavor(name="
+                        + name
+                        + ", properties="
+                        + properties
+                        + ", priority="
+                        + priority
+                        + ", features="
+                        + features
+                        + ")";
         assertEquals(expectedString, serviceFlavor.toString());
     }
-
 }

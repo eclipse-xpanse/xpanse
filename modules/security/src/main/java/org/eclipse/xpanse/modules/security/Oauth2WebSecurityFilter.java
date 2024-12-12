@@ -50,9 +50,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
- * Configuration applied on all web endpoints defined for this
- * application. Any configuration on specific resources is applied
- * in addition to these global rules.
+ * Configuration applied on all web endpoints defined for this application. Any configuration on
+ * specific resources is applied in addition to these global rules.
  */
 @Slf4j
 @Profile("oauth")
@@ -70,71 +69,92 @@ public class Oauth2WebSecurityFilter {
     @Value("${spring.security.oauth2.resourceserver.opaquetoken.client-secret}")
     private String clientSecret;
 
-    private void configureHttpSecurity(HttpSecurity http, HandlerMappingIntrospector introspector,
-                                       @Nullable Converter<Jwt, XpanseAuthentication>
-                                               jwtAuthenticationConverter,
-                                       @Nullable OpaqueTokenAuthenticationConverter
-                                               opaqueTokenAuthenticationConverter)
+    private void configureHttpSecurity(
+            HttpSecurity http,
+            HandlerMappingIntrospector introspector,
+            @Nullable Converter<Jwt, XpanseAuthentication> jwtAuthenticationConverter,
+            @Nullable OpaqueTokenAuthenticationConverter opaqueTokenAuthenticationConverter)
             throws Exception {
         // accept cors requests and allow preflight checks
-        http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(
-                corsConfigurationSource()));
+        http.cors(
+                httpSecurityCorsConfigurer ->
+                        httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
 
         MvcRequestMatcher.Builder mvcMatcherBuilder =
                 new MvcRequestMatcher.Builder(introspector).servletPath("/");
 
-        http.authorizeHttpRequests(arc -> {
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll();
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/swagger-ui/**")).permitAll();
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/v3/**")).permitAll();
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/favicon.ico")).permitAll();
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll();
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/openapi/**")).permitAll();
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/xpanse/agent/**"))
-                    .permitAll();
-            arc.requestMatchers(mvcMatcherBuilder.pattern("/xpanse/**")).authenticated();
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll();
-            arc.requestMatchers(AntPathRequestMatcher.antMatcher("/webhook/**")).permitAll();
-            arc.anyRequest().authenticated();
-        });
+        http.authorizeHttpRequests(
+                arc -> {
+                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**"))
+                            .permitAll();
+                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/swagger-ui/**"))
+                            .permitAll();
+                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/v3/**")).permitAll();
+                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/favicon.ico"))
+                            .permitAll();
+                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll();
+                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/openapi/**"))
+                            .permitAll();
+                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/xpanse/agent/**"))
+                            .permitAll();
+                    arc.requestMatchers(mvcMatcherBuilder.pattern("/xpanse/**")).authenticated();
+                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll();
+                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/webhook/**"))
+                            .permitAll();
+                    arc.anyRequest().authenticated();
+                });
 
         http.csrf(AbstractHttpConfigurer::disable);
 
-        http.headers(headersConfigurer -> headersConfigurer.addHeaderWriter(
-                new XFrameOptionsHeaderWriter(
-                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)));
+        http.headers(
+                headersConfigurer ->
+                        headersConfigurer.addHeaderWriter(
+                                new XFrameOptionsHeaderWriter(
+                                        XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)));
 
         // set custom exception handler
-        http.exceptionHandling(exceptionHandler -> exceptionHandler.authenticationEntryPoint(
-                (httpRequest, httpResponse, authException) -> {
-                    httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    httpResponse.setCharacterEncoding(UTF_8);
-                    httpResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    ErrorResponse errorResponseModel = getUnauthorizedResponse(authException);
-                    String resBody = objectMapper.writeValueAsString(errorResponseModel);
-                    PrintWriter printWriter = httpResponse.getWriter();
-                    printWriter.print(resBody);
-                    printWriter.flush();
-                    printWriter.close();
-                }));
+        http.exceptionHandling(
+                exceptionHandler ->
+                        exceptionHandler.authenticationEntryPoint(
+                                (httpRequest, httpResponse, authException) -> {
+                                    httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                    httpResponse.setCharacterEncoding(UTF_8);
+                                    httpResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                                    ErrorResponse errorResponseModel =
+                                            getUnauthorizedResponse(authException);
+                                    String resBody =
+                                            objectMapper.writeValueAsString(errorResponseModel);
+                                    PrintWriter printWriter = httpResponse.getWriter();
+                                    printWriter.print(resBody);
+                                    printWriter.flush();
+                                    printWriter.close();
+                                }));
 
         if (Objects.nonNull(opaqueTokenAuthenticationConverter)) {
             // Config custom OpaqueTokenIntrospect
-            http.oauth2ResourceServer(oauth2 -> oauth2.opaqueToken(opaque -> opaque.introspector(
-                            new SpringOpaqueTokenIntrospector(
-                                    introspectionUri, clientId, clientSecret))
-                    .authenticationConverter(opaqueTokenAuthenticationConverter)
-
-            ));
+            http.oauth2ResourceServer(
+                    oauth2 ->
+                            oauth2.opaqueToken(
+                                    opaque ->
+                                            opaque.introspector(
+                                                            new SpringOpaqueTokenIntrospector(
+                                                                    introspectionUri,
+                                                                    clientId,
+                                                                    clientSecret))
+                                                    .authenticationConverter(
+                                                            opaqueTokenAuthenticationConverter)));
         }
 
         if (Objects.nonNull(jwtAuthenticationConverter)) {
             // Config custom JwtAuthenticationConverter
-            http.oauth2ResourceServer(oauth2 -> oauth2.jwt(
-                    jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+            http.oauth2ResourceServer(
+                    oauth2 ->
+                            oauth2.jwt(
+                                    jwt ->
+                                            jwt.jwtAuthenticationConverter(
+                                                    jwtAuthenticationConverter)));
         }
     }
-
 
     /**
      * Get unauthorized response.
@@ -155,7 +175,6 @@ public class Oauth2WebSecurityFilter {
         }
     }
 
-
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(false); // credentials are not directly accepted.
@@ -167,61 +186,55 @@ public class Oauth2WebSecurityFilter {
         return source;
     }
 
-
-    /**
-     * Configuration applied when method security is disabled.
-     */
+    /** Configuration applied when method security is disabled. */
     @Profile("oauth")
     @EnableWebSecurity
     @ConditionalOnProperty(name = "enable.role.protection", havingValue = "false")
     public class WebSecurityWithoutMethodSecurity {
 
-        /**
-         * Configures basic security handler per HTTP session.
-         */
+        /** Configures basic security handler per HTTP session. */
         @Bean
-        public SecurityFilterChain apiFilterChain(HttpSecurity http,
-                                                  HandlerMappingIntrospector introspector,
-                                                  @Nullable Converter<Jwt, XpanseAuthentication>
-                                                          jwtAuthenticationConverter,
-                                                  @Nullable OpaqueTokenAuthenticationConverter
-                                                          opaqueTokenAuthenticationConverter)
+        public SecurityFilterChain apiFilterChain(
+                HttpSecurity http,
+                HandlerMappingIntrospector introspector,
+                @Nullable Converter<Jwt, XpanseAuthentication> jwtAuthenticationConverter,
+                @Nullable OpaqueTokenAuthenticationConverter opaqueTokenAuthenticationConverter)
                 throws Exception {
             log.info("Enable web security without method authoriztion.");
-            configureHttpSecurity(http, introspector, jwtAuthenticationConverter,
+            configureHttpSecurity(
+                    http,
+                    introspector,
+                    jwtAuthenticationConverter,
                     opaqueTokenAuthenticationConverter);
             return http.build();
         }
     }
 
-
-    /**
-     * Configuration applied when method security is enabled.
-     */
+    /** Configuration applied when method security is enabled. */
     @Profile("oauth")
     @EnableWebSecurity
     @EnableMethodSecurity(securedEnabled = true)
-    @ConditionalOnProperty(name = "enable.role.protection",
-            havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(
+            name = "enable.role.protection",
+            havingValue = "true",
+            matchIfMissing = true)
     public class WebSecurityWithMethodSecurity {
 
-        /**
-         * Configures basic security handler per HTTP session.
-         */
+        /** Configures basic security handler per HTTP session. */
         @Bean
-        public SecurityFilterChain apiFilterChain(HttpSecurity http,
-                                                  HandlerMappingIntrospector introspector,
-                                                  @Nullable Converter<Jwt, XpanseAuthentication>
-                                                          jwtAuthenticationConverter,
-                                                  @Nullable OpaqueTokenAuthenticationConverter
-                                                          opaqueTokenAuthenticationConverter)
+        public SecurityFilterChain apiFilterChain(
+                HttpSecurity http,
+                HandlerMappingIntrospector introspector,
+                @Nullable Converter<Jwt, XpanseAuthentication> jwtAuthenticationConverter,
+                @Nullable OpaqueTokenAuthenticationConverter opaqueTokenAuthenticationConverter)
                 throws Exception {
             log.info("Enable web security with method authorization.");
-            configureHttpSecurity(http, introspector, jwtAuthenticationConverter,
+            configureHttpSecurity(
+                    http,
+                    introspector,
+                    jwtAuthenticationConverter,
                     opaqueTokenAuthenticationConverter);
             return http.build();
         }
     }
-
-
 }

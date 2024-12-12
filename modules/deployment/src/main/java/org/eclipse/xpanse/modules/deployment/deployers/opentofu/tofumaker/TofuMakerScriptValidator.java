@@ -28,9 +28,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Bean to validate openTofu scripts via tofu-maker.
- */
+/** Bean to validate openTofu scripts via tofu-maker. */
 @Slf4j
 @Component
 @Profile("tofu-maker")
@@ -41,20 +39,17 @@ public class TofuMakerScriptValidator {
     private final TofuMakerHelper tofuMakerHelper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * constructor for OpenTofuMakerScriptValidator.
-     */
-    public TofuMakerScriptValidator(OpenTofuFromScriptsApi openTofuFromScriptsApi,
-                                    OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
-                                    TofuMakerHelper tofuMakerHelper) {
+    /** constructor for OpenTofuMakerScriptValidator. */
+    public TofuMakerScriptValidator(
+            OpenTofuFromScriptsApi openTofuFromScriptsApi,
+            OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
+            TofuMakerHelper tofuMakerHelper) {
         this.openTofuFromScriptsApi = openTofuFromScriptsApi;
         this.openTofuFromGitRepoApi = openTofuFromGitRepoApi;
         this.tofuMakerHelper = tofuMakerHelper;
     }
 
-    /**
-     * Validate scripts provided in the OCL.
-     */
+    /** Validate scripts provided in the OCL. */
     public DeploymentScriptValidationResult validateOpenTofuScripts(Deployment deployment) {
         DeploymentScriptValidationResult deployValidationResult = null;
         try {
@@ -63,7 +58,8 @@ public class TofuMakerScriptValidator {
                             getValidateScriptsInOclRequest(deployment));
             try {
                 deployValidationResult =
-                        objectMapper.readValue(objectMapper.writeValueAsString(validate),
+                        objectMapper.readValue(
+                                objectMapper.writeValueAsString(validate),
                                 DeploymentScriptValidationResult.class);
             } catch (JsonProcessingException e) {
                 log.error("JsonProcessingException", e);
@@ -75,9 +71,7 @@ public class TofuMakerScriptValidator {
         return deployValidationResult;
     }
 
-    /**
-     * Validate scripts in the GIT repo.
-     */
+    /** Validate scripts in the GIT repo. */
     public DeploymentScriptValidationResult validateOpenTofuScriptsFromGitRepo(
             Deployment deployment) {
         DeploymentScriptValidationResult deployValidationResult = null;
@@ -87,7 +81,8 @@ public class TofuMakerScriptValidator {
                             getValidateScriptsInGitRepoRequest(deployment));
             try {
                 deployValidationResult =
-                        objectMapper.readValue(objectMapper.writeValueAsString(validate),
+                        objectMapper.readValue(
+                                objectMapper.writeValueAsString(validate),
                                 DeploymentScriptValidationResult.class);
             } catch (JsonProcessingException e) {
                 log.error("JsonProcessingException", e);

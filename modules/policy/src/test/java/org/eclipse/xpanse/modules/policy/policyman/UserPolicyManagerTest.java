@@ -35,14 +35,10 @@ class UserPolicyManagerTest {
 
     private final UUID policyId = UUID.randomUUID();
     private final String userId = "userId";
-    @Mock
-    private PolicyManager mockPolicyManager;
-    @Mock
-    private UserServiceHelper mockUserServiceHelper;
-    @Mock
-    private DatabaseUserPolicyStorage mockUserPolicyStorage;
-    @InjectMocks
-    private UserPolicyManager userPolicyManagerUnderTest;
+    @Mock private PolicyManager mockPolicyManager;
+    @Mock private UserServiceHelper mockUserServiceHelper;
+    @Mock private DatabaseUserPolicyStorage mockUserPolicyStorage;
+    @InjectMocks private UserPolicyManager userPolicyManagerUnderTest;
 
     @Test
     void testListUserPolicies() {
@@ -134,15 +130,14 @@ class UserPolicyManagerTest {
         userPolicyEntity1.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity1.setEnabled(true);
 
-        when(mockUserPolicyStorage.storeAndFlush(any(UserPolicyEntity.class))).thenReturn(
-                userPolicyEntity1);
+        when(mockUserPolicyStorage.storeAndFlush(any(UserPolicyEntity.class)))
+                .thenReturn(userPolicyEntity1);
 
         // Run the test
         final UserPolicy result = userPolicyManagerUnderTest.addUserPolicy(createRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
-
     }
 
     @Test
@@ -188,7 +183,8 @@ class UserPolicyManagerTest {
         expectedResult.setCsp(Csp.HUAWEI_CLOUD);
         expectedResult.setEnabled(true);
 
-        doThrow(new PoliciesValidationFailedException("error")).when(mockPolicyManager)
+        doThrow(new PoliciesValidationFailedException("error"))
+                .when(mockPolicyManager)
                 .validatePolicy("policy");
 
         // Run the test
@@ -235,11 +231,11 @@ class UserPolicyManagerTest {
         updatedUserPolicyEntity.setPolicy("policy_update");
         updatedUserPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         updatedUserPolicyEntity.setEnabled(false);
-        when(mockUserPolicyStorage.storeAndFlush(updatedUserPolicyEntity)).thenReturn(
-                updatedUserPolicyEntity);
+        when(mockUserPolicyStorage.storeAndFlush(updatedUserPolicyEntity))
+                .thenReturn(updatedUserPolicyEntity);
         // Run the test
-        final UserPolicy result = userPolicyManagerUnderTest.updateUserPolicy(policyId,
-                updateRequest);
+        final UserPolicy result =
+                userPolicyManagerUnderTest.updateUserPolicy(policyId, updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -283,12 +279,12 @@ class UserPolicyManagerTest {
         updatedUserPolicyEntity.setPolicy("policy");
         updatedUserPolicyEntity.setCsp(Csp.OPENSTACK_TESTLAB);
         updatedUserPolicyEntity.setEnabled(false);
-        when(mockUserPolicyStorage.storeAndFlush(updatedUserPolicyEntity)).thenReturn(
-                updatedUserPolicyEntity);
+        when(mockUserPolicyStorage.storeAndFlush(updatedUserPolicyEntity))
+                .thenReturn(updatedUserPolicyEntity);
 
         // Run the test
-        final UserPolicy result = userPolicyManagerUnderTest.updateUserPolicy(policyId,
-                updateRequest);
+        final UserPolicy result =
+                userPolicyManagerUnderTest.updateUserPolicy(policyId, updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -303,8 +299,8 @@ class UserPolicyManagerTest {
         // Configure DatabaseUserPolicyStorage.findPolicyById(...).
         when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(null);
         // Run the test
-        assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(policyId,
-                updateRequest))
+        assertThatThrownBy(
+                        () -> userPolicyManagerUnderTest.updateUserPolicy(policyId, updateRequest))
                 .isInstanceOf(PolicyNotFoundException.class);
     }
 
@@ -327,8 +323,8 @@ class UserPolicyManagerTest {
         when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(false);
 
         // Run the test
-        assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(policyId,
-                updateRequest))
+        assertThatThrownBy(
+                        () -> userPolicyManagerUnderTest.updateUserPolicy(policyId, updateRequest))
                 .isInstanceOf(AccessDeniedException.class);
     }
 

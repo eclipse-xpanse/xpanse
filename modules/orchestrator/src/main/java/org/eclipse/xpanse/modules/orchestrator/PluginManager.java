@@ -29,31 +29,29 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * The instance to manage all the plugins.
- */
+/** The instance to manage all the plugins. */
 @Slf4j
 @Component
 public class PluginManager implements ApplicationListener<ContextRefreshedEvent> {
 
-    @Getter
-    private final Map<Csp, OrchestratorPlugin> pluginsMap = new ConcurrentHashMap<>();
+    @Getter private final Map<Csp, OrchestratorPlugin> pluginsMap = new ConcurrentHashMap<>();
+
     @Value("${multiple.providers.black.properties}")
     private String multipleProvidersBlackProperties;
-    @Resource
-    private ApplicationContext applicationContext;
 
-    /**
-     * Instantiates plugins map.
-     */
+    @Resource private ApplicationContext applicationContext;
 
+    /** Instantiates plugins map. */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        applicationContext.getBeansOfType(OrchestratorPlugin.class).forEach((key, value) -> {
-            if (isPluginUsable(value.requiredProperties(), value.getCsp())) {
-                pluginsMap.put(value.getCsp(), value);
-            }
-        });
+        applicationContext
+                .getBeansOfType(OrchestratorPlugin.class)
+                .forEach(
+                        (key, value) -> {
+                            if (isPluginUsable(value.requiredProperties(), value.getCsp())) {
+                                pluginsMap.put(value.getCsp(), value);
+                            }
+                        });
         checkCredentialDefinitions();
         log.info("Cloud service providers {} with activated plugins.", pluginsMap.keySet());
         if (pluginsMap.isEmpty()) {
@@ -63,17 +61,21 @@ public class PluginManager implements ApplicationListener<ContextRefreshedEvent>
             List<String> blackProperties =
                     Arrays.asList(StringUtils.split(multipleProvidersBlackProperties, ","));
             if (!CollectionUtils.isEmpty(blackProperties)) {
-                blackProperties.forEach(env -> {
-                    if (Objects.nonNull(applicationContext.getEnvironment().getProperty(env))) {
-                        log.warn("More than one plugin is activated. The environment variable "
-                                + env + " will cause the exception when connecting to the provider "
-                                + "service.");
-                    }
-                });
+                blackProperties.forEach(
+                        env -> {
+                            if (Objects.nonNull(
+                                    applicationContext.getEnvironment().getProperty(env))) {
+                                log.warn(
+                                        "More than one plugin is activated. The environment"
+                                                + " variable "
+                                                + env
+                                                + " will cause the exception when connecting to the"
+                                                + " provider service.");
+                            }
+                        });
             }
         }
     }
-
 
     /**
      * Get available plugin bean implements OrchestratorPlugin by the @csp.
@@ -98,8 +100,10 @@ public class PluginManager implements ApplicationListener<ContextRefreshedEvent>
             }
         }
         if (!missingMandatoryProperties.isEmpty()) {
-            log.warn("Plugin for provider {} will not be activated. Due to missing mandatory "
-                            + "configuration properties {}", csp.toValue(),
+            log.warn(
+                    "Plugin for provider {} will not be activated. Due to missing mandatory "
+                            + "configuration properties {}",
+                    csp.toValue(),
                     String.join(",", missingMandatoryProperties));
             return false;
         }
@@ -112,20 +116,23 @@ public class PluginManager implements ApplicationListener<ContextRefreshedEvent>
             List<AbstractCredentialInfo> cspCredentialDefinitions =
                     entry.getValue().getCredentialDefinitions();
             if (CollectionUtils.isEmpty(cspCredentialDefinitions)) {
-                log.warn("No defined credential definition found in the plugin of csp:{}",
+                log.warn(
+                        "No defined credential definition found in the plugin of csp:{}",
                         entry.getKey().toValue());
                 continue;
             }
             Map<String, List<AbstractCredentialInfo>> uniqueKeyCredentialDefinitionsMap =
                     cspCredentialDefinitions.stream()
                             .collect(Collectors.groupingBy(AbstractCredentialInfo::getUniqueKey));
-            for (Map.Entry<String, List<AbstractCredentialInfo>> credentialEntry
-                    : uniqueKeyCredentialDefinitionsMap.entrySet()) {
+            for (Map.Entry<String, List<AbstractCredentialInfo>> credentialEntry :
+                    uniqueKeyCredentialDefinitionsMap.entrySet()) {
                 if (!CollectionUtils.isEmpty(credentialEntry.getValue())
                         && credentialEntry.getValue().size() > 1) {
-                    String errorMsg = String.format("In the plugin of csp %s defined duplicate "
-                                    + "credential definitions with key %s",
-                            entry.getKey().toValue(), credentialEntry.getKey());
+                    String errorMsg =
+                            String.format(
+                                    "In the plugin of csp %s defined duplicate "
+                                            + "credential definitions with key %s",
+                                    entry.getKey().toValue(), credentialEntry.getKey());
                     errorMsgList.add(errorMsg);
                 }
             }
@@ -133,7 +140,5 @@ public class PluginManager implements ApplicationListener<ContextRefreshedEvent>
         if (!errorMsgList.isEmpty()) {
             throw new DuplicateCredentialDefinition(StringUtils.join(errorMsgList, "\n"));
         }
-
     }
-
 }

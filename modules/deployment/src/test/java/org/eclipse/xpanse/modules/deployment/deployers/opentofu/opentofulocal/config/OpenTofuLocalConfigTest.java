@@ -13,11 +13,11 @@ class OpenTofuLocalConfigTest {
     @BeforeEach
     void setUp() {
         openTofuLocalConfigUnderTest = new OpenTofuLocalConfig();
-        ReflectionTestUtils.setField(openTofuLocalConfigUnderTest, "workspaceDirectory",
-                "xpanse_deploy_ws");
+        ReflectionTestUtils.setField(
+                openTofuLocalConfigUnderTest, "workspaceDirectory", "xpanse_deploy_ws");
         ReflectionTestUtils.setField(openTofuLocalConfigUnderTest, "isDebugEnabled", false);
-        ReflectionTestUtils.setField(openTofuLocalConfigUnderTest, "debugLogLevel",
-                "debugLogLevel");
+        ReflectionTestUtils.setField(
+                openTofuLocalConfigUnderTest, "debugLogLevel", "debugLogLevel");
     }
 
     @Test

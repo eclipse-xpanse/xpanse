@@ -13,14 +13,11 @@ import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 
-/**
- * Defines the data model for the resource usage.
- */
+/** Defines the data model for the resource usage. */
 @Data
 public class ResourceUsage implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 240913796673011260L;
+    @Serial private static final long serialVersionUID = 240913796673011260L;
 
     @NotNull
     @NotEmpty

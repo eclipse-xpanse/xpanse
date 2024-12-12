@@ -14,9 +14,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of CredentialVariables.
- */
+/** Test of CredentialVariables. */
 class CredentialVariablesTest {
 
     private final Csp csp = Csp.HUAWEI_CLOUD;
@@ -25,10 +23,10 @@ class CredentialVariablesTest {
     private final String name = "credential";
     private final String description = "Test credential";
     private final CredentialType type = CredentialType.VARIABLES;
-    private final List<CredentialVariable> variables = Arrays.asList(
-            new CredentialVariable("variable1", "description1", true, true),
-            new CredentialVariable("variable2", "description2", false, false)
-    );
+    private final List<CredentialVariable> variables =
+            Arrays.asList(
+                    new CredentialVariable("variable1", "description1", true, true),
+                    new CredentialVariable("variable2", "description2", false, false));
 
     @Test
     public void testConstructorAndGetters() {
@@ -66,5 +64,4 @@ class CredentialVariablesTest {
         assertEquals(createCredential.getVariables(), credentialVariables.getVariables());
         assertEquals(createCredential.getTimeToLive(), credentialVariables.getTimeToLive());
     }
-
 }

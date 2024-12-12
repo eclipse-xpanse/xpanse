@@ -16,14 +16,11 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDat
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 
-/**
- * Defines for the deploy variable.
- */
+/** Defines for the deploy variable. */
 @Data
 public class DeployVariable implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 4180720936204332115L;
+    @Serial private static final long serialVersionUID = 4180720936204332115L;
 
     @NotNull
     @NotBlank
@@ -46,17 +43,21 @@ public class DeployVariable implements Serializable {
     @Schema(description = "The description of the deploy variable")
     private String description;
 
-    @Schema(description = "The value of the deploy variable. "
-            + "Value can be provided for default variables")
+    @Schema(
+            description =
+                    "The value of the deploy variable. "
+                            + "Value can be provided for default variables")
     private String value;
 
     @NotNull
     @Schema(description = "Indicates if the variable is mandatory")
     private Boolean mandatory;
 
-    @Schema(description = "valueSchema of the variable. "
-            + "The key be any keyword that is part of the JSON schema definition which can be "
-            + "found here https://json-schema.org/draft/2020-12/schema")
+    @Schema(
+            description =
+                    "valueSchema of the variable. The key be any keyword that is part of the JSON"
+                            + " schema definition which can be found here"
+                            + " https://json-schema.org/draft/2020-12/schema")
     private Map<String, Object> valueSchema;
 
     @Schema(description = "Sensitive scope of variable storage")

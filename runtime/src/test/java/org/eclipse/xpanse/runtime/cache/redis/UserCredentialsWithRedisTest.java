@@ -27,12 +27,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for UserCloudCredentialsApi with Redis cache.
- */
+/** Test for UserCloudCredentialsApi with Redis cache. */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test",
-        "enable.redis.distributed.cache=true"})
+@SpringBootTest(
+        properties = {
+            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test",
+            "enable.redis.distributed.cache=true"
+        })
 @AutoConfigureMockMvc
 class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
 
@@ -40,8 +41,7 @@ class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
     private final String site = "Chinese Mainland";
     private final String credentialName = "AK_SK";
     private final CredentialType credentialType = CredentialType.VARIABLES;
-    @Resource
-    private UserCloudCredentialsApi userCloudCredentialsApi;
+    @Resource private UserCloudCredentialsApi userCloudCredentialsApi;
 
     @Test
     @WithJwt(file = "jwt_user.json")
@@ -50,7 +50,6 @@ class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
         testUpdateCredential();
         testDeleteCredential();
     }
-
 
     private CreateCredential getCreateCredential(Integer timeToLive) {
         final CreateCredential createCredential = new CreateCredential();
@@ -61,11 +60,19 @@ class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
-                        "The access key.", true, false, "AK_VALUE"));
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.",
+                        true,
+                        false,
+                        "AK_VALUE"));
         credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                        "The security key.", true, false, "SK_VALUE"));
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.",
+                        true,
+                        false,
+                        "SK_VALUE"));
         createCredential.setVariables(credentialVariables);
         createCredential.setTimeToLive(timeToLive);
         return createCredential;
@@ -78,17 +85,15 @@ class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
         userCloudCredentialsApi.addUserCloudCredential(createCredential);
 
         List<AbstractCredentialInfo> credentialInfos =
-                userCloudCredentialsApi.getUserCloudCredentials(csp,
-                        credentialType);
+                userCloudCredentialsApi.getUserCloudCredentials(csp, credentialType);
 
         // Verify the results
         Assertions.assertFalse(credentialInfos.isEmpty());
         Assertions.assertInstanceOf(CredentialVariables.class, credentialInfos.getFirst());
         CredentialVariables credentialVariables = (CredentialVariables) credentialInfos.getFirst();
-        Assertions.assertEquals(createCredential.getVariables(),
-                credentialVariables.getVariables());
+        Assertions.assertEquals(
+                createCredential.getVariables(), credentialVariables.getVariables());
     }
-
 
     void testUpdateCredential() {
         // Setup
@@ -97,24 +102,23 @@ class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
         userCloudCredentialsApi.updateUserCloudCredential(updateCredential);
 
         List<AbstractCredentialInfo> credentialInfos =
-                userCloudCredentialsApi.getUserCloudCredentials(csp,
-                        credentialType);
+                userCloudCredentialsApi.getUserCloudCredentials(csp, credentialType);
 
         // Verify the results
         Assertions.assertFalse(credentialInfos.isEmpty());
         Assertions.assertInstanceOf(CredentialVariables.class, credentialInfos.getFirst());
         CredentialVariables credentialVariables = (CredentialVariables) credentialInfos.getFirst();
-        Assertions.assertEquals(updateCredential.getVariables(),
-                credentialVariables.getVariables());
+        Assertions.assertEquals(
+                updateCredential.getVariables(), credentialVariables.getVariables());
     }
 
     void testDeleteCredential() {
         // Setup
-        userCloudCredentialsApi.deleteUserCloudCredential(csp, site, credentialType, credentialName);
+        userCloudCredentialsApi.deleteUserCloudCredential(
+                csp, site, credentialType, credentialName);
         // Verify the results
         List<AbstractCredentialInfo> credentialInfos =
                 userCloudCredentialsApi.getUserCloudCredentials(csp, credentialType);
         assertTrue(credentialInfos.isEmpty());
     }
-
 }

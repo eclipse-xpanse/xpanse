@@ -10,25 +10,17 @@ import java.io.Serial;
 import java.io.Serializable;
 import lombok.Data;
 
-/**
- * Service lock config model.
- */
+/** Service lock config model. */
 @Data
 public class ServiceLockConfig implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 5655216229043227729L;
+    @Serial private static final long serialVersionUID = 5655216229043227729L;
 
-    /**
-     * Whether the service is locked from deletion.
-     */
+    /** Whether the service is locked from deletion. */
     @Schema(description = "Whether the service is locked from deletion.")
     private boolean isDestroyLocked;
 
-    /**
-     * Whether the service is locked from modification.
-     */
+    /** Whether the service is locked from modification. */
     @Schema(description = "Whether the service is locked from modification.")
     private boolean isModifyLocked;
-
 }

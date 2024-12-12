@@ -5,9 +5,7 @@
 
 package org.eclipse.xpanse.modules.models.monitor.exceptions;
 
-/**
- * Throw exception when monitor or metrics data is not yet ready or unavailable.
- */
+/** Throw exception when monitor or metrics data is not yet ready or unavailable. */
 public class MetricsDataNotYetAvailableException extends RuntimeException {
 
     public MetricsDataNotYetAvailableException(String message) {

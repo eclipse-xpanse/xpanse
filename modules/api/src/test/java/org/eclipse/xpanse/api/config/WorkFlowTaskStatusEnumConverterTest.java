@@ -23,7 +23,8 @@ class WorkFlowTaskStatusEnumConverterTest {
                 .isEqualTo(WorkFlowTaskStatus.DONE);
         assertThat(workFlowTaskStatusEnumConverter.convert("failed"))
                 .isEqualTo(WorkFlowTaskStatus.FAILED);
-        assertThrows(UnsupportedEnumValueException.class,
+        assertThrows(
+                UnsupportedEnumValueException.class,
                 () -> workFlowTaskStatusEnumConverter.convert("unknown"));
     }
 }

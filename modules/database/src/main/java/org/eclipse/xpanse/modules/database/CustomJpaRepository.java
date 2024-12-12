@@ -11,9 +11,7 @@ import java.util.Optional;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
 
-/**
- * Custom repository interface for database operations.
- */
+/** Custom repository interface for database operations. */
 @NoRepositoryBean
 public interface CustomJpaRepository<T, ID> extends Repository<T, ID> {
     Optional<T> findById(ID id);

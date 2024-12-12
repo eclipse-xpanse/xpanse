@@ -11,8 +11,7 @@ import org.springframework.web.client.RestTemplate;
 @ExtendWith(MockitoExtension.class)
 class PolicyManRestTemplateConfigTest {
 
-    @Mock
-    private RestTemplateLoggingInterceptor mockRestTemplateLoggingInterceptor;
+    @Mock private RestTemplateLoggingInterceptor mockRestTemplateLoggingInterceptor;
 
     private PolicyManRestTemplateConfig policyManRestTemplateConfigUnderTest;
 

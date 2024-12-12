@@ -14,9 +14,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
 
-/**
- * Response for the REST API.
- */
+/** Response for the REST API. */
 @Data
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,14 +29,13 @@ public class ErrorResponse {
     @Schema(description = "Details of the errors occurred")
     private List<String> details;
 
-    public ErrorResponse() {
-    }
+    public ErrorResponse() {}
 
     /**
      * Create error response with resultCode and errorMessage.
      *
      * @param resultCode error result code
-     * @param errMsg     error message
+     * @param errMsg error message
      * @return errorResponse
      */
     public static ErrorResponse errorResponse(ErrorType resultCode, List<String> errMsg) {

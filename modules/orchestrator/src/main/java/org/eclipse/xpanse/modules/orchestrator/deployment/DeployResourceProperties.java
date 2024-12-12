@@ -10,10 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 
-
-/**
- * Defines methods to get kind and properties for deploy resources.
- */
+/** Defines methods to get kind and properties for deploy resources. */
 public class DeployResourceProperties {
 
     /**

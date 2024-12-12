@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of DeployerNotFoundException.
- */
+/** Test of DeployerNotFoundException. */
 class DeployerNotFoundExceptionTest {
 
     private static final String message = "deployer not found.";
@@ -28,5 +26,4 @@ class DeployerNotFoundExceptionTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

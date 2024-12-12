@@ -43,83 +43,56 @@ import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceSt
 import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
-/**
- * ServiceDeploymentEntity for persistence.
- */
+/** ServiceDeploymentEntity for persistence. */
 @Table(name = "SERVICE_DEPLOYMENT")
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ServiceDeploymentEntity extends CreateModifiedTime {
 
-    @Id
-    private UUID id;
+    @Id private UUID id;
 
-    /**
-     * The id of user who deployed the service.
-     */
+    /** The id of user who deployed the service. */
     private String userId;
 
-    /**
-     * The category of the Service.
-     */
+    /** The category of the Service. */
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    /**
-     * The name of the Service.
-     */
+    /** The name of the Service. */
     private String name;
 
-    /**
-     * The customer provided name for the service deployment.
-     */
+    /** The customer provided name for the service deployment. */
     private String customerServiceName;
 
-    /**
-     * The version of the Service.
-     */
+    /** The version of the Service. */
     private String version;
 
-    /**
-     * Namespace of the user who registered service template.
-     */
+    /** Namespace of the user who registered service template. */
     private String namespace;
 
-    /**
-     * The csp of the Service.
-     */
+    /** The csp of the Service. */
     @Enumerated(EnumType.STRING)
     private Csp csp;
 
-    /**
-     * The flavor of the Service.
-     */
+    /** The flavor of the Service. */
     private String flavor;
 
-    /**
-     * The deployment state of the Service.
-     */
+    /** The deployment state of the Service. */
     @Enumerated(EnumType.STRING)
     @Column(name = "SERVICE_DEPLOYMENT_STATE")
     private ServiceDeploymentState serviceDeploymentState;
 
-    /**
-     * The result message of the service deployment.
-     */
+    /** The result message of the service deployment. */
     @Column(name = "RESULT_MESSAGE", length = Integer.MAX_VALUE)
     private String resultMessage;
 
-    /**
-     * The run state of the Service.
-     */
+    /** The run state of the Service. */
     @Enumerated(EnumType.STRING)
     @Column(name = "SERVICE_STATE")
     private ServiceState serviceState = ServiceState.NOT_RUNNING;
 
-    /**
-     * The id of the Service Template.
-     */
+    /** The id of the Service Template. */
     @Column(name = "SERVICE_TEMPLATE_ID", nullable = false)
     private UUID serviceTemplateId;
 
@@ -128,8 +101,10 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
     @Convert(converter = ObjectJsonConverter.class)
     private DeployRequest deployRequest;
 
-    @OneToMany(mappedBy = "serviceDeploymentEntity",
-            cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "serviceDeploymentEntity",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @ToString.Exclude
     private List<ServiceResourceEntity> deployResourceList;
 
@@ -137,16 +112,17 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
     @ToString.Exclude
     private ServiceConfigurationEntity serviceConfigurationEntity;
 
-    @OneToMany(mappedBy = "serviceDeploymentEntity",
-            cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "serviceDeploymentEntity",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
     @ToString.Exclude
     private List<ServiceOrderEntity> serviceOrderList;
 
-    /**
-     * The output properties of the service deployment.
-     */
+    /** The output properties of the service deployment. */
     @ElementCollection
-    @CollectionTable(name = "SERVICE_DEPLOYMENT_OUTPUT",
+    @CollectionTable(
+            name = "SERVICE_DEPLOYMENT_OUTPUT",
             joinColumns = @JoinColumn(name = "SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
@@ -154,11 +130,11 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
 
     /**
      * The deployment generated files of the service deployment. This is not returned to the
-     * customer.
-     * This can be used by the deployer for storing any internal data.
+     * customer. This can be used by the deployer for storing any internal data.
      */
     @ElementCollection
-    @CollectionTable(name = "SERVICE_DEPLOYMENT_GENERATED_FILES",
+    @CollectionTable(
+            name = "SERVICE_DEPLOYMENT_GENERATED_FILES",
             joinColumns = @JoinColumn(name = "SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
@@ -178,5 +154,4 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private ServiceLockConfig lockConfig;
-
 }

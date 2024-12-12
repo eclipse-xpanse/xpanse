@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,21 +17,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Objects;
 
-/**
- * List of validation errors.
- */
-@JsonPropertyOrder({
-        OpenTofuValidateDiagnostics.JSON_PROPERTY_DETAIL
-})
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+/** List of validation errors. */
+@JsonPropertyOrder({OpenTofuValidateDiagnostics.JSON_PROPERTY_DETAIL})
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuValidateDiagnostics {
     public static final String JSON_PROPERTY_DETAIL = "detail";
-    @jakarta.annotation.Nullable
-    private String detail;
+    @jakarta.annotation.Nullable private String detail;
 
-    public OpenTofuValidateDiagnostics() {
-    }
+    public OpenTofuValidateDiagnostics() {}
 
     public OpenTofuValidateDiagnostics detail(@jakarta.annotation.Nullable String detail) {
 
@@ -48,11 +42,9 @@ public class OpenTofuValidateDiagnostics {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_DETAIL)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getDetail() {
         return detail;
     }
-
 
     @JsonProperty(JSON_PROPERTY_DETAIL)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -87,8 +79,8 @@ public class OpenTofuValidateDiagnostics {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -96,6 +88,4 @@ public class OpenTofuValidateDiagnostics {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

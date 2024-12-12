@@ -12,7 +12,8 @@ import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.resour
 import org.springframework.stereotype.Component;
 
 /**
- * Class to handle all Gnocchi resources services - <a href="https://gnocchi.osci.io/rest.html#resources">Resources</a>.
+ * Class to handle all Gnocchi resources services - <a
+ * href="https://gnocchi.osci.io/rest.html#resources">Resources</a>.
  */
 @Component
 public class ResourcesService extends BaseGnocchiServices {
@@ -28,16 +29,23 @@ public class ResourcesService extends BaseGnocchiServices {
      * @return InstanceNetworkResource
      */
     public InstanceNetworkResource getInstanceNetworkResourceInfoByInstanceId(String instanceId) {
-        List<InstanceNetworkResource> instanceNetworkResources = Arrays.stream(get(
-                InstanceNetworkResource[].class,
-                uri("/v1/resource/instance_network_interface")).execute()).toList();
+        List<InstanceNetworkResource> instanceNetworkResources =
+                Arrays.stream(
+                                get(
+                                                InstanceNetworkResource[].class,
+                                                uri("/v1/resource/instance_network_interface"))
+                                        .execute())
+                        .toList();
         return instanceNetworkResources.stream()
-                .filter(instanceNetworkResource ->
-                        instanceNetworkResource.getInstanceId().equals(instanceId))
+                .filter(
+                        instanceNetworkResource ->
+                                instanceNetworkResource.getInstanceId().equals(instanceId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("No network resource for instance id %s  found",
-                                instanceId)));
-
+                .orElseThrow(
+                        () ->
+                                new IllegalArgumentException(
+                                        String.format(
+                                                "No network resource for instance id %s  found",
+                                                instanceId)));
     }
 }

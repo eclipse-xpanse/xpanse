@@ -14,12 +14,12 @@ class ServiceTemplateRequestStatusEnumConverterTest {
 
     @Test
     void testConvert() throws Exception {
-        assertThat(converterTest.convert("in-review")).isEqualTo(
-                ServiceTemplateRequestStatus.IN_REVIEW);
-        assertThat(converterTest.convert("accepted")).isEqualTo(
-                ServiceTemplateRequestStatus.ACCEPTED);
-        assertThat(converterTest.convert("rejected")).isEqualTo(
-                ServiceTemplateRequestStatus.REJECTED);
+        assertThat(converterTest.convert("in-review"))
+                .isEqualTo(ServiceTemplateRequestStatus.IN_REVIEW);
+        assertThat(converterTest.convert("accepted"))
+                .isEqualTo(ServiceTemplateRequestStatus.ACCEPTED);
+        assertThat(converterTest.convert("rejected"))
+                .isEqualTo(ServiceTemplateRequestStatus.REJECTED);
         assertThrows(UnsupportedEnumValueException.class, () -> converterTest.convert("unknown"));
     }
 }

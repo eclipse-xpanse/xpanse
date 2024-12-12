@@ -20,27 +20,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
-/**
- * Bean to manage task result via tofu-maker.
- */
+/** Bean to manage task result via tofu-maker. */
 @Slf4j
 @Component
 public class TofuMakerResultRefetchManager {
 
-    @Resource
-    private DeployResultManager deployResultManager;
-    @Resource
-    private RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
+    @Resource private DeployResultManager deployResultManager;
+    @Resource private RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
 
-    /**
-     * retrieve openTofu result.
-     */
-    public void retrieveOpenTofuResult(ServiceDeploymentEntity serviceDeployment,
-                                       ServiceOrderEntity serviceOrder) {
+    /** retrieve openTofu result. */
+    public void retrieveOpenTofuResult(
+            ServiceDeploymentEntity serviceDeployment, ServiceOrderEntity serviceOrder) {
         try {
             ResponseEntity<OpenTofuResult> result =
-                    retrieveOpenTofuResultApi.getStoredTaskResultByRequestIdWithHttpInfo(String
-                            .valueOf(serviceOrder.getOrderId()));
+                    retrieveOpenTofuResultApi.getStoredTaskResultByRequestIdWithHttpInfo(
+                            String.valueOf(serviceOrder.getOrderId()));
             if (result.getStatusCode() == HttpStatus.NO_CONTENT) {
                 return;
             }
@@ -54,15 +48,16 @@ public class TofuMakerResultRefetchManager {
             if (e.getStatusCode() == HttpStatus.BAD_REQUEST
                     && Objects.nonNull(response)
                     && response.getResultType()
-                    == Response.ResultTypeEnum.RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID) {
-                deployResultManager
-                        .updateServiceDeploymentStateAndServiceOrder(serviceDeployment,
-                                serviceOrder, ErrorType.TOFU_MAKER_REQUEST_FAILED, e);
+                            == Response.ResultTypeEnum
+                                    .RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID) {
+                deployResultManager.updateServiceDeploymentStateAndServiceOrder(
+                        serviceDeployment, serviceOrder, ErrorType.TOFU_MAKER_REQUEST_FAILED, e);
             } else {
-                log.error(String.format("Refetch openTofu result failed. orderId %s, error %s ",
-                        serviceOrder.getOrderId(), e.getMessage()));
+                log.error(
+                        String.format(
+                                "Refetch openTofu result failed. orderId %s, error %s ",
+                                serviceOrder.getOrderId(), e.getMessage()));
             }
         }
     }
-
 }

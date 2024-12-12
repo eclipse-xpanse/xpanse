@@ -20,14 +20,22 @@ class ServiceMetricsRequestTest {
     private final UUID serviceId = UUID.fromString("16e6e050-8933-4383-e56-6131c8666d0c");
     private final DeployResource deployResource = new DeployResource();
     private final List<DeployResource> deployResources = List.of(deployResource);
-    @Mock
-    private Region region;
+    @Mock private Region region;
     private ServiceMetricsRequest test;
 
     @BeforeEach
     void setUp() {
-        test = new ServiceMetricsRequest(serviceId, region, deployResources,
-                MonitorResourceType.CPU, 0L, 0L, 1, false, userId);
+        test =
+                new ServiceMetricsRequest(
+                        serviceId,
+                        region,
+                        deployResources,
+                        MonitorResourceType.CPU,
+                        0L,
+                        0L,
+                        1,
+                        false,
+                        userId);
     }
 
     @Test
@@ -50,8 +58,8 @@ class ServiceMetricsRequestTest {
         assertThat(test).isNotEqualTo(o);
         assertThat(test.hashCode()).isNotEqualTo(o.hashCode());
 
-        ServiceMetricsRequest test1 = new ServiceMetricsRequest(null, null, null, null, null, null,
-                null, false, null);
+        ServiceMetricsRequest test1 =
+                new ServiceMetricsRequest(null, null, null, null, null, null, null, false, null);
         assertThat(test.canEqual(test1)).isTrue();
         assertThat(test).isNotEqualTo(test1);
         assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
@@ -60,10 +68,17 @@ class ServiceMetricsRequestTest {
     @Test
     void testToString() {
         assertNotEquals(test.toString(), null);
-        String exceptedString = "MetricsRequest(serviceId=" + serviceId + ", region=" + region
-                + ", monitorResourceType=" + MonitorResourceType.CPU
-                + ", from=0, to=0, granularity=1,"
-                + " onlyLastKnownMetric=false, userId=" + userId + ")";
+        String exceptedString =
+                "MetricsRequest(serviceId="
+                        + serviceId
+                        + ", region="
+                        + region
+                        + ", monitorResourceType="
+                        + MonitorResourceType.CPU
+                        + ", from=0, to=0, granularity=1,"
+                        + " onlyLastKnownMetric=false, userId="
+                        + userId
+                        + ")";
         assertEquals(exceptedString, test.toString());
     }
 }

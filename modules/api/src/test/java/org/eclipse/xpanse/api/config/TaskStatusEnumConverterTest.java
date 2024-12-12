@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class TaskStatusEnumConverterTest {
 
-    private final TaskStatusEnumConverter converterTest =
-            new TaskStatusEnumConverter();
+    private final TaskStatusEnumConverter converterTest = new TaskStatusEnumConverter();
 
     @Test
     void testConvert() {

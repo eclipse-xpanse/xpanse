@@ -49,16 +49,24 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for OpenTofuMakerDeployment.
- */
-
-@ContextConfiguration(classes = {TofuMakerServiceDeployer.class, TofuMakerServiceModifier.class,
-        DeployEnvironments.class,
-        PluginManager.class, OpenTofuFromScriptsApi.class, TofuMakerConfig.class,
-        ServiceDeploymentEntityHandler.class, TofuMakerScriptValidator.class,
-        TofuMakerServiceDeployer.class, TofuMakerDeployment.class, TofuMakerHelper.class,
-        AdminApi.class, TofuMakerDeploymentPlanManage.class, TofuMakerServiceDestroyer.class})
+/** Test for OpenTofuMakerDeployment. */
+@ContextConfiguration(
+        classes = {
+            TofuMakerServiceDeployer.class,
+            TofuMakerServiceModifier.class,
+            DeployEnvironments.class,
+            PluginManager.class,
+            OpenTofuFromScriptsApi.class,
+            TofuMakerConfig.class,
+            ServiceDeploymentEntityHandler.class,
+            TofuMakerScriptValidator.class,
+            TofuMakerServiceDeployer.class,
+            TofuMakerDeployment.class,
+            TofuMakerHelper.class,
+            AdminApi.class,
+            TofuMakerDeploymentPlanManage.class,
+            TofuMakerServiceDestroyer.class
+        })
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("tofu-maker")
 class TofuMakerDeploymentTest {
@@ -66,40 +74,29 @@ class TofuMakerDeploymentTest {
     private final UUID serviceId = UUID.randomUUID();
     private final UUID orderId = UUID.randomUUID();
     private final String errorDeployer = "error_deployer";
-    private final String invalidDeployer = """
+    private final String invalidDeployer =
+            """
             resource "random_id" "new" {
               byte_length = 4
             }
-                                    
+
             output "random_id" {
               value = resource.random_id_2.new.id
             }
             """;
-    @MockitoBean
-    DeployEnvironments deployEnvironments;
-    @MockitoBean
-    PluginManager pluginManager;
-    @MockitoBean
-    OpenTofuFromScriptsApi terraformApi;
-    @MockitoBean
-    TofuMakerConfig tofuMakerConfig;
-    @MockitoBean
-    ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @MockitoBean
-    TofuMakerScriptValidator tofuMakerScriptValidator;
-    @MockitoBean
-    OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
-    @MockitoBean
-    RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
-    @Autowired
-    TofuMakerServiceDeployer tofuMakerServiceDeployer;
-    @Autowired
-    TofuMakerServiceModifier tofuMakerServiceModifier;
-    @MockitoBean
-    AdminApi adminApi;
+    @MockitoBean DeployEnvironments deployEnvironments;
+    @MockitoBean PluginManager pluginManager;
+    @MockitoBean OpenTofuFromScriptsApi terraformApi;
+    @MockitoBean TofuMakerConfig tofuMakerConfig;
+    @MockitoBean ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @MockitoBean TofuMakerScriptValidator tofuMakerScriptValidator;
+    @MockitoBean OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
+    @MockitoBean RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
+    @Autowired TofuMakerServiceDeployer tofuMakerServiceDeployer;
+    @Autowired TofuMakerServiceModifier tofuMakerServiceModifier;
+    @MockitoBean AdminApi adminApi;
 
-    @Autowired
-    private TofuMakerDeployment openTofuMakerDeployment;
+    @Autowired private TofuMakerDeployment openTofuMakerDeployment;
 
     private DeployTask deployTask;
     private Ocl ocl;
@@ -108,8 +105,9 @@ class TofuMakerDeploymentTest {
     void setUp() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ocl =
+                oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
 
         DeployRequest deployRequest = new DeployRequest();
@@ -134,7 +132,6 @@ class TofuMakerDeploymentTest {
         deployTask.setDeployRequest(deployRequest);
     }
 
-
     @Test
     void testDeploy() {
         doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
@@ -145,9 +142,10 @@ class TofuMakerDeploymentTest {
 
     @Test
     void testModify() {
-        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
-                TfResourceTransUtils.class)) {
-            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils =
+                Mockito.mockStatic(TfResourceTransUtils.class)) {
+            tfResourceTransUtils
+                    .when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
             doReturn(new HashMap<>()).when(this.deployEnvironments).getEnvironmentVariables(any());
             deployTask.setTaskType(ServiceOrderType.MODIFY);
@@ -158,9 +156,10 @@ class TofuMakerDeploymentTest {
 
     @Test
     void testDestroy() {
-        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
-                TfResourceTransUtils.class)) {
-            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils =
+                Mockito.mockStatic(TfResourceTransUtils.class)) {
+            tfResourceTransUtils
+                    .when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
             deployTask.setTaskType(ServiceOrderType.DESTROY);
             DeployResult destroyResult = this.openTofuMakerDeployment.destroy(deployTask);
@@ -169,32 +168,37 @@ class TofuMakerDeploymentTest {
         }
     }
 
-
     @Test
     void testDeploy_ThrowsRestClientException() {
         ocl.getDeployment().setDeployer(errorDeployer);
 
-        Mockito.doThrow(new OpenTofuMakerRequestFailedException("IO error")).when(terraformApi)
+        Mockito.doThrow(new OpenTofuMakerRequestFailedException("IO error"))
+                .when(terraformApi)
                 .asyncDeployWithScripts(any());
 
         ocl.getDeployment().setDeployer(invalidDeployer);
-        Assertions.assertThrows(OpenTofuMakerRequestFailedException.class,
+        Assertions.assertThrows(
+                OpenTofuMakerRequestFailedException.class,
                 () -> this.openTofuMakerDeployment.deploy(deployTask));
     }
 
     @Test
     void testDestroy_ThrowsRestClientException() {
-        Mockito.doThrow(new OpenTofuMakerRequestFailedException("IO error")).when(terraformApi)
+        Mockito.doThrow(new OpenTofuMakerRequestFailedException("IO error"))
+                .when(terraformApi)
                 .asyncDestroyWithScripts(any());
 
-        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils = Mockito.mockStatic(
-                TfResourceTransUtils.class)) {
-            tfResourceTransUtils.when(() -> TfResourceTransUtils.getStoredStateContent(any()))
+        try (MockedStatic<TfResourceTransUtils> tfResourceTransUtils =
+                Mockito.mockStatic(TfResourceTransUtils.class)) {
+            tfResourceTransUtils
+                    .when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
-            Assertions.assertThrows(OpenTofuMakerRequestFailedException.class,
+            Assertions.assertThrows(
+                    OpenTofuMakerRequestFailedException.class,
                     () -> this.openTofuMakerDeployment.destroy(deployTask));
 
-            Assertions.assertThrows(OpenTofuMakerRequestFailedException.class,
+            Assertions.assertThrows(
+                    OpenTofuMakerRequestFailedException.class,
                     () -> this.openTofuMakerDeployment.destroy(deployTask));
         }
     }
@@ -213,18 +217,17 @@ class TofuMakerDeploymentTest {
 
         String deployPlanJson = openTofuMakerDeployment.getDeploymentPlanAsJson(deployTask);
         Assertions.assertNotNull(deployPlanJson);
-
     }
 
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
 
-        when(terraformApi.planWithScripts(any())).thenThrow(
-                new OpenTofuMakerRequestFailedException("IO error"));
+        when(terraformApi.planWithScripts(any()))
+                .thenThrow(new OpenTofuMakerRequestFailedException("IO error"));
 
-        Assertions.assertThrows(OpenTofuMakerRequestFailedException.class,
+        Assertions.assertThrows(
+                OpenTofuMakerRequestFailedException.class,
                 () -> this.openTofuMakerDeployment.getDeploymentPlanAsJson(deployTask));
-
     }
 
     @Test
@@ -252,8 +255,8 @@ class TofuMakerDeploymentTest {
         expectedResult.setValid(false);
         DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
         diagnostics.setDetail(
-                "A managed resource \"random_id_2\" \"new\" has not been declared in the root " +
-                        "module.");
+                "A managed resource \"random_id_2\" \"new\" has not been declared in the root "
+                        + "module.");
         expectedResult.setDiagnostics(List.of(diagnostics));
 
         when(tofuMakerScriptValidator.validateOpenTofuScripts(any())).thenReturn(expectedResult);
@@ -269,11 +272,11 @@ class TofuMakerDeploymentTest {
     @Test
     void testValidate_ThrowsOpenTofuExecutorException() {
         ocl.getDeployment().setDeployer(errorDeployer);
-        when(tofuMakerScriptValidator.validateOpenTofuScripts(any())).thenThrow(
-                new OpenTofuMakerRequestFailedException("IO error"));
+        when(tofuMakerScriptValidator.validateOpenTofuScripts(any()))
+                .thenThrow(new OpenTofuMakerRequestFailedException("IO error"));
 
-        Assertions.assertThrows(OpenTofuMakerRequestFailedException.class,
+        Assertions.assertThrows(
+                OpenTofuMakerRequestFailedException.class,
                 () -> this.openTofuMakerDeployment.validate(ocl.getDeployment()));
     }
-
 }

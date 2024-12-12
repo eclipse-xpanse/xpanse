@@ -55,24 +55,18 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-/**
- * Plugin to deploy managed services on FlexibleEngine cloud.
- */
+/** Plugin to deploy managed services on FlexibleEngine cloud. */
 @Slf4j
 @Component
 public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    @Resource
-    private FlexibleEngineTerraformResourceHandler terraformResourceHandler;
-    @Resource
-    private FlexibleEngineMetricsService metricsService;
-    @Resource
-    private FlexibleEngineVmStateManager vmStateManager;
-    @Resource
-    private FlexibleEngineResourceManager resourceManager;
-    @Resource
-    private FlexibleEnginePriceCalculator pricingCalculator;
+    @Resource private FlexibleEngineTerraformResourceHandler terraformResourceHandler;
+    @Resource private FlexibleEngineMetricsService metricsService;
+    @Resource private FlexibleEngineVmStateManager vmStateManager;
+    @Resource private FlexibleEngineResourceManager resourceManager;
+    @Resource private FlexibleEnginePriceCalculator pricingCalculator;
+
     @Value("${flexibleengine.auto.approve.service.template.enabled:false}")
     private boolean autoApproveServiceTemplateEnabled;
 
@@ -112,7 +106,6 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
         return Collections.emptyMap();
     }
 
-
     @Override
     public boolean autoApproveServiceTemplateIsEnabled() {
         return autoApproveServiceTemplateEnabled;
@@ -126,27 +119,46 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     public boolean validateRegionsOfService(Ocl ocl) {
         List<String> errors = new ArrayList<>();
-        ocl.getCloudServiceProvider().getRegions().forEach(region -> {
-            try {
-                String iamEndpointForRegion =
-                        PROTOCOL_HTTPS + IAM_ENDPOINT_PREFIX + region.getName() + ENDPOINT_SUFFIX;
-                ResponseEntity<JsonNode>
-                        response = restTemplate.getForEntity(iamEndpointForRegion, JsonNode.class);
-                log.info("Request IAM endpoint for region {} get response with status {} body {}",
-                        region.getName(), response.getStatusCode().value(), response.getBody());
-            } catch (RestClientException e) {
-                log.error("Request IAM endpoint for region {} error. {}",
-                        region.getName(), e.getMessage());
-                String errorMsg = String.format("Region with name %s is unavailable in "
-                        + "Csp %s.", region.getName(), getCsp().toValue());
-                errors.add(errorMsg);
-            }
-            if (!getSites().contains(region.getSite())) {
-                String errorMsg = String.format("Region with site %s is unavailable in Csp %s. "
-                        + "Available sites %s", region.getName(), getCsp().toValue(), getSites());
-                errors.add(errorMsg);
-            }
-        });
+        ocl.getCloudServiceProvider()
+                .getRegions()
+                .forEach(
+                        region -> {
+                            try {
+                                String iamEndpointForRegion =
+                                        PROTOCOL_HTTPS
+                                                + IAM_ENDPOINT_PREFIX
+                                                + region.getName()
+                                                + ENDPOINT_SUFFIX;
+                                ResponseEntity<JsonNode> response =
+                                        restTemplate.getForEntity(
+                                                iamEndpointForRegion, JsonNode.class);
+                                log.info(
+                                        "Request IAM endpoint for region {} get response with"
+                                                + " status {} body {}",
+                                        region.getName(),
+                                        response.getStatusCode().value(),
+                                        response.getBody());
+                            } catch (RestClientException e) {
+                                log.error(
+                                        "Request IAM endpoint for region {} error. {}",
+                                        region.getName(),
+                                        e.getMessage());
+                                String errorMsg =
+                                        String.format(
+                                                "Region with name %s is unavailable in "
+                                                        + "Csp %s.",
+                                                region.getName(), getCsp().toValue());
+                                errors.add(errorMsg);
+                            }
+                            if (!getSites().contains(region.getSite())) {
+                                String errorMsg =
+                                        String.format(
+                                                "Region with site %s is unavailable in Csp %s. "
+                                                        + "Available sites %s",
+                                                region.getName(), getCsp().toValue(), getSites());
+                                errors.add(errorMsg);
+                            }
+                        });
         if (CollectionUtils.isEmpty(errors)) {
             return true;
         }
@@ -169,23 +181,29 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         CredentialVariables accessKey =
-                new CredentialVariables(getCsp(), DEFAULT_SITE, CredentialType.VARIABLES, "AK_SK",
-                        "The access key and security key.", null, credentialVariables);
+                new CredentialVariables(
+                        getCsp(),
+                        DEFAULT_SITE,
+                        CredentialType.VARIABLES,
+                        "AK_SK",
+                        "The access key and security key.",
+                        null,
+                        credentialVariables);
         credentialVariables.add(
-                new CredentialVariable(FlexibleEngineConstants.OS_ACCESS_KEY, "The access key.",
-                        true));
+                new CredentialVariable(
+                        FlexibleEngineConstants.OS_ACCESS_KEY, "The access key.", true));
         credentialVariables.add(
-                new CredentialVariable(FlexibleEngineConstants.OS_SECRET_KEY, "The security key.",
-                        true));
+                new CredentialVariable(
+                        FlexibleEngineConstants.OS_SECRET_KEY, "The security key.", true));
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(accessKey);
         /* In the credential definition object CredentialVariables. The value of fields joined like
-           csp-type-name must be unique. It means when you want to add a new CredentialVariables
-           with type VARIABLES for this csp, the value of filed name in the new CredentialVariables
-           must be different from the value of filed name in others CredentialVariables
-           with the same type VARIABLES. Otherwise, it will throw an exception at the application
-           startup.
-           */
+        csp-type-name must be unique. It means when you want to add a new CredentialVariables
+        with type VARIABLES for this csp, the value of filed name in the new CredentialVariables
+        must be different from the value of filed name in others CredentialVariables
+        with the same type VARIABLES. Otherwise, it will throw an exception at the application
+        startup.
+        */
         return credentialInfos;
     }
 

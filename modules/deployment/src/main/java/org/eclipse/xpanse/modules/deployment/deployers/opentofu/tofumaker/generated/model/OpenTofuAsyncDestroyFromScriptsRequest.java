@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,53 +22,45 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * OpenTofuAsyncDestroyFromScriptsRequest
- */
+/** OpenTofuAsyncDestroyFromScriptsRequest */
 @JsonPropertyOrder({
-        OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_REQUEST_ID,
-        OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
-        OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_VARIABLES,
-        OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
-        OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_SCRIPTS,
-        OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_TF_STATE,
-        OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_WEBHOOK_CONFIG
+    OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_REQUEST_ID,
+    OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
+    OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_VARIABLES,
+    OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
+    OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_SCRIPTS,
+    OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_TF_STATE,
+    OpenTofuAsyncDestroyFromScriptsRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuAsyncDestroyFromScriptsRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_OPEN_TOFU_VERSION = "openTofuVersion";
-    @jakarta.annotation.Nonnull
-    private String openTofuVersion;
+    @jakarta.annotation.Nonnull private String openTofuVersion;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_SCRIPTS = "scripts";
-    @jakarta.annotation.Nonnull
-    private List<String> scripts = new ArrayList<>();
+    @jakarta.annotation.Nonnull private List<String> scripts = new ArrayList<>();
 
     public static final String JSON_PROPERTY_TF_STATE = "tfState";
-    @jakarta.annotation.Nonnull
-    private String tfState;
+    @jakarta.annotation.Nonnull private String tfState;
 
     public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
-    @jakarta.annotation.Nonnull
-    private WebhookConfig webhookConfig;
+    @jakarta.annotation.Nonnull private WebhookConfig webhookConfig;
 
-    public OpenTofuAsyncDestroyFromScriptsRequest() {
-    }
+    public OpenTofuAsyncDestroyFromScriptsRequest() {}
 
-    public OpenTofuAsyncDestroyFromScriptsRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
+    public OpenTofuAsyncDestroyFromScriptsRequest requestId(
+            @jakarta.annotation.Nullable UUID requestId) {
 
         this.requestId = requestId;
         return this;
@@ -83,11 +74,9 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -95,7 +84,8 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
         this.requestId = requestId;
     }
 
-    public OpenTofuAsyncDestroyFromScriptsRequest openTofuVersion(@jakarta.annotation.Nonnull String openTofuVersion) {
+    public OpenTofuAsyncDestroyFromScriptsRequest openTofuVersion(
+            @jakarta.annotation.Nonnull String openTofuVersion) {
 
         this.openTofuVersion = openTofuVersion;
         return this;
@@ -109,11 +99,9 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getOpenTofuVersion() {
         return openTofuVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -121,13 +109,15 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
         this.openTofuVersion = openTofuVersion;
     }
 
-    public OpenTofuAsyncDestroyFromScriptsRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public OpenTofuAsyncDestroyFromScriptsRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
     }
 
-    public OpenTofuAsyncDestroyFromScriptsRequest putVariablesItem(String key, Object variablesItem) {
+    public OpenTofuAsyncDestroyFromScriptsRequest putVariablesItem(
+            String key, Object variablesItem) {
         this.variables.put(key, variablesItem);
         return this;
     }
@@ -140,11 +130,9 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -159,7 +147,8 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
         return this;
     }
 
-    public OpenTofuAsyncDestroyFromScriptsRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public OpenTofuAsyncDestroyFromScriptsRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -168,18 +157,17 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to OpenTofu process.
+     * Key-value pairs of variables that must be injected as environment variables to OpenTofu
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -187,7 +175,8 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
         this.envVariables = envVariables;
     }
 
-    public OpenTofuAsyncDestroyFromScriptsRequest scripts(@jakarta.annotation.Nonnull List<String> scripts) {
+    public OpenTofuAsyncDestroyFromScriptsRequest scripts(
+            @jakarta.annotation.Nonnull List<String> scripts) {
 
         this.scripts = scripts;
         return this;
@@ -209,11 +198,9 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_SCRIPTS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public List<String> getScripts() {
         return scripts;
     }
-
 
     @JsonProperty(JSON_PROPERTY_SCRIPTS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -221,7 +208,8 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
         this.scripts = scripts;
     }
 
-    public OpenTofuAsyncDestroyFromScriptsRequest tfState(@jakarta.annotation.Nonnull String tfState) {
+    public OpenTofuAsyncDestroyFromScriptsRequest tfState(
+            @jakarta.annotation.Nonnull String tfState) {
 
         this.tfState = tfState;
         return this;
@@ -235,11 +223,9 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTfState() {
         return tfState;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -262,11 +248,9 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public WebhookConfig getWebhookConfig() {
         return webhookConfig;
     }
-
 
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -284,18 +268,29 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
         }
         OpenTofuAsyncDestroyFromScriptsRequest openTofuAsyncDestroyFromScriptsRequest =
                 (OpenTofuAsyncDestroyFromScriptsRequest) o;
-        return Objects.equals(this.requestId, openTofuAsyncDestroyFromScriptsRequest.requestId) &&
-                Objects.equals(this.openTofuVersion, openTofuAsyncDestroyFromScriptsRequest.openTofuVersion) &&
-                Objects.equals(this.variables, openTofuAsyncDestroyFromScriptsRequest.variables) &&
-                Objects.equals(this.envVariables, openTofuAsyncDestroyFromScriptsRequest.envVariables) &&
-                Objects.equals(this.scripts, openTofuAsyncDestroyFromScriptsRequest.scripts) &&
-                Objects.equals(this.tfState, openTofuAsyncDestroyFromScriptsRequest.tfState) &&
-                Objects.equals(this.webhookConfig, openTofuAsyncDestroyFromScriptsRequest.webhookConfig);
+        return Objects.equals(this.requestId, openTofuAsyncDestroyFromScriptsRequest.requestId)
+                && Objects.equals(
+                        this.openTofuVersion,
+                        openTofuAsyncDestroyFromScriptsRequest.openTofuVersion)
+                && Objects.equals(this.variables, openTofuAsyncDestroyFromScriptsRequest.variables)
+                && Objects.equals(
+                        this.envVariables, openTofuAsyncDestroyFromScriptsRequest.envVariables)
+                && Objects.equals(this.scripts, openTofuAsyncDestroyFromScriptsRequest.scripts)
+                && Objects.equals(this.tfState, openTofuAsyncDestroyFromScriptsRequest.tfState)
+                && Objects.equals(
+                        this.webhookConfig, openTofuAsyncDestroyFromScriptsRequest.webhookConfig);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, openTofuVersion, variables, envVariables, scripts, tfState, webhookConfig);
+        return Objects.hash(
+                requestId,
+                openTofuVersion,
+                variables,
+                envVariables,
+                scripts,
+                tfState,
+                webhookConfig);
     }
 
     @Override
@@ -314,8 +309,8 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -323,6 +318,4 @@ public class OpenTofuAsyncDestroyFromScriptsRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

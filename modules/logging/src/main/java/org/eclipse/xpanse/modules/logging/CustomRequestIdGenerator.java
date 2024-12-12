@@ -15,9 +15,7 @@ import org.springframework.lang.NonNull;
 import org.zalando.logbook.CorrelationId;
 import org.zalando.logbook.HttpRequest;
 
-/**
- * Custom unique ID generated per request by Logbook.
- */
+/** Custom unique ID generated per request by Logbook. */
 public class CustomRequestIdGenerator implements CorrelationId {
 
     /**

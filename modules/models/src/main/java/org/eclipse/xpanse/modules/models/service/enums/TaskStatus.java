@@ -11,9 +11,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Enumeration class for service order status.
- */
+/** Enumeration class for service order status. */
 public enum TaskStatus {
     CREATED("created"),
     IN_PROGRESS("in-progress"),
@@ -26,9 +24,7 @@ public enum TaskStatus {
         this.value = value;
     }
 
-    /**
-     * For WorkFlowTaskStatus deserialize.
-     */
+    /** For WorkFlowTaskStatus deserialize. */
     @JsonCreator
     public static TaskStatus getByValue(String value) {
         for (TaskStatus entry : values()) {
@@ -40,12 +36,9 @@ public enum TaskStatus {
                 String.format("WorkFlowTaskStatus value %s is not supported.", value));
     }
 
-    /**
-     * For WorkFlowTaskStatus serialize.
-     */
+    /** For WorkFlowTaskStatus serialize. */
     @JsonValue
     public String toValue() {
         return this.value;
     }
-
 }

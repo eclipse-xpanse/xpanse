@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of MetricItemType.
- */
+/** Test of MetricItemType. */
 class MetricItemTypeTest {
 
     @Test
@@ -20,8 +18,8 @@ class MetricItemTypeTest {
         Assertions.assertEquals(MetricItemType.VALUE, MetricItemType.VALUE.getByValue("value"));
         Assertions.assertEquals(MetricItemType.COUNT, MetricItemType.COUNT.getByValue("count"));
         Assertions.assertEquals(MetricItemType.SUM, MetricItemType.SUM.getByValue("sum"));
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> MetricItemType.SUM.getByValue("null"));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> MetricItemType.SUM.getByValue("null"));
     }
 
     @Test
@@ -30,5 +28,4 @@ class MetricItemTypeTest {
         Assertions.assertEquals("count", MetricItemType.COUNT.toValue());
         Assertions.assertEquals("sum", MetricItemType.SUM.toValue());
     }
-
 }

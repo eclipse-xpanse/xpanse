@@ -34,28 +34,19 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Bean provide methods to get the csp info.
- */
+/** Bean provide methods to get the csp info. */
 @Slf4j
 @Component
 public class GetCspInfoFromRequest {
 
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-    @Resource
-    private DatabaseServiceTemplateStorage serviceTemplateStorage;
-    @Resource
-    private DatabaseServiceDeploymentStorage deployServiceStorage;
-    @Resource
-    private DatabaseServicePolicyStorage servicePolicyStorage;
-    @Resource
-    private DatabaseUserPolicyStorage userPolicyStorage;
-    @Resource
-    private TaskService taskService;
-    @Resource
-    private DatabaseServiceOrderStorage serviceOrderTaskStorage;
-    @Resource
-    private ServiceTemplateRequestHistoryStorage serviceTemplateHistoryStorage;
+    @Resource private DatabaseServiceTemplateStorage serviceTemplateStorage;
+    @Resource private DatabaseServiceDeploymentStorage deployServiceStorage;
+    @Resource private DatabaseServicePolicyStorage servicePolicyStorage;
+    @Resource private DatabaseUserPolicyStorage userPolicyStorage;
+    @Resource private TaskService taskService;
+    @Resource private DatabaseServiceOrderStorage serviceOrderTaskStorage;
+    @Resource private ServiceTemplateRequestHistoryStorage serviceTemplateHistoryStorage;
 
     /**
      * Get Csp with the URL of Ocl.
@@ -73,7 +64,6 @@ public class GetCspInfoFromRequest {
         }
         return null;
     }
-
 
     /**
      * Get Csp with id of service template.
@@ -121,8 +111,7 @@ public class GetCspInfoFromRequest {
      */
     public Csp getCspFromUserPolicyId(String id) {
         try {
-            UserPolicyEntity userPolicy =
-                    userPolicyStorage.findPolicyById(UUID.fromString(id));
+            UserPolicyEntity userPolicy = userPolicyStorage.findPolicyById(UUID.fromString(id));
             if (Objects.nonNull(userPolicy)) {
                 return userPolicy.getCsp();
             }
@@ -193,8 +182,9 @@ public class GetCspInfoFromRequest {
                     serviceOrderTaskStorage.getEntityById(UUID.fromString(orderId));
             if (Objects.nonNull(order)
                     && Objects.nonNull(order.getServiceDeploymentEntity().getId())) {
-                ServiceDeploymentEntity deployService = deployServiceStorage
-                        .findServiceDeploymentById(order.getServiceDeploymentEntity().getId());
+                ServiceDeploymentEntity deployService =
+                        deployServiceStorage.findServiceDeploymentById(
+                                order.getServiceDeploymentEntity().getId());
                 return deployService.getCsp();
             }
         } catch (Exception e) {
@@ -202,7 +192,6 @@ public class GetCspInfoFromRequest {
         }
         return null;
     }
-
 
     /**
      * Get Csp with service template request id.
@@ -214,8 +203,8 @@ public class GetCspInfoFromRequest {
         try {
             ServiceTemplateRequestHistoryEntity serviceTemplateHistory =
                     serviceTemplateHistoryStorage.getEntityByRequestId(requestId);
-            if (Objects.nonNull(serviceTemplateHistory) && Objects.nonNull(
-                    serviceTemplateHistory.getServiceTemplate())) {
+            if (Objects.nonNull(serviceTemplateHistory)
+                    && Objects.nonNull(serviceTemplateHistory.getServiceTemplate())) {
                 return serviceTemplateHistory.getServiceTemplate().getCsp();
             }
         } catch (Exception e) {

@@ -51,7 +51,6 @@ class IconProcessorUtilTest {
         } catch (Exception e) {
             assertTrue(e instanceof IconProcessingFailedException);
         }
-
     }
 
     @Test
@@ -67,9 +66,7 @@ class IconProcessorUtilTest {
         ocl.setIcon(iconUrl);
 
         // Verify the results
-        assertThrows(IconProcessingFailedException.class,
-                () -> IconProcessorUtil.processImage(ocl));
+        assertThrows(
+                IconProcessingFailedException.class, () -> IconProcessorUtil.processImage(ocl));
     }
-
-
 }

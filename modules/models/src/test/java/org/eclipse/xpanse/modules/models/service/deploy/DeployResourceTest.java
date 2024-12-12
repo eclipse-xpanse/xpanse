@@ -16,9 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of DeployResource.
- */
+/** Test of DeployResource. */
 class DeployResourceTest {
 
     private final String resourceId = "f0dcb6ea-cbe7-4c88-9c94-a5d00e82a4f2";
@@ -68,14 +66,20 @@ class DeployResourceTest {
 
     @Test
     void testToString() {
-        String expectedToString = "DeployResource(groupType=" + groupType +
-                ", groupName=" + groupName +
-                ", resourceId=" + resourceId +
-                ", resourceName=" + resourceName +
-                ", resourceKind=" + resourceKind +
-                ", properties=" + properties +
-                ')';
+        String expectedToString =
+                "DeployResource(groupType="
+                        + groupType
+                        + ", groupName="
+                        + groupName
+                        + ", resourceId="
+                        + resourceId
+                        + ", resourceName="
+                        + resourceName
+                        + ", resourceKind="
+                        + resourceKind
+                        + ", properties="
+                        + properties
+                        + ')';
         assertEquals(expectedToString, resource.toString());
     }
-
 }

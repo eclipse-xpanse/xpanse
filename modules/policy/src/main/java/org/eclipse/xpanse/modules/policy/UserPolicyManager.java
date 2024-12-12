@@ -28,25 +28,20 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * The service for managing policies created by the end user.
- */
+/** The service for managing policies created by the end user. */
 @Slf4j
 @Component
 public class UserPolicyManager {
 
-    @Resource
-    private PolicyManager policyManager;
+    @Resource private PolicyManager policyManager;
 
-    @Resource
-    private UserServiceHelper userServiceHelper;
-    @Resource
-    private DatabaseUserPolicyStorage userPolicyStorage;
+    @Resource private UserServiceHelper userServiceHelper;
+    @Resource private DatabaseUserPolicyStorage userPolicyStorage;
 
     /**
      * Get the query model for listing policies.
      *
-     * @param csp     The csp.
+     * @param csp The csp.
      * @param enabled The enabled.
      * @return Returns the query model.
      */
@@ -63,7 +58,6 @@ public class UserPolicyManager {
         return userPolicyQueryRequest;
     }
 
-
     /**
      * List policies by the query model.
      *
@@ -72,8 +66,10 @@ public class UserPolicyManager {
      */
     public List<UserPolicy> listUserPolicies(UserPolicyQueryRequest queryModel) {
         List<UserPolicyEntity> policyEntities = userPolicyStorage.listPolicies(queryModel);
-        return policyEntities.stream().sorted(Comparator.comparing(UserPolicyEntity::getCsp))
-                .map(this::conventToUserPolicy).toList();
+        return policyEntities.stream()
+                .sorted(Comparator.comparing(UserPolicyEntity::getCsp))
+                .map(this::conventToUserPolicy)
+                .toList();
     }
 
     /**
@@ -114,7 +110,6 @@ public class UserPolicyManager {
         return conventToUserPolicy(existingEntity);
     }
 
-
     private UserPolicyEntity getUserPolicyEntity(UUID policyId) {
         UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(policyId);
         if (Objects.isNull(existingEntity)) {
@@ -122,15 +117,14 @@ public class UserPolicyManager {
             throw new PolicyNotFoundException(errorMsg);
         }
 
-        boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(
-                existingEntity.getUserId());
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(existingEntity.getUserId());
         if (!currentUserIsOwner) {
             throw new AccessDeniedException(
                     "No permissions to view or manage policy belonging to other users.");
         }
         return existingEntity;
     }
-
 
     /**
      * Delete the policy by user.
@@ -152,13 +146,13 @@ public class UserPolicyManager {
         List<UserPolicyEntity> userPolicyEntityList = userPolicyStorage.listPolicies(queryModel);
         if (!CollectionUtils.isEmpty(userPolicyEntityList)) {
             String policyKey = userPolicyEntityList.getFirst().getId().toString();
-            String errMsg = String.format("The same policy already exists for Csp: %s."
-                    + " with id: %s", csp, policyKey);
+            String errMsg =
+                    String.format(
+                            "The same policy already exists for Csp: %s." + " with id: %s",
+                            csp, policyKey);
             throw new PolicyDuplicateException(errMsg);
         }
-
     }
-
 
     private UserPolicy conventToUserPolicy(UserPolicyEntity userPolicyEntity) {
         if (Objects.nonNull(userPolicyEntity)) {
@@ -179,19 +173,22 @@ public class UserPolicyManager {
         return userPolicyEntity;
     }
 
-    private UserPolicyEntity getUserPolicyToUpdate(UserPolicyUpdateRequest updateRequest,
-                                                   UserPolicyEntity existingEntity) {
+    private UserPolicyEntity getUserPolicyToUpdate(
+            UserPolicyUpdateRequest updateRequest, UserPolicyEntity existingEntity) {
         UserPolicyEntity policyToUpdate = new UserPolicyEntity();
         BeanUtils.copyProperties(existingEntity, policyToUpdate);
-        boolean updatePolicy = StringUtils.isNotBlank(updateRequest.getPolicy())
-                && !StringUtils.equals(updateRequest.getPolicy(), existingEntity.getPolicy());
+        boolean updatePolicy =
+                StringUtils.isNotBlank(updateRequest.getPolicy())
+                        && !StringUtils.equals(
+                                updateRequest.getPolicy(), existingEntity.getPolicy());
         if (updatePolicy) {
             policyManager.validatePolicy(updateRequest.getPolicy());
             policyToUpdate.setPolicy(updateRequest.getPolicy());
         }
 
-        boolean updateCsp = Objects.nonNull(updateRequest.getCsp())
-                && !Objects.equals(updateRequest.getCsp(), existingEntity.getCsp());
+        boolean updateCsp =
+                Objects.nonNull(updateRequest.getCsp())
+                        && !Objects.equals(updateRequest.getCsp(), existingEntity.getCsp());
         if (updateCsp) {
             policyToUpdate.setCsp(updateRequest.getCsp());
         }
@@ -205,5 +202,4 @@ public class UserPolicyManager {
         }
         return policyToUpdate;
     }
-
 }

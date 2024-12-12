@@ -29,9 +29,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTe
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.hibernate.annotations.Type;
 
-/**
- * Represents the SERVICE_TEMPLATE_REQUEST_HISTORY table in the database.
- */
+/** Represents the SERVICE_TEMPLATE_REQUEST_HISTORY table in the database. */
 @Table(name = "SERVICE_TEMPLATE_REQUEST_HISTORY")
 @Entity
 @Data

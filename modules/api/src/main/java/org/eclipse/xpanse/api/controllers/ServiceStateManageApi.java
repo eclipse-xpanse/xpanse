@@ -28,9 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Service Management REST API.
- */
+/** Service Management REST API. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -39,8 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServiceStateManageApi {
 
-    @Resource
-    private ServiceStateManager serviceStateManager;
+    @Resource private ServiceStateManager serviceStateManager;
 
     /**
      * Start the deployed service by the service id.
@@ -48,7 +45,8 @@ public class ServiceStateManageApi {
      * @param serviceId id of service.
      * @return id of the service state management task.
      */
-    @Tag(name = "ServiceStatusManagement",
+    @Tag(
+            name = "ServiceStatusManagement",
             description = "APIs to manage status of the service instances")
     @Operation(description = "Start a task to start the service instance.")
     @PutMapping(value = "/services/start/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,7 +62,8 @@ public class ServiceStateManageApi {
      * @param serviceId id of service.
      * @return id of the service state management task.
      */
-    @Tag(name = "ServiceStatusManagement",
+    @Tag(
+            name = "ServiceStatusManagement",
             description = "APIs to manage status of the service instances")
     @Operation(description = "Start a task to stop the service instance.")
     @PutMapping(value = "/services/stop/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -80,10 +79,12 @@ public class ServiceStateManageApi {
      * @param serviceId id of service.
      * @return id of the service state management task.
      */
-    @Tag(name = "ServiceStatusManagement",
+    @Tag(
+            name = "ServiceStatusManagement",
             description = "APIs to manage status of the service instances")
     @Operation(description = "Start a task to restart the service instance.")
-    @PutMapping(value = "/services/restart/{serviceId}",
+    @PutMapping(
+            value = "/services/restart/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")

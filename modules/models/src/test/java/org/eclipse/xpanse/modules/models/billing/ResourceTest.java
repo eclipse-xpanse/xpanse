@@ -15,10 +15,8 @@ import org.springframework.beans.BeanUtils;
 class ResourceTest {
 
     private final int count = 1;
-    @Mock
-    private DeployResourceKind mockDeployResourceKind;
-    @Mock
-    private Map<String, String> mockProperties;
+    @Mock private DeployResourceKind mockDeployResourceKind;
+    @Mock private Map<String, String> mockProperties;
 
     private Resource resourceUnderTest;
 
@@ -57,8 +55,14 @@ class ResourceTest {
 
     @Test
     void testToString() {
-        String result = "Resource(count=" + count + ", deployResourceKind=" + mockDeployResourceKind
-                + ", properties=" + mockProperties + ")";
+        String result =
+                "Resource(count="
+                        + count
+                        + ", deployResourceKind="
+                        + mockDeployResourceKind
+                        + ", properties="
+                        + mockProperties
+                        + ")";
         assertThat(resourceUnderTest.toString()).isEqualTo(result);
     }
 }

@@ -12,9 +12,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of AbstractCredentialInfo.
- */
+/** Test of AbstractCredentialInfo. */
 class AbstractCredentialInfoTest {
 
     @Test
@@ -42,10 +40,14 @@ class AbstractCredentialInfoTest {
     }
 
     private static class AbstractCredentialInfoImpl extends AbstractCredentialInfo {
-        AbstractCredentialInfoImpl(Csp csp, String site, CredentialType type, String name,
-                                   String description, String userId) {
+        AbstractCredentialInfoImpl(
+                Csp csp,
+                String site,
+                CredentialType type,
+                String name,
+                String description,
+                String userId) {
             super(csp, site, type, name, description, userId);
         }
     }
-
 }

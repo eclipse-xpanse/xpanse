@@ -24,9 +24,7 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurati
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 
-/**
- * Define view object for UI Client to query deployed services.
- */
+/** Define view object for UI Client to query deployed services. */
 @Data
 public class DeployedService {
 
@@ -34,76 +32,57 @@ public class DeployedService {
     @Schema(description = "The ID of the service")
     private UUID serviceId;
 
-    /**
-     * The category of the Service.
-     */
+    /** The category of the Service. */
     @NotNull
     @Schema(description = "The catalog of the service")
     private Category category;
 
-
-    /**
-     * The name of the Service.
-     */
+    /** The name of the Service. */
     @NotNull
     @NotBlank
     @Schema(description = "The name of the service")
     private String name;
 
-    /**
-     * Customer provided name for the service.
-     */
-    @Schema(description = "Customer's name for the service. Used only for customer's reference."
-            + "If not provided, this value will be auto-generated")
+    /** Customer provided name for the service. */
+    @Schema(
+            description =
+                    "Customer's name for the service. Used only for customer's reference."
+                            + "If not provided, this value will be auto-generated")
     private String customerServiceName;
 
-    /**
-     * The version of the Service.
-     */
+    /** The version of the Service. */
     @NotNull
     @NotBlank
     @Schema(description = "The version of the service")
     private String version;
 
-    /**
-     * The csp of the Service.
-     */
+    /** The csp of the Service. */
     @NotNull
     @Schema(description = "The provider of the service")
     private Csp csp;
 
-    /**
-     * The flavor of the Service.
-     */
+    /** The flavor of the Service. */
     @Schema(description = "The flavor of the service")
     private String flavor;
 
-    /**
-     * The billing mode of the Service.
-     */
+    /** The billing mode of the Service. */
     @NotNull
     @Schema(description = "The billing mode of the managed service.")
     private BillingMode billingMode;
 
-    /**
-     * The region of the Service.
-     */
+    /** The region of the Service. */
     @NotNull
     @Schema(description = "The region of the service.")
     private Region region;
 
-    /**
-     * The id of the Service Template.
-     */
+    /** The id of the Service Template. */
     @Schema(description = "The id of the Service Template")
     private UUID serviceTemplateId;
 
     @Schema(description = "The id of the user who deployed the service.")
     private String userId;
 
-    /**
-     * The state of the Service.
-     */
+    /** The state of the Service. */
     @NotNull
     @Schema(description = "The deployment state of the service")
     private ServiceDeploymentState serviceDeploymentState;
@@ -113,8 +92,10 @@ public class DeployedService {
     private ServiceState serviceState = ServiceState.NOT_RUNNING;
 
     @NotNull
-    @Schema(description = "Defines which cloud service account is used "
-            + "for deploying cloud resources.")
+    @Schema(
+            description =
+                    "Defines which cloud service account is used "
+                            + "for deploying cloud resources.")
     private ServiceHostingType serviceHostingType;
 
     @NotNull

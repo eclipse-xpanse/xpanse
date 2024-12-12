@@ -12,9 +12,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedEx
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of ClientApiCallFailedException.
- */
+/** Test of ClientApiCallFailedException. */
 class ClientApiCallFailedExceptionTest {
 
     private static final String message = "clientApi call failed.";
@@ -29,5 +27,4 @@ class ClientApiCallFailedExceptionTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

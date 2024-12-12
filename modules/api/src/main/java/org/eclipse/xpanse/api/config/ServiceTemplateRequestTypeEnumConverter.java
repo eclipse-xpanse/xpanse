@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTe
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to ServiceTemplateRequestType enum.
- */
+/** Bean for serializing string in request parameters to ServiceTemplateRequestType enum. */
 @Component
 public class ServiceTemplateRequestTypeEnumConverter
         implements Converter<String, ServiceTemplateRequestType> {

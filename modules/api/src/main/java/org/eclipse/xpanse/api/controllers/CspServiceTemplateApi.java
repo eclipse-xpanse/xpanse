@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-
 import static org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter.convertToServiceTemplateDetailVo;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_CSP;
@@ -48,10 +47,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-/**
- * REST interface methods for role csp to manage service templates.
- */
+/** REST interface methods for role csp to manage service templates. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -60,22 +56,21 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class CspServiceTemplateApi {
 
-    @Resource
-    private ServiceTemplateManage serviceTemplateManage;
-    @Resource
-    private UserServiceHelper userServiceHelper;
+    @Resource private ServiceTemplateManage serviceTemplateManage;
+    @Resource private UserServiceHelper userServiceHelper;
 
     /**
      * List service templates with query params.
      *
-     * @param categoryName                     category of the service.
-     * @param serviceName                      name of the service.
-     * @param serviceVersion                   version of the service.
-     * @param serviceHostingType               type of the service hosting.
+     * @param categoryName category of the service.
+     * @param serviceName name of the service.
+     * @param serviceVersion version of the service.
+     * @param serviceHostingType type of the service hosting.
      * @param serviceTemplateRegistrationState state of the service template registration.
      * @return service templates
      */
-    @Tag(name = "CloudServiceProvider",
+    @Tag(
+            name = "CloudServiceProvider",
             description = "APIs for cloud service provider to manage service templates.")
     @Operation(description = "List managed service templates with query params.")
     @GetMapping(value = "/csp/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -83,31 +78,41 @@ public class CspServiceTemplateApi {
     @AuditApiRequest(enabled = false)
     public List<ServiceTemplateDetailVo> listManagedServiceTemplates(
             @Parameter(name = "categoryName", description = "category of the service")
-            @RequestParam(name = "categoryName", required = false) Category categoryName,
+                    @RequestParam(name = "categoryName", required = false)
+                    Category categoryName,
             @Parameter(name = "serviceName", description = "name of the service")
-            @RequestParam(name = "serviceName", required = false) String serviceName,
+                    @RequestParam(name = "serviceName", required = false)
+                    String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
-            @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
+                    @RequestParam(name = "serviceVersion", required = false)
+                    String serviceVersion,
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
-            @RequestParam(name = "serviceHostingType", required = false)
-            ServiceHostingType serviceHostingType,
-            @Parameter(name = "serviceTemplateRegistrationState",
-                    description = "state of service template registration")
-            @RequestParam(name = "serviceTemplateRegistrationState", required = false)
-            ServiceTemplateRegistrationState serviceTemplateRegistrationState,
+                    @RequestParam(name = "serviceHostingType", required = false)
+                    ServiceHostingType serviceHostingType,
+            @Parameter(
+                            name = "serviceTemplateRegistrationState",
+                            description = "state of service template registration")
+                    @RequestParam(name = "serviceTemplateRegistrationState", required = false)
+                    ServiceTemplateRegistrationState serviceTemplateRegistrationState,
             @Parameter(name = "availableInCatalog", description = "is available in catalog")
-            @RequestParam(name = "availableInCatalog", required = false)
-            Boolean availableInCatalog,
+                    @RequestParam(name = "availableInCatalog", required = false)
+                    Boolean availableInCatalog,
             @Parameter(name = "isUpdatePending", description = "is service template updating")
-            @RequestParam(name = "isUpdatePending", required = false)
-            Boolean isUpdatePending) {
+                    @RequestParam(name = "isUpdatePending", required = false)
+                    Boolean isUpdatePending) {
         Csp csp = userServiceHelper.getCurrentUserManageCsp();
-        ServiceTemplateQueryModel queryRequest = ServiceTemplateQueryModel.builder()
-                .csp(csp).category(categoryName).serviceName(serviceName)
-                .serviceVersion(serviceVersion).serviceHostingType(serviceHostingType)
-                .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
-                .availableInCatalog(availableInCatalog)
-                .isUpdatePending(isUpdatePending).checkNamespace(false).build();
+        ServiceTemplateQueryModel queryRequest =
+                ServiceTemplateQueryModel.builder()
+                        .csp(csp)
+                        .category(categoryName)
+                        .serviceName(serviceName)
+                        .serviceVersion(serviceVersion)
+                        .serviceHostingType(serviceHostingType)
+                        .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
+                        .availableInCatalog(availableInCatalog)
+                        .isUpdatePending(isUpdatePending)
+                        .checkNamespace(false)
+                        .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);
         log.info(serviceTemplateEntities.size() + " service templates found.");
@@ -116,71 +121,78 @@ public class CspServiceTemplateApi {
                 .toList();
     }
 
-
     /**
      * View details of service template registration.
      *
      * @param serviceTemplateId service template id.
      * @return service template details.
      */
-    @Tag(name = "CloudServiceProvider",
+    @Tag(
+            name = "CloudServiceProvider",
             description = "APIs for cloud service provider to manage service templates.")
     @Operation(description = "view service template by id.")
-    @GetMapping(value = "/csp/service_templates/{serviceTemplateId}", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(
+            value = "/csp/service_templates/{serviceTemplateId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public ServiceTemplateDetailVo getServiceTemplateDetails(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
-            @PathVariable("serviceTemplateId") UUID serviceTemplateId) {
+                    @PathVariable("serviceTemplateId")
+                    UUID serviceTemplateId) {
         ServiceTemplateEntity templateEntity =
                 serviceTemplateManage.getServiceTemplateDetails(serviceTemplateId, false, true);
         return convertToServiceTemplateDetailVo(templateEntity);
     }
-
 
     /**
      * List pending service template request history to review.
      *
      * @return service templates
      */
-    @Tag(name = "CloudServiceProvider",
+    @Tag(
+            name = "CloudServiceProvider",
             description = "APIs for cloud service provider to manage service templates.")
     @Operation(description = "Get service template requests pending to review.")
-    @GetMapping(value = "/csp/service_templates/requests/pending",
+    @GetMapping(
+            value = "/csp/service_templates/requests/pending",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(enabled = false)
     public List<ServiceTemplateRequestToReview> getPendingServiceReviewRequests(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
-            @RequestParam(name = "serviceTemplateId", required = false)
-            UUID serviceTemplateId) {
+                    @RequestParam(name = "serviceTemplateId", required = false)
+                    UUID serviceTemplateId) {
         Csp csp = userServiceHelper.getCurrentUserManageCsp();
-        ServiceTemplateRequestHistoryQueryModel
-                queryModel = ServiceTemplateRequestHistoryQueryModel.builder()
-                .csp(csp).serviceTemplateId(serviceTemplateId)
-                .status(ServiceTemplateRequestStatus.IN_REVIEW).build();
+        ServiceTemplateRequestHistoryQueryModel queryModel =
+                ServiceTemplateRequestHistoryQueryModel.builder()
+                        .csp(csp)
+                        .serviceTemplateId(serviceTemplateId)
+                        .status(ServiceTemplateRequestStatus.IN_REVIEW)
+                        .build();
         return serviceTemplateManage.getPendingServiceTemplateRequests(queryModel);
     }
 
     /**
      * Review service template request.
      *
-     * @param requestId                    service template request id.
+     * @param requestId service template request id.
      * @param reviewServiceTemplateRequest review request for service template registration.
      */
-    @Tag(name = "CloudServiceProvider",
+    @Tag(
+            name = "CloudServiceProvider",
             description = "APIs for cloud service provider to manage service templates.")
     @Operation(description = "Submit review result for a service template request.")
-    @PutMapping(value = "/csp/service_templates/requests/review/{requestId}", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(
+            value = "/csp/service_templates/requests/review/{requestId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @AuditApiRequest(methodName = "getCspFromServiceTemplateRequestId")
     public void reviewServiceTemplateRequest(
             @Parameter(name = "requestId", description = "id of service template request")
-            @PathVariable(name = "requestId") UUID requestId,
+                    @PathVariable(name = "requestId")
+                    UUID requestId,
             @Valid @RequestBody ReviewServiceTemplateRequest reviewServiceTemplateRequest) {
-        serviceTemplateManage.reviewServiceTemplateRequest(requestId,
-                reviewServiceTemplateRequest);
+        serviceTemplateManage.reviewServiceTemplateRequest(requestId, reviewServiceTemplateRequest);
     }
 }

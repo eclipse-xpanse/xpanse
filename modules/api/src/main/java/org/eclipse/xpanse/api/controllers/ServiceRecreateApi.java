@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
 
@@ -49,10 +48,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-/**
- * REST interface methods for Service Recreate.
- */
+/** REST interface methods for Service Recreate. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -61,18 +57,13 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServiceRecreateApi {
 
-    @Resource
-    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
-    @Resource
-    private ServiceOrderManager serviceOrderManager;
+    @Resource private ServiceOrderManager serviceOrderManager;
 
-    @Resource
-    private UserServiceHelper userServiceHelper;
+    @Resource private UserServiceHelper userServiceHelper;
 
-    @Resource
-    private WorkflowUtils workflowUtils;
-
+    @Resource private WorkflowUtils workflowUtils;
 
     /**
      * Create a job to recreate the deployed service.
@@ -81,13 +72,15 @@ public class ServiceRecreateApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Create a job to recreate the deployed service.")
-    @PutMapping(value = "/services/recreate/{serviceId}", produces =
-            MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(
+            value = "/services/recreate/{serviceId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public ServiceOrder recreateService(@Valid @PathVariable("serviceId") String serviceId) {
-        ServiceDeploymentEntity serviceDeploymentEntity = this.serviceDeploymentEntityHandler
-                .getServiceDeploymentEntity(UUID.fromString(serviceId));
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                this.serviceDeploymentEntityHandler.getServiceDeploymentEntity(
+                        UUID.fromString(serviceId));
         String userId = getUserId();
         if (!StringUtils.equals(userId, serviceDeploymentEntity.getUserId())) {
             throw new AccessDeniedException(
@@ -96,21 +89,28 @@ public class ServiceRecreateApi {
 
         if (Objects.nonNull(serviceDeploymentEntity.getLockConfig())
                 && serviceDeploymentEntity.getLockConfig().isModifyLocked()) {
-            String errorMsg = String.format("Service with id %s is locked from recreate.",
-                    UUID.fromString(serviceId));
+            String errorMsg =
+                    String.format(
+                            "Service with id %s is locked from recreate.",
+                            UUID.fromString(serviceId));
             throw new ServiceLockedException(errorMsg);
         }
 
-        if (!serviceDeploymentEntity.getServiceDeploymentState()
-                .equals(ServiceDeploymentState.DEPLOY_SUCCESS)
-                && !serviceDeploymentEntity.getServiceDeploymentState()
-                .equals(ServiceDeploymentState.DESTROY_FAILED)
-                && !serviceDeploymentEntity.getServiceDeploymentState()
-                .equals(ServiceDeploymentState.MODIFICATION_FAILED)
-                && !serviceDeploymentEntity.getServiceDeploymentState()
-                .equals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL)) {
+        if (!serviceDeploymentEntity
+                        .getServiceDeploymentState()
+                        .equals(ServiceDeploymentState.DEPLOY_SUCCESS)
+                && !serviceDeploymentEntity
+                        .getServiceDeploymentState()
+                        .equals(ServiceDeploymentState.DESTROY_FAILED)
+                && !serviceDeploymentEntity
+                        .getServiceDeploymentState()
+                        .equals(ServiceDeploymentState.MODIFICATION_FAILED)
+                && !serviceDeploymentEntity
+                        .getServiceDeploymentState()
+                        .equals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL)) {
             throw new InvalidServiceStateException(
-                    String.format("Service %s with the state %s is not allowed to recreate.",
+                    String.format(
+                            "Service %s with the state %s is not allowed to recreate.",
                             serviceDeploymentEntity.getId(),
                             serviceDeploymentEntity.getServiceDeploymentState()));
         }
@@ -118,8 +118,8 @@ public class ServiceRecreateApi {
         // prepare parent recreate service order entity
         DeployTask recreateTask = getRecreateTask(serviceDeploymentEntity);
         ServiceOrderEntity recreateOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(recreateTask,
-                        serviceDeploymentEntity, Handler.WORKFLOW);
+                serviceOrderManager.storeNewServiceOrderEntity(
+                        recreateTask, serviceDeploymentEntity, Handler.WORKFLOW);
 
         // prepare recreate process variables
         Map<String, Object> variable =
@@ -131,7 +131,8 @@ public class ServiceRecreateApi {
         ServiceOrderEntity updatedRecreateOrderEntity =
                 serviceOrderManager.startOrderProgress(recreateOrderEntity);
 
-        return new ServiceOrder(updatedRecreateOrderEntity.getOrderId(),
+        return new ServiceOrder(
+                updatedRecreateOrderEntity.getOrderId(),
                 updatedRecreateOrderEntity.getOriginalServiceId());
     }
 
@@ -151,8 +152,7 @@ public class ServiceRecreateApi {
     }
 
     private Map<String, Object> getRecreateProcessVariable(
-            ServiceDeploymentEntity deployedService,
-            ServiceOrderEntity recreateOrderEntity) {
+            ServiceDeploymentEntity deployedService, ServiceOrderEntity recreateOrderEntity) {
         Map<String, Object> variable = new HashMap<>();
         variable.put(RecreateConstants.SERVICE_ID, deployedService.getId());
         variable.put(RecreateConstants.RECREATE_ORDER_ID, recreateOrderEntity.getOrderId());
@@ -162,5 +162,4 @@ public class ServiceRecreateApi {
         variable.put(RecreateConstants.DESTROY_RETRY_NUM, 0);
         return variable;
     }
-
 }

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
-import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -40,8 +40,11 @@ class ServiceMigrationApiTest extends ApisTestCommon {
     @WithJwt(file = "jwt_all_roles.json")
     void testServiceMigrationApis() throws Exception {
         // prepare data
-        Ocl ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl =
+                new OclLoader()
+                        .getOcl(
+                                URI.create("file:src/test/resources/ocl_terraform_test.yml")
+                                        .toURL());
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         addCredentialForHuaweiCloud();
@@ -49,7 +52,6 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         testServiceMigrationApisThrowsException(serviceTemplate);
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
-
 
     void testServiceMigrationApisWell(ServiceTemplateDetailVo serviceTemplate) throws Exception {
         ServiceOrder serviceOrder = deployService(serviceTemplate);
@@ -61,8 +63,8 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         migrateRequest.setOriginalServiceId(serviceId);
         migrateRequest.setCustomerServiceName("newService");
         MockHttpServletResponse migrateResponse = migrateService(migrateRequest);
-        ServiceOrder migrationOrder = objectMapper.readValue(migrateResponse.getContentAsString(),
-                ServiceOrder.class);
+        ServiceOrder migrationOrder =
+                objectMapper.readValue(migrateResponse.getContentAsString(), ServiceOrder.class);
         assertThat(migrateResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
         assertThat(migrationOrder).isNotNull();
 
@@ -80,7 +82,6 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         }
     }
 
-
     void testServiceMigrationApisThrowsException(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
         ServiceOrder serviceOrder = deployService(serviceTemplate);
@@ -96,35 +97,42 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         testMigrateThrowsAccessDeniedException(serviceId, serviceTemplate);
     }
 
-
     void testMigrateThrowsServiceNotFoundException(MigrateRequest migrateRequest) throws Exception {
         migrateRequest.setOriginalServiceId(UUID.randomUUID());
         // Setup
-        ErrorResponse expectedErrorResponse = ErrorResponse.errorResponse(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                List.of(String.format("Service with id %s not found.",
-                        migrateRequest.getOriginalServiceId())));
+        ErrorResponse expectedErrorResponse =
+                ErrorResponse.errorResponse(
+                        ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                        List.of(
+                                String.format(
+                                        "Service with id %s not found.",
+                                        migrateRequest.getOriginalServiceId())));
         // Run the test
         final MockHttpServletResponse response = migrateService(migrateRequest);
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(expectedErrorResponse));
+        assertThat(response.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(expectedErrorResponse));
     }
 
     void testMigrateThrowsServiceLockedException(MigrateRequest migrateRequest) throws Exception {
         // Setup
         ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
         serviceLockConfig.setModifyLocked(true);
-        ServiceDeploymentEntity deployService = serviceDeploymentStorage
-                .findServiceDeploymentById(migrateRequest.getOriginalServiceId());
+        ServiceDeploymentEntity deployService =
+                serviceDeploymentStorage.findServiceDeploymentById(
+                        migrateRequest.getOriginalServiceId());
         deployService.setLockConfig(serviceLockConfig);
         serviceDeploymentStorage.storeAndFlush(deployService);
 
-        String message = String.format("Service with id %s is locked from migration.",
-                migrateRequest.getOriginalServiceId());
-        ErrorResponse expectedErrorResponse = ErrorResponse.errorResponse(ErrorType.SERVICE_LOCKED,
-                Collections.singletonList(message));
+        String message =
+                String.format(
+                        "Service with id %s is locked from migration.",
+                        migrateRequest.getOriginalServiceId());
+        ErrorResponse expectedErrorResponse =
+                ErrorResponse.errorResponse(
+                        ErrorType.SERVICE_LOCKED, Collections.singletonList(message));
         String result = objectMapper.writeValueAsString(expectedErrorResponse);
         // Run the test
         final MockHttpServletResponse response = migrateService(migrateRequest);
@@ -134,14 +142,14 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         assertThat(response.getContentAsString()).isEqualTo(result);
     }
 
+    void testMigrateThrowsAccessDeniedException(
+            UUID serviceId, ServiceTemplateDetailVo serviceTemplate) throws Exception {
 
-    void testMigrateThrowsAccessDeniedException(UUID serviceId,
-                                                ServiceTemplateDetailVo serviceTemplate)
-            throws Exception {
-
-        ErrorResponse expectedErrorResponse = ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
-                Collections.singletonList(
-                        "No permissions to migrate services belonging to other users."));
+        ErrorResponse expectedErrorResponse =
+                ErrorResponse.errorResponse(
+                        ErrorType.ACCESS_DENIED,
+                        Collections.singletonList(
+                                "No permissions to migrate services belonging to other users."));
 
         ServiceDeploymentEntity deployService =
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId);
@@ -156,15 +164,17 @@ class ServiceMigrationApiTest extends ApisTestCommon {
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-        assertThat(response.getContentAsString()).isEqualTo(
-                objectMapper.writeValueAsString(expectedErrorResponse));
+        assertThat(response.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(expectedErrorResponse));
     }
 
-
     MockHttpServletResponse migrateService(MigrateRequest migrateRequest) throws Exception {
-        return mockMvc.perform(post("/xpanse/services/migration").content(
-                                objectMapper.writeValueAsString(migrateRequest))
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        return mockMvc.perform(
+                        post("/xpanse/services/migration")
+                                .content(objectMapper.writeValueAsString(migrateRequest))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
 }

@@ -13,12 +13,9 @@ import org.springframework.beans.BeanUtils;
 @ExtendWith(MockitoExtension.class)
 class ResourceUsageTest {
 
-    @Mock
-    private List<PriceWithRegion> mockLicensePrices;
-    @Mock
-    private List<PriceWithRegion> mockMarkUpPrices;
-    @Mock
-    private List<Resource> mockResources;
+    @Mock private List<PriceWithRegion> mockLicensePrices;
+    @Mock private List<PriceWithRegion> mockMarkUpPrices;
+    @Mock private List<Resource> mockResources;
 
     private ResourceUsage resourceUsageUnderTest;
 
@@ -56,11 +53,15 @@ class ResourceUsageTest {
 
     @Test
     void testToString() {
-        String result = "ResourceUsage("
-                + "resources=" + mockResources
-                + ", licensePrices=" + mockLicensePrices
-                + ", markUpPrices=" + mockMarkUpPrices
-                + ")";
+        String result =
+                "ResourceUsage("
+                        + "resources="
+                        + mockResources
+                        + ", licensePrices="
+                        + mockLicensePrices
+                        + ", markUpPrices="
+                        + mockMarkUpPrices
+                        + ")";
         assertThat(resourceUsageUnderTest.toString()).isEqualTo(result);
     }
 }

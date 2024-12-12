@@ -31,9 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of ServiceTemplateDetailVo.
- */
+/** Test of ServiceTemplateDetailVo. */
 class ServiceTemplateDetailVoTest {
 
     private final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
@@ -55,8 +53,7 @@ class ServiceTemplateDetailVoTest {
     private final Boolean isUpdatePending = false;
     private final ServiceConfigurationManage serviceConfigurationManage =
             new ServiceConfigurationManage();
-    @Mock
-    private ServiceProviderContactDetails serviceProviderContactDetails;
+    @Mock private ServiceProviderContactDetails serviceProviderContactDetails;
     private List<Region> regions;
     private List<DeployVariable> variables;
     private FlavorsWithPrice flavors;
@@ -124,15 +121,18 @@ class ServiceTemplateDetailVoTest {
         assertEquals(billing, serviceTemplateDetailVo.getBilling());
         assertEquals(createTime, serviceTemplateDetailVo.getCreateTime());
         assertEquals(lastModifiedTime, serviceTemplateDetailVo.getLastModifiedTime());
-        assertEquals(serviceTemplateRegistrationState,
+        assertEquals(
+                serviceTemplateRegistrationState,
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
         assertEquals(availableInCatalog, serviceTemplateDetailVo.getAvailableInCatalog());
         assertEquals(isUpdatePending, serviceTemplateDetailVo.getIsUpdatePending());
         assertEquals(serviceHostingType, serviceTemplateDetailVo.getServiceHostingType());
-        assertEquals(serviceProviderContactDetails,
+        assertEquals(
+                serviceProviderContactDetails,
                 serviceTemplateDetailVo.getServiceProviderContactDetails());
         assertEquals(eula, serviceTemplateDetailVo.getEula());
-        assertEquals(serviceConfigurationManage,
+        assertEquals(
+                serviceConfigurationManage,
                 serviceTemplateDetailVo.getServiceConfigurationManage());
     }
 
@@ -152,31 +152,53 @@ class ServiceTemplateDetailVoTest {
 
     @Test
     void testToString() {
-        String expectedToString = "ServiceTemplateDetailVo(serviceTemplateId=" + uuid
-                + ", name=" + name
-                + ", version=" + version
-                + ", csp=" + csp
-                + ", category=" + category
-                + ", namespace=" + namespace
-                + ", regions=" + regions
-                + ", description=" + description
-                + ", icon=" + icon
-                + ", deployment=" + deployment
-                + ", variables=" + variables
-                + ", flavors=" + flavors
-                + ", billing=" + billing
-                + ", serviceHostingType=" + serviceHostingType
-                + ", createTime=" + createTime
-                + ", lastModifiedTime=" + lastModifiedTime
-                + ", serviceTemplateRegistrationState=" + serviceTemplateRegistrationState
-                + ", isUpdatePending=" + isUpdatePending
-                + ", availableInCatalog=" + availableInCatalog
-                + ", serviceProviderContactDetails=" + serviceProviderContactDetails
-                + ", eula=" + eula
-                + ", serviceConfigurationManage=" + serviceConfigurationManage
-                + ")";
+        String expectedToString =
+                "ServiceTemplateDetailVo(serviceTemplateId="
+                        + uuid
+                        + ", name="
+                        + name
+                        + ", version="
+                        + version
+                        + ", csp="
+                        + csp
+                        + ", category="
+                        + category
+                        + ", namespace="
+                        + namespace
+                        + ", regions="
+                        + regions
+                        + ", description="
+                        + description
+                        + ", icon="
+                        + icon
+                        + ", deployment="
+                        + deployment
+                        + ", variables="
+                        + variables
+                        + ", flavors="
+                        + flavors
+                        + ", billing="
+                        + billing
+                        + ", serviceHostingType="
+                        + serviceHostingType
+                        + ", createTime="
+                        + createTime
+                        + ", lastModifiedTime="
+                        + lastModifiedTime
+                        + ", serviceTemplateRegistrationState="
+                        + serviceTemplateRegistrationState
+                        + ", isUpdatePending="
+                        + isUpdatePending
+                        + ", availableInCatalog="
+                        + availableInCatalog
+                        + ", serviceProviderContactDetails="
+                        + serviceProviderContactDetails
+                        + ", eula="
+                        + eula
+                        + ", serviceConfigurationManage="
+                        + serviceConfigurationManage
+                        + ")";
 
         assertEquals(expectedToString, serviceTemplateDetailVo.toString());
     }
-
 }

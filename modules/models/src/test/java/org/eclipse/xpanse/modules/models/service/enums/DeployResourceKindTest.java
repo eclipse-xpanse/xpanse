@@ -12,9 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of DeployResourceKind.
- */
+/** Test of DeployResourceKind. */
 class DeployResourceKindTest {
 
     private static final DeployResourceKind vmKind = DeployResourceKind.VM;
@@ -37,10 +35,10 @@ class DeployResourceKindTest {
         assertEquals(volumeKind, DeployResourceKind.getByValue("volume"));
         assertEquals(unknownKind, DeployResourceKind.getByValue("unknown"));
         assertEquals(securityGroupKind, DeployResourceKind.getByValue("Security_Group"));
-        assertEquals(securityGroupRuleKind,
-                DeployResourceKind.getByValue("security_Group_rule"));
+        assertEquals(securityGroupRuleKind, DeployResourceKind.getByValue("security_Group_rule"));
         assertEquals(keyPairKind, DeployResourceKind.getByValue("Keypair"));
-        assertThrows(UnsupportedEnumValueException.class,
+        assertThrows(
+                UnsupportedEnumValueException.class,
                 () -> DeployResourceKind.getByValue("unavailable"));
     }
 
@@ -56,5 +54,4 @@ class DeployResourceKindTest {
         assertEquals("security_group_rule", securityGroupRuleKind.toValue());
         assertEquals("keypair", keyPairKind.toValue());
     }
-
 }

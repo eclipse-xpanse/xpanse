@@ -47,44 +47,36 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 
-/**
- * Bean to handle deployment result.
- */
+/** Bean to handle deployment result. */
 @Component
 @Slf4j
 public class DeployResultManager {
 
-    @Resource
-    private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource
-    private ServiceOrderStorage serviceOrderStorage;
-    @Resource
-    private ServiceTemplateStorage serviceTemplateStorage;
-    @Resource
-    private ResourceHandlerManager resourceHandlerManager;
-    @Resource
-    private WorkflowUtils workflowUtils;
-    @Resource
-    private SensitiveDataHandler sensitiveDataHandler;
-    @Resource
-    private DeployServiceEntityConverter deployServiceEntityConverter;
-    @Resource
-    private ServiceOrderManager serviceOrderManager;
-    @Resource
-    private DeployerKindManager deployerKindManager;
-
+    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
+    @Resource private ServiceOrderStorage serviceOrderStorage;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource private ResourceHandlerManager resourceHandlerManager;
+    @Resource private WorkflowUtils workflowUtils;
+    @Resource private SensitiveDataHandler sensitiveDataHandler;
+    @Resource private DeployServiceEntityConverter deployServiceEntityConverter;
+    @Resource private ServiceOrderManager serviceOrderManager;
+    @Resource private DeployerKindManager deployerKindManager;
 
     /**
      * Get failed deploy result.
      *
      * @param task task
-     * @param ex   exception
+     * @param ex exception
      * @return deploy result.
      */
     public DeployResult getFailedDeployResult(DeployTask task, Exception ex) {
         String errorMsg =
-                String.format("Order task %s to %s the service %s failed. %s", task.getOrderId(),
-                        task.getTaskType().toValue(), task.getServiceId(), ex.getMessage());
+                String.format(
+                        "Order task %s to %s the service %s failed. %s",
+                        task.getOrderId(),
+                        task.getTaskType().toValue(),
+                        task.getServiceId(),
+                        ex.getMessage());
         DeployResult deployResult = new DeployResult();
         deployResult.setOrderId(task.getOrderId());
         deployResult.setIsTaskSuccessful(false);
@@ -98,7 +90,8 @@ public class DeployResultManager {
      * @param deployResult DeployResult.
      */
     public void updateServiceWithDeployResult(DeployResult deployResult, Handler handler) {
-        if (Objects.isNull(deployResult) || Objects.isNull(deployResult.getOrderId())
+        if (Objects.isNull(deployResult)
+                || Objects.isNull(deployResult.getOrderId())
                 || Objects.isNull(deployResult.getIsTaskSuccessful())) {
             log.warn("Could not update service data with unuseful deploy result {}.", deployResult);
             return;
@@ -113,12 +106,15 @@ public class DeployResultManager {
         // error message. Then start a new rollback order task and wait the order callback.
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         if (isFailedDeployTask(isTaskSuccessful, taskType)) {
-            serviceOrderManager.completeOrderProgress(storedOrderEntity.getOrderId(),
+            serviceOrderManager.completeOrderProgress(
+                    storedOrderEntity.getOrderId(),
                     TaskStatus.FAILED,
-                    ErrorResponse.errorResponse(ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                    ErrorResponse.errorResponse(
+                            ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
                             List.of(deployResult.getMessage())));
-            DeployTask rollbackTask = deployServiceEntityConverter.getDeployTaskByStoredService(
-                    ServiceOrderType.ROLLBACK, updatedServiceEntity);
+            DeployTask rollbackTask =
+                    deployServiceEntityConverter.getDeployTaskByStoredService(
+                            ServiceOrderType.ROLLBACK, updatedServiceEntity);
             rollbackTask.setParentOrderId(orderId);
             rollbackTask.setOriginalServiceId(storedOrderEntity.getOriginalServiceId());
             rollbackTask.setWorkflowId(storedOrderEntity.getWorkflowId());
@@ -128,20 +124,22 @@ public class DeployResultManager {
         updateServiceOrderEntityWithDeployResult(deployResult, storedOrderEntity);
     }
 
-    /**
-     * Perform rollback when deployment fails and destroy the created resources.
-     */
-    public void rollbackOnDeploymentFailure(DeployTask rollbackTask,
-            ServiceDeploymentEntity serviceDeploymentEntity, Handler handler) {
+    /** Perform rollback when deployment fails and destroy the created resources. */
+    public void rollbackOnDeploymentFailure(
+            DeployTask rollbackTask,
+            ServiceDeploymentEntity serviceDeploymentEntity,
+            Handler handler) {
         DeployResult rollbackResult;
         RuntimeException exception = null;
         log.info("Performing rollback of already provisioned resources.");
         rollbackTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         rollbackTask.setTaskType(ServiceOrderType.ROLLBACK);
-        ServiceOrderEntity serviceOrderEntity = serviceOrderManager
-                .storeNewServiceOrderEntity(rollbackTask, serviceDeploymentEntity, handler);
-        Deployer deployer = deployerKindManager.getDeployment(
-                rollbackTask.getOcl().getDeployment().getDeployerTool().getKind());
+        ServiceOrderEntity serviceOrderEntity =
+                serviceOrderManager.storeNewServiceOrderEntity(
+                        rollbackTask, serviceDeploymentEntity, handler);
+        Deployer deployer =
+                deployerKindManager.getDeployment(
+                        rollbackTask.getOcl().getDeployment().getDeployerTool().getKind());
         try {
             if (CollectionUtils.isEmpty(serviceDeploymentEntity.getDeployResourceList())) {
                 log.info("No resources need to destroy, the rollback task success.");
@@ -149,7 +147,8 @@ public class DeployResultManager {
                 rollbackResult.setOrderId(rollbackTask.getOrderId());
                 rollbackResult.setIsTaskSuccessful(true);
             } else {
-                log.info("Rollback to destroy created resources of the service {}",
+                log.info(
+                        "Rollback to destroy created resources of the service {}",
                         rollbackTask.getServiceId());
                 serviceOrderManager.startOrderProgress(serviceOrderEntity);
                 rollbackResult = deployer.destroy(rollbackTask);
@@ -164,7 +163,6 @@ public class DeployResultManager {
         }
     }
 
-
     private boolean isFailedDeployTask(boolean isTaskSuccessful, ServiceOrderType taskType) {
         return !isTaskSuccessful
                 && (taskType == ServiceOrderType.DEPLOY || taskType == ServiceOrderType.RETRY);
@@ -174,30 +172,38 @@ public class DeployResultManager {
             DeployResult deployResult, ServiceOrderType taskType) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 serviceOrderStorage.getServiceDeploymentByOrderId(deployResult.getOrderId());
-        log.info("Update deploy service entity {} with deploy result {}",
-                serviceDeploymentEntity.getId(), deployResult);
+        log.info(
+                "Update deploy service entity {} with deploy result {}",
+                serviceDeploymentEntity.getId(),
+                deployResult);
         if (StringUtils.isNotBlank(deployResult.getTfStateContent())) {
-            deployResult.getDeploymentGeneratedFiles()
+            deployResult
+                    .getDeploymentGeneratedFiles()
                     .put(TF_STATE_FILE_NAME, deployResult.getTfStateContent());
         } else {
             if (Objects.nonNull(serviceDeploymentEntity.getDeploymentGeneratedFiles())) {
-                String storedTfStateContent = serviceDeploymentEntity.getDeploymentGeneratedFiles()
-                        .get(TF_STATE_FILE_NAME);
+                String storedTfStateContent =
+                        serviceDeploymentEntity
+                                .getDeploymentGeneratedFiles()
+                                .get(TF_STATE_FILE_NAME);
                 if (StringUtils.isNotBlank(storedTfStateContent)) {
                     deployResult.setTfStateContent(storedTfStateContent);
-                    deployResult.getDeploymentGeneratedFiles()
+                    deployResult
+                            .getDeploymentGeneratedFiles()
                             .put(TF_STATE_FILE_NAME, deployResult.getTfStateContent());
                 }
             }
         }
 
-        ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage.getServiceTemplateById(
-                serviceDeploymentEntity.getServiceTemplateId());
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(
+                        serviceDeploymentEntity.getServiceTemplateId());
         DeployerKind deployerKind =
                 serviceTemplateEntity.getOcl().getDeployment().getDeployerTool().getKind();
         try {
-            resourceHandlerManager.getResourceHandler(serviceDeploymentEntity.getCsp(),
-                    deployerKind).handler(deployResult);
+            resourceHandlerManager
+                    .getResourceHandler(serviceDeploymentEntity.getCsp(), deployerKind)
+                    .handler(deployResult);
         } catch (RuntimeException e) {
             log.error("Exception occurred in handling deployment result.", e);
             deployResult.setIsTaskSuccessful(false);
@@ -210,10 +216,10 @@ public class DeployResultManager {
         return serviceDeploymentStorage.storeAndFlush(deployServiceToUpdate);
     }
 
-
-    private void updateServiceEntityWithDeployResult(DeployResult deployResult,
-                                                     ServiceOrderType taskType,
-                                                     ServiceDeploymentEntity serviceDeployment) {
+    private void updateServiceEntityWithDeployResult(
+            DeployResult deployResult,
+            ServiceOrderType taskType,
+            ServiceDeploymentEntity serviceDeployment) {
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         ServiceDeploymentState deploymentState =
                 getServiceDeploymentState(taskType, isTaskSuccessful);
@@ -233,11 +239,12 @@ public class DeployResultManager {
             serviceDeployment.setFlavor(modifyRequest.getFlavor());
             serviceDeployment.setCustomerServiceName(modifyRequest.getCustomerServiceName());
         }
-        ServiceTemplateEntity serviceTemplateEntity = serviceTemplateStorage
-                .getServiceTemplateById(serviceDeployment.getServiceTemplateId());
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(
+                        serviceDeployment.getServiceTemplateId());
         if (Objects.nonNull(serviceTemplateEntity)
-                && Objects.nonNull(serviceTemplateEntity
-                .getOcl().getServiceConfigurationManage())) {
+                && Objects.nonNull(
+                        serviceTemplateEntity.getOcl().getServiceConfigurationManage())) {
             updateServiceConfiguration(deploymentState, serviceDeployment);
         }
         updateServiceState(deploymentState, serviceDeployment);
@@ -264,14 +271,14 @@ public class DeployResultManager {
                 serviceDeployment.setDeployResourceList(Collections.emptyList());
             }
         } else {
-            serviceDeployment.setDeployResourceList(getDeployResourceEntityList(
-                    deployResult.getResources(), serviceDeployment));
+            serviceDeployment.setDeployResourceList(
+                    getDeployResourceEntityList(deployResult.getResources(), serviceDeployment));
         }
         sensitiveDataHandler.maskSensitiveFields(serviceDeployment);
     }
 
-    private void updateServiceConfiguration(ServiceDeploymentState state,
-                                            ServiceDeploymentEntity serviceDeploymentEntity) {
+    private void updateServiceConfiguration(
+            ServiceDeploymentState state, ServiceDeploymentEntity serviceDeploymentEntity) {
         if (state == ServiceDeploymentState.DEPLOY_SUCCESS) {
             ServiceConfigurationEntity serviceConfigurationEntity =
                     deployServiceEntityConverter.getInitialServiceConfiguration(
@@ -283,8 +290,8 @@ public class DeployResultManager {
         }
     }
 
-    private void updateServiceState(ServiceDeploymentState state,
-                                    ServiceDeploymentEntity serviceDeploymentEntity) {
+    private void updateServiceState(
+            ServiceDeploymentState state, ServiceDeploymentEntity serviceDeploymentEntity) {
         if (state == ServiceDeploymentState.DEPLOY_SUCCESS
                 || state == ServiceDeploymentState.MODIFICATION_SUCCESSFUL) {
             serviceDeploymentEntity.setServiceState(ServiceState.RUNNING);
@@ -297,26 +304,31 @@ public class DeployResultManager {
         // case other cases, do not change the state of service.
     }
 
-    private ServiceDeploymentState getServiceDeploymentState(ServiceOrderType taskType,
-                                                             boolean isTaskSuccessful) {
+    private ServiceDeploymentState getServiceDeploymentState(
+            ServiceOrderType taskType, boolean isTaskSuccessful) {
         return switch (taskType) {
             case DEPLOY, RETRY -> isTaskSuccessful ? ServiceDeploymentState.DEPLOY_SUCCESS : null;
-            case DESTROY -> isTaskSuccessful ? ServiceDeploymentState.DESTROY_SUCCESS
-                    : ServiceDeploymentState.DESTROY_FAILED;
-            case MODIFY -> isTaskSuccessful ? ServiceDeploymentState.MODIFICATION_SUCCESSFUL
-                    : ServiceDeploymentState.MODIFICATION_FAILED;
-            case ROLLBACK -> isTaskSuccessful ? ServiceDeploymentState.DEPLOY_FAILED
-                    : ServiceDeploymentState.ROLLBACK_FAILED;
-            case PURGE -> isTaskSuccessful ? ServiceDeploymentState.DESTROY_SUCCESS
-                    : ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED;
+            case DESTROY ->
+                    isTaskSuccessful
+                            ? ServiceDeploymentState.DESTROY_SUCCESS
+                            : ServiceDeploymentState.DESTROY_FAILED;
+            case MODIFY ->
+                    isTaskSuccessful
+                            ? ServiceDeploymentState.MODIFICATION_SUCCESSFUL
+                            : ServiceDeploymentState.MODIFICATION_FAILED;
+            case ROLLBACK ->
+                    isTaskSuccessful
+                            ? ServiceDeploymentState.DEPLOY_FAILED
+                            : ServiceDeploymentState.ROLLBACK_FAILED;
+            case PURGE ->
+                    isTaskSuccessful
+                            ? ServiceDeploymentState.DESTROY_SUCCESS
+                            : ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED;
             default -> null;
         };
     }
 
-
-    /**
-     * Convert service resources to deploy resource entities.
-     */
+    /** Convert service resources to deploy resource entities. */
     private List<ServiceResourceEntity> getDeployResourceEntityList(
             List<DeployResource> deployResources, ServiceDeploymentEntity serviceDeploymentEntity) {
         List<ServiceResourceEntity> deployResourceEntities = new ArrayList<>();
@@ -338,8 +350,8 @@ public class DeployResultManager {
      *
      * @param deployResult Deployment Result.
      */
-    private void updateServiceOrderEntityWithDeployResult(DeployResult deployResult,
-                                                          ServiceOrderEntity storedOrderEntity) {
+    private void updateServiceOrderEntityWithDeployResult(
+            DeployResult deployResult, ServiceOrderEntity storedOrderEntity) {
         // When the related parent order id is not null, complete the parent service order.
         if (Objects.nonNull(storedOrderEntity.getParentOrderId())) {
             completeParentServiceOrder(storedOrderEntity.getParentOrderId());
@@ -353,10 +365,14 @@ public class DeployResultManager {
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         TaskStatus taskStatus = isTaskSuccessful ? TaskStatus.SUCCESSFUL : TaskStatus.FAILED;
         entityToUpdate.setCompletedTime(OffsetDateTime.now());
-        serviceOrderManager.completeOrderProgress(storedOrderEntity.getOrderId(), taskStatus,
-                isTaskSuccessful ? null
-                        : ErrorResponse.errorResponse(ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
-                        List.of(deployResult.getMessage())));
+        serviceOrderManager.completeOrderProgress(
+                storedOrderEntity.getOrderId(),
+                taskStatus,
+                isTaskSuccessful
+                        ? null
+                        : ErrorResponse.errorResponse(
+                                ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                                List.of(deployResult.getMessage())));
     }
 
     private void completeParentServiceOrder(UUID parentOrderId) {
@@ -383,77 +399,85 @@ public class DeployResultManager {
                 if (parentOrder.getTaskType() == ServiceOrderType.MIGRATE) {
                     if (serviceOrder.getTaskType() == ServiceOrderType.DEPLOY
                             || serviceOrder.getTaskType() == ServiceOrderType.RETRY) {
-                        workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                        workflowUtils.completeReceiveTask(
+                                parentOrder.getWorkflowId(),
                                 MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
                     }
                     if (serviceOrder.getTaskType() == ServiceOrderType.DESTROY) {
-                        workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                        workflowUtils.completeReceiveTask(
+                                parentOrder.getWorkflowId(),
                                 MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
                     }
                 }
                 if (parentOrder.getTaskType() == ServiceOrderType.RECREATE) {
                     if (serviceOrder.getTaskType() == ServiceOrderType.DEPLOY
                             || serviceOrder.getTaskType() == ServiceOrderType.RETRY) {
-                        workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                        workflowUtils.completeReceiveTask(
+                                parentOrder.getWorkflowId(),
                                 RecreateConstants.RECREATE_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
                     }
                     if (serviceOrder.getTaskType() == ServiceOrderType.DESTROY) {
-                        workflowUtils.completeReceiveTask(parentOrder.getWorkflowId(),
+                        workflowUtils.completeReceiveTask(
+                                parentOrder.getWorkflowId(),
                                 RecreateConstants.RECREATE_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
                     }
                 }
             }
         } catch (Exception e) {
-            log.error("Failed to process the related workflow task of service order: {}",
-                    serviceOrder.getOrderId(), e);
+            log.error(
+                    "Failed to process the related workflow task of service order: {}",
+                    serviceOrder.getOrderId(),
+                    e);
         }
     }
 
-
-    /**
-     * update service state.
-     */
-    public void updateServiceDeploymentState(Boolean isSuccess,
-            ServiceDeploymentEntity serviceDeployment) {
+    /** update service state. */
+    public void updateServiceDeploymentState(
+            Boolean isSuccess, ServiceDeploymentEntity serviceDeployment) {
         if (isSuccess) {
-            if (serviceDeployment.getServiceDeploymentState()
+            if (serviceDeployment
+                    .getServiceDeploymentState()
                     .equals(ServiceDeploymentState.DEPLOYING)) {
                 serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
-            } else if (serviceDeployment.getServiceDeploymentState()
+            } else if (serviceDeployment
+                    .getServiceDeploymentState()
                     .equals(ServiceDeploymentState.DESTROYING)) {
                 serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
-            } else if (serviceDeployment.getServiceDeploymentState()
+            } else if (serviceDeployment
+                    .getServiceDeploymentState()
                     .equals(ServiceDeploymentState.MODIFYING)) {
-                serviceDeployment
-                        .setServiceDeploymentState(ServiceDeploymentState.MODIFICATION_SUCCESSFUL);
+                serviceDeployment.setServiceDeploymentState(
+                        ServiceDeploymentState.MODIFICATION_SUCCESSFUL);
             }
         } else {
-            if (serviceDeployment.getServiceDeploymentState()
+            if (serviceDeployment
+                    .getServiceDeploymentState()
                     .equals(ServiceDeploymentState.DEPLOYING)) {
                 serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
-            } else if (serviceDeployment.getServiceDeploymentState()
+            } else if (serviceDeployment
+                    .getServiceDeploymentState()
                     .equals(ServiceDeploymentState.DESTROYING)) {
-                serviceDeployment
-                        .setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
-            } else if (serviceDeployment.getServiceDeploymentState()
+                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
+            } else if (serviceDeployment
+                    .getServiceDeploymentState()
                     .equals(ServiceDeploymentState.MODIFYING)) {
-                serviceDeployment
-                        .setServiceDeploymentState(ServiceDeploymentState.MODIFICATION_FAILED);
+                serviceDeployment.setServiceDeploymentState(
+                        ServiceDeploymentState.MODIFICATION_FAILED);
             }
         }
         serviceDeploymentStorage.storeAndFlush(serviceDeployment);
     }
 
-    /**
-     * update service state and service order state by exception.
-     */
-    public void updateServiceDeploymentStateAndServiceOrder(ServiceDeploymentEntity serviceEntity,
-            ServiceOrderEntity serviceOrder, ErrorType errorType, HttpClientErrorException e) {
-        serviceEntity
-                .setServiceDeploymentState(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
+    /** update service state and service order state by exception. */
+    public void updateServiceDeploymentStateAndServiceOrder(
+            ServiceDeploymentEntity serviceEntity,
+            ServiceOrderEntity serviceOrder,
+            ErrorType errorType,
+            HttpClientErrorException e) {
+        serviceEntity.setServiceDeploymentState(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
         serviceOrder.setTaskStatus(TaskStatus.FAILED);
-        serviceOrder.setErrorResponse(ErrorResponse.errorResponse(errorType,
-                List.of(e.getMessage())));
+        serviceOrder.setErrorResponse(
+                ErrorResponse.errorResponse(errorType, List.of(e.getMessage())));
         serviceDeploymentStorage.storeAndFlush(serviceEntity);
         serviceOrderStorage.storeAndFlush(serviceOrder);
     }

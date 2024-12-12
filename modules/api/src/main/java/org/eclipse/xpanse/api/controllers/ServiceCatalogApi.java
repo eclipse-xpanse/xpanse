@@ -43,9 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST interface methods for service catalog.
- */
+/** REST interface methods for service catalog. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -54,44 +52,54 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServiceCatalogApi {
 
-    @Resource
-    private ServiceTemplateManage serviceTemplateManage;
+    @Resource private ServiceTemplateManage serviceTemplateManage;
 
     /**
      * List all approved service templates which are available for user to order/deploy.
      *
-     * @param categoryName       category of the service.
-     * @param cspName            name of the cloud service provider.
-     * @param serviceName        name of the service.
-     * @param serviceVersion     version of the service.
+     * @param categoryName category of the service.
+     * @param cspName name of the cloud service provider.
+     * @param serviceName name of the service.
+     * @param serviceVersion version of the service.
      * @param serviceHostingType type of the service hosting.
      * @return service templates
      */
-    @Tag(name = "ServiceCatalog", description =
-            "APIs to query the services which are available for the user to order.")
-    @Operation(description =
-            "List of all approved services which are available for user to order.")
-    @GetMapping(value = "/catalog/services",
+    @Tag(
+            name = "ServiceCatalog",
+            description = "APIs to query the services which are available for the user to order.")
+    @Operation(description = "List of all approved services which are available for user to order.")
+    @GetMapping(
+            value = "/catalog/services",
             produces = {MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<UserOrderableServiceVo> getOrderableServices(
             @Parameter(name = "categoryName", description = "category of the service")
-            @RequestParam(name = "categoryName", required = false) Category categoryName,
+                    @RequestParam(name = "categoryName", required = false)
+                    Category categoryName,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
-            @RequestParam(name = "cspName", required = false) Csp cspName,
+                    @RequestParam(name = "cspName", required = false)
+                    Csp cspName,
             @Parameter(name = "serviceName", description = "name of the service")
-            @RequestParam(name = "serviceName", required = false) String serviceName,
+                    @RequestParam(name = "serviceName", required = false)
+                    String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
-            @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
+                    @RequestParam(name = "serviceVersion", required = false)
+                    String serviceVersion,
             @Parameter(name = "serviceHostingType", description = "who hosts ths cloud resources")
-            @RequestParam(name = "serviceHostingType", required = false)
-            ServiceHostingType serviceHostingType) {
+                    @RequestParam(name = "serviceHostingType", required = false)
+                    ServiceHostingType serviceHostingType) {
 
-        ServiceTemplateQueryModel queryRequest = ServiceTemplateQueryModel.builder()
-                .category(categoryName).csp(cspName).serviceName(serviceName)
-                .serviceVersion(serviceVersion).serviceHostingType(serviceHostingType)
-                .availableInCatalog(true).checkNamespace(false).build();
+        ServiceTemplateQueryModel queryRequest =
+                ServiceTemplateQueryModel.builder()
+                        .category(categoryName)
+                        .csp(cspName)
+                        .serviceName(serviceName)
+                        .serviceVersion(serviceVersion)
+                        .serviceHostingType(serviceHostingType)
+                        .availableInCatalog(true)
+                        .checkNamespace(false)
+                        .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);
         log.info(serviceTemplateEntities.size() + " orderable services found.");
@@ -107,16 +115,17 @@ public class ServiceCatalogApi {
      * @param id The id of deployable service.
      * @return userOrderableServiceVo
      */
-    @Tag(name = "ServiceCatalog",
+    @Tag(
+            name = "ServiceCatalog",
             description = "APIs to query the services which are available for the user to order.")
     @Operation(description = "Get deployable service by id.")
-    @GetMapping(value = "/catalog/services/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/catalog/services/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public UserOrderableServiceVo getOrderableServiceDetailsById(
             @Parameter(name = "id", description = "The id of orderable service.")
-            @PathVariable("id") String id) {
+                    @PathVariable("id")
+                    String id) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManage.getServiceTemplateDetails(UUID.fromString(id), false, false);
         if (Objects.equals(false, serviceTemplateEntity.getAvailableInCatalog())) {
@@ -134,9 +143,11 @@ public class ServiceCatalogApi {
      *
      * @param id The id of deployable service.
      */
-    @Tag(name = "ServiceCatalog",
+    @Tag(
+            name = "ServiceCatalog",
             description = "APIs to query the services which are available for the user to order.")
-    @GetMapping(value = "/catalog/services/{id}/openapi",
+    @GetMapping(
+            value = "/catalog/services/{id}/openapi",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the API document of the orderable service.")
@@ -144,8 +155,10 @@ public class ServiceCatalogApi {
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public Link openApi(@PathVariable("id") String id) {
         String apiUrl = this.serviceTemplateManage.getOpenApiUrl(UUID.fromString(id));
-        String successMsg = String.format(
-                "Get API document of the orderable service successful with Url %s.", apiUrl);
+        String successMsg =
+                String.format(
+                        "Get API document of the orderable service successful with Url %s.",
+                        apiUrl);
         log.info(successMsg);
         return Link.of(apiUrl, "OpenApi");
     }

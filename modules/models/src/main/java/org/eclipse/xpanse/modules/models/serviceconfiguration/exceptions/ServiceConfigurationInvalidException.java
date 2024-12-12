@@ -9,10 +9,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Exception thrown when service configuration is invalid.
- */
-
+/** Exception thrown when service configuration is invalid. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ServiceConfigurationInvalidException extends RuntimeException {

@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Set;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperties;
-import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerraformResourceProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +29,6 @@ class OpenstackTerraformResourcePropertiesTest {
         Assertions.assertNotNull(volumeResult);
         Assertions.assertEquals(volumeResult.getResourceKind(), DeployResourceKind.VOLUME);
         Assertions.assertFalse(volumeResult.getResourceProperties().isEmpty());
-
 
         // Run the test
         final DeployResourceProperties subnetResult =
@@ -65,8 +63,8 @@ class OpenstackTerraformResourcePropertiesTest {
                         "openstack_networking_secgroup_v2");
         // Verify the results
         Assertions.assertNotNull(secGroupResult);
-        Assertions.assertEquals(secGroupResult.getResourceKind(),
-                DeployResourceKind.SECURITY_GROUP);
+        Assertions.assertEquals(
+                secGroupResult.getResourceKind(), DeployResourceKind.SECURITY_GROUP);
         Assertions.assertFalse(secGroupResult.getResourceProperties().isEmpty());
 
         // Run the test
@@ -75,8 +73,8 @@ class OpenstackTerraformResourcePropertiesTest {
                         "openstack_networking_secgroup_rule_v2");
         // Verify the results
         Assertions.assertNotNull(secGroupRuleResult);
-        Assertions.assertEquals(secGroupRuleResult.getResourceKind(),
-                DeployResourceKind.SECURITY_GROUP_RULE);
+        Assertions.assertEquals(
+                secGroupRuleResult.getResourceKind(), DeployResourceKind.SECURITY_GROUP_RULE);
         Assertions.assertFalse(secGroupRuleResult.getResourceProperties().isEmpty());
 
         // Run the test
@@ -103,14 +101,16 @@ class OpenstackTerraformResourcePropertiesTest {
 
     @Test
     void testGetTerraformResourceTypes() {
-        Set<String> exceptedTypes = Set.of("openstack_compute_instance_v2",
-                "openstack_networking_subnet_v2",
-                "openstack_networking_floatingip_v2",
-                "openstack_compute_keypair_v2",
-                "openstack_networking_network_v2",
-                "openstack_networking_secgroup_rule_v2",
-                "openstack_networking_secgroup_v2",
-                "openstack_blockstorage_volume_v3");
+        Set<String> exceptedTypes =
+                Set.of(
+                        "openstack_compute_instance_v2",
+                        "openstack_networking_subnet_v2",
+                        "openstack_networking_floatingip_v2",
+                        "openstack_compute_keypair_v2",
+                        "openstack_networking_network_v2",
+                        "openstack_networking_secgroup_rule_v2",
+                        "openstack_networking_secgroup_v2",
+                        "openstack_blockstorage_volume_v3");
         assertThat(OpenstackTerraformResourceProperties.getTerraformResourceTypes())
                 .isEqualTo(exceptedTypes);
     }

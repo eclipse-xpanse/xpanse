@@ -34,9 +34,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionManager;
 
-/**
- * Activiti configuration class.
- */
+/** Activiti configuration class. */
 @Configuration
 public class ActivitiConfig {
 
@@ -49,20 +47,18 @@ public class ActivitiConfig {
     @Value("${spring.activiti.history-level}")
     private HistoryLevel historyLevel;
 
-    /**
-     * constructor for ActivitiConfig bean.
-     */
+    /** constructor for ActivitiConfig bean. */
     @Autowired
-    public ActivitiConfig(DataSource dataSource, TransactionManager transactionManager,
-                          ApplicationContext applicationContext) {
+    public ActivitiConfig(
+            DataSource dataSource,
+            TransactionManager transactionManager,
+            ApplicationContext applicationContext) {
         this.dataSource = dataSource;
         this.transactionManager = transactionManager;
         this.applicationContext = applicationContext;
     }
 
-    /**
-     * Create ProcessEngineConfiguration object into SpringIoc.
-     */
+    /** Create ProcessEngineConfiguration object into SpringIoc. */
     @Bean
     public ProcessEngineConfiguration processEngineConfiguration() throws IOException {
         SpringProcessEngineConfiguration springProcessEngineConfiguration =
@@ -73,8 +69,10 @@ public class ActivitiConfig {
                 (PlatformTransactionManager) transactionManager);
         springProcessEngineConfiguration.setDatabaseSchemaUpdate("true");
         springProcessEngineConfiguration.setDeploymentMode("single-resource");
-        Resource[] resources = new PathMatchingResourcePatternResolver().getResources(
-                ResourceLoader.CLASSPATH_URL_PREFIX + "processes/**.bpmn20.xml");
+        Resource[] resources =
+                new PathMatchingResourcePatternResolver()
+                        .getResources(
+                                ResourceLoader.CLASSPATH_URL_PREFIX + "processes/**.bpmn20.xml");
         springProcessEngineConfiguration.setDeploymentResources(resources);
         springProcessEngineConfiguration.setHistoryLevel(historyLevel);
         springProcessEngineConfiguration.setApplicationContext(this.applicationContext);
@@ -87,8 +85,8 @@ public class ActivitiConfig {
     }
 
     /**
-     * Creates ProcessEngineFactoryBean which automatically joins the spring-boot
-     * application context to activiti.
+     * Creates ProcessEngineFactoryBean which automatically joins the spring-boot application
+     * context to activiti.
      */
     @Bean
     public ProcessEngineFactoryBean processEngine() throws IOException {
@@ -128,9 +126,7 @@ public class ActivitiConfig {
         return Objects.requireNonNull(processEngine().getObject()).getDynamicBpmnService();
     }
 
-    /**
-     * Assembling the ObjectMapper object.
-     */
+    /** Assembling the ObjectMapper object. */
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -138,5 +134,4 @@ public class ActivitiConfig {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return objectMapper;
     }
-
 }

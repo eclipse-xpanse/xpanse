@@ -29,9 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-/**
- * Test for Health Check with Database mysql and Cache caffeine.
- */
+/** Test for Health Check with Database mysql and Cache caffeine. */
 @Slf4j
 @Testcontainers
 @ExtendWith(SpringExtension.class)
@@ -41,8 +39,8 @@ class AdminHealthCheckWithMysqlDbTest extends AbstractMysqlIntegrationTest {
 
     @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
     private String dataSourceUrl;
-    @Resource
-    private AdminServicesApi adminServicesApi;
+
+    @Resource private AdminServicesApi adminServicesApi;
 
     @Test
     @WithJwt(file = "jwt_admin.json")
@@ -55,21 +53,35 @@ class AdminHealthCheckWithMysqlDbTest extends AbstractMysqlIntegrationTest {
         List<BackendSystemStatus> backendSystemStatuses = systemStatus.getBackendSystemStatuses();
         assertEquals(4, backendSystemStatuses.size());
 
-        assertTrue(backendSystemStatuses.stream()
-                .allMatch(status -> status.getEndpoint() != null));
+        assertTrue(backendSystemStatuses.stream().allMatch(status -> status.getEndpoint() != null));
 
-        assertTrue(backendSystemStatuses.stream()
-                .filter(status -> status.getBackendSystemType()
-                        .equals(BackendSystemType.CACHE_PROVIDER))
-                .allMatch(status ->
-                        status.getEndpoint().equals(CacheConstants.CACHE_PROVIDER_CAFFEINE_ENDPOINT)
-                                && status.getName()
-                                .equals(CacheConstants.CACHE_PROVIDER_CAFFEINE)));
+        assertTrue(
+                backendSystemStatuses.stream()
+                        .filter(
+                                status ->
+                                        status.getBackendSystemType()
+                                                .equals(BackendSystemType.CACHE_PROVIDER))
+                        .allMatch(
+                                status ->
+                                        status.getEndpoint()
+                                                        .equals(
+                                                                CacheConstants
+                                                                        .CACHE_PROVIDER_CAFFEINE_ENDPOINT)
+                                                && status.getName()
+                                                        .equals(
+                                                                CacheConstants
+                                                                        .CACHE_PROVIDER_CAFFEINE)));
 
-        assertTrue(backendSystemStatuses.stream()
-                .filter(status -> status.getBackendSystemType().equals(BackendSystemType.DATABASE))
-                .allMatch(status -> status.getEndpoint().equals(dataSourceUrl)
-                        && status.getName().equals(DatabaseType.MYSQL.toValue())));
+        assertTrue(
+                backendSystemStatuses.stream()
+                        .filter(
+                                status ->
+                                        status.getBackendSystemType()
+                                                .equals(BackendSystemType.DATABASE))
+                        .allMatch(
+                                status ->
+                                        status.getEndpoint().equals(dataSourceUrl)
+                                                && status.getName()
+                                                        .equals(DatabaseType.MYSQL.toValue())));
     }
-
 }

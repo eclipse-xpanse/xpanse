@@ -9,9 +9,7 @@ package org.eclipse.xpanse.modules.database.servicetemplate;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Interface for persist of ServiceTemplate.
- */
+/** Interface for persist of ServiceTemplate. */
 public interface ServiceTemplateStorage {
 
     /**
@@ -43,5 +41,4 @@ public interface ServiceTemplateStorage {
      * @param serviceTemplateEntity service template entity
      */
     void deleteServiceTemplate(ServiceTemplateEntity serviceTemplateEntity);
-
 }

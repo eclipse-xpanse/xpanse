@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of InvalidServiceStateException.
- */
+/** Test of InvalidServiceStateException. */
 class InvalidServiceStateExceptionTest {
 
     private static final String message = "serviceState is invalid.";
@@ -28,5 +26,4 @@ class InvalidServiceStateExceptionTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

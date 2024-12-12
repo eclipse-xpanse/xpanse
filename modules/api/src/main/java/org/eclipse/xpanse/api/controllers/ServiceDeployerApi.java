@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-
 import static org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter.convertToUserOrderableServiceVo;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_CSP;
@@ -64,10 +63,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
-
-/**
- * REST interface methods for processing OCL.
- */
+/** REST interface methods for processing OCL. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -78,12 +74,10 @@ public class ServiceDeployerApi {
 
     @Value("${region.azs.cache.expire.time.in.minutes:60}")
     private long duration;
-    @Resource
-    private DeployService deployService;
-    @Resource
-    private ServiceLockConfigService lockConfigService;
-    @Resource
-    private ServiceDetailsViewManager serviceDetailsViewManager;
+
+    @Resource private DeployService deployService;
+    @Resource private ServiceLockConfigService lockConfigService;
+    @Resource private ServiceDetailsViewManager serviceDetailsViewManager;
 
     /**
      * Get details of the managed service by serviceId.
@@ -92,17 +86,18 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Get details of the deployed service by id.")
-    @GetMapping(value = "/services/details/self_hosted/{serviceId}",
+    @GetMapping(
+            value = "/services/details/self_hosted/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public DeployedServiceDetails getSelfHostedServiceDetailsById(
             @Parameter(name = "serviceId", description = "Id of the service")
-            @PathVariable("serviceId") String serviceId) {
+                    @PathVariable("serviceId")
+                    String serviceId) {
         return this.serviceDetailsViewManager.getSelfHostedServiceDetailsByIdForEndUser(
                 UUID.fromString(serviceId));
     }
-
 
     /**
      * Get details of the managed vendor hosted service by serviceId.
@@ -111,13 +106,15 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Get deployed service details by serviceId.")
-    @GetMapping(value = "/services/details/vendor_hosted/{serviceId}",
+    @GetMapping(
+            value = "/services/details/vendor_hosted/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsById(
             @Parameter(name = "serviceId", description = "Id of the service")
-            @PathVariable("serviceId") String serviceId) {
+                    @PathVariable("serviceId")
+                    String serviceId) {
         return this.serviceDetailsViewManager.getVendorHostedServiceDetailsByIdForEndUser(
                 UUID.fromString(serviceId));
     }
@@ -129,22 +126,25 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "List all deployed services belongs to the user.")
-    @GetMapping(value = "/services",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/services", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<DeployedService> listDeployedServices(
             @Parameter(name = "categoryName", description = "category of the service")
-            @RequestParam(name = "categoryName", required = false) Category category,
+                    @RequestParam(name = "categoryName", required = false)
+                    Category category,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
-            @RequestParam(name = "cspName", required = false) Csp csp,
+                    @RequestParam(name = "cspName", required = false)
+                    Csp csp,
             @Parameter(name = "serviceName", description = "name of the service")
-            @RequestParam(name = "serviceName", required = false) String serviceName,
+                    @RequestParam(name = "serviceName", required = false)
+                    String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
-            @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
+                    @RequestParam(name = "serviceVersion", required = false)
+                    String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
-            @RequestParam(name = "serviceState", required = false)
-            ServiceDeploymentState serviceState) {
+                    @RequestParam(name = "serviceState", required = false)
+                    ServiceDeploymentState serviceState) {
         return this.serviceDetailsViewManager.listDeployedServices(
                 category, csp, serviceName, serviceVersion, serviceState);
     }
@@ -156,22 +156,25 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "List details of deployed services using parameters.")
-    @GetMapping(value = "/services/details",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/services/details", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<DeployedService> listDeployedServicesDetails(
             @Parameter(name = "categoryName", description = "category of the service")
-            @RequestParam(name = "categoryName", required = false) Category category,
+                    @RequestParam(name = "categoryName", required = false)
+                    Category category,
             @Parameter(name = "cspName", description = "name of the cloud service provider")
-            @RequestParam(name = "cspName", required = false) Csp csp,
+                    @RequestParam(name = "cspName", required = false)
+                    Csp csp,
             @Parameter(name = "serviceName", description = "name of the service")
-            @RequestParam(name = "serviceName", required = false) String serviceName,
+                    @RequestParam(name = "serviceName", required = false)
+                    String serviceName,
             @Parameter(name = "serviceVersion", description = "version of the service")
-            @RequestParam(name = "serviceVersion", required = false) String serviceVersion,
+                    @RequestParam(name = "serviceVersion", required = false)
+                    String serviceVersion,
             @Parameter(name = "serviceState", description = "deployment state of the service")
-            @RequestParam(name = "serviceState", required = false)
-            ServiceDeploymentState serviceState) {
+                    @RequestParam(name = "serviceState", required = false)
+                    ServiceDeploymentState serviceState) {
         // return type is DeployedService but actually returns one of the child types
         // VendorHostedDeployedServiceDetails or DeployedServiceDetails
         return this.serviceDetailsViewManager.listDeployedServicesDetails(
@@ -185,8 +188,9 @@ public class ServiceDeployerApi {
      * @return UUID
      */
     @Tag(name = "Service", description = "APIs to manage the services")
-    @Operation(description =
-            "Create an order task to deploy new service using approved service template.")
+    @Operation(
+            description =
+                    "Create an order task to deploy new service using approved service template.")
     @PostMapping(value = "/services", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
@@ -203,7 +207,8 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Create an order to redeploy the failed service using service id.")
-    @PutMapping(value = "/services/deploy/retry/{serviceId}",
+    @PutMapping(
+            value = "/services/deploy/retry/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
@@ -220,14 +225,15 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Create an order task to modify the deployed service.")
-    @PutMapping(value = "/services/modify/{serviceId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/services/modify/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     @OrderFailedApiResponses
-    public ServiceOrder modify(@Parameter(name = "serviceId", description = "Id of the service")
-                               @PathVariable("serviceId") String serviceId,
-                               @Valid @RequestBody ModifyRequest modifyRequest) {
+    public ServiceOrder modify(
+            @Parameter(name = "serviceId", description = "Id of the service")
+                    @PathVariable("serviceId")
+                    String serviceId,
+            @Valid @RequestBody ModifyRequest modifyRequest) {
         return this.deployService.createOrderToModifyDeployedService(
                 UUID.fromString(serviceId), modifyRequest);
     }
@@ -239,16 +245,18 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Change the lock config of the service.")
-    @PutMapping(value = "/services/changelock/{serviceId}",
+    @PutMapping(
+            value = "/services/changelock/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public ServiceOrder changeServiceLockConfig(
             @Parameter(name = "serviceId", description = "Id of the service")
-            @PathVariable("serviceId") String serviceId,
+                    @PathVariable("serviceId")
+                    String serviceId,
             @Valid @RequestBody ServiceLockConfig serviceLockConfig) {
-        return this.lockConfigService.changeServiceLockConfig(UUID.fromString(serviceId),
-                serviceLockConfig);
+        return this.lockConfigService.changeServiceLockConfig(
+                UUID.fromString(serviceId), serviceLockConfig);
     }
 
     /**
@@ -263,8 +271,10 @@ public class ServiceDeployerApi {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     @OrderFailedApiResponses
-    public ServiceOrder destroy(@Parameter(name = "serviceId", description = "Id of the service")
-                                @PathVariable("serviceId") String serviceId) {
+    public ServiceOrder destroy(
+            @Parameter(name = "serviceId", description = "Id of the service")
+                    @PathVariable("serviceId")
+                    String serviceId) {
         return this.deployService.createOrderToDestroyDeployedService(UUID.fromString(serviceId));
     }
 
@@ -276,16 +286,18 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Create an order task to purge the deployed service using service id.")
-    @DeleteMapping(value = "/services/purge/{serviceId}",
+    @DeleteMapping(
+            value = "/services/purge/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     @OrderFailedApiResponses
-    public ServiceOrder purge(@Parameter(name = "serviceId", description = "Id of the service")
-                              @PathVariable("serviceId") String serviceId) {
+    public ServiceOrder purge(
+            @Parameter(name = "serviceId", description = "Id of the service")
+                    @PathVariable("serviceId")
+                    String serviceId) {
         return this.deployService.createOrderToPurgeDestroyedService(UUID.fromString(serviceId));
     }
-
 
     /**
      * Get details of the managed service by serviceId.
@@ -294,30 +306,34 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Get availability zones with csp and region.")
-    @GetMapping(value = "/csp/region/azs",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/csp/region/azs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public ResponseEntity<List<String>> getAvailabilityZones(
             @Parameter(name = "cspName", description = "name of the cloud service provider")
-            @RequestParam(name = "cspName") Csp csp,
+                    @RequestParam(name = "cspName")
+                    Csp csp,
             @Parameter(name = "siteName", description = "site of the region belongs to")
-            @RequestParam(name = "siteName") String siteName,
+                    @RequestParam(name = "siteName")
+                    String siteName,
             @Parameter(name = "regionName", description = "name of the region")
-            @RequestParam(name = "regionName") String regionName,
+                    @RequestParam(name = "regionName")
+                    String regionName,
             @Parameter(name = "serviceTemplateId", description = "Id of the serviceTemplate")
-            @RequestParam(name = "serviceTemplateId", required = false) UUID serviceTemplateId,
+                    @RequestParam(name = "serviceTemplateId", required = false)
+                    UUID serviceTemplateId,
             @Parameter(name = "serviceId", description = "Id of the deployed service")
-            @RequestParam(name = "serviceId", required = false) UUID serviceId) {
+                    @RequestParam(name = "serviceId", required = false)
+                    UUID serviceId) {
         try {
             if (Objects.nonNull(serviceTemplateId) && Objects.nonNull(serviceId)) {
-                throw new IllegalArgumentException("Either serviceTemplateId or "
-                        + "serviceId must be provided. Not both.");
+                throw new IllegalArgumentException(
+                        "Either serviceTemplateId or " + "serviceId must be provided. Not both.");
             }
             List<String> availabilityZones =
-                    this.deployService.getAvailabilityZonesOfRegion(csp, siteName, regionName,
-                            serviceId, serviceTemplateId);
+                    this.deployService.getAvailabilityZonesOfRegion(
+                            csp, siteName, regionName, serviceId, serviceTemplateId);
             return ResponseEntity.ok().cacheControl(getCacheControl()).body(availabilityZones);
         } catch (Exception ex) {
             log.error("Error fetching availability zones", ex);
@@ -327,28 +343,32 @@ public class ServiceDeployerApi {
         }
     }
 
-    /**
-     * Method to fetch status of service deployment.
-     */
+    /** Method to fetch status of service deployment. */
     @Tag(name = "Service", description = "APIs to manage the services")
-    @GetMapping(value = "/services/{serviceId}/deployment/status",
+    @GetMapping(
+            value = "/services/{serviceId}/deployment/status",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(description =
-            "Long-polling method to get the latest service deployment or service update status.")
+    @Operation(
+            description =
+                    "Long-polling method to get the latest service deployment or service update"
+                            + " status.")
     @AuditApiRequest(methodName = "getCspFromServiceId")
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
     public DeferredResult<DeploymentStatusUpdate> getLatestServiceDeploymentStatus(
             @Parameter(name = "serviceId", description = "ID of the service")
-            @PathVariable(name = "serviceId") String serviceId,
-            @Parameter(name = "lastKnownServiceDeploymentState",
-                    description = "Last known service status to client. When provided, "
-                            + "the service will wait for a configured period time until "
-                            + "to see if there is a change to the last known state.")
-            @RequestParam(name = "lastKnownServiceDeploymentState", required = false)
-            ServiceDeploymentState lastKnownServiceDeploymentState) {
-        return deployService.getLatestServiceDeploymentStatus(UUID.fromString(serviceId),
-                lastKnownServiceDeploymentState);
+                    @PathVariable(name = "serviceId")
+                    String serviceId,
+            @Parameter(
+                            name = "lastKnownServiceDeploymentState",
+                            description =
+                                    "Last known service status to client. When provided, the"
+                                        + " service will wait for a configured period time until to"
+                                        + " see if there is a change to the last known state.")
+                    @RequestParam(name = "lastKnownServiceDeploymentState", required = false)
+                    ServiceDeploymentState lastKnownServiceDeploymentState) {
+        return deployService.getLatestServiceDeploymentStatus(
+                UUID.fromString(serviceId), lastKnownServiceDeploymentState);
     }
 
     /**
@@ -359,19 +379,20 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "Get service template details by service id.")
-    @GetMapping(value = "/services/{serviceId}/service_template",
+    @GetMapping(
+            value = "/services/{serviceId}/service_template",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
     public UserOrderableServiceVo getOrderableServiceDetailsByServiceId(
             @Parameter(name = "serviceId", description = "The id of deployed service.")
-            @PathVariable("serviceId") String serviceId) {
+                    @PathVariable("serviceId")
+                    String serviceId) {
         ServiceTemplateEntity usedServiceTemplate =
                 deployService.getOrderableServiceDetailsByServiceId(UUID.fromString(serviceId));
         return convertToUserOrderableServiceVo(usedServiceTemplate);
     }
-
 
     /**
      * List compute resources of the service.
@@ -381,13 +402,15 @@ public class ServiceDeployerApi {
      */
     @Tag(name = "Service", description = "APIs to manage the services")
     @Operation(description = "List compute resources of the service.")
-    @GetMapping(value = "/services/{serviceId}/resources/compute",
+    @GetMapping(
+            value = "/services/{serviceId}/resources/compute",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public List<DeployResource> getComputeResourceInventoryOfService(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
-            @PathVariable(name = "serviceId") String serviceId) {
+                    @PathVariable(name = "serviceId")
+                    String serviceId) {
         return this.deployService.listResourcesOfDeployedService(
                 UUID.fromString(serviceId), DeployResourceKind.VM);
     }

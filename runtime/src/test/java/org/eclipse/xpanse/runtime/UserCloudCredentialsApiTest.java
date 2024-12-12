@@ -35,9 +35,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for UserCloudCredentialsApi.
- */
+/** Test for UserCloudCredentialsApi. */
 @ExtendWith(SpringExtension.class)
 @Transactional
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
@@ -70,11 +68,19 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
-                        "The access key.", true, isSensitive, "AK_VALUE"));
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.",
+                        true,
+                        isSensitive,
+                        "AK_VALUE"));
         credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                        "The security key.", true, isSensitive, "SK_VALUE"));
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.",
+                        true,
+                        isSensitive,
+                        "SK_VALUE"));
         createCredential.setVariables(credentialVariables);
         createCredential.setTimeToLive(300);
         return createCredential;
@@ -85,11 +91,13 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
         String result = "[]";
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/user/credentials")
-                                .param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue())
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                get("/xpanse/user/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
@@ -107,17 +115,22 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
         // Run the test
         final MockHttpServletResponse addResponse =
-                mockMvc.perform(post("/xpanse/user/credentials")
-                                .content(requestBody).contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                post("/xpanse/user/credentials")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/user/credentials")
-                                .param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue())
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                get("/xpanse/user/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), addResponse.getStatus());
@@ -137,17 +150,22 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
         // Run the test
         final MockHttpServletResponse addResponse =
-                mockMvc.perform(post("/xpanse/user/credentials")
-                                .content(requestBody).contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                post("/xpanse/user/credentials")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/user/credentials")
-                                .param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue())
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                get("/xpanse/user/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), addResponse.getStatus());
@@ -159,22 +177,27 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
 
     void testGetCredentialOpenApi() throws Exception {
         // Setup
-        Link link = Link.of("http://localhost/openapi/HuaweiCloud_variables_credentialApi.html",
-                "OpenApi");
+        Link link =
+                Link.of(
+                        "http://localhost/openapi/HuaweiCloud_variables_credentialApi.html",
+                        "OpenApi");
         String result = objectMapper.writeValueAsString(link);
 
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/credentials/openapi/{csp}/{type}", Csp.HUAWEI_CLOUD,
-                                CredentialType.VARIABLES)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                get(
+                                                "/xpanse/credentials/openapi/{csp}/{type}",
+                                                Csp.HUAWEI_CLOUD,
+                                                CredentialType.VARIABLES)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
         Assertions.assertEquals(result, response.getContentAsString());
     }
-
 
     void testUpdateCredential() throws Exception {
         // Setup
@@ -186,20 +209,24 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
         CredentialVariables credentialVariables1 = new CredentialVariables(updateCredential);
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
 
-
         // Run the test
         final MockHttpServletResponse updateResponse =
-                mockMvc.perform(put("/xpanse/user/credentials")
-                                .content(requestBody).contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                put("/xpanse/user/credentials")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/user/credentials")
-                                .param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue())
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                get("/xpanse/user/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), updateResponse.getStatus());
@@ -216,20 +243,24 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
 
         // Run the test
         final MockHttpServletResponse deleteResponse =
-                mockMvc.perform(delete("/xpanse/user/credentials")
-                                .param("cspName", csp.toValue())
-                                .param("siteName", site)
-                                .param("type", credentialType.toValue())
-                                .param("name", "AK_SK")
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                delete("/xpanse/user/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("siteName", site)
+                                        .param("type", credentialType.toValue())
+                                        .param("name", "AK_SK")
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         final MockHttpServletResponse queryResponse =
-                mockMvc.perform(get("/xpanse/user/credentials")
-                                .param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue())
-                                .accept(MediaType.APPLICATION_JSON))
-                        .andReturn().getResponse();
+                mockMvc.perform(
+                                get("/xpanse/user/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.getStatus());
@@ -238,5 +269,4 @@ class UserCloudCredentialsApiTest extends ApisTestCommon {
         Assertions.assertEquals(HttpStatus.OK.value(), queryResponse.getStatus());
         Assertions.assertEquals(queryResult, queryResponse.getContentAsString());
     }
-
 }

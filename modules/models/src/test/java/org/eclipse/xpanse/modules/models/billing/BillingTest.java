@@ -21,8 +21,8 @@ public class BillingTest {
 
     @Test
     void testGetters() {
-        assertThat(billingTest.getBillingModes()).isEqualTo(Arrays.asList(BillingMode.FIXED,
-                BillingMode.PAY_PER_USE));
+        assertThat(billingTest.getBillingModes())
+                .isEqualTo(Arrays.asList(BillingMode.FIXED, BillingMode.PAY_PER_USE));
         assertThat(billingTest.getDefaultBillingMode()).isEqualTo(BillingMode.PAY_PER_USE);
     }
 
@@ -49,5 +49,4 @@ public class BillingTest {
                 "Billing(billingModes=[FIXED, PAY_PER_USE], defaultBillingMode=PAY_PER_USE)";
         assertThat(billingTest.toString()).isEqualTo(result);
     }
-
 }

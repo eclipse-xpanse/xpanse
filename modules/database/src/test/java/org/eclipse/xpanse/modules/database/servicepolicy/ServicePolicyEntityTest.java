@@ -21,8 +21,7 @@ class ServicePolicyEntityTest {
     final String flavorNames = "flavor1,flavor2";
     final String policy = "policy";
     final Boolean enabled = false;
-    @Mock
-    private ServiceTemplateEntity mockServiceTemplate;
+    @Mock private ServiceTemplateEntity mockServiceTemplate;
     private ServicePolicyEntity test;
 
     @BeforeEach
@@ -83,10 +82,11 @@ class ServicePolicyEntityTest {
 
     @Test
     void testToString() {
-        String result = String.format(
-                "ServicePolicyEntity(id=%s, policy=%s, serviceTemplate=%s, flavorNames=%s, "
-                        + "enabled=%s)",
-                id, policy, mockServiceTemplate, flavorNames, enabled);
+        String result =
+                String.format(
+                        "ServicePolicyEntity(id=%s, policy=%s, serviceTemplate=%s, flavorNames=%s, "
+                                + "enabled=%s)",
+                        id, policy, mockServiceTemplate, flavorNames, enabled);
 
         assertThat(test.toString()).isEqualTo(result);
     }

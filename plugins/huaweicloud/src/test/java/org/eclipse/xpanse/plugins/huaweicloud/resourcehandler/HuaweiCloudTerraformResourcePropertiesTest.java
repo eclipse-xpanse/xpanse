@@ -30,7 +30,6 @@ class HuaweiCloudTerraformResourcePropertiesTest {
         Assertions.assertEquals(volumeResult.getResourceKind(), DeployResourceKind.VOLUME);
         Assertions.assertFalse(volumeResult.getResourceProperties().isEmpty());
 
-
         // Run the test
         final DeployResourceProperties subnetResult =
                 HuaweiCloudTerraformResourceProperties.getDeployResourceProperties(
@@ -64,8 +63,8 @@ class HuaweiCloudTerraformResourcePropertiesTest {
                         "huaweicloud_networking_secgroup");
         // Verify the results
         Assertions.assertNotNull(secGroupResult);
-        Assertions.assertEquals(secGroupResult.getResourceKind(),
-                DeployResourceKind.SECURITY_GROUP);
+        Assertions.assertEquals(
+                secGroupResult.getResourceKind(), DeployResourceKind.SECURITY_GROUP);
         Assertions.assertFalse(secGroupResult.getResourceProperties().isEmpty());
 
         // Run the test
@@ -74,8 +73,8 @@ class HuaweiCloudTerraformResourcePropertiesTest {
                         "huaweicloud_networking_secgroup_rule");
         // Verify the results
         Assertions.assertNotNull(secGroupRuleResult);
-        Assertions.assertEquals(secGroupRuleResult.getResourceKind(),
-                DeployResourceKind.SECURITY_GROUP_RULE);
+        Assertions.assertEquals(
+                secGroupRuleResult.getResourceKind(), DeployResourceKind.SECURITY_GROUP_RULE);
         Assertions.assertFalse(secGroupRuleResult.getResourceProperties().isEmpty());
 
         // Run the test
@@ -102,14 +101,16 @@ class HuaweiCloudTerraformResourcePropertiesTest {
 
     @Test
     void testGetTerraformResourceTypes() {
-        Set<String> exceptedTypes = Set.of("huaweicloud_compute_instance",
-                "huaweicloud_evs_volume",
-                "huaweicloud_vpc_subnet",
-                "huaweicloud_networking_secgroup_rule",
-                "huaweicloud_kps_keypair",
-                "huaweicloud_vpc",
-                "huaweicloud_networking_secgroup",
-                "huaweicloud_vpc_eip");
+        Set<String> exceptedTypes =
+                Set.of(
+                        "huaweicloud_compute_instance",
+                        "huaweicloud_evs_volume",
+                        "huaweicloud_vpc_subnet",
+                        "huaweicloud_networking_secgroup_rule",
+                        "huaweicloud_kps_keypair",
+                        "huaweicloud_vpc",
+                        "huaweicloud_networking_secgroup",
+                        "huaweicloud_vpc_eip");
         assertThat(HuaweiCloudTerraformResourceProperties.getTerraformResourceTypes())
                 .isEqualTo(exceptedTypes);
     }

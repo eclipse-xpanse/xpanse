@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
 import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
 
@@ -55,10 +54,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-/**
- * REST interface methods for Service Migration.
- */
+/** REST interface methods for Service Migration. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -67,16 +63,11 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServiceMigrationApi {
 
-    @Resource
-    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Resource
-    private UserServiceHelper userServiceHelper;
-    @Resource
-    private WorkflowUtils workflowUtils;
-    @Resource
-    private ServiceTemplateStorage serviceTemplateStorage;
-    @Resource
-    private ServiceOrderManager serviceOrderManager;
+    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @Resource private UserServiceHelper userServiceHelper;
+    @Resource private WorkflowUtils workflowUtils;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource private ServiceOrderManager serviceOrderManager;
 
     /**
      * Create a job to migrate the deployed service.
@@ -100,14 +91,17 @@ public class ServiceMigrationApi {
         }
         if (Objects.nonNull(deployServiceEntity.getLockConfig())
                 && deployServiceEntity.getLockConfig().isModifyLocked()) {
-            String errorMsg = String.format("Service with id %s is locked from migration.",
-                    migrateRequest.getOriginalServiceId());
+            String errorMsg =
+                    String.format(
+                            "Service with id %s is locked from migration.",
+                            migrateRequest.getOriginalServiceId());
             throw new ServiceLockedException(errorMsg);
         }
         migrateRequest.setUserId(userId);
         DeployTask migrateTask = getMigrateTask(migrateRequest);
-        ServiceOrderEntity migrateOrderEntity = serviceOrderManager
-                .storeNewServiceOrderEntity(migrateTask, deployServiceEntity, Handler.WORKFLOW);
+        ServiceOrderEntity migrateOrderEntity =
+                serviceOrderManager.storeNewServiceOrderEntity(
+                        migrateTask, deployServiceEntity, Handler.WORKFLOW);
         Map<String, Object> variable =
                 getMigrateProcessVariable(migrateRequest, migrateOrderEntity);
         ProcessInstance instance =
@@ -115,33 +109,47 @@ public class ServiceMigrationApi {
         migrateOrderEntity.setWorkflowId(instance.getProcessInstanceId());
         ServiceOrderEntity updatedOrderEntity =
                 serviceOrderManager.startOrderProgress(migrateOrderEntity);
-        return new ServiceOrder(updatedOrderEntity.getOrderId(),
+        return new ServiceOrder(
+                updatedOrderEntity.getOrderId(),
                 (UUID) variable.get(MigrateConstants.NEW_SERVICE_ID));
     }
 
     private void validateData(MigrateRequest migrateRequest) {
-        ServiceTemplateQueryModel queryModel = ServiceTemplateQueryModel.builder()
-                .category(migrateRequest.getCategory()).csp(migrateRequest.getCsp())
-                .serviceName(migrateRequest.getServiceName())
-                .serviceVersion(migrateRequest.getVersion())
-                .serviceHostingType(migrateRequest.getServiceHostingType()).build();
+        ServiceTemplateQueryModel queryModel =
+                ServiceTemplateQueryModel.builder()
+                        .category(migrateRequest.getCategory())
+                        .csp(migrateRequest.getCsp())
+                        .serviceName(migrateRequest.getServiceName())
+                        .serviceVersion(migrateRequest.getVersion())
+                        .serviceHostingType(migrateRequest.getServiceHostingType())
+                        .build();
         List<ServiceTemplateEntity> existingServiceTemplates =
                 serviceTemplateStorage.listServiceTemplates(queryModel);
-        ServiceTemplateEntity existingTemplate = existingServiceTemplates.stream()
-                .filter(serviceTemplate -> serviceTemplate.getAvailableInCatalog()
-                        && Objects.nonNull(serviceTemplate.getOcl()))
-                .findFirst().orElseThrow(() -> new ServiceTemplateNotRegistered(
-                        "No available service templates found"));
+        ServiceTemplateEntity existingTemplate =
+                existingServiceTemplates.stream()
+                        .filter(
+                                serviceTemplate ->
+                                        serviceTemplate.getAvailableInCatalog()
+                                                && Objects.nonNull(serviceTemplate.getOcl()))
+                        .findFirst()
+                        .orElseThrow(
+                                () ->
+                                        new ServiceTemplateNotRegistered(
+                                                "No available service templates found"));
         if (StringUtils.isNotBlank(existingTemplate.getOcl().getEula())
                 && !migrateRequest.isEulaAccepted()) {
             log.error("Service not accepted Eula.");
             throw new EulaNotAccepted("Service not accepted Eula.");
         }
-        if (!existingTemplate.getOcl().getBilling().getBillingModes()
+        if (!existingTemplate
+                .getOcl()
+                .getBilling()
+                .getBillingModes()
                 .contains(migrateRequest.getBillingMode())) {
-            String errorMsg = String.format(
-                    "The service template with id %s does not support billing mode %s.",
-                    existingTemplate.getId(), migrateRequest.getBillingMode());
+            String errorMsg =
+                    String.format(
+                            "The service template with id %s does not support billing mode %s.",
+                            existingTemplate.getId(), migrateRequest.getBillingMode());
             log.error(errorMsg);
             throw new BillingModeNotSupported(errorMsg);
         }
@@ -158,8 +166,8 @@ public class ServiceMigrationApi {
         return migrateTask;
     }
 
-    private Map<String, Object> getMigrateProcessVariable(MigrateRequest migrateRequest,
-                                                          ServiceOrderEntity migrateOrderEntity) {
+    private Map<String, Object> getMigrateProcessVariable(
+            MigrateRequest migrateRequest, ServiceOrderEntity migrateOrderEntity) {
         Map<String, Object> variable = new HashMap<>();
         variable.put(MigrateConstants.MIGRATE_ORDER_ID, migrateOrderEntity.getOrderId());
         variable.put(MigrateConstants.ORIGINAL_SERVICE_ID, migrateRequest.getOriginalServiceId());
@@ -170,5 +178,4 @@ public class ServiceMigrationApi {
         variable.put(MigrateConstants.DESTROY_RETRY_NUM, 0);
         return variable;
     }
-
 }

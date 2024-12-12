@@ -39,9 +39,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedEx
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * FlexibleEngine Service Client.
- */
+/** FlexibleEngine Service Client. */
 @Slf4j
 @Component
 public class FlexibleEngineClient extends FlexibleEngineCredentials {
@@ -49,8 +47,7 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
     @Value("${flexibleengine.sdk.enable.http.debug.logs:false}")
     private boolean sdkHttpDebugLogsEnabled;
 
-    @Resource
-    private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+    @Resource private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
 
     /**
      * Get client for service ECS.
@@ -122,11 +119,14 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
 
     private ICredential getCredentialWithProjectId(ICredential credential, String regionName) {
         String projectId = getProjectId(credential, regionName);
-        if (Objects.nonNull(credential) && StringUtils.isNotBlank(projectId)
+        if (Objects.nonNull(credential)
+                && StringUtils.isNotBlank(projectId)
                 && credential instanceof BasicCredentials basicCredentials) {
             String accessKey = basicCredentials.getAk();
             String securityKey = basicCredentials.getSk();
-            return new BasicCredentials().withAk(accessKey).withSk(securityKey)
+            return new BasicCredentials()
+                    .withAk(accessKey)
+                    .withSk(securityKey)
                     .withProjectId(projectId);
         }
         return credential;
@@ -143,7 +143,8 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
             KeystoneListProjectsRequest listProjectsRequest = new KeystoneListProjectsRequest();
             listProjectsRequest.setName(regionName);
             KeystoneListProjectsResponse response =
-                    iamClient.keystoneListProjectsInvoker(listProjectsRequest)
+                    iamClient
+                            .keystoneListProjectsInvoker(listProjectsRequest)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
                             .backoffStrategy(flexibleEngineRetryStrategy)
@@ -162,8 +163,7 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
     private HttpConfig getHttpConfig() {
         HttpConfig httpConfig = HttpConfig.getDefaultHttpConfig();
         if (sdkHttpDebugLogsEnabled) {
-            HttpListener requestListener =
-                    HttpListener.forRequestListener(this::outputRequestInfo);
+            HttpListener requestListener = HttpListener.forRequestListener(this::outputRequestInfo);
             httpConfig.addHttpListener(requestListener);
 
             HttpListener responseListener =
@@ -174,34 +174,56 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
     }
 
     private void outputRequestInfo(HttpListener.RequestListener listener) {
-        String requestInfo = "> Request " + listener.httpMethod() + " " + listener.uri()
-                + System.lineSeparator()
-                + "> Headers:" + System.lineSeparator() + getRequestHeadersString(listener)
-                + System.lineSeparator() + "> Body:" + listener.body().orElse("")
-                + System.lineSeparator();
+        String requestInfo =
+                "> Request "
+                        + listener.httpMethod()
+                        + " "
+                        + listener.uri()
+                        + System.lineSeparator()
+                        + "> Headers:"
+                        + System.lineSeparator()
+                        + getRequestHeadersString(listener)
+                        + System.lineSeparator()
+                        + "> Body:"
+                        + listener.body().orElse("")
+                        + System.lineSeparator();
         log.info(requestInfo);
     }
 
     private void outputResponseInfo(HttpListener.ResponseListener listener) {
-        String responseInfo = "< Response " + listener.httpMethod() + " " + listener.uri() + " "
-                + listener.statusCode() + System.lineSeparator()
-                + "< Headers:" + System.lineSeparator() + getResponseHeadersString(listener)
-                + System.lineSeparator() + "< Body:" + listener.body().orElse("")
-                + System.lineSeparator();
+        String responseInfo =
+                "< Response "
+                        + listener.httpMethod()
+                        + " "
+                        + listener.uri()
+                        + " "
+                        + listener.statusCode()
+                        + System.lineSeparator()
+                        + "< Headers:"
+                        + System.lineSeparator()
+                        + getResponseHeadersString(listener)
+                        + System.lineSeparator()
+                        + "< Body:"
+                        + listener.body().orElse("")
+                        + System.lineSeparator();
         log.info(responseInfo);
     }
 
     private String getRequestHeadersString(HttpListener.RequestListener listener) {
-        return listener.headers().entrySet().stream().flatMap(entry -> entry.getValue().stream()
-                        .map(value -> "\t" + entry.getKey() + ": " + value))
+        return listener.headers().entrySet().stream()
+                .flatMap(
+                        entry ->
+                                entry.getValue().stream()
+                                        .map(value -> "\t" + entry.getKey() + ": " + value))
                 .collect(Collectors.joining("\n"));
     }
 
     private String getResponseHeadersString(HttpListener.ResponseListener listener) {
-        return listener.headers().entrySet().stream().flatMap(entry -> entry.getValue().stream()
-                        .map(value -> "\t" + entry.getKey() + ": " + value))
+        return listener.headers().entrySet().stream()
+                .flatMap(
+                        entry ->
+                                entry.getValue().stream()
+                                        .map(value -> "\t" + entry.getKey() + ": " + value))
                 .collect(Collectors.joining("\n"));
     }
-
-
 }

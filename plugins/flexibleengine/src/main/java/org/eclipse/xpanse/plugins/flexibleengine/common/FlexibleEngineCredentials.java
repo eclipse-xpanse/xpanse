@@ -18,13 +18,10 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.springframework.stereotype.Component;
 
-/**
- * HuaweiCloud BasicCredentials Class.
- */
+/** HuaweiCloud BasicCredentials Class. */
 @Slf4j
 @Component
 public class FlexibleEngineCredentials {
-
 
     /**
      * Get Credential for Client.
@@ -48,7 +45,9 @@ public class FlexibleEngineCredentials {
             }
         }
         if (StringUtils.isBlank(accessKey) || StringUtils.isBlank(securityKey)) {
-            log.error("Get Credential For Client error,accessKey:{},securityKey:{}", accessKey,
+            log.error(
+                    "Get Credential For Client error,accessKey:{},securityKey:{}",
+                    accessKey,
                     securityKey);
             throw new CredentialsNotFoundException("Get ICredential error,AK or SK is empty");
         }

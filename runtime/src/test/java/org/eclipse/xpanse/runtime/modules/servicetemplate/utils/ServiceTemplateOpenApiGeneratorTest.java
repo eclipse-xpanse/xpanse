@@ -28,17 +28,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.test.util.ReflectionTestUtils;
 
-/**
- * Test for ServiceTemplateOpenApiGenerator.
- */
+/** Test for ServiceTemplateOpenApiGenerator. */
 @Slf4j
 class ServiceTemplateOpenApiGeneratorTest {
 
     private static final String appVersion = "1.0.0";
     private UUID serviceId;
     private OpenApiGeneratorJarManage openApiGeneratorJarManage;
-    @InjectMocks
-    private ServiceTemplateOpenApiGenerator openApiGenerator;
+    @InjectMocks private ServiceTemplateOpenApiGenerator openApiGenerator;
 
     @BeforeEach
     void init() {
@@ -46,23 +43,28 @@ class ServiceTemplateOpenApiGeneratorTest {
         Integer serverPort = 8080;
         serviceId = UUID.randomUUID();
         OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(openApiPath, serverPort);
-        String clientDownloadURL = "https://repo1.maven.org/maven2/org/"
-                + "openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar";
-        openApiGeneratorJarManage =
-                new OpenApiGeneratorJarManage(clientDownloadURL, openApiPath);
+        String clientDownloadURL =
+                "https://repo1.maven.org/maven2/org/"
+                    + "openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar";
+        openApiGeneratorJarManage = new OpenApiGeneratorJarManage(clientDownloadURL, openApiPath);
         PluginManager pluginManager = new PluginManager();
-        openApiGenerator = new ServiceTemplateOpenApiGenerator(appVersion, null,
-                pluginManager, openApiUrlManage, openApiGeneratorJarManage);
+        openApiGenerator =
+                new ServiceTemplateOpenApiGenerator(
+                        appVersion,
+                        null,
+                        pluginManager,
+                        openApiUrlManage,
+                        openApiGeneratorJarManage);
     }
 
     void setConfiguration(Boolean webSecurityIsEnabled, Boolean roleProtectionIsEnabled) {
 
         ReflectionTestUtils.setField(openApiGenerator, "appVersion", appVersion);
 
-        ReflectionTestUtils.setField(openApiGenerator, "webSecurityIsEnabled",
-                webSecurityIsEnabled);
-        ReflectionTestUtils.setField(openApiGenerator, "roleProtectionIsEnabled",
-                roleProtectionIsEnabled);
+        ReflectionTestUtils.setField(
+                openApiGenerator, "webSecurityIsEnabled", webSecurityIsEnabled);
+        ReflectionTestUtils.setField(
+                openApiGenerator, "roleProtectionIsEnabled", roleProtectionIsEnabled);
     }
 
     @Test
@@ -89,10 +91,10 @@ class ServiceTemplateOpenApiGeneratorTest {
         deleteServiceApi();
     }
 
-
     void createServiceApi() throws Exception {
-        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ServiceTemplateEntity serviceTemplateEntity =
+                getServiceTemplateEntity(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         openApiGenerator.createServiceApi(serviceTemplateEntity);
         String openApiWorkdir = openApiGeneratorJarManage.getOpenApiWorkdir();
         File htmlFile = new File(openApiWorkdir, serviceTemplateEntity.getId() + ".html");
@@ -100,8 +102,9 @@ class ServiceTemplateOpenApiGeneratorTest {
     }
 
     void updateServiceApi() throws Exception {
-        ServiceTemplateEntity serviceTemplateEntity = getServiceTemplateEntity(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        ServiceTemplateEntity serviceTemplateEntity =
+                getServiceTemplateEntity(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
         Assertions.assertDoesNotThrow(
                 () -> openApiGenerator.updateServiceApi(serviceTemplateEntity));
     }
@@ -118,8 +121,7 @@ class ServiceTemplateOpenApiGeneratorTest {
         Ocl ocl = oclLoader.getOcl(url);
         AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
                 ocl.getDeployment().getServiceAvailabilityConfig());
-        DeployVariableSchemaValidator.validateDeployVariable(
-                ocl.getDeployment().getVariables());
+        DeployVariableSchemaValidator.validateDeployVariable(ocl.getDeployment().getVariables());
         ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator =
                 new ServiceDeployVariablesJsonSchemaGenerator();
         JsonObjectSchema jsonObjectSchema =

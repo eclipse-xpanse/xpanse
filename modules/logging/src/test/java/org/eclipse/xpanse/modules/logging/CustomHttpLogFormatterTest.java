@@ -23,7 +23,6 @@ class CustomHttpLogFormatterTest {
 
     private CustomHttpLogWriter customHttpLogWriterUnderTest;
 
-
     @BeforeEach
     void setUp() {
         customHttpLogFormatterUnderTest = new CustomHttpLogFormatter();
@@ -42,7 +41,6 @@ class CustomHttpLogFormatterTest {
         assertThat(result).isEqualTo("Request: GET /xpanse?id=1");
         customHttpLogWriterUnderTest.write(getPrecorrelation(), "request");
     }
-
 
     @Test
     void testResponseLogFormatAndWrite() throws Exception {

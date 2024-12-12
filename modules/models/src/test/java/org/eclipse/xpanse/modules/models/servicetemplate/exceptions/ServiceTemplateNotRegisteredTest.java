@@ -12,9 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of ServiceNotRegisteredException.
- */
+/** Test of ServiceNotRegisteredException. */
 class ServiceTemplateNotRegisteredTest {
 
     private static final String message = "service not registered.";
@@ -40,8 +38,7 @@ class ServiceTemplateNotRegisteredTest {
         assertNotEquals(exception, null);
         assertNotEquals(exception.hashCode(), obj.hashCode());
 
-        ServiceTemplateNotRegistered exception1 =
-                new ServiceTemplateNotRegistered(message);
+        ServiceTemplateNotRegistered exception1 = new ServiceTemplateNotRegistered(message);
         ServiceTemplateNotRegistered exception2 =
                 new ServiceTemplateNotRegistered("different message");
 
@@ -67,5 +64,4 @@ class ServiceTemplateNotRegisteredTest {
 
         assertEquals(message, exception.getMessage());
     }
-
 }

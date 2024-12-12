@@ -11,12 +11,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Defines which cloud service account is used for deploying cloud resources.
- */
+/** Defines which cloud service account is used for deploying cloud resources. */
 @Schema(description = "Defines which cloud service account is used for deploying cloud resources.")
 public enum ServiceHostingType {
-
     SELF("self"),
     SERVICE_VENDOR("service-vendor");
 
@@ -26,9 +23,7 @@ public enum ServiceHostingType {
         this.serviceHostingType = serviceHostingType;
     }
 
-    /**
-     * For ServiceHostingType serialize.
-     */
+    /** For ServiceHostingType serialize. */
     @JsonCreator
     public static ServiceHostingType getByValue(String type) {
         for (ServiceHostingType serviceHostingType : values()) {
@@ -40,9 +35,7 @@ public enum ServiceHostingType {
                 String.format("ServiceHostingType value %s is not supported.", type));
     }
 
-    /**
-     * For ServiceHostingType deserialize.
-     */
+    /** For ServiceHostingType deserialize. */
     @JsonValue
     public String toValue() {
         return this.serviceHostingType;

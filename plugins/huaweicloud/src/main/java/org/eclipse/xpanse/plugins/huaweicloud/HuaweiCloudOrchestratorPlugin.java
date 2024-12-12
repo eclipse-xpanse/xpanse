@@ -50,23 +50,16 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Plugin to deploy managed services on Huawei cloud.
- */
+/** Plugin to deploy managed services on Huawei cloud. */
 @Slf4j
 @Component
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
-    @Resource
-    private HuaweiCloudTerraformResourceHandler terraformResourceHandler;
-    @Resource
-    private HuaweiCloudMetricsService metricsService;
-    @Resource
-    private HuaweiCloudVmStateManager vmStateManager;
-    @Resource
-    private HuaweiCloudResourceManager resourceManager;
-    @Resource
-    private HuaweiCloudPriceCalculator priceCalculator;
+    @Resource private HuaweiCloudTerraformResourceHandler terraformResourceHandler;
+    @Resource private HuaweiCloudMetricsService metricsService;
+    @Resource private HuaweiCloudVmStateManager vmStateManager;
+    @Resource private HuaweiCloudResourceManager resourceManager;
+    @Resource private HuaweiCloudPriceCalculator priceCalculator;
 
     @Value("${huaweicloud.auto.approve.service.template.enabled:false}")
     private boolean autoApproveServiceTemplateEnabled;
@@ -118,7 +111,8 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public List<String> getSites() {
-        return List.of(HuaweiCloudConstants.INTERNATIONAL_SITE,
+        return List.of(
+                HuaweiCloudConstants.INTERNATIONAL_SITE,
                 HuaweiCloudConstants.CHINESE_MAINLAND_SITE,
                 HuaweiCloudConstants.EUROPE_SITE);
     }
@@ -127,20 +121,26 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     public boolean validateRegionsOfService(Ocl ocl) {
         List<String> errors = new ArrayList<>();
         List<Region> regions = ocl.getCloudServiceProvider().getRegions();
-        regions.forEach(region -> {
-            try {
-                IamRegion.valueOf(region.getName());
-            } catch (IllegalArgumentException e) {
-                String errorMsg = String.format("Region with name %s is unavailable in "
-                        + "Csp %s.", region.getName(), getCsp().toValue());
-                errors.add(errorMsg);
-            }
-            if (!getSites().contains(region.getSite())) {
-                String errorMsg = String.format("Region with site %s is unavailable in Csp %s. "
-                        + "Available sites %s", region.getName(), getCsp().toValue(), getSites());
-                errors.add(errorMsg);
-            }
-        });
+        regions.forEach(
+                region -> {
+                    try {
+                        IamRegion.valueOf(region.getName());
+                    } catch (IllegalArgumentException e) {
+                        String errorMsg =
+                                String.format(
+                                        "Region with name %s is unavailable in " + "Csp %s.",
+                                        region.getName(), getCsp().toValue());
+                        errors.add(errorMsg);
+                    }
+                    if (!getSites().contains(region.getSite())) {
+                        String errorMsg =
+                                String.format(
+                                        "Region with site %s is unavailable in Csp %s. "
+                                                + "Available sites %s",
+                                        region.getName(), getCsp().toValue(), getSites());
+                        errors.add(errorMsg);
+                    }
+                });
         if (CollectionUtils.isEmpty(errors)) {
             return true;
         }
@@ -163,23 +163,30 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     public List<AbstractCredentialInfo> getCredentialDefinitions() {
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY, "The access key.",
-                        true));
-        credentialVariables.add(new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                "The security key.", true));
-        CredentialVariables accessKey = new CredentialVariables(getCsp(), getSites().getFirst(),
-                CredentialType.VARIABLES, HuaweiCloudMonitorConstants.IAM,
-                "Using The access key and security key authentication.", null, credentialVariables);
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_ACCESS_KEY, "The access key.", true));
+        credentialVariables.add(
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_SECRET_KEY, "The security key.", true));
+        CredentialVariables accessKey =
+                new CredentialVariables(
+                        getCsp(),
+                        getSites().getFirst(),
+                        CredentialType.VARIABLES,
+                        HuaweiCloudMonitorConstants.IAM,
+                        "Using The access key and security key authentication.",
+                        null,
+                        credentialVariables);
 
         List<AbstractCredentialInfo> credentialInfos = new ArrayList<>();
         credentialInfos.add(accessKey);
         /* In the credential definition object CredentialVariables. The value of fields joined like
-           csp-type-name must be unique. It means when you want to add a new CredentialVariables
-           with type VARIABLES for this csp, the value of filed name in the new CredentialVariables
-           must be different from the value of filed name in others CredentialVariables
-           with the same type VARIABLES. Otherwise, it will throw an exception at the application
-           startup.
-           */
+        csp-type-name must be unique. It means when you want to add a new CredentialVariables
+        with type VARIABLES for this csp, the value of filed name in the new CredentialVariables
+        must be different from the value of filed name in others CredentialVariables
+        with the same type VARIABLES. Otherwise, it will throw an exception at the application
+        startup.
+        */
         return credentialInfos;
     }
 
@@ -224,7 +231,6 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
     public void auditApiRequest(AuditLog auditLog) {
         log.info(auditLog.toString());
     }
-
 
     @Override
     @Cacheable(cacheNames = SERVICE_FLAVOR_PRICE_CACHE_NAME, key = "#request")

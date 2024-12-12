@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-/**
- * Implementation of the deployment with tofu-maker.
- */
+/** Implementation of the deployment with tofu-maker. */
 @Slf4j
 @Profile("tofu-maker")
 @Component
@@ -31,16 +29,14 @@ public class TofuMakerDeployment implements Deployer {
     private final TofuMakerServiceDestroyer tofuMakerServiceDestroyer;
     private final TofuMakerServiceModifier tofuMakerServiceModifier;
 
-    /**
-     * Initializes the OpenTofuBoot deployer.
-     */
+    /** Initializes the OpenTofuBoot deployer. */
     @Autowired
-    public TofuMakerDeployment(TofuMakerScriptValidator tofuMakerScriptValidator,
-                               TofuMakerDeploymentPlanManage
-                                       tofuMakerDeploymentPlanManage,
-                               TofuMakerServiceDeployer tofuMakerServiceDeployer,
-                               TofuMakerServiceDestroyer tofuMakerServiceDestroyer,
-                               TofuMakerServiceModifier tofuMakerServiceModifier) {
+    public TofuMakerDeployment(
+            TofuMakerScriptValidator tofuMakerScriptValidator,
+            TofuMakerDeploymentPlanManage tofuMakerDeploymentPlanManage,
+            TofuMakerServiceDeployer tofuMakerServiceDeployer,
+            TofuMakerServiceDestroyer tofuMakerServiceDestroyer,
+            TofuMakerServiceModifier tofuMakerServiceModifier) {
         this.tofuMakerServiceDestroyer = tofuMakerServiceDestroyer;
         this.tofuMakerScriptValidator = tofuMakerScriptValidator;
         this.tofuMakerDeploymentPlanManage = tofuMakerDeploymentPlanManage;
@@ -72,17 +68,13 @@ public class TofuMakerDeployment implements Deployer {
         return tofuMakerServiceModifier.modifyFromGitRepo(deployTask);
     }
 
-    /**
-     * Get the deployer kind.
-     */
+    /** Get the deployer kind. */
     @Override
     public DeployerKind getDeployerKind() {
         return DeployerKind.OPEN_TOFU;
     }
 
-    /**
-     * Validates the OpenTofu script.
-     */
+    /** Validates the OpenTofu script. */
     @Override
     public DeploymentScriptValidationResult validate(Deployment deployment) {
         DeploymentScriptValidationResult result = null;
@@ -102,5 +94,4 @@ public class TofuMakerDeployment implements Deployer {
         }
         return tofuMakerDeploymentPlanManage.getOpenTofuPlanFromGitRepo(task).getPlan();
     }
-
 }

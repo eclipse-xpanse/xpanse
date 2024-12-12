@@ -19,8 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class TerraformScriptFormatInvalidExceptionTest {
 
-    @Mock
-    private List<String> mockErrorReasons;
+    @Mock private List<String> mockErrorReasons;
 
     private TerraformScriptFormatInvalidException terraformScriptFormatInvalidExceptionUnderTest;
 
@@ -56,7 +55,7 @@ class TerraformScriptFormatInvalidExceptionTest {
     void testHashCode() {
         TerraformScriptFormatInvalidException test =
                 new TerraformScriptFormatInvalidException(new ArrayList<>());
-        assertThat(terraformScriptFormatInvalidExceptionUnderTest.hashCode()).isNotEqualTo(
-                test.hashCode());
+        assertThat(terraformScriptFormatInvalidExceptionUnderTest.hashCode())
+                .isNotEqualTo(test.hashCode());
     }
 }

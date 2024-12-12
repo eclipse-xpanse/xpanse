@@ -12,11 +12,9 @@ import org.springframework.web.client.RestTemplate;
 @ExtendWith(MockitoExtension.class)
 class ZitadelRestTemplateConfigTest {
 
-    @Mock
-    private RestTemplateLoggingInterceptor mockRestTemplateLoggingInterceptor;
+    @Mock private RestTemplateLoggingInterceptor mockRestTemplateLoggingInterceptor;
 
-    @InjectMocks
-    private ZitadelRestTemplateConfig zitadelRestTemplateConfigUnderTest;
+    @InjectMocks private ZitadelRestTemplateConfig zitadelRestTemplateConfigUnderTest;
 
     @Test
     void testZitadelRestTemplate() {

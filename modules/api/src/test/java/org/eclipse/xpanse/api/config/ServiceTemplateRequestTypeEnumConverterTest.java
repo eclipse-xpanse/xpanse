@@ -16,8 +16,7 @@ class ServiceTemplateRequestTypeEnumConverterTest {
     void testConvert() {
         assertThat(converterTest.convert("register"))
                 .isEqualTo(ServiceTemplateRequestType.REGISTER);
-        assertThat(converterTest.convert("update"))
-                .isEqualTo(ServiceTemplateRequestType.UPDATE);
+        assertThat(converterTest.convert("update")).isEqualTo(ServiceTemplateRequestType.UPDATE);
         assertThat(converterTest.convert("unregister"))
                 .isEqualTo(ServiceTemplateRequestType.UNREGISTER);
         assertThat(converterTest.convert("re-register"))

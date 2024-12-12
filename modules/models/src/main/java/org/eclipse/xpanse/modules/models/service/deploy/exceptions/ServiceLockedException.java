@@ -5,13 +5,9 @@
 
 package org.eclipse.xpanse.modules.models.service.deploy.exceptions;
 
-/**
- * Exception thrown when the service is locked for modification or destruction.
- */
+/** Exception thrown when the service is locked for modification or destruction. */
 public class ServiceLockedException extends RuntimeException {
     public ServiceLockedException(String message) {
         super(message);
     }
-
 }
-

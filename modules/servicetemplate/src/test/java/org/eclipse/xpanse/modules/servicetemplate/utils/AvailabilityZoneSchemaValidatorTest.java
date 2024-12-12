@@ -13,8 +13,11 @@ class AvailabilityZoneSchemaValidatorTest {
         // Setup
         final List<AvailabilityZoneConfig> availabilityZones = new ArrayList<>();
         // Run the test
-        Assertions.assertThrows(InvalidValueSchemaException.class, () ->
-                AvailabilityZoneSchemaValidator.validateServiceAvailabilities(availabilityZones));
+        Assertions.assertThrows(
+                InvalidValueSchemaException.class,
+                () ->
+                        AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
+                                availabilityZones));
 
         final AvailabilityZoneConfig availabilityZoneConfig = new AvailabilityZoneConfig();
         availabilityZoneConfig.setDisplayName("displayName");
@@ -24,8 +27,10 @@ class AvailabilityZoneSchemaValidatorTest {
         availabilityZones.add(availabilityZoneConfig);
 
         // Run the test
-        Assertions.assertDoesNotThrow(() ->
-                AvailabilityZoneSchemaValidator.validateServiceAvailabilities(availabilityZones));
+        Assertions.assertDoesNotThrow(
+                () ->
+                        AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
+                                availabilityZones));
 
         final AvailabilityZoneConfig availabilityZoneConfig1 = new AvailabilityZoneConfig();
         availabilityZoneConfig1.setDisplayName("displayName1");
@@ -35,7 +40,10 @@ class AvailabilityZoneSchemaValidatorTest {
 
         availabilityZones.add(availabilityZoneConfig1);
         // Run the test
-        Assertions.assertThrows(InvalidValueSchemaException.class, () ->
-                AvailabilityZoneSchemaValidator.validateServiceAvailabilities(availabilityZones));
+        Assertions.assertThrows(
+                InvalidValueSchemaException.class,
+                () ->
+                        AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
+                                availabilityZones));
     }
 }

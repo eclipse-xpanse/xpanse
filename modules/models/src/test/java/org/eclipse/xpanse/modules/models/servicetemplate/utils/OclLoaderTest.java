@@ -17,24 +17,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test of OclLoader.
- */
+/** Test of OclLoader. */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {OclLoader.class})
 public class OclLoaderTest {
 
-    @Autowired
-    OclLoader oclLoader;
+    @Autowired OclLoader oclLoader;
 
     @Test
     public void testGetOcl() throws Exception {
-        Ocl ocl = oclLoader.getOcl(
-                new File("src/test/resources/ocl_terraform_test.yml").toURI().toURL());
+        Ocl ocl =
+                oclLoader.getOcl(
+                        new File("src/test/resources/ocl_terraform_test.yml").toURI().toURL());
         Assertions.assertNotNull(ocl);
         Assertions.assertEquals(Category.OTHERS, ocl.getCategory());
         Assertions.assertEquals("terraform-test", ocl.getName());
-        Assertions.assertEquals(DeployerKind.TERRAFORM,
-                ocl.getDeployment().getDeployerTool().getKind());
+        Assertions.assertEquals(
+                DeployerKind.TERRAFORM, ocl.getDeployment().getDeployerTool().getKind());
     }
 }

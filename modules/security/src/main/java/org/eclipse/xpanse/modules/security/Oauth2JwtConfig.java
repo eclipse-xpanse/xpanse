@@ -21,9 +21,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 
-/**
- * Beans necessary to manage Oauth2 with OpaqueToken.
- */
+/** Beans necessary to manage Oauth2 with OpaqueToken. */
 @Configuration
 @Profile("oauth")
 public class Oauth2JwtConfig {
@@ -34,12 +32,11 @@ public class Oauth2JwtConfig {
     @Value("${authorization.userid.key}")
     private String userIdKey;
 
-    @Resource
-    private Oauth2JwtDecoder oauth2JwtDecoder;
+    @Resource private Oauth2JwtDecoder oauth2JwtDecoder;
 
     /**
-     * This Converter&lt;Jwt,AbstractAuthenticationToken&gt; must be exposed as a bean to be
-     * picked by @WithJwt.
+     * This Converter&lt;Jwt,AbstractAuthenticationToken&gt; must be exposed as a bean to be picked
+     * by @WithJwt.
      *
      * @param authoritiesConverter convert bean
      * @return XpanseAuthenticationConverter bean
@@ -51,8 +48,8 @@ public class Oauth2JwtConfig {
         return (Jwt jwt) -> {
             final var username = (String) jwt.getClaims().get(userIdKey);
             final var authorities = authoritiesConverter.convert(jwt.getClaims());
-            return new XpanseAuthentication(username, authorities, jwt.getClaims(),
-                    jwt.getTokenValue());
+            return new XpanseAuthentication(
+                    username, authorities, jwt.getClaims(), jwt.getTokenValue());
         };
     }
 
@@ -61,5 +58,4 @@ public class Oauth2JwtConfig {
     JwtDecoder jwtDecoder() {
         return oauth2JwtDecoder.createJwtDecoder(issuerUri);
     }
-
 }

@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,53 +20,45 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * OpenTofuAsyncDestroyFromGitRepoRequest
- */
+/** OpenTofuAsyncDestroyFromGitRepoRequest */
 @JsonPropertyOrder({
-        OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
-        OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
-        OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
-        OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
-        OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
-        OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_TF_STATE,
-        OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_WEBHOOK_CONFIG
+    OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
+    OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_OPEN_TOFU_VERSION,
+    OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
+    OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
+    OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
+    OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_TF_STATE,
+    OpenTofuAsyncDestroyFromGitRepoRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class OpenTofuAsyncDestroyFromGitRepoRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_OPEN_TOFU_VERSION = "openTofuVersion";
-    @jakarta.annotation.Nonnull
-    private String openTofuVersion;
+    @jakarta.annotation.Nonnull private String openTofuVersion;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_GIT_REPO_DETAILS = "gitRepoDetails";
-    @jakarta.annotation.Nullable
-    private OpenTofuScriptGitRepoDetails gitRepoDetails;
+    @jakarta.annotation.Nullable private OpenTofuScriptGitRepoDetails gitRepoDetails;
 
     public static final String JSON_PROPERTY_TF_STATE = "tfState";
-    @jakarta.annotation.Nonnull
-    private String tfState;
+    @jakarta.annotation.Nonnull private String tfState;
 
     public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
-    @jakarta.annotation.Nonnull
-    private WebhookConfig webhookConfig;
+    @jakarta.annotation.Nonnull private WebhookConfig webhookConfig;
 
-    public OpenTofuAsyncDestroyFromGitRepoRequest() {
-    }
+    public OpenTofuAsyncDestroyFromGitRepoRequest() {}
 
-    public OpenTofuAsyncDestroyFromGitRepoRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
+    public OpenTofuAsyncDestroyFromGitRepoRequest requestId(
+            @jakarta.annotation.Nullable UUID requestId) {
 
         this.requestId = requestId;
         return this;
@@ -81,11 +72,9 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -93,7 +82,8 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
         this.requestId = requestId;
     }
 
-    public OpenTofuAsyncDestroyFromGitRepoRequest openTofuVersion(@jakarta.annotation.Nonnull String openTofuVersion) {
+    public OpenTofuAsyncDestroyFromGitRepoRequest openTofuVersion(
+            @jakarta.annotation.Nonnull String openTofuVersion) {
 
         this.openTofuVersion = openTofuVersion;
         return this;
@@ -107,11 +97,9 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getOpenTofuVersion() {
         return openTofuVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_OPEN_TOFU_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -119,13 +107,15 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
         this.openTofuVersion = openTofuVersion;
     }
 
-    public OpenTofuAsyncDestroyFromGitRepoRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public OpenTofuAsyncDestroyFromGitRepoRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
     }
 
-    public OpenTofuAsyncDestroyFromGitRepoRequest putVariablesItem(String key, Object variablesItem) {
+    public OpenTofuAsyncDestroyFromGitRepoRequest putVariablesItem(
+            String key, Object variablesItem) {
         this.variables.put(key, variablesItem);
         return this;
     }
@@ -138,11 +128,9 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -157,7 +145,8 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
         return this;
     }
 
-    public OpenTofuAsyncDestroyFromGitRepoRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public OpenTofuAsyncDestroyFromGitRepoRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -166,18 +155,17 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to OpenTofu process.
+     * Key-value pairs of variables that must be injected as environment variables to OpenTofu
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -200,19 +188,19 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public OpenTofuScriptGitRepoDetails getGitRepoDetails() {
         return gitRepoDetails;
     }
 
-
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setGitRepoDetails(@jakarta.annotation.Nullable OpenTofuScriptGitRepoDetails gitRepoDetails) {
+    public void setGitRepoDetails(
+            @jakarta.annotation.Nullable OpenTofuScriptGitRepoDetails gitRepoDetails) {
         this.gitRepoDetails = gitRepoDetails;
     }
 
-    public OpenTofuAsyncDestroyFromGitRepoRequest tfState(@jakarta.annotation.Nonnull String tfState) {
+    public OpenTofuAsyncDestroyFromGitRepoRequest tfState(
+            @jakarta.annotation.Nonnull String tfState) {
 
         this.tfState = tfState;
         return this;
@@ -226,11 +214,9 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTfState() {
         return tfState;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -253,11 +239,9 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public WebhookConfig getWebhookConfig() {
         return webhookConfig;
     }
-
 
     @JsonProperty(JSON_PROPERTY_WEBHOOK_CONFIG)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -275,18 +259,29 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
         }
         OpenTofuAsyncDestroyFromGitRepoRequest openTofuAsyncDestroyFromGitRepoRequest =
                 (OpenTofuAsyncDestroyFromGitRepoRequest) o;
-        return Objects.equals(this.requestId, openTofuAsyncDestroyFromGitRepoRequest.requestId) &&
-                Objects.equals(this.openTofuVersion, openTofuAsyncDestroyFromGitRepoRequest.openTofuVersion) &&
-                Objects.equals(this.variables, openTofuAsyncDestroyFromGitRepoRequest.variables) &&
-                Objects.equals(this.envVariables, openTofuAsyncDestroyFromGitRepoRequest.envVariables) &&
-                Objects.equals(this.gitRepoDetails, openTofuAsyncDestroyFromGitRepoRequest.gitRepoDetails) &&
-                Objects.equals(this.tfState, openTofuAsyncDestroyFromGitRepoRequest.tfState) &&
-                Objects.equals(this.webhookConfig, openTofuAsyncDestroyFromGitRepoRequest.webhookConfig);
+        return Objects.equals(this.requestId, openTofuAsyncDestroyFromGitRepoRequest.requestId)
+                && Objects.equals(
+                        this.openTofuVersion,
+                        openTofuAsyncDestroyFromGitRepoRequest.openTofuVersion)
+                && Objects.equals(this.variables, openTofuAsyncDestroyFromGitRepoRequest.variables)
+                && Objects.equals(
+                        this.envVariables, openTofuAsyncDestroyFromGitRepoRequest.envVariables)
+                && Objects.equals(
+                        this.gitRepoDetails, openTofuAsyncDestroyFromGitRepoRequest.gitRepoDetails)
+                && Objects.equals(this.tfState, openTofuAsyncDestroyFromGitRepoRequest.tfState)
+                && Objects.equals(
+                        this.webhookConfig, openTofuAsyncDestroyFromGitRepoRequest.webhookConfig);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, openTofuVersion, variables, envVariables, gitRepoDetails, tfState,
+        return Objects.hash(
+                requestId,
+                openTofuVersion,
+                variables,
+                envVariables,
+                gitRepoDetails,
+                tfState,
                 webhookConfig);
     }
 
@@ -306,8 +301,8 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -315,6 +310,4 @@ public class OpenTofuAsyncDestroyFromGitRepoRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

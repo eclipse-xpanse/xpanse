@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of XpanseUnhandledException.
- */
+/** Test of XpanseUnhandledException. */
 class XpanseUnhandledExceptionTest {
 
     private static final String message = "Unhandled exception occurred";
@@ -28,5 +26,4 @@ class XpanseUnhandledExceptionTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

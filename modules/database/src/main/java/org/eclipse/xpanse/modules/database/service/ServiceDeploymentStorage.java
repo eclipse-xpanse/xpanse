@@ -9,9 +9,7 @@ package org.eclipse.xpanse.modules.database.service;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Interface for persist of serviceDeployment.
- */
+/** Interface for persist of serviceDeployment. */
 public interface ServiceDeploymentStorage {
 
     /**
@@ -44,5 +42,4 @@ public interface ServiceDeploymentStorage {
      * @param serviceDeploymentEntity the model of service deployment.
      */
     void deleteServiceDeployment(ServiceDeploymentEntity serviceDeploymentEntity);
-
 }

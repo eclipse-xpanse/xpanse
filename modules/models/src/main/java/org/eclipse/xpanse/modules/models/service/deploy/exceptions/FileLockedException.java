@@ -5,9 +5,7 @@
 
 package org.eclipse.xpanse.modules.models.service.deploy.exceptions;
 
-/**
- * Exception thrown When the tfstate file is locked for deployment retries.
- */
+/** Exception thrown When the tfstate file is locked for deployment retries. */
 public class FileLockedException extends RuntimeException {
 
     public FileLockedException(String message) {

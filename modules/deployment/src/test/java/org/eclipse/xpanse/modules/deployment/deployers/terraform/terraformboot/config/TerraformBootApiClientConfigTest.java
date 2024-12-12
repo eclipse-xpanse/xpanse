@@ -7,7 +7,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.
 
 import static org.mockito.Mockito.verify;
 
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.config.TerraformBootApiClientConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,15 +19,15 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class TerraformBootApiClientConfigTest {
 
-    @Mock
-    private ApiClient mockApiClient;
+    @Mock private ApiClient mockApiClient;
 
-    @InjectMocks
-    private TerraformBootApiClientConfig terraformBootApiClientConfigUnderTest;
+    @InjectMocks private TerraformBootApiClientConfig terraformBootApiClientConfigUnderTest;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(terraformBootApiClientConfigUnderTest, "terraformBootBaseUrl",
+        ReflectionTestUtils.setField(
+                terraformBootApiClientConfigUnderTest,
+                "terraformBootBaseUrl",
                 "http://localhost:9090");
     }
 

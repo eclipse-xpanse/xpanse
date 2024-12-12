@@ -37,17 +37,13 @@ import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-/**
- * ServiceOrderEntity for persistence.
- */
+/** ServiceOrderEntity for persistence. */
 @Table(name = "SERVICE_ORDER")
 @Entity
 @Data
 public class ServiceOrderEntity implements Serializable {
 
-
-    @Serial
-    private static final long serialVersionUID = 8759112775257851274L;
+    @Serial private static final long serialVersionUID = 8759112775257851274L;
 
     @Id
     @Column(name = "ORDER_ID", nullable = false)
@@ -130,5 +126,4 @@ public class ServiceOrderEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "HANDLER", nullable = false)
     private Handler handler;
-
 }

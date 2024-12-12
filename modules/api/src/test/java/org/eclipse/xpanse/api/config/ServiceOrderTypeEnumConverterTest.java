@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class ServiceOrderTypeEnumConverterTest {
 
-    private final ServiceOrderTypeEnumConverter converterTest =
-            new ServiceOrderTypeEnumConverter();
+    private final ServiceOrderTypeEnumConverter converterTest = new ServiceOrderTypeEnumConverter();
 
     @Test
     void testConvert() {
@@ -21,8 +20,7 @@ class ServiceOrderTypeEnumConverterTest {
         assertThat(converterTest.convert("purge")).isEqualTo(ServiceOrderType.PURGE);
         assertThat(converterTest.convert("rollback")).isEqualTo(ServiceOrderType.ROLLBACK);
         assertThat(converterTest.convert("lockChange")).isEqualTo(ServiceOrderType.LOCK_CHANGE);
-        assertThat(converterTest.convert("configChange"))
-                .isEqualTo(ServiceOrderType.CONFIG_CHANGE);
+        assertThat(converterTest.convert("configChange")).isEqualTo(ServiceOrderType.CONFIG_CHANGE);
         assertThrows(UnsupportedEnumValueException.class, () -> converterTest.convert("unknown"));
     }
 }

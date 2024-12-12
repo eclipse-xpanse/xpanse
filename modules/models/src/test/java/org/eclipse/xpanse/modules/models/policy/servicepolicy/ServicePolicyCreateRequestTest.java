@@ -56,9 +56,11 @@ class ServicePolicyCreateRequestTest {
 
     @Test
     void testToString() {
-        String result = String.format(
-                "ServicePolicyCreateRequest(serviceTemplateId=%s, flavorNameList=%s, policy=%s, "
-                        + "enabled=%s)", serviceTemplateId, flavorNameList, policy, enabled);
+        String result =
+                String.format(
+                        "ServicePolicyCreateRequest(serviceTemplateId=%s, flavorNameList=%s,"
+                                + " policy=%s, enabled=%s)",
+                        serviceTemplateId, flavorNameList, policy, enabled);
         assertThat(test.toString()).isEqualTo(result);
     }
 }

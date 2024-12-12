@@ -11,10 +11,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Deploy variable kinds.
- */
-@Schema(enumAsRef = true, description = """
+/** Deploy variable kinds. */
+@Schema(
+        enumAsRef = true,
+        description =
+                """
         - `fix_env`: Values for variable of this type are defined by the managed service provider\s
         in the OCL template. Runtime will inject it to deployer as environment variables.\s
         This variable is not visible to the end user.
@@ -41,7 +42,6 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
         and injected as a regular variable to the deployer.\s
         End user cannot see or change this variable.""")
 public enum DeployVariableKind {
-
     FIX_ENV("fix_env"),
     FIX_VARIABLE("fix_variable"),
     ENV("env"),
@@ -55,9 +55,7 @@ public enum DeployVariableKind {
         this.type = type;
     }
 
-    /**
-     * For DeployVariableKind serialize.
-     */
+    /** For DeployVariableKind serialize. */
     @JsonCreator
     public DeployVariableKind getByValue(String type) {
         for (DeployVariableKind deployVariableKind : values()) {
@@ -69,9 +67,7 @@ public enum DeployVariableKind {
                 String.format("DeployVariableKind value %s is not supported.", type));
     }
 
-    /**
-     * For DeployVariableKind deserialize.
-     */
+    /** For DeployVariableKind deserialize. */
     @JsonValue
     public String toValue() {
         return this.type;

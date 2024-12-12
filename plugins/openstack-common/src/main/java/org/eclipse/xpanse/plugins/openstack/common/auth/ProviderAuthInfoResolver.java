@@ -33,27 +33,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
-/**
- * Defines methods to resolve all the auth info of the cloud service provider.
- */
+/** Defines methods to resolve all the auth info of the cloud service provider. */
 @Slf4j
 @Component
 public class ProviderAuthInfoResolver {
 
-    @Resource
-    private CredentialCenter credentialCenter;
-    @Resource
-    private DeployEnvironments deployEnvironments;
-    @Resource
-    private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource
-    private Environment environment;
-    @Resource
-    private ServiceTemplateStorage serviceTemplateStorage;
-    @Resource
-    private OpenstackKeystoneManager openstackKeystoneManager;
-    @Resource
-    private ScsKeystoneManager scsKeystoneManager;
+    @Resource private CredentialCenter credentialCenter;
+    @Resource private DeployEnvironments deployEnvironments;
+    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
+    @Resource private Environment environment;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource private OpenstackKeystoneManager openstackKeystoneManager;
+    @Resource private ScsKeystoneManager scsKeystoneManager;
 
     /**
      * Get the mapping key of the env variable OS_AUTH_URL by csp.
@@ -70,7 +61,6 @@ public class ProviderAuthInfoResolver {
             default -> OpenstackCommonEnvironmentConstants.OS_AUTH_URL;
         };
     }
-
 
     /**
      * Get the authenticated client for csp.
@@ -102,23 +92,29 @@ public class ProviderAuthInfoResolver {
             log.info("Using auth url {} of provider {} from environment", authUrl, csp.toValue());
         } else {
             authUrl = getAuthUrlFromDeploymentVariables(csp, serviceId, serviceTemplateId);
-            log.info("Using auth url {} of provider {} from the deploy variables of {} {}",
+            log.info(
+                    "Using auth url {} of provider {} from the deploy variables of {} {}",
                     authUrl,
                     csp.toValue(),
                     Objects.nonNull(serviceTemplateId) ? "service template" : "service",
                     Objects.nonNull(serviceTemplateId) ? serviceTemplateId : serviceId);
         }
         if (StringUtils.isBlank(authUrl)) {
-            String errorMsg = String.format("The value of auth url of the provider "
-                    + "%s is not configured.", csp);
+            String errorMsg =
+                    String.format(
+                            "The value of auth url of the provider " + "%s is not configured.",
+                            csp);
             throw new IllegalArgumentException(errorMsg);
         }
         try {
             URI uri = new URI(authUrl);
             return uri.toString();
         } catch (URISyntaxException e) {
-            String errorMsg = String.format("The configured value [%s] of auth url of the provider "
-                    + "%s is not a valid url.", authUrl, csp);
+            String errorMsg =
+                    String.format(
+                            "The configured value [%s] of auth url of the provider "
+                                    + "%s is not a valid url.",
+                            authUrl, csp);
             throw new IllegalArgumentException(errorMsg);
         }
     }
@@ -126,7 +122,7 @@ public class ProviderAuthInfoResolver {
     /**
      * Get the auth credential by csp and userId.
      *
-     * @param csp    cloud service provider
+     * @param csp cloud service provider
      * @param userId user id
      * @return credential
      */
@@ -134,11 +130,10 @@ public class ProviderAuthInfoResolver {
         return credentialCenter.getCredential(csp, site, CredentialType.VARIABLES, userId);
     }
 
-
     /**
      * Get the auth url from deployment variables.
      *
-     * @param csp       csp
+     * @param csp csp
      * @param serviceId serviceId
      * @return auth url
      */
@@ -153,23 +148,23 @@ public class ProviderAuthInfoResolver {
                             serviceDeploymentEntity.getServiceTemplateId());
             Map<String, Object> serviceRequestVariables =
                     this.deployEnvironments.getAllDeploymentVariablesForService(
-                            serviceDeploymentEntity.getDeployRequest()
+                            serviceDeploymentEntity
+                                    .getDeployRequest()
                                     .getServiceRequestProperties(),
-                            serviceTemplateEntity.getOcl().getDeployment()
-                                    .getVariables(),
+                            serviceTemplateEntity.getOcl().getDeployment().getVariables(),
                             serviceDeploymentEntity.getFlavor(),
-                            serviceTemplateEntity.getOcl()
-                    );
-            defaultAuthUrl = serviceRequestVariables.get(
-                    OpenstackCommonEnvironmentConstants.OS_AUTH_URL);
+                            serviceTemplateEntity.getOcl());
+            defaultAuthUrl =
+                    serviceRequestVariables.get(OpenstackCommonEnvironmentConstants.OS_AUTH_URL);
         }
         if (Objects.nonNull(serviceTemplateId)) {
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
             Map<String, Object> getServiceTemplateVariables =
                     this.deployEnvironments.getFixedVariablesFromTemplate(serviceTemplateEntity);
-            defaultAuthUrl = getServiceTemplateVariables.get(
-                    OpenstackCommonEnvironmentConstants.OS_AUTH_URL);
+            defaultAuthUrl =
+                    getServiceTemplateVariables.get(
+                            OpenstackCommonEnvironmentConstants.OS_AUTH_URL);
         }
         if (Objects.isNull(defaultAuthUrl)) {
             return this.environment.getProperty(getAuthUrlKeyByCsp(csp));
@@ -178,15 +173,16 @@ public class ProviderAuthInfoResolver {
         }
     }
 
-
     /**
      * Handle auth exception for spring retry.
      *
      * @param ex Exception
      */
     public void handleAuthExceptionForSpringRetry(Exception ex) {
-        int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+        int retryCount =
+                Objects.isNull(RetrySynchronizationManager.getContext())
+                        ? 0
+                        : RetrySynchronizationManager.getContext().getRetryCount();
         log.error(ex.getMessage() + System.lineSeparator() + "Retry count:" + retryCount);
         if (ex instanceof ClientAuthenticationFailedException) {
             throw new ClientAuthenticationFailedException(ex.getMessage());
@@ -200,7 +196,6 @@ public class ProviderAuthInfoResolver {
             }
         }
     }
-
 
     private AuthenticationException getAuthenticationException(Throwable ex) {
         if (Objects.isNull(ex)) {

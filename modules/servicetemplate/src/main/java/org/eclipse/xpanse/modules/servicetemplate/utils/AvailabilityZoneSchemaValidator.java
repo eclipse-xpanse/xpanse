@@ -14,9 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 
-/**
- * Defines method to validate the availability zone configuration list of deployment.
- */
+/** Defines method to validate the availability zone configuration list of deployment. */
 @Slf4j
 public class AvailabilityZoneSchemaValidator {
 
@@ -37,9 +35,11 @@ public class AvailabilityZoneSchemaValidator {
         Set<String> availabilityVarName = new HashSet<>();
         for (AvailabilityZoneConfig availabilityZone : availabilityZones) {
             if (availabilityVarName.contains(availabilityZone.getVarName())) {
-                String errorMessage = String.format(
-                        "The availability zone configuration list with duplicated variable name %s",
-                        availabilityZone.getVarName());
+                String errorMessage =
+                        String.format(
+                                "The availability zone configuration list with duplicated variable"
+                                        + " name %s",
+                                availabilityZone.getVarName());
                 throw new InvalidValueSchemaException(List.of(errorMessage));
             } else {
                 availabilityVarName.add(availabilityZone.getVarName());

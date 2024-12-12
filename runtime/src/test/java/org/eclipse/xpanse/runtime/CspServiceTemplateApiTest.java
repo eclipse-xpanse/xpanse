@@ -53,17 +53,20 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     @Test
     @WithJwt(file = "jwt_csp_isv.json")
     void testCspManageServiceTemplates() throws Exception {
-        Ocl ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl =
+                new OclLoader()
+                        .getOcl(
+                                URI.create("file:src/test/resources/ocl_terraform_test.yml")
+                                        .toURL());
         ocl.setName(UUID.randomUUID().toString());
         MockHttpServletResponse registerResponse = register(ocl);
         assertEquals(HttpStatus.OK.value(), registerResponse.getStatus());
         ServiceTemplateRequestInfo registerChangeInfo =
-                objectMapper.readValue(registerResponse.getContentAsString(),
-                        ServiceTemplateRequestInfo.class);
+                objectMapper.readValue(
+                        registerResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
         UUID serviceTemplateId = registerChangeInfo.getServiceTemplateId();
-        ServiceTemplateDetailVo serviceTemplate = getRegistrationDetailsByServiceTemplateId(
-                serviceTemplateId);
+        ServiceTemplateDetailVo serviceTemplate =
+                getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
         testListManagedServiceTemplatesWithStateApprovalPending(serviceTemplate);
         testCspManageServiceTemplatesWell(serviceTemplateId, ocl);
         testCspManageServiceTemplatesBelongToOtherCsp(serviceTemplateId);
@@ -72,8 +75,11 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     MockHttpServletResponse register(Ocl ocl) throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
-        return mockMvc.perform(post("/xpanse/service_templates").content(requestBody)
-                        .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON))
+        return mockMvc.perform(
+                        post("/xpanse/service_templates")
+                                .content(requestBody)
+                                .contentType("application/x-yaml")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
     }
@@ -82,32 +88,35 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
             throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
-        return mockMvc.perform(put("/xpanse/service_templates/{id}", id)
-                        .param("isRemoveServiceTemplateUntilApproved",
-                                String.valueOf(isRemoveServiceTemplateUntilApproved))
-                        .content(requestBody)
-                        .contentType("application/x-yaml").accept(MediaType.APPLICATION_JSON))
+        return mockMvc.perform(
+                        put("/xpanse/service_templates/{id}", id)
+                                .param(
+                                        "isRemoveServiceTemplateUntilApproved",
+                                        String.valueOf(isRemoveServiceTemplateUntilApproved))
+                                .content(requestBody)
+                                .contentType("application/x-yaml")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
     }
 
     MockHttpServletResponse unregister(UUID id) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/unregister/{id}", id).accept(
-                                MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+                        put("/xpanse/service_templates/unregister/{id}", id)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
 
     MockHttpServletResponse reRegister(UUID id) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/re-register/{id}", id).accept(
-                                MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+                        put("/xpanse/service_templates/re-register/{id}", id)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
 
-
-    void testCspManageServiceTemplatesWell(UUID serviceTemplateId, Ocl ocl)
-            throws Exception {
+    void testCspManageServiceTemplatesWell(UUID serviceTemplateId, Ocl ocl) throws Exception {
         // List pending service template requests
         List<ServiceTemplateRequestToReview> pendingServiceTemplateRequests =
                 listPendingServiceTemplateRequests(serviceTemplateId);
@@ -126,11 +135,13 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         MockHttpServletResponse reviewAgainResponse =
                 reviewServiceTemplateRequest(registerRequestId, reviewRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), reviewAgainResponse.getStatus());
-        ErrorResponse errorResponse = objectMapper.readValue(
-                reviewAgainResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_ALREADY_REVIEWED,
-                errorResponse.getErrorType());
-        assertEquals(errorResponse.getDetails(),
+        ErrorResponse errorResponse =
+                objectMapper.readValue(
+                        reviewAgainResponse.getContentAsString(), ErrorResponse.class);
+        assertEquals(
+                ErrorType.SERVICE_TEMPLATE_REQUEST_ALREADY_REVIEWED, errorResponse.getErrorType());
+        assertEquals(
+                errorResponse.getDetails(),
                 List.of("Service template request is already reviewed."));
 
         // List pending service template requests
@@ -143,8 +154,9 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         String descriptionToUpdate = "update-test";
         ocl.setDescription(descriptionToUpdate);
         MockHttpServletResponse updateResponse = update(serviceTemplateId, true, ocl);
-        ServiceTemplateRequestInfo updateChangeInfo = objectMapper.readValue(
-                updateResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+        ServiceTemplateRequestInfo updateChangeInfo =
+                objectMapper.readValue(
+                        updateResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
         // List pending service template requests
         List<ServiceTemplateRequestToReview> pendingServiceTemplateRequests1 =
                 listPendingServiceTemplateRequests(serviceTemplateId);
@@ -169,16 +181,16 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         pendingServiceTemplateRequests1 = listPendingServiceTemplateRequests(serviceTemplateId);
         assertThat(pendingServiceTemplateRequests1).isEmpty();
         // After update is approved, the service template should be updated
-        serviceTemplate =
-                getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
+        serviceTemplate = getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
         assertEquals(updateRequest.getOcl().getDescription(), descriptionToUpdate);
         assertEquals(descriptionToUpdate, serviceTemplate.getDescription());
         assertTrue(serviceTemplate.getAvailableInCatalog());
 
         // Unregister service template
         MockHttpServletResponse unregisterResponse = unregister(serviceTemplateId);
-        ServiceTemplateRequestInfo unregisterChangeInfo = objectMapper.readValue(
-                unregisterResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+        ServiceTemplateRequestInfo unregisterChangeInfo =
+                objectMapper.readValue(
+                        unregisterResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
 
         assertNotNull(unregisterChangeInfo);
         // List pending service template requests is empty. Because of the unregister request is
@@ -191,8 +203,9 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
 
         // Re-register service template
         MockHttpServletResponse reRegisterResponse = reRegister(serviceTemplateId);
-        ServiceTemplateRequestInfo reRegisterChangeInfo = objectMapper.readValue(
-                reRegisterResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+        ServiceTemplateRequestInfo reRegisterChangeInfo =
+                objectMapper.readValue(
+                        reRegisterResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
         // List pending service template requests
         List<ServiceTemplateRequestToReview> pendingServiceTemplateRequests3 =
                 listPendingServiceTemplateRequests(serviceTemplateId);
@@ -200,7 +213,8 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         ServiceTemplateRequestToReview reRegisterRequest =
                 pendingServiceTemplateRequests3.getFirst();
         assertEquals(ServiceTemplateRequestType.RE_REGISTER, reRegisterRequest.getRequestType());
-        assertEquals(reRegisterChangeInfo.getServiceTemplateId(),
+        assertEquals(
+                reRegisterChangeInfo.getServiceTemplateId(),
                 reRegisterRequest.getServiceTemplateId());
         assertEquals(reRegisterChangeInfo.getRequestId(), reRegisterRequest.getRequestId());
 
@@ -217,8 +231,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         assertThat(pendingServiceTemplateRequests3).isEmpty();
     }
 
-    void testCspManageServiceTemplatesBelongToOtherCsp(UUID serviceTemplateId)
-            throws Exception {
+    void testCspManageServiceTemplatesBelongToOtherCsp(UUID serviceTemplateId) throws Exception {
         // change csp of service template
         ServiceTemplateEntity serviceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
@@ -227,8 +240,9 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         serviceTemplate = serviceTemplateStorage.storeAndFlush(serviceTemplate);
 
         MockHttpServletResponse reRegisterResponse = reRegister(serviceTemplateId);
-        ServiceTemplateRequestInfo reRegisterChangeInfo = objectMapper.readValue(
-                reRegisterResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+        ServiceTemplateRequestInfo reRegisterChangeInfo =
+                objectMapper.readValue(
+                        reRegisterResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
         assertNotNull(reRegisterChangeInfo.getRequestId());
         List<ServiceTemplateRequestToReview> pendingServiceTemplateRequests =
                 listPendingServiceTemplateRequests(serviceTemplateId);
@@ -243,42 +257,46 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     ServiceTemplateDetailVo getRegistrationDetailsByServiceTemplateId(UUID serviceTemplateId)
             throws Exception {
         final MockHttpServletResponse detailResponse = getRegistrationDetails(serviceTemplateId);
-        return objectMapper.readValue(detailResponse.getContentAsString(),
-                ServiceTemplateDetailVo.class);
+        return objectMapper.readValue(
+                detailResponse.getContentAsString(), ServiceTemplateDetailVo.class);
     }
 
     void testGetRegistrationDetailsThrowsAccessDeniedException(UUID serviceTemplateId)
             throws Exception {
 
         ErrorResponse accessDeniedErrorResponse =
-                ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
-                        Collections.singletonList("No permissions to review service template "
-                                + "belonging to other cloud service providers."));
+                ErrorResponse.errorResponse(
+                        ErrorType.ACCESS_DENIED,
+                        Collections.singletonList(
+                                "No permissions to review service template "
+                                        + "belonging to other cloud service providers."));
         // Run the test detail
         final MockHttpServletResponse detailResponse = getRegistrationDetails(serviceTemplateId);
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), detailResponse.getStatus());
-        assertEquals(objectMapper.writeValueAsString(accessDeniedErrorResponse),
+        assertEquals(
+                objectMapper.writeValueAsString(accessDeniedErrorResponse),
                 detailResponse.getContentAsString());
     }
-
 
     void testReviewRegistrationThrowsAccessDeniedException(UUID requestId) throws Exception {
 
         // Setup request
         ErrorResponse accessDeniedErrorResponse =
-                ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
-                        Collections.singletonList("No permissions to review service template "
-                                + "request belonging to other cloud service providers."));
+                ErrorResponse.errorResponse(
+                        ErrorType.ACCESS_DENIED,
+                        Collections.singletonList(
+                                "No permissions to review service template "
+                                        + "request belonging to other cloud service providers."));
         ReviewServiceTemplateRequest request = new ReviewServiceTemplateRequest();
         request.setReviewResult(ServiceReviewResult.APPROVED);
         request.setReviewComment("reviewComment");
         // Run the test case 1
-        final MockHttpServletResponse response =
-                reviewServiceTemplateRequest(requestId, request);
+        final MockHttpServletResponse response = reviewServiceTemplateRequest(requestId, request);
         // Verify the results
         assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
-        assertEquals(objectMapper.writeValueAsString(accessDeniedErrorResponse),
+        assertEquals(
+                objectMapper.writeValueAsString(accessDeniedErrorResponse),
                 response.getContentAsString());
     }
 
@@ -289,8 +307,8 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         String errorMessage = "Failed to convert value of type 'java.lang.String' to required type";
 
         // Run the test case 1
-        MockHttpServletResponse response1 = listServiceTemplatesWithParams(
-                null, null, null, null, serviceRegistrationState1);
+        MockHttpServletResponse response1 =
+                listServiceTemplatesWithParams(null, null, null, null, serviceRegistrationState1);
         // Verify the results 1
         assertThat(response1.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
         assertThat(errorMessage).isSubstringOf(response1.getContentAsString());
@@ -298,65 +316,65 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         // Setup request 2
         String serviceRegistrationState2 = ServiceTemplateRegistrationState.APPROVED.toValue();
         // Run the test case 2
-        MockHttpServletResponse response2 = listServiceTemplatesWithParams(
-                null, null, null, null, serviceRegistrationState2);
+        MockHttpServletResponse response2 =
+                listServiceTemplatesWithParams(null, null, null, null, serviceRegistrationState2);
         List<ServiceTemplateDetailVo> detailsList2 =
-                objectMapper.readValue(response2.getContentAsString(),
-                        new TypeReference<>() {
-                        });
+                objectMapper.readValue(response2.getContentAsString(), new TypeReference<>() {});
         // Verify the results 2
         assertThat(response2.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(detailsList2).isNotEmpty();
     }
-
 
     void testListManagedServiceTemplatesWithStateApprovalPending(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup
         String serviceRegistrationState = ServiceTemplateRegistrationState.IN_REVIEW.toValue();
         // Run the test
-        MockHttpServletResponse response = listServiceTemplatesWithParams(
-                serviceTemplateDetailVo.getCategory().toValue(),
-                serviceTemplateDetailVo.getName(),
-                serviceTemplateDetailVo.getVersion(),
-                serviceTemplateDetailVo.getServiceHostingType().toValue(),
-                serviceRegistrationState);
+        MockHttpServletResponse response =
+                listServiceTemplatesWithParams(
+                        serviceTemplateDetailVo.getCategory().toValue(),
+                        serviceTemplateDetailVo.getName(),
+                        serviceTemplateDetailVo.getVersion(),
+                        serviceTemplateDetailVo.getServiceHostingType().toValue(),
+                        serviceRegistrationState);
         List<ServiceTemplateDetailVo> detailsList =
-                objectMapper.readValue(response.getContentAsString(),
-                        new TypeReference<>() {
-                        });
+                objectMapper.readValue(response.getContentAsString(), new TypeReference<>() {});
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(detailsList).isNotEmpty();
     }
 
-    void testListManagedServiceTemplatesReturnsEmptyList(
-            ServiceTemplateEntity serviceTemplate) throws Exception {
+    void testListManagedServiceTemplatesReturnsEmptyList(ServiceTemplateEntity serviceTemplate)
+            throws Exception {
         // SetupServiceTemplateApiTest
         String serviceRegistrationState = ServiceTemplateRegistrationState.IN_REVIEW.toValue();
         // Run the test
-        MockHttpServletResponse response = listServiceTemplatesWithParams(
-                serviceTemplate.getCategory().toValue(),
-                serviceTemplate.getName(),
-                serviceTemplate.getVersion(),
-                serviceTemplate.getServiceHostingType().toValue(),
-                serviceRegistrationState);
+        MockHttpServletResponse response =
+                listServiceTemplatesWithParams(
+                        serviceTemplate.getCategory().toValue(),
+                        serviceTemplate.getName(),
+                        serviceTemplate.getVersion(),
+                        serviceTemplate.getServiceHostingType().toValue(),
+                        serviceRegistrationState);
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo("[]");
     }
 
     MockHttpServletResponse getRegistrationDetails(UUID id) throws Exception {
-        return mockMvc.perform(get("/xpanse/csp/service_templates/{id}", id)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        return mockMvc.perform(
+                        get("/xpanse/csp/service_templates/{id}", id)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
 
-    MockHttpServletResponse listServiceTemplatesWithParams(String categoryName,
-                                                           String serviceName,
-                                                           String serviceVersion,
-                                                           String serviceHostingType,
-                                                           String serviceTemplateRegistrationState)
+    MockHttpServletResponse listServiceTemplatesWithParams(
+            String categoryName,
+            String serviceName,
+            String serviceVersion,
+            String serviceHostingType,
+            String serviceTemplateRegistrationState)
             throws Exception {
         MockHttpServletRequestBuilder getRequestBuilder = get("/xpanse/csp/service_templates");
         if (StringUtils.isNotBlank(categoryName)) {
@@ -372,21 +390,22 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
             getRequestBuilder = getRequestBuilder.param("serviceHostingType", serviceHostingType);
         }
         if (StringUtils.isNotBlank(serviceTemplateRegistrationState)) {
-            getRequestBuilder = getRequestBuilder.param("serviceTemplateRegistrationState",
-                    serviceTemplateRegistrationState);
+            getRequestBuilder =
+                    getRequestBuilder.param(
+                            "serviceTemplateRegistrationState", serviceTemplateRegistrationState);
         }
         return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
     }
 
-
-    MockHttpServletResponse reviewServiceTemplateRequest(UUID requestId,
-                                                         ReviewServiceTemplateRequest request)
-            throws Exception {
+    MockHttpServletResponse reviewServiceTemplateRequest(
+            UUID requestId, ReviewServiceTemplateRequest request) throws Exception {
         String requestBody = objectMapper.writeValueAsString(request);
         return mockMvc.perform(
                         put("/xpanse/csp/service_templates/requests/review/{requestId}", requestId)
-                                .content(requestBody).contentType(MediaType.APPLICATION_JSON)
+                                .content(requestBody)
+                                .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+                .andReturn()
+                .getResponse();
     }
 }

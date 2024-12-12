@@ -9,9 +9,7 @@ package org.eclipse.xpanse.common.proxy;
 import lombok.Builder;
 import lombok.Data;
 
-/**
- * Class to hold proxy information.
- */
+/** Class to hold proxy information. */
 @Data
 @Builder
 public class ProxyDetails {

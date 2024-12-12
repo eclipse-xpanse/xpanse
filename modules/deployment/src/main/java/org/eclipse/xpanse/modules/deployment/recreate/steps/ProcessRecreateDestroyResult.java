@@ -26,9 +26,7 @@ import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Processing class for checking destroy status after destroy callback.
- */
+/** Processing class for checking destroy status after destroy callback. */
 @Slf4j
 @Component
 public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate {
@@ -37,13 +35,12 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
     private final ServiceOrderManager serviceOrderManager;
     private final ServiceDeploymentEntityHandler deploymentEntityHandler;
 
-    /**
-     * Constructor for ProcessDestroyResult bean.
-     */
+    /** Constructor for ProcessDestroyResult bean. */
     @Autowired
-    public ProcessRecreateDestroyResult(RuntimeService runtimeService,
-                                        ServiceOrderManager serviceOrderManager,
-                                        ServiceDeploymentEntityHandler deploymentEntityHandler) {
+    public ProcessRecreateDestroyResult(
+            RuntimeService runtimeService,
+            ServiceOrderManager serviceOrderManager,
+            ServiceDeploymentEntityHandler deploymentEntityHandler) {
         this.runtimeService = runtimeService;
         this.serviceOrderManager = serviceOrderManager;
         this.deploymentEntityHandler = deploymentEntityHandler;
@@ -55,7 +52,8 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
         UUID serviceId = (UUID) variables.get(RecreateConstants.SERVICE_ID);
         UUID recreateOrderId = (UUID) variables.get(RecreateConstants.RECREATE_ORDER_ID);
-        log.info("Recreate workflow of instance id : {} start check destroy status.",
+        log.info(
+                "Recreate workflow of instance id : {} start check destroy status.",
                 processInstanceId);
 
         try {
@@ -64,40 +62,51 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
 
             if (Objects.nonNull(serviceDeploymentEntity)
                     && serviceDeploymentEntity.getServiceDeploymentState()
-                    == ServiceDeploymentState.DESTROY_SUCCESS) {
-                runtimeService.setVariable(processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS,
-                        true);
-                runtimeService.setVariable(processInstanceId, RecreateConstants.DEPLOY_RETRY_NUM,
-                        0);
-                log.info("Destroy step completed for recreate order workflow with id {}",
+                            == ServiceDeploymentState.DESTROY_SUCCESS) {
+                runtimeService.setVariable(
+                        processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS, true);
+                runtimeService.setVariable(
+                        processInstanceId, RecreateConstants.DEPLOY_RETRY_NUM, 0);
+                log.info(
+                        "Destroy step completed for recreate order workflow with id {}",
                         processInstanceId);
             } else {
-                runtimeService.setVariable(processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS,
-                        false);
+                runtimeService.setVariable(
+                        processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS, false);
                 int destroyRetryNum = getDestroyRetryNum(variables);
-                runtimeService.setVariable(processInstanceId, RecreateConstants.DESTROY_RETRY_NUM,
+                runtimeService.setVariable(
+                        processInstanceId,
+                        RecreateConstants.DESTROY_RETRY_NUM,
                         destroyRetryNum + 1);
-                log.info("Process instance： {} retry to destroy task during recreation workflow. "
-                        + "RetryCount:{}", processInstanceId, destroyRetryNum);
+                log.info(
+                        "Process instance： {} retry to destroy task during recreation workflow. "
+                                + "RetryCount:{}",
+                        processInstanceId,
+                        destroyRetryNum);
                 if (destroyRetryNum >= 1) {
                     String userId = (String) variables.get(RecreateConstants.USER_ID);
-                    runtimeService.setVariable(processInstanceId, RecreateConstants.ASSIGNEE,
-                            userId);
-                    serviceOrderManager.completeOrderProgress(recreateOrderId,
+                    runtimeService.setVariable(
+                            processInstanceId, RecreateConstants.ASSIGNEE, userId);
+                    serviceOrderManager.completeOrderProgress(
+                            recreateOrderId,
                             TaskStatus.FAILED,
-                            ErrorResponse.errorResponse(ErrorType.DESTROY_FAILED_EXCEPTION,
-                            List.of(serviceDeploymentEntity.getResultMessage())));
+                            ErrorResponse.errorResponse(
+                                    ErrorType.DESTROY_FAILED_EXCEPTION,
+                                    List.of(serviceDeploymentEntity.getResultMessage())));
                 }
             }
         } catch (Exception e) {
-            log.error("Failed to process destroy task of recreation workflow with id:{}",
-                    processInstanceId, e);
-            runtimeService.setVariable(processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS,
-                    false);
-            serviceOrderManager.completeOrderProgress(recreateOrderId, TaskStatus.FAILED,
-                    ErrorResponse.errorResponse(ErrorType.DESTROY_FAILED_EXCEPTION,
-                            List.of(e.getMessage())));
-
+            log.error(
+                    "Failed to process destroy task of recreation workflow with id:{}",
+                    processInstanceId,
+                    e);
+            runtimeService.setVariable(
+                    processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS, false);
+            serviceOrderManager.completeOrderProgress(
+                    recreateOrderId,
+                    TaskStatus.FAILED,
+                    ErrorResponse.errorResponse(
+                            ErrorType.DESTROY_FAILED_EXCEPTION, List.of(e.getMessage())));
         }
     }
 

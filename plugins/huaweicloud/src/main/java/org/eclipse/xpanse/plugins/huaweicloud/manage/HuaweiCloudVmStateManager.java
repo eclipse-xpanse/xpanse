@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.manage;
 
-
 import static org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy.WAITING_JOB_SUCCESS_RETRY_TIMES;
 
 import com.huaweicloud.sdk.core.auth.ICredential;
@@ -31,35 +30,32 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
-/**
- * Class that encapsulates all Manager-related public methods of the Huawei Cloud plugin.
- */
+/** Class that encapsulates all Manager-related public methods of the Huawei Cloud plugin. */
 @Slf4j
 @Component
 public class HuaweiCloudVmStateManager {
-    @Resource
-    private HuaweiCloudClient huaweiCloudClient;
-    @Resource
-    private HuaweiCloudServerManageRequestConverter converter;
-    @Resource
-    private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
+    @Resource private HuaweiCloudClient huaweiCloudClient;
+    @Resource private HuaweiCloudServerManageRequestConverter converter;
+    @Resource private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
 
-    /**
-     * Start the Huawei Cloud Ecs server.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** Start the Huawei Cloud Ecs server. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
-            BatchStartServersRequest request = converter.buildBatchStartServersRequest(
-                    serviceStateManageRequest.getServiceResourceEntityList());
-            BatchStartServersResponse response = ecsClient.batchStartServersInvoker(request)
-                    .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
-                    .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(huaweiCloudRetryStrategy)
-                    .invoke();
+            BatchStartServersRequest request =
+                    converter.buildBatchStartServersRequest(
+                            serviceStateManageRequest.getServiceResourceEntityList());
+            BatchStartServersResponse response =
+                    ecsClient
+                            .batchStartServersInvoker(request)
+                            .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(huaweiCloudRetryStrategy)
+                            .invoke();
             return checkEcsExecResultByJobId(ecsClient, response.getJobId());
         } catch (Exception e) {
             log.error("Start service {} failed", serviceStateManageRequest.getServiceId());
@@ -68,10 +64,9 @@ public class HuaweiCloudVmStateManager {
         }
     }
 
-    /**
-     * Stop the Huawei Cloud Ecs server.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** Stop the Huawei Cloud Ecs server. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
@@ -81,7 +76,8 @@ public class HuaweiCloudVmStateManager {
                     converter.buildBatchStopServersRequest(
                             serviceStateManageRequest.getServiceResourceEntityList());
             BatchStopServersResponse response =
-                    ecsClient.batchStopServersInvoker(batchStopServersRequest)
+                    ecsClient
+                            .batchStopServersInvoker(batchStopServersRequest)
                             .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
                             .backoffStrategy(huaweiCloudRetryStrategy)
@@ -94,22 +90,24 @@ public class HuaweiCloudVmStateManager {
         }
     }
 
-    /**
-     * Restart the Huawei Cloud Ecs server.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** Restart the Huawei Cloud Ecs server. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
-            BatchRebootServersRequest request = converter.buildBatchRebootServersRequest(
-                    serviceStateManageRequest.getServiceResourceEntityList());
-            BatchRebootServersResponse response = ecsClient.batchRebootServersInvoker(request)
-                    .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
-                    .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
-                    .backoffStrategy(huaweiCloudRetryStrategy)
-                    .invoke();
+            BatchRebootServersRequest request =
+                    converter.buildBatchRebootServersRequest(
+                            serviceStateManageRequest.getServiceResourceEntityList());
+            BatchRebootServersResponse response =
+                    ecsClient
+                            .batchRebootServersInvoker(request)
+                            .retryTimes(huaweiCloudRetryStrategy.getRetryMaxAttempts())
+                            .retryCondition(huaweiCloudRetryStrategy::matchRetryCondition)
+                            .backoffStrategy(huaweiCloudRetryStrategy)
+                            .invoke();
             return checkEcsExecResultByJobId(ecsClient, response.getJobId());
         } catch (Exception e) {
             log.error("Restart service {} failed", serviceStateManageRequest.getServiceId());
@@ -128,14 +126,18 @@ public class HuaweiCloudVmStateManager {
     }
 
     private boolean checkEcsExecResultByJobId(EcsClient ecsClient, String jobId) {
-        ShowJobResponse response = ecsClient.showJobInvoker(new ShowJobRequest().withJobId(jobId))
-                .retryTimes(WAITING_JOB_SUCCESS_RETRY_TIMES)
-                .retryCondition(this::jobIsNotSuccess)
-                .backoffStrategy(huaweiCloudRetryStrategy).invoke();
+        ShowJobResponse response =
+                ecsClient
+                        .showJobInvoker(new ShowJobRequest().withJobId(jobId))
+                        .retryTimes(WAITING_JOB_SUCCESS_RETRY_TIMES)
+                        .retryCondition(this::jobIsNotSuccess)
+                        .backoffStrategy(huaweiCloudRetryStrategy)
+                        .invoke();
         if (response.getStatus().equals(StatusEnum.FAIL)) {
-            String errorMsg = String.format(
-                    "Manage vm operation failed. JobId: %s reason: %s " + "message: %s", jobId,
-                    response.getFailReason(), response.getMessage());
+            String errorMsg =
+                    String.format(
+                            "Manage vm operation failed. JobId: %s reason: %s " + "message: %s",
+                            jobId, response.getFailReason(), response.getMessage());
             throw new ClientApiCallFailedException(errorMsg);
         }
         return response.getStatus().equals(StatusEnum.SUCCESS);
@@ -147,5 +149,4 @@ public class HuaweiCloudVmStateManager {
         }
         return response.getStatus() != StatusEnum.SUCCESS;
     }
-
 }

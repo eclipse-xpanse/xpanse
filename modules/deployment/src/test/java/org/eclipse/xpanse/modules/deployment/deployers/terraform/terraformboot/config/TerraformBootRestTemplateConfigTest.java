@@ -17,8 +17,7 @@ import org.springframework.web.client.RestTemplate;
 @ExtendWith(MockitoExtension.class)
 class TerraformBootRestTemplateConfigTest {
 
-    @Mock
-    private RestTemplateLoggingInterceptor mockRestTemplateLoggingInterceptor;
+    @Mock private RestTemplateLoggingInterceptor mockRestTemplateLoggingInterceptor;
 
     private TerraformBootRestTemplateConfig terraformBootRestTemplateConfigUnderTest;
 

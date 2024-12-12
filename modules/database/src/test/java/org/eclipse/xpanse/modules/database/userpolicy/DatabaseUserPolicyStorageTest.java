@@ -21,8 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 @ExtendWith(MockitoExtension.class)
 class DatabaseUserPolicyStorageTest {
 
-    @Mock
-    private UserPolicyRepository mockUserPolicyRepository;
+    @Mock private UserPolicyRepository mockUserPolicyRepository;
 
     private DatabaseUserPolicyStorage databasePolicyStorageUnderTest;
 
@@ -116,7 +115,8 @@ class DatabaseUserPolicyStorageTest {
         queryModel.setPolicy("policy");
 
         // Run the test
-        final List<UserPolicyEntity> result = databasePolicyStorageUnderTest.listPolicies(queryModel);
+        final List<UserPolicyEntity> result =
+                databasePolicyStorageUnderTest.listPolicies(queryModel);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -141,12 +141,13 @@ class DatabaseUserPolicyStorageTest {
         userPolicyEntity.setEnabled(false);
         final Optional<UserPolicyEntity> policyEntityOptional = Optional.of(userPolicyEntity);
         when(mockUserPolicyRepository.findById(
-                UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983")))
+                        UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983")))
                 .thenReturn(policyEntityOptional);
 
         // Run the test
-        final UserPolicyEntity result = databasePolicyStorageUnderTest.findPolicyById(
-                UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983"));
+        final UserPolicyEntity result =
+                databasePolicyStorageUnderTest.findPolicyById(
+                        UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983"));
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -156,12 +157,13 @@ class DatabaseUserPolicyStorageTest {
     void testFindPolicyById_PolicyRepositoryReturnsAbsent() {
         // Setup
         when(mockUserPolicyRepository.findById(
-                UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983")))
+                        UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983")))
                 .thenReturn(Optional.empty());
 
         // Run the test
-        final UserPolicyEntity result = databasePolicyStorageUnderTest.findPolicyById(
-                UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983"));
+        final UserPolicyEntity result =
+                databasePolicyStorageUnderTest.findPolicyById(
+                        UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983"));
 
         // Verify the results
         assertThat(result).isNull();
@@ -199,7 +201,7 @@ class DatabaseUserPolicyStorageTest {
                 UUID.fromString("c74096c4-710b-4767-be2b-77ff462d2cb3"));
 
         // Verify the results
-        verify(mockUserPolicyRepository).deleteById(
-                UUID.fromString("c74096c4-710b-4767-be2b-77ff462d2cb3"));
+        verify(mockUserPolicyRepository)
+                .deleteById(UUID.fromString("c74096c4-710b-4767-be2b-77ff462d2cb3"));
     }
 }

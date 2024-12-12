@@ -28,9 +28,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Webhook class for terraform-boot. These API methods are not exposed to the end user.
- * They are only for machine-to-machine communication.
- * This class implements the callback methods described in the terraform-boot specifications.
+ * Webhook class for terraform-boot. These API methods are not exposed to the end user. They are
+ * only for machine-to-machine communication. This class implements the callback methods described
+ * in the terraform-boot specifications.
  */
 @Slf4j
 @RestController
@@ -42,20 +42,18 @@ public class TerraformBootWebhookApi {
     @Resource
     private TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
 
-    /**
-     * Webhook method to receive the execution result of the order task from terraform-boot.
-     */
+    /** Webhook method to receive the execution result of the order task from terraform-boot. */
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result of the order task from terraform-boot.")
-    @PostMapping(value = "${webhook.terraform-boot.orderCallbackUri}/{orderId}",
+    @PostMapping(
+            value = "${webhook.terraform-boot.orderCallbackUri}/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(enabled = false)
     public void orderCallback(
-            @Parameter(name = "orderId", description = "Id of the order.")
-            @PathVariable("orderId") String orderId,
+            @Parameter(name = "orderId", description = "Id of the order.") @PathVariable("orderId")
+                    String orderId,
             @Valid @RequestBody TerraformResult result) {
         terraformDeploymentResultCallbackManager.orderCallback(UUID.fromString(orderId), result);
     }
-
 }

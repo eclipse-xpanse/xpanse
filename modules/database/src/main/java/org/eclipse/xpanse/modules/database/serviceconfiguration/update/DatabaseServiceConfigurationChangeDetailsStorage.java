@@ -17,10 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-
-/**
- * Implementation of the ServiceConfigurationUpdateStorage.
- */
+/** Implementation of the ServiceConfigurationUpdateStorage. */
 @Component
 @Transactional
 public class DatabaseServiceConfigurationChangeDetailsStorage
@@ -41,8 +38,8 @@ public class DatabaseServiceConfigurationChangeDetailsStorage
     }
 
     @Override
-    public <S extends ServiceConfigurationChangeDetailsEntity>
-            List<S> saveAll(Iterable<S> entities) {
+    public <S extends ServiceConfigurationChangeDetailsEntity> List<S> saveAll(
+            Iterable<S> entities) {
         return repository.saveAll(entities);
     }
 
@@ -53,28 +50,34 @@ public class DatabaseServiceConfigurationChangeDetailsStorage
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(requestQuery.getOrderId())) {
-                        predicateList.add(criteriaBuilder.equal(
-                                root.get("serviceOrderEntity").get("orderId"),
-                                requestQuery.getOrderId()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("serviceOrderEntity").get("orderId"),
+                                        requestQuery.getOrderId()));
                     }
 
                     if (Objects.nonNull(requestQuery.getServiceId())) {
-                        predicateList.add(criteriaBuilder.equal(
-                                root.get("deployServiceEntity").get("id"),
-                                requestQuery.getServiceId()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("deployServiceEntity").get("id"),
+                                        requestQuery.getServiceId()));
                     }
                     if (StringUtils.isNotBlank(requestQuery.getResourceName())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("resourceName"),
-                                StringUtils.lowerCase(requestQuery.getResourceName())));
-
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("resourceName"),
+                                        StringUtils.lowerCase(requestQuery.getResourceName())));
                     }
                     if (StringUtils.isNotBlank(requestQuery.getConfigManager())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("configManager"),
-                                StringUtils.lowerCase(requestQuery.getConfigManager())));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("configManager"),
+                                        StringUtils.lowerCase(requestQuery.getConfigManager())));
                     }
                     if (Objects.nonNull(requestQuery.getStatus())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("status"),
-                                requestQuery.getStatus()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("status"), requestQuery.getStatus()));
                     }
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();

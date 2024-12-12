@@ -12,9 +12,7 @@ import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 
-/**
- * DeployResource model.
- */
+/** DeployResource model. */
 @Data
 public class DeployResource {
 

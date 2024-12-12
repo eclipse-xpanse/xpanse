@@ -11,9 +11,7 @@ import lombok.Data;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 
-/**
- * Describes health status of the backend system.
- */
+/** Describes health status of the backend system. */
 @Data
 public class BackendSystemStatus {
 
@@ -29,12 +27,15 @@ public class BackendSystemStatus {
     @Schema(description = "The health status of backend system.")
     private HealthStatus healthStatus;
 
-    @Schema(description = "The endpoint of backend system. "
-            + "This filed is shown when the user have role 'admin' otherwise it is null.")
+    @Schema(
+            description =
+                    "The endpoint of backend system. This filed is shown when the user have role"
+                            + " 'admin' otherwise it is null.")
     private String endpoint;
 
-    @Schema(description = "The details why health is not ok."
-            + "This filed is shown when the user have role 'admin' otherwise it is null.")
+    @Schema(
+            description =
+                    "The details why health is not ok.This filed is shown when the user have role"
+                            + " 'admin' otherwise it is null.")
     private String details;
-
 }

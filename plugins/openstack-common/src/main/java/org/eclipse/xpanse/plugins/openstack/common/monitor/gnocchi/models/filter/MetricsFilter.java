@@ -8,9 +8,7 @@ package org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.filte
 import lombok.Builder;
 import lombok.Data;
 
-/**
- * Gnocchi object for defining the query parameters to filter metrics.
- */
+/** Gnocchi object for defining the query parameters to filter metrics. */
 @Data
 @Builder
 public class MetricsFilter {

@@ -12,9 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of ServiceTemplateDisabledException.
- */
+/** Test of ServiceTemplateDisabledException. */
 class ServiceTemplateDisabledExceptionTest {
 
     private static final String message = "service template is unavailable.";
@@ -40,8 +38,7 @@ class ServiceTemplateDisabledExceptionTest {
         assertNotEquals(exception, null);
         assertNotEquals(exception.hashCode(), obj.hashCode());
 
-        ServiceTemplateDisabledException exception1 =
-                new ServiceTemplateDisabledException(message);
+        ServiceTemplateDisabledException exception1 = new ServiceTemplateDisabledException(message);
         ServiceTemplateDisabledException exception2 =
                 new ServiceTemplateDisabledException("different message");
 
@@ -67,5 +64,4 @@ class ServiceTemplateDisabledExceptionTest {
 
         assertEquals(message, exception.getMessage());
     }
-
 }

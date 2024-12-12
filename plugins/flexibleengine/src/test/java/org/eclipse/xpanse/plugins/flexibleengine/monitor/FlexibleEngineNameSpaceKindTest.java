@@ -18,7 +18,6 @@ class FlexibleEngineNameSpaceKindTest {
                 .isEqualTo(FlexibleEngineNameSpaceKind.ECS_SYS);
         assertThat(FlexibleEngineNameSpaceKind.ECS_AGT.getByValue("AGT.ECS"))
                 .isEqualTo(FlexibleEngineNameSpaceKind.ECS_AGT);
-        assertThat(FlexibleEngineNameSpaceKind.ECS_AGT.getByValue("NULL"))
-                .isEqualTo(null);
+        assertThat(FlexibleEngineNameSpaceKind.ECS_AGT.getByValue("NULL")).isEqualTo(null);
     }
 }

@@ -27,10 +27,9 @@ class CategoryEnumConverterTest {
         Assertions.assertEquals(Category.SECURITY, converterTest.convert("security"));
         Assertions.assertEquals(Category.MIDDLEWARE, converterTest.convert("middleware"));
         Assertions.assertEquals(Category.OTHERS, converterTest.convert("others"));
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> converterTest.convert(" "));
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> converterTest.convert("error_value"));
-
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> converterTest.convert(" "));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> converterTest.convert("error_value"));
     }
 }

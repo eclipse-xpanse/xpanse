@@ -36,41 +36,51 @@ class FlexibleEngineClientTest {
         Assertions.assertFalse(Objects.isNull(result));
     }
 
-
     @Test
     void testGetCredentialForClientException() {
         // Setup
         final AbstractCredentialInfo credential = getCredentialDefinition("", "");
         // Verify the run
-        Assertions.assertThrows(CredentialsNotFoundException.class,
-                () -> testClient.getCredential(credential));
+        Assertions.assertThrows(
+                CredentialsNotFoundException.class, () -> testClient.getCredential(credential));
     }
-
 
     @Test
     void testGetCesClient() {
         // Setup
-        ICredential iCredential =
-                testClient.getCredential(getCredentialDefinition("ak", "sk"));
+        ICredential iCredential = testClient.getCredential(getCredentialDefinition("ak", "sk"));
 
         // Verify the results
-        Assertions.assertThrows(Exception.class,
-                () -> testClient.getCesClient(iCredential,
-                        "eu-west-0"));
+        Assertions.assertThrows(
+                Exception.class, () -> testClient.getCesClient(iCredential, "eu-west-0"));
     }
 
     private CredentialVariables getCredentialDefinition(String akValue, String skValue) {
 
         List<CredentialVariable> credentialVariables = new ArrayList<>();
-        CredentialVariable ak = new CredentialVariable(FlexibleEngineMonitorConstants.OS_ACCESS_KEY,
-                "The access key.", true, false, akValue);
+        CredentialVariable ak =
+                new CredentialVariable(
+                        FlexibleEngineMonitorConstants.OS_ACCESS_KEY,
+                        "The access key.",
+                        true,
+                        false,
+                        akValue);
         credentialVariables.add(ak);
-        CredentialVariable sk = new CredentialVariable(FlexibleEngineMonitorConstants.OS_SECRET_KEY,
-                "The access key.", true, true, skValue);
+        CredentialVariable sk =
+                new CredentialVariable(
+                        FlexibleEngineMonitorConstants.OS_SECRET_KEY,
+                        "The access key.",
+                        true,
+                        true,
+                        skValue);
         credentialVariables.add(sk);
         return new CredentialVariables(
-                Csp.FLEXIBLE_ENGINE, DEFAULT_SITE, CredentialType.VARIABLES, "AK_SK",
+                Csp.FLEXIBLE_ENGINE,
+                DEFAULT_SITE,
+                CredentialType.VARIABLES,
+                "AK_SK",
                 "The access key and security key.",
-                "userId", credentialVariables);
+                "userId",
+                credentialVariables);
     }
 }

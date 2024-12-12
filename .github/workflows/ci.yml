@@ -31,6 +31,8 @@ jobs:
         uses: opentofu/setup-opentofu@v1.0.4
         with:
           tofu_version: 1.6.1
+      - name: Format check
+        run: mvn spotless:check &&  mvn checkstyle:check
       - name: Build
         run: mvn --batch-mode --update-snapshots --no-transfer-progress verify
       - name: Generate API doc

@@ -13,9 +13,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of TfStateResource.
- */
+/** Test of TfStateResource. */
 class TfStateResourceTest {
 
     private static final String type = "type";
@@ -91,12 +89,20 @@ class TfStateResourceTest {
 
     @Test
     void testToString() {
-        String expectedToString = "TfStateResource(" +
-                "type=" + type + ", " +
-                "name=" + name + ", " +
-                "mode=" + mode + ", " +
-                "instances=" + instances + ")";
+        String expectedToString =
+                "TfStateResource("
+                        + "type="
+                        + type
+                        + ", "
+                        + "name="
+                        + name
+                        + ", "
+                        + "mode="
+                        + mode
+                        + ", "
+                        + "instances="
+                        + instances
+                        + ")";
         assertEquals(expectedToString, tfStateResource.toString());
     }
-
 }

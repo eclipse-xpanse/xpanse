@@ -10,11 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Defines type of the backend system.
- */
+/** Defines type of the backend system. */
 public enum BackendSystemType {
-
     IDENTITY_PROVIDER("Identity Provider"),
     DATABASE("Database"),
     TERRAFORM_BOOT("Terraform Boot"),
@@ -29,9 +26,7 @@ public enum BackendSystemType {
         this.code = code;
     }
 
-    /**
-     * For BackendSystemType serialize.
-     */
+    /** For BackendSystemType serialize. */
     @JsonCreator
     public static BackendSystemType getByValue(String code) {
         for (BackendSystemType providerType : values()) {
@@ -43,9 +38,7 @@ public enum BackendSystemType {
                 String.format("BackendSystemType value %s is not supported.", code));
     }
 
-    /**
-     * For BackendSystemType deserialize.
-     */
+    /** For BackendSystemType deserialize. */
     @JsonValue
     public String toValue() {
         return this.code;

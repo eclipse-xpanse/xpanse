@@ -12,9 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.eclipse.xpanse.modules.models.billing.RatingMode;
 
-/**
- * Defines for service flavor with price.
- */
+/** Defines for service flavor with price. */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)

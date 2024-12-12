@@ -13,11 +13,10 @@ import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 
 /**
- * This interface describes the DeployResourceHandler used to extract the resources
- * used by the service.
+ * This interface describes the DeployResourceHandler used to extract the resources used by the
+ * service.
  */
 public interface ServiceResourceHandler {
-
 
     /**
      * get the resource handler of the CSP plugin.
@@ -29,25 +28,28 @@ public interface ServiceResourceHandler {
     /**
      * get the existing resources of the specified kind.
      *
-     * @param userId    id of the user.
-     * @param site      site of the resource.
-     * @param region    region of the resource.
-     * @param kind      kind of the resource.
+     * @param userId id of the user.
+     * @param site site of the resource.
+     * @param region region of the resource.
+     * @param kind kind of the resource.
      * @param serviceId id of the service.
      * @return the existing resources names with the specified kind.
      */
-    List<String> getExistingResourceNamesWithKind(String site, String region, String userId,
-                                                  DeployResourceKind kind, UUID serviceId);
-
+    List<String> getExistingResourceNamesWithKind(
+            String site, String region, String userId, DeployResourceKind kind, UUID serviceId);
 
     /**
      * get the availability zones of the specified region.
      *
-     * @param userId     id of the user.
-     * @param siteName   site name.
+     * @param userId id of the user.
+     * @param siteName site name.
      * @param regionName region name.
      * @return the availability zones of the specified region.
      */
-    List<String> getAvailabilityZonesOfRegion(String siteName, String regionName, String userId,
-                                              UUID serviceId, UUID serviceTemplateId);
+    List<String> getAvailabilityZonesOfRegion(
+            String siteName,
+            String regionName,
+            String userId,
+            UUID serviceId,
+            UUID serviceTemplateId);
 }

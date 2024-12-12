@@ -19,8 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class InvalidValueSchemaExceptionTest {
 
-    @Mock
-    private List<String> mockInvalidValueSchemaKeys;
+    @Mock private List<String> mockInvalidValueSchemaKeys;
 
     private InvalidValueSchemaException invalidValueSchemaExceptionUnderTest;
 

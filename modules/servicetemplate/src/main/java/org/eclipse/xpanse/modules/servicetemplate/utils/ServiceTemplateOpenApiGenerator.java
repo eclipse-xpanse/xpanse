@@ -49,9 +49,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Bean to generate OpenApi files for registered services.
- */
+/** Bean to generate OpenApi files for registered services. */
 @Component
 @Slf4j
 public class ServiceTemplateOpenApiGenerator {
@@ -67,14 +65,14 @@ public class ServiceTemplateOpenApiGenerator {
     private final PluginManager pluginManager;
     private final ZitadelIdentityProviderService zitadelIdentityProviderService;
     private final String appVersion;
+
     @Value("${enable.web.security:false}")
     private Boolean webSecurityIsEnabled;
+
     @Value("${enable.role.protection:false}")
     private Boolean roleProtectionIsEnabled;
 
-    /**
-     * Constructor to instantiate ServiceTemplateOpenApiGenerator bean.
-     */
+    /** Constructor to instantiate ServiceTemplateOpenApiGenerator bean. */
     @Autowired
     public ServiceTemplateOpenApiGenerator(
             @Value("${app.version:1.0.0}") String appVersion,
@@ -100,8 +98,10 @@ public class ServiceTemplateOpenApiGenerator {
             throw new ServiceTemplateNotRegistered("Registered service is null.");
         }
         String id = serviceTemplateEntity.getId().toString();
-        File apiFile = new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
-                id + OPENAPI_FILE_EXTENSION);
+        File apiFile =
+                new File(
+                        this.openApiGeneratorJarManage.getOpenApiWorkdir(),
+                        id + OPENAPI_FILE_EXTENSION);
         if (apiFile.exists()) {
             return this.openApiUrlManage.getOpenApiUrl(id);
         } else {
@@ -126,8 +126,10 @@ public class ServiceTemplateOpenApiGenerator {
      */
     @Async(TaskConfiguration.ASYNC_EXECUTOR_NAME)
     public void updateServiceApi(ServiceTemplateEntity registerService) {
-        File file = new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
-                registerService.getId() + OPENAPI_FILE_EXTENSION);
+        File file =
+                new File(
+                        this.openApiGeneratorJarManage.getOpenApiWorkdir(),
+                        registerService.getId() + OPENAPI_FILE_EXTENSION);
         if (file.exists()) {
             log.info("Delete old openApi file:{}, success:{}", file.getName(), file.delete());
         }
@@ -141,8 +143,10 @@ public class ServiceTemplateOpenApiGenerator {
      */
     @Async(TaskConfiguration.ASYNC_EXECUTOR_NAME)
     public void deleteServiceApi(String id) {
-        File file = new File(this.openApiGeneratorJarManage.getOpenApiWorkdir(),
-                id + OPENAPI_FILE_EXTENSION);
+        File file =
+                new File(
+                        this.openApiGeneratorJarManage.getOpenApiWorkdir(),
+                        id + OPENAPI_FILE_EXTENSION);
         if (file.exists()) {
             log.info("Delete openApi html file:{}, success:{}", file.getName(), file.delete());
         }
@@ -173,8 +177,10 @@ public class ServiceTemplateOpenApiGenerator {
             }
             File jarPath = getJarPath();
             if (yamlFile.exists() && jarPath.exists()) {
-                String comm = String.format("java -jar %s generate -g html2 " + "-i %s -o %s",
-                        jarPath.getPath(), yamlFile.getPath(), openApiDir);
+                String comm =
+                        String.format(
+                                "java -jar %s generate -g html2 " + "-i %s -o %s",
+                                jarPath.getPath(), yamlFile.getPath(), openApiDir);
                 Process exec = Runtime.getRuntime().exec(comm.split("\\s+"));
                 StringBuilder stdErrOut = new StringBuilder();
                 BufferedReader outputReader =
@@ -191,15 +197,16 @@ public class ServiceTemplateOpenApiGenerator {
                 // Modify the file name to serviceId.html
                 File tempHtmlFile = new File(openApiDir, "index.html");
                 if (tempHtmlFile.exists() && (tempHtmlFile.renameTo(htmlFile))) {
-                    log.info("Created service openApi html file:{} successfully.",
+                    log.info(
+                            "Created service openApi html file:{} successfully.",
                             htmlFile.getName());
                     if (htmlFile.exists()) {
                         return this.openApiUrlManage.getOpenApiUrl(serviceId);
                     }
-
                 }
             } else {
-                log.error("Not generating {} file. Missing json or openapi-generator jar file",
+                log.error(
+                        "Not generating {} file. Missing json or openapi-generator jar file",
                         htmlFile.getName());
             }
             return StringUtils.EMPTY;
@@ -215,7 +222,6 @@ public class ServiceTemplateOpenApiGenerator {
                     log.info("Deleted temp yaml file:{} successfully.", yamlFile.getName());
                 } catch (IOException ioException) {
                     log.info("Deleting temp yaml file:{} failed.", yamlFile.getName(), ioException);
-
                 }
             }
         }
@@ -229,7 +235,6 @@ public class ServiceTemplateOpenApiGenerator {
     private File getJarPath() throws IOException {
         return this.openApiGeneratorJarManage.getCliFile();
     }
-
 
     private String getApiDocsJson(ServiceTemplateEntity registerService) {
         if (Objects.isNull(registerService)) {
@@ -286,10 +291,13 @@ public class ServiceTemplateOpenApiGenerator {
 
         try {
             createRequiredStr = mapper.writeValueAsString(getRequiredFields(new DeployRequest()));
-            propertiesStr = objectMapper.writeValueAsString(convertJsonSchemaSpecToOpenApiSpec(
-                    registerService.getJsonObjectSchema().getProperties()));
-            propertiesRequiredStr = objectMapper.writeValueAsString(
-                    registerService.getJsonObjectSchema().getRequired());
+            propertiesStr =
+                    objectMapper.writeValueAsString(
+                            convertJsonSchemaSpecToOpenApiSpec(
+                                    registerService.getJsonObjectSchema().getProperties()));
+            propertiesRequiredStr =
+                    objectMapper.writeValueAsString(
+                            registerService.getJsonObjectSchema().getRequired());
             List<Region> regions = registerService.getOcl().getCloudServiceProvider().getRegions();
 
             Region regionExample = regions.getFirst();
@@ -311,14 +319,16 @@ public class ServiceTemplateOpenApiGenerator {
             cspValuesStr = mapper.writeValueAsString(getActiveCspValues());
             categoryValuesStr = mapper.writeValueAsString(getCategoryValues());
             serviceHostingTypesStr = mapper.writeValueAsString(getServiceHostingTypeValues());
-            availabilityZonesSchemaStr = getSchemaOfAvailabilityZones(
-                    registerService.getOcl().getDeployment()
-                            .getServiceAvailabilityConfig(), mapper);
+            availabilityZonesSchemaStr =
+                    getSchemaOfAvailabilityZones(
+                            registerService.getOcl().getDeployment().getServiceAvailabilityConfig(),
+                            mapper);
         } catch (JsonProcessingException e) {
             log.error("Failed to write value as string.", e);
         }
-        //CHECKSTYLE OFF: LineLength
-        return String.format("""
+        // CHECKSTYLE OFF: LineLength
+        return String.format(
+                """
                         {
                             "openapi": "3.0.1",
                             "info": {
@@ -596,20 +606,40 @@ public class ServiceTemplateOpenApiGenerator {
                                 }%s                                     \s
                             }
                         }
-                        """, appVersion, serviceUrl, securityConfigList, requiredRolesDesc,
-                createRequiredStr, category, categoryValuesStr, serviceName, serviceVersion,
-                regionNameExample, regionNamesStr, regionSiteExample, regionSitesStr,
-                regionAreaExample, regionAreasStr,
-                csp, cspValuesStr, flavorNameExample, flavorNamesStr,
-                serviceHostingType, serviceHostingTypesStr, propertiesRequiredStr,
-                propertiesStr, availabilityZonesSchemaStr, getSecuritySchemes());
+                        """,
+                appVersion,
+                serviceUrl,
+                securityConfigList,
+                requiredRolesDesc,
+                createRequiredStr,
+                category,
+                categoryValuesStr,
+                serviceName,
+                serviceVersion,
+                regionNameExample,
+                regionNamesStr,
+                regionSiteExample,
+                regionSitesStr,
+                regionAreaExample,
+                regionAreasStr,
+                csp,
+                cspValuesStr,
+                flavorNameExample,
+                flavorNamesStr,
+                serviceHostingType,
+                serviceHostingTypesStr,
+                propertiesRequiredStr,
+                propertiesStr,
+                availabilityZonesSchemaStr,
+                getSecuritySchemes());
     }
 
     private String getSecurityConfigList() {
         if (webSecurityIsEnabled) {
             String roleScopeStr =
                     roleProtectionIsEnabled ? "\"urn:zitadel:iam:org:project:roles\"," : "";
-            return String.format("""
+            return String.format(
+                    """
                     "security": [
                                 {
                                     "OAuth2Flow": [
@@ -620,11 +650,11 @@ public class ServiceTemplateOpenApiGenerator {
                                     ]
                                 }
                             ],
-                    """, roleScopeStr);
+                    """,
+                    roleScopeStr);
         }
         return "";
     }
-
 
     private String getRequiredRolesDesc() {
         if (webSecurityIsEnabled && roleProtectionIsEnabled) {
@@ -666,14 +696,14 @@ public class ServiceTemplateOpenApiGenerator {
             Annotation notNullAnnotation = field.getAnnotation(NotNull.class);
             if (Objects.nonNull(notNullAnnotation)) {
                 fieldNames.add(field.getName());
-
             }
         }
         return fieldNames;
     }
 
     private List<String> getActiveCspValues() {
-        return pluginManager.getPluginsMap().keySet().stream().map(Csp::toValue)
+        return pluginManager.getPluginsMap().keySet().stream()
+                .map(Csp::toValue)
                 .collect(Collectors.toList());
     }
 
@@ -682,28 +712,32 @@ public class ServiceTemplateOpenApiGenerator {
     }
 
     private List<String> getServiceHostingTypeValues() {
-        return Arrays.stream(ServiceHostingType.values()).map(ServiceHostingType::toValue)
+        return Arrays.stream(ServiceHostingType.values())
+                .map(ServiceHostingType::toValue)
                 .collect(Collectors.toList());
     }
 
     private Map<String, Map<String, Object>> convertJsonSchemaSpecToOpenApiSpec(
             Map<String, Map<String, Object>> properties) {
-        properties.forEach((key, value) -> {
-            String exampleValue = (String) value.get(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
-            if (Objects.nonNull(exampleValue)) {
-                value.remove(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
-                value.put(OPENAPI_EXAMPLE_KEYWORD, exampleValue);
-            }
-        });
+        properties.forEach(
+                (key, value) -> {
+                    String exampleValue = (String) value.get(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
+                    if (Objects.nonNull(exampleValue)) {
+                        value.remove(JSON_SCHEMA_DEF_EXAMPLE_KEYWORD);
+                        value.put(OPENAPI_EXAMPLE_KEYWORD, exampleValue);
+                    }
+                });
         return properties;
     }
 
-    private String getSchemaOfAvailabilityZones(List<AvailabilityZoneConfig> availabilityZones,
-                                                ObjectMapper mapper) {
+    private String getSchemaOfAvailabilityZones(
+            List<AvailabilityZoneConfig> availabilityZones, ObjectMapper mapper) {
         String availabilityZonesSchemaStr = "";
         try {
             if (!CollectionUtils.isEmpty(availabilityZones)) {
-                availabilityZonesSchemaStr = String.format("""
+                availabilityZonesSchemaStr =
+                        String.format(
+                                """
                                                    ,
                                                    "availabilityZones": {
                                                        "required": %s,
@@ -712,9 +746,10 @@ public class ServiceTemplateOpenApiGenerator {
                                                        "properties": %s
                                                    }
                                 """,
-                        mapper.writeValueAsString(getRequiredAvailabilityZones(availabilityZones)),
-                        mapper.writeValueAsString(
-                                convertAvailabilityZonesToOpenApiSpec(availabilityZones)));
+                                mapper.writeValueAsString(
+                                        getRequiredAvailabilityZones(availabilityZones)),
+                                mapper.writeValueAsString(
+                                        convertAvailabilityZonesToOpenApiSpec(availabilityZones)));
             }
         } catch (JsonProcessingException e) {
             log.error("Failed to get schema of availability zones.", e);
@@ -724,8 +759,10 @@ public class ServiceTemplateOpenApiGenerator {
 
     private List<String> getRequiredAvailabilityZones(
             List<AvailabilityZoneConfig> availabilityZones) {
-        return availabilityZones.stream().filter(AvailabilityZoneConfig::getMandatory)
-                .map(AvailabilityZoneConfig::getVarName).toList();
+        return availabilityZones.stream()
+                .filter(AvailabilityZoneConfig::getMandatory)
+                .map(AvailabilityZoneConfig::getVarName)
+                .toList();
     }
 
     private Map<String, Map<String, Object>> convertAvailabilityZonesToOpenApiSpec(

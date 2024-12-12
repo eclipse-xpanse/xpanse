@@ -22,9 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of ServiceConfigurationEntityTest.
- */
+/** Test of ServiceConfigurationEntityTest. */
 @ExtendWith(MockitoExtension.class)
 class ServiceConfigurationEntityTest {
 
@@ -33,8 +31,7 @@ class ServiceConfigurationEntityTest {
 
     private ServiceConfigurationEntity test;
 
-    @Mock
-    private ServiceDeploymentEntity serviceDeploymentEntity;
+    @Mock private ServiceDeploymentEntity serviceDeploymentEntity;
 
     @BeforeEach
     void setUp() {
@@ -92,21 +89,20 @@ class ServiceConfigurationEntityTest {
 
     @Test
     void testToString() {
-        String result = String.format(
-                "ServiceConfigurationEntity(id=%s, serviceDeploymentEntity=%s, configuration=%s, "
-                        + "createdTime=%s, "
-                        + "updatedTime=%s)",
-                id, serviceDeploymentEntity, getConfiguration(), createTime, null);
+        String result =
+                String.format(
+                        "ServiceConfigurationEntity(id=%s, serviceDeploymentEntity=%s,"
+                                + " configuration=%s, createdTime=%s, updatedTime=%s)",
+                        id, serviceDeploymentEntity, getConfiguration(), createTime, null);
 
         assertThat(test.toString()).isEqualTo(result);
     }
 
-
-    private Map<String, Object> getConfiguration(){
+    private Map<String, Object> getConfiguration() {
         Map<String, Object> configuration = new HashMap<>();
-        configuration.put("key1","value1");
-        configuration.put("key2","value2");
-        configuration.put("key3","value3");
+        configuration.put("key1", "value1");
+        configuration.put("key2", "value2");
+        configuration.put("key3", "value3");
         return configuration;
     }
 }

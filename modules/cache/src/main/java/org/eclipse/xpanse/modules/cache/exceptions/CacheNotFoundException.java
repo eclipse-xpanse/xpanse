@@ -5,9 +5,7 @@
 
 package org.eclipse.xpanse.modules.cache.exceptions;
 
-/**
- * Exception thrown when no cache found.
- */
+/** Exception thrown when no cache found. */
 public class CacheNotFoundException extends RuntimeException {
 
     public CacheNotFoundException(String message) {

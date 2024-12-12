@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRe
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to ServiceTemplateRegistrationState enum.
- */
+/** Bean for serializing string in request parameters to ServiceTemplateRegistrationState enum. */
 @Component
 public class ServiceTemplateRegistrationStateConverter
         implements Converter<String, ServiceTemplateRegistrationState> {

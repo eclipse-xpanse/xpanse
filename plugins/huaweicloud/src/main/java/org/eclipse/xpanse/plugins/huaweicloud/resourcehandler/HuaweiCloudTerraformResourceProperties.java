@@ -13,32 +13,27 @@ import java.util.Set;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperties;
 
-
-/**
- * Enum for resource type in tfState and HuaweiCloudResourceProperties.
- */
+/** Enum for resource type in tfState and HuaweiCloudResourceProperties. */
 public enum HuaweiCloudTerraformResourceProperties {
     HUAWEI_CLOUD_VM_PROPERTIES("huaweicloud_compute_instance", new HuaweiVmProperties()),
     HUAWEI_CLOUD_VOLUME_PROPERTIES("huaweicloud_evs_volume", new HuaweiVolumeProperties()),
     HUAWEI_CLOUD_PUBLIC_IP_PROPERTIES("huaweicloud_vpc_eip", new HuaweiPublicIpProperties()),
     HUAWEI_CLOUD_VPC_PROPERTIES("huaweicloud_vpc", new HuaweiVpcProperties()),
     HUAWEI_CLOUD_SUBNET_PROPERTIES("huaweicloud_vpc_subnet", new HuaweiSubnetProperties()),
-    HUAWEI_CLOUD_KEYPAIR_PROPERTIES("huaweicloud_kps_keypair",
-            new HuaweiKeyPairProperties()),
-    HUAWEI_CLOUD_SECURITY_GROUP_PROPERTIES("huaweicloud_networking_secgroup",
-            new HuaweiSecurityGroupProperties()),
-    HUAWEI_CLOUD_SECURITY_GROUP_RULE_PROPERTIES("huaweicloud_networking_secgroup_rule",
-            new HuaweiSecurityGroupRuleProperties());
+    HUAWEI_CLOUD_KEYPAIR_PROPERTIES("huaweicloud_kps_keypair", new HuaweiKeyPairProperties()),
+    HUAWEI_CLOUD_SECURITY_GROUP_PROPERTIES(
+            "huaweicloud_networking_secgroup", new HuaweiSecurityGroupProperties()),
+    HUAWEI_CLOUD_SECURITY_GROUP_RULE_PROPERTIES(
+            "huaweicloud_networking_secgroup_rule", new HuaweiSecurityGroupRuleProperties());
 
     private final String tfResourceType;
     private final DeployResourceProperties resourceProperties;
 
-    HuaweiCloudTerraformResourceProperties(String tfResourceType,
-                                           DeployResourceProperties resourceProperties) {
+    HuaweiCloudTerraformResourceProperties(
+            String tfResourceType, DeployResourceProperties resourceProperties) {
         this.tfResourceType = tfResourceType;
         this.resourceProperties = resourceProperties;
     }
-
 
     /**
      * Get deploy resource properties by resource type in tfState.
@@ -46,8 +41,7 @@ public enum HuaweiCloudTerraformResourceProperties {
      * @param tfResourceType resource type in tfState.
      * @return DeployResourceProperties.
      */
-    public static DeployResourceProperties getDeployResourceProperties(
-            String tfResourceType) {
+    public static DeployResourceProperties getDeployResourceProperties(String tfResourceType) {
         for (HuaweiCloudTerraformResourceProperties property : values()) {
             if (property.tfResourceType.equals(tfResourceType)) {
                 return property.resourceProperties;
@@ -69,9 +63,7 @@ public enum HuaweiCloudTerraformResourceProperties {
         return types;
     }
 
-    /**
-     * Huawei cloud vm properties.
-     */
+    /** Huawei cloud vm properties. */
     static class HuaweiVmProperties extends DeployResourceProperties {
 
         @Override
@@ -90,9 +82,7 @@ public enum HuaweiCloudTerraformResourceProperties {
         }
     }
 
-    /**
-     * Huawei cloud volume properties.
-     */
+    /** Huawei cloud volume properties. */
     static class HuaweiVolumeProperties extends DeployResourceProperties {
         @Override
         public DeployResourceKind getResourceKind() {
@@ -108,9 +98,7 @@ public enum HuaweiCloudTerraformResourceProperties {
         }
     }
 
-    /**
-     * Huawei cloud publicIp properties.
-     */
+    /** Huawei cloud publicIp properties. */
     static class HuaweiPublicIpProperties extends DeployResourceProperties {
 
         @Override
@@ -126,9 +114,7 @@ public enum HuaweiCloudTerraformResourceProperties {
         }
     }
 
-    /**
-     * Huawei cloud vpc properties.
-     */
+    /** Huawei cloud vpc properties. */
     static class HuaweiVpcProperties extends DeployResourceProperties {
 
         @Override
@@ -144,9 +130,7 @@ public enum HuaweiCloudTerraformResourceProperties {
         }
     }
 
-    /**
-     * Huawei cloud subnet properties.
-     */
+    /** Huawei cloud subnet properties. */
     static class HuaweiSubnetProperties extends DeployResourceProperties {
 
         @Override
@@ -164,9 +148,7 @@ public enum HuaweiCloudTerraformResourceProperties {
         }
     }
 
-    /**
-     * Huawei cloud keypair properties.
-     */
+    /** Huawei cloud keypair properties. */
     static class HuaweiKeyPairProperties extends DeployResourceProperties {
 
         @Override
@@ -184,9 +166,7 @@ public enum HuaweiCloudTerraformResourceProperties {
         }
     }
 
-    /**
-     * Huawei cloud security group properties.
-     */
+    /** Huawei cloud security group properties. */
     static class HuaweiSecurityGroupProperties extends DeployResourceProperties {
 
         @Override
@@ -203,9 +183,7 @@ public enum HuaweiCloudTerraformResourceProperties {
         }
     }
 
-    /**
-     * Huawei cloud security group role properties.
-     */
+    /** Huawei cloud security group role properties. */
     static class HuaweiSecurityGroupRuleProperties extends DeployResourceProperties {
 
         @Override

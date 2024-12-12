@@ -20,11 +20,11 @@ public abstract class AbstractRedisIntegrationTest {
     private static final GenericContainer<?> redis;
 
     static {
-        redis = new GenericContainer<>(DockerImageName.parse("redis:latest"))
-                .withExposedPorts(6379);
+        redis =
+                new GenericContainer<>(DockerImageName.parse("redis:latest"))
+                        .withExposedPorts(6379);
         redis.start();
         System.setProperty("spring.data.redis.host", redis.getHost());
         System.setProperty("spring.data.redis.port", redis.getMappedPort(6379).toString());
     }
-
 }

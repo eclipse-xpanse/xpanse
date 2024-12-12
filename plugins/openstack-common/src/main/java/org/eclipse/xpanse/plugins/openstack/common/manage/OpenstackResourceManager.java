@@ -29,27 +29,26 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Openstack Resource Manager.
- */
+/** Openstack Resource Manager. */
 @Slf4j
 @Component
 public class OpenstackResourceManager {
     public static final String RESOURCE = "resource";
     public static final String OPENSTACK_COMPUTE_INSTANCE = "openstack_compute_instance_v2";
-    @Resource
-    private ProviderAuthInfoResolver providerAuthInfoResolver;
+    @Resource private ProviderAuthInfoResolver providerAuthInfoResolver;
 
-
-    /**
-     * List Openstack resource by the kind of ReusableCloudResource.
-     */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    /** List Openstack resource by the kind of ReusableCloudResource. */
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public List<String> getExistingResourceNamesWithKind(Csp csp, String site, String region,
-                                                         String userId, DeployResourceKind kind,
-                                                         UUID serviceId) {
+    public List<String> getExistingResourceNamesWithKind(
+            Csp csp,
+            String site,
+            String region,
+            String userId,
+            DeployResourceKind kind,
+            UUID serviceId) {
 
         if (kind == DeployResourceKind.VPC) {
             return getVpcList(csp, site, region, userId, serviceId);
@@ -75,18 +74,27 @@ public class OpenstackResourceManager {
      *
      * @return availability zones
      */
-    @Retryable(retryFor = ClientApiCallFailedException.class,
+    @Retryable(
+            retryFor = ClientApiCallFailedException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
-    public List<String> getAvailabilityZonesOfRegion(Csp csp, String site, String region,
-                                                     String userId, UUID serviceId,
-                                                     UUID serviceTemplateId) {
+    public List<String> getAvailabilityZonesOfRegion(
+            Csp csp,
+            String site,
+            String region,
+            String userId,
+            UUID serviceId,
+            UUID serviceTemplateId) {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(
-                    csp, site, region, userId, serviceId, serviceTemplateId);
-            osClient.networking().availabilityzone().list().forEach(
-                    availabilityZone -> availabilityZoneNames.add(availabilityZone.getName()));
+            OSClientV3 osClient =
+                    getOsClient(csp, site, region, userId, serviceId, serviceTemplateId);
+            osClient.networking()
+                    .availabilityzone()
+                    .list()
+                    .forEach(
+                            availabilityZone ->
+                                    availabilityZoneNames.add(availabilityZone.getName()));
         } catch (Exception e) {
             log.error("OpenstackClient listAvailabilityZones with region {} failed.", region);
             providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
@@ -95,14 +103,14 @@ public class OpenstackResourceManager {
         return availabilityZoneNames;
     }
 
-
-    private List<String> getVpcList(Csp csp, String site, String region,
-                                    String userId, UUID serviceId) {
+    private List<String> getVpcList(
+            Csp csp, String site, String region, String userId, UUID serviceId) {
         List<String> vpcNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(
-                    csp, site, region, userId, serviceId, null);
-            osClient.networking().network().list()
+            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId, null);
+            osClient.networking()
+                    .network()
+                    .list()
                     .forEach(network -> vpcNames.add(network.getName()));
         } catch (Exception e) {
             log.error("OpenstackClient listVpcs with region {} failed.", region);
@@ -112,13 +120,14 @@ public class OpenstackResourceManager {
         return vpcNames;
     }
 
-    private List<String> getSubnetList(Csp csp, String site, String region,
-                                       String userId, UUID serviceId) {
+    private List<String> getSubnetList(
+            Csp csp, String site, String region, String userId, UUID serviceId) {
         List<String> subnetNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(
-                    csp, site, region, userId, serviceId, null);
-            osClient.networking().subnet().list()
+            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId, null);
+            osClient.networking()
+                    .subnet()
+                    .list()
                     .forEach(subnet -> subnetNames.add(subnet.getName()));
         } catch (Exception e) {
             log.error("OpenstackClient listSubnets with region {} failed.", region);
@@ -128,12 +137,14 @@ public class OpenstackResourceManager {
         return subnetNames;
     }
 
-    private List<String> getSecurityGroupsList(Csp csp, String site, String region,
-                                               String userId, UUID serviceId) {
+    private List<String> getSecurityGroupsList(
+            Csp csp, String site, String region, String userId, UUID serviceId) {
         List<String> securityGroupNames = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId, null);
-            osClient.networking().securitygroup().list()
+            osClient.networking()
+                    .securitygroup()
+                    .list()
                     .forEach(securityGroup -> securityGroupNames.add(securityGroup.getName()));
         } catch (Exception e) {
             log.error("OpenstackClient listSecurityGroups with region {} failed.", region);
@@ -143,14 +154,17 @@ public class OpenstackResourceManager {
         return securityGroupNames;
     }
 
-    private List<String> getSecurityGroupRuleList(Csp csp, String site, String region,
-                                                  String userId, UUID serviceId) {
+    private List<String> getSecurityGroupRuleList(
+            Csp csp, String site, String region, String userId, UUID serviceId) {
         List<String> securityGroupRuleIds = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(
-                    csp, site, region, userId, serviceId, null);
-            osClient.networking().securityrule().list().forEach(
-                    securityGroupRule -> securityGroupRuleIds.add(securityGroupRule.getId()));
+            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId, null);
+            osClient.networking()
+                    .securityrule()
+                    .list()
+                    .forEach(
+                            securityGroupRule ->
+                                    securityGroupRuleIds.add(securityGroupRule.getId()));
         } catch (Exception e) {
             log.error("OpenstackClient listSecurityGroupRules with region {} failed.", region);
             providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
@@ -159,13 +173,16 @@ public class OpenstackResourceManager {
         return securityGroupRuleIds;
     }
 
-    private List<String> getPublicIpList(Csp csp, String site, String region,
-                                         String userId, UUID serviceId) {
+    private List<String> getPublicIpList(
+            Csp csp, String site, String region, String userId, UUID serviceId) {
         List<String> publicIpAddresses = new ArrayList<>();
         try {
             OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId, null);
-            osClient.networking().floatingip().list().forEach(
-                    floatingIp -> publicIpAddresses.add(floatingIp.getFloatingIpAddress()));
+            osClient.networking()
+                    .floatingip()
+                    .list()
+                    .forEach(
+                            floatingIp -> publicIpAddresses.add(floatingIp.getFloatingIpAddress()));
         } catch (Exception e) {
             log.error("OpenstackClient listPublicIps with region {} failed.", region);
             providerAuthInfoResolver.handleAuthExceptionForSpringRetry(e);
@@ -174,13 +191,14 @@ public class OpenstackResourceManager {
         return publicIpAddresses;
     }
 
-    private List<String> getVolumeList(Csp csp, String site, String region,
-                                       String userId, UUID serviceId) {
+    private List<String> getVolumeList(
+            Csp csp, String site, String region, String userId, UUID serviceId) {
         List<String> volumeNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(
-                    csp, site, region, userId, serviceId, null);
-            osClient.blockStorage().volumes().list()
+            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId, null);
+            osClient.blockStorage()
+                    .volumes()
+                    .list()
                     .forEach(volume -> volumeNames.add(volume.getName()));
         } catch (Exception e) {
             log.error("OpenstackClient listVolumes with region {} failed.", region);
@@ -190,13 +208,14 @@ public class OpenstackResourceManager {
         return volumeNames;
     }
 
-    private List<String> getKeyPairsList(Csp csp, String site, String region,
-                                         String userId, UUID serviceId) {
+    private List<String> getKeyPairsList(
+            Csp csp, String site, String region, String userId, UUID serviceId) {
         List<String> keyPairNames = new ArrayList<>();
         try {
-            OSClientV3 osClient = getOsClient(
-                    csp, site, region, userId, serviceId, null);
-            osClient.compute().keypairs().list()
+            OSClientV3 osClient = getOsClient(csp, site, region, userId, serviceId, null);
+            osClient.compute()
+                    .keypairs()
+                    .list()
                     .forEach(keyPair -> keyPairNames.add(keyPair.getName()));
         } catch (Exception e) {
             log.error("OpenstackClient listKeyPairs with region {} failed.", region);
@@ -206,16 +225,19 @@ public class OpenstackResourceManager {
         return keyPairNames;
     }
 
-    private OSClient.OSClientV3 getOsClient(Csp csp, String site, String region,
-                                            String userId, UUID serviceId, UUID serviceTemplateId) {
+    private OSClient.OSClientV3 getOsClient(
+            Csp csp,
+            String site,
+            String region,
+            String userId,
+            UUID serviceId,
+            UUID serviceTemplateId) {
         return providerAuthInfoResolver
-                .getAuthenticatedClientForCsp(
-                        csp, site, userId, serviceId, serviceTemplateId).useRegion(region);
+                .getAuthenticatedClientForCsp(csp, site, userId, serviceId, serviceTemplateId)
+                .useRegion(region);
     }
 
-    /**
-     * get resources name for service deployment.
-     */
+    /** get resources name for service deployment. */
     public Map<String, String> getComputeResourcesInServiceDeployment(File scriptFile) {
         Map<String, Object> results;
         Map<String, String> resources = new HashMap<>();
@@ -229,15 +251,17 @@ public class OpenstackResourceManager {
                             (Map<String, Object>) resourceMap.get(OPENSTACK_COMPUTE_INSTANCE);
                     if (!CollectionUtils.isEmpty(resourceInfoMap)) {
                         Set<String> resourceNameSet = resourceInfoMap.keySet();
-                        resourceNameSet.forEach(resourceName -> {
-                            resources.put(resourceName, OPENSTACK_COMPUTE_INSTANCE);
-                        });
+                        resourceNameSet.forEach(
+                                resourceName -> {
+                                    resources.put(resourceName, OPENSTACK_COMPUTE_INSTANCE);
+                                });
                     }
                 }
             }
         } catch (HCLParserException | IOException e) {
-            String error = String.format("Hcl4j parse terraform.tf file error, error %s .",
-                    e.getMessage());
+            String error =
+                    String.format(
+                            "Hcl4j parse terraform.tf file error, error %s .", e.getMessage());
             log.error(error);
             throw new TerraformScriptFormatInvalidException(List.of(error));
         }

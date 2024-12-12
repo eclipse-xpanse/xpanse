@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * The credential types.
- */
+/** The credential types. */
 public enum CredentialType {
     VARIABLES("variables"),
     HTTP_AUTHENTICATION("http_authentication"),
@@ -25,9 +23,7 @@ public enum CredentialType {
         this.type = type;
     }
 
-    /**
-     * For CredentialType serialize.
-     */
+    /** For CredentialType serialize. */
     @JsonCreator
     public static CredentialType getByValue(String type) {
         for (CredentialType credentialType : values()) {
@@ -39,9 +35,7 @@ public enum CredentialType {
                 String.format("CredentialType value %s is not supported.", type));
     }
 
-    /**
-     * For CredentialType deserialize.
-     */
+    /** For CredentialType deserialize. */
     @JsonValue
     public String toValue() {
         return this.type;

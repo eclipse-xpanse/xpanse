@@ -9,9 +9,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of SystemCmd.
- */
+/** Test of SystemCmd. */
 public class SystemCmdTest {
 
     @Test

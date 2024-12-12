@@ -48,17 +48,12 @@ class ServicePolicyManagerTest {
     private final OffsetDateTime createTime =
             OffsetDateTime.of(LocalDateTime.of(2023, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
 
-    @Mock
-    private PolicyManager mockPolicyManager;
-    @Mock
-    private UserServiceHelper mockUserServiceHelper;
-    @Mock
-    private DatabaseServicePolicyStorage mockServicePolicyStorage;
-    @Mock
-    private DatabaseServiceTemplateStorage mockServiceTemplateStorage;
+    @Mock private PolicyManager mockPolicyManager;
+    @Mock private UserServiceHelper mockUserServiceHelper;
+    @Mock private DatabaseServicePolicyStorage mockServicePolicyStorage;
+    @Mock private DatabaseServiceTemplateStorage mockServiceTemplateStorage;
 
-    @InjectMocks
-    private ServicePolicyManager test;
+    @InjectMocks private ServicePolicyManager test;
 
     @Test
     void testListServicePolicies() {
@@ -86,8 +81,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
-        final List<ServicePolicy> result =
-                test.listServicePolicies(serviceTemplateId.toString());
+        final List<ServicePolicy> result = test.listServicePolicies(serviceTemplateId.toString());
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -101,9 +95,7 @@ class ServicePolicyManagerTest {
                 .thenThrow(new ServiceTemplateNotRegistered("serviceTemplateId"));
 
         // Run the test
-        assertThatThrownBy(
-                () -> test.listServicePolicies(
-                        serviceTemplateId.toString()))
+        assertThatThrownBy(() -> test.listServicePolicies(serviceTemplateId.toString()))
                 .isInstanceOf(ServiceTemplateNotRegistered.class);
     }
 
@@ -114,8 +106,7 @@ class ServicePolicyManagerTest {
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
         serviceTemplateEntity.setNamespace(namespace);
-        when(mockServiceTemplateStorage.getServiceTemplateById(
-                serviceTemplateId))
+        when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
@@ -218,8 +209,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setEnabled(false);
         existingPolicy.setServiceTemplate(serviceTemplateEntity);
         serviceTemplateEntity.setServicePolicyList(List.of(existingPolicy));
-        when(mockServiceTemplateStorage.getServiceTemplateById(
-                serviceTemplateId))
+        when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
@@ -268,14 +258,12 @@ class ServicePolicyManagerTest {
         ocl.setFlavors(flavors);
         serviceTemplateEntity.setOcl(ocl);
 
-        when(mockServiceTemplateStorage.getServiceTemplateById(
-                serviceTemplateId))
+        when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
-        assertThatThrownBy(
-                () -> test.addServicePolicy(createRequest))
+        assertThatThrownBy(() -> test.addServicePolicy(createRequest))
                 .isInstanceOf(FlavorInvalidException.class);
     }
 
@@ -287,12 +275,11 @@ class ServicePolicyManagerTest {
         createRequest.setPolicy("policy");
         createRequest.setEnabled(false);
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
-        when(mockServiceTemplateStorage.getServiceTemplateById(
-                serviceTemplateId)).thenThrow(new ServiceTemplateNotRegistered(""));
+        when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
+                .thenThrow(new ServiceTemplateNotRegistered(""));
 
         // Run the test
-        assertThatThrownBy(
-                () -> test.addServicePolicy(createRequest))
+        assertThatThrownBy(() -> test.addServicePolicy(createRequest))
                 .isInstanceOf(ServiceTemplateNotRegistered.class);
     }
 
@@ -307,15 +294,13 @@ class ServicePolicyManagerTest {
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
         serviceTemplateEntity.setNamespace(namespace);
-        when(mockServiceTemplateStorage.getServiceTemplateById(
-                serviceTemplateId))
+        when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
-        assertThatThrownBy(
-                () -> test.addServicePolicy(createRequest))
+        assertThatThrownBy(() -> test.addServicePolicy(createRequest))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -336,12 +321,12 @@ class ServicePolicyManagerTest {
 
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
-        doThrow(new PoliciesValidationFailedException("test")).when(mockPolicyManager)
+        doThrow(new PoliciesValidationFailedException("test"))
+                .when(mockPolicyManager)
                 .validatePolicy("policy");
 
         // Run the test
-        assertThatThrownBy(
-                () -> test.addServicePolicy(createRequest))
+        assertThatThrownBy(() -> test.addServicePolicy(createRequest))
                 .isInstanceOf(PoliciesValidationFailedException.class);
     }
 
@@ -377,8 +362,7 @@ class ServicePolicyManagerTest {
 
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
         // Run the test
-        assertThatThrownBy(
-                () -> test.addServicePolicy(createRequest))
+        assertThatThrownBy(() -> test.addServicePolicy(createRequest))
                 .isInstanceOf(PolicyDuplicateException.class);
     }
 
@@ -423,8 +407,7 @@ class ServicePolicyManagerTest {
 
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(servicePolicyEntity);
         // Run the test
-        final ServicePolicy result =
-                test.updateServicePolicy(policyId, updateRequest);
+        final ServicePolicy result = test.updateServicePolicy(policyId, updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -490,13 +473,11 @@ class ServicePolicyManagerTest {
 
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(servicePolicyEntity);
         // Run the test
-        final ServicePolicy result =
-                test.updateServicePolicy(policyId, updateRequest);
+        final ServicePolicy result = test.updateServicePolicy(policyId, updateRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
     }
-
 
     @Test
     void testUpdateServicePolicyWithFlavorName_ThrowsFlavorInvalidException() {
@@ -543,8 +524,7 @@ class ServicePolicyManagerTest {
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
-        assertThatThrownBy(
-                () -> test.updateServicePolicy(policyId, updateRequest))
+        assertThatThrownBy(() -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(FlavorInvalidException.class);
     }
 
@@ -559,8 +539,7 @@ class ServicePolicyManagerTest {
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(null);
 
         // Run the test
-        assertThatThrownBy(
-                () -> test.updateServicePolicy(policyId, updateRequest))
+        assertThatThrownBy(() -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(PolicyNotFoundException.class);
     }
 
@@ -587,8 +566,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
 
         // Run the test
-        assertThatThrownBy(
-                () -> test.updateServicePolicy(policyId, updateRequest))
+        assertThatThrownBy(() -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -620,12 +598,12 @@ class ServicePolicyManagerTest {
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
-        doThrow(new PoliciesValidationFailedException("error")).when(mockPolicyManager)
+        doThrow(new PoliciesValidationFailedException("error"))
+                .when(mockPolicyManager)
                 .validatePolicy(updatePolicy);
 
         // Run the test
-        assertThatThrownBy(
-                () -> test.updateServicePolicy(policyId, updateRequest))
+        assertThatThrownBy(() -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(PoliciesValidationFailedException.class);
     }
 
@@ -659,8 +637,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
-        assertThatThrownBy(
-                () -> test.updateServicePolicy(policyId, updateRequest))
+        assertThatThrownBy(() -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(PolicyDuplicateException.class);
     }
 
@@ -689,8 +666,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
 
         // Run the test
-        final ServicePolicy result =
-                test.getServicePolicyDetails(policyId);
+        final ServicePolicy result = test.getServicePolicyDetails(policyId);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -786,7 +762,6 @@ class ServicePolicyManagerTest {
         assertThatThrownBy(() -> test.deleteServicePolicy(policyId))
                 .isInstanceOf(AccessDeniedException.class);
     }
-
 
     @Test
     void testDeleteServicePolicy_ThrowsPolicyNotFoundException() {

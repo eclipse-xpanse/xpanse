@@ -45,9 +45,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-/**
- * Service for authorization of IAM 'Zitadel'.
- */
+/** Service for authorization of IAM 'Zitadel'. */
 @Slf4j
 @Profile("zitadel")
 @Service
@@ -59,20 +57,28 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     @Qualifier("zitadelRestTemplate")
     @Resource
     private RestTemplate restTemplate;
+
     @Value("${authorization.server.endpoint}")
     private String iamServerEndpoint;
+
     @Value("${authorization.swagger.ui.client.id}")
     private String clientId;
+
     @Value("${authorization.csp.key}")
     private String cspKey;
+
     @Value("${authorization.required.scopes}")
     private String requiredScopes;
+
     @Value("${authorization.userid.key}")
     private String userIdKey;
+
     @Value("${authorization.username.key}")
     private String usernameKey;
+
     @Value("${authorization.metadata.key}")
     private String metadataKey;
+
     @Value("${authorization.namespace.key}")
     private String namespaceKey;
 
@@ -89,15 +95,13 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(bytes, 0, bytes.length);
             byte[] digest = md.digest();
-            String challenge = Base64.getUrlEncoder()
-                    .withoutPadding().encodeToString(digest);
+            String challenge = Base64.getUrlEncoder().withoutPadding().encodeToString(digest);
             map.put("code_challenge", challenge);
         } catch (NoSuchAlgorithmException e) {
             log.error("initCodeChallengeMap error.", e);
         }
         log.debug("CODE_CHALLENGE_MAP:{}", map);
         return map;
-
     }
 
     @Override
@@ -147,22 +151,24 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                 currentUserInfo.setUserName(String.valueOf(claimsMap.get(usernameKey)));
             }
 
-            List<String> roles = authentication.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority).toList();
+            List<String> roles =
+                    authentication.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .toList();
             currentUserInfo.setRoles(roles);
 
             if (claimsMap.containsKey(metadataKey)) {
                 Object metadataObject = claimsMap.get(metadataKey);
                 if (Objects.nonNull(metadataObject)) {
-                    Map<String, String> metadataMap = OBJECT_MAPPER.convertValue(metadataObject,
-                            new TypeReference<>() {
-                            });
+                    Map<String, String> metadataMap =
+                            OBJECT_MAPPER.convertValue(metadataObject, new TypeReference<>() {});
                     if (!metadataMap.isEmpty()) {
                         Map<String, String> userMetadata = new HashMap<>();
                         for (String key : metadataMap.keySet()) {
-                            String value = new String(
-                                    Base64.getDecoder().decode(metadataMap.get(key)),
-                                    StandardCharsets.UTF_8);
+                            String value =
+                                    new String(
+                                            Base64.getDecoder().decode(metadataMap.get(key)),
+                                            StandardCharsets.UTF_8);
                             userMetadata.put(key, value);
                             if (StringUtils.equals(namespaceKey, key)) {
                                 currentUserInfo.setNamespace(value);
@@ -184,15 +190,28 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     @Override
     public String getAuthorizeUrl() {
         StringBuilder stringBuilder = new StringBuilder();
-        String redirectUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .build().toUriString() + "/auth/token";
-        stringBuilder.append(iamServerEndpoint).append("/oauth/v2/authorize").append("?")
-                .append("client_id=").append(clientId).append("&")
-                .append("response_type=code").append("&")
-                .append("scope=").append(requiredScopes).append("&")
-                .append("redirect_uri=").append(redirectUrl).append("&")
-                .append("code_challenge_method=S256").append("&")
-                .append("code_challenge=").append(CODE_CHALLENGE_MAP.get("code_challenge"));
+        String redirectUrl =
+                ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()
+                        + "/auth/token";
+        stringBuilder
+                .append(iamServerEndpoint)
+                .append("/oauth/v2/authorize")
+                .append("?")
+                .append("client_id=")
+                .append(clientId)
+                .append("&")
+                .append("response_type=code")
+                .append("&")
+                .append("scope=")
+                .append(requiredScopes)
+                .append("&")
+                .append("redirect_uri=")
+                .append(redirectUrl)
+                .append("&")
+                .append("code_challenge_method=S256")
+                .append("&")
+                .append("code_challenge=")
+                .append(CODE_CHALLENGE_MAP.get("code_challenge"));
         return stringBuilder.toString();
     }
 
@@ -203,8 +222,9 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
         map.add("grant_type", "authorization_code");
         map.add("client_id", clientId);
         map.add("code_verifier", CODE_CHALLENGE_MAP.get("code_verifier"));
-        String redirectUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .build().toUriString() + "/auth/token";
+        String redirectUrl =
+                ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()
+                        + "/auth/token";
         map.add("redirect_uri", redirectUrl);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

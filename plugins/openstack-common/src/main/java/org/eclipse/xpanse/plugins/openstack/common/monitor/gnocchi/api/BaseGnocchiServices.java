@@ -12,9 +12,7 @@ import java.util.List;
 import org.openstack4j.api.types.ServiceType;
 import org.openstack4j.openstack.internal.BaseOpenStackService;
 
-/**
- * Base class for all Gnocchi APIs.
- */
+/** Base class for all Gnocchi APIs. */
 public class BaseGnocchiServices extends BaseOpenStackService {
 
     protected BaseGnocchiServices() {
@@ -22,12 +20,11 @@ public class BaseGnocchiServices extends BaseOpenStackService {
     }
 
     /**
-     * Sometimes the endpoint does not contain the API version which is required.  This insures that
+     * Sometimes the endpoint does not contain the API version which is required. This insures that
      */
     private static class EndpointFunction implements Function<String, String> {
 
-        static final EndpointFunction
-                INSTANCE = new EndpointFunction();
+        static final EndpointFunction INSTANCE = new EndpointFunction();
 
         @Override
         public String apply(String input) {
@@ -40,6 +37,5 @@ public class BaseGnocchiServices extends BaseOpenStackService {
             return Lists.newArrayList(type);
         }
         return Collections.emptyList();
-
     }
 }

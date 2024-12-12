@@ -10,13 +10,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.openstack4j.model.ModelEntity;
 
-/**
- * Data model for AggregationRequest objects.
- */
+/** Data model for AggregationRequest objects. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "operations"
-})
+@JsonPropertyOrder({"operations"})
 public class AggregationRequest implements ModelEntity {
 
     @JsonProperty("operations")
@@ -31,5 +27,4 @@ public class AggregationRequest implements ModelEntity {
     public void setOperations(String operations) {
         this.operations = operations;
     }
-
 }

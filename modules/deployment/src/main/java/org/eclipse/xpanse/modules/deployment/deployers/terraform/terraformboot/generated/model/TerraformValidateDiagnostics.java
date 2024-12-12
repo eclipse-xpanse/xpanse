@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,19 +17,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Objects;
 
-/**
- * List of validation errors.
- */
+/** List of validation errors. */
 @JsonPropertyOrder({TerraformValidateDiagnostics.JSON_PROPERTY_DETAIL})
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformValidateDiagnostics {
     public static final String JSON_PROPERTY_DETAIL = "detail";
-    @jakarta.annotation.Nullable
-    private String detail;
+    @jakarta.annotation.Nullable private String detail;
 
-    public TerraformValidateDiagnostics() {
-    }
+    public TerraformValidateDiagnostics() {}
 
     public TerraformValidateDiagnostics detail(@jakarta.annotation.Nullable String detail) {
 
@@ -46,11 +42,9 @@ public class TerraformValidateDiagnostics {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_DETAIL)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public String getDetail() {
         return detail;
     }
-
 
     @JsonProperty(JSON_PROPERTY_DETAIL)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -66,7 +60,8 @@ public class TerraformValidateDiagnostics {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        TerraformValidateDiagnostics terraformValidateDiagnostics = (TerraformValidateDiagnostics) o;
+        TerraformValidateDiagnostics terraformValidateDiagnostics =
+                (TerraformValidateDiagnostics) o;
         return Objects.equals(this.detail, terraformValidateDiagnostics.detail);
     }
 
@@ -85,8 +80,8 @@ public class TerraformValidateDiagnostics {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -94,6 +89,4 @@ public class TerraformValidateDiagnostics {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

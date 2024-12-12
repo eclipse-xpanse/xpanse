@@ -3,7 +3,6 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-
 package org.eclipse.xpanse.modules.models.servicetemplate.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,9 +16,7 @@ import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 
-/**
- * Defines view object for service template request to review.
- */
+/** Defines view object for service template request to review. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ServiceTemplateRequestToReview extends ServiceTemplateRequestInfo {

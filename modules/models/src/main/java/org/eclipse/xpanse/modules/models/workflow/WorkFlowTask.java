@@ -15,12 +15,9 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import lombok.Data;
 
-/**
- * WorkFlowTask class.
- */
+/** WorkFlowTask class. */
 @Data
 public class WorkFlowTask {
-
 
     @NotEmpty
     @Schema(description = "The id of the ProcessInstance")

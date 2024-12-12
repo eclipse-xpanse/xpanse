@@ -32,9 +32,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-/**
- * Writer for audit logs.
- */
+/** Writer for audit logs. */
 @Slf4j
 @Aspect
 @Component
@@ -42,19 +40,13 @@ public class AuditLogWriter {
 
     private static final String DEFAULT_GET_CSP_METHOD_NAME = "getCspFromRequestUri";
 
-    @Resource
-    private PluginManager pluginManager;
-    @Resource
-    private UserServiceHelper userServiceHelper;
-    @Resource
-    private GetCspInfoFromRequest getCspInfoFromRequest;
+    @Resource private PluginManager pluginManager;
+    @Resource private UserServiceHelper userServiceHelper;
+    @Resource private GetCspInfoFromRequest getCspInfoFromRequest;
 
-    /**
-     * Pointcut for all controller methods.
-     */
+    /** Pointcut for all controller methods. */
     @Pointcut("execution(* org.eclipse.xpanse.api.controllers.*.*(..))")
-    public void controllerMethods() {
-    }
+    public void controllerMethods() {}
 
     /**
      * Validate request parameters.
@@ -71,8 +63,12 @@ public class AuditLogWriter {
                             .getRequest();
             OrchestratorPlugin orchestratorPlugin = pluginManager.getOrchestratorPlugin(csp);
             orchestratorPlugin.auditApiRequest(
-                    getAuditLog(csp, joinPoint.getSignature().getName(), request,
-                            joinPoint.getArgs(), result));
+                    getAuditLog(
+                            csp,
+                            joinPoint.getSignature().getName(),
+                            request,
+                            joinPoint.getArgs(),
+                            result));
         }
         return result;
     }
@@ -134,9 +130,8 @@ public class AuditLogWriter {
         return null;
     }
 
-    private AuditLog getAuditLog(Csp csp, String methodName, HttpServletRequest request,
-                                 Object[] args,
-                                 Object result) {
+    private AuditLog getAuditLog(
+            Csp csp, String methodName, HttpServletRequest request, Object[] args, Object result) {
         AuditLog auditLog = new AuditLog();
         auditLog.setMethodName(methodName);
         auditLog.setMethodType(request.getMethod());

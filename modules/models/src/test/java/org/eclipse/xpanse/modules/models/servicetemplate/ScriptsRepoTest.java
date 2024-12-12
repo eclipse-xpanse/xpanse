@@ -51,9 +51,14 @@ class ScriptsRepoTest {
 
     @Test
     void testToString() throws Exception {
-        String result = "ScriptsRepo(repoUrl=" + repoUrl
-                + ", branch=" + branch
-                + ", scriptsPath=" + scriptsPath + ")";
+        String result =
+                "ScriptsRepo(repoUrl="
+                        + repoUrl
+                        + ", branch="
+                        + branch
+                        + ", scriptsPath="
+                        + scriptsPath
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

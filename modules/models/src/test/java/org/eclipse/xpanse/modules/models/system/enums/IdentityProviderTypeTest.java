@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of HealthStatus.
- */
+/** Test of HealthStatus. */
 class IdentityProviderTypeTest {
 
     @Test
@@ -23,8 +21,8 @@ class IdentityProviderTypeTest {
         IdentityProviderType type1 = IdentityProviderType.getByValue("ZITAdel");
         Assertions.assertEquals(type1, IdentityProviderType.ZITADEL);
 
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> IdentityProviderType.getByValue(null));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> IdentityProviderType.getByValue(null));
     }
 
     @Test
@@ -41,8 +39,7 @@ class IdentityProviderTypeTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        Assertions.assertEquals(IdentityProviderType.ZITADEL.hashCode(),
-                IdentityProviderType.ZITADEL.hashCode());
+        Assertions.assertEquals(
+                IdentityProviderType.ZITADEL.hashCode(), IdentityProviderType.ZITADEL.hashCode());
     }
-
 }

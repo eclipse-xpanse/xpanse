@@ -24,7 +24,8 @@ public class AbstractCredentialInfoDeserializerTest {
     @Test
     public void deserialize_ValidJson_ShouldReturnCredentialVariables() throws IOException {
         String json =
-                "{\"csp\":\"AWS\",\"type\":\"VARIABLES\",\"name\":\"MyCredential\",\"description\":\"Credential for AWS\",\"userId\":\"user123\",\"timeToLive\":3600,\"variables\":[]}";
+                "{\"csp\":\"AWS\",\"type\":\"VARIABLES\",\"name\":\"MyCredential\",\"description\":\"Credential"
+                    + " for AWS\",\"userId\":\"user123\",\"timeToLive\":3600,\"variables\":[]}";
         JsonParser jsonParser = jsonFactory.createParser(json);
         AbstractCredentialInfo result = deserializer.deserialize(jsonParser, null);
 
@@ -43,7 +44,8 @@ public class AbstractCredentialInfoDeserializerTest {
     @Test
     public void deserialize_UnsupportedCsp_ShouldReturnNull() throws IOException {
         String json =
-                "{\"csp\":\"UNSUPPORTED\",\"type\":\"VARIABLES\",\"name\":\"MyCredential\",\"description\":\"Credential for AWS\",\"userId\":\"user123\",\"timeToLive\":3600,\"variables\":[]}";
+                "{\"csp\":\"UNSUPPORTED\",\"type\":\"VARIABLES\",\"name\":\"MyCredential\",\"description\":\"Credential"
+                    + " for AWS\",\"userId\":\"user123\",\"timeToLive\":3600,\"variables\":[]}";
         JsonParser jsonParser = jsonFactory.createParser(json);
         AbstractCredentialInfo result = deserializer.deserialize(jsonParser, null);
 
@@ -53,7 +55,8 @@ public class AbstractCredentialInfoDeserializerTest {
     @Test
     public void deserialize_UnsupportedCredentialType_ShouldReturnNull() throws IOException {
         String json =
-                "{\"csp\":\"AWS\",\"type\":\"UNSUPPORTED\",\"name\":\"MyCredential\",\"description\":\"Credential for AWS\",\"userId\":\"user123\",\"timeToLive\":3600,\"variables\":[]}";
+                "{\"csp\":\"AWS\",\"type\":\"UNSUPPORTED\",\"name\":\"MyCredential\",\"description\":\"Credential"
+                    + " for AWS\",\"userId\":\"user123\",\"timeToLive\":3600,\"variables\":[]}";
         JsonParser jsonParser = jsonFactory.createParser(json);
         AbstractCredentialInfo result = deserializer.deserialize(jsonParser, null);
 
@@ -64,7 +67,8 @@ public class AbstractCredentialInfoDeserializerTest {
     public void deserialize_InvalidVariables_ShouldReturnCredentialVariablesWithNullVariables()
             throws IOException {
         String json =
-                "{\"csp\":\"AWS\",\"type\":\"VARIABLES\",\"name\":\"MyCredential\",\"description\":\"Credential for AWS\",\"userId\":\"user123\",\"timeToLive\":3600,\"variables\":\"invalid\"}";
+                "{\"csp\":\"AWS\",\"type\":\"VARIABLES\",\"name\":\"MyCredential\",\"description\":\"Credential"
+                    + " for AWS\",\"userId\":\"user123\",\"timeToLive\":3600,\"variables\":\"invalid\"}";
         JsonParser jsonParser = jsonFactory.createParser(json);
         AbstractCredentialInfo result = deserializer.deserialize(jsonParser, null);
 

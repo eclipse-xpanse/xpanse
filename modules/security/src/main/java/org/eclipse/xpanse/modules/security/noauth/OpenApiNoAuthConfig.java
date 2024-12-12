@@ -13,10 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-
-/**
- * Configuration springdoc without security oauth2.
- */
+/** Configuration springdoc without security oauth2. */
 @Profile({"noauth"})
 @Configuration
 public class OpenApiNoAuthConfig {
@@ -32,8 +29,11 @@ public class OpenApiNoAuthConfig {
     @Bean
     public OpenAPI customOpenApi() {
 
-        Info info = new Info().title("XpanseAPI").version(appVersion)
-                .description("RESTful Services to interact with Xpanse runtime.");
+        Info info =
+                new Info()
+                        .title("XpanseAPI")
+                        .version(appVersion)
+                        .description("RESTful Services to interact with Xpanse runtime.");
 
         return new OpenAPI().info(info);
     }

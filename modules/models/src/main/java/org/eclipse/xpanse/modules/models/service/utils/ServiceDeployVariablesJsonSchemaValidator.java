@@ -26,9 +26,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * The class is used to validate deployment variables.
- */
+/** The class is used to validate deployment variables. */
 @Slf4j
 @Component
 public class ServiceDeployVariablesJsonSchemaValidator {
@@ -39,9 +37,10 @@ public class ServiceDeployVariablesJsonSchemaValidator {
      * Check validation of deploy property map by list of deployVariables in registered service.
      *
      * @param deployVariables list of deployVariables in registered service
-     * @param deployProperty  deploy property map
+     * @param deployProperty deploy property map
      */
-    public void validateDeployVariables(List<DeployVariable> deployVariables,
+    public void validateDeployVariables(
+            List<DeployVariable> deployVariables,
             Map<String, Object> deployProperty,
             JsonObjectSchema jsonObjectSchema) {
 

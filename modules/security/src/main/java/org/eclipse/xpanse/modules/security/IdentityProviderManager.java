@@ -20,25 +20,19 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * The instance to manage active identity provider service.
- */
+/** The instance to manage active identity provider service. */
 @Slf4j
 @Component
 public class IdentityProviderManager implements ApplicationListener<ContextRefreshedEvent> {
 
-    @Getter
-    private IdentityProviderService activeIdentityProviderService;
+    @Getter private IdentityProviderService activeIdentityProviderService;
 
-    @Resource
-    private ApplicationContext applicationContext;
+    @Resource private ApplicationContext applicationContext;
 
     @Value("${enable.web.security:false}")
     private Boolean webSecurityIsEnabled;
 
-    /**
-     * Instantiates active IdentityProviderService.
-     */
+    /** Instantiates active IdentityProviderService. */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (!webSecurityIsEnabled) {
@@ -47,8 +41,8 @@ public class IdentityProviderManager implements ApplicationListener<ContextRefre
             return;
         }
         List<IdentityProviderService> identityProviderServices =
-                applicationContext.getBeansOfType(IdentityProviderService.class)
-                        .values().stream().toList();
+                applicationContext.getBeansOfType(IdentityProviderService.class).values().stream()
+                        .toList();
         if (CollectionUtils.isEmpty(identityProviderServices)) {
             String errorMsg = "Security is enabled, but no identity provider service is active.";
             log.error(errorMsg);
@@ -58,10 +52,10 @@ public class IdentityProviderManager implements ApplicationListener<ContextRefre
             throw new IllegalStateException("More than one identity provider service is active.");
         }
         activeIdentityProviderService = identityProviderServices.getFirst();
-        log.info("Identity provider service:{} with type:{} is active.",
+        log.info(
+                "Identity provider service:{} with type:{} is active.",
                 activeIdentityProviderService.getClass().getName(),
                 activeIdentityProviderService.getIdentityProviderType());
-
     }
 
     /**

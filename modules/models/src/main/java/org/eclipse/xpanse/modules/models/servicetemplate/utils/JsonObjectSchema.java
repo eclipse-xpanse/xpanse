@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 
-/**
- * The class is used to describe the structure and validation rules of JSON data.
- */
+/** The class is used to describe the structure and validation rules of JSON data. */
 @Data
 public class JsonObjectSchema {
 
@@ -19,5 +17,4 @@ public class JsonObjectSchema {
     private Map<String, Map<String, Object>> properties;
     private List<String> required;
     private boolean additionalProperties;
-
 }

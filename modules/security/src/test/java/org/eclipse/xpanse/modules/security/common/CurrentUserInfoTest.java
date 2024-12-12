@@ -15,10 +15,8 @@ import org.springframework.beans.BeanUtils;
 @ExtendWith(MockitoExtension.class)
 class CurrentUserInfoTest {
 
-    @Mock
-    private List<String> mockRoles;
-    @Mock
-    private Map<String, String> mockMetadata;
+    @Mock private List<String> mockRoles;
+    @Mock private Map<String, String> mockMetadata;
 
     private CurrentUserInfo test;
 
@@ -70,8 +68,9 @@ class CurrentUserInfoTest {
 
     @Test
     void testToString() {
-        String result = "CurrentUserInfo(userId=userId, userName=userName, roles=mockRoles, "
-                + "metadata=mockMetadata, namespace=namespace, csp=HuaweiCloud, token=token)";
+        String result =
+                "CurrentUserInfo(userId=userId, userName=userName, roles=mockRoles,"
+                    + " metadata=mockMetadata, namespace=namespace, csp=HuaweiCloud, token=token)";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

@@ -20,9 +20,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Bean to manage service destroy via terraform-boot.
- */
+/** Bean to manage service destroy via terraform-boot. */
 @Slf4j
 @Component
 @Profile("terraform-boot")
@@ -33,22 +31,19 @@ public class TerraformBootServiceDestroyer {
     private final TerraformBootHelper terraformBootHelper;
     private final ServiceDeploymentEntityHandler deploymentEntityHandler;
 
-    /**
-     * Constructor for TerraformBootServiceDestroyer bean.
-     */
-    public TerraformBootServiceDestroyer(TerraformFromScriptsApi terraformFromScriptsApi,
-                                         TerraformFromGitRepoApi terraformFromGitRepoApi,
-                                         TerraformBootHelper terraformBootHelper,
-                                         ServiceDeploymentEntityHandler deploymentEntityHandler) {
+    /** Constructor for TerraformBootServiceDestroyer bean. */
+    public TerraformBootServiceDestroyer(
+            TerraformFromScriptsApi terraformFromScriptsApi,
+            TerraformFromGitRepoApi terraformFromGitRepoApi,
+            TerraformBootHelper terraformBootHelper,
+            ServiceDeploymentEntityHandler deploymentEntityHandler) {
         this.terraformFromScriptsApi = terraformFromScriptsApi;
         this.terraformFromGitRepoApi = terraformFromGitRepoApi;
         this.terraformBootHelper = terraformBootHelper;
         this.deploymentEntityHandler = deploymentEntityHandler;
     }
 
-    /**
-     * method to perform service destroy using scripts provided in OCL.
-     */
+    /** method to perform service destroy using scripts provided in OCL. */
     public DeployResult destroyFromScripts(DeployTask deployTask) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
@@ -61,15 +56,15 @@ public class TerraformBootServiceDestroyer {
             result.setOrderId(deployTask.getOrderId());
             return result;
         } catch (RestClientException e) {
-            log.error("terraform-boot destroy service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(), e.getMessage());
+            log.error(
+                    "terraform-boot destroy service failed. service id: {} , error:{} ",
+                    deployTask.getServiceId(),
+                    e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
 
-    /**
-     * method to perform service destroy using scripts form GIT repo.
-     */
+    /** method to perform service destroy using scripts form GIT repo. */
     public DeployResult destroyFromGitRepo(DeployTask deployTask) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
@@ -82,15 +77,16 @@ public class TerraformBootServiceDestroyer {
             result.setOrderId(deployTask.getOrderId());
             return result;
         } catch (RestClientException e) {
-            log.error("terraform-boot deploy service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(), e.getMessage());
+            log.error(
+                    "terraform-boot deploy service failed. service id: {} , error:{} ",
+                    deployTask.getServiceId(),
+                    e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
 
-    private TerraformAsyncDestroyFromScriptsRequest getDestroyFromScriptsRequest(DeployTask task,
-                                                                                 String stateFile)
-            throws TerraformBootRequestFailedException {
+    private TerraformAsyncDestroyFromScriptsRequest getDestroyFromScriptsRequest(
+            DeployTask task, String stateFile) throws TerraformBootRequestFailedException {
         TerraformAsyncDestroyFromScriptsRequest request =
                 new TerraformAsyncDestroyFromScriptsRequest();
         request.setRequestId(task.getOrderId());
@@ -103,9 +99,8 @@ public class TerraformBootServiceDestroyer {
         return request;
     }
 
-    private TerraformAsyncDestroyFromGitRepoRequest getDestroyFromGitRepoRequest(DeployTask task,
-                                                                                 String stateFile)
-            throws TerraformBootRequestFailedException {
+    private TerraformAsyncDestroyFromGitRepoRequest getDestroyFromGitRepoRequest(
+            DeployTask task, String stateFile) throws TerraformBootRequestFailedException {
         TerraformAsyncDestroyFromGitRepoRequest request =
                 new TerraformAsyncDestroyFromGitRepoRequest();
         request.setRequestId(task.getOrderId());
@@ -119,5 +114,4 @@ public class TerraformBootServiceDestroyer {
                         task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }
-
 }

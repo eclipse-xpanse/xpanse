@@ -11,9 +11,7 @@ import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricItemType;
 
-/**
- * Defines metric at a specific timestamp.
- */
+/** Defines metric at a specific timestamp. */
 @Data
 public class MetricItem {
 

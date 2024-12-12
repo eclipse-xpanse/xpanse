@@ -12,9 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of IconProcessingFailedException.
- */
+/** Test of IconProcessingFailedException. */
 class IconProcessingFailedExceptionTest {
 
     private static final String message = "Processing failed";
@@ -66,5 +64,4 @@ class IconProcessingFailedExceptionTest {
 
         assertEquals(message, exception.getMessage());
     }
-
 }

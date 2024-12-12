@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.modules.orchestrator.servicestate;
 
-/**
- * Service management interface.
- */
+/** Service management interface. */
 public interface ServiceStateManager {
 
     boolean startService(ServiceStateManageRequest serviceStateManageRequest);

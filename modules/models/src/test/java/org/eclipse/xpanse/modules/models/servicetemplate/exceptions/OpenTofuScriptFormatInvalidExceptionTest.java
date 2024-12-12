@@ -13,8 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class OpenTofuScriptFormatInvalidExceptionTest {
 
-    @Mock
-    private List<String> mockErrorReasons;
+    @Mock private List<String> mockErrorReasons;
 
     private OpenTofuScriptFormatInvalidException openTofuScriptFormatInvalidExceptionUnderTest;
 
@@ -50,7 +49,7 @@ class OpenTofuScriptFormatInvalidExceptionTest {
     void testHashCode() {
         OpenTofuScriptFormatInvalidException test =
                 new OpenTofuScriptFormatInvalidException(new ArrayList<>());
-        assertThat(openTofuScriptFormatInvalidExceptionUnderTest.hashCode()).isNotEqualTo(
-                test.hashCode());
+        assertThat(openTofuScriptFormatInvalidExceptionUnderTest.hashCode())
+                .isNotEqualTo(test.hashCode());
     }
 }

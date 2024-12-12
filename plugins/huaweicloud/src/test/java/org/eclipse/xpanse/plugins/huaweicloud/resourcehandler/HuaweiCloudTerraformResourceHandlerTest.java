@@ -18,8 +18,10 @@ class HuaweiCloudTerraformResourceHandlerTest {
 
     @Test
     void handler() throws IOException {
-        TfState tfState = objectMapper.readValue(
-                URI.create("file:src/test/resources/huawei-tfstate.json").toURL(), TfState.class);
+        TfState tfState =
+                objectMapper.readValue(
+                        URI.create("file:src/test/resources/huawei-tfstate.json").toURL(),
+                        TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.setTfStateContent(objectMapper.writeValueAsString(tfState));
         huaweiHandler.handler(deployResult);
@@ -27,12 +29,12 @@ class HuaweiCloudTerraformResourceHandlerTest {
         Assertions.assertFalse(deployResult.getOutputProperties().isEmpty());
     }
 
-
     @Test
     void handler_destroy() throws IOException {
-        TfState tfState = objectMapper.readValue(
-                URI.create("file:src/test/resources/huawei-tfstate-destroy.json").toURL(),
-                TfState.class);
+        TfState tfState =
+                objectMapper.readValue(
+                        URI.create("file:src/test/resources/huawei-tfstate-destroy.json").toURL(),
+                        TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.setTfStateContent(objectMapper.writeValueAsString(tfState));
         huaweiHandler.handler(deployResult);

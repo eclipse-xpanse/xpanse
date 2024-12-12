@@ -14,9 +14,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to get openTofu plan using tofu-maker.
- */
+/** Bean to get openTofu plan using tofu-maker. */
 @Component
 @Profile("tofu-maker")
 public class TofuMakerDeploymentPlanManage {
@@ -25,27 +23,22 @@ public class TofuMakerDeploymentPlanManage {
     private final OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
     private final TofuMakerHelper tofuMakerHelper;
 
-    /**
-     * constructor for OpenTofuMakerDeploymentPlanManage.
-     */
-    public TofuMakerDeploymentPlanManage(OpenTofuFromScriptsApi openTofuFromScriptsApi,
-                                         OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
-                                         TofuMakerHelper tofuMakerHelper) {
+    /** constructor for OpenTofuMakerDeploymentPlanManage. */
+    public TofuMakerDeploymentPlanManage(
+            OpenTofuFromScriptsApi openTofuFromScriptsApi,
+            OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
+            TofuMakerHelper tofuMakerHelper) {
         this.openTofuFromScriptsApi = openTofuFromScriptsApi;
         this.openTofuFromGitRepoApi = openTofuFromGitRepoApi;
         this.tofuMakerHelper = tofuMakerHelper;
     }
 
-    /**
-     * Method to get openTofu plan from scripts provided in OCL.
-     */
+    /** Method to get openTofu plan from scripts provided in OCL. */
     public OpenTofuPlan getOpenTofuPlanFromScripts(DeployTask deployTask) {
         return openTofuFromScriptsApi.planWithScripts(getPlanWithScriptsRequest(deployTask));
     }
 
-    /**
-     * Method to get openTofu plan from scripts provided in GIT repo.
-     */
+    /** Method to get openTofu plan from scripts provided in GIT repo. */
     public OpenTofuPlan getOpenTofuPlanFromGitRepo(DeployTask deployTask) {
         return openTofuFromGitRepoApi.planFromGitRepo(getPlanFromGitRepoRequest(deployTask));
     }

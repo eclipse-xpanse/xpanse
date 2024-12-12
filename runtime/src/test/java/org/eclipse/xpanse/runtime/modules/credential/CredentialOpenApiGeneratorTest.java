@@ -23,21 +23,24 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-/**
- * Test of CredentialOpenApiGenerator.
- */
+/** Test of CredentialOpenApiGenerator. */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {XpanseApplication.class, CredentialsStore.class,
-        ServletUriComponentsBuilder.class, OpenApiUrlManage.class, PluginManager.class},
+@SpringBootTest(
+        classes = {
+            XpanseApplication.class,
+            CredentialsStore.class,
+            ServletUriComponentsBuilder.class,
+            OpenApiUrlManage.class,
+            PluginManager.class
+        },
         properties = {
-                "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,test"})
+            "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,test"
+        })
 class CredentialOpenApiGeneratorTest {
 
-    @Autowired
-    private CredentialOpenApiGenerator credentialOpenApiGenerator;
+    @Autowired private CredentialOpenApiGenerator credentialOpenApiGenerator;
 
-    @Autowired
-    private OpenApiGeneratorJarManage openApiGeneratorJarManage;
+    @Autowired private OpenApiGeneratorJarManage openApiGeneratorJarManage;
 
     @Test
     void testGetServiceUrl() {

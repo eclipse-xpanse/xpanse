@@ -33,10 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-/**
- * REST interface methods for service prices calculation.
- */
+/** REST interface methods for service prices calculation. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -48,34 +45,38 @@ public class ServicePricingApi {
     @Value("${service.flavor.price.cache.expire.time.in.minutes:60}")
     private long duration;
 
-    @Resource
-    private ServicePricesManager servicePricesManager;
+    @Resource private ServicePricesManager servicePricesManager;
 
-
-    /**
-     * Get the price of one specific flavor of the service.
-     */
-    @Tag(name = "ServicePrices",
+    /** Get the price of one specific flavor of the service. */
+    @Tag(
+            name = "ServicePrices",
             description = "API to manage prices of the flavors of the service.")
-    @GetMapping(value = "/pricing/{templateId}/{regionName}/{siteName}/{billingMode}/{flavorName}",
+    @GetMapping(
+            value = "/pricing/{templateId}/{regionName}/{siteName}/{billingMode}/{flavorName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the price of one specific flavor of the service.")
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public ResponseEntity<FlavorPriceResult> getServicePriceByFlavor(
             @Parameter(name = "templateId", description = "id of the service template")
-            @PathVariable(name = "templateId") String templateId,
+                    @PathVariable(name = "templateId")
+                    String templateId,
             @Parameter(name = "regionName", description = "region name of the service")
-            @PathVariable(name = "regionName") String regionName,
+                    @PathVariable(name = "regionName")
+                    String regionName,
             @Parameter(name = "siteName", description = "site name of the region belongs to")
-            @PathVariable(name = "siteName") String siteName,
+                    @PathVariable(name = "siteName")
+                    String siteName,
             @Parameter(name = "billingMode", description = "mode of billing")
-            @PathVariable("billingMode") BillingMode billingMode,
+                    @PathVariable("billingMode")
+                    BillingMode billingMode,
             @Parameter(name = "flavorName", description = "flavor name of the service")
-            @PathVariable("flavorName") String flavorName) {
+                    @PathVariable("flavorName")
+                    String flavorName) {
         try {
-            FlavorPriceResult flavorPriceResult = servicePricesManager.getServicePriceByFlavor(
-                    templateId, regionName, siteName, billingMode, flavorName);
+            FlavorPriceResult flavorPriceResult =
+                    servicePricesManager.getServicePriceByFlavor(
+                            templateId, regionName, siteName, billingMode, flavorName);
             return ResponseEntity.ok().cacheControl(getCacheControl()).body(flavorPriceResult);
         } catch (Exception ex) {
             FlavorPriceResult errorResult = new FlavorPriceResult();
@@ -85,45 +86,50 @@ public class ServicePricingApi {
             errorResult.setErrorMessage(ex.getMessage());
             log.error("Error fetching prices of the flavor of the service.", ex);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .cacheControl(CacheControl.noCache()).body(errorResult);
+                    .cacheControl(CacheControl.noCache())
+                    .body(errorResult);
         }
     }
 
-
-    /**
-     * Get the prices of all flavors of the service.
-     */
-    @Tag(name = "ServicePrices",
+    /** Get the prices of all flavors of the service. */
+    @Tag(
+            name = "ServicePrices",
             description = "API to manage prices of the flavors of the service.")
-    @GetMapping(value = "/pricing/service/{templateId}/{regionName}/{siteName}/{billingMode}",
+    @GetMapping(
+            value = "/pricing/service/{templateId}/{regionName}/{siteName}/{billingMode}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the prices of all flavors of the service")
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
     public ResponseEntity<List<FlavorPriceResult>> getPricesByService(
             @Parameter(name = "templateId", description = "id of the service template")
-            @PathVariable(name = "templateId") String templateId,
+                    @PathVariable(name = "templateId")
+                    String templateId,
             @Parameter(name = "regionName", description = "region name of the service")
-            @PathVariable(name = "regionName") String regionName,
+                    @PathVariable(name = "regionName")
+                    String regionName,
             @Parameter(name = "siteName", description = "site name of the region belongs to")
-            @PathVariable(name = "siteName") String siteName,
+                    @PathVariable(name = "siteName")
+                    String siteName,
             @Parameter(name = "billingMode", description = "mode of billing")
-            @PathVariable("billingMode") BillingMode billingMode) {
-        List<FlavorPriceResult> allFlavorPriceResult = servicePricesManager
-                .getPricesByService(templateId, regionName, siteName, billingMode);
-        boolean findFailed = allFlavorPriceResult.stream()
-                .anyMatch(flavorPriceResult -> !flavorPriceResult.isSuccessful());
+                    @PathVariable("billingMode")
+                    BillingMode billingMode) {
+        List<FlavorPriceResult> allFlavorPriceResult =
+                servicePricesManager.getPricesByService(
+                        templateId, regionName, siteName, billingMode);
+        boolean findFailed =
+                allFlavorPriceResult.stream()
+                        .anyMatch(flavorPriceResult -> !flavorPriceResult.isSuccessful());
         if (findFailed) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .cacheControl(CacheControl.noCache()).body(allFlavorPriceResult);
+                    .cacheControl(CacheControl.noCache())
+                    .body(allFlavorPriceResult);
         }
         return ResponseEntity.ok().cacheControl(getCacheControl()).body(allFlavorPriceResult);
     }
-
 
     private CacheControl getCacheControl() {
         long durationTime = this.duration > 0 ? this.duration : 60;
         return CacheControl.maxAge(durationTime, TimeUnit.MINUTES).mustRevalidate();
     }
-
 }

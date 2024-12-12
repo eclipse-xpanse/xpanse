@@ -9,9 +9,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to Category enum.
- */
+/** Bean for serializing string in request parameters to Category enum. */
 @Component
 public class CategoryEnumConverter implements Converter<String, Category> {
 

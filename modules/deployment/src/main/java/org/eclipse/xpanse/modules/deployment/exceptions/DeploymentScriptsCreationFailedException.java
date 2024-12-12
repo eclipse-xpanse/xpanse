@@ -5,9 +5,7 @@
 
 package org.eclipse.xpanse.modules.deployment.exceptions;
 
-/**
- * Defines possible exceptions when the deployment scripts are not created successfully.
- */
+/** Defines possible exceptions when the deployment scripts are not created successfully. */
 public class DeploymentScriptsCreationFailedException extends RuntimeException {
 
     public DeploymentScriptsCreationFailedException(String message) {

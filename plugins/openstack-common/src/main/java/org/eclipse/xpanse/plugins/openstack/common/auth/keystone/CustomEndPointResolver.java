@@ -25,15 +25,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Overrides the DefaultEndpointResolver from OpenStack4j.
- * This is required because the default implementation of OpenStack4j assumes that the metric
- * measures are available via Ceilometer API. But this is already not available in the recent
- * Openstack releases, and we must use Gnocchi API.
+ * Overrides the DefaultEndpointResolver from OpenStack4j. This is required because the default
+ * implementation of OpenStack4j assumes that the metric measures are available via Ceilometer API.
+ * But this is already not available in the recent Openstack releases, and we must use Gnocchi API.
  */
 public class CustomEndPointResolver implements EndpointURLResolver {
     private static final Logger LOG = LoggerFactory.getLogger(CustomEndPointResolver.class);
-    private static final Map<Key, String>
-            CACHE = new ConcurrentHashMap<>();
+    private static final Map<Key, String> CACHE = new ConcurrentHashMap<>();
     private static final boolean LEGACY_EP_HANDLING = Boolean.getBoolean(LEGACY_EP_RESOLVING_PROP);
     private String publicHostIp;
 
@@ -43,8 +41,7 @@ public class CustomEndPointResolver implements EndpointURLResolver {
             return p.access.getEndpoint();
         }
 
-        Key
-                key = Key.of(p.access.getCacheIdentifier(), p.type, p.perspective, p.region);
+        Key key = Key.of(p.access.getCacheIdentifier(), p.type, p.perspective, p.region);
         String url = CACHE.get(key);
 
         if (url != null) {
@@ -69,8 +66,7 @@ public class CustomEndPointResolver implements EndpointURLResolver {
             return p.token.getEndpoint();
         }
 
-        Key
-                key = Key.of(p.token.getCacheIdentifier(), p.type, p.perspective, p.region);
+        Key key = Key.of(p.token.getCacheIdentifier(), p.type, p.perspective, p.region);
 
         String url = CACHE.get(key);
 
@@ -121,7 +117,7 @@ public class CustomEndPointResolver implements EndpointURLResolver {
                 };
             }
         } else {
-            //if no catalog returned, if is identity service, just return endpoint
+            // if no catalog returned, if is identity service, just return endpoint
             if (ServiceType.IDENTITY.equals(p.type)) {
                 return p.access.getEndpoint();
             }
@@ -132,9 +128,9 @@ public class CustomEndPointResolver implements EndpointURLResolver {
     private String resolveV3(URLResolverParams urlResolverParams) {
         Token token = urlResolverParams.token;
 
-        //in v3 api, if user has no default project, and token is unscoped,
+        // in v3 api, if user has no default project, and token is unscoped,
         // no catalog will be returned
-        //then if service is Identity service, should directly return the endpoint back
+        // then if service is Identity service, should directly return the endpoint back
         if (token.getCatalog() == null) {
             if (ServiceType.IDENTITY.equals(urlResolverParams.type)) {
                 return token.getEndpoint();
@@ -146,7 +142,7 @@ public class CustomEndPointResolver implements EndpointURLResolver {
         for (Service service : token.getCatalog()) {
             // Special handling for metric to get the correct end point.
             if (urlResolverParams.type == ServiceType.TELEMETRY
-                    && service.getType().equals("metric")
+                            && service.getType().equals("metric")
                     || urlResolverParams.type == ServiceType.forName(service.getType())
                     || urlResolverParams.type == ServiceType.forName(service.getName())) {
                 if (urlResolverParams.perspective == null) {
@@ -162,20 +158,18 @@ public class CustomEndPointResolver implements EndpointURLResolver {
             }
         }
 
-
         return null;
     }
 
     /**
-     * Returns <code>true</code> for any endpoint that matches a given
-     * {@link URLResolverParams}.
+     * Returns <code>true</code> for any endpoint that matches a given {@link URLResolverParams}.
      *
      * @param endpoint Endpoint to be resolved
-     * @param p        URL parameters
+     * @param p URL parameters
      * @return returns if endpoint matches
      */
-    private boolean matches(org.openstack4j.model.identity.v3.Endpoint endpoint,
-                            URLResolverParams p) {
+    private boolean matches(
+            org.openstack4j.model.identity.v3.Endpoint endpoint, URLResolverParams p) {
         boolean matches = endpoint.getIface() == p.perspective;
         if (Optional.ofNullable(p.region).isPresent()) {
             matches &= endpoint.getRegion().equals(p.region);
@@ -186,7 +180,7 @@ public class CustomEndPointResolver implements EndpointURLResolver {
     /**
      * Gets the endpoint url.
      *
-     * @param access   the current access data source
+     * @param access the current access data source
      * @param endpoint the endpoint
      * @return the endpoint url
      */
@@ -195,9 +189,9 @@ public class CustomEndPointResolver implements EndpointURLResolver {
             if (endpoint.getAdminURL() != null) {
                 if (getPublicIp(access) != null
                         && !getPublicIp(access).equals(endpoint.getAdminURL().getHost())) {
-                    return endpoint.getAdminURL().toString()
-                            .replaceAll(endpoint.getAdminURL().getHost(),
-                                    getPublicIp(access));
+                    return endpoint.getAdminURL()
+                            .toString()
+                            .replaceAll(endpoint.getAdminURL().getHost(), getPublicIp(access));
                 }
                 return endpoint.getAdminURL().toString();
             }

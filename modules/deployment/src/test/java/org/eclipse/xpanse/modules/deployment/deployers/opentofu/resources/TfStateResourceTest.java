@@ -13,22 +13,18 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of TfStateResource.
- */
+/** Test of TfStateResource. */
 class TfStateResourceTest {
 
     private static final String type = "type";
     private static final String name = "name";
     private static final String mode = "mode";
-    private static TfStateResource
-            tfStateResource;
+    private static TfStateResource tfStateResource;
     private static List<TfStateResourceInstance> instances;
 
     @BeforeEach
     void setUp() {
-        TfStateResourceInstance
-                instance = new TfStateResourceInstance();
+        TfStateResourceInstance instance = new TfStateResourceInstance();
         instance.setAttributes(Map.of("key", "value"));
         instances = List.of(instance);
 
@@ -57,10 +53,8 @@ class TfStateResourceTest {
         assertNotEquals(tfStateResource, null);
         assertNotEquals(tfStateResource.hashCode(), obj.hashCode());
 
-        TfStateResource
-                tfStateResource1 = new TfStateResource();
-        TfStateResource
-                tfStateResource2 = new TfStateResource();
+        TfStateResource tfStateResource1 = new TfStateResource();
+        TfStateResource tfStateResource2 = new TfStateResource();
         assertNotEquals(tfStateResource, tfStateResource1);
         assertNotEquals(tfStateResource, tfStateResource2);
         assertEquals(tfStateResource1, tfStateResource2);
@@ -95,12 +89,20 @@ class TfStateResourceTest {
 
     @Test
     void testToString() {
-        String expectedToString = "TfStateResource(" +
-                "type=" + type + ", " +
-                "name=" + name + ", " +
-                "mode=" + mode + ", " +
-                "instances=" + instances + ")";
+        String expectedToString =
+                "TfStateResource("
+                        + "type="
+                        + type
+                        + ", "
+                        + "name="
+                        + name
+                        + ", "
+                        + "mode="
+                        + mode
+                        + ", "
+                        + "instances="
+                        + instances
+                        + ")";
         assertEquals(expectedToString, tfStateResource.toString());
     }
-
 }

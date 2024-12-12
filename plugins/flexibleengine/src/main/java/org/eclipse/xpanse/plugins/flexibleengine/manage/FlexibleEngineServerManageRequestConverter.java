@@ -23,16 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.springframework.stereotype.Component;
 
-/**
- * ECS Server Manage Request Converter for FlexibleEngine.
- */
+/** ECS Server Manage Request Converter for FlexibleEngine. */
 @Slf4j
 @Component
 public class FlexibleEngineServerManageRequestConverter {
 
-    /**
-     * Build BatchStartServersRequest Object.
-     */
+    /** Build BatchStartServersRequest Object. */
     public BatchStartServersRequest buildBatchStartServersRequest(
             List<ServiceResourceEntity> serviceResourceEntityList) {
         BatchStartServersRequest request = new BatchStartServersRequest();
@@ -45,9 +41,7 @@ public class FlexibleEngineServerManageRequestConverter {
         return request;
     }
 
-    /**
-     * Build BatchStopServersRequest Object.
-     */
+    /** Build BatchStopServersRequest Object. */
     public BatchStopServersRequest buildBatchStopServersRequest(
             List<ServiceResourceEntity> serviceResourceEntityList) {
         BatchStopServersRequest request = new BatchStopServersRequest();
@@ -60,9 +54,7 @@ public class FlexibleEngineServerManageRequestConverter {
         return request;
     }
 
-    /**
-     * Build BatchRebootServersRequest Object.
-     */
+    /** Build BatchRebootServersRequest Object. */
     public BatchRebootServersRequest buildBatchRebootServersRequest(
             List<ServiceResourceEntity> serviceResourceEntityList) {
         BatchRebootServersRequest request = new BatchRebootServersRequest();
@@ -73,7 +65,6 @@ public class FlexibleEngineServerManageRequestConverter {
         body.withReboot(reboot);
         request.withBody(body);
         return request;
-
     }
 
     private List<ServerId> getServerIdList(List<ServiceResourceEntity> serviceResourceEntityList) {
@@ -82,5 +73,4 @@ public class FlexibleEngineServerManageRequestConverter {
                 .map(uuid -> new ServerId().withId(uuid))
                 .collect(Collectors.toList());
     }
-
 }

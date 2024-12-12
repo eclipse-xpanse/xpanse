@@ -12,9 +12,7 @@ import java.util.concurrent.Executor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of TaskConfiguration.
- */
+/** Test of TaskConfiguration. */
 class TaskConfigurationTest {
 
     private static TaskConfiguration taskConfiguration;
@@ -37,5 +35,4 @@ class TaskConfigurationTest {
         assertNotNull(result);
         assertEquals(ServiceThreadPoolTaskExecutor.class, result.getClass());
     }
-
 }

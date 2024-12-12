@@ -5,14 +5,9 @@
 
 package org.eclipse.xpanse.modules.models.workflow.migrate.exceptions;
 
-/**
- * Exception thrown when the service Migration was not requested.
- */
+/** Exception thrown when the service Migration was not requested. */
 public class ServiceMigrationFailedException extends RuntimeException {
     public ServiceMigrationFailedException(String message) {
         super(message);
     }
-
-
 }
-

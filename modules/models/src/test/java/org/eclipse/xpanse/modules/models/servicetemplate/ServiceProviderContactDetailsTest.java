@@ -57,10 +57,16 @@ class ServiceProviderContactDetailsTest {
 
     @Test
     void testToString() throws Exception {
-        String result = "ServiceProviderContactDetails(emails=" + emails
-                + ", phones=" + phones + ", chats=" + chats
-                + ", websites=" + websites + ")";
+        String result =
+                "ServiceProviderContactDetails(emails="
+                        + emails
+                        + ", phones="
+                        + phones
+                        + ", chats="
+                        + chats
+                        + ", websites="
+                        + websites
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
-
 }

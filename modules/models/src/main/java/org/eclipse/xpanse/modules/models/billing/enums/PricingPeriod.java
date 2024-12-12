@@ -10,12 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-
-/**
- * Enum of PricingPeriod.
- */
+/** Enum of PricingPeriod. */
 public enum PricingPeriod {
-
     YEARLY("yearly"),
     MONTHLY("monthly"),
     DAILY("daily"),
@@ -28,9 +24,7 @@ public enum PricingPeriod {
         this.value = value;
     }
 
-    /**
-     * For PricingPeriod serialize.
-     */
+    /** For PricingPeriod serialize. */
     @JsonCreator
     public static PricingPeriod getByValue(String value) {
         for (PricingPeriod enumeration : values()) {
@@ -42,9 +36,7 @@ public enum PricingPeriod {
                 String.format("PricingPeriod value %s is not supported.", value));
     }
 
-    /**
-     * For PricingPeriod deserialize.
-     */
+    /** For PricingPeriod deserialize. */
     @JsonValue
     public String toValue() {
         return this.value;

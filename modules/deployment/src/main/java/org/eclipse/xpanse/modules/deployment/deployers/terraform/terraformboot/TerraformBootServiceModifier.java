@@ -20,9 +20,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Bean to manage service modify via terraform-boot.
- */
+/** Bean to manage service modify via terraform-boot. */
 @Slf4j
 @Component
 @Profile("terraform-boot")
@@ -33,22 +31,19 @@ public class TerraformBootServiceModifier {
     private final TerraformBootHelper terraformBootHelper;
     private final ServiceDeploymentEntityHandler deploymentEntityHandler;
 
-    /**
-     * Constructor for TerraformBootServiceDestroyer bean.
-     */
-    public TerraformBootServiceModifier(TerraformFromScriptsApi terraformFromScriptsApi,
-                                        TerraformFromGitRepoApi terraformFromGitRepoApi,
-                                        TerraformBootHelper terraformBootHelper,
-                                        ServiceDeploymentEntityHandler deploymentEntityHandler) {
+    /** Constructor for TerraformBootServiceDestroyer bean. */
+    public TerraformBootServiceModifier(
+            TerraformFromScriptsApi terraformFromScriptsApi,
+            TerraformFromGitRepoApi terraformFromGitRepoApi,
+            TerraformBootHelper terraformBootHelper,
+            ServiceDeploymentEntityHandler deploymentEntityHandler) {
         this.terraformFromScriptsApi = terraformFromScriptsApi;
         this.terraformFromGitRepoApi = terraformFromGitRepoApi;
         this.terraformBootHelper = terraformBootHelper;
         this.deploymentEntityHandler = deploymentEntityHandler;
     }
 
-    /**
-     * method to perform service modify using scripts provided in OCL.
-     */
+    /** method to perform service modify using scripts provided in OCL. */
     public DeployResult modifyFromScripts(DeployTask deployTask) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 this.deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
@@ -61,15 +56,15 @@ public class TerraformBootServiceModifier {
             terraformFromScriptsApi.asyncModifyWithScripts(request);
             return result;
         } catch (RestClientException e) {
-            log.error("terraform-boot modify service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(), e.getMessage());
+            log.error(
+                    "terraform-boot modify service failed. service id: {} , error:{} ",
+                    deployTask.getServiceId(),
+                    e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
 
-    /**
-     * method to perform service modify using scripts form GIT repo.
-     */
+    /** method to perform service modify using scripts form GIT repo. */
     public DeployResult modifyFromGitRepo(DeployTask deployTask) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 this.deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
@@ -82,15 +77,16 @@ public class TerraformBootServiceModifier {
             terraformFromGitRepoApi.asyncModifyFromGitRepo(request);
             return result;
         } catch (RestClientException e) {
-            log.error("terraform-boot modify service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(), e.getMessage());
+            log.error(
+                    "terraform-boot modify service failed. service id: {} , error:{} ",
+                    deployTask.getServiceId(),
+                    e.getMessage());
             throw new TerraformBootRequestFailedException(e.getMessage());
         }
     }
 
-    private TerraformAsyncModifyFromScriptsRequest getModifyFromScriptsRequest(DeployTask task,
-                                                                               String stateFile)
-            throws TerraformBootRequestFailedException {
+    private TerraformAsyncModifyFromScriptsRequest getModifyFromScriptsRequest(
+            DeployTask task, String stateFile) throws TerraformBootRequestFailedException {
         TerraformAsyncModifyFromScriptsRequest request =
                 new TerraformAsyncModifyFromScriptsRequest();
         request.setRequestId(task.getOrderId());
@@ -103,9 +99,8 @@ public class TerraformBootServiceModifier {
         return request;
     }
 
-    private TerraformAsyncModifyFromGitRepoRequest getModifyFromGitRepoRequest(DeployTask task,
-                                                                               String stateFile)
-            throws TerraformBootRequestFailedException {
+    private TerraformAsyncModifyFromGitRepoRequest getModifyFromGitRepoRequest(
+            DeployTask task, String stateFile) throws TerraformBootRequestFailedException {
         TerraformAsyncModifyFromGitRepoRequest request =
                 new TerraformAsyncModifyFromGitRepoRequest();
         request.setRequestId(task.getOrderId());

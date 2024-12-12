@@ -23,9 +23,13 @@ class XpanseAuditApiRequestTest {
         List<Method> annotatedMethods = getAnnotatedMethods(ANNOTATED_METHOD_PACKAGE_NAME);
 
         for (Method method : annotatedMethods) {
-            assertTrue(method.isAnnotationPresent(AuditApiRequest.class),
-                    "Class [" + method.getDeclaringClass().getName() + "],Method ["
-                            + method.getName() + "] does not have @AuditApiRequest annotation.");
+            assertTrue(
+                    method.isAnnotationPresent(AuditApiRequest.class),
+                    "Class ["
+                            + method.getDeclaringClass().getName()
+                            + "],Method ["
+                            + method.getName()
+                            + "] does not have @AuditApiRequest annotation.");
         }
     }
 
@@ -35,12 +39,12 @@ class XpanseAuditApiRequestTest {
         for (Class<?> clazz : classes) {
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
-                if (method.isAnnotationPresent(PostMapping.class) ||
-                        method.isAnnotationPresent(GetMapping.class) ||
-                        method.isAnnotationPresent(PutMapping.class) ||
-                        method.isAnnotationPresent(DeleteMapping.class) ||
-                        method.isAnnotationPresent(PatchMapping.class) ||
-                        method.isAnnotationPresent(RequestMapping.class)) {
+                if (method.isAnnotationPresent(PostMapping.class)
+                        || method.isAnnotationPresent(GetMapping.class)
+                        || method.isAnnotationPresent(PutMapping.class)
+                        || method.isAnnotationPresent(DeleteMapping.class)
+                        || method.isAnnotationPresent(PatchMapping.class)
+                        || method.isAnnotationPresent(RequestMapping.class)) {
                     annotatedMethods.add(method);
                 }
             }
@@ -57,8 +61,11 @@ class XpanseAuditApiRequestTest {
             for (File file : dir.listFiles()) {
                 String fileName = file.getName();
                 if (fileName.endsWith(".class")) {
-                    classes.add(Class.forName(
-                            packageName + '.' + fileName.substring(0, fileName.length() - 6)));
+                    classes.add(
+                            Class.forName(
+                                    packageName
+                                            + '.'
+                                            + fileName.substring(0, fileName.length() - 6)));
                 }
             }
         } catch (ClassNotFoundException e) {

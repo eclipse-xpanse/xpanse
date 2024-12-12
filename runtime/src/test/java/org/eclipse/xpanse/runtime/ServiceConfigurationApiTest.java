@@ -48,9 +48,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for ServiceConfigurationApi.
- */
+/** Test for ServiceConfigurationApi. */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
@@ -78,8 +76,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
     public static final String KAFKA_BROKER = "kafka-broker";
     public static final String USER_ID = "userId";
     private static final Logger log = LoggerFactory.getLogger(ServiceConfigurationApiTest.class);
-    @MockitoBean
-    private PolicyValidator mockPolicyValidator;
+    @MockitoBean private PolicyValidator mockPolicyValidator;
 
     void mockDeploymentWitPolicies() {
         doNothing().when(mockPolicyValidator).validateDeploymentWithPolicies(any());
@@ -89,8 +86,8 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
     @WithJwt(file = "jwt_all_roles-no-policies.json")
     void test_change_service_configuration_success() throws Exception {
         ServiceOrder deployOrder = test_register_and_deploy_service();
-        if (Objects.nonNull(deployOrder) && waitServiceDeploymentIsCompleted(
-                deployOrder.getServiceId())) {
+        if (Objects.nonNull(deployOrder)
+                && waitServiceDeploymentIsCompleted(deployOrder.getServiceId())) {
             test_change_service_configuration_well(deployOrder.getServiceId());
         }
     }
@@ -104,29 +101,42 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
             assertEquals(requests.size(), 1);
             requests.forEach(request -> assertEquals(request.getOrderId(), order.getOrderId()));
             requests.forEach(
-                    request -> request.getChangeRequests().forEach(
-                            requestDetails ->
-                                    assertEquals(requestDetails.getStatus(),
-                                            ServiceConfigurationStatus.PENDING)
-                    )
-            );
-            requests.forEach(request -> request.getChangeRequests().forEach(requestDetails -> {
-                if (ZOOKEEPER.equals(requestDetails.getConfigManager())) {
-                    assertEquals(requestDetails.getProperties(), getZookeeperConfig());
-                }
-                if (KAFKA_BROKER.equals(requestDetails.getConfigManager())) {
-                    assertEquals(requestDetails.getProperties(), getKafkaBrokerConfig());
-                }
-
-            }));
+                    request ->
+                            request.getChangeRequests()
+                                    .forEach(
+                                            requestDetails ->
+                                                    assertEquals(
+                                                            requestDetails.getStatus(),
+                                                            ServiceConfigurationStatus.PENDING)));
+            requests.forEach(
+                    request ->
+                            request.getChangeRequests()
+                                    .forEach(
+                                            requestDetails -> {
+                                                if (ZOOKEEPER.equals(
+                                                        requestDetails.getConfigManager())) {
+                                                    assertEquals(
+                                                            requestDetails.getProperties(),
+                                                            getZookeeperConfig());
+                                                }
+                                                if (KAFKA_BROKER.equals(
+                                                        requestDetails.getConfigManager())) {
+                                                    assertEquals(
+                                                            requestDetails.getProperties(),
+                                                            getKafkaBrokerConfig());
+                                                }
+                                            }));
         }
     }
 
     ServiceOrder test_register_and_deploy_service() throws Exception {
         // Setup
         addCredentialForHuaweiCloud();
-        Ocl ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_kafka_test.yml").toURL());
+        Ocl ocl =
+                new OclLoader()
+                        .getOcl(
+                                URI.create("file:src/test/resources/ocl_terraform_kafka_test.yml")
+                                        .toURL());
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         if (Objects.isNull(serviceTemplate)) {
             log.error("Register service template failed.");
@@ -140,8 +150,8 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
     Map<String, Object> getZookeeperConfig() {
         Map<String, Object> configuration = new HashMap<>();
         configuration.put(ZOOKEEPER_SNAP_COUNT, ZOOKEEPER_SNAP_COUNT_VALUE);
-        configuration.put(ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT,
-                ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT_VALUE);
+        configuration.put(
+                ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT, ZOOKEEPER_GLOBAL_OUTSTANDING_LIMIT_VALUE);
         return configuration;
     }
 
@@ -150,10 +160,11 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         configuration.put(KAFKA_CFG_MESSAGE_MAX_BYTES, KAFKA_CFG_MESSAGE_MAX_BYTES_VALUE);
         configuration.put(KAFKA_CFG_LOG_DIRS, KAFKA_CFG_LOG_DIRS_VALUE);
         configuration.put(KAFKA_CFG_NUM_IO_THREADS, KAFKA_CFG_NUM_IO_THREADS_VALUE);
-        configuration.put(KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR,
+        configuration.put(
+                KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR,
                 KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR_VALUE);
-        configuration.put(KAFKA_LOG_FLUSH_INTERVAL_MESSAGES,
-                KAFKA_LOG_FLUSH_INTERVAL_MESSAGES_VALUE);
+        configuration.put(
+                KAFKA_LOG_FLUSH_INTERVAL_MESSAGES, KAFKA_LOG_FLUSH_INTERVAL_MESSAGES_VALUE);
         return configuration;
     }
 
@@ -188,14 +199,17 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         return deployResources;
     }
 
-
     ServiceOrder changeServiceConfiguration(UUID serviceId) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(
-                        put("/xpanse/services/config/{serviceId}", serviceId)
-                                .content(objectMapper.writeValueAsString(getServiceConfigurationUpdate()))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        MockHttpServletResponse response =
+                mockMvc.perform(
+                                put("/xpanse/services/config/{serviceId}", serviceId)
+                                        .content(
+                                                objectMapper.writeValueAsString(
+                                                        getServiceConfigurationUpdate()))
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
         if (response.getStatus() == HttpStatus.OK.value()) {
             ServiceOrder order =
@@ -204,27 +218,31 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
             assertEquals(order.getServiceId(), serviceId);
             return order;
         } else {
-            ErrorResponse errorResponseError = objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
-            log.error("Change service configuration failed. Error: " + errorResponseError.getDetails());
+            ErrorResponse errorResponseError =
+                    objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
+            log.error(
+                    "Change service configuration failed. Error: "
+                            + errorResponseError.getDetails());
             return null;
         }
     }
 
-    List<ServiceConfigurationChangeOrderDetails> listServiceConfigurationChangeDetails(UUID orderId,
-                                                                                       UUID serviceId)
-            throws Exception {
+    List<ServiceConfigurationChangeOrderDetails> listServiceConfigurationChangeDetails(
+            UUID orderId, UUID serviceId) throws Exception {
 
-        final MockHttpServletResponse listResponse = mockMvc.perform(
-                        get("/xpanse/services/config/requests")
-                                .param("orderId", orderId.toString())
-                                .param("serviceId", serviceId.toString())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse listResponse =
+                mockMvc.perform(
+                                get("/xpanse/services/config/requests")
+                                        .param("orderId", orderId.toString())
+                                        .param("serviceId", serviceId.toString())
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
         assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
         assertNotNull(listResponse.getHeader(HEADER_TRACKING_ID));
-        return objectMapper.readValue(listResponse.getContentAsString(),
-                new TypeReference<List<ServiceConfigurationChangeOrderDetails>>() {
-                });
+        return objectMapper.readValue(
+                listResponse.getContentAsString(),
+                new TypeReference<List<ServiceConfigurationChangeOrderDetails>>() {});
     }
 }

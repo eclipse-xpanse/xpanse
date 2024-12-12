@@ -40,10 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-/**
- * REST interface methods for user managing policies of the cloud service provider.
- */
+/** REST interface methods for user managing policies of the cloud service provider. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -52,32 +49,30 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class UserPolicyManageApi {
 
-    @Resource
-    private UserPolicyManager userPolicyManager;
+    @Resource private UserPolicyManager userPolicyManager;
 
     /**
      * List the policies created by the user.
      *
-     * @param csp     The cloud service provider.
+     * @param csp The cloud service provider.
      * @param enabled Is the policy enabled.
      * @return Returns list of the policies created by the user.
      */
-    @Tag(name = "UserPoliciesManagement",
-            description = "APIs for managing user's infra policies.")
-    @GetMapping(value = "/policies",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
+    @GetMapping(value = "/policies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the policies defined by the user.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<UserPolicy> listUserPolicies(
             @Parameter(name = "cspName", description = "Name of csp which the policy belongs to.")
-            @RequestParam(name = "cspName", required = false) Csp csp,
+                    @RequestParam(name = "cspName", required = false)
+                    Csp csp,
             @Parameter(name = "enabled", description = "Is the policy enabled.")
-            @RequestParam(name = "enabled", required = false) Boolean enabled) {
+                    @RequestParam(name = "enabled", required = false)
+                    Boolean enabled) {
         UserPolicyQueryRequest queryModel = userPolicyManager.getUserPolicyQueryModel(csp, enabled);
         return userPolicyManager.listUserPolicies(queryModel);
     }
-
 
     /**
      * Get the details of the policy created by the user.
@@ -85,10 +80,8 @@ public class UserPolicyManageApi {
      * @param id The id of the policy.
      * @return Returns list of the policies defined by the user.
      */
-    @Tag(name = "UserPoliciesManagement",
-            description = "APIs for managing user's infra policies.")
-    @GetMapping(value = "/policies/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
+    @GetMapping(value = "/policies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the details of the policy created by the user.")
     @AuditApiRequest(methodName = "getCspFromUserPolicyId")
@@ -96,16 +89,13 @@ public class UserPolicyManageApi {
         return userPolicyManager.getUserPolicyDetails(UUID.fromString(id));
     }
 
-
     /**
      * Add policy created by the user.
      *
      * @param userPolicyCreateRequest The policy to be created.
      */
-    @Tag(name = "UserPoliciesManagement",
-            description = "APIs for managing user's infra policies.")
-    @PostMapping(value = "/policies",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
+    @PostMapping(value = "/policies", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Add policy created by the user.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UserPolicy addUserPolicy(
@@ -118,15 +108,14 @@ public class UserPolicyManageApi {
      *
      * @param updateRequest The policy to be updated.
      */
-    @Tag(name = "UserPoliciesManagement",
-            description = "APIs for managing user's infra policies.")
-    @PutMapping(value = "/policies/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
+    @PutMapping(value = "/policies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update the policy created by the user.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UserPolicy updateUserPolicy(
             @Parameter(name = "id", description = "ID of the policy to be updated")
-            @PathVariable("id") String id,
+                    @PathVariable("id")
+                    String id,
             @Valid @RequestBody UserPolicyUpdateRequest updateRequest) {
         return userPolicyManager.updateUserPolicy(UUID.fromString(id), updateRequest);
     }
@@ -136,15 +125,12 @@ public class UserPolicyManageApi {
      *
      * @param id The id of policy.
      */
-    @Tag(name = "UserPoliciesManagement",
-            description = "APIs for managing user's infra policies.")
-    @DeleteMapping(value = "/policies/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
+    @DeleteMapping(value = "/policies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete the policy created by the user.")
     @AuditApiRequest(methodName = "getCspFromUserPolicyId")
     public void deleteUserPolicy(@PathVariable("id") String id) {
         userPolicyManager.deleteUserPolicy(UUID.fromString(id));
     }
-
 }

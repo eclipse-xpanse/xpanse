@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.models.system;
 
-
 import java.util.List;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
@@ -15,9 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of SystemStatus.
- */
+/** Test of SystemStatus. */
 class SystemStatusTest {
 
     private SystemStatus systemStatus;
@@ -35,9 +32,10 @@ class SystemStatusTest {
 
     @Test
     void testToString() {
-        String expectedToString = "SystemStatus(healthStatus=OK, backendSystemStatuses="
-                + "[BackendSystemStatus(backendSystemType=DATABASE, name=h2, healthStatus=OK, "
-                + "endpoint=null, details=null)])";
+        String expectedToString =
+                "SystemStatus(healthStatus=OK,"
+                        + " backendSystemStatuses=[BackendSystemStatus(backendSystemType=DATABASE,"
+                        + " name=h2, healthStatus=OK, endpoint=null, details=null)])";
         Assertions.assertEquals(expectedToString, systemStatus.toString());
     }
 
@@ -47,11 +45,13 @@ class SystemStatusTest {
         Assertions.assertNotNull(systemStatus.getHealthStatus());
         Assertions.assertEquals(HealthStatus.OK, systemStatus.getHealthStatus());
         Assertions.assertEquals(1, systemStatus.getBackendSystemStatuses().size());
-        Assertions.assertEquals(BackendSystemType.DATABASE,
+        Assertions.assertEquals(
+                BackendSystemType.DATABASE,
                 systemStatus.getBackendSystemStatuses().get(0).getBackendSystemType());
-        Assertions.assertEquals(HealthStatus.OK,
-                systemStatus.getBackendSystemStatuses().get(0).getHealthStatus());
-        Assertions.assertEquals(DatabaseType.H2DB.toValue(),
+        Assertions.assertEquals(
+                HealthStatus.OK, systemStatus.getBackendSystemStatuses().get(0).getHealthStatus());
+        Assertions.assertEquals(
+                DatabaseType.H2DB.toValue(),
                 systemStatus.getBackendSystemStatuses().get(0).getName());
     }
 
@@ -92,5 +92,4 @@ class SystemStatusTest {
         Assertions.assertEquals(systemStatus.hashCode(), systemStatus1.hashCode());
         Assertions.assertNotEquals(systemStatus1.hashCode(), systemStatus2.hashCode());
     }
-
 }

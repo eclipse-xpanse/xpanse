@@ -24,8 +24,8 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
-import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
@@ -49,23 +49,24 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-/**
- * Test for ServiceDeployerApi.
- */
+/** Test for ServiceDeployerApi. */
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceOrderManageApiTest extends ApisTestCommon {
 
-    @MockitoBean
-    private PoliciesEvaluationApi mockPoliciesEvaluationApi;
+    @MockitoBean private PoliciesEvaluationApi mockPoliciesEvaluationApi;
+
     @Test
     @WithJwt(file = "jwt_csp_isv_user.json")
     void testServiceOrderManageApis() throws Exception {
         // Setup
-        Ocl ocl = new OclLoader().getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl =
+                new OclLoader()
+                        .getOcl(
+                                URI.create("file:src/test/resources/ocl_terraform_test.yml")
+                                        .toURL());
         ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
         if (Objects.isNull(serviceTemplate)) {
             log.error("Register service template failed.");
@@ -97,8 +98,9 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
 
         MockHttpServletResponse orderDetailsResponse = getOrderDetailsByOrderId(orderId);
         assertEquals(HttpStatus.OK.value(), orderDetailsResponse.getStatus());
-        ServiceOrderDetails orderDetails = objectMapper.readValue(
-                orderDetailsResponse.getContentAsString(), ServiceOrderDetails.class);
+        ServiceOrderDetails orderDetails =
+                objectMapper.readValue(
+                        orderDetailsResponse.getContentAsString(), ServiceOrderDetails.class);
 
         assertThat(orderDetails.getOrderId()).isEqualTo(orderId);
         assertThat(orderDetails.getTaskStatus()).isEqualTo(TaskStatus.SUCCESSFUL);
@@ -109,9 +111,9 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
                 listServiceOrders(serviceId, ServiceOrderType.DEPLOY, TaskStatus.SUCCESSFUL);
 
         assertThat(serviceOrdersResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        List<ServiceOrderDetails> serviceOrders = objectMapper.readValue(
-                serviceOrdersResponse.getContentAsString(), new TypeReference<>() {
-                });
+        List<ServiceOrderDetails> serviceOrders =
+                objectMapper.readValue(
+                        serviceOrdersResponse.getContentAsString(), new TypeReference<>() {});
         assertThat(serviceOrders).isNotEmpty();
 
         assertThat(serviceOrders.getFirst()).isEqualTo(orderDetails);
@@ -122,8 +124,8 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         assertThat(deleteOrderResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         MockHttpServletResponse deleteServiceOrdersResponse = deleteOrdersByServiceId(serviceId);
-        assertThat(deleteServiceOrdersResponse.getStatus()).isEqualTo(
-                HttpStatus.BAD_REQUEST.value());
+        assertThat(deleteServiceOrdersResponse.getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         MockHttpServletResponse getOrderDetailsResponse = getOrderDetailsByOrderId(orderId);
         assertThat(getOrderDetailsResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -139,8 +141,8 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         evalResult.setIsSuccessful(isSuccessful);
         evalResult.setPolicy("policy");
         // Configure PoliciesEvaluationApi.evaluatePoliciesPost(...).
-        when(mockPoliciesEvaluationApi.evaluatePoliciesPost(any(EvalCmdList.class))).thenReturn(
-                evalResult);
+        when(mockPoliciesEvaluationApi.evaluatePoliciesPost(any(EvalCmdList.class)))
+                .thenReturn(evalResult);
     }
 
     void testServiceOrderManageApisThrowsException(ServiceTemplateDetailVo serviceTemplate)
@@ -152,7 +154,7 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
 
     private void testApisThrowAccessDenied(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
-        //Set up
+        // Set up
         ServiceOrder serviceOrder = deployService(serviceTemplate);
         UUID orderId = serviceOrder.getOrderId();
         UUID serviceId = serviceOrder.getServiceId();
@@ -169,8 +171,8 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
 
         String errorMsg = "No permissions to manage service orders belonging to other users.";
         ErrorResponse expectedErrorResponse =
-                ErrorResponse.errorResponse(ErrorType.ACCESS_DENIED,
-                        Collections.singletonList(errorMsg));
+                ErrorResponse.errorResponse(
+                        ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg));
         String result = objectMapper.writeValueAsString(expectedErrorResponse);
 
         MockHttpServletResponse listOrdersResponse = listServiceOrders(serviceId, null, null);
@@ -188,12 +190,12 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         deleteServiceDeployment(serviceId);
     }
 
-
     void testApisThrowServiceOrderNotFound() throws Exception {
         // SetUp
         UUID orderId = UUID.randomUUID();
         ErrorResponse expectedErrorResponse =
-                ErrorResponse.errorResponse(ErrorType.SERVICE_ORDER_NOT_FOUND,
+                ErrorResponse.errorResponse(
+                        ErrorType.SERVICE_ORDER_NOT_FOUND,
                         Collections.singletonList(
                                 String.format("Service order with id %s not found.", orderId)));
         String result = objectMapper.writeValueAsString(expectedErrorResponse);
@@ -205,14 +207,14 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         MockHttpServletResponse deleteAuditResponse = deleteOrderByOrderId(orderId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), deleteAuditResponse.getStatus());
         assertEquals(result, deleteAuditResponse.getContentAsString());
-
     }
 
     void testApisThrowServiceNotFound() throws Exception {
         // SetUp
         UUID serviceId = UUID.randomUUID();
         ErrorResponse expectedErrorResponse =
-                ErrorResponse.errorResponse(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
+                ErrorResponse.errorResponse(
+                        ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
                         Collections.singletonList(
                                 String.format("Service with id %s not found.", serviceId)));
         String result = objectMapper.writeValueAsString(expectedErrorResponse);
@@ -226,8 +228,8 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         assertEquals(result, deleteOrdersResponse.getContentAsString());
     }
 
-    MockHttpServletResponse listServiceOrders(UUID serviceId, ServiceOrderType taskType,
-                                              TaskStatus taskStatus) throws Exception {
+    MockHttpServletResponse listServiceOrders(
+            UUID serviceId, ServiceOrderType taskType, TaskStatus taskStatus) throws Exception {
         MockHttpServletRequestBuilder listRequestBuilder =
                 get("/xpanse/services/{serviceId}/orders", serviceId)
                         .accept(MediaType.APPLICATION_JSON);
@@ -242,24 +244,25 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
 
     MockHttpServletResponse deleteOrdersByServiceId(UUID serviceId) throws Exception {
         return mockMvc.perform(
-                delete("/xpanse/services/{serviceId}/orders", serviceId).accept(
-                        MediaType.APPLICATION_JSON)).andReturn().getResponse();
+                        delete("/xpanse/services/{serviceId}/orders", serviceId)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
 
     MockHttpServletResponse getOrderDetailsByOrderId(UUID orderId) throws Exception {
         return mockMvc.perform(
-                        get("/xpanse/services/orders/{orderId}", orderId).accept(
-                                MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+                        get("/xpanse/services/orders/{orderId}", orderId)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
 
-    MockHttpServletResponse deleteOrderByOrderId(UUID orderId)
-            throws Exception {
+    MockHttpServletResponse deleteOrderByOrderId(UUID orderId) throws Exception {
         return mockMvc.perform(
-                        delete("/xpanse/services/orders/{orderId}", orderId).accept(
-                                MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+                        delete("/xpanse/services/orders/{orderId}", orderId)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
     }
-
-
 }

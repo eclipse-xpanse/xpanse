@@ -19,8 +19,7 @@ import org.springframework.beans.BeanUtils;
 @ExtendWith(MockitoExtension.class)
 class UserPolicyCreateRequestTest {
 
-    @Mock
-    private Csp mockCsp;
+    @Mock private Csp mockCsp;
 
     private final Boolean enabled = true;
 
@@ -67,8 +66,10 @@ class UserPolicyCreateRequestTest {
 
     @Test
     void testToString() {
-        String result = String.format("UserPolicyCreateRequest(csp=%s, policy=%s, enabled=%s)",
-                mockCsp, policy, enabled);
+        String result =
+                String.format(
+                        "UserPolicyCreateRequest(csp=%s, policy=%s, enabled=%s)",
+                        mockCsp, policy, enabled);
         assertThat(test.toString()).isEqualTo(result);
     }
 }

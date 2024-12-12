@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Deploy variable data types.
- */
+/** Deploy variable data types. */
 public enum DeployVariableDataType {
     STRING("string"),
     NUMBER("number"),
@@ -24,9 +22,7 @@ public enum DeployVariableDataType {
         this.type = type;
     }
 
-    /**
-     * For DeployVariableKind serialize.
-     */
+    /** For DeployVariableKind serialize. */
     @JsonCreator
     public DeployVariableDataType getByValue(String type) {
         for (DeployVariableDataType deployVariableType : values()) {
@@ -38,9 +34,7 @@ public enum DeployVariableDataType {
                 String.format("DeployVariableDataType value %s is not supported.", type));
     }
 
-    /**
-     * For DeployVariableKind deserialize.
-     */
+    /** For DeployVariableKind deserialize. */
     @JsonValue
     public String toValue() {
         return this.type;

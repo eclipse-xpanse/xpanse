@@ -21,7 +21,7 @@ class CspEnumConverterTest {
         assertEquals(converterTest.convert("AlibabaCloud"), Csp.ALIBABA_CLOUD);
         assertEquals(converterTest.convert("aws"), Csp.AWS);
         assertEquals(converterTest.convert("azure"), Csp.AZURE);
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> converterTest.convert("error_value"));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> converterTest.convert("error_value"));
     }
 }

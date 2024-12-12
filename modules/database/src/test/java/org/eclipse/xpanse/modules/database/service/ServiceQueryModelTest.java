@@ -17,9 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of ServiceQueryModel.
- */
+/** Test of ServiceQueryModel. */
 class ServiceQueryModelTest {
 
     private final Csp csp = Csp.HUAWEI_CLOUD;
@@ -74,16 +72,24 @@ class ServiceQueryModelTest {
 
     @Test
     void testToString() {
-        String expectedString = "ServiceQueryModel(csp=" + csp
-                + ", category=" + category
-                + ", serviceName=" + serviceName
-                + ", serviceVersion=" + serviceVersion
-                + ", serviceState=" + serviceState
-                + ", userId=" + userId
-                + ", namespace=" + namespace
-                + ", serviceTemplateId=" + serviceTemplateId
-                + ")";
+        String expectedString =
+                "ServiceQueryModel(csp="
+                        + csp
+                        + ", category="
+                        + category
+                        + ", serviceName="
+                        + serviceName
+                        + ", serviceVersion="
+                        + serviceVersion
+                        + ", serviceState="
+                        + serviceState
+                        + ", userId="
+                        + userId
+                        + ", namespace="
+                        + namespace
+                        + ", serviceTemplateId="
+                        + serviceTemplateId
+                        + ")";
         assertEquals(expectedString, serviceQueryTest.toString());
     }
-
 }

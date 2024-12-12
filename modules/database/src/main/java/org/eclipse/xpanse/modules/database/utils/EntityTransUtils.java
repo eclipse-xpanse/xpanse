@@ -4,7 +4,6 @@
  *
  */
 
-
 package org.eclipse.xpanse.modules.database.utils;
 
 import java.util.ArrayList;
@@ -33,16 +32,13 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplate
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Transform DB entity object and model object.
- */
+/** Transform DB entity object and model object. */
 @Slf4j
 public class EntityTransUtils {
 
     private EntityTransUtils() {
         // block constructor.
     }
-
 
     /**
      * Transform list of deployResourceEntity to list of DeployResource.
@@ -63,7 +59,6 @@ public class EntityTransUtils {
         return resources;
     }
 
-
     /**
      * DeployServiceEntity converted to DeployedService.
      *
@@ -83,7 +78,6 @@ public class EntityTransUtils {
         }
         return null;
     }
-
 
     /**
      * DeployServiceEntity converted to DeployedServiceDetails.
@@ -161,45 +155,48 @@ public class EntityTransUtils {
     }
 
     /**
-     * Collection of ServiceConfigurationChangeDetailsEntity converted to
-     * Collection of ServiceConfigurationUpdateRequestOrderDetails.
+     * Collection of ServiceConfigurationChangeDetailsEntity converted to Collection of
+     * ServiceConfigurationUpdateRequestOrderDetails.
      *
      * @param requests Collection of ServiceConfigurationChangeDetailsEntity.
      * @return Collection of ServiceConfigurationUpdateRequestOrderDetails.
      */
     public static List<ServiceConfigurationChangeOrderDetails>
             transToServiceConfigurationChangeOrderDetails(
-            List<ServiceConfigurationChangeDetailsEntity> requests) {
+                    List<ServiceConfigurationChangeDetailsEntity> requests) {
 
-        Map<UUID, List<ServiceConfigurationChangeDetailsEntity>> orderDetailsMap = requests.stream()
-                .collect(Collectors.groupingBy(
-                        request -> request.getServiceOrderEntity().getOrderId()));
+        Map<UUID, List<ServiceConfigurationChangeDetailsEntity>> orderDetailsMap =
+                requests.stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        request -> request.getServiceOrderEntity().getOrderId()));
         List<ServiceConfigurationChangeOrderDetails> orderDetailsList = new ArrayList<>();
-        orderDetailsMap.forEach((orderId, requestList) -> {
-            ServiceConfigurationChangeOrderDetails orderDetails =
-                    new ServiceConfigurationChangeOrderDetails();
-            orderDetails.setOrderId(orderId);
-            ServiceOrderEntity orderEntity = requestList.getFirst().getServiceOrderEntity();
-            orderDetails.setConfigRequest(orderEntity.getNewConfigRequest());
-            orderDetails.setOrderStatus(orderEntity.getTaskStatus());
-            List<ServiceConfigurationChangeDetails> detailsList = new ArrayList<>();
-            requestList.forEach(request -> {
-                ServiceConfigurationChangeDetails details =
-                        new ServiceConfigurationChangeDetails();
-                details.setChangeId(request.getId());
-                details.setResourceName(request.getResourceName());
-                details.setConfigManager(request.getConfigManager());
-                details.setResultMessage(request.getResultMessage());
-                details.setProperties(request.getProperties());
-                details.setStatus(request.getStatus());
-                detailsList.add(details);
-            });
-            orderDetails.setChangeRequests(detailsList);
-            orderDetailsList.add(orderDetails);
-        });
+        orderDetailsMap.forEach(
+                (orderId, requestList) -> {
+                    ServiceConfigurationChangeOrderDetails orderDetails =
+                            new ServiceConfigurationChangeOrderDetails();
+                    orderDetails.setOrderId(orderId);
+                    ServiceOrderEntity orderEntity = requestList.getFirst().getServiceOrderEntity();
+                    orderDetails.setConfigRequest(orderEntity.getNewConfigRequest());
+                    orderDetails.setOrderStatus(orderEntity.getTaskStatus());
+                    List<ServiceConfigurationChangeDetails> detailsList = new ArrayList<>();
+                    requestList.forEach(
+                            request -> {
+                                ServiceConfigurationChangeDetails details =
+                                        new ServiceConfigurationChangeDetails();
+                                details.setChangeId(request.getId());
+                                details.setResourceName(request.getResourceName());
+                                details.setConfigManager(request.getConfigManager());
+                                details.setResultMessage(request.getResultMessage());
+                                details.setProperties(request.getProperties());
+                                details.setStatus(request.getStatus());
+                                detailsList.add(details);
+                            });
+                    orderDetails.setChangeRequests(detailsList);
+                    orderDetailsList.add(orderDetails);
+                });
         return orderDetailsList;
     }
-
 
     /**
      * ServiceTemplateRequestHistoryEntity converted to ServiceTemplateRequestHistory.
@@ -209,15 +206,14 @@ public class EntityTransUtils {
      */
     public static ServiceTemplateRequestHistory convertToServiceTemplateHistoryVo(
             ServiceTemplateRequestHistoryEntity serviceTemplateRequestHistoryEntity) {
-        ServiceTemplateRequestHistory
-                serviceTemplateRequestHistory = new ServiceTemplateRequestHistory();
+        ServiceTemplateRequestHistory serviceTemplateRequestHistory =
+                new ServiceTemplateRequestHistory();
         serviceTemplateRequestHistory.setServiceTemplateId(
                 serviceTemplateRequestHistoryEntity.getServiceTemplate().getId());
-        BeanUtils.copyProperties(serviceTemplateRequestHistoryEntity,
-                serviceTemplateRequestHistory);
+        BeanUtils.copyProperties(
+                serviceTemplateRequestHistoryEntity, serviceTemplateRequestHistory);
         return serviceTemplateRequestHistory;
     }
-
 
     /**
      * ServiceTemplateRequestHistoryEntity converted to ServiceTemplateRequestToReview.

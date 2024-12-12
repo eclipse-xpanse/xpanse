@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of DatabaseType.
- */
+/** Test of DatabaseType. */
 class DatabaseTypeTest {
 
     @Test
@@ -23,8 +21,8 @@ class DatabaseTypeTest {
         DatabaseType type1 = DatabaseType.getByValue("mysql");
         Assertions.assertEquals(type1, DatabaseType.MYSQL);
 
-        Assertions.assertThrows(UnsupportedEnumValueException.class,
-                () -> DatabaseType.getByValue(null));
+        Assertions.assertThrows(
+                UnsupportedEnumValueException.class, () -> DatabaseType.getByValue(null));
     }
 
     @Test
@@ -54,5 +52,4 @@ class DatabaseTypeTest {
         Assertions.assertEquals(DatabaseType.MYSQL.hashCode(), DatabaseType.MYSQL.hashCode());
         Assertions.assertNotEquals(DatabaseType.H2DB.hashCode(), DatabaseType.MYSQL.hashCode());
     }
-
 }

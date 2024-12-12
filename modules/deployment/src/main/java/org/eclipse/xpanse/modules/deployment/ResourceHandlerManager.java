@@ -16,15 +16,11 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to decide which resource handler to be used.
- */
+/** Bean to decide which resource handler to be used. */
 @Component
 public class ResourceHandlerManager {
 
-    @Resource
-    private PluginManager pluginManager;
-
+    @Resource private PluginManager pluginManager;
 
     /**
      * method to decide which resource handler to be used for handling deployment result.
@@ -33,8 +29,7 @@ public class ResourceHandlerManager {
      * @return DeployResourceHandler to be used.
      */
     public DeployResourceHandler getResourceHandler(Csp csp, DeployerKind deployerKind) {
-        OrchestratorPlugin plugin =
-                pluginManager.getPluginsMap().get(csp);
+        OrchestratorPlugin plugin = pluginManager.getPluginsMap().get(csp);
         if (Objects.isNull(plugin) || Objects.isNull(plugin.resourceHandlers().get(deployerKind))) {
             throw new PluginNotFoundException(
                     "Can't find suitable plugin and resource handler for the Task.");

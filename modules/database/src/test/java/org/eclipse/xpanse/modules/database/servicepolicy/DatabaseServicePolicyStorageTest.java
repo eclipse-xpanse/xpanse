@@ -16,8 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class DatabaseServicePolicyStorageTest {
 
-    @Mock
-    private ServicePolicyRepository mockServicePolicyRepository;
+    @Mock private ServicePolicyRepository mockServicePolicyRepository;
 
     private DatabaseServicePolicyStorage databaseServicePolicyStorageUnderTest;
 
@@ -92,12 +91,13 @@ class DatabaseServicePolicyStorageTest {
         servicePolicyEntity1.setServiceTemplate(serviceTemplate1);
         final Optional<ServicePolicyEntity> servicePolicyEntity = Optional.of(servicePolicyEntity1);
         when(mockServicePolicyRepository.findById(
-                UUID.fromString("ff871a4b-0a08-43f7-8335-98d0217a0f4e")))
+                        UUID.fromString("ff871a4b-0a08-43f7-8335-98d0217a0f4e")))
                 .thenReturn(servicePolicyEntity);
 
         // Run the test
-        final ServicePolicyEntity result = databaseServicePolicyStorageUnderTest.findPolicyById(
-                UUID.fromString("ff871a4b-0a08-43f7-8335-98d0217a0f4e"));
+        final ServicePolicyEntity result =
+                databaseServicePolicyStorageUnderTest.findPolicyById(
+                        UUID.fromString("ff871a4b-0a08-43f7-8335-98d0217a0f4e"));
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -107,12 +107,13 @@ class DatabaseServicePolicyStorageTest {
     void testFindPolicyById_ServicePolicyRepositoryReturnsAbsent() {
         // Setup
         when(mockServicePolicyRepository.findById(
-                UUID.fromString("ff871a4b-0a08-43f7-8335-98d0217a0f4e")))
+                        UUID.fromString("ff871a4b-0a08-43f7-8335-98d0217a0f4e")))
                 .thenReturn(Optional.empty());
 
         // Run the test
-        final ServicePolicyEntity result = databaseServicePolicyStorageUnderTest.findPolicyById(
-                UUID.fromString("ff871a4b-0a08-43f7-8335-98d0217a0f4e"));
+        final ServicePolicyEntity result =
+                databaseServicePolicyStorageUnderTest.findPolicyById(
+                        UUID.fromString("ff871a4b-0a08-43f7-8335-98d0217a0f4e"));
 
         // Verify the results
         assertThat(result).isNull();
@@ -152,7 +153,7 @@ class DatabaseServicePolicyStorageTest {
                 UUID.fromString("ced71ed8-aaa1-428a-b8c8-53c3c77d5934"));
 
         // Verify the results
-        verify(mockServicePolicyRepository).deleteById(
-                UUID.fromString("ced71ed8-aaa1-428a-b8c8-53c3c77d5934"));
+        verify(mockServicePolicyRepository)
+                .deleteById(UUID.fromString("ced71ed8-aaa1-428a-b8c8-53c3c77d5934"));
     }
 }

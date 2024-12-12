@@ -36,10 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-/**
- * REST interface method for managing cloud provider credentials for users of a role ISV.
- */
+/** REST interface method for managing cloud provider credentials for users of a role ISV. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse/isv")
@@ -59,25 +56,27 @@ public class IsvCloudCredentialsApi {
      * Users in the ISV role get all cloud provider credentials added by the user for a cloud
      * service provider.
      *
-     * @param csp  The cloud service provider.
+     * @param csp The cloud service provider.
      * @param type The type of credential.
      * @return Returns credentials of the cloud service provider and the user.
      */
-    @Tag(name = "ISVCloudCredentialsManagement",
+    @Tag(
+            name = "ISVCloudCredentialsManagement",
             description = "APIs for managing isv's cloud provider credentials")
-    @GetMapping(value = "/credentials",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/credentials", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description =
-            "Users in the ISV role get all cloud provider credentials added by the user for a "
-                    + "cloud service "
-                    + "provider.")
+    @Operation(
+            description =
+                    "Users in the ISV role get all cloud provider credentials added by the user for"
+                            + " a cloud service provider.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public List<AbstractCredentialInfo> getIsvCloudCredentials(
             @Parameter(name = "cspName", description = "The cloud service provider.")
-            @RequestParam(name = "cspName", required = false) Csp csp,
+                    @RequestParam(name = "cspName", required = false)
+                    Csp csp,
             @Parameter(name = "type", description = "The type of credential.")
-            @RequestParam(name = "type", required = false) CredentialType type) {
+                    @RequestParam(name = "type", required = false)
+                    CredentialType type) {
         return credentialCenter.listCredentials(csp, type, null);
     }
 
@@ -86,16 +85,17 @@ public class IsvCloudCredentialsApi {
      *
      * @param createCredential The credential to be created.
      */
-    @Tag(name = "ISVCloudCredentialsManagement",
+    @Tag(
+            name = "ISVCloudCredentialsManagement",
             description = "APIs for managing isv's cloud provider credentials")
-    @PostMapping(value = "/credentials",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/credentials", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(description = "Add the user credentials for the ISV role used to connect to the "
-            + "cloud service provider.")
+    @Operation(
+            description =
+                    "Add the user credentials for the ISV role used to connect to the "
+                            + "cloud service provider.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public void addIsvCloudCredential(
-            @Valid @RequestBody CreateCredential createCredential) {
+    public void addIsvCloudCredential(@Valid @RequestBody CreateCredential createCredential) {
         credentialCenter.addCredential(createCredential);
     }
 
@@ -104,44 +104,50 @@ public class IsvCloudCredentialsApi {
      *
      * @param updateCredential The credential to be updated.
      */
-    @Tag(name = "ISVCloudCredentialsManagement",
+    @Tag(
+            name = "ISVCloudCredentialsManagement",
             description = "APIs for managing isv's cloud provider credentials")
-    @PutMapping(value = "/credentials",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/credentials", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(description =
-            "Update the user credentials used for ISV to connect to the cloud service provider.")
+    @Operation(
+            description =
+                    "Update the user credentials used for ISV to connect to the cloud service"
+                            + " provider.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public void updateIsvCloudCredential(
-            @Valid @RequestBody CreateCredential updateCredential) {
+    public void updateIsvCloudCredential(@Valid @RequestBody CreateCredential updateCredential) {
         credentialCenter.updateCredential(updateCredential);
     }
 
     /**
-     * Delete the credentials of the user in the USER role to connect to the cloud service
-     * provider.
+     * Delete the credentials of the user in the USER role to connect to the cloud service provider.
      *
-     * @param csp  The cloud service provider.
+     * @param csp The cloud service provider.
      * @param type The type of credential.
      * @param name The name of credential.
      */
-    @Tag(name = "ISVCloudCredentialsManagement",
+    @Tag(
+            name = "ISVCloudCredentialsManagement",
             description = "APIs for managing isv's cloud provider credentials")
-    @DeleteMapping(value = "/credentials",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/credentials", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(description = "Delete the credentials of the user in the USER role "
-            + "to connect to the cloud service provider.")
+    @Operation(
+            description =
+                    "Delete the credentials of the user in the USER role "
+                            + "to connect to the cloud service provider.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public void deleteIsvCloudCredential(
             @Parameter(name = "cspName", description = "The cloud service provider.")
-            @RequestParam("cspName") Csp csp,
+                    @RequestParam("cspName")
+                    Csp csp,
             @Parameter(name = "siteName", description = "The site of the provider.")
-            @RequestParam(name = "siteName") String siteName,
+                    @RequestParam(name = "siteName")
+                    String siteName,
             @Parameter(name = "type", description = "The type of credential.")
-            @RequestParam(name = "type") CredentialType type,
+                    @RequestParam(name = "type")
+                    CredentialType type,
             @Parameter(name = "name", description = "The name of credential.")
-            @RequestParam(name = "name") String name) {
+                    @RequestParam(name = "name")
+                    String name) {
         credentialCenter.deleteCredential(csp, siteName, type, name, null);
     }
 }

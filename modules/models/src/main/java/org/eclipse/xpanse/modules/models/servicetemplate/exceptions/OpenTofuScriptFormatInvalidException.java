@@ -9,9 +9,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Exception thrown when an OpenTofu script is invalid.
- */
+/** Exception thrown when an OpenTofu script is invalid. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class OpenTofuScriptFormatInvalidException extends RuntimeException {

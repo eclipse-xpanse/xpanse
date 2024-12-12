@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.resourcehandler;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,9 +25,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperti
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.springframework.stereotype.Component;
 
-/**
- * Terraform resource handler for HuaweiCloud.
- */
+/** Terraform resource handler for HuaweiCloud. */
 @Component
 @Slf4j
 public class HuaweiCloudTerraformResourceHandler implements DeployResourceHandler {
@@ -62,7 +59,8 @@ public class HuaweiCloudTerraformResourceHandler implements DeployResourceHandle
                     HuaweiCloudTerraformResourceProperties.getTerraformResourceTypes();
             for (TfStateResource tfStateResource : tfState.getResources()) {
                 if (!supportTypes.contains(tfStateResource.getType())) {
-                    log.info("The resource type {} is unsupported to parse.",
+                    log.info(
+                            "The resource type {} is unsupported to parse.",
                             tfStateResource.getType());
                     continue;
                 }
@@ -74,7 +72,9 @@ public class HuaweiCloudTerraformResourceHandler implements DeployResourceHandle
                     deployResource.setGroupType(tfStateResource.getType());
                     deployResource.setGroupName(tfStateResource.getName());
                     deployResource.setResourceKind(deployResourceProperties.getResourceKind());
-                    TfResourceTransUtils.fillDeployResource(instance, deployResource,
+                    TfResourceTransUtils.fillDeployResource(
+                            instance,
+                            deployResource,
                             deployResourceProperties.getResourceProperties());
                     deployResourceList.add(deployResource);
                 }
@@ -82,5 +82,4 @@ public class HuaweiCloudTerraformResourceHandler implements DeployResourceHandle
         }
         deployResult.setResources(deployResourceList);
     }
-
 }

@@ -5,14 +5,9 @@
 
 package org.eclipse.xpanse.modules.models.service.deploy.exceptions;
 
-/**
- * Exception thrown when the service deployment was not requested.
- */
+/** Exception thrown when the service deployment was not requested. */
 public class ServiceNotDeployedException extends RuntimeException {
     public ServiceNotDeployedException(String message) {
         super(message);
     }
-
-
 }
-

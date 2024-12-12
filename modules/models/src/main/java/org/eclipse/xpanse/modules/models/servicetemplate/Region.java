@@ -13,14 +13,11 @@ import java.io.Serial;
 import java.io.Serializable;
 import lombok.Data;
 
-/**
- * The regions of the Cloud Service Provider.
- */
+/** The regions of the Cloud Service Provider. */
 @Data
 public class Region implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = -908536837247974803L;
+    @Serial private static final long serialVersionUID = -908536837247974803L;
 
     @NotNull
     @NotBlank
@@ -31,8 +28,10 @@ public class Region implements Serializable {
     @NotNull
     @NotBlank
     @NotEmpty
-    @Schema(description = "The site with the region belongs to, such as default, Chinese Mainland, "
-            + "International, ")
+    @Schema(
+            description =
+                    "The site with the region belongs to, such as default, Chinese Mainland, "
+                            + "International, ")
     private String site = "default";
 
     @NotEmpty

@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of MetricsDataNotYetAvailableException.
- */
+/** Test of MetricsDataNotYetAvailableException. */
 public class MetricsDataNotYetAvailableExceptionTest {
 
     private static final String message = "Metrics data not ready.";

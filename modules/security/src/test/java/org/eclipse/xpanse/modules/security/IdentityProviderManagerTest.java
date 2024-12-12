@@ -18,17 +18,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class IdentityProviderManagerTest {
 
-    @Mock
-    private ApplicationContext mockApplicationContext;
-    @Mock
-    private IdentityProviderService mockActiveIdentityProviderService;
+    @Mock private ApplicationContext mockApplicationContext;
+    @Mock private IdentityProviderService mockActiveIdentityProviderService;
 
-    @InjectMocks
-    private IdentityProviderManager identityProviderManagerUnderTest;
+    @InjectMocks private IdentityProviderManager identityProviderManagerUnderTest;
 
     void setUpSecurityConfig(boolean webSecurityIsEnabled) {
-        ReflectionTestUtils.setField(identityProviderManagerUnderTest, "webSecurityIsEnabled",
-                webSecurityIsEnabled);
+        ReflectionTestUtils.setField(
+                identityProviderManagerUnderTest, "webSecurityIsEnabled", webSecurityIsEnabled);
     }
 
     CurrentUserInfo getMockCurrentUserInfo() {
@@ -57,8 +54,8 @@ class IdentityProviderManagerTest {
         // Setup
         final CurrentUserInfo expectedResult = getMockCurrentUserInfo();
         // Configure IdentityProviderService.getCurrentUserInfo(...).
-        when(mockActiveIdentityProviderService.getCurrentUserInfo()).thenReturn(
-                getMockCurrentUserInfo());
+        when(mockActiveIdentityProviderService.getCurrentUserInfo())
+                .thenReturn(getMockCurrentUserInfo());
         // Run the test
         final CurrentUserInfo result = identityProviderManagerUnderTest.getCurrentUserInfo();
         // Verify the results

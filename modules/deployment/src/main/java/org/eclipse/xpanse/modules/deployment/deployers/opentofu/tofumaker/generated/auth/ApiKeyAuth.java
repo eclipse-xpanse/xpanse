@@ -10,14 +10,14 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.auth;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class ApiKeyAuth implements Authentication {
     private final String location;
     private final String paramName;
@@ -55,8 +55,10 @@ public class ApiKeyAuth implements Authentication {
     }
 
     @Override
-    public void applyToParams(MultiValueMap<String, String> queryParams, HttpHeaders headerParams,
-                              MultiValueMap<String, String> cookieParams) {
+    public void applyToParams(
+            MultiValueMap<String, String> queryParams,
+            HttpHeaders headerParams,
+            MultiValueMap<String, String> cookieParams) {
         if (apiKey == null) {
             return;
         }

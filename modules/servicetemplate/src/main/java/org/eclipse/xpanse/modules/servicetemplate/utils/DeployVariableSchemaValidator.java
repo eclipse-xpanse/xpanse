@@ -16,9 +16,7 @@ import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 
-/**
- * Defines method to validate the deploy variable configuration list of deployment.
- */
+/** Defines method to validate the deploy variable configuration list of deployment. */
 @Slf4j
 public class DeployVariableSchemaValidator {
 
@@ -38,9 +36,11 @@ public class DeployVariableSchemaValidator {
         Set<String> varNameSet = new HashSet<>();
         for (DeployVariable deployVariable : deployVariables) {
             if (varNameSet.contains(deployVariable.getName())) {
-                String errorMessage = String.format(
-                        "The deploy variable configuration list with duplicated variable name %s",
-                        deployVariable.getName());
+                String errorMessage =
+                        String.format(
+                                "The deploy variable configuration list with duplicated variable"
+                                        + " name %s",
+                                deployVariable.getName());
                 throw new InvalidValueSchemaException(List.of(errorMessage));
             } else {
                 varNameSet.add(deployVariable.getName());
@@ -64,7 +64,7 @@ public class DeployVariableSchemaValidator {
                         if (otherVariable != deployVariable
                                 && Objects.nonNull(otherVariable.getAutoFill())
                                 && otherVariable.getAutoFill().getDeployResourceKind()
-                                == parentKind) {
+                                        == parentKind) {
                             return true;
                         }
                     }
@@ -74,5 +74,4 @@ public class DeployVariableSchemaValidator {
         }
         return true;
     }
-
 }

@@ -22,8 +22,7 @@ class ServiceResourceEntityTest {
     private final String resourceName = "resourceName";
     private final DeployResourceKind resourceKind = DeployResourceKind.VM;
     private final Map<String, String> properties = Collections.singletonMap("key", "value");
-    @Mock
-    private ServiceDeploymentEntity mockDeployService;
+    @Mock private ServiceDeploymentEntity mockDeployService;
     private ServiceResourceEntity resource;
 
     @BeforeEach
@@ -69,16 +68,24 @@ class ServiceResourceEntityTest {
 
     @Test
     void testToString() {
-        String expectedToString = "ServiceResourceEntity(id=" + id +
-                ", groupType=" + groupType +
-                ", groupName=" + groupName +
-                ", resourceId=" + resourceId +
-                ", resourceName=" + resourceName +
-                ", resourceKind=" + resourceKind +
-                ", serviceDeploymentEntity=" + mockDeployService +
-                ", properties=" + properties +
-                ')';
+        String expectedToString =
+                "ServiceResourceEntity(id="
+                        + id
+                        + ", groupType="
+                        + groupType
+                        + ", groupName="
+                        + groupName
+                        + ", resourceId="
+                        + resourceId
+                        + ", resourceName="
+                        + resourceName
+                        + ", resourceKind="
+                        + resourceKind
+                        + ", serviceDeploymentEntity="
+                        + mockDeployService
+                        + ", properties="
+                        + properties
+                        + ')';
         assertEquals(expectedToString, resource.toString());
     }
-
 }

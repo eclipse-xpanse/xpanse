@@ -11,9 +11,7 @@ import java.net.URL;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to deserialize Ocl data.
- */
+/** Bean to deserialize Ocl data. */
 @Component
 public class OclLoader {
 
@@ -22,5 +20,4 @@ public class OclLoader {
     public Ocl getOcl(URL url) throws Exception {
         return mapper.readValue(url, Ocl.class);
     }
-
 }

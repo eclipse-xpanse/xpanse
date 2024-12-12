@@ -22,13 +22,10 @@ import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
-/**
- * Beans helper for creating JwtDecoder for OAuth2 JWT authentication.
- */
+/** Beans helper for creating JwtDecoder for OAuth2 JWT authentication. */
 @Slf4j
 @Configuration
 public class Oauth2JwtDecoder {
-
 
     /**
      * Create JwtDecoder for OAuth2 JWT authentication.
@@ -36,20 +33,25 @@ public class Oauth2JwtDecoder {
      * @param issuerUri url of the issuer.
      * @return JwtDecoder.
      */
-    @Retryable(retryFor = Exception.class,
+    @Retryable(
+            retryFor = Exception.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public JwtDecoder createJwtDecoder(String issuerUri) {
-        int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
-        log.info("Creating Oauth2 JwtDecoder from issuerUri:{}. Retry count:{}", issuerUri,
+        int retryCount =
+                Objects.isNull(RetrySynchronizationManager.getContext())
+                        ? 0
+                        : RetrySynchronizationManager.getContext().getRetryCount();
+        log.info(
+                "Creating Oauth2 JwtDecoder from issuerUri:{}. Retry count:{}",
+                issuerUri,
                 retryCount);
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
-        OAuth2TokenValidator<Jwt> withClockSkew = new DelegatingOAuth2TokenValidator<>(
-                new JwtTimestampValidator(Duration.ofSeconds(60)),
-                new JwtIssuerValidator(issuerUri));
+        OAuth2TokenValidator<Jwt> withClockSkew =
+                new DelegatingOAuth2TokenValidator<>(
+                        new JwtTimestampValidator(Duration.ofSeconds(60)),
+                        new JwtIssuerValidator(issuerUri));
         jwtDecoder.setJwtValidator(withClockSkew);
         return jwtDecoder;
     }
-
 }

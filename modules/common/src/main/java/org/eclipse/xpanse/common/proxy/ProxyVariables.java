@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.common.proxy;
 
-/**
- * Variables which control the proxy configuration.
- */
+/** Variables which control the proxy configuration. */
 public class ProxyVariables {
     public static final String HTTP_PROXY_ENVIRONMENT_VAR = "http_proxy";
     public static final String HTTPS_PROXY_ENVIRONMENT_VAR = "https_proxy";

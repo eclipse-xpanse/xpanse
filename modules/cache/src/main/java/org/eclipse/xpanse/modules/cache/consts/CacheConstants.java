@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.modules.cache.consts;
 
-/**
- * Define the constants for cache.
- */
+/** Define the constants for cache. */
 public class CacheConstants {
 
     public static final String REGION_AZS_CACHE_NAME = "REGION_AZS_CACHE";
@@ -30,5 +28,4 @@ public class CacheConstants {
     public static final String CACHE_PROVIDER_REDIS = "Redis";
 
     public static final String CACHE_PROVIDER_CAFFEINE_ENDPOINT = "local";
-
 }

@@ -12,14 +12,11 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of TfStateResourceInstance.
- */
+/** Test of TfStateResourceInstance. */
 class TfStateResourceInstanceTest {
 
     public static Map<String, Object> attributes;
-    private static TfStateResourceInstance
-            tfStateResourceInstance;
+    private static TfStateResourceInstance tfStateResourceInstance;
 
     @BeforeEach
     void setUp() {
@@ -44,10 +41,8 @@ class TfStateResourceInstanceTest {
         assertNotEquals(tfStateResourceInstance, null);
         assertNotEquals(tfStateResourceInstance.hashCode(), obj.hashCode());
 
-        TfStateResourceInstance
-                tfStateResourceInstance1 = new TfStateResourceInstance();
-        TfStateResourceInstance
-                tfStateResourceInstance2 = new TfStateResourceInstance();
+        TfStateResourceInstance tfStateResourceInstance1 = new TfStateResourceInstance();
+        TfStateResourceInstance tfStateResourceInstance2 = new TfStateResourceInstance();
         assertNotEquals(tfStateResourceInstance, tfStateResourceInstance1);
         assertNotEquals(tfStateResourceInstance, tfStateResourceInstance2);
         assertEquals(tfStateResourceInstance1, tfStateResourceInstance2);
@@ -61,5 +56,4 @@ class TfStateResourceInstanceTest {
         assertEquals(tfStateResourceInstance.hashCode(), tfStateResourceInstance1.hashCode());
         assertNotEquals(tfStateResourceInstance1.hashCode(), tfStateResourceInstance2.hashCode());
     }
-
 }

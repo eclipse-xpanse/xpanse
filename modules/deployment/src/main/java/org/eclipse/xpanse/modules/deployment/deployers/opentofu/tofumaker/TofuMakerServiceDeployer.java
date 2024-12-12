@@ -17,9 +17,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Bean to manage service deployment via tofu-maker.
- */
+/** Bean to manage service deployment via tofu-maker. */
 @Slf4j
 @Component
 @Profile("tofu-maker")
@@ -29,20 +27,17 @@ public class TofuMakerServiceDeployer {
     private final OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
     private final TofuMakerHelper tofuMakerHelper;
 
-    /**
-     * Constructor for OpenTofuMakerServiceDeployer bean.
-     */
-    public TofuMakerServiceDeployer(OpenTofuFromScriptsApi openTofuFromScriptsApi,
-                                    OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
-                                    TofuMakerHelper tofuMakerHelper) {
+    /** Constructor for OpenTofuMakerServiceDeployer bean. */
+    public TofuMakerServiceDeployer(
+            OpenTofuFromScriptsApi openTofuFromScriptsApi,
+            OpenTofuFromGitRepoApi openTofuFromGitRepoApi,
+            TofuMakerHelper tofuMakerHelper) {
         this.openTofuFromScriptsApi = openTofuFromScriptsApi;
         this.openTofuFromGitRepoApi = openTofuFromGitRepoApi;
         this.tofuMakerHelper = tofuMakerHelper;
     }
 
-    /**
-     * method to perform service deployment using scripts provided in OCL.
-     */
+    /** method to perform service deployment using scripts provided in OCL. */
     public DeployResult deployFromScripts(DeployTask deployTask) {
         DeployResult result = new DeployResult();
         OpenTofuAsyncDeployFromScriptsRequest request = getDeployFromScriptsRequest(deployTask);
@@ -51,15 +46,15 @@ public class TofuMakerServiceDeployer {
             result.setOrderId(deployTask.getOrderId());
             return result;
         } catch (RestClientException e) {
-            log.error("tofu-maker deploy service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(), e.getMessage());
+            log.error(
+                    "tofu-maker deploy service failed. service id: {} , error:{} ",
+                    deployTask.getServiceId(),
+                    e.getMessage());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
     }
 
-    /**
-     * method to perform service deployment using scripts form GIT repo.
-     */
+    /** method to perform service deployment using scripts form GIT repo. */
     public DeployResult deployFromGitRepo(DeployTask deployTask) {
         DeployResult result = new DeployResult();
         OpenTofuAsyncDeployFromGitRepoRequest request = getDeployFromGitRepoRequest(deployTask);
@@ -68,15 +63,16 @@ public class TofuMakerServiceDeployer {
             result.setOrderId(deployTask.getOrderId());
             return result;
         } catch (RestClientException e) {
-            log.error("tofu-maker deploy service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(), e.getMessage());
+            log.error(
+                    "tofu-maker deploy service failed. service id: {} , error:{} ",
+                    deployTask.getServiceId(),
+                    e.getMessage());
             throw new OpenTofuMakerRequestFailedException(e.getMessage());
         }
     }
 
     private OpenTofuAsyncDeployFromScriptsRequest getDeployFromScriptsRequest(DeployTask task) {
-        OpenTofuAsyncDeployFromScriptsRequest request =
-                new OpenTofuAsyncDeployFromScriptsRequest();
+        OpenTofuAsyncDeployFromScriptsRequest request = new OpenTofuAsyncDeployFromScriptsRequest();
         request.setRequestId(task.getOrderId());
         request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
@@ -88,8 +84,7 @@ public class TofuMakerServiceDeployer {
     }
 
     private OpenTofuAsyncDeployFromGitRepoRequest getDeployFromGitRepoRequest(DeployTask task) {
-        OpenTofuAsyncDeployFromGitRepoRequest request =
-                new OpenTofuAsyncDeployFromGitRepoRequest();
+        OpenTofuAsyncDeployFromGitRepoRequest request = new OpenTofuAsyncDeployFromGitRepoRequest();
         request.setRequestId(task.getOrderId());
         request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
@@ -98,8 +93,7 @@ public class TofuMakerServiceDeployer {
         request.setWebhookConfig(tofuMakerHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
                 tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
-                        task.getOcl().getDeployment().getScriptsRepo())
-        );
+                        task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }
 }

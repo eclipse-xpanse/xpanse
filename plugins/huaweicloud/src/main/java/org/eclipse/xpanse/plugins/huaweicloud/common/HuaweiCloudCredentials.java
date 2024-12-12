@@ -28,44 +28,42 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.springframework.stereotype.Component;
 
-/**
- * HuaweiCloud Credentials Class.
- */
+/** HuaweiCloud Credentials Class. */
 @Slf4j
 @Component
 public class HuaweiCloudCredentials {
 
-    @Resource
-    private CredentialCenter credentialCenter;
+    @Resource private CredentialCenter credentialCenter;
 
     /**
      * Get Basic Credential For Huawei Cloud Client.
      *
-     * @param siteName   site name.
+     * @param siteName site name.
      * @param regionName region name.
-     * @param userId     user id.
+     * @param userId user id.
      */
     public ICredential getBasicCredential(String siteName, String regionName, String userId) {
 
-        AbstractCredentialInfo credential = credentialCenter
-                .getCredential(Csp.HUAWEI_CLOUD, siteName, CredentialType.VARIABLES, userId);
+        AbstractCredentialInfo credential =
+                credentialCenter.getCredential(
+                        Csp.HUAWEI_CLOUD, siteName, CredentialType.VARIABLES, userId);
         Map<String, String> akSkMap = getCredentialVariablesMap((CredentialVariables) credential);
         if (StringUtils.isNotBlank(regionName)) {
-            return new BasicCredentials().withAk(akSkMap.get(HW_ACCESS_KEY))
+            return new BasicCredentials()
+                    .withAk(akSkMap.get(HW_ACCESS_KEY))
                     .withSk(akSkMap.get(HW_SECRET_KEY))
                     .withIamEndpoint(IamRegion.valueOf(regionName).getEndpoints().getFirst());
         }
-        return new BasicCredentials().withAk(akSkMap.get(HW_ACCESS_KEY))
+        return new BasicCredentials()
+                .withAk(akSkMap.get(HW_ACCESS_KEY))
                 .withSk(akSkMap.get(HW_SECRET_KEY));
     }
 
-
-    /**
-     * Get Global Credential For Huawei Cloud Client.
-     */
+    /** Get Global Credential For Huawei Cloud Client. */
     public ICredential getGlobalCredential(String site, String region, String userId) {
-        AbstractCredentialInfo credential = credentialCenter
-                .getCredential(Csp.HUAWEI_CLOUD, site, CredentialType.VARIABLES, userId);
+        AbstractCredentialInfo credential =
+                credentialCenter.getCredential(
+                        Csp.HUAWEI_CLOUD, site, CredentialType.VARIABLES, userId);
         Map<String, String> akSkMap = getCredentialVariablesMap((CredentialVariables) credential);
         if (StringUtils.isNotBlank(region)) {
             return new GlobalCredentials()
@@ -84,14 +82,13 @@ public class HuaweiCloudCredentials {
      * @param credentialVariables object of CredentialVariables.
      * @return map of AK/SK/ProjectId.
      */
-    private Map<String, String> getCredentialVariablesMap(
-            CredentialVariables credentialVariables) {
+    private Map<String, String> getCredentialVariablesMap(CredentialVariables credentialVariables) {
         Map<String, String> credentialVariablesMap = new HashMap<>();
         if (CredentialType.VARIABLES.toValue().equals(credentialVariables.getType().toValue())) {
             List<CredentialVariable> variables = credentialVariables.getVariables();
             for (CredentialVariable credentialVariable : variables) {
-                credentialVariablesMap.put(credentialVariable.getName(),
-                        credentialVariable.getValue());
+                credentialVariablesMap.put(
+                        credentialVariable.getName(), credentialVariable.getValue());
             }
         }
         if (StringUtils.isBlank(credentialVariablesMap.get(HW_ACCESS_KEY))) {

@@ -28,10 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-/**
- * REST interface methods for authentication.
- */
+/** REST interface methods for authentication. */
 @Slf4j
 @Profile("oauth")
 @CrossOrigin
@@ -39,11 +36,9 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class AuthorizationApi {
 
-    @Resource
-    private IdentityProviderManager identityProviderManager;
+    @Resource private IdentityProviderManager identityProviderManager;
 
-    @Tag(name = "AuthManagement",
-            description = "APIs for user authentication and authorization.")
+    @Tag(name = "AuthManagement", description = "APIs for user authentication and authorization.")
     @Operation(description = "Get and redirect authorization url for user to authenticate.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/auth/authorize")
@@ -61,20 +56,18 @@ public class AuthorizationApi {
             PrintWriter writer = response.getWriter();
             writer.write("No active identity provider found.");
         }
-
     }
 
-    @Tag(name = "AuthManagement",
-            description = "APIs for user authentication and authorization.")
+    @Tag(name = "AuthManagement", description = "APIs for user authentication and authorization.")
     @Operation(description = "Get token info by authorization code.")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/auth/token")
     @AuditApiRequest(enabled = false)
     TokenResponse getAccessToken(
             @Parameter(name = "code", required = true, description = "The authorization code.")
-            String code,
+                    String code,
             @Parameter(name = "state", description = "Opaque value used to maintain state.")
-            String state) {
+                    String state) {
         IdentityProviderService identityProviderService =
                 identityProviderManager.getActiveIdentityProviderService();
         if (Objects.nonNull(identityProviderService)) {

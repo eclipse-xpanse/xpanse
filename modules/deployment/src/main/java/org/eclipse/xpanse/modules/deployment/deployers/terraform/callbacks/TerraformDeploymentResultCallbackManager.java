@@ -16,27 +16,23 @@ import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for managing deployer terraform callback functions.
- */
+/** Bean for managing deployer terraform callback functions. */
 @Slf4j
 @Component
 public class TerraformDeploymentResultCallbackManager {
-    @Resource
-    private DeployResultManager deployResultManager;
+    @Resource private DeployResultManager deployResultManager;
 
     /**
      * Handle the callback of the order task.
      *
      * @param orderId the orderId of the task.
-     * @param result  execution result of the task.
+     * @param result execution result of the task.
      */
     public void orderCallback(UUID orderId, TerraformResult result) {
         DeployResult deployResult = getDeployResult(result);
         deployResult.setOrderId(orderId);
         deployResultManager.updateServiceWithDeployResult(deployResult, Handler.TERRAFORM_BOOT);
     }
-
 
     private DeployResult getDeployResult(TerraformResult result) {
         DeployResult deployResult = new DeployResult();

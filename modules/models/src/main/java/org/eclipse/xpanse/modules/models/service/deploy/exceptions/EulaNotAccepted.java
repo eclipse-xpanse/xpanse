@@ -14,6 +14,4 @@ public class EulaNotAccepted extends RuntimeException {
     public EulaNotAccepted(String message) {
         super(message);
     }
-
 }
-

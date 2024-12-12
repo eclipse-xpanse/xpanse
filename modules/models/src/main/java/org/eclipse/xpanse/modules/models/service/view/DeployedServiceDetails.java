@@ -15,9 +15,7 @@ import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 
-/**
- * Define view object for detail of the deployed service.
- */
+/** Define view object for detail of the deployed service. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class DeployedServiceDetails extends DeployedService {

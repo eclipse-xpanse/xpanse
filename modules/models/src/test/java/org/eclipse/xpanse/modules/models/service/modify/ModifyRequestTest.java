@@ -16,8 +16,7 @@ class ModifyRequestTest {
     private final String userId = "userId";
     private final String customerServiceName = "customerService";
     private final String flavor = "flavor";
-    @Mock
-    private Map<String, Object> mockServiceRequestProperties;
+    @Mock private Map<String, Object> mockServiceRequestProperties;
 
     private ModifyRequest test;
 
@@ -58,11 +57,16 @@ class ModifyRequestTest {
 
     @Test
     void testToString() {
-        String result = "ModifyRequest(userId=" + userId
-                + ", customerServiceName=" + customerServiceName
-                + ", flavor=" + flavor
-                + ", serviceRequestProperties=" + mockServiceRequestProperties
-                + ")";
+        String result =
+                "ModifyRequest(userId="
+                        + userId
+                        + ", customerServiceName="
+                        + customerServiceName
+                        + ", flavor="
+                        + flavor
+                        + ", serviceRequestProperties="
+                        + mockServiceRequestProperties
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

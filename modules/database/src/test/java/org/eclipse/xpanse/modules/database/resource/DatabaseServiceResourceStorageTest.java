@@ -23,14 +23,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
-/**
- * Test of DatabaseServiceResourceStorage.
- */
+/** Test of DatabaseServiceResourceStorage. */
 @ExtendWith(MockitoExtension.class)
 class DatabaseServiceResourceStorageTest {
 
-    @Mock
-    private ServiceResourceRepository mockServiceResourceRepository;
+    @Mock private ServiceResourceRepository mockServiceResourceRepository;
 
     private DatabaseServiceResourceStorage databaseDeployResourceStorageUnderTest;
 
@@ -60,7 +57,7 @@ class DatabaseServiceResourceStorageTest {
         final Optional<ServiceResourceEntity> deployResourceEntity =
                 Optional.of(serviceResourceEntity1);
         when(mockServiceResourceRepository.findById(
-                UUID.fromString("f23db79e-fe0c-425e-97c6-1ebb64958cc5")))
+                        UUID.fromString("f23db79e-fe0c-425e-97c6-1ebb64958cc5")))
                 .thenReturn(deployResourceEntity);
         final ServiceResourceEntity result =
                 databaseDeployResourceStorageUnderTest.findServiceResourceById(
@@ -71,7 +68,7 @@ class DatabaseServiceResourceStorageTest {
     @Test
     void testFindDeployResourceById_ServiceResourceRepositoryReturnsAbsent() {
         when(mockServiceResourceRepository.findById(
-                UUID.fromString("f23db79e-fe0c-425e-97c6-1ebb64958cc5")))
+                        UUID.fromString("f23db79e-fe0c-425e-97c6-1ebb64958cc5")))
                 .thenReturn(Optional.empty());
         final ServiceResourceEntity result =
                 databaseDeployResourceStorageUnderTest.findServiceResourceById(
@@ -99,7 +96,8 @@ class DatabaseServiceResourceStorageTest {
         when(mockServiceResourceRepository.findAll(any(Specification.class)))
                 .thenReturn(deployResourceEntities);
         final ServiceResourceEntity result =
-                databaseDeployResourceStorageUnderTest.findServiceResourceByResourceId("resourceId");
+                databaseDeployResourceStorageUnderTest.findServiceResourceByResourceId(
+                        "resourceId");
         assertThat(result).isEqualTo(expectedResult);
     }
 
@@ -108,7 +106,8 @@ class DatabaseServiceResourceStorageTest {
         when(mockServiceResourceRepository.findAll(any(Specification.class)))
                 .thenReturn(Collections.emptyList());
         final ServiceResourceEntity result =
-                databaseDeployResourceStorageUnderTest.findServiceResourceByResourceId("resourceId");
+                databaseDeployResourceStorageUnderTest.findServiceResourceByResourceId(
+                        "resourceId");
         assertThat(result).isNull();
     }
 }

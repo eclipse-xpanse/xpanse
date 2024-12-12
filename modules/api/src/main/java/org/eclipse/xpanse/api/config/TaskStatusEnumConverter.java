@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to TaskStatus enum.
- */
+/** Bean for serializing string in request parameters to TaskStatus enum. */
 @Component
 public class TaskStatusEnumConverter implements Converter<String, TaskStatus> {
 

@@ -18,9 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of ServiceTemplateQueryModel.
- */
+/** Test of ServiceTemplateQueryModel. */
 class ServiceTemplateQueryModelTest {
 
     private final Category category = Category.COMPUTE;
@@ -38,18 +36,19 @@ class ServiceTemplateQueryModelTest {
 
     @BeforeEach
     void setUp() {
-        testModel = ServiceTemplateQueryModel.builder()
-                .category(category)
-                .csp(csp)
-                .serviceName(serviceName)
-                .serviceVersion(serviceVersion)
-                .serviceHostingType(serviceHostingType)
-                .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
-                .checkNamespace(checkNamespace)
-                .availableInCatalog(availableInCatalog)
-                .isUpdatePending(isUpdatePending)
-                .namespace(namespace)
-                .build();
+        testModel =
+                ServiceTemplateQueryModel.builder()
+                        .category(category)
+                        .csp(csp)
+                        .serviceName(serviceName)
+                        .serviceVersion(serviceVersion)
+                        .serviceHostingType(serviceHostingType)
+                        .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
+                        .checkNamespace(checkNamespace)
+                        .availableInCatalog(availableInCatalog)
+                        .isUpdatePending(isUpdatePending)
+                        .namespace(namespace)
+                        .build();
     }
 
     @Test
@@ -60,7 +59,8 @@ class ServiceTemplateQueryModelTest {
         assertEquals(serviceVersion, testModel.getServiceVersion());
         assertEquals(namespace, testModel.getNamespace());
         assertEquals(serviceHostingType, testModel.getServiceHostingType());
-        assertEquals(serviceTemplateRegistrationState, testModel.getServiceTemplateRegistrationState());
+        assertEquals(
+                serviceTemplateRegistrationState, testModel.getServiceTemplateRegistrationState());
         assertEquals(checkNamespace, testModel.getCheckNamespace());
         assertEquals(availableInCatalog, testModel.getAvailableInCatalog());
         assertEquals(isUpdatePending, testModel.getIsUpdatePending());
@@ -71,7 +71,6 @@ class ServiceTemplateQueryModelTest {
         ServiceTemplateQueryModel test = ServiceTemplateQueryModel.builder().build();
         assertNotEquals(testModel, test);
         assertNotEquals(testModel.hashCode(), test.hashCode());
-
 
         ServiceTemplateQueryModel test1 = ServiceTemplateQueryModel.builder().build();
         BeanUtils.copyProperties(testModel, test1);
@@ -86,19 +85,29 @@ class ServiceTemplateQueryModelTest {
 
     @Test
     void testToString() {
-        String expectedString = "ServiceTemplateQueryModel(" +
-                "category=" + category +
-                ", csp=" + csp +
-                ", serviceName=" + serviceName +
-                ", serviceVersion=" + serviceVersion +
-                ", serviceHostingType=" + serviceHostingType +
-                ", serviceTemplateRegistrationState=" + serviceTemplateRegistrationState +
-                ", availableInCatalog=" + availableInCatalog +
-                ", isUpdatePending=" + isUpdatePending +
-                ", checkNamespace=" + checkNamespace +
-                ", namespace=" + namespace +
-                ")";
+        String expectedString =
+                "ServiceTemplateQueryModel("
+                        + "category="
+                        + category
+                        + ", csp="
+                        + csp
+                        + ", serviceName="
+                        + serviceName
+                        + ", serviceVersion="
+                        + serviceVersion
+                        + ", serviceHostingType="
+                        + serviceHostingType
+                        + ", serviceTemplateRegistrationState="
+                        + serviceTemplateRegistrationState
+                        + ", availableInCatalog="
+                        + availableInCatalog
+                        + ", isUpdatePending="
+                        + isUpdatePending
+                        + ", checkNamespace="
+                        + checkNamespace
+                        + ", namespace="
+                        + namespace
+                        + ")";
         assertEquals(expectedString, testModel.toString());
     }
-
 }

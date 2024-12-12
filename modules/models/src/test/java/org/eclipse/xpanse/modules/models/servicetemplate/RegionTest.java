@@ -13,9 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of Region.
- */
+/** Test of Region. */
 class RegionTest {
 
     private final String name = "cn-north-1";
@@ -61,5 +59,4 @@ class RegionTest {
         String expectedString = "Region(name=" + name + ", site=" + site + ", area=" + area + ")";
         assertEquals(expectedString, region.toString());
     }
-
 }

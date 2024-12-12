@@ -1,6 +1,5 @@
 package org.eclipse.xpanse.plugins.openstack.common.resourcehandler;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
@@ -19,9 +18,10 @@ class OpenstackTerraformResourceHandlerTest {
 
     @Test
     void handler() throws IOException {
-        TfState tfState = objectMapper.readValue(
-                URI.create("file:src/test/resources/openstack-tfstate.json").toURL(),
-                TfState.class);
+        TfState tfState =
+                objectMapper.readValue(
+                        URI.create("file:src/test/resources/openstack-tfstate.json").toURL(),
+                        TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.setTfStateContent(objectMapper.writeValueAsString(tfState));
         openstackHandler.handler(deployResult);
@@ -29,12 +29,13 @@ class OpenstackTerraformResourceHandlerTest {
         Assertions.assertFalse(deployResult.getOutputProperties().isEmpty());
     }
 
-
     @Test
     void handler_destroy() throws IOException {
-        TfState tfState = objectMapper.readValue(
-                URI.create("file:src/test/resources/openstack-tfstate-destroy.json").toURL(),
-                TfState.class);
+        TfState tfState =
+                objectMapper.readValue(
+                        URI.create("file:src/test/resources/openstack-tfstate-destroy.json")
+                                .toURL(),
+                        TfState.class);
         DeployResult deployResult = new DeployResult();
         deployResult.setTfStateContent(objectMapper.writeValueAsString(tfState));
         openstackHandler.handler(deployResult);

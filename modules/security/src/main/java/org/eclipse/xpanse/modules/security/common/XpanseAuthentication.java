@@ -16,18 +16,15 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
- * Data class to hold information all information of authenticated user.
- * this will be available in the security context.
+ * Data class to hold information all information of authenticated user. this will be available in
+ * the security context.
  */
 public class XpanseAuthentication extends AbstractAuthenticationToken {
 
-    @Serial
-    private static final long serialVersionUID = -2797266050799781972L;
-    @Getter
-    private final Map<String, Object> claims;
+    @Serial private static final long serialVersionUID = -2797266050799781972L;
+    @Getter private final Map<String, Object> claims;
     private final Principal principal;
-    @Getter
-    private final String token;
+    @Getter private final String token;
 
     /**
      * Constructor to create Xpanse Authentication objects.
@@ -37,8 +34,11 @@ public class XpanseAuthentication extends AbstractAuthenticationToken {
      * @param claims all claims received in the token
      * @param token actual token.
      */
-    public XpanseAuthentication(String username, Collection<? extends GrantedAuthority> authorities,
-                                Map<String, Object> claims, String token) {
+    public XpanseAuthentication(
+            String username,
+            Collection<? extends GrantedAuthority> authorities,
+            Map<String, Object> claims,
+            String token) {
         super(authorities);
         this.claims = Collections.unmodifiableMap(claims);
         this.principal = new SimplePrincipal(username);

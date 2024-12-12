@@ -5,14 +5,9 @@
 
 package org.eclipse.xpanse.modules.models.credential.exceptions;
 
-/**
- * Exception thrown when no credentials for connecting to a cloud provider is found.
- */
+/** Exception thrown when no credentials for connecting to a cloud provider is found. */
 public class CredentialsNotFoundException extends RuntimeException {
     public CredentialsNotFoundException(String message) {
         super(message);
     }
-
-
 }
-

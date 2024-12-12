@@ -25,21 +25,18 @@ import org.springframework.web.client.RestClientException;
 @ExtendWith(MockitoExtension.class)
 class TerraformBootManagerTest {
 
-    @Mock
-    private AdminApi mockTerraformApi;
+    @Mock private AdminApi mockTerraformApi;
 
-    @Mock
-    private TerraformBootHelper terraformBootHelper;
+    @Mock private TerraformBootHelper terraformBootHelper;
 
-    @InjectMocks
-    private TerraformBootManager terraformBootManagerUnderTest;
+    @InjectMocks private TerraformBootManager terraformBootManagerUnderTest;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(terraformBootManagerUnderTest, "springProfilesActive",
-                "terraform-boot");
-        ReflectionTestUtils.setField(terraformBootManagerUnderTest, "terraformBootBaseUrl",
-                "endpoint");
+        ReflectionTestUtils.setField(
+                terraformBootManagerUnderTest, "springProfilesActive", "terraform-boot");
+        ReflectionTestUtils.setField(
+                terraformBootManagerUnderTest, "terraformBootBaseUrl", "endpoint");
     }
 
     @Test
@@ -90,7 +87,6 @@ class TerraformBootManagerTest {
         expectedResult.setHealthStatus(HealthStatus.NOK);
         expectedResult.setEndpoint("endpoint");
 
-
         // Configure TerraformApi.healthCheck(...).
         final TerraformBootSystemStatus terraformBootSystemStatus = new TerraformBootSystemStatus();
         terraformBootSystemStatus.setHealthStatus(TerraformBootSystemStatus.HealthStatusEnum.NOK);
@@ -103,11 +99,10 @@ class TerraformBootManagerTest {
         assertThat(result).isEqualTo(expectedResult);
     }
 
-
     @Test
     void testGetTerraformBootStatus_WhenTerraformBootNotActive() {
-        ReflectionTestUtils.setField(terraformBootManagerUnderTest, "springProfilesActive",
-                "oauth");
+        ReflectionTestUtils.setField(
+                terraformBootManagerUnderTest, "springProfilesActive", "oauth");
 
         // Run the test
         final BackendSystemStatus result = terraformBootManagerUnderTest.getTerraformBootStatus();

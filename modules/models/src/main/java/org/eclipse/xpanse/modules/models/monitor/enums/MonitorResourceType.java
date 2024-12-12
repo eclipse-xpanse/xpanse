@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * The Resources Type of The Monitor.
- */
+/** The Resources Type of The Monitor. */
 public enum MonitorResourceType {
     CPU("cpu"),
     MEM("mem"),
@@ -25,17 +23,13 @@ public enum MonitorResourceType {
         this.value = value;
     }
 
-    /**
-     * For MonitorResourceType serialize.
-     */
+    /** For MonitorResourceType serialize. */
     @JsonValue
     public String toValue() {
         return this.value;
     }
 
-    /**
-     * For MonitorResourceType deserialize.
-     */
+    /** For MonitorResourceType deserialize. */
     @JsonCreator
     public static MonitorResourceType getByValue(String name) {
         for (MonitorResourceType monitorEnum : values()) {

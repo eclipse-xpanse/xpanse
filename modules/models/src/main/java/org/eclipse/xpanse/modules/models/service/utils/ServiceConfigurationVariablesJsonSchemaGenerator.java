@@ -21,9 +21,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * The Class is used to generate a JSONSchema for service configuration variables.
- */
+/** The Class is used to generate a JSONSchema for service configuration variables. */
 @Slf4j
 @Component
 public class ServiceConfigurationVariablesJsonSchemaGenerator {
@@ -37,15 +35,15 @@ public class ServiceConfigurationVariablesJsonSchemaGenerator {
      * of ServiceConfigurationParameter.
      *
      * @param serviceConfigurationParameters list of ServiceConfigurationParameter in registered
-     *                                       service.
+     *     service.
      * @return JsonObjectSchema jsonObjectSchema.
      */
     public JsonObjectSchema buildServiceConfigurationJsonSchema(
             List<ServiceConfigurationParameter> serviceConfigurationParameters) {
         JsonObjectSchema jsonObjectSchema = new JsonObjectSchema();
         Map<String, Map<String, Object>> serviceConfigurationJsonSchemaProperties = new HashMap<>();
-        for (ServiceConfigurationParameter configurationParameter
-                : serviceConfigurationParameters) {
+        for (ServiceConfigurationParameter configurationParameter :
+                serviceConfigurationParameters) {
             if (configurationParameter.getKind() == DeployVariableKind.VARIABLE
                     || configurationParameter.getKind() == DeployVariableKind.ENV) {
                 Map<String, Object> validationProperties = new HashMap<>();
@@ -55,23 +53,23 @@ public class ServiceConfigurationVariablesJsonSchemaGenerator {
                 }
 
                 if (Objects.nonNull(configurationParameter.getDataType())) {
-                    validationProperties.put(VARIABLE_TYPE_KEY,
-                            configurationParameter.getDataType().toValue());
+                    validationProperties.put(
+                            VARIABLE_TYPE_KEY, configurationParameter.getDataType().toValue());
                 }
 
                 if (Objects.nonNull(configurationParameter.getDescription())) {
-                    validationProperties.put(VARIABLE_DESCRIPTION_KEY,
-                            configurationParameter.getDescription());
+                    validationProperties.put(
+                            VARIABLE_DESCRIPTION_KEY, configurationParameter.getDescription());
                 }
 
                 if (Objects.nonNull(configurationParameter.getExample())) {
-                    validationProperties.put(VARIABLE_EXAMPLE_KEY,
-                            configurationParameter.getExample());
+                    validationProperties.put(
+                            VARIABLE_EXAMPLE_KEY, configurationParameter.getExample());
                 }
 
                 if (!validationProperties.isEmpty()) {
-                    serviceConfigurationJsonSchemaProperties.put(configurationParameter.getName(),
-                            validationProperties);
+                    serviceConfigurationJsonSchemaProperties.put(
+                            configurationParameter.getName(), validationProperties);
                 }
             }
         }
@@ -84,17 +82,22 @@ public class ServiceConfigurationVariablesJsonSchemaGenerator {
     private void validateSchemaDefinition(JsonObjectSchema jsonObjectSchema) {
         Set<String> allowedKeys = JsonMetaSchema.getV202012().getKeywords().keySet();
         List<String> invalidKeys = new ArrayList<>();
-        jsonObjectSchema.getProperties().forEach((deployVariable, variableValueSchema) ->
-                variableValueSchema.forEach((schemaDefKey, schemaDefValue) -> {
-                    if (!allowedKeys.contains(schemaDefKey)) {
-                        invalidKeys.add(String.format(
-                                "Value schema key %s in deploy variable %s is invalid",
-                                schemaDefKey, deployVariable));
-                    }
-                }));
+        jsonObjectSchema
+                .getProperties()
+                .forEach(
+                        (deployVariable, variableValueSchema) ->
+                                variableValueSchema.forEach(
+                                        (schemaDefKey, schemaDefValue) -> {
+                                            if (!allowedKeys.contains(schemaDefKey)) {
+                                                invalidKeys.add(
+                                                        String.format(
+                                                                "Value schema key %s in deploy"
+                                                                        + " variable %s is invalid",
+                                                                schemaDefKey, deployVariable));
+                                            }
+                                        }));
         if (!invalidKeys.isEmpty()) {
             throw new InvalidValueSchemaException(invalidKeys);
         }
     }
-
 }

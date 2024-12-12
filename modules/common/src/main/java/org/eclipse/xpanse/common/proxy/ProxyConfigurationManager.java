@@ -18,10 +18,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
- * This class reads standard linux format proxy configuration and
- * injects java like system properties.
- * The libraries which depend on standard java proxy system properties will work without any
- * further configuration.
+ * This class reads standard linux format proxy configuration and injects java like system
+ * properties. The libraries which depend on standard java proxy system properties will work without
+ * any further configuration.
  */
 @Slf4j
 @Getter
@@ -34,12 +33,15 @@ public class ProxyConfigurationManager {
 
     @Autowired
     private ProxyConfigurationManager(Environment environment) {
-        String httpProxyUrl = getCaseInsensitiveProxyVariable(
-                environment, ProxyVariables.HTTP_PROXY_ENVIRONMENT_VAR);
-        String httpsProxyUrl = getCaseInsensitiveProxyVariable(
-                environment, ProxyVariables.HTTPS_PROXY_ENVIRONMENT_VAR);
-        this.nonProxyHosts = getCaseInsensitiveProxyVariable(
-                environment, ProxyVariables.NO_PROXY_ENVIRONMENT_VAR);
+        String httpProxyUrl =
+                getCaseInsensitiveProxyVariable(
+                        environment, ProxyVariables.HTTP_PROXY_ENVIRONMENT_VAR);
+        String httpsProxyUrl =
+                getCaseInsensitiveProxyVariable(
+                        environment, ProxyVariables.HTTPS_PROXY_ENVIRONMENT_VAR);
+        this.nonProxyHosts =
+                getCaseInsensitiveProxyVariable(
+                        environment, ProxyVariables.NO_PROXY_ENVIRONMENT_VAR);
         if (Objects.nonNull(httpProxyUrl) && !httpProxyUrl.isBlank()) {
             this.httpProxyDetails = extractProxyDetails(httpProxyUrl, true);
 
@@ -70,9 +72,7 @@ public class ProxyConfigurationManager {
         return null;
     }
 
-    /**
-     * Priority is given to the lower case proxy variables which are the linux standards.
-     */
+    /** Priority is given to the lower case proxy variables which are the linux standards. */
     private String getCaseInsensitiveProxyVariable(Environment environment, String proxyVariable) {
         if (environment.getProperty(proxyVariable) != null) {
             return environment.getProperty(proxyVariable);
@@ -86,18 +86,24 @@ public class ProxyConfigurationManager {
         try {
             URI uri = new URI(proxyUrl);
             String[] proxyCredentials = extractProxyCredentials(proxyUrl);
-            ProxyDetails proxyDetails = new ProxyDetails
-                    .ProxyDetailsBuilder()
-                    .proxyUrl(proxyUrl)
-                    .proxyHost(uri.getHost())
-                    .proxyPort(uri.getPort() != -1 ? uri.getPort()
-                            : URL.of(uri, null).getDefaultPort())
-                    .proxyUsername(Objects.nonNull(proxyCredentials) ? proxyCredentials[0] : null)
-                    .proxyPassword(Objects.nonNull(proxyCredentials) ? proxyCredentials[1] : null)
-                    .build();
-            System.setProperty(isHttpProxy ? "http.proxyHost" : "https.proxyHost",
+            ProxyDetails proxyDetails =
+                    new ProxyDetails.ProxyDetailsBuilder()
+                            .proxyUrl(proxyUrl)
+                            .proxyHost(uri.getHost())
+                            .proxyPort(
+                                    uri.getPort() != -1
+                                            ? uri.getPort()
+                                            : URL.of(uri, null).getDefaultPort())
+                            .proxyUsername(
+                                    Objects.nonNull(proxyCredentials) ? proxyCredentials[0] : null)
+                            .proxyPassword(
+                                    Objects.nonNull(proxyCredentials) ? proxyCredentials[1] : null)
+                            .build();
+            System.setProperty(
+                    isHttpProxy ? "http.proxyHost" : "https.proxyHost",
                     proxyDetails.getProxyHost());
-            System.setProperty(isHttpProxy ? "http.proxyPort" : "https.proxyPort",
+            System.setProperty(
+                    isHttpProxy ? "http.proxyPort" : "https.proxyPort",
                     String.valueOf(proxyDetails.getProxyPort()));
             return proxyDetails;
         } catch (URISyntaxException | MalformedURLException e) {

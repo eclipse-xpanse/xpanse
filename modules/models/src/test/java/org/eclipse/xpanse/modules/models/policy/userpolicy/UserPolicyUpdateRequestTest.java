@@ -23,8 +23,7 @@ class UserPolicyUpdateRequestTest {
     private final Boolean enabled = true;
     private final String policy = "policy";
     private final UUID id = UUID.fromString("8f06ca43-e699-424e-92d4-37b85f35134f");
-    @Mock
-    private Csp mockCsp;
+    @Mock private Csp mockCsp;
     private UserPolicyUpdateRequest test;
 
     @BeforeEach
@@ -66,8 +65,10 @@ class UserPolicyUpdateRequestTest {
 
     @Test
     void testToString() {
-        String result = String.format("UserPolicyUpdateRequest(csp=%s, policy=%s, enabled=%s)",
-                mockCsp, policy, enabled);
+        String result =
+                String.format(
+                        "UserPolicyUpdateRequest(csp=%s, policy=%s, enabled=%s)",
+                        mockCsp, policy, enabled);
         assertThat(test.toString()).isEqualTo(result);
     }
 }

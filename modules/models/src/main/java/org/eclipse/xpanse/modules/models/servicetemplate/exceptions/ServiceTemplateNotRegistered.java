@@ -5,13 +5,9 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate.exceptions;
 
-/**
- * Exception thrown when the deployer mentioned in the service is not available.
- */
+/** Exception thrown when the deployer mentioned in the service is not available. */
 public class ServiceTemplateNotRegistered extends RuntimeException {
     public ServiceTemplateNotRegistered(String message) {
         super(message);
     }
-
 }
-

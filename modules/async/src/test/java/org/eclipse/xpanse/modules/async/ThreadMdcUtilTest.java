@@ -15,9 +15,7 @@ import java.util.concurrent.Callable;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
-/**
- * Test of ThreadMdcUtil.
- */
+/** Test of ThreadMdcUtil. */
 class ThreadMdcUtilTest {
 
     @Test
@@ -49,9 +47,10 @@ class ThreadMdcUtilTest {
 
     @Test
     public void testWrapRunnableWithNullContext() {
-        Runnable runnable = () -> {
-            MDC.put("key", "modified");
-        };
+        Runnable runnable =
+                () -> {
+                    MDC.put("key", "modified");
+                };
         Runnable wrappedRunnable = ThreadMdcUtil.wrap(runnable, null);
         MDC.put("key", "value");
         wrappedRunnable.run();
@@ -61,9 +60,10 @@ class ThreadMdcUtilTest {
 
     @Test
     public void testWrapRunnableWithNonNullContext() {
-        Runnable runnable = () -> {
-            MDC.put("key", "modified");
-        };
+        Runnable runnable =
+                () -> {
+                    MDC.put("key", "modified");
+                };
         Map<String, String> context = new HashMap<>();
         context.put("key", "value");
         Runnable wrappedRunnable = ThreadMdcUtil.wrap(runnable, context);
@@ -73,5 +73,4 @@ class ThreadMdcUtilTest {
 
         assertEquals("value", mdcContext.get().get("key"));
     }
-
 }

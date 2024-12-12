@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.security;
 
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -26,8 +25,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Profile("oauth")
 @Component
-public class Oauth2GrantedAuthoritiesExtractor implements
-        Converter<Map<String, Object>, Collection<GrantedAuthority>> {
+public class Oauth2GrantedAuthoritiesExtractor
+        implements Converter<Map<String, Object>, Collection<GrantedAuthority>> {
 
     @Value("${authorization.default.role}")
     private String defaultRole;
@@ -46,14 +45,15 @@ public class Oauth2GrantedAuthoritiesExtractor implements
         Map<String, Object> rolesClaim = (Map<String, Object>) claims.get(grantedRolesScope);
         if (Objects.isNull(rolesClaim) || rolesClaim.isEmpty()) {
             roles = Set.of(new SimpleGrantedAuthority(defaultRole));
-            log.info("Get user [id:{}] granted authorities is empty,"
-                    + " set default authority user", userId);
+            log.info(
+                    "Get user [id:{}] granted authorities is empty,"
+                            + " set default authority user",
+                    userId);
         } else {
-            roles = rolesClaim
-                    .keySet()
-                    .stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toSet());
+            roles =
+                    rolesClaim.keySet().stream()
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toSet());
             log.info("Get user [id:{}] granted authorities:{}.", userId, roles);
         }
         return roles;

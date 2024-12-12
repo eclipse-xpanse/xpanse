@@ -37,10 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST interface methods for service configuration.
- */
-
+/** REST interface methods for service configuration. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
@@ -49,8 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServiceConfigurationApi {
 
-    @Resource
-    private ServiceConfigurationManager serviceConfigurationManager;
+    @Resource private ServiceConfigurationManager serviceConfigurationManager;
 
     /**
      * Query the service's current configuration by id of the deployed service.
@@ -58,68 +54,69 @@ public class ServiceConfigurationApi {
      * @param serviceId id of the deployed service.
      * @return ServiceConfigurationEntity.
      */
-    @Tag(name = "ServiceConfiguration",
-            description = "APIs for managing service's configuration.")
-    @GetMapping(value = "/service/current/config/{serviceId}",
+    @Tag(name = "ServiceConfiguration", description = "APIs for managing service's configuration.")
+    @GetMapping(
+            value = "/service/current/config/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "Query the service's current configuration by"
-            + " id of the deployed service.")
+    @Operation(
+            description =
+                    "Query the service's current configuration by" + " id of the deployed service.")
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public ServiceConfigurationDetails getCurrentConfigurationOfService(
             @Parameter(name = "serviceId", description = "The id of the deployed service")
-            @PathVariable("serviceId") String serviceId) {
+                    @PathVariable("serviceId")
+                    String serviceId) {
         return serviceConfigurationManager.getCurrentConfigurationOfService(serviceId);
     }
 
     /**
      * Update the service's configuration to the registered service template.
      *
-     * @param serviceId                  id of the deployed service
+     * @param serviceId id of the deployed service
      * @param serviceConfigurationUpdate serviceConfigurationUpdate.
      * @return serviceOrder.
      */
-    @Tag(name = "ServiceConfiguration",
-            description = "APIs for managing service's configuration.")
-    @PutMapping(value = "/services/config/{serviceId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "ServiceConfiguration", description = "APIs for managing service's configuration.")
+    @PutMapping(value = "/services/config/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "Update the service's configuration to the registered service "
-            + "template.")
+    @Operation(
+            description =
+                    "Update the service's configuration to the registered service " + "template.")
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public ServiceOrder changeServiceConfiguration(
             @Parameter(name = "serviceId", description = "The id of the deployed service")
-            @PathVariable("serviceId") String serviceId,
+                    @PathVariable("serviceId")
+                    String serviceId,
             @Valid @RequestBody ServiceConfigurationUpdate serviceConfigurationUpdate) {
-        return serviceConfigurationManager.changeServiceConfiguration(serviceId,
-                serviceConfigurationUpdate);
+        return serviceConfigurationManager.changeServiceConfiguration(
+                serviceId, serviceConfigurationUpdate);
     }
 
-
-    /**
-     * List all service configuration update request.
-     *
-     */
-    @Tag(name = "ServiceConfiguration",
-            description = "APIs for managing service's configuration.")
-    @GetMapping(value = "/services/config/requests",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    /** List all service configuration update request. */
+    @Tag(name = "ServiceConfiguration", description = "APIs for managing service's configuration.")
+    @GetMapping(value = "/services/config/requests", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List service's configuration.")
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    public List<ServiceConfigurationChangeOrderDetails>
-            getAllServiceConfigurationChangeDetails(
+    public List<ServiceConfigurationChangeOrderDetails> getAllServiceConfigurationChangeDetails(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
-            @RequestParam(name = "serviceId") String serviceId,
+                    @RequestParam(name = "serviceId")
+                    String serviceId,
             @Parameter(name = "orderId", description = "id of the service order")
-            @RequestParam(name = "orderId", required = false) String orderId,
+                    @RequestParam(name = "orderId", required = false)
+                    String orderId,
             @Parameter(name = "resourceName", description = "name of the service resource")
-            @RequestParam(name = "resourceName", required = false) String resourceName,
-            @Parameter(name = "configManager",
-                    description = "Manager of the service configuration parameter.")
-            @RequestParam(name = "configManager", required = false) String configManager,
+                    @RequestParam(name = "resourceName", required = false)
+                    String resourceName,
+            @Parameter(
+                            name = "configManager",
+                            description = "Manager of the service configuration parameter.")
+                    @RequestParam(name = "configManager", required = false)
+                    String configManager,
             @Parameter(name = "status", description = "Status of the service configuration")
-            @RequestParam(name = "status", required = false) ServiceConfigurationStatus status) {
+                    @RequestParam(name = "status", required = false)
+                    ServiceConfigurationStatus status) {
         return serviceConfigurationManager.getAllServiceConfigurationChangeDetails(
                 orderId, serviceId, resourceName, configManager, status);
     }

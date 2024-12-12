@@ -9,9 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 import lombok.Data;
 
-/**
- * Defines the Terraform validation result.
- */
+/** Defines the Terraform validation result. */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DeploymentScriptValidationResult {

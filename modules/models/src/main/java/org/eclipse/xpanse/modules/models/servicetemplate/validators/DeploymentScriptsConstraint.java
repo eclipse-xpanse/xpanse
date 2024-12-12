@@ -13,9 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Bean validation for Deployment scripts.
- */
+/** Bean validation for Deployment scripts. */
 @Documented
 @Constraint(validatedBy = DeploymentValidator.class)
 @Target({ElementType.METHOD, ElementType.FIELD})
@@ -28,15 +26,9 @@ public @interface DeploymentScriptsConstraint {
      */
     String message() default "Either deployer or deployFromGitRepo must be provided";
 
-    /**
-     * standard field to be provided to javax validator. We just
-     * provide an empty array.
-     */
+    /** standard field to be provided to javax validator. We just provide an empty array. */
     Class<?>[] groups() default {};
 
-    /**
-     * standard field to be provided to javax validator. We just
-     * provide an empty array.
-     */
+    /** standard field to be provided to javax validator. We just provide an empty array. */
     Class<? extends Payload>[] payload() default {};
 }

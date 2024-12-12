@@ -14,15 +14,15 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class TofuMakerApiClientConfigTest {
 
-    @Mock
-    private ApiClient mockApiClient;
+    @Mock private ApiClient mockApiClient;
 
-    @InjectMocks
-    private TofuMakerApiClientConfig openTofuMakerApiClientConfigUnderTest;
+    @InjectMocks private TofuMakerApiClientConfig openTofuMakerApiClientConfigUnderTest;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(openTofuMakerApiClientConfigUnderTest, "openTofuMakerBaseUrl",
+        ReflectionTestUtils.setField(
+                openTofuMakerApiClientConfigUnderTest,
+                "openTofuMakerBaseUrl",
                 "http://localhost:9092");
     }
 

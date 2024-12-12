@@ -13,14 +13,11 @@ import java.io.Serial;
 import java.io.Serializable;
 import lombok.Data;
 
-/**
- * Defines the availability zone model of the managed service.
- */
+/** Defines the availability zone model of the managed service. */
 @Data
 public class AvailabilityZoneConfig implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = -4194637466122775932L;
+    @Serial private static final long serialVersionUID = -4194637466122775932L;
 
     @NotNull
     @NotBlank
@@ -40,5 +37,4 @@ public class AvailabilityZoneConfig implements Serializable {
 
     @Schema(description = "The description of availability zone.")
     private String description;
-
 }

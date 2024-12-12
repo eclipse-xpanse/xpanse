@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Cloud service providers.
- */
+/** Cloud service providers. */
 public enum Csp {
     HUAWEI_CLOUD("HuaweiCloud"),
     FLEXIBLE_ENGINE("FlexibleEngine"),
@@ -30,9 +28,7 @@ public enum Csp {
         this.value = value;
     }
 
-    /**
-     * For CSP deserialize.
-     */
+    /** For CSP deserialize. */
     @JsonCreator
     public static Csp getByValue(String name) {
         for (Csp csp : values()) {
@@ -44,9 +40,7 @@ public enum Csp {
                 String.format("Csp value %s is not supported.", name));
     }
 
-    /**
-     * For CSP serialize.
-     */
+    /** For CSP serialize. */
     @JsonValue
     public String toValue() {
         return this.value;

@@ -29,20 +29,15 @@ import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.springframework.stereotype.Component;
 
-/**
- * Process tool class.
- */
+/** Process tool class. */
 @Component
 public class WorkflowUtils {
 
-    @Resource
-    private RuntimeService runtimeService;
+    @Resource private RuntimeService runtimeService;
 
-    @Resource
-    private TaskService taskService;
+    @Resource private TaskService taskService;
 
-    @Resource
-    private HistoryService historyService;
+    @Resource private HistoryService historyService;
 
     /**
      * Start the process through the process definition key.
@@ -58,7 +53,7 @@ public class WorkflowUtils {
      * Start the process through the process definition key and set the process variables.
      *
      * @param processKey process definition key.
-     * @param variable   Process variables.
+     * @param variable Process variables.
      * @return ProcessInstance Process instance.
      */
     public ProcessInstance startProcess(String processKey, Map<String, Object> variable) {
@@ -81,10 +76,12 @@ public class WorkflowUtils {
      * @param userId the ID of the currently logged in user.
      */
     public List<WorkFlowTask> doneTasks(String userId) {
-        List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
-                .taskAssignee(userId)
-                .finished()
-                .list();
+        List<HistoricTaskInstance> list =
+                historyService
+                        .createHistoricTaskInstanceQuery()
+                        .taskAssignee(userId)
+                        .finished()
+                        .list();
         return transHistoricTaskInstanceToWorkFlowTask(list);
     }
 
@@ -111,7 +108,7 @@ public class WorkflowUtils {
     /**
      * Complete tasks based on task ID and set global process variables.
      *
-     * @param taskId    taskId taskId.
+     * @param taskId taskId taskId.
      * @param variables global process variables.
      */
     public void completeTask(String taskId, Map<String, Object> variables) {
@@ -120,22 +117,25 @@ public class WorkflowUtils {
     }
 
     /**
-     * Complete ReceiveTask for the given processInstanceId and activityId.
-     * The method closes the waiting task and pushes the workflow to the next step.
+     * Complete ReceiveTask for the given processInstanceId and activityId. The method closes the
+     * waiting task and pushes the workflow to the next step.
      */
     public void completeReceiveTask(String processInstanceId, String activityId) {
         if (StringUtils.isNotBlank(processInstanceId)) {
             ProcessInstance instance =
-                    runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId)
+                    runtimeService
+                            .createProcessInstanceQuery()
+                            .processInstanceId(processInstanceId)
                             .singleResult();
 
             if (Objects.nonNull(instance)) {
-                Execution execution = runtimeService.createExecutionQuery()
-                        .processInstanceId(processInstanceId)
-                        .activityId(activityId)
-                        .singleResult();
+                Execution execution =
+                        runtimeService
+                                .createExecutionQuery()
+                                .processInstanceId(processInstanceId)
+                                .activityId(activityId)
+                                .singleResult();
                 runtimeService.trigger(execution.getId());
-
             }
         }
     }
@@ -154,8 +154,11 @@ public class WorkflowUtils {
 
     private WorkFlowTask getTodoWorkFlow(TaskInfo task) {
         WorkFlowTask workFlowTask = getWorkFlow(task);
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(task.getProcessInstanceId()).singleResult();
+        ProcessInstance instance =
+                runtimeService
+                        .createProcessInstanceQuery()
+                        .processInstanceId(task.getProcessInstanceId())
+                        .singleResult();
         if (Objects.nonNull(instance)) {
             workFlowTask.setProcessInstanceName(instance.getProcessDefinitionName());
             workFlowTask.setProcessDefinitionName(instance.getProcessDefinitionName());
@@ -164,12 +167,13 @@ public class WorkflowUtils {
         return workFlowTask;
     }
 
-
     private WorkFlowTask getDoneWorkFlow(TaskInfo task) {
         WorkFlowTask workFlowTask = getWorkFlow(task);
         HistoricProcessInstance instance =
-                historyService.createHistoricProcessInstanceQuery()
-                        .processInstanceId(task.getProcessInstanceId()).singleResult();
+                historyService
+                        .createHistoricProcessInstanceQuery()
+                        .processInstanceId(task.getProcessInstanceId())
+                        .singleResult();
         if (Objects.nonNull(instance)) {
             workFlowTask.setProcessInstanceName(instance.getProcessDefinitionName());
             workFlowTask.setProcessDefinitionName(instance.getProcessDefinitionName());
@@ -190,8 +194,8 @@ public class WorkflowUtils {
     private void validateTaskId(String taskId) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
-            throw new ServiceNotDeployedException("The migrated activiti task was not found, "
-                    + "taskId: " + taskId);
+            throw new ServiceNotDeployedException(
+                    "The migrated activiti task was not found, " + "taskId: " + taskId);
         }
     }
 

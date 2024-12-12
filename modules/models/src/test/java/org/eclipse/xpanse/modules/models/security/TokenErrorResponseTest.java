@@ -22,7 +22,6 @@ class TokenResponseTest {
         test.setScopes("openid");
     }
 
-
     @Test
     void testGetters() {
         assertEquals("access_token", test.getAccessToken());
@@ -31,7 +30,6 @@ class TokenResponseTest {
         assertEquals("Bearer", test.getTokenType());
         assertEquals("openid", test.getScopes());
     }
-
 
     @Test
     void testEqualsAndHashCode() {
@@ -100,11 +98,11 @@ class TokenResponseTest {
         assertNotEquals(test2.hashCode(), test3.hashCode());
     }
 
-
     @Test
     void testToString() {
         String exceptedString =
-                "TokenResponse(accessToken=access_token, tokenType=Bearer, expiresIn=300, idToken=id_token, scopes=openid)";
+                "TokenResponse(accessToken=access_token, tokenType=Bearer, expiresIn=300,"
+                        + " idToken=id_token, scopes=openid)";
         assertEquals(test.toString(), exceptedString);
         assertNotEquals(test.toString(), null);
     }

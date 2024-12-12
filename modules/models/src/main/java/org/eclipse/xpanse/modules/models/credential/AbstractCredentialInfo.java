@@ -24,9 +24,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 @JsonDeserialize(using = AbstractCredentialInfoDeserializer.class)
 public abstract class AbstractCredentialInfo {
 
-    /**
-     * The cloud service provider of the credential, this field is provided by the plugins.
-     */
+    /** The cloud service provider of the credential, this field is provided by the plugins. */
     @Setter
     @NotNull
     @Schema(description = "The cloud service provider of the credential.")
@@ -38,53 +36,52 @@ public abstract class AbstractCredentialInfo {
     @Schema(description = "The site which the credentials belong to.")
     String site;
 
-    /**
-     * The type of the credential.
-     */
+    /** The type of the credential. */
     @NotNull
-    @Schema(description = "The type of the credential, "
-            + "this field is provided by the plugin of cloud service provider.")
+    @Schema(
+            description =
+                    "The type of the credential, "
+                            + "this field is provided by the plugin of cloud service provider.")
     CredentialType type;
 
-    /**
-     * The name of the credential, this field is provided by the plugins.
-     */
+    /** The name of the credential, this field is provided by the plugins. */
     @NotNull
     @NotBlank
-    @Schema(description = "The name of the credential, this field is provided by "
-            + "the plugin of cloud service provider. The value of this field must be unique "
-            + "between credentials with the same csp and type.")
+    @Schema(
+            description =
+                    "The name of the credential, this field is provided by the plugin of cloud"
+                            + " service provider. The value of this field must be unique between"
+                            + " credentials with the same csp and type.")
     String name;
 
-    /**
-     * The description of the credential.
-     */
+    /** The description of the credential. */
     @NotNull
     @NotBlank
-    @Schema(description = "The description of the credential,"
-            + "this field is provided by the plugin of cloud service provider.")
+    @Schema(
+            description =
+                    "The description of the credential,"
+                            + "this field is provided by the plugin of cloud service provider.")
     String description;
 
-    /**
-     * The id of user who create the credential.
-     */
+    /** The id of user who create the credential. */
     @Setter
     @Schema(description = "The id of user who created the credential.")
     String userId;
 
-    /**
-     * The expired unix long time of the credential.
-     */
+    /** The expired unix long time of the credential. */
     @Setter
     @Hidden
     @Schema(description = "The time in seconds to live of the credential")
     Integer timeToLive;
 
-    /**
-     * The constructor.
-     */
-    AbstractCredentialInfo(Csp csp, String site, CredentialType type, String name,
-                           String description, String userId) {
+    /** The constructor. */
+    AbstractCredentialInfo(
+            Csp csp,
+            String site,
+            CredentialType type,
+            String name,
+            String description,
+            String userId) {
         this.csp = csp;
         this.site = site;
         this.type = type;

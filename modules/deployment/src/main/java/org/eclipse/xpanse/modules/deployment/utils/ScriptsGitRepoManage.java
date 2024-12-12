@@ -27,9 +27,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to manage GIT clone.
- */
+/** Bean to manage GIT clone. */
 @Slf4j
 @Component
 public class ScriptsGitRepoManage {
@@ -40,10 +38,11 @@ public class ScriptsGitRepoManage {
     /**
      * Method to check out scripts from a GIT repo.
      *
-     * @param workspace   directory where the GIT clone must be executed.
+     * @param workspace directory where the GIT clone must be executed.
      * @param scriptsRepo directory inside the GIT repo where scripts are expected to be present.
      */
-    @Retryable(retryFor = GitRepoCloneException.class,
+    @Retryable(
+            retryFor = GitRepoCloneException.class,
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<File> checkoutScripts(String workspace, ScriptsRepo scriptsRepo) {
@@ -61,10 +60,14 @@ public class ScriptsGitRepoManage {
             try (Git git = cloneCommand.call()) {
                 git.checkout();
             } catch (GitAPIException e) {
-                String errorMsg = String.format("Clone scripts from branch %s of repo %s error. %s",
-                        scriptsRepo.getBranch(), scriptsRepo.getRepoUrl(), e.getMessage());
-                int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                        ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+                String errorMsg =
+                        String.format(
+                                "Clone scripts from branch %s of repo %s error. %s",
+                                scriptsRepo.getBranch(), scriptsRepo.getRepoUrl(), e.getMessage());
+                int retryCount =
+                        Objects.isNull(RetrySynchronizationManager.getContext())
+                                ? 0
+                                : RetrySynchronizationManager.getContext().getRetryCount();
                 log.error(errorMsg + " Retry count:" + retryCount);
                 throw new GitRepoCloneException(errorMsg);
             }
@@ -78,18 +81,22 @@ public class ScriptsGitRepoManage {
 
     private List<File> getSourceFiles(String workspace, ScriptsRepo scriptsRepo) {
         List<File> sourceFiles = new ArrayList<>();
-        File directory = new File(workspace
-                + (StringUtils.isNotBlank(scriptsRepo.getScriptsPath())
-                ? File.separator + scriptsRepo.getScriptsPath()
-                : ""));
+        File directory =
+                new File(
+                        workspace
+                                + (StringUtils.isNotBlank(scriptsRepo.getScriptsPath())
+                                        ? File.separator + scriptsRepo.getScriptsPath()
+                                        : ""));
         if (directory.exists() && directory.isDirectory()) {
             File[] files = directory.listFiles();
             if (Objects.nonNull(files)) {
-                Arrays.stream(files).forEach(file -> {
-                    if (file.isFile()) {
-                        sourceFiles.add(file);
-                    }
-                });
+                Arrays.stream(files)
+                        .forEach(
+                                file -> {
+                                    if (file.isFile()) {
+                                        sourceFiles.add(file);
+                                    }
+                                });
             }
         }
         return sourceFiles;
@@ -97,15 +104,16 @@ public class ScriptsGitRepoManage {
 
     private void validateIfFolderContainsTerraformScripts(
             List<File> files, ScriptsRepo scriptsRepo) {
-        boolean isScriptsExisted = files.stream()
-                .anyMatch(file -> file.getName().endsWith(TF_SCRIPT_FILE_EXTENSION));
+        boolean isScriptsExisted =
+                files.stream().anyMatch(file -> file.getName().endsWith(TF_SCRIPT_FILE_EXTENSION));
         if (!isScriptsExisted) {
             throw new DeploymentScriptsCreationFailedException(
                     "No deployment scripts found in the "
                             + scriptsRepo.getRepoUrl()
                             + " repo's '"
                             + (StringUtils.isNotBlank(scriptsRepo.getScriptsPath())
-                            ? File.separator + scriptsRepo.getScriptsPath() : "root")
+                                    ? File.separator + scriptsRepo.getScriptsPath()
+                                    : "root")
                             + "' folder.");
         }
     }

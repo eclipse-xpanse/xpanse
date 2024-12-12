@@ -13,37 +13,33 @@ import java.util.Set;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperties;
 
-
-/**
- * Enum for resource type in tfState and FlexibleEngineResourceProperties.
- */
+/** Enum for resource type in tfState and FlexibleEngineResourceProperties. */
 public enum FlexibleEngineTerraformResourceProperties {
-    FLEXIBLE_ENGINE_VM_PROPERTIES("flexibleengine_compute_instance_v2",
-            new FlexibleEngineVmProperties()),
-    FLEXIBLE_ENGINE_VOLUME_PROPERTIES("flexibleengine_blockstorage_volume_v2",
-            new FlexibleEngineVolumeProperties()),
-    FLEXIBLE_ENGINE_PUBLIC_IP_PROPERTIES("flexibleengine_vpc_eip",
-            new FlexibleEnginePublicIpProperties()),
-    FLEXIBLE_ENGINE_VPC_PROPERTIES("flexibleengine_vpc_v1",
-            new FlexibleEngineVpcProperties()),
-    FLEXIBLE_ENGINE_SUBNET_PROPERTIES("flexibleengine_vpc_subnet_v1",
-            new FlexibleEngineSubnetProperties()),
-    FLEXIBLE_ENGINE_KEYPAIR_PROPERTIES("flexibleengine_compute_keypair_v2",
-            new FlexibleEngineKeyPairProperties()),
-    FLEXIBLE_ENGINE_SECURITY_GROUP_PROPERTIES("flexibleengine_networking_secgroup_v2",
-            new FlexibleEngineSecurityGroupProperties()),
-    FLEXIBLE_ENGINE_SECURITY_GROUP_RULE_PROPERTIES("flexibleengine_networking_secgroup_rule_v2",
+    FLEXIBLE_ENGINE_VM_PROPERTIES(
+            "flexibleengine_compute_instance_v2", new FlexibleEngineVmProperties()),
+    FLEXIBLE_ENGINE_VOLUME_PROPERTIES(
+            "flexibleengine_blockstorage_volume_v2", new FlexibleEngineVolumeProperties()),
+    FLEXIBLE_ENGINE_PUBLIC_IP_PROPERTIES(
+            "flexibleengine_vpc_eip", new FlexibleEnginePublicIpProperties()),
+    FLEXIBLE_ENGINE_VPC_PROPERTIES("flexibleengine_vpc_v1", new FlexibleEngineVpcProperties()),
+    FLEXIBLE_ENGINE_SUBNET_PROPERTIES(
+            "flexibleengine_vpc_subnet_v1", new FlexibleEngineSubnetProperties()),
+    FLEXIBLE_ENGINE_KEYPAIR_PROPERTIES(
+            "flexibleengine_compute_keypair_v2", new FlexibleEngineKeyPairProperties()),
+    FLEXIBLE_ENGINE_SECURITY_GROUP_PROPERTIES(
+            "flexibleengine_networking_secgroup_v2", new FlexibleEngineSecurityGroupProperties()),
+    FLEXIBLE_ENGINE_SECURITY_GROUP_RULE_PROPERTIES(
+            "flexibleengine_networking_secgroup_rule_v2",
             new FlexibleEngineSecurityGroupRuleProperties());
 
     private final String tfResourceType;
     private final DeployResourceProperties resourceProperties;
 
-    FlexibleEngineTerraformResourceProperties(String tfResourceType,
-                                              DeployResourceProperties resourceProperties) {
+    FlexibleEngineTerraformResourceProperties(
+            String tfResourceType, DeployResourceProperties resourceProperties) {
         this.tfResourceType = tfResourceType;
         this.resourceProperties = resourceProperties;
     }
-
 
     /**
      * Get deploy resource properties by resourceKind.
@@ -51,8 +47,7 @@ public enum FlexibleEngineTerraformResourceProperties {
      * @param tfResourceType resource type in tfState.
      * @return DeployResourceProperties.
      */
-    public static DeployResourceProperties getDeployResourceProperties(
-            String tfResourceType) {
+    public static DeployResourceProperties getDeployResourceProperties(String tfResourceType) {
         for (FlexibleEngineTerraformResourceProperties property : values()) {
             if (property.tfResourceType.equals(tfResourceType)) {
                 return property.resourceProperties;
@@ -74,9 +69,7 @@ public enum FlexibleEngineTerraformResourceProperties {
         return types;
     }
 
-    /**
-     * FlexibleEngine vm properties.
-     */
+    /** FlexibleEngine vm properties. */
     static class FlexibleEngineVmProperties extends DeployResourceProperties {
 
         @Override
@@ -96,9 +89,7 @@ public enum FlexibleEngineTerraformResourceProperties {
         }
     }
 
-    /**
-     * FlexibleEngine volume properties.
-     */
+    /** FlexibleEngine volume properties. */
     static class FlexibleEngineVolumeProperties extends DeployResourceProperties {
         @Override
         public DeployResourceKind getResourceKind() {
@@ -114,9 +105,7 @@ public enum FlexibleEngineTerraformResourceProperties {
         }
     }
 
-    /**
-     * FlexibleEngine publicIp properties.
-     */
+    /** FlexibleEngine publicIp properties. */
     static class FlexibleEnginePublicIpProperties extends DeployResourceProperties {
 
         @Override
@@ -132,10 +121,7 @@ public enum FlexibleEngineTerraformResourceProperties {
         }
     }
 
-
-    /**
-     * FlexibleEngine vpc properties.
-     */
+    /** FlexibleEngine vpc properties. */
     static class FlexibleEngineVpcProperties extends DeployResourceProperties {
 
         @Override
@@ -152,9 +138,7 @@ public enum FlexibleEngineTerraformResourceProperties {
         }
     }
 
-    /**
-     * FlexibleEngine subnet properties.
-     */
+    /** FlexibleEngine subnet properties. */
     static class FlexibleEngineSubnetProperties extends DeployResourceProperties {
 
         @Override
@@ -172,9 +156,7 @@ public enum FlexibleEngineTerraformResourceProperties {
         }
     }
 
-    /**
-     * FlexibleEngine keypair properties.
-     */
+    /** FlexibleEngine keypair properties. */
     static class FlexibleEngineKeyPairProperties extends DeployResourceProperties {
 
         @Override
@@ -192,9 +174,7 @@ public enum FlexibleEngineTerraformResourceProperties {
         }
     }
 
-    /**
-     * FlexibleEngine security group properties.
-     */
+    /** FlexibleEngine security group properties. */
     static class FlexibleEngineSecurityGroupProperties extends DeployResourceProperties {
 
         @Override
@@ -211,10 +191,7 @@ public enum FlexibleEngineTerraformResourceProperties {
         }
     }
 
-
-    /**
-     * FlexibleEngine security group role properties.
-     */
+    /** FlexibleEngine security group role properties. */
     static class FlexibleEngineSecurityGroupRuleProperties extends DeployResourceProperties {
 
         @Override

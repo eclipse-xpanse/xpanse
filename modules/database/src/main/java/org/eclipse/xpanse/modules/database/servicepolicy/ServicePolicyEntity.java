@@ -22,34 +22,26 @@ import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 
-/**
- * Represents the SERVICE_POLICY table in the database.
- */
+/** Represents the SERVICE_POLICY table in the database. */
 @Data
-@Table(name = "SERVICE_POLICY", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"SERVICE_TEMPLATE_ID", "POLICY"})
-})
+@Table(
+        name = "SERVICE_POLICY",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"SERVICE_TEMPLATE_ID", "POLICY"})})
 @Entity
 @EqualsAndHashCode(callSuper = true)
 public class ServicePolicyEntity extends CreateModifiedTime {
 
-    /**
-     * The id of the entity.
-     */
+    /** The id of the entity. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ID", nullable = false)
     private UUID id;
 
-    /**
-     * The valid policy created by the user.
-     */
+    /** The valid policy created by the user. */
     @Column(name = "POLICY", length = Integer.MAX_VALUE)
     private String policy;
 
-    /**
-     * The registered service template we belonged to.
-     */
+    /** The registered service template we belonged to. */
     @ManyToOne
     @JoinColumn(name = "SERVICE_TEMPLATE_ID", nullable = false)
     @JsonIgnoreProperties({"servicePolicyEntity"})
@@ -58,10 +50,7 @@ public class ServicePolicyEntity extends CreateModifiedTime {
     @Column(name = "FLAVOR_NAMES")
     private String flavorNames;
 
-    /**
-     * Is the policy enabled.
-     */
+    /** Is the policy enabled. */
     @Column(columnDefinition = "boolean default true")
     private Boolean enabled;
-
 }

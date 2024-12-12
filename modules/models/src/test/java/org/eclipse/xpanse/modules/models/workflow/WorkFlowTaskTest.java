@@ -17,8 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class WorkFlowTaskTest {
 
-    @Mock
-    private OffsetDateTime mockCreateTime;
+    @Mock private OffsetDateTime mockCreateTime;
 
     @Test
     void testProcessInstanceIdGetterAndSetter() {
@@ -127,10 +126,11 @@ class WorkFlowTaskTest {
 
     @Test
     void testToString() {
-        String result = "WorkFlowTask(processInstanceId=null, processInstanceName=null,"
-                + " processDefinitionId=null, processDefinitionName=null, executionId=null,"
-                + " taskId=null, taskName=null, businessKey=null, status=null, "
-                + "createTime=mockCreateTime)";
+        String result =
+                "WorkFlowTask(processInstanceId=null, processInstanceName=null,"
+                        + " processDefinitionId=null, processDefinitionName=null, executionId=null,"
+                        + " taskId=null, taskName=null, businessKey=null, status=null, "
+                        + "createTime=mockCreateTime)";
 
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
         workFlowTaskUnderTest.setCreateTime(mockCreateTime);

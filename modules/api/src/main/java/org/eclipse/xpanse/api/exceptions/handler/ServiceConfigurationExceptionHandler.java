@@ -3,9 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-
 package org.eclipse.xpanse.api.exceptions.handler;
-
 
 import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.getErrorResponse;
 
@@ -24,47 +22,40 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Exception handler related to service configuration.
- */
+/** Exception handler related to service configuration. */
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class ServiceConfigurationExceptionHandler {
 
-    /**
-     * Exception handler for ServiceConfigurationNotValidException.
-     */
+    /** Exception handler for ServiceConfigurationNotValidException. */
     @ExceptionHandler({ServiceConfigurationInvalidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleServiceConfigurationInvalidException(
             ServiceConfigurationInvalidException ex) {
-        return getErrorResponse(ErrorType.INVALID_SERVICE_CONFIGURATION,
-                ex.getErrorReasons());
+        return getErrorResponse(ErrorType.INVALID_SERVICE_CONFIGURATION, ex.getErrorReasons());
     }
 
-    /**
-     * Exception handler for ServiceConfigurationUpdateRequestNotFoundException.
-     */
+    /** Exception handler for ServiceConfigurationUpdateRequestNotFoundException. */
     @ExceptionHandler({ServiceConfigurationChangeDetailsEntityNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleServiceConfigurationUpdateRequestNotFoundException(
             ServiceConfigurationChangeDetailsEntityNotFoundException ex) {
-        return getErrorResponse(ErrorType.SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND,
+        return getErrorResponse(
+                ErrorType.SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 
-    /**
-     * Exception handler for ServiceConfigurationNotFoundException.
-     */
+    /** Exception handler for ServiceConfigurationNotFoundException. */
     @ExceptionHandler({ServiceConfigurationNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleServiceConfigurationNotFoundException(
             ServiceConfigurationNotFoundException ex) {
-        return getErrorResponse(ErrorType.SERVICE_CONFIGURATION_NOT_FOUND,
+        return getErrorResponse(
+                ErrorType.SERVICE_CONFIGURATION_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));
     }
 }

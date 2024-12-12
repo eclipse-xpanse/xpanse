@@ -31,26 +31,19 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * The service for managing policies belongs to the registered service template.
- */
+/** The service for managing policies belongs to the registered service template. */
 @Slf4j
 @Component
 public class ServicePolicyManager {
     private static final String SEPARATOR = ",";
 
-    @Resource
-    private PolicyManager policyManager;
+    @Resource private PolicyManager policyManager;
 
-    @Resource
-    private UserServiceHelper userServiceHelper;
+    @Resource private UserServiceHelper userServiceHelper;
 
-    @Resource
-    private DatabaseServicePolicyStorage servicePolicyStorage;
+    @Resource private DatabaseServicePolicyStorage servicePolicyStorage;
 
-    @Resource
-    private DatabaseServiceTemplateStorage serviceTemplateStorage;
-
+    @Resource private DatabaseServiceTemplateStorage serviceTemplateStorage;
 
     /**
      * List policies belonging to the registered service template.
@@ -65,7 +58,8 @@ public class ServicePolicyManager {
             return Collections.emptyList();
         }
         return existingServiceTemplate.getServicePolicyList().stream()
-                .map(this::conventToServicePolicy).toList();
+                .map(this::conventToServicePolicy)
+                .toList();
     }
 
     /**
@@ -88,11 +82,13 @@ public class ServicePolicyManager {
     private ServiceTemplateEntity getServiceTemplateEntity(UUID serviceTemplateId) {
         ServiceTemplateEntity existedServiceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
-        boolean hasManagePermission = userServiceHelper.currentUserCanManageNamespace(
-                existedServiceTemplate.getNamespace());
+        boolean hasManagePermission =
+                userServiceHelper.currentUserCanManageNamespace(
+                        existedServiceTemplate.getNamespace());
         if (!hasManagePermission) {
-            throw new AccessDeniedException("No permissions to view or manage policy belonging to "
-                    + "the service template belonging to other namespaces.");
+            throw new AccessDeniedException(
+                    "No permissions to view or manage policy belonging to "
+                            + "the service template belonging to other namespaces.");
         }
         return existedServiceTemplate;
     }
@@ -111,17 +107,17 @@ public class ServicePolicyManager {
         return conventToServicePolicy(updatedPolicy);
     }
 
-
-    private void validFlavorNames(List<String> flavorNameList,
-                                  ServiceTemplateEntity existingServiceTemplate) {
+    private void validFlavorNames(
+            List<String> flavorNameList, ServiceTemplateEntity existingServiceTemplate) {
         for (String flavorName : flavorNameList) {
             boolean flavorExists =
                     existingServiceTemplate.getOcl().getFlavors().getServiceFlavors().stream()
                             .anyMatch(flavor -> flavor.getName().equals(flavorName));
             if (!flavorExists) {
-                String errMsg = String.format(
-                        "Flavor name %s is not valid for service template with id %s.", flavorName,
-                        existingServiceTemplate.getId());
+                String errMsg =
+                        String.format(
+                                "Flavor name %s is not valid for service template with id %s.",
+                                flavorName, existingServiceTemplate.getId());
                 throw new FlavorInvalidException(errMsg);
             }
         }
@@ -155,25 +151,29 @@ public class ServicePolicyManager {
             throw new PolicyNotFoundException(errorMsg);
         }
 
-        boolean hasManagePermission = userServiceHelper.currentUserCanManageNamespace(
-                existingPolicy.getServiceTemplate().getNamespace());
+        boolean hasManagePermission =
+                userServiceHelper.currentUserCanManageNamespace(
+                        existingPolicy.getServiceTemplate().getNamespace());
         if (!hasManagePermission) {
-            throw new AccessDeniedException("No permissions to view or manage policy belonging to "
-                    + "the service templates belonging to other namespaces.");
+            throw new AccessDeniedException(
+                    "No permissions to view or manage policy belonging to "
+                            + "the service templates belonging to other namespaces.");
         }
         return existingPolicy;
     }
 
-    private void checkIfServicePolicyIsDuplicate(ServicePolicyEntity newPolicy,
-                                                 ServiceTemplateEntity existingService) {
+    private void checkIfServicePolicyIsDuplicate(
+            ServicePolicyEntity newPolicy, ServiceTemplateEntity existingService) {
         if (!CollectionUtils.isEmpty(existingService.getServicePolicyList())) {
             String newPolicyUniqueKey = getPolicyUniqueKey(newPolicy);
             for (ServicePolicyEntity servicePolicyEntity : existingService.getServicePolicyList()) {
-                if (StringUtils.equals(newPolicyUniqueKey,
-                        getPolicyUniqueKey(servicePolicyEntity))) {
-                    String errMsg = String.format("The same policy already exists with id: %s for "
-                                    + "the registered service template with id: %s.",
-                            servicePolicyEntity.getId(), existingService.getId());
+                if (StringUtils.equals(
+                        newPolicyUniqueKey, getPolicyUniqueKey(servicePolicyEntity))) {
+                    String errMsg =
+                            String.format(
+                                    "The same policy already exists with id: %s for "
+                                            + "the registered service template with id: %s.",
+                                    servicePolicyEntity.getId(), existingService.getId());
                     throw new PolicyDuplicateException(errMsg);
                 }
             }
@@ -191,14 +191,15 @@ public class ServicePolicyManager {
      * @return Returns service policy view object.
      */
     public ServicePolicy conventToServicePolicy(ServicePolicyEntity servicePolicyEntity) {
-        if (Objects.nonNull(servicePolicyEntity) && Objects.nonNull(
-                servicePolicyEntity.getServiceTemplate())) {
+        if (Objects.nonNull(servicePolicyEntity)
+                && Objects.nonNull(servicePolicyEntity.getServiceTemplate())) {
             ServicePolicy servicePolicy = new ServicePolicy();
             BeanUtils.copyProperties(servicePolicyEntity, servicePolicy);
             servicePolicy.setServicePolicyId(servicePolicyEntity.getId());
             if (StringUtils.isNotBlank(servicePolicyEntity.getFlavorNames())) {
-                List<String> flavorNames = Arrays.asList(
-                        StringUtils.split(servicePolicyEntity.getFlavorNames(), SEPARATOR));
+                List<String> flavorNames =
+                        Arrays.asList(
+                                StringUtils.split(servicePolicyEntity.getFlavorNames(), SEPARATOR));
                 servicePolicy.setFlavorNameList(flavorNames);
             }
             if (Objects.nonNull(servicePolicyEntity.getServiceTemplate().getId())) {
@@ -210,8 +211,8 @@ public class ServicePolicyManager {
         return null;
     }
 
-    private ServicePolicyEntity getServicePolicyToCreate(ServicePolicyCreateRequest createRequest,
-                                                         ServiceTemplateEntity existingService) {
+    private ServicePolicyEntity getServicePolicyToCreate(
+            ServicePolicyCreateRequest createRequest, ServiceTemplateEntity existingService) {
         ServicePolicyEntity policyToCreate = new ServicePolicyEntity();
         BeanUtils.copyProperties(createRequest, policyToCreate);
         policyToCreate.setServiceTemplate(existingService);
@@ -228,25 +229,27 @@ public class ServicePolicyManager {
         return policyToCreate;
     }
 
-    private ServicePolicyEntity getServicePolicyToUpdate(ServicePolicyUpdateRequest updateRequest,
-                                                         ServicePolicyEntity existingPolicy) {
+    private ServicePolicyEntity getServicePolicyToUpdate(
+            ServicePolicyUpdateRequest updateRequest, ServicePolicyEntity existingPolicy) {
         ServicePolicyEntity policyToUpdate = new ServicePolicyEntity();
         BeanUtils.copyProperties(existingPolicy, policyToUpdate);
         if (Objects.nonNull(updateRequest.getFlavorNameList())) {
             if (CollectionUtils.isEmpty(updateRequest.getFlavorNameList())) {
                 policyToUpdate.setFlavorNames(null);
             } else {
-                validFlavorNames(updateRequest.getFlavorNameList(),
-                        existingPolicy.getServiceTemplate());
-                String flavorNames = StringUtils.join(
-                        new HashSet<>(updateRequest.getFlavorNameList()), SEPARATOR);
+                validFlavorNames(
+                        updateRequest.getFlavorNameList(), existingPolicy.getServiceTemplate());
+                String flavorNames =
+                        StringUtils.join(
+                                new HashSet<>(updateRequest.getFlavorNameList()), SEPARATOR);
                 policyToUpdate.setFlavorNames(flavorNames);
             }
         }
 
         boolean updatePolicy =
-                StringUtils.isNotBlank(updateRequest.getPolicy()) && !StringUtils.equals(
-                        updateRequest.getPolicy(), existingPolicy.getPolicy());
+                StringUtils.isNotBlank(updateRequest.getPolicy())
+                        && !StringUtils.equals(
+                                updateRequest.getPolicy(), existingPolicy.getPolicy());
         if (updatePolicy) {
             policyManager.validatePolicy(updateRequest.getPolicy());
             policyToUpdate.setPolicy(updateRequest.getPolicy());
@@ -257,5 +260,4 @@ public class ServicePolicyManager {
         }
         return policyToUpdate;
     }
-
 }

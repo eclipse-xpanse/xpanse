@@ -20,11 +20,9 @@ class DatabaseServiceDeploymentStorageTest {
 
     private final UUID id = UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2");
     private final String userId = "defaultUserId";
-    @Mock
-    private ServiceDeploymentRepository mockServiceDeploymentRepository;
+    @Mock private ServiceDeploymentRepository mockServiceDeploymentRepository;
 
-    @InjectMocks
-    private DatabaseServiceDeploymentStorage databaseServiceDeploymentStorageUnderTest;
+    @InjectMocks private DatabaseServiceDeploymentStorage databaseServiceDeploymentStorageUnderTest;
 
     @Test
     void testStoreAndFlush() {
@@ -58,24 +56,19 @@ class DatabaseServiceDeploymentStorageTest {
         serviceDeploymentEntity1.setCategory(Category.AI);
         serviceDeploymentEntity1.setName("name");
         serviceDeploymentEntity1.setCustomerServiceName("customerServiceName");
-        final Optional<ServiceDeploymentEntity> deployServiceEntity = Optional.of(serviceDeploymentEntity1);
-        when(mockServiceDeploymentRepository.findById(
-                id))
-                .thenReturn(deployServiceEntity);
+        final Optional<ServiceDeploymentEntity> deployServiceEntity =
+                Optional.of(serviceDeploymentEntity1);
+        when(mockServiceDeploymentRepository.findById(id)).thenReturn(deployServiceEntity);
         final ServiceDeploymentEntity result =
-                databaseServiceDeploymentStorageUnderTest.findServiceDeploymentById(
-                        id);
+                databaseServiceDeploymentStorageUnderTest.findServiceDeploymentById(id);
         assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
     void testFindDeployServiceById_ServiceDeploymentRepositoryReturnsAbsent() {
-        when(mockServiceDeploymentRepository.findById(
-                id))
-                .thenReturn(Optional.empty());
+        when(mockServiceDeploymentRepository.findById(id)).thenReturn(Optional.empty());
         final ServiceDeploymentEntity result =
-                databaseServiceDeploymentStorageUnderTest.findServiceDeploymentById(
-                        id);
+                databaseServiceDeploymentStorageUnderTest.findServiceDeploymentById(id);
         assertThat(result).isNull();
     }
 
@@ -83,8 +76,7 @@ class DatabaseServiceDeploymentStorageTest {
     void testDeleteServiceDeployment() {
         final ServiceDeploymentEntity expectedResult = new ServiceDeploymentEntity();
         doNothing().when(mockServiceDeploymentRepository).delete(expectedResult);
-        databaseServiceDeploymentStorageUnderTest.deleteServiceDeployment(
-                expectedResult);
+        databaseServiceDeploymentStorageUnderTest.deleteServiceDeployment(expectedResult);
 
         verify(mockServiceDeploymentRepository, times(1)).delete(expectedResult);
     }

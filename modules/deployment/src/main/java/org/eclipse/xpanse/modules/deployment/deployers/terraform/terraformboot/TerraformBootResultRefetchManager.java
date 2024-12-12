@@ -20,27 +20,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
-/**
- * Bean to manage task result via terraform-boot.
- */
+/** Bean to manage task result via terraform-boot. */
 @Slf4j
 @Component
 public class TerraformBootResultRefetchManager {
 
-    @Resource
-    private DeployResultManager deployResultManager;
-    @Resource
-    private RetrieveTerraformResultApi retrieveTerraformResultApi;
+    @Resource private DeployResultManager deployResultManager;
+    @Resource private RetrieveTerraformResultApi retrieveTerraformResultApi;
 
-    /**
-     * retrieve terraform result.
-     */
-    public void retrieveTerraformResult(ServiceDeploymentEntity serviceDeployment,
-                                        ServiceOrderEntity serviceOrder) {
+    /** retrieve terraform result. */
+    public void retrieveTerraformResult(
+            ServiceDeploymentEntity serviceDeployment, ServiceOrderEntity serviceOrder) {
         try {
-            ResponseEntity<TerraformResult> result = retrieveTerraformResultApi
-                    .getStoredTaskResultByRequestIdWithHttpInfo(String
-                            .valueOf(serviceOrder.getOrderId()));
+            ResponseEntity<TerraformResult> result =
+                    retrieveTerraformResultApi.getStoredTaskResultByRequestIdWithHttpInfo(
+                            String.valueOf(serviceOrder.getOrderId()));
             if (result.getStatusCode() == HttpStatus.NO_CONTENT) {
                 return;
             }
@@ -54,15 +48,19 @@ public class TerraformBootResultRefetchManager {
             if (e.getStatusCode() == HttpStatus.BAD_REQUEST
                     && Objects.nonNull(response)
                     && response.getResultType()
-                    == Response.ResultTypeEnum.RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID) {
-                deployResultManager
-                        .updateServiceDeploymentStateAndServiceOrder(serviceDeployment,
-                                serviceOrder, ErrorType.TERRAFORM_BOOT_REQUEST_FAILED, e);
+                            == Response.ResultTypeEnum
+                                    .RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID) {
+                deployResultManager.updateServiceDeploymentStateAndServiceOrder(
+                        serviceDeployment,
+                        serviceOrder,
+                        ErrorType.TERRAFORM_BOOT_REQUEST_FAILED,
+                        e);
             } else {
-                log.error(String.format("Refetch terraform result failed. requestId %s,"
-                                + " error %s ", serviceOrder.getOrderId(), e.getMessage()));
+                log.error(
+                        String.format(
+                                "Refetch terraform result failed. requestId %s," + " error %s ",
+                                serviceOrder.getOrderId(), e.getMessage()));
             }
         }
     }
-
 }

@@ -12,20 +12,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-
-/**
- * DeployRequest model.
- */
+/** DeployRequest model. */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
 public class DeployRequest extends DeployRequestBase {
 
-    @Serial
-    private static final long serialVersionUID = -8027459207480627100L;
-    /**
-     * The id of the service to deploy.
-     */
-    @Hidden
-    private UUID serviceId;
+    @Serial private static final long serialVersionUID = -8027459207480627100L;
+
+    /** The id of the service to deploy. */
+    @Hidden private UUID serviceId;
 }

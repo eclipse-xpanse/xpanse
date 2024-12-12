@@ -8,9 +8,7 @@ package org.eclipse.xpanse.modules.models.policy.exceptions;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Exception thrown when found the same policy already created.
- */
+/** Exception thrown when found the same policy already created. */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuppressWarnings("UnnecessarilyFullyQualified")
@@ -22,6 +20,4 @@ public class PolicyDuplicateException extends RuntimeException {
         super(errorReason);
         this.errorReason = errorReason;
     }
-
-
 }

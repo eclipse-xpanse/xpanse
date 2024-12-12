@@ -20,13 +20,10 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Validator for billing config of service flavors.
- */
+/** Validator for billing config of service flavors. */
 @Slf4j
 @Component
 public class BillingConfigValidator {
-
 
     /**
      * Validate the billing config.
@@ -51,42 +48,68 @@ public class BillingConfigValidator {
                     if (!CollectionUtils.isEmpty(resourceUsage.getMarkUpPrices())) {
                         // Check if there are duplicated regions in markUpPrices
                         Set<String> regionInSites = new HashSet<>();
-                        resourceUsage.getMarkUpPrices().forEach(price -> {
-                            String regionInSite = price.getRegionName() + ":" + price.getSiteName();
-                            if (regionInSites.contains(regionInSite)) {
-                                String message = String.format(
-                                        "Duplicated items with regionName: %s and siteName: %s "
-                                                + "in markUpPrices for the flavor with name: %s.",
-                                        price.getRegionName(), price.getSiteName(), flavorName);
-                                errors.add(message);
-                            } else {
-                                regionInSites.add(regionInSite);
-                            }
-                        });
+                        resourceUsage
+                                .getMarkUpPrices()
+                                .forEach(
+                                        price -> {
+                                            String regionInSite =
+                                                    price.getRegionName()
+                                                            + ":"
+                                                            + price.getSiteName();
+                                            if (regionInSites.contains(regionInSite)) {
+                                                String message =
+                                                        String.format(
+                                                                "Duplicated items with regionName:"
+                                                                    + " %s and siteName: %s in"
+                                                                    + " markUpPrices for the flavor"
+                                                                    + " with name: %s.",
+                                                                price.getRegionName(),
+                                                                price.getSiteName(),
+                                                                flavorName);
+                                                errors.add(message);
+                                            } else {
+                                                regionInSites.add(regionInSite);
+                                            }
+                                        });
                     }
                     if (!CollectionUtils.isEmpty(resourceUsage.getLicensePrices())) {
                         // Check if there are duplicate items with region-site in licensePrices
                         Set<String> regionInSites = new HashSet<>();
-                        resourceUsage.getLicensePrices().forEach(price -> {
-                            String regionInSite = price.getRegionName() + ":" + price.getSiteName();
-                            if (regionInSites.contains(regionInSite)) {
-                                String message = String.format(
-                                        "Duplicated items with regionName: %s and siteName: %s "
-                                                + "in licensePrices for the flavor with name: %s.",
-                                        price.getRegionName(), price.getSiteName(), flavorName);
-                                errors.add(message);
-                            } else {
-                                regionInSites.add(regionInSite);
-                            }
-                        });
+                        resourceUsage
+                                .getLicensePrices()
+                                .forEach(
+                                        price -> {
+                                            String regionInSite =
+                                                    price.getRegionName()
+                                                            + ":"
+                                                            + price.getSiteName();
+                                            if (regionInSites.contains(regionInSite)) {
+                                                String message =
+                                                        String.format(
+                                                                "Duplicated items with regionName:"
+                                                                        + " %s and siteName: %s in"
+                                                                        + " licensePrices for the"
+                                                                        + " flavor with name: %s.",
+                                                                price.getRegionName(),
+                                                                price.getSiteName(),
+                                                                flavorName);
+                                                errors.add(message);
+                                            } else {
+                                                regionInSites.add(regionInSite);
+                                            }
+                                        });
                     }
                 }
             }
-            flavorNamesUnsupportedPayPerUse.forEach(flavorName -> {
-                String message = String.format("Service flavor %s has no 'resourceUsage' "
-                        + "defined in 'pricing' for the billing mode 'pay-per-use'.", flavorName);
-                errors.add(message);
-            });
+            flavorNamesUnsupportedPayPerUse.forEach(
+                    flavorName -> {
+                        String message =
+                                String.format(
+                                        "Service flavor %s has no 'resourceUsage' defined in"
+                                                + " 'pricing' for the billing mode 'pay-per-use'.",
+                                        flavorName);
+                        errors.add(message);
+                    });
         }
 
         if (isSupportedFixed) {
@@ -100,27 +123,36 @@ public class BillingConfigValidator {
                 } else {
                     // Check if there are duplicate items with region-site in fixedPrices
                     Set<String> regionInSites = new HashSet<>();
-                    fixedPrices.forEach(price -> {
-                        String regionInSite = price.getRegionName() + ":" + price.getSiteName();
-                        if (regionInSites.contains(regionInSite)) {
-                            String message = String.format(
-                                    "Duplicated items with regionName: %s and siteName: %s "
-                                            + "in fixedPrices for the flavor with name: %s.",
-                                    price.getRegionName(), price.getSiteName(), flavorName);
-                            errors.add(message);
-                        } else {
-                            regionInSites.add(regionInSite);
-                        }
-                    });
+                    fixedPrices.forEach(
+                            price -> {
+                                String regionInSite =
+                                        price.getRegionName() + ":" + price.getSiteName();
+                                if (regionInSites.contains(regionInSite)) {
+                                    String message =
+                                            String.format(
+                                                    "Duplicated items with regionName: %s and"
+                                                            + " siteName: %s in fixedPrices for the"
+                                                            + " flavor with name: %s.",
+                                                    price.getRegionName(),
+                                                    price.getSiteName(),
+                                                    flavorName);
+                                    errors.add(message);
+                                } else {
+                                    regionInSites.add(regionInSite);
+                                }
+                            });
                 }
             }
-            flavorNamesUnsupportedFixed.forEach(flavorName -> {
-                String message = String.format("Service flavor %s has no 'fixedPrices' "
-                                + "defined in 'pricing' for the billing mode 'fixed'.",
-                        flavorName);
-                log.error(message);
-                errors.add(message);
-            });
+            flavorNamesUnsupportedFixed.forEach(
+                    flavorName -> {
+                        String message =
+                                String.format(
+                                        "Service flavor %s has no 'fixedPrices' defined in"
+                                                + " 'pricing' for the billing mode 'fixed'.",
+                                        flavorName);
+                        log.error(message);
+                        errors.add(message);
+                    });
         }
         if (!CollectionUtils.isEmpty(errors)) {
             throw new InvalidBillingConfigException(errors);

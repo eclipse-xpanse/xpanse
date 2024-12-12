@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to PricingPeriod enum.
- */
+/** Bean for serializing string in request parameters to PricingPeriod enum. */
 @Component
 public class PricingPeriodEnumConverter implements Converter<String, PricingPeriod> {
 

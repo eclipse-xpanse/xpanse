@@ -9,9 +9,7 @@ package org.eclipse.xpanse.modules.database.serviceconfiguration.update;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Interface for persist of ServiceConfigurationChangeDetailsEntity.
- */
+/** Interface for persist of ServiceConfigurationChangeDetailsEntity. */
 public interface ServiceConfigurationChangeDetailsStorage {
 
     /**
@@ -22,14 +20,10 @@ public interface ServiceConfigurationChangeDetailsStorage {
     ServiceConfigurationChangeDetailsEntity storeAndFlush(
             ServiceConfigurationChangeDetailsEntity serviceConfigurationChangeDetailsEntity);
 
-    /**
-     * Batch add or update service configuration data to database.
-     */
+    /** Batch add or update service configuration data to database. */
     <S extends ServiceConfigurationChangeDetailsEntity> List<S> saveAll(Iterable<S> entities);
 
-    /**
-     * Method to list database entry based ServiceConfigurationChangeDetailsEntity.
-     */
+    /** Method to list database entry based ServiceConfigurationChangeDetailsEntity. */
     List<ServiceConfigurationChangeDetailsEntity> listServiceConfigurationChangeDetails(
             ServiceConfigurationChangeDetailsQueryModel query);
 

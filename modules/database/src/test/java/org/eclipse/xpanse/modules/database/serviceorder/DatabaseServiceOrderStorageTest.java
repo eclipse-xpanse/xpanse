@@ -29,11 +29,9 @@ class DatabaseServiceOrderStorageTest {
 
     private final String userId = "userId";
 
-    @Mock
-    private ServiceOrderRepository mockRepository;
+    @Mock private ServiceOrderRepository mockRepository;
 
-    @Mock
-    private ServiceDeploymentStorage serviceDeploymentStorage;
+    @Mock private ServiceDeploymentStorage serviceDeploymentStorage;
 
     private DatabaseServiceOrderStorage test;
 
@@ -45,7 +43,8 @@ class DatabaseServiceOrderStorageTest {
     ServiceOrderEntity getServiceOrderEntity() {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
         serviceOrderEntity.setOrderId(orderId);
-        serviceOrderEntity.setServiceDeploymentEntity(serviceDeploymentStorage.findServiceDeploymentById(serviceId));
+        serviceOrderEntity.setServiceDeploymentEntity(
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId));
         serviceOrderEntity.setTaskType(ServiceOrderType.DEPLOY);
         serviceOrderEntity.setUserId(userId);
         serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
@@ -79,7 +78,8 @@ class DatabaseServiceOrderStorageTest {
 
         // Configure ServiceOrderRepository.findAll(...).
         final ServiceOrderEntity queryEntity = new ServiceOrderEntity();
-        queryEntity.setServiceDeploymentEntity(serviceDeploymentStorage.findServiceDeploymentById(serviceId));
+        queryEntity.setServiceDeploymentEntity(
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId));
         queryEntity.setTaskType(ServiceOrderType.DEPLOY);
         queryEntity.setUserId(userId);
         queryEntity.setTaskStatus(TaskStatus.CREATED);
@@ -97,7 +97,8 @@ class DatabaseServiceOrderStorageTest {
         // Setup
         final ServiceOrderEntity entity = new ServiceOrderEntity();
         entity.setOrderId(orderId);
-        entity.setServiceDeploymentEntity(serviceDeploymentStorage.findServiceDeploymentById(serviceId));
+        entity.setServiceDeploymentEntity(
+                serviceDeploymentStorage.findServiceDeploymentById(serviceId));
         entity.setTaskType(ServiceOrderType.DESTROY);
         entity.setUserId(userId);
         entity.setTaskStatus(TaskStatus.CREATED);
@@ -134,8 +135,7 @@ class DatabaseServiceOrderStorageTest {
         when(mockRepository.findById(uuid)).thenReturn(Optional.empty());
 
         // Run the test
-        assertThatThrownBy(() -> test.getEntityById(uuid))
-                .isInstanceOf(ServiceOrderNotFound.class);
+        assertThatThrownBy(() -> test.getEntityById(uuid)).isInstanceOf(ServiceOrderNotFound.class);
     }
 
     @Test

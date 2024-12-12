@@ -14,8 +14,7 @@ class DeployResourcePropertiesTest {
 
     @BeforeEach
     void setUp() {
-        deployResourcePropertiesUnderTest = new DeployResourceProperties() {
-        };
+        deployResourcePropertiesUnderTest = new DeployResourceProperties() {};
     }
 
     @Test

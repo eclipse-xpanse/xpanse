@@ -41,16 +41,13 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-/**
- * Redis cache configuration class.
- */
+/** Redis cache configuration class. */
 @Slf4j
 @Configuration
 @ConditionalOnProperty(name = "enable.redis.distributed.cache", havingValue = "true")
 public class RedisCacheConfig {
 
-    @Resource
-    private RedisConnectionFactory connectionFactory;
+    @Resource private RedisConnectionFactory connectionFactory;
 
     @Value("${region.azs.cache.expire.time.in.minutes:60}")
     private long regionAzsCacheDuration;
@@ -80,14 +77,13 @@ public class RedisCacheConfig {
         RedisCacheManager.RedisCacheManagerBuilder builder =
                 RedisCacheManager.builder(connectionFactory);
         builder.withCacheConfiguration(REGION_AZS_CACHE_NAME, getRegionAzsCache());
-        builder.withCacheConfiguration(SERVICE_FLAVOR_PRICE_CACHE_NAME,
-                getServiceFlavorPriceCache());
+        builder.withCacheConfiguration(
+                SERVICE_FLAVOR_PRICE_CACHE_NAME, getServiceFlavorPriceCache());
         builder.withCacheConfiguration(CREDENTIAL_CACHE_NAME, getCredentialCache());
         builder.withCacheConfiguration(MONITOR_METRICS_CACHE_NAME, getMonitorMetricsCache());
         builder.withCacheConfiguration(DEPLOYER_VERSIONS_CACHE_NAME, getDeployerVersionsCache());
         return builder.build();
     }
-
 
     /**
      * Check status redis cache.
@@ -123,8 +119,10 @@ public class RedisCacheConfig {
     }
 
     private RedisCacheConfiguration getRegionAzsCache() {
-        long duration = regionAzsCacheDuration > 0 ? regionAzsCacheDuration
-                : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+        long duration =
+                regionAzsCacheDuration > 0
+                        ? regionAzsCacheDuration
+                        : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))
                 .serializeKeysWith(getStringRedisSerializer())
@@ -132,8 +130,10 @@ public class RedisCacheConfig {
     }
 
     private RedisCacheConfiguration getServiceFlavorPriceCache() {
-        long duration = flavorPriceCacheDuration > 0 ? flavorPriceCacheDuration
-                : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+        long duration =
+                flavorPriceCacheDuration > 0
+                        ? flavorPriceCacheDuration
+                        : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))
                 .serializeKeysWith(getStringRedisSerializer())
@@ -148,8 +148,10 @@ public class RedisCacheConfig {
     }
 
     private RedisCacheConfiguration getMonitorMetricsCache() {
-        long duration = monitorMetricsCacheDuration > 0 ? monitorMetricsCacheDuration
-                : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
+        long duration =
+                monitorMetricsCacheDuration > 0
+                        ? monitorMetricsCacheDuration
+                        : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))
                 .serializeKeysWith(getStringRedisSerializer())
@@ -161,7 +163,6 @@ public class RedisCacheConfig {
                 .serializeKeysWith(getStringRedisSerializer())
                 .serializeValuesWith(getJdkRedisSerializer());
     }
-
 
     /**
      * Config redis template.
@@ -177,7 +178,6 @@ public class RedisCacheConfig {
         template.afterPropertiesSet();
         return template;
     }
-
 
     /**
      * Config redis template for credential.
@@ -202,12 +202,13 @@ public class RedisCacheConfig {
             log.error("Failed to connect to Redis server. Error message: {}", e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Error occurred while checking Redis availability. Error message: {}",
-                    e.getMessage(), e);
+            log.error(
+                    "Error occurred while checking Redis availability. Error message: {}",
+                    e.getMessage(),
+                    e);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
 
     private RedisSerializationContext.SerializationPair<String> getStringRedisSerializer() {
         return RedisSerializationContext.SerializationPair.fromSerializer(
@@ -226,11 +227,9 @@ public class RedisCacheConfig {
                 new JdkSerializationRedisSerializer());
     }
 
-    private RedisSerializationContext
-            .SerializationPair<AbstractCredentialInfo> getCredentialValueSerializer() {
+    private RedisSerializationContext.SerializationPair<AbstractCredentialInfo>
+            getCredentialValueSerializer() {
         return RedisSerializationContext.SerializationPair.fromSerializer(
                 new Jackson2JsonRedisSerializer<>(AbstractCredentialInfo.class));
     }
-
-
 }

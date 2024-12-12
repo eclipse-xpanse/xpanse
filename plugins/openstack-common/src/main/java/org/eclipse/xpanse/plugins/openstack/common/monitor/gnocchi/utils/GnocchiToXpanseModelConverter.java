@@ -24,20 +24,17 @@ import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.measur
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Class to encapsulate all methods to convert between Gnocchi and Xpanse objects.
- */
+/** Class to encapsulate all methods to convert between Gnocchi and Xpanse objects. */
 @Component
 public class GnocchiToXpanseModelConverter {
 
-    /**
-     * Convert Gnocchi Measures object to Xpanse Metric object.
-     */
-    public Metric convertGnocchiMeasuresToMetric(DeployResource deployResource,
-                                                 MonitorResourceType monitorResourceType,
-                                                 List<Measure> measures,
-                                                 MetricUnit metricUnit,
-                                                 boolean onlyLastKnownMetric) {
+    /** Convert Gnocchi Measures object to Xpanse Metric object. */
+    public Metric convertGnocchiMeasuresToMetric(
+            DeployResource deployResource,
+            MonitorResourceType monitorResourceType,
+            List<Measure> measures,
+            MetricUnit metricUnit,
+            boolean onlyLastKnownMetric) {
         Metric metric = new Metric();
         metric.setName(monitorResourceType.toValue());
         metric.setMonitorResourceType(monitorResourceType);
@@ -71,15 +68,16 @@ public class GnocchiToXpanseModelConverter {
 
     /**
      * Build AggregationRequest. From the Stein release, Ceilometer has stopped generating cpu_util
-     * metrics. Hence, it is necessary to convert the cpu metric which is the absolute CPU value
-     * to percentage.
+     * metrics. Hence, it is necessary to convert the cpu metric which is the absolute CPU value to
+     * percentage.
      *
      * @param metricId ID of the metric.
      * @return AggregationRequest object.
      */
     public AggregationRequest buildAggregationRequestToGetCpuMeasureAsPercentage(String metricId) {
         String operationString =
-                String.format("(* (/ (aggregate rate:mean (metric %s mean)) 60000000000.0) 100)",
+                String.format(
+                        "(* (/ (aggregate rate:mean (metric %s mean)) 60000000000.0) 100)",
                         metricId);
         AggregationRequest aggregationRequest = new AggregationRequest();
         aggregationRequest.setOperations(operationString);
@@ -115,4 +113,3 @@ public class GnocchiToXpanseModelConverter {
         return aggregationRequest;
     }
 }
-

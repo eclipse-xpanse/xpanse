@@ -28,9 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-/**
- * Class to encapsulate all calls to Keystone API.
- */
+/** Class to encapsulate all calls to Keystone API. */
 @Component
 public class OpenstackKeystoneManager {
 
@@ -43,8 +41,8 @@ public class OpenstackKeystoneManager {
      * @param environment Environment Bean
      */
     @Autowired
-    public OpenstackKeystoneManager(Environment environment,
-                                    ProxyConfigurationManager proxyConfigurationManager) {
+    public OpenstackKeystoneManager(
+            Environment environment, ProxyConfigurationManager proxyConfigurationManager) {
         this.environment = environment;
         this.proxyConfigurationManager = proxyConfigurationManager;
     }
@@ -57,15 +55,14 @@ public class OpenstackKeystoneManager {
         }
     }
 
-
     /**
      * Get the Openstack API client based on the credential information.
      *
-     * @param authUrl    Authentication URL
+     * @param authUrl Authentication URL
      * @param credential Credential information available for Openstack in the runtime.
      */
-    public OSClient.OSClientV3 getAuthenticatedClient(String authUrl,
-                                                      AbstractCredentialInfo credential) {
+    public OSClient.OSClientV3 getAuthenticatedClient(
+            String authUrl, AbstractCredentialInfo credential) {
 
         String userName = null;
         String password = null;
@@ -97,7 +94,9 @@ public class OpenstackKeystoneManager {
                 }
             }
         }
-        if (Objects.isNull(userName) || Objects.isNull(password) || Objects.isNull(tenant)
+        if (Objects.isNull(userName)
+                || Objects.isNull(password)
+                || Objects.isNull(tenant)
                 || Objects.isNull(userDomain)) {
             throw new CredentialsNotFoundException(
                     "Values for all openstack credential"
@@ -108,10 +107,10 @@ public class OpenstackKeystoneManager {
         // the authentication details in the thread context.
         String serviceTenant =
                 this.environment.getProperty(OpenstackCommonEnvironmentConstants.SERVICE_PROJECT);
-        String sslDisabled = this.environment.getProperty(
-                OpenstackCommonEnvironmentConstants.SSL_VERIFICATION_DISABLED);
-        return OSFactory
-                .builderV3()
+        String sslDisabled =
+                this.environment.getProperty(
+                        OpenstackCommonEnvironmentConstants.SSL_VERIFICATION_DISABLED);
+        return OSFactory.builderV3()
                 .withConfig(buildClientConfig(authUrl, sslDisabled))
                 .credentials(userName, password, Identifier.byName(userDomain))
                 .scopeToProject(
@@ -128,35 +127,56 @@ public class OpenstackKeystoneManager {
             URI uri = URI.create(url);
             if ("http".equalsIgnoreCase(uri.getScheme())
                     && Objects.nonNull(proxyConfigurationManager.getHttpProxyDetails())) {
-                config = Config.newConfig()
-                        .withEndpointNATResolution(getIpAddressFromUrl(url))
-                        .withEndpointURLResolver(new CustomEndPointResolver())
-                        .withProxy(ProxyHost.of(
-                                // bug in openstack4J. It expects full URL for the host argument.
-                                proxyConfigurationManager.getHttpProxyDetails().getProxyUrl(),
-                                proxyConfigurationManager.getHttpProxyDetails().getProxyPort(),
-                                proxyConfigurationManager.getHttpProxyDetails().getProxyUsername(),
-                                proxyConfigurationManager
-                                        .getHttpProxyDetails().getProxyPassword()));
+                config =
+                        Config.newConfig()
+                                .withEndpointNATResolution(getIpAddressFromUrl(url))
+                                .withEndpointURLResolver(new CustomEndPointResolver())
+                                .withProxy(
+                                        ProxyHost.of(
+                                                // bug in openstack4J. It expects full URL for the
+                                                // host argument.
+                                                proxyConfigurationManager
+                                                        .getHttpProxyDetails()
+                                                        .getProxyUrl(),
+                                                proxyConfigurationManager
+                                                        .getHttpProxyDetails()
+                                                        .getProxyPort(),
+                                                proxyConfigurationManager
+                                                        .getHttpProxyDetails()
+                                                        .getProxyUsername(),
+                                                proxyConfigurationManager
+                                                        .getHttpProxyDetails()
+                                                        .getProxyPassword()));
             }
             if ("https".equalsIgnoreCase(uri.getScheme())
                     && Objects.nonNull(proxyConfigurationManager.getHttpsProxyDetails())) {
-                config = Config.newConfig()
-                        .withEndpointNATResolution(getIpAddressFromUrl(url))
-                        .withEndpointURLResolver(new CustomEndPointResolver())
-                        .withProxy(ProxyHost.of(
-                                // bug in openstack4J. It expects full URL for the host argument.
-                                proxyConfigurationManager.getHttpsProxyDetails().getProxyUrl(),
-                                proxyConfigurationManager.getHttpsProxyDetails().getProxyPort(),
-                                proxyConfigurationManager.getHttpsProxyDetails().getProxyUsername(),
-                                proxyConfigurationManager
-                                        .getHttpsProxyDetails().getProxyPassword()));
+                config =
+                        Config.newConfig()
+                                .withEndpointNATResolution(getIpAddressFromUrl(url))
+                                .withEndpointURLResolver(new CustomEndPointResolver())
+                                .withProxy(
+                                        ProxyHost.of(
+                                                // bug in openstack4J. It expects full URL for the
+                                                // host argument.
+                                                proxyConfigurationManager
+                                                        .getHttpsProxyDetails()
+                                                        .getProxyUrl(),
+                                                proxyConfigurationManager
+                                                        .getHttpsProxyDetails()
+                                                        .getProxyPort(),
+                                                proxyConfigurationManager
+                                                        .getHttpsProxyDetails()
+                                                        .getProxyUsername(),
+                                                proxyConfigurationManager
+                                                        .getHttpsProxyDetails()
+                                                        .getProxyPassword()));
             }
         }
         if (Objects.isNull(config)) {
-            config = Config.newConfig()
-                    .withEndpointNATResolution(getIpAddressFromUrl(url))
-                    .withEndpointURLResolver(new CustomEndPointResolver());
+            config =
+                    Config.newConfig()
+                            .withEndpointNATResolution(getIpAddressFromUrl(url))
+                            .withEndpointURLResolver(new CustomEndPointResolver());
         }
         if (Objects.nonNull(sslDisabled) && sslDisabled.equals("true")) {
             config.withSSLVerificationDisabled();

@@ -14,7 +14,9 @@ class InstanceResourceTest {
     @Test
     void testSettersAndGetters() throws Exception {
         InstanceResource test = mapper.readValue(setUpObjectJson(), InstanceResource.class);
-        assertEquals("91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5", test.getCreator());
+        assertEquals(
+                "91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5",
+                test.getCreator());
         assertEquals("2023-06-05T11:05:39.758133+00:00", test.getStartedAt());
         assertEquals("2023-06-05T12:00:47.073036+00:00", test.getRevisionStart());
         assertNull(test.getEndedAt());
@@ -79,5 +81,4 @@ class InstanceResourceTest {
                 }
                 """;
     }
-
 }

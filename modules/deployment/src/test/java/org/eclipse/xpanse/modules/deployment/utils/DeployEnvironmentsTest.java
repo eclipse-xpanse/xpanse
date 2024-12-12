@@ -53,9 +53,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 
-/**
- * Test of DeployEnvironments.
- */
+/** Test of DeployEnvironments. */
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 class DeployEnvironmentsTest {
@@ -72,16 +70,11 @@ class DeployEnvironmentsTest {
     private DeployVariable deployVariable2;
     private DeployVariable deployVariable3;
     private DeployVariable deployVariable4;
-    @Mock
-    private AesUtil aesUtil;
-    @Mock
-    private CredentialCenter mockCredentialCenter;
-    @Mock
-    private PluginManager pluginManager;
-    @Mock
-    private Environment environment;
-    @Mock
-    private OrchestratorPlugin mockOrchestratorPlugin;
+    @Mock private AesUtil aesUtil;
+    @Mock private CredentialCenter mockCredentialCenter;
+    @Mock private PluginManager pluginManager;
+    @Mock private Environment environment;
+    @Mock private OrchestratorPlugin mockOrchestratorPlugin;
     private DeployEnvironments deployEnvironmentsUnderTest;
 
     @BeforeEach
@@ -162,17 +155,16 @@ class DeployEnvironmentsTest {
         expectedResult.put("key2", "value2");
         task.getOcl().getCloudServiceProvider().setName(Csp.HUAWEI_CLOUD);
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(mockOrchestratorPlugin);
-        when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD)
-                .getEnvVarKeysMappingMap()).thenReturn(Collections.emptyMap());
+        when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD).getEnvVarKeysMappingMap())
+                .thenReturn(Collections.emptyMap());
         Map<String, String> result = deployEnvironmentsUnderTest.getEnvironmentVariables(task);
         assertThat(result).isEqualTo(expectedResult);
 
         String osAuthUrl = "http://127.0.0.1";
         expectedResult.put("OS_AUTH_URL", osAuthUrl);
         task.getOcl().getCloudServiceProvider().setName(Csp.OPENSTACK_TESTLAB);
-        when(pluginManager.getOrchestratorPlugin(Csp.OPENSTACK_TESTLAB)
-                .getEnvVarKeysMappingMap()).thenReturn(
-                Map.of("OS_AUTH_URL", "OPENSTACK_TESTLAB_AUTH_URL"));
+        when(pluginManager.getOrchestratorPlugin(Csp.OPENSTACK_TESTLAB).getEnvVarKeysMappingMap())
+                .thenReturn(Map.of("OS_AUTH_URL", "OPENSTACK_TESTLAB_AUTH_URL"));
         when(environment.getProperty("OPENSTACK_TESTLAB_AUTH_URL")).thenReturn(osAuthUrl);
         Map<String, String> result2 = deployEnvironmentsUnderTest.getEnvironmentVariables(task);
         assertThat(result2).isEqualTo(expectedResult);
@@ -180,16 +172,14 @@ class DeployEnvironmentsTest {
 
     @Test
     void testGetFlavorVariables() {
-        Map<String, String> expectedResult = Map.ofEntries(
-                Map.entry("region", "cn-north-4"),
-                Map.entry("key", "value"));
+        Map<String, String> expectedResult =
+                Map.ofEntries(Map.entry("region", "cn-north-4"), Map.entry("key", "value"));
 
         Map<String, Object> result = deployEnvironmentsUnderTest.getInputVariables(task, true);
 
         // Verify the results
         assertEquals(result, expectedResult);
     }
-
 
     @Test
     void testGetFlavorVariables_FlavorInvalidException() {
@@ -198,7 +188,8 @@ class DeployEnvironmentsTest {
         flavors.setServiceFlavors(List.of(flavor));
 
         // Verify the results
-        assertThrows(FlavorInvalidException.class,
+        assertThrows(
+                FlavorInvalidException.class,
                 () -> deployEnvironmentsUnderTest.getInputVariables(task, true));
     }
 
@@ -239,13 +230,14 @@ class DeployEnvironmentsTest {
         CredentialType credentialType = CredentialType.VARIABLES;
 
         AbstractCredentialInfo abstractCredentialInfo =
-                new CredentialVariables(csp, siteName, credentialType, "AK_SK", "description",
-                        userId, variables);
-        when(mockCredentialCenter.getCredential(csp, siteName, credentialType,
-                deployRequest.getUserId())).thenReturn(abstractCredentialInfo);
+                new CredentialVariables(
+                        csp, siteName, credentialType, "AK_SK", "description", userId, variables);
+        when(mockCredentialCenter.getCredential(
+                        csp, siteName, credentialType, deployRequest.getUserId()))
+                .thenReturn(abstractCredentialInfo);
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(mockOrchestratorPlugin);
-        when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD)
-                .getEnvVarKeysMappingMap()).thenReturn(Collections.emptyMap());
+        when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD).getEnvVarKeysMappingMap())
+                .thenReturn(Collections.emptyMap());
         Map<String, String> variablesActual =
                 deployEnvironmentsUnderTest.getEnvironmentVariables(task);
 
@@ -254,9 +246,7 @@ class DeployEnvironmentsTest {
             assertTrue(variablesActual.containsKey(variable.getName()));
             assertEquals(variable.getValue(), variablesActual.get(variable.getName()));
         }
-        verify(mockCredentialCenter, times(1)).getCredential(csp, siteName, credentialType,
-                userId);
-
+        verify(mockCredentialCenter, times(1)).getCredential(csp, siteName, credentialType, userId);
     }
 
     @Test
@@ -273,14 +263,14 @@ class DeployEnvironmentsTest {
 
         CredentialType credentialType = CredentialType.VARIABLES;
 
-        AbstractCredentialInfo abstractCredentialInfo = new CredentialVariables(csp,
-                siteName, credentialType, "AK_SK", "description", null,
-                variables);
-        when(mockCredentialCenter.getCredential(csp, siteName, credentialType, null)).thenReturn(
-                abstractCredentialInfo);
+        AbstractCredentialInfo abstractCredentialInfo =
+                new CredentialVariables(
+                        csp, siteName, credentialType, "AK_SK", "description", null, variables);
+        when(mockCredentialCenter.getCredential(csp, siteName, credentialType, null))
+                .thenReturn(abstractCredentialInfo);
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(mockOrchestratorPlugin);
-        when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD)
-                .getEnvVarKeysMappingMap()).thenReturn(Collections.emptyMap());
+        when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD).getEnvVarKeysMappingMap())
+                .thenReturn(Collections.emptyMap());
         Map<String, String> variablesActual =
                 deployEnvironmentsUnderTest.getEnvironmentVariables(task);
 
@@ -289,16 +279,16 @@ class DeployEnvironmentsTest {
             assertTrue(variablesActual.containsKey(variable.getName()));
             assertEquals(variable.getValue(), variablesActual.get(variable.getName()));
         }
-        verify(mockCredentialCenter, times(1)).getCredential(csp, siteName, credentialType,
-                null);
+        verify(mockCredentialCenter, times(1)).getCredential(csp, siteName, credentialType, null);
     }
 
     @Test
     void testGetPluginMandatoryVariable() throws Exception {
 
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(
-                URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
+        Ocl ocl =
+                oclLoader.getOcl(
+                        URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
         DeployRequest deployRequest = new DeployRequest();
         deployRequest.setServiceName(ocl.getName());
@@ -324,13 +314,12 @@ class DeployEnvironmentsTest {
         xpanseDeployTask.setUserId("userId");
         xpanseDeployTask.setOcl(ocl);
         xpanseDeployTask.setDeployRequest(deployRequest);
-        when(this.pluginManager.getOrchestratorPlugin(any(Csp.class))).thenReturn(
-                mockOrchestratorPlugin);
+        when(this.pluginManager.getOrchestratorPlugin(any(Csp.class)))
+                .thenReturn(mockOrchestratorPlugin);
         when(mockOrchestratorPlugin.requiredProperties()).thenReturn(List.of("OS_AUTH_URL"));
-        Map<String, String> variables = deployEnvironmentsUnderTest.getEnvironmentVariables(
-                xpanseDeployTask);
+        Map<String, String> variables =
+                deployEnvironmentsUnderTest.getEnvironmentVariables(xpanseDeployTask);
 
         Assertions.assertNotNull(variables);
     }
-
 }

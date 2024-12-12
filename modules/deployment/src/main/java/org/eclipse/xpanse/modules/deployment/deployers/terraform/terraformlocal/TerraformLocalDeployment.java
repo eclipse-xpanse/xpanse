@@ -35,28 +35,22 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValida
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
-/**
- * Implementation of the deployment with terraform.
- */
+/** Implementation of the deployment with terraform. */
 @Slf4j
 @Component
 @ConditionalOnMissingBean(TerraformBootDeployment.class)
 public class TerraformLocalDeployment implements Deployer {
     public static final String TF_DEBUG_FLAG = "TF_LOG";
-    @Resource
-    private TerraformInstaller terraformInstaller;
-    @Resource
-    private DeployEnvironments deployEnvironments;
-    @Resource
-    private TerraformLocalConfig terraformLocalConfig;
+    @Resource private TerraformInstaller terraformInstaller;
+    @Resource private DeployEnvironments deployEnvironments;
+    @Resource private TerraformLocalConfig terraformLocalConfig;
+
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
-    @Resource
-    private TerraformDeploymentResultCallbackManager terraformResultCallbackManager;
-    @Resource
-    private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Resource
-    private DeploymentScriptsHelper scriptsHelper;
+
+    @Resource private TerraformDeploymentResultCallbackManager terraformResultCallbackManager;
+    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @Resource private DeploymentScriptsHelper scriptsHelper;
 
     /**
      * Deploy the DeployTask.
@@ -71,7 +65,6 @@ public class TerraformLocalDeployment implements Deployer {
         return deployResult;
     }
 
-
     /**
      * Destroy the DeployTask.
      *
@@ -83,8 +76,10 @@ public class TerraformLocalDeployment implements Deployer {
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(task.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         if (StringUtils.isBlank(resourceState)) {
-            String errorMsg = String.format("tfState of deployed service with id %s not found.",
-                    task.getServiceId());
+            String errorMsg =
+                    String.format(
+                            "tfState of deployed service with id %s not found.",
+                            task.getServiceId());
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
@@ -105,8 +100,10 @@ public class TerraformLocalDeployment implements Deployer {
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(task.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         if (StringUtils.isBlank(resourceState)) {
-            String errorMsg = String.format("tfState of deployed service with id %s not found.",
-                    task.getServiceId());
+            String errorMsg =
+                    String.format(
+                            "tfState of deployed service with id %s not found.",
+                            task.getServiceId());
             log.error(errorMsg);
             throw new ServiceNotDeployedException(errorMsg);
         }
@@ -117,101 +114,116 @@ public class TerraformLocalDeployment implements Deployer {
     }
 
     private void asyncExecDeploy(DeployTask task) {
-        String workspace = scriptsHelper.createWorkspaceForTask(
-                getDeployerConfigWorkspace(), task.getOrderId());
-        List<File> preparedFiles = scriptsHelper.prepareDeploymentScripts(
-                workspace, task.getOcl().getDeployment(), null);
+        String workspace =
+                scriptsHelper.createWorkspaceForTask(
+                        getDeployerConfigWorkspace(), task.getOrderId());
+        List<File> preparedFiles =
+                scriptsHelper.prepareDeploymentScripts(
+                        workspace, task.getOcl().getDeployment(), null);
         TerraformLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
         // Execute the terraform command asynchronously.
-        taskExecutor.execute(() -> {
-            TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setRequestId(task.getOrderId());
-            try {
-                executor.deploy();
-                terraformResult.setCommandSuccessful(true);
-            } catch (RuntimeException tfEx) {
-                log.error("Execute Terraform deploy script failed. {}", tfEx.getMessage());
-                terraformResult.setCommandSuccessful(false);
-                terraformResult.setCommandStdError(tfEx.getMessage());
-            }
-            terraformResult.setTerraformState(
-                    scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
-            terraformResult.setTerraformVersionUsed(
-                    terraformInstaller.getExactVersionOfTerraform(executor.getExecutorPath()));
-            terraformResult.setGeneratedFileContentMap(scriptsHelper.getGeneratedFileContents(
-                    executor.getTaskWorkspace(), preparedFiles));
-            terraformResultCallbackManager.orderCallback(task.getOrderId(),
-                    terraformResult);
-            scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
-        });
+        taskExecutor.execute(
+                () -> {
+                    TerraformResult terraformResult = new TerraformResult();
+                    terraformResult.setRequestId(task.getOrderId());
+                    try {
+                        executor.deploy();
+                        terraformResult.setCommandSuccessful(true);
+                    } catch (RuntimeException tfEx) {
+                        log.error("Execute Terraform deploy script failed. {}", tfEx.getMessage());
+                        terraformResult.setCommandSuccessful(false);
+                        terraformResult.setCommandStdError(tfEx.getMessage());
+                    }
+                    terraformResult.setTerraformState(
+                            scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
+                    terraformResult.setTerraformVersionUsed(
+                            terraformInstaller.getExactVersionOfTerraform(
+                                    executor.getExecutorPath()));
+                    terraformResult.setGeneratedFileContentMap(
+                            scriptsHelper.getGeneratedFileContents(
+                                    executor.getTaskWorkspace(), preparedFiles));
+                    terraformResultCallbackManager.orderCallback(
+                            task.getOrderId(), terraformResult);
+                    scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
+                });
     }
 
     private void asyncExecDestroy(DeployTask task, String tfState) {
-        String workspace = scriptsHelper.createWorkspaceForTask(
-                getDeployerConfigWorkspace(), task.getOrderId());
-        List<File> preparedFiles = scriptsHelper.prepareDeploymentScripts(
-                workspace, task.getOcl().getDeployment(), tfState);
+        String workspace =
+                scriptsHelper.createWorkspaceForTask(
+                        getDeployerConfigWorkspace(), task.getOrderId());
+        List<File> preparedFiles =
+                scriptsHelper.prepareDeploymentScripts(
+                        workspace, task.getOcl().getDeployment(), tfState);
         TerraformLocalExecutor executor = getExecutorForDeployTask(task, workspace, false);
         // Execute the terraform command asynchronously.
-        taskExecutor.execute(() -> {
-            TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setRequestId(task.getOrderId());
-            try {
-                executor.destroy();
-                terraformResult.setCommandSuccessful(true);
-            } catch (RuntimeException tfEx) {
-                log.error("Execute terraform destroy script failed. {}", tfEx.getMessage());
-                terraformResult.setCommandSuccessful(false);
-                terraformResult.setCommandStdError(tfEx.getMessage());
-            }
-            terraformResult.setTerraformState(
-                    scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
-            terraformResult.setTerraformVersionUsed(
-                    terraformInstaller.getExactVersionOfTerraform(executor.getExecutorPath()));
-            terraformResult.setGeneratedFileContentMap(scriptsHelper.getGeneratedFileContents(
-                    executor.getTaskWorkspace(), preparedFiles));
-            terraformResultCallbackManager.orderCallback(task.getOrderId(),
-                    terraformResult);
-            scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
-        });
+        taskExecutor.execute(
+                () -> {
+                    TerraformResult terraformResult = new TerraformResult();
+                    terraformResult.setRequestId(task.getOrderId());
+                    try {
+                        executor.destroy();
+                        terraformResult.setCommandSuccessful(true);
+                    } catch (RuntimeException tfEx) {
+                        log.error("Execute terraform destroy script failed. {}", tfEx.getMessage());
+                        terraformResult.setCommandSuccessful(false);
+                        terraformResult.setCommandStdError(tfEx.getMessage());
+                    }
+                    terraformResult.setTerraformState(
+                            scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
+                    terraformResult.setTerraformVersionUsed(
+                            terraformInstaller.getExactVersionOfTerraform(
+                                    executor.getExecutorPath()));
+                    terraformResult.setGeneratedFileContentMap(
+                            scriptsHelper.getGeneratedFileContents(
+                                    executor.getTaskWorkspace(), preparedFiles));
+                    terraformResultCallbackManager.orderCallback(
+                            task.getOrderId(), terraformResult);
+                    scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
+                });
     }
 
     private void asyncExecModify(DeployTask task, String tfState) {
-        String workspace = scriptsHelper.createWorkspaceForTask(
-                getDeployerConfigWorkspace(), task.getOrderId());
-        List<File> preparedFiles = scriptsHelper.prepareDeploymentScripts(
-                workspace, task.getOcl().getDeployment(), tfState);
+        String workspace =
+                scriptsHelper.createWorkspaceForTask(
+                        getDeployerConfigWorkspace(), task.getOrderId());
+        List<File> preparedFiles =
+                scriptsHelper.prepareDeploymentScripts(
+                        workspace, task.getOcl().getDeployment(), tfState);
         TerraformLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
         // Execute the terraform command asynchronously.
-        taskExecutor.execute(() -> {
-            TerraformResult terraformResult = new TerraformResult();
-            terraformResult.setRequestId(task.getOrderId());
-            try {
-                executor.deploy();
-                terraformResult.setCommandSuccessful(true);
-            } catch (RuntimeException tfEx) {
-                log.error("Execute terraform modify script failed. {}", tfEx.getMessage());
-                terraformResult.setCommandSuccessful(false);
-                terraformResult.setCommandStdError(tfEx.getMessage());
-            }
-            terraformResult.setTerraformState(
-                    scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
-            terraformResult.setTerraformVersionUsed(
-                    terraformInstaller.getExactVersionOfTerraform(executor.getExecutorPath()));
-            terraformResult.setGeneratedFileContentMap(scriptsHelper.getGeneratedFileContents(
-                    executor.getTaskWorkspace(), preparedFiles));
-            terraformResultCallbackManager.orderCallback(task.getOrderId(),
-                    terraformResult);
-            scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
-        });
+        taskExecutor.execute(
+                () -> {
+                    TerraformResult terraformResult = new TerraformResult();
+                    terraformResult.setRequestId(task.getOrderId());
+                    try {
+                        executor.deploy();
+                        terraformResult.setCommandSuccessful(true);
+                    } catch (RuntimeException tfEx) {
+                        log.error("Execute terraform modify script failed. {}", tfEx.getMessage());
+                        terraformResult.setCommandSuccessful(false);
+                        terraformResult.setCommandStdError(tfEx.getMessage());
+                    }
+                    terraformResult.setTerraformState(
+                            scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
+                    terraformResult.setTerraformVersionUsed(
+                            terraformInstaller.getExactVersionOfTerraform(
+                                    executor.getExecutorPath()));
+                    terraformResult.setGeneratedFileContentMap(
+                            scriptsHelper.getGeneratedFileContents(
+                                    executor.getTaskWorkspace(), preparedFiles));
+                    terraformResultCallbackManager.orderCallback(
+                            task.getOrderId(), terraformResult);
+                    scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
+                });
     }
 
     @Override
     public String getDeploymentPlanAsJson(DeployTask task) {
-        String workspace = scriptsHelper.createWorkspaceForTask(
-                getDeployerConfigWorkspace(), task.getOrderId());
-        scriptsHelper.prepareDeploymentScripts(
-                workspace, task.getOcl().getDeployment(), null);
+        String workspace =
+                scriptsHelper.createWorkspaceForTask(
+                        getDeployerConfigWorkspace(), task.getOrderId());
+        scriptsHelper.prepareDeploymentScripts(workspace, task.getOcl().getDeployment(), null);
         // Execute the terraform command.
         TerraformLocalExecutor executor = getExecutorForDeployTask(task, workspace, true);
         return executor.getTerraformPlanAsJson();
@@ -220,50 +232,51 @@ public class TerraformLocalDeployment implements Deployer {
     /**
      * Get a TerraformExecutor.
      *
-     * @param task         the task for the deployment.
-     * @param workspace    the workspace of the deployment.
+     * @param task the task for the deployment.
+     * @param workspace the workspace of the deployment.
      * @param isDeployTask if the task is for deploying a service.
      */
-    private TerraformLocalExecutor getExecutorForDeployTask(DeployTask task, String workspace,
-                                                            boolean isDeployTask) {
+    private TerraformLocalExecutor getExecutorForDeployTask(
+            DeployTask task, String workspace, boolean isDeployTask) {
         Map<String, String> envVariables = this.deployEnvironments.getEnvironmentVariables(task);
-        Map<String, Object> inputVariables = this.deployEnvironments.getInputVariables(
-                task, isDeployTask);
-        return getExecutor(envVariables, inputVariables, workspace,
-                task.getOcl().getDeployment());
+        Map<String, Object> inputVariables =
+                this.deployEnvironments.getInputVariables(task, isDeployTask);
+        return getExecutor(envVariables, inputVariables, workspace, task.getOcl().getDeployment());
     }
 
-    private TerraformLocalExecutor getExecutor(Map<String, String> envVariables,
-                                               Map<String, Object> inputVariables,
-                                               String workspace,
-                                               Deployment deployment) {
+    private TerraformLocalExecutor getExecutor(
+            Map<String, String> envVariables,
+            Map<String, Object> inputVariables,
+            String workspace,
+            Deployment deployment) {
         if (terraformLocalConfig.isDebugEnabled()) {
-            log.info("Debug enabled for Terraform CLI with level {}",
+            log.info(
+                    "Debug enabled for Terraform CLI with level {}",
                     terraformLocalConfig.getDebugLogLevel());
             envVariables.put(TF_DEBUG_FLAG, terraformLocalConfig.getDebugLogLevel());
         }
-        String executorPath = terraformInstaller.getExecutorPathThatMatchesRequiredVersion(
-                deployment.getDeployerTool().getVersion());
-        return new TerraformLocalExecutor(executorPath, envVariables, inputVariables,
+        String executorPath =
+                terraformInstaller.getExecutorPathThatMatchesRequiredVersion(
+                        deployment.getDeployerTool().getVersion());
+        return new TerraformLocalExecutor(
+                executorPath,
+                envVariables,
+                inputVariables,
                 scriptsHelper.getScriptsLocationInWorkspace(workspace, deployment));
     }
 
-
-    /**
-     * Get the deployer kind.
-     */
+    /** Get the deployer kind. */
     @Override
     public DeployerKind getDeployerKind() {
         return DeployerKind.TERRAFORM;
     }
 
-    /**
-     * Validates the Terraform script.
-     */
+    /** Validates the Terraform script. */
     @Override
     public DeploymentScriptValidationResult validate(Deployment deployment) {
-        String workspace = scriptsHelper.createWorkspaceForTask(
-                getDeployerConfigWorkspace(), UUID.randomUUID());
+        String workspace =
+                scriptsHelper.createWorkspaceForTask(
+                        getDeployerConfigWorkspace(), UUID.randomUUID());
         scriptsHelper.prepareDeploymentScripts(workspace, deployment, null);
         TerraformLocalExecutor executor =
                 getExecutor(new HashMap<>(), new HashMap<>(), workspace, deployment);

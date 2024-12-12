@@ -48,10 +48,11 @@ class DeploymentScriptValidationResultTest {
 
     @Test
     void testToString() {
-        String exceptedString = "DeploymentScriptValidationResult(valid=true"
-                + ", deployerVersionUsed=" + deployerVersionUsed
-                + ", diagnostics=[DeployValidateDiagnostics(detail=detail)])";
+        String exceptedString =
+                "DeploymentScriptValidationResult(valid=true"
+                        + ", deployerVersionUsed="
+                        + deployerVersionUsed
+                        + ", diagnostics=[DeployValidateDiagnostics(detail=detail)])";
         assertEquals(test.toString(), exceptedString);
     }
-
 }

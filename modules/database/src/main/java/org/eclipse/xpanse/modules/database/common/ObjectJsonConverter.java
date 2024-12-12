@@ -24,7 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 public class ObjectJsonConverter implements AttributeConverter<Object, String> {
 
     private final ObjectMapper objectMapper =
-            new ObjectMapper().registerModule(new JavaTimeModule())
+            new ObjectMapper()
+                    .registerModule(new JavaTimeModule())
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
                     .configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true);
 
@@ -51,5 +52,4 @@ public class ObjectJsonConverter implements AttributeConverter<Object, String> {
             throw new IllegalStateException("Serialising string to object failed.", ex);
         }
     }
-
 }

@@ -17,9 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-/**
- * Bean to manage OpenTelemetry Collector Health check.
- */
+/** Bean to manage OpenTelemetry Collector Health check. */
 @Component
 @Slf4j
 public class OpenTelemetryCollectorHealthCheck {
@@ -34,17 +32,15 @@ public class OpenTelemetryCollectorHealthCheck {
     boolean isOtelExporterDisabled;
 
     /**
-     * Method checks the status of opentelemetry collector.
-     * Depends on health-check extension of otel collector.
-     * See details in <a href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/healthcheckextension#readme">health-check-extension</a>
+     * Method checks the status of opentelemetry collector. Depends on health-check extension of
+     * otel collector. See details in <a
+     * href="https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/healthcheckextension#readme">health-check-extension</a>
      *
      * @return BackendSystemStatus
      */
     public BackendSystemStatus getOpenTelemetryHealthStatus() {
         if (!isOtelExporterDisabled) {
-            RestClient restClient = RestClient.builder()
-                    .baseUrl(getHealthCheckUrl())
-                    .build();
+            RestClient restClient = RestClient.builder().baseUrl(getHealthCheckUrl()).build();
             BackendSystemStatus backendSystemStatus = new BackendSystemStatus();
             backendSystemStatus.setName("Opentelemetry Collector");
             backendSystemStatus.setBackendSystemType(BackendSystemType.OPEN_TELEMETRY_COLLECTOR);
@@ -52,8 +48,11 @@ public class OpenTelemetryCollectorHealthCheck {
             try {
                 OpenTelemetryHealthCheckResponse openTelemetryHealthCheckResponse =
                         restClient.get().retrieve().body(OpenTelemetryHealthCheckResponse.class);
-                backendSystemStatus.setHealthStatus(openTelemetryHealthCheckResponse.getStatus()
-                        == CollectorStatus.SERVER_AVAILABLE ? HealthStatus.OK : HealthStatus.NOK);
+                backendSystemStatus.setHealthStatus(
+                        openTelemetryHealthCheckResponse.getStatus()
+                                        == CollectorStatus.SERVER_AVAILABLE
+                                ? HealthStatus.OK
+                                : HealthStatus.NOK);
             } catch (RestClientException restClientException) {
                 backendSystemStatus.setHealthStatus(HealthStatus.NOK);
                 backendSystemStatus.setDetails(restClientException.getMessage());

@@ -26,16 +26,13 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
-/**
- * ServiceConfigurationEntity for persistence.
- */
+/** ServiceConfigurationEntity for persistence. */
 @Table(name = "SERVICE_CONFIGURATION")
 @Entity
 @Data
 public class ServiceConfigurationEntity {
 
-    @Id
-    private UUID id;
+    @Id private UUID id;
 
     @MapsId
     @OneToOne

@@ -29,26 +29,19 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/**
- * Service to update database tables column values by code generation automatically.
- */
+/** Service to update database tables column values by code generation automatically. */
 @Slf4j
 @Component
-public class EnumColumnAllowedValuesUpdater implements
-        ApplicationListener<ContextRefreshedEvent> {
+public class EnumColumnAllowedValuesUpdater implements ApplicationListener<ContextRefreshedEvent> {
 
-    @Resource
-    private EntityManagerFactory entityManagerFactory;
+    @Resource private EntityManagerFactory entityManagerFactory;
 
-    @Resource
-    private EnumColumnConstraintManage enumColumnConstraintManage;
+    @Resource private EnumColumnConstraintManage enumColumnConstraintManage;
 
     @Value("${spring.datasource.name:h2}")
     private String dataSourceName;
 
-    /**
-     * Update the values of all enum columns in all tables.
-     */
+    /** Update the values of all enum columns in all tables. */
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
         DatabaseType activeDatabaseType = DatabaseType.getByValue(dataSourceName);
@@ -59,12 +52,16 @@ public class EnumColumnAllowedValuesUpdater implements
             for (Field field : enumFields) {
                 Class<?> filedClass = field.getType();
                 Column columnAnnotation = field.getAnnotation(Column.class);
-                String columnName = StringUtils.toRootUpperCase(Objects.nonNull(columnAnnotation)
-                        ? columnAnnotation.name() : field.getName());
+                String columnName =
+                        StringUtils.toRootUpperCase(
+                                Objects.nonNull(columnAnnotation)
+                                        ? columnAnnotation.name()
+                                        : field.getName());
                 if (filedClass.isEnum()) {
                     List<String> enumNames = getEnumNames(filedClass);
-                    String enumNamesStr = StringUtils.toRootUpperCase(
-                            "'" + StringUtils.join(enumNames, "','") + "'");
+                    String enumNamesStr =
+                            StringUtils.toRootUpperCase(
+                                    "'" + StringUtils.join(enumNames, "','") + "'");
                     if (activeDatabaseType == DatabaseType.MYSQL) {
                         updateTableColumnEnumValuesForMySql(tableName, columnName, enumNamesStr);
                     }
@@ -76,43 +73,56 @@ public class EnumColumnAllowedValuesUpdater implements
         }
     }
 
-    private void updateTableColumnEnumValuesForMySql(String tableName, String columnName,
-                                                     String enumValuesStr) {
+    private void updateTableColumnEnumValuesForMySql(
+            String tableName, String columnName, String enumValuesStr) {
         try {
             if (enumColumnConstraintManage.queryTableColumnExisted(tableName, columnName)) {
-                enumColumnConstraintManage.updateTableEnumColumnValuesForMySql(tableName,
+                enumColumnConstraintManage.updateTableEnumColumnValuesForMySql(
+                        tableName, columnName, enumValuesStr);
+                log.info(
+                        "Update MySql table:{} enum column:{} to values:[{}] completed.",
+                        tableName,
                         columnName,
                         enumValuesStr);
-                log.info("Update MySql table:{} enum column:{} to values:[{}] completed.",
-                        tableName, columnName, enumValuesStr);
             }
         } catch (RuntimeException e) {
-            log.error("Update MySql table:{} enum column:{} to values:[{}] failed. error:{}",
-                    tableName, columnName, enumValuesStr, e.getMessage());
+            log.error(
+                    "Update MySql table:{} enum column:{} to values:[{}] failed. error:{}",
+                    tableName,
+                    columnName,
+                    enumValuesStr,
+                    e.getMessage());
         }
     }
 
-
-    private void updateTableColumnEnumValuesForH2(String tableName, String columnName,
-                                                  String enumValuesStr) {
+    private void updateTableColumnEnumValuesForH2(
+            String tableName, String columnName, String enumValuesStr) {
         try {
             if (enumColumnConstraintManage.queryTableColumnExisted(tableName, columnName)) {
-                List<String> oldConstraintNames = enumColumnConstraintManage
-                        .queryConstraintForH2TableEnumColumn(tableName, columnName);
+                List<String> oldConstraintNames =
+                        enumColumnConstraintManage.queryConstraintForH2TableEnumColumn(
+                                tableName, columnName);
                 if (!CollectionUtils.isEmpty(oldConstraintNames)) {
                     for (String constraintName : oldConstraintNames) {
-                        enumColumnConstraintManage
-                                .dropOldConstraintForH2TableEnumColumn(tableName, constraintName);
-                        enumColumnConstraintManage.addNewConstraintForH2TableEnumColumn(tableName,
-                                columnName, constraintName, enumValuesStr);
-                        log.info("Update H2 table:{} enum column:{} to values:[{}] completed.",
-                                tableName, columnName, enumValuesStr);
+                        enumColumnConstraintManage.dropOldConstraintForH2TableEnumColumn(
+                                tableName, constraintName);
+                        enumColumnConstraintManage.addNewConstraintForH2TableEnumColumn(
+                                tableName, columnName, constraintName, enumValuesStr);
+                        log.info(
+                                "Update H2 table:{} enum column:{} to values:[{}] completed.",
+                                tableName,
+                                columnName,
+                                enumValuesStr);
                     }
                 }
             }
         } catch (RuntimeException e) {
-            log.error("Update H2 table:{} enum column:{} to values:[{}] failed. error:{}",
-                    tableName, columnName, enumValuesStr, e.getMessage());
+            log.error(
+                    "Update H2 table:{} enum column:{} to values:[{}] failed. error:{}",
+                    tableName,
+                    columnName,
+                    enumValuesStr,
+                    e.getMessage());
         }
     }
 
@@ -125,7 +135,6 @@ public class EnumColumnAllowedValuesUpdater implements
         }
         return enumNames;
     }
-
 
     private Map<Class<?>, String> getTableNamesMap() {
         Map<Class<?>, String> tableClassNameMap = new HashMap<>();
@@ -140,7 +149,6 @@ public class EnumColumnAllowedValuesUpdater implements
         return tableClassNameMap;
     }
 
-
     private List<Field> getFieldsWithAnnotationEnum(Class<?> clazz) {
         List<Field> fields = new ArrayList<>();
         if (Objects.isNull(clazz)) {
@@ -153,6 +161,4 @@ public class EnumColumnAllowedValuesUpdater implements
         }
         return fields;
     }
-
-
 }

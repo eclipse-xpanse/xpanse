@@ -86,6 +86,7 @@
         <swagger.core.v3.version>2.2.26</swagger.core.v3.version>
         <hcl4j.version>0.9.7</hcl4j.version>
         <jackson.datatype.jsr310.version>2.18.2</jackson.datatype.jsr310.version>
+        <spotless.version>2.43.0</spotless.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
@@ -381,6 +382,51 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <version>${spotless.version}</version>
+            <configuration>
+                <formats>
+                    <format>
+                        <includes>
+                            <include>*.md</include>
+                            <include>.gitignore</include>
+                        </includes>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                        <indent>
+                            <tabs>true</tabs>
+                            <spacesPerTab>4</spacesPerTab>
+                        </indent>
+                    </format>
+                </formats>
+                <java>
+                    <importOrder />
+                    <removeUnusedImports />
+                    <googleJavaFormat>
+                        <style>AOSP</style>
+                        <reflowLongStrings>true</reflowLongStrings>
+                    </googleJavaFormat>
+                </java>
+            </configuration>
+                <executions>
+                <execution>
+                    <id>apply-spotless</id>
+                    <goals>
+                        <goal>apply</goal>
+                    </goals>
+                    <phase>validate</phase>
+                </execution>
+                <execution>
+                <id>check-spotless</id>
+                <goals>
+                    <goal>check</goal>
+                </goals>
+                <phase>verify</phase>
+                </execution>
+                </executions>
+        </plugin>
         </plugins>
     </build>
 </project>

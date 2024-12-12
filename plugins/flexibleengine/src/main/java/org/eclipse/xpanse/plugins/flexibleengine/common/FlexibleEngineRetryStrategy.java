@@ -19,9 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
-/**
- * Define retry strategy.
- */
+/** Define retry strategy. */
 @Slf4j
 @Component
 public class FlexibleEngineRetryStrategy implements BackoffStrategy {
@@ -39,7 +37,6 @@ public class FlexibleEngineRetryStrategy implements BackoffStrategy {
         return retryMaxDelayMillions;
     }
 
-
     /**
      * Set retry max attempts with config.
      *
@@ -49,7 +46,8 @@ public class FlexibleEngineRetryStrategy implements BackoffStrategy {
     public void setRetryAttempts(int maxAttempts) {
         if (maxAttempts <= 0) {
             retryMaxAttempts = DEFAULT_RETRY_ATTEMPTS;
-            log.warn("The retry max attempts is invalid, use default value {}",
+            log.warn(
+                    "The retry max attempts is invalid, use default value {}",
                     DEFAULT_RETRY_ATTEMPTS);
         }
         retryMaxAttempts = maxAttempts;
@@ -64,7 +62,8 @@ public class FlexibleEngineRetryStrategy implements BackoffStrategy {
     public void setRetryDelayMillions(long delayMillions) {
         if (delayMillions <= 0) {
             retryMaxDelayMillions = DEFAULT_DELAY_MILLIONS;
-            log.warn("The max delay millions time is invalid, use default value {}",
+            log.warn(
+                    "The max delay millions time is invalid, use default value {}",
                     DEFAULT_DELAY_MILLIONS);
         }
         retryMaxDelayMillions = delayMillions;
@@ -83,7 +82,7 @@ public class FlexibleEngineRetryStrategy implements BackoffStrategy {
      * Match retry condition.
      *
      * @param response response
-     * @param ex       exception
+     * @param ex exception
      * @return true if match retry condition, otherwise false
      */
     public boolean matchRetryCondition(SdkResponse response, Exception ex) {
@@ -104,8 +103,10 @@ public class FlexibleEngineRetryStrategy implements BackoffStrategy {
      * @param ex Exception
      */
     public void handleAuthExceptionForSpringRetry(Exception ex) {
-        int retryCount = Objects.isNull(RetrySynchronizationManager.getContext())
-                ? 0 : RetrySynchronizationManager.getContext().getRetryCount();
+        int retryCount =
+                Objects.isNull(RetrySynchronizationManager.getContext())
+                        ? 0
+                        : RetrySynchronizationManager.getContext().getRetryCount();
         log.error(ex.getMessage() + System.lineSeparator() + "Retry count:" + retryCount);
         if (ex instanceof ClientAuthenticationFailedException) {
             throw new ClientAuthenticationFailedException(ex.getMessage());

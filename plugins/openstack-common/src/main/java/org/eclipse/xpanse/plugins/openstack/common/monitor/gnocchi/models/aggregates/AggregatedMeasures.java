@@ -9,13 +9,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-/**
- * Data model for AggregatedMeasures objects.
- */
+/** Data model for AggregatedMeasures objects. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-        "measures"
-})
+@JsonPropertyOrder({"measures"})
 public class AggregatedMeasures {
 
     @JsonProperty("measures")
@@ -30,5 +26,4 @@ public class AggregatedMeasures {
     public void setMeasures(AggregateMeasure measures) {
         this.aggregateMeasure = measures;
     }
-
 }

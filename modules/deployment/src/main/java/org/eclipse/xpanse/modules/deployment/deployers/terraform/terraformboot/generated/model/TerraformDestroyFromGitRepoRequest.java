@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,48 +20,41 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * TerraformDestroyFromGitRepoRequest
- */
+/** TerraformDestroyFromGitRepoRequest */
 @JsonPropertyOrder({
-        TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
-        TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_TERRAFORM_VERSION,
-        TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
-        TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
-        TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
-        TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_TF_STATE
+    TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_REQUEST_ID,
+    TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_TERRAFORM_VERSION,
+    TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_VARIABLES,
+    TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_ENV_VARIABLES,
+    TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_GIT_REPO_DETAILS,
+    TerraformDestroyFromGitRepoRequest.JSON_PROPERTY_TF_STATE
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformDestroyFromGitRepoRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_TERRAFORM_VERSION = "terraformVersion";
-    @jakarta.annotation.Nonnull
-    private String terraformVersion;
+    @jakarta.annotation.Nonnull private String terraformVersion;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_GIT_REPO_DETAILS = "gitRepoDetails";
-    @jakarta.annotation.Nullable
-    private TerraformScriptGitRepoDetails gitRepoDetails;
+    @jakarta.annotation.Nullable private TerraformScriptGitRepoDetails gitRepoDetails;
 
     public static final String JSON_PROPERTY_TF_STATE = "tfState";
-    @jakarta.annotation.Nonnull
-    private String tfState;
+    @jakarta.annotation.Nonnull private String tfState;
 
-    public TerraformDestroyFromGitRepoRequest() {
-    }
+    public TerraformDestroyFromGitRepoRequest() {}
 
-    public TerraformDestroyFromGitRepoRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
+    public TerraformDestroyFromGitRepoRequest requestId(
+            @jakarta.annotation.Nullable UUID requestId) {
 
         this.requestId = requestId;
         return this;
@@ -76,11 +68,9 @@ public class TerraformDestroyFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -88,7 +78,8 @@ public class TerraformDestroyFromGitRepoRequest {
         this.requestId = requestId;
     }
 
-    public TerraformDestroyFromGitRepoRequest terraformVersion(@jakarta.annotation.Nonnull String terraformVersion) {
+    public TerraformDestroyFromGitRepoRequest terraformVersion(
+            @jakarta.annotation.Nonnull String terraformVersion) {
 
         this.terraformVersion = terraformVersion;
         return this;
@@ -102,11 +93,9 @@ public class TerraformDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTerraformVersion() {
         return terraformVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -114,7 +103,8 @@ public class TerraformDestroyFromGitRepoRequest {
         this.terraformVersion = terraformVersion;
     }
 
-    public TerraformDestroyFromGitRepoRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public TerraformDestroyFromGitRepoRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
@@ -133,11 +123,9 @@ public class TerraformDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -152,7 +140,8 @@ public class TerraformDestroyFromGitRepoRequest {
         return this;
     }
 
-    public TerraformDestroyFromGitRepoRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public TerraformDestroyFromGitRepoRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -161,18 +150,17 @@ public class TerraformDestroyFromGitRepoRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to terraform process.
+     * Key-value pairs of variables that must be injected as environment variables to terraform
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -195,15 +183,14 @@ public class TerraformDestroyFromGitRepoRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public TerraformScriptGitRepoDetails getGitRepoDetails() {
         return gitRepoDetails;
     }
 
-
     @JsonProperty(JSON_PROPERTY_GIT_REPO_DETAILS)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-    public void setGitRepoDetails(@jakarta.annotation.Nullable TerraformScriptGitRepoDetails gitRepoDetails) {
+    public void setGitRepoDetails(
+            @jakarta.annotation.Nullable TerraformScriptGitRepoDetails gitRepoDetails) {
         this.gitRepoDetails = gitRepoDetails;
     }
 
@@ -221,11 +208,9 @@ public class TerraformDestroyFromGitRepoRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTfState() {
         return tfState;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TF_STATE)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -241,18 +226,23 @@ public class TerraformDestroyFromGitRepoRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        TerraformDestroyFromGitRepoRequest terraformDestroyFromGitRepoRequest = (TerraformDestroyFromGitRepoRequest) o;
-        return Objects.equals(this.requestId, terraformDestroyFromGitRepoRequest.requestId) &&
-                Objects.equals(this.terraformVersion, terraformDestroyFromGitRepoRequest.terraformVersion) &&
-                Objects.equals(this.variables, terraformDestroyFromGitRepoRequest.variables) &&
-                Objects.equals(this.envVariables, terraformDestroyFromGitRepoRequest.envVariables) &&
-                Objects.equals(this.gitRepoDetails, terraformDestroyFromGitRepoRequest.gitRepoDetails) &&
-                Objects.equals(this.tfState, terraformDestroyFromGitRepoRequest.tfState);
+        TerraformDestroyFromGitRepoRequest terraformDestroyFromGitRepoRequest =
+                (TerraformDestroyFromGitRepoRequest) o;
+        return Objects.equals(this.requestId, terraformDestroyFromGitRepoRequest.requestId)
+                && Objects.equals(
+                        this.terraformVersion, terraformDestroyFromGitRepoRequest.terraformVersion)
+                && Objects.equals(this.variables, terraformDestroyFromGitRepoRequest.variables)
+                && Objects.equals(
+                        this.envVariables, terraformDestroyFromGitRepoRequest.envVariables)
+                && Objects.equals(
+                        this.gitRepoDetails, terraformDestroyFromGitRepoRequest.gitRepoDetails)
+                && Objects.equals(this.tfState, terraformDestroyFromGitRepoRequest.tfState);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, terraformVersion, variables, envVariables, gitRepoDetails, tfState);
+        return Objects.hash(
+                requestId, terraformVersion, variables, envVariables, gitRepoDetails, tfState);
     }
 
     @Override
@@ -270,8 +260,8 @@ public class TerraformDestroyFromGitRepoRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -279,6 +269,4 @@ public class TerraformDestroyFromGitRepoRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

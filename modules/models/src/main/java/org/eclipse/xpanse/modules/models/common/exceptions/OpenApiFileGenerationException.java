@@ -5,10 +5,7 @@
 
 package org.eclipse.xpanse.modules.models.common.exceptions;
 
-
-/**
- * Exception thrown for errors generated while generating open api file.
- */
+/** Exception thrown for errors generated while generating open api file. */
 public class OpenApiFileGenerationException extends RuntimeException {
     public OpenApiFileGenerationException(String message) {
         super(message);

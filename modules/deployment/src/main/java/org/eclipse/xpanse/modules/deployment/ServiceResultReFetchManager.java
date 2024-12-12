@@ -23,9 +23,7 @@ import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNo
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean to manage all methods used by the service operation result recapture manager.
- */
+/** Bean to manage all methods used by the service operation result recapture manager. */
 @Slf4j
 @Component
 public class ServiceResultReFetchManager {
@@ -33,14 +31,10 @@ public class ServiceResultReFetchManager {
     @Value("${max.service.order.processing.duration.in.seconds}")
     private int maxServiceOrderProcessingDuration;
 
-    @Resource
-    private TerraformBootResultRefetchManager terraformBootResultRefetchManager;
-    @Resource
-    private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
+    @Resource private TerraformBootResultRefetchManager terraformBootResultRefetchManager;
+    @Resource private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
 
-    /**
-     * ReFetch deploymentState for missing service orders.
-     */
+    /** ReFetch deploymentState for missing service orders. */
     public void refetchDeploymentStateForMissingOrdersFromDeployers(
             ServiceDeploymentEntity serviceDeployment) {
         ServiceOrderEntity serviceOrderEntity =
@@ -52,54 +46,74 @@ public class ServiceResultReFetchManager {
             ServiceDeploymentEntity serviceDeployment) {
         List<ServiceOrderEntity> serviceOrderEntities = serviceDeployment.getServiceOrderList();
         ServiceOrderEntity serviceOrderEntity = null;
-        if (serviceDeployment.getServiceDeploymentState()
+        if (serviceDeployment
+                .getServiceDeploymentState()
                 .equals(ServiceDeploymentState.DEPLOYING)) {
-            serviceOrderEntity = serviceOrderEntities
-                    .stream()
-                    .filter(serviceOrder ->
-                            serviceOrder.getTaskType()
-                                    .equals(ServiceOrderType.DEPLOY)).findFirst()
-                    .orElseThrow(
-                            () -> new ServiceOrderNotFound(String.format(
-                                    "No ServiceOrderEntity found with serviceId %s,"
-                                            + " ServiceOrderType DEPLOY",
-                                    serviceDeployment.getId())));
-        } else if (serviceDeployment.getServiceDeploymentState()
+            serviceOrderEntity =
+                    serviceOrderEntities.stream()
+                            .filter(
+                                    serviceOrder ->
+                                            serviceOrder
+                                                    .getTaskType()
+                                                    .equals(ServiceOrderType.DEPLOY))
+                            .findFirst()
+                            .orElseThrow(
+                                    () ->
+                                            new ServiceOrderNotFound(
+                                                    String.format(
+                                                            "No ServiceOrderEntity found with"
+                                                                + " serviceId %s, ServiceOrderType"
+                                                                + " DEPLOY",
+                                                            serviceDeployment.getId())));
+        } else if (serviceDeployment
+                .getServiceDeploymentState()
                 .equals(ServiceDeploymentState.DESTROYING)) {
-            serviceOrderEntity = serviceOrderEntities
-                    .stream()
-                    .filter(serviceOrder ->
-                            serviceOrder.getTaskType()
-                                    .equals(ServiceOrderType.DESTROY)).findFirst()
-                    .orElseThrow(
-                            () -> new ServiceOrderNotFound(String.format(
-                                    "No ServiceOrderEntity found with serviceId %s,"
-                                            + " ServiceOrderType DESTROY",
-                                    serviceDeployment.getId())));
-        } else if (serviceDeployment.getServiceDeploymentState()
+            serviceOrderEntity =
+                    serviceOrderEntities.stream()
+                            .filter(
+                                    serviceOrder ->
+                                            serviceOrder
+                                                    .getTaskType()
+                                                    .equals(ServiceOrderType.DESTROY))
+                            .findFirst()
+                            .orElseThrow(
+                                    () ->
+                                            new ServiceOrderNotFound(
+                                                    String.format(
+                                                            "No ServiceOrderEntity found with"
+                                                                + " serviceId %s, ServiceOrderType"
+                                                                + " DESTROY",
+                                                            serviceDeployment.getId())));
+        } else if (serviceDeployment
+                .getServiceDeploymentState()
                 .equals(ServiceDeploymentState.MODIFYING)) {
-            serviceOrderEntity = serviceOrderEntities
-                    .stream()
-                    .filter(serviceOrder ->
-                            serviceOrder.getTaskType()
-                                    .equals(ServiceOrderType.MODIFY)).findFirst()
-                    .orElseThrow(
-                            () -> new ServiceOrderNotFound(String.format(
-                                    "No ServiceOrderEntity found with serviceId %s,"
-                                            + " ServiceOrderType MODIFY",
-                                    serviceDeployment.getId())));
+            serviceOrderEntity =
+                    serviceOrderEntities.stream()
+                            .filter(
+                                    serviceOrder ->
+                                            serviceOrder
+                                                    .getTaskType()
+                                                    .equals(ServiceOrderType.MODIFY))
+                            .findFirst()
+                            .orElseThrow(
+                                    () ->
+                                            new ServiceOrderNotFound(
+                                                    String.format(
+                                                            "No ServiceOrderEntity found with"
+                                                                + " serviceId %s, ServiceOrderType"
+                                                                + " MODIFY",
+                                                            serviceDeployment.getId())));
         } else {
             return serviceOrderEntity;
         }
         return serviceOrderEntity;
     }
 
-
     private void reFetchDeploymentStateForMissingOrdersFromDeployers(
             ServiceDeploymentEntity serviceDeployment, ServiceOrderEntity serviceOrder) {
         if (Objects.nonNull(serviceOrder)) {
-            if (Duration.between(serviceOrder.getStartedTime(),
-                    OffsetDateTime.now()).getSeconds() > maxServiceOrderProcessingDuration) {
+            if (Duration.between(serviceOrder.getStartedTime(), OffsetDateTime.now()).getSeconds()
+                    > maxServiceOrderProcessingDuration) {
                 if (serviceOrder.getHandler().equals(Handler.TERRAFORM_BOOT)) {
                     terraformBootResultRefetchManager.retrieveTerraformResult(
                             serviceDeployment, serviceOrder);
@@ -111,5 +125,4 @@ public class ServiceResultReFetchManager {
             }
         }
     }
-
 }

@@ -10,9 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/**
- * Enumeration class for types of service order tasks.
- */
+/** Enumeration class for types of service order tasks. */
 public enum ServiceOrderType {
     DEPLOY("deploy"),
     RETRY("retry"),
@@ -34,9 +32,7 @@ public enum ServiceOrderType {
         this.type = type;
     }
 
-    /**
-     * For ServiceOrderType deserialize.
-     */
+    /** For ServiceOrderType deserialize. */
     @JsonCreator
     public static ServiceOrderType getByValue(String type) {
         for (ServiceOrderType item : values()) {
@@ -48,9 +44,7 @@ public enum ServiceOrderType {
                 String.format("ServiceOrderType type %s is not supported.", type));
     }
 
-    /**
-     * For ServiceOrderType serialize.
-     */
+    /** For ServiceOrderType serialize. */
     @JsonValue
     public String toValue() {
         return this.type;

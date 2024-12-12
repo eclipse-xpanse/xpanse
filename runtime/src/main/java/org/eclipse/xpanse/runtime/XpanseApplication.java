@@ -19,9 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-/**
- * Main entry class to xpanse runtime. This class can be directly executed to start the server.
- */
+/** Main entry class to xpanse runtime. This class can be directly executed to start the server. */
 @EnableCaching
 @EnableRetry
 @EnableAsync(proxyTargetClass = true)
@@ -29,8 +27,12 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EntityScan(basePackages = "org.eclipse.xpanse")
 @ComponentScan(basePackages = "org.eclipse.xpanse")
 @EnableJpaAuditing(dateTimeProviderRef = "auditDateTimeProviderConfig")
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class,
-        ProcessEngineAutoConfiguration.class, ActivitiMethodSecurityAutoConfiguration.class})
+@SpringBootApplication(
+        exclude = {
+            SecurityAutoConfiguration.class,
+            ProcessEngineAutoConfiguration.class,
+            ActivitiMethodSecurityAutoConfiguration.class
+        })
 public class XpanseApplication {
 
     public static void main(String[] args) {

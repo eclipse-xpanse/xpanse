@@ -23,8 +23,7 @@ import org.springframework.beans.BeanUtils;
 @ExtendWith(MockitoExtension.class)
 class UserPolicyTest {
 
-    @Mock
-    private Csp mockCsp;
+    @Mock private Csp mockCsp;
 
     private final Boolean enabled = true;
     private final String policy = "policy";
@@ -88,9 +87,11 @@ class UserPolicyTest {
 
     @Test
     void testToString() {
-        String result = String.format(
-                "UserPolicy(userPolicyId=%s, policy=%s, csp=%s, enabled=%s, createTime=%s, lastModifiedTime=%s)",
-                id, policy, mockCsp, enabled, null, null);
+        String result =
+                String.format(
+                        "UserPolicy(userPolicyId=%s, policy=%s, csp=%s, enabled=%s, createTime=%s,"
+                                + " lastModifiedTime=%s)",
+                        id, policy, mockCsp, enabled, null, null);
         assertThat(test.toString()).isEqualTo(result);
     }
 }

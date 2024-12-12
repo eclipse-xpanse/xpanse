@@ -13,14 +13,11 @@ import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 
-/**
- * Defines the data model for the same resource.
- */
+/** Defines the data model for the same resource. */
 @Data
 public class Resource implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 240913796673011260L;
+    @Serial private static final long serialVersionUID = 240913796673011260L;
 
     @NotNull
     @Schema(description = "The count of the same resource.")

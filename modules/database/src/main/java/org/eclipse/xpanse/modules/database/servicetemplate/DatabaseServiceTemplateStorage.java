@@ -20,9 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Bean to manage all service task to database.
- */
+/** Bean to manage all service task to database. */
 @Slf4j
 @Component
 @Transactional
@@ -52,42 +50,54 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(queryModel.getCategory())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("category"),
-                                queryModel.getCategory()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("category"), queryModel.getCategory()));
                     }
                     if (Objects.nonNull(queryModel.getCsp())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("csp"),
-                                queryModel.getCsp()));
+                        predicateList.add(
+                                criteriaBuilder.equal(root.get("csp"), queryModel.getCsp()));
                     }
                     if (StringUtils.isNotBlank(queryModel.getServiceName())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("name"),
-                                StringUtils.lowerCase(queryModel.getServiceName())));
-
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("name"),
+                                        StringUtils.lowerCase(queryModel.getServiceName())));
                     }
                     if (StringUtils.isNotBlank(queryModel.getServiceVersion())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("version"),
-                                StringUtils.lowerCase(queryModel.getServiceVersion())));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("version"),
+                                        StringUtils.lowerCase(queryModel.getServiceVersion())));
                     }
                     if (StringUtils.isNotBlank(queryModel.getNamespace())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("namespace"),
-                                queryModel.getNamespace()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("namespace"), queryModel.getNamespace()));
                     }
                     if (Objects.nonNull(queryModel.getServiceHostingType())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("serviceHostingType"),
-                                queryModel.getServiceHostingType()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("serviceHostingType"),
+                                        queryModel.getServiceHostingType()));
                     }
                     if (Objects.nonNull(queryModel.getServiceTemplateRegistrationState())) {
-                        predicateList.add(criteriaBuilder.equal(
-                                root.get("serviceTemplateRegistrationState"),
-                                queryModel.getServiceTemplateRegistrationState()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("serviceTemplateRegistrationState"),
+                                        queryModel.getServiceTemplateRegistrationState()));
                     }
                     if (Objects.nonNull(queryModel.getAvailableInCatalog())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("availableInCatalog"),
-                                queryModel.getAvailableInCatalog()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("availableInCatalog"),
+                                        queryModel.getAvailableInCatalog()));
                     }
                     if (Objects.nonNull(queryModel.getIsUpdatePending())) {
-                        predicateList.add(criteriaBuilder.equal(root.get("isUpdatePending"),
-                                queryModel.getIsUpdatePending()));
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        root.get("isUpdatePending"),
+                                        queryModel.getIsUpdatePending()));
                     }
                     assert query != null;
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
@@ -106,9 +116,10 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
     @Override
     public ServiceTemplateEntity getServiceTemplateById(UUID uuid) {
         Optional<ServiceTemplateEntity> optional = repository.findById(uuid);
-        return optional.orElseThrow(() -> new ServiceTemplateNotRegistered(
-                String.format("Service template with id %s not found.", uuid)
-        ));
+        return optional.orElseThrow(
+                () ->
+                        new ServiceTemplateNotRegistered(
+                                String.format("Service template with id %s not found.", uuid)));
     }
 
     /**

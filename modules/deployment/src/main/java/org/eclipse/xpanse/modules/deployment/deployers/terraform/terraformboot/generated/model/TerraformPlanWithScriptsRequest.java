@@ -10,7 +10,6 @@
  * Do not edit the class manually.
  */
 
-
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,39 +22,34 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * TerraformPlanWithScriptsRequest
- */
-@JsonPropertyOrder({TerraformPlanWithScriptsRequest.JSON_PROPERTY_REQUEST_ID,
-        TerraformPlanWithScriptsRequest.JSON_PROPERTY_TERRAFORM_VERSION,
-        TerraformPlanWithScriptsRequest.JSON_PROPERTY_VARIABLES,
-        TerraformPlanWithScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
-        TerraformPlanWithScriptsRequest.JSON_PROPERTY_SCRIPTS})
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator " +
-        "version: 7.10.0")
+/** TerraformPlanWithScriptsRequest */
+@JsonPropertyOrder({
+    TerraformPlanWithScriptsRequest.JSON_PROPERTY_REQUEST_ID,
+    TerraformPlanWithScriptsRequest.JSON_PROPERTY_TERRAFORM_VERSION,
+    TerraformPlanWithScriptsRequest.JSON_PROPERTY_VARIABLES,
+    TerraformPlanWithScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
+    TerraformPlanWithScriptsRequest.JSON_PROPERTY_SCRIPTS
+})
+@jakarta.annotation.Generated(
+        value = "org.openapitools.codegen.languages.JavaClientCodegen",
+        comments = "Generator " + "version: 7.10.0")
 public class TerraformPlanWithScriptsRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
-    @jakarta.annotation.Nullable
-    private UUID requestId;
+    @jakarta.annotation.Nullable private UUID requestId;
 
     public static final String JSON_PROPERTY_TERRAFORM_VERSION = "terraformVersion";
-    @jakarta.annotation.Nonnull
-    private String terraformVersion;
+    @jakarta.annotation.Nonnull private String terraformVersion;
 
     public static final String JSON_PROPERTY_VARIABLES = "variables";
-    @jakarta.annotation.Nonnull
-    private Map<String, Object> variables = new HashMap<>();
+    @jakarta.annotation.Nonnull private Map<String, Object> variables = new HashMap<>();
 
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
-    @jakarta.annotation.Nullable
-    private Map<String, String> envVariables = new HashMap<>();
+    @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
     public static final String JSON_PROPERTY_SCRIPTS = "scripts";
-    @jakarta.annotation.Nonnull
-    private List<String> scripts = new ArrayList<>();
+    @jakarta.annotation.Nonnull private List<String> scripts = new ArrayList<>();
 
-    public TerraformPlanWithScriptsRequest() {
-    }
+    public TerraformPlanWithScriptsRequest() {}
 
     public TerraformPlanWithScriptsRequest requestId(@jakarta.annotation.Nullable UUID requestId) {
 
@@ -71,11 +65,9 @@ public class TerraformPlanWithScriptsRequest {
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public UUID getRequestId() {
         return requestId;
     }
-
 
     @JsonProperty(JSON_PROPERTY_REQUEST_ID)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -83,7 +75,8 @@ public class TerraformPlanWithScriptsRequest {
         this.requestId = requestId;
     }
 
-    public TerraformPlanWithScriptsRequest terraformVersion(@jakarta.annotation.Nonnull String terraformVersion) {
+    public TerraformPlanWithScriptsRequest terraformVersion(
+            @jakarta.annotation.Nonnull String terraformVersion) {
 
         this.terraformVersion = terraformVersion;
         return this;
@@ -97,11 +90,9 @@ public class TerraformPlanWithScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public String getTerraformVersion() {
         return terraformVersion;
     }
-
 
     @JsonProperty(JSON_PROPERTY_TERRAFORM_VERSION)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -109,7 +100,8 @@ public class TerraformPlanWithScriptsRequest {
         this.terraformVersion = terraformVersion;
     }
 
-    public TerraformPlanWithScriptsRequest variables(@jakarta.annotation.Nonnull Map<String, Object> variables) {
+    public TerraformPlanWithScriptsRequest variables(
+            @jakarta.annotation.Nonnull Map<String, Object> variables) {
 
         this.variables = variables;
         return this;
@@ -128,11 +120,9 @@ public class TerraformPlanWithScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public Map<String, Object> getVariables() {
         return variables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -140,13 +130,15 @@ public class TerraformPlanWithScriptsRequest {
         this.variables = variables;
     }
 
-    public TerraformPlanWithScriptsRequest envVariables(@jakarta.annotation.Nullable Map<String, String> envVariables) {
+    public TerraformPlanWithScriptsRequest envVariables(
+            @jakarta.annotation.Nullable Map<String, String> envVariables) {
 
         this.envVariables = envVariables;
         return this;
     }
 
-    public TerraformPlanWithScriptsRequest putEnvVariablesItem(String key, String envVariablesItem) {
+    public TerraformPlanWithScriptsRequest putEnvVariablesItem(
+            String key, String envVariablesItem) {
         if (this.envVariables == null) {
             this.envVariables = new HashMap<>();
         }
@@ -155,18 +147,17 @@ public class TerraformPlanWithScriptsRequest {
     }
 
     /**
-     * Key-value pairs of variables that must be injected as environment variables to terraform process.
+     * Key-value pairs of variables that must be injected as environment variables to terraform
+     * process.
      *
      * @return envVariables
      */
     @jakarta.annotation.Nullable
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-
     public Map<String, String> getEnvVariables() {
         return envVariables;
     }
-
 
     @JsonProperty(JSON_PROPERTY_ENV_VARIABLES)
     @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
@@ -174,7 +165,8 @@ public class TerraformPlanWithScriptsRequest {
         this.envVariables = envVariables;
     }
 
-    public TerraformPlanWithScriptsRequest scripts(@jakarta.annotation.Nonnull List<String> scripts) {
+    public TerraformPlanWithScriptsRequest scripts(
+            @jakarta.annotation.Nonnull List<String> scripts) {
 
         this.scripts = scripts;
         return this;
@@ -196,11 +188,9 @@ public class TerraformPlanWithScriptsRequest {
     @jakarta.annotation.Nonnull
     @JsonProperty(JSON_PROPERTY_SCRIPTS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-
     public List<String> getScripts() {
         return scripts;
     }
-
 
     @JsonProperty(JSON_PROPERTY_SCRIPTS)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
@@ -216,12 +206,14 @@ public class TerraformPlanWithScriptsRequest {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest = (TerraformPlanWithScriptsRequest) o;
-        return Objects.equals(this.requestId, terraformPlanWithScriptsRequest.requestId) &&
-                Objects.equals(this.terraformVersion, terraformPlanWithScriptsRequest.terraformVersion) &&
-                Objects.equals(this.variables, terraformPlanWithScriptsRequest.variables) &&
-                Objects.equals(this.envVariables, terraformPlanWithScriptsRequest.envVariables) &&
-                Objects.equals(this.scripts, terraformPlanWithScriptsRequest.scripts);
+        TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest =
+                (TerraformPlanWithScriptsRequest) o;
+        return Objects.equals(this.requestId, terraformPlanWithScriptsRequest.requestId)
+                && Objects.equals(
+                        this.terraformVersion, terraformPlanWithScriptsRequest.terraformVersion)
+                && Objects.equals(this.variables, terraformPlanWithScriptsRequest.variables)
+                && Objects.equals(this.envVariables, terraformPlanWithScriptsRequest.envVariables)
+                && Objects.equals(this.scripts, terraformPlanWithScriptsRequest.scripts);
     }
 
     @Override
@@ -243,8 +235,8 @@ public class TerraformPlanWithScriptsRequest {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
+     * Convert the given object to string with each line indented by 4 spaces (except the first
+     * line).
      */
     private String toIndentedString(Object o) {
         if (o == null) {
@@ -252,6 +244,4 @@ public class TerraformPlanWithScriptsRequest {
         }
         return o.toString().replace("\n", "\n    ");
     }
-
 }
-

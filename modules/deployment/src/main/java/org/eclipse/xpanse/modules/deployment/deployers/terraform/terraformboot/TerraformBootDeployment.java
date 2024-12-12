@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-/**
- * Implementation of the deployment with terraform-boot.
- */
+/** Implementation of the deployment with terraform-boot. */
 @Slf4j
 @Profile("terraform-boot")
 @Component
@@ -31,9 +29,7 @@ public class TerraformBootDeployment implements Deployer {
     private final TerraformBootServiceDestroyer terraformBootServiceDestroyer;
     private final TerraformBootServiceModifier terraformBootServiceModifier;
 
-    /**
-     * Initializes the TerraformBoot deployer.
-     */
+    /** Initializes the TerraformBoot deployer. */
     @Autowired
     public TerraformBootDeployment(
             TerraformBootScriptValidator terraformBootScriptValidator,
@@ -72,17 +68,13 @@ public class TerraformBootDeployment implements Deployer {
         return terraformBootServiceDestroyer.destroyFromGitRepo(deployTask);
     }
 
-    /**
-     * Get the deployer kind.
-     */
+    /** Get the deployer kind. */
     @Override
     public DeployerKind getDeployerKind() {
         return DeployerKind.TERRAFORM;
     }
 
-    /**
-     * Validates the Terraform script.
-     */
+    /** Validates the Terraform script. */
     @Override
     public DeploymentScriptValidationResult validate(Deployment deployment) {
         DeploymentScriptValidationResult result = null;
@@ -102,5 +94,4 @@ public class TerraformBootDeployment implements Deployer {
         }
         return terraformBootDeploymentPlanManage.getTerraformPlanFromGitRepo(task).getPlan();
     }
-
 }

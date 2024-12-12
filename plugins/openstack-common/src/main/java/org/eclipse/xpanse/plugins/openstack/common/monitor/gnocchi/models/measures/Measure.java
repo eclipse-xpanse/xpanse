@@ -10,7 +10,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Data model for Measure objects. Measure in Gnocchi are returned as tuples <a href="https://gnocchi.osci.io/rest.html#id1">Tuples</a>.
+ * Data model for Measure objects. Measure in Gnocchi are returned as tuples <a
+ * href="https://gnocchi.osci.io/rest.html#id1">Tuples</a>.
  */
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
 public class Measure {
@@ -22,14 +23,15 @@ public class Measure {
     /**
      * Constructor to deserialize a tuple to a Java object.
      *
-     * @param timestamp   time when the measure was recorded.
+     * @param timestamp time when the measure was recorded.
      * @param granularity time difference between two measures.
-     * @param value       actual value measures.
+     * @param value actual value measures.
      */
     @JsonCreator
-    public Measure(@JsonProperty("timestamp") String timestamp,
-                   @JsonProperty("granularity") String granularity,
-                   @JsonProperty("value") Number value) {
+    public Measure(
+            @JsonProperty("timestamp") String timestamp,
+            @JsonProperty("granularity") String granularity,
+            @JsonProperty("value") Number value) {
         this.timestamp = timestamp;
         this.value = value;
         this.granularity = granularity;

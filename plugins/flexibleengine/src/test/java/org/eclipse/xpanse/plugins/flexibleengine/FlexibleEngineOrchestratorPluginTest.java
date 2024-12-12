@@ -41,33 +41,26 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class FlexibleEngineOrchestratorPluginTest {
-    @Mock
-    private FlexibleEngineTerraformResourceHandler mockFlexibleEngineTerraformResourceHandler;
-    @Mock
-    private FlexibleEngineMetricsService mockFlexibleEngineMetricsService;
-    @Mock
-    private FlexibleEngineVmStateManager mockFlexibleEngineVmStateManagerService;
-    @Mock
-    private FlexibleEngineResourceManager flexibleEngineResourceManager;
-    @InjectMocks
-    private FlexibleEngineOrchestratorPlugin plugin;
+    @Mock private FlexibleEngineTerraformResourceHandler mockFlexibleEngineTerraformResourceHandler;
+    @Mock private FlexibleEngineMetricsService mockFlexibleEngineMetricsService;
+    @Mock private FlexibleEngineVmStateManager mockFlexibleEngineVmStateManagerService;
+    @Mock private FlexibleEngineResourceManager flexibleEngineResourceManager;
+    @InjectMocks private FlexibleEngineOrchestratorPlugin plugin;
 
     @Test
     void testGetResourceHandler() {
-        assertThat(plugin.resourceHandlers()
-                .get(DeployerKind.TERRAFORM)).isEqualTo(mockFlexibleEngineTerraformResourceHandler);
+        assertThat(plugin.resourceHandlers().get(DeployerKind.TERRAFORM))
+                .isEqualTo(mockFlexibleEngineTerraformResourceHandler);
     }
 
     @Test
     void testGetCsp() {
-        assertThat(plugin.getCsp()).isEqualTo(
-                Csp.FLEXIBLE_ENGINE);
+        assertThat(plugin.getCsp()).isEqualTo(Csp.FLEXIBLE_ENGINE);
     }
 
     @Test
     void testRequiredProperties() {
-        assertThat(plugin.requiredProperties()).isEqualTo(
-                Collections.emptyList());
+        assertThat(plugin.requiredProperties()).isEqualTo(Collections.emptyList());
     }
 
     @Test
@@ -82,8 +75,8 @@ class FlexibleEngineOrchestratorPluginTest {
 
     @Test
     void testGetAvailableCredentialTypes() {
-        assertThat(plugin.getAvailableCredentialTypes()).isEqualTo(
-                List.of(CredentialType.VARIABLES));
+        assertThat(plugin.getAvailableCredentialTypes())
+                .isEqualTo(List.of(CredentialType.VARIABLES));
     }
 
     @Test
@@ -150,8 +143,16 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, getRegion(), deployResource, MonitorResourceType.CPU, 0L,
-                        0L, 0, false, "userId");
+                new ResourceMetricsRequest(
+                        serviceId,
+                        getRegion(),
+                        deployResource,
+                        MonitorResourceType.CPU,
+                        0L,
+                        0L,
+                        0,
+                        false,
+                        "userId");
         final Metric metric = new Metric();
         metric.setName("name");
         metric.setDescription("description");
@@ -174,14 +175,21 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, getRegion(), deployResource1,
-                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
-        when(mockFlexibleEngineMetricsService.getMetricsByResource(
-                resourceMetricRequest1)).thenReturn(metrics);
+                new ResourceMetricsRequest(
+                        serviceId,
+                        getRegion(),
+                        deployResource1,
+                        MonitorResourceType.CPU,
+                        0L,
+                        0L,
+                        0,
+                        false,
+                        "userId");
+        when(mockFlexibleEngineMetricsService.getMetricsByResource(resourceMetricRequest1))
+                .thenReturn(metrics);
 
         // Run the test
-        final List<Metric> result = plugin.getMetricsForResource(
-                resourceMetricRequest);
+        final List<Metric> result = plugin.getMetricsForResource(resourceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -197,8 +205,16 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest =
-                new ResourceMetricsRequest(serviceId, getRegion(), deployResource, MonitorResourceType.CPU, 0L,
-                        0L, 0, false, "userId");
+                new ResourceMetricsRequest(
+                        serviceId,
+                        getRegion(),
+                        deployResource,
+                        MonitorResourceType.CPU,
+                        0L,
+                        0L,
+                        0,
+                        false,
+                        "userId");
 
         // Configure FlexibleEngineMetricsService.getMetricsByResource(...).
         final DeployResource deployResource1 = new DeployResource();
@@ -207,14 +223,21 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ResourceMetricsRequest resourceMetricRequest1 =
-                new ResourceMetricsRequest(serviceId, getRegion(), deployResource1, MonitorResourceType.CPU, 0L,
-                        0L, 0, false, "userId");
-        when(mockFlexibleEngineMetricsService.getMetricsByResource(
-                resourceMetricRequest1)).thenReturn(Collections.emptyList());
+                new ResourceMetricsRequest(
+                        serviceId,
+                        getRegion(),
+                        deployResource1,
+                        MonitorResourceType.CPU,
+                        0L,
+                        0L,
+                        0,
+                        false,
+                        "userId");
+        when(mockFlexibleEngineMetricsService.getMetricsByResource(resourceMetricRequest1))
+                .thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<Metric> result = plugin.getMetricsForResource(
-                resourceMetricRequest);
+        final List<Metric> result = plugin.getMetricsForResource(resourceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -230,8 +253,16 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, getRegion(), List.of(deployResource),
-                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
+                new ServiceMetricsRequest(
+                        serviceId,
+                        getRegion(),
+                        List.of(deployResource),
+                        MonitorResourceType.CPU,
+                        0L,
+                        0L,
+                        0,
+                        false,
+                        "userId");
         final Metric metric = new Metric();
         metric.setName("name");
         metric.setDescription("description");
@@ -254,14 +285,21 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, getRegion(), List.of(deployResource1),
-                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
-        when(mockFlexibleEngineMetricsService.getMetricsByService(
-                serviceMetricRequest1)).thenReturn(metrics);
+                new ServiceMetricsRequest(
+                        serviceId,
+                        getRegion(),
+                        List.of(deployResource1),
+                        MonitorResourceType.CPU,
+                        0L,
+                        0L,
+                        0,
+                        false,
+                        "userId");
+        when(mockFlexibleEngineMetricsService.getMetricsByService(serviceMetricRequest1))
+                .thenReturn(metrics);
 
         // Run the test
-        final List<Metric> result = plugin.getMetricsForService(
-                serviceMetricRequest);
+        final List<Metric> result = plugin.getMetricsForService(serviceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -277,8 +315,16 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource.setResourceKind(DeployResourceKind.VM);
         deployResource.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest =
-                new ServiceMetricsRequest(serviceId, getRegion(), List.of(deployResource),
-                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
+                new ServiceMetricsRequest(
+                        serviceId,
+                        getRegion(),
+                        List.of(deployResource),
+                        MonitorResourceType.CPU,
+                        0L,
+                        0L,
+                        0,
+                        false,
+                        "userId");
 
         // Configure FlexibleEngineMetricsService.getMetricsByService(...).
         final DeployResource deployResource1 = new DeployResource();
@@ -287,14 +333,21 @@ class FlexibleEngineOrchestratorPluginTest {
         deployResource1.setResourceKind(DeployResourceKind.VM);
         deployResource1.setProperties(Map.ofEntries(Map.entry("value", "value")));
         final ServiceMetricsRequest serviceMetricRequest1 =
-                new ServiceMetricsRequest(serviceId, getRegion(), List.of(deployResource1),
-                        MonitorResourceType.CPU, 0L, 0L, 0, false, "userId");
-        when(mockFlexibleEngineMetricsService.getMetricsByService(
-                serviceMetricRequest1)).thenReturn(Collections.emptyList());
+                new ServiceMetricsRequest(
+                        serviceId,
+                        getRegion(),
+                        List.of(deployResource1),
+                        MonitorResourceType.CPU,
+                        0L,
+                        0L,
+                        0,
+                        false,
+                        "userId");
+        when(mockFlexibleEngineMetricsService.getMetricsByService(serviceMetricRequest1))
+                .thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<Metric> result = plugin.getMetricsForService(
-                serviceMetricRequest);
+        final List<Metric> result = plugin.getMetricsForService(serviceMetricRequest);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -320,12 +373,11 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         serviceResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
-        when(mockFlexibleEngineVmStateManagerService.startService(
-                serviceStateManageRequest1)).thenReturn(false);
+        when(mockFlexibleEngineVmStateManagerService.startService(serviceStateManageRequest1))
+                .thenReturn(false);
 
         // Run the test
-        final boolean result =
-                plugin.startService(serviceStateManageRequest);
+        final boolean result = plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -351,12 +403,11 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         serviceResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
-        when(mockFlexibleEngineVmStateManagerService.startService(
-                serviceStateManageRequest1)).thenReturn(true);
+        when(mockFlexibleEngineVmStateManagerService.startService(serviceStateManageRequest1))
+                .thenReturn(true);
 
         // Run the test
-        final boolean result =
-                plugin.startService(serviceStateManageRequest);
+        final boolean result = plugin.startService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -382,12 +433,11 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         serviceResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
-        when(mockFlexibleEngineVmStateManagerService.stopService(
-                serviceStateManageRequest1)).thenReturn(false);
+        when(mockFlexibleEngineVmStateManagerService.stopService(serviceStateManageRequest1))
+                .thenReturn(false);
 
         // Run the test
-        final boolean result =
-                plugin.stopService(serviceStateManageRequest);
+        final boolean result = plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -413,12 +463,11 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         serviceResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
-        when(mockFlexibleEngineVmStateManagerService.stopService(
-                serviceStateManageRequest1)).thenReturn(true);
+        when(mockFlexibleEngineVmStateManagerService.stopService(serviceStateManageRequest1))
+                .thenReturn(true);
 
         // Run the test
-        final boolean result =
-                plugin.stopService(serviceStateManageRequest);
+        final boolean result = plugin.stopService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();
@@ -444,12 +493,11 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         serviceResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
-        when(mockFlexibleEngineVmStateManagerService.restartService(
-                serviceStateManageRequest1)).thenReturn(false);
+        when(mockFlexibleEngineVmStateManagerService.restartService(serviceStateManageRequest1))
+                .thenReturn(false);
 
         // Run the test
-        final boolean result =
-                plugin.restartService(serviceStateManageRequest);
+        final boolean result = plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isFalse();
@@ -475,12 +523,11 @@ class FlexibleEngineOrchestratorPluginTest {
         serviceResourceEntity1.setId(UUID.fromString("f305c8a2-fa75-4194-a2ad-084418311a7d"));
         serviceResourceEntity1.setResourceId("resourceId");
         serviceStateManageRequest1.setServiceResourceEntityList(List.of(serviceResourceEntity1));
-        when(mockFlexibleEngineVmStateManagerService.restartService(
-                serviceStateManageRequest1)).thenReturn(true);
+        when(mockFlexibleEngineVmStateManagerService.restartService(serviceStateManageRequest1))
+                .thenReturn(true);
 
         // Run the test
-        final boolean result =
-                plugin.restartService(serviceStateManageRequest);
+        final boolean result = plugin.restartService(serviceStateManageRequest);
 
         // Verify the results
         assertThat(result).isTrue();

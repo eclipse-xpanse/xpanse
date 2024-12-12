@@ -11,14 +11,11 @@ import org.eclipse.xpanse.modules.policy.policyman.generated.ApiClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuration class to update the policy-man endpoint in the client bean.
- */
+/** Configuration class to update the policy-man endpoint in the client bean. */
 @Configuration
 public class PolicyManRestApiClientConfig {
 
-    @Resource
-    private ApiClient apiClient;
+    @Resource private ApiClient apiClient;
 
     @Value("${policy.man.endpoint}")
     private String policyManBaseUrl;

@@ -15,11 +15,11 @@ public class DeploymentStatusUpdateTest {
 
     @Test
     void deploymentTestGetters() {
-        DeploymentStatusUpdate deploymentStatusUpdate = new DeploymentStatusUpdate(
-                ServiceDeploymentState.DEPLOY_SUCCESS, true
-        );
+        DeploymentStatusUpdate deploymentStatusUpdate =
+                new DeploymentStatusUpdate(ServiceDeploymentState.DEPLOY_SUCCESS, true);
         assertTrue(deploymentStatusUpdate.getIsOrderCompleted());
-        assertEquals(deploymentStatusUpdate.getServiceDeploymentState(),
+        assertEquals(
+                deploymentStatusUpdate.getServiceDeploymentState(),
                 ServiceDeploymentState.DEPLOY_SUCCESS);
     }
 }

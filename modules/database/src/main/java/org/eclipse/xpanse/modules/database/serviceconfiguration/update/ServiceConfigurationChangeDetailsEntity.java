@@ -34,16 +34,13 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 
-/**
- * ServiceConfigurationChangeDetailsEntity for persistence.
- */
+/** ServiceConfigurationChangeDetailsEntity for persistence. */
 @Table(name = "SERVICE_CONFIGURATION_CHANGE_DETAILS")
 @Entity
 @Data
 public class ServiceConfigurationChangeDetailsEntity implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 8759112725757851274L;
+    @Serial private static final long serialVersionUID = 8759112725757851274L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -51,18 +48,28 @@ public class ServiceConfigurationChangeDetailsEntity implements Serializable {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "ORDER_ID", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_service_configuration_order",
-                    foreignKeyDefinition = "FOREIGN KEY (ORDER_ID) "
-                            + "REFERENCES SERVICE_ORDER(ORDER_ID) ON DELETE CASCADE"))
+    @JoinColumn(
+            name = "ORDER_ID",
+            nullable = false,
+            foreignKey =
+                    @ForeignKey(
+                            name = "fk_service_configuration_order",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY (ORDER_ID) REFERENCES SERVICE_ORDER(ORDER_ID) ON"
+                                            + " DELETE CASCADE"))
     @Cascade(CascadeType.ALL)
     private ServiceOrderEntity serviceOrderEntity;
 
     @ManyToOne
-    @JoinColumn(name = "SERVICE_ID", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_service_configuration_deploy_service",
-            foreignKeyDefinition = "FOREIGN KEY (SERVICE_ID) "
-                    + "REFERENCES DEPLOY_SERVICE(ID) ON DELETE CASCADE"))
+    @JoinColumn(
+            name = "SERVICE_ID",
+            nullable = false,
+            foreignKey =
+                    @ForeignKey(
+                            name = "fk_service_configuration_deploy_service",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY (SERVICE_ID) "
+                                            + "REFERENCES DEPLOY_SERVICE(ID) ON DELETE CASCADE"))
     @Cascade(CascadeType.ALL)
     private ServiceDeploymentEntity serviceDeploymentEntity;
 

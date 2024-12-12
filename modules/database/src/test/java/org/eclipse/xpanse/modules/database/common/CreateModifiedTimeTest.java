@@ -21,7 +21,6 @@ class CreateModifiedTimeTest {
 
     private CreateModifiedTime test;
 
-
     @BeforeEach
     void setUp() {
         test = new CreateModifiedTime();
@@ -62,12 +61,15 @@ class CreateModifiedTimeTest {
         assertNotEquals(test1.hashCode(), test2.hashCode());
     }
 
-
     @Test
     void testToString() {
         String expectedToString =
-                "CreateModifiedTime(createTime=" + createTime + ", "
-                        + "lastModifiedTime=" + lastModifiedTime + ")";
+                "CreateModifiedTime(createTime="
+                        + createTime
+                        + ", "
+                        + "lastModifiedTime="
+                        + lastModifiedTime
+                        + ")";
         assertEquals(expectedToString, test.toString());
     }
 }

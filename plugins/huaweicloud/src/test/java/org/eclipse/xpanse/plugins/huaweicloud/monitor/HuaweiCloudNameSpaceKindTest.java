@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 class HuaweiCloudNameSpaceKindTest {
 
-
     @Test
     void testToValue() {
         assertThat(HuaweiCloudNameSpaceKind.ECS_SYS.toValue()).isEqualTo("SYS.ECS");
@@ -19,7 +18,6 @@ class HuaweiCloudNameSpaceKindTest {
                 .isEqualTo(HuaweiCloudNameSpaceKind.ECS_SYS);
         assertThat(HuaweiCloudNameSpaceKind.ECS_AGT.getByValue("AGT.ECS"))
                 .isEqualTo(HuaweiCloudNameSpaceKind.ECS_AGT);
-        assertThat(HuaweiCloudNameSpaceKind.ECS_AGT.getByValue("NULL"))
-                .isEqualTo(null);
+        assertThat(HuaweiCloudNameSpaceKind.ECS_AGT.getByValue("NULL")).isEqualTo(null);
     }
 }

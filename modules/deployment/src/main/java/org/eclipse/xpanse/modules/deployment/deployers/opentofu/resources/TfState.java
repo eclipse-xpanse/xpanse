@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 
-/**
- * TfState class.
- */
+/** TfState class. */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class TfState {

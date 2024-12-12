@@ -29,15 +29,15 @@ class DatabaseDeployConfigurationStorageTest {
     private static final UUID id = UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2");
     private static final OffsetDateTime createTime = OffsetDateTime.now();
 
-    @Mock
-    private ServiceConfigurationRepository serviceConfigurationRepository;
+    @Mock private ServiceConfigurationRepository serviceConfigurationRepository;
 
     @InjectMocks
     private DatabaseServiceConfigurationStorage databaseServiceConfigurationStorageTest;
 
     @Test
     void testStoreAndFlush() {
-        final ServiceConfigurationEntity serviceConfigurationEntity = new ServiceConfigurationEntity();
+        final ServiceConfigurationEntity serviceConfigurationEntity =
+                new ServiceConfigurationEntity();
         serviceConfigurationEntity.setConfiguration(getConfiguration());
         serviceConfigurationEntity.setCreatedTime(createTime);
         databaseServiceConfigurationStorageTest.storeAndFlush(serviceConfigurationEntity);
@@ -53,27 +53,23 @@ class DatabaseDeployConfigurationStorageTest {
         final ServiceConfigurationEntity expectedResult = new ServiceConfigurationEntity();
         expectedResult.setConfiguration(getConfiguration());
         expectedResult.setCreatedTime(createTime);
-        final ServiceConfigurationEntity serviceConfigurationEntity1 = new ServiceConfigurationEntity();
+        final ServiceConfigurationEntity serviceConfigurationEntity1 =
+                new ServiceConfigurationEntity();
         serviceConfigurationEntity1.setConfiguration(getConfiguration());
         serviceConfigurationEntity1.setCreatedTime(createTime);
-        final Optional<ServiceConfigurationEntity> entity = Optional.of(serviceConfigurationEntity1);
-        when(serviceConfigurationRepository.findById(
-                id))
-                .thenReturn(entity);
+        final Optional<ServiceConfigurationEntity> entity =
+                Optional.of(serviceConfigurationEntity1);
+        when(serviceConfigurationRepository.findById(id)).thenReturn(entity);
         final ServiceConfigurationEntity result =
-                databaseServiceConfigurationStorageTest.findServiceConfigurationById(
-                        id);
+                databaseServiceConfigurationStorageTest.findServiceConfigurationById(id);
         assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
     void testFindServiceConfigurationById_ServiceConfigurationRepositoryReturnsAbsent() {
-        when(serviceConfigurationRepository.findById(
-                id))
-                .thenReturn(Optional.empty());
+        when(serviceConfigurationRepository.findById(id)).thenReturn(Optional.empty());
         final ServiceConfigurationEntity result =
-                databaseServiceConfigurationStorageTest.findServiceConfigurationById(
-                        id);
+                databaseServiceConfigurationStorageTest.findServiceConfigurationById(id);
         assertThat(result).isNull();
     }
 
@@ -81,17 +77,16 @@ class DatabaseDeployConfigurationStorageTest {
     void testDeleteServiceConfiguration() {
         final ServiceConfigurationEntity expectedResult = new ServiceConfigurationEntity();
         doNothing().when(serviceConfigurationRepository).delete(expectedResult);
-        databaseServiceConfigurationStorageTest.deleteServiceConfiguration(
-                expectedResult);
+        databaseServiceConfigurationStorageTest.deleteServiceConfiguration(expectedResult);
 
         verify(serviceConfigurationRepository, times(1)).delete(expectedResult);
     }
 
-    private Map<String, Object> getConfiguration(){
+    private Map<String, Object> getConfiguration() {
         Map<String, Object> configuration = new HashMap<>();
-        configuration.put("key1","value1");
-        configuration.put("key2","value2");
-        configuration.put("key3","value3");
+        configuration.put("key1", "value1");
+        configuration.put("key2", "value2");
+        configuration.put("key3", "value3");
         return configuration;
     }
 }

@@ -8,9 +8,7 @@ package org.eclipse.xpanse.modules.security.common;
 
 import java.util.Objects;
 
-/**
- * User information holder.
- */
+/** User information holder. */
 public class CurrentUserInfoHolder {
 
     private static final InheritableThreadLocal<CurrentUserInfo> USERINFO_CACHE =
@@ -32,5 +30,4 @@ public class CurrentUserInfoHolder {
         CurrentUserInfo currentUserInfo = getCurrentUserInfo();
         return Objects.nonNull(currentUserInfo) ? currentUserInfo.getToken() : null;
     }
-
 }

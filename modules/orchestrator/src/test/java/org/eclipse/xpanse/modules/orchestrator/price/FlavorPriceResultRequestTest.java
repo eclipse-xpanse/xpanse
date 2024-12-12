@@ -20,10 +20,8 @@ class FlavorPriceResultRequestTest {
     private final String userId = "userId";
     private final String regionName = "any";
     private final String siteName = "default";
-    @Mock
-    private RatingMode mockRatingMode;
-    @Mock
-    private BillingMode mockBillingMode;
+    @Mock private RatingMode mockRatingMode;
+    @Mock private BillingMode mockBillingMode;
     private ServiceFlavorPriceRequest test;
 
     @BeforeEach
@@ -69,10 +67,22 @@ class FlavorPriceResultRequestTest {
 
     @Test
     void testToString() {
-        String result = "ServiceFlavorPriceRequest(serviceTemplateId=" + serviceTemplateId
-                + ", flavorName=" + flavorName + ", userId=" + userId + ", regionName=" + regionName
-                + ", siteName=" + siteName + ", flavorRatingMode=" + mockRatingMode
-                + ", billingMode=" + mockBillingMode + ")";
+        String result =
+                "ServiceFlavorPriceRequest(serviceTemplateId="
+                        + serviceTemplateId
+                        + ", flavorName="
+                        + flavorName
+                        + ", userId="
+                        + userId
+                        + ", regionName="
+                        + regionName
+                        + ", siteName="
+                        + siteName
+                        + ", flavorRatingMode="
+                        + mockRatingMode
+                        + ", billingMode="
+                        + mockBillingMode
+                        + ")";
         assertThat(test.toString()).isEqualTo(result);
     }
 }

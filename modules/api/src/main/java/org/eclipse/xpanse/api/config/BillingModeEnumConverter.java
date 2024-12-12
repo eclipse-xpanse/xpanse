@@ -10,9 +10,7 @@ import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-/**
- * Bean for serializing string in request parameters to BillingMode enum.
- */
+/** Bean for serializing string in request parameters to BillingMode enum. */
 @Component
 public class BillingModeEnumConverter implements Converter<String, BillingMode> {
 

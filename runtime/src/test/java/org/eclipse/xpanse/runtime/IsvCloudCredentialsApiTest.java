@@ -32,9 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-/**
- * Test for UserCloudCredentialsApi.
- */
+/** Test for UserCloudCredentialsApi. */
 @ExtendWith(SpringExtension.class)
 @Transactional
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
@@ -65,10 +63,19 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(
-                new CredentialVariable(HuaweiCloudMonitorConstants.HW_ACCESS_KEY, "The access key.",
-                        true, isSensitive, "AK_VALUE"));
-        credentialVariables.add(new CredentialVariable(HuaweiCloudMonitorConstants.HW_SECRET_KEY,
-                "The security key.", true, isSensitive, "SK_VALUE"));
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_ACCESS_KEY,
+                        "The access key.",
+                        true,
+                        isSensitive,
+                        "AK_VALUE"));
+        credentialVariables.add(
+                new CredentialVariable(
+                        HuaweiCloudMonitorConstants.HW_SECRET_KEY,
+                        "The security key.",
+                        true,
+                        isSensitive,
+                        "SK_VALUE"));
         createCredential.setVariables(credentialVariables);
         createCredential.setTimeToLive(300);
         return createCredential;
@@ -78,10 +85,14 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
         // Setup
         String result = "[]";
         // Run the test
-        final MockHttpServletResponse response = mockMvc.perform(
-                        get("/xpanse/isv/credentials").param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue()).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse response =
+                mockMvc.perform(
+                                get("/xpanse/isv/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatus());
@@ -97,15 +108,23 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
         CredentialVariables credentialVariables1 = new CredentialVariables(createCredential);
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
         // Run the test
-        final MockHttpServletResponse addResponse = mockMvc.perform(
-                        post("/xpanse/isv/credentials").content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse addResponse =
+                mockMvc.perform(
+                                post("/xpanse/isv/credentials")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
-        final MockHttpServletResponse queryResponse = mockMvc.perform(
-                        get("/xpanse/isv/credentials").param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue()).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse queryResponse =
+                mockMvc.perform(
+                                get("/xpanse/isv/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), addResponse.getStatus());
@@ -123,15 +142,23 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
         CredentialVariables credentialVariables1 = new CredentialVariables(createCredential);
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
         // Run the test
-        final MockHttpServletResponse addResponse = mockMvc.perform(
-                        post("/xpanse/isv/credentials").content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse addResponse =
+                mockMvc.perform(
+                                post("/xpanse/isv/credentials")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
-        final MockHttpServletResponse queryResponse = mockMvc.perform(
-                        get("/xpanse/isv/credentials").param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue()).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse queryResponse =
+                mockMvc.perform(
+                                get("/xpanse/isv/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), addResponse.getStatus());
@@ -150,17 +177,24 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
         CredentialVariables credentialVariables1 = new CredentialVariables(updateCredential);
         String queryResult = objectMapper.writeValueAsString(List.of(credentialVariables1));
 
-
         // Run the test
-        final MockHttpServletResponse updateResponse = mockMvc.perform(
-                        put("/xpanse/isv/credentials").content(requestBody)
-                                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse updateResponse =
+                mockMvc.perform(
+                                put("/xpanse/isv/credentials")
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
-        final MockHttpServletResponse queryResponse = mockMvc.perform(
-                        get("/xpanse/isv/credentials").param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue()).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse queryResponse =
+                mockMvc.perform(
+                                get("/xpanse/isv/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), updateResponse.getStatus());
@@ -176,18 +210,25 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
         String queryResult = "[]";
 
         // Run the test
-        final MockHttpServletResponse deleteResponse = mockMvc.perform(
-                delete("/xpanse/isv/credentials")
-                        .param("cspName", csp.toValue())
-                        .param("siteName", site)
-                        .param("type", credentialType.toValue())
-                        .param("name", credentialName)
-                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        final MockHttpServletResponse deleteResponse =
+                mockMvc.perform(
+                                delete("/xpanse/isv/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("siteName", site)
+                                        .param("type", credentialType.toValue())
+                                        .param("name", credentialName)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
-        final MockHttpServletResponse queryResponse = mockMvc.perform(
-                        get("/xpanse/isv/credentials").param("cspName", csp.toValue())
-                                .param("type", credentialType.toValue()).accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        final MockHttpServletResponse queryResponse =
+                mockMvc.perform(
+                                get("/xpanse/isv/credentials")
+                                        .param("cspName", csp.toValue())
+                                        .param("type", credentialType.toValue())
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
 
         // Verify the results
         Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), deleteResponse.getStatus());
@@ -196,5 +237,4 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
         Assertions.assertEquals(HttpStatus.OK.value(), queryResponse.getStatus());
         Assertions.assertEquals(queryResult, queryResponse.getContentAsString());
     }
-
 }

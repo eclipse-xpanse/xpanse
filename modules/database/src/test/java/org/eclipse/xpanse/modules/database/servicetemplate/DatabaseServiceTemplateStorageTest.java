@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -28,8 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 class DatabaseServiceTemplateStorageTest {
 
     private final UUID id = UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f2d");
-    @Mock
-    private ServiceTemplateRepository mockServiceTemplateRepository;
+    @Mock private ServiceTemplateRepository mockServiceTemplateRepository;
     private DatabaseServiceTemplateStorage test;
 
     @BeforeEach
@@ -84,15 +82,19 @@ class DatabaseServiceTemplateStorageTest {
                 .thenThrow(OptimisticLockingFailureException.class);
 
         // Run the test
-        assertThatThrownBy(() -> test.storeAndFlush(
-                serviceTemplateEntity)).isInstanceOf(OptimisticLockingFailureException.class);
+        assertThatThrownBy(() -> test.storeAndFlush(serviceTemplateEntity))
+                .isInstanceOf(OptimisticLockingFailureException.class);
     }
 
     @Test
     void testQueryServiceTemplates() {
         // Setup
-        final ServiceTemplateQueryModel serviceQuery = ServiceTemplateQueryModel.builder()
-                .category(Category.AI).csp(Csp.HUAWEI_CLOUD).checkNamespace(false).build();
+        final ServiceTemplateQueryModel serviceQuery =
+                ServiceTemplateQueryModel.builder()
+                        .category(Category.AI)
+                        .csp(Csp.HUAWEI_CLOUD)
+                        .checkNamespace(false)
+                        .build();
 
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(id);
@@ -114,8 +116,7 @@ class DatabaseServiceTemplateStorageTest {
                 .thenReturn(ServiceTemplateEntities);
 
         // Run the test
-        final List<ServiceTemplateEntity> result =
-                test.listServiceTemplates(serviceQuery);
+        final List<ServiceTemplateEntity> result = test.listServiceTemplates(serviceQuery);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -124,17 +125,20 @@ class DatabaseServiceTemplateStorageTest {
     @Test
     void testQueryServiceTemplates_ServiceTemplateRepositoryReturnsNoItems() {
         // Setup
-        final ServiceTemplateQueryModel serviceQuery = ServiceTemplateQueryModel.builder()
-                .category(Category.AI).csp(Csp.HUAWEI_CLOUD).serviceName("serviceName")
-                .serviceVersion("serviceVersion")
-                .serviceTemplateRegistrationState(ServiceTemplateRegistrationState.APPROVED)
-                .checkNamespace(false).build();
+        final ServiceTemplateQueryModel serviceQuery =
+                ServiceTemplateQueryModel.builder()
+                        .category(Category.AI)
+                        .csp(Csp.HUAWEI_CLOUD)
+                        .serviceName("serviceName")
+                        .serviceVersion("serviceVersion")
+                        .serviceTemplateRegistrationState(ServiceTemplateRegistrationState.APPROVED)
+                        .checkNamespace(false)
+                        .build();
         when(mockServiceTemplateRepository.findAll(any(Specification.class)))
                 .thenReturn(Collections.emptyList());
 
         // Run the test
-        final List<ServiceTemplateEntity> result =
-                test.listServiceTemplates(serviceQuery);
+        final List<ServiceTemplateEntity> result = test.listServiceTemplates(serviceQuery);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -159,12 +163,10 @@ class DatabaseServiceTemplateStorageTest {
         serviceTemplateEntity1.setCategory(Category.AI);
         final Optional<ServiceTemplateEntity> ServiceTemplateEntity =
                 Optional.of(serviceTemplateEntity1);
-        when(mockServiceTemplateRepository.findById(id))
-                .thenReturn(ServiceTemplateEntity);
+        when(mockServiceTemplateRepository.findById(id)).thenReturn(ServiceTemplateEntity);
 
         // Run the test
-        final ServiceTemplateEntity result =
-                test.getServiceTemplateById(id);
+        final ServiceTemplateEntity result = test.getServiceTemplateById(id);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -211,11 +213,12 @@ class DatabaseServiceTemplateStorageTest {
         entity.setVersion("version");
         entity.setCsp(Csp.HUAWEI_CLOUD);
         entity.setCategory(Category.AI);
-        doThrow(OptimisticLockingFailureException.class).when(mockServiceTemplateRepository)
+        doThrow(OptimisticLockingFailureException.class)
+                .when(mockServiceTemplateRepository)
                 .delete(entity);
 
         // Run the test
-        assertThatThrownBy(() -> test.deleteServiceTemplate(
-                serviceTemplateEntity)).isInstanceOf(OptimisticLockingFailureException.class);
+        assertThatThrownBy(() -> test.deleteServiceTemplate(serviceTemplateEntity))
+                .isInstanceOf(OptimisticLockingFailureException.class);
     }
 }

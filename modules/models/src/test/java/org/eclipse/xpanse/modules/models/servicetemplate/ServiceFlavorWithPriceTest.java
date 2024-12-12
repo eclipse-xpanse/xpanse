@@ -19,19 +19,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of F.
- */
+/** Test of F. */
 class ServiceFlavorWithPriceTest {
 
     private final String name = "flavor";
     private final Integer priority = 1;
     private final Map<String, String> properties = Map.of("key", "value");
     private List<String> features = List.of("feature1", "feature2");
-    @Mock
-    private RatingMode pricing;
+    @Mock private RatingMode pricing;
     private ServiceFlavorWithPrice serviceFlavor;
-
 
     @BeforeEach
     void setUp() {
@@ -74,10 +70,18 @@ class ServiceFlavorWithPriceTest {
     @Test
     void testToString() {
         String expectedString =
-                "ServiceFlavorWithPrice(" + "super=ServiceFlavor(name=" + name + ", properties="
-                        + properties + ", priority=" + priority + ", features=" + features +
-                        "), pricing=" + pricing + ")";
+                "ServiceFlavorWithPrice("
+                        + "super=ServiceFlavor(name="
+                        + name
+                        + ", properties="
+                        + properties
+                        + ", priority="
+                        + priority
+                        + ", features="
+                        + features
+                        + "), pricing="
+                        + pricing
+                        + ")";
         assertEquals(expectedString, serviceFlavor.toString());
     }
-
 }

@@ -13,9 +13,7 @@ import org.activiti.engine.delegate.ExecutionListener;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.springframework.stereotype.Component;
 
-/**
- * Recreate monitoring class for manual recreation processing after destroy failure and retry.
- */
+/** Recreate monitoring class for manual recreation processing after destroy failure and retry. */
 @Slf4j
 @Component
 public class RecreateDestroyFailedManualHandlerListener implements ExecutionListener {

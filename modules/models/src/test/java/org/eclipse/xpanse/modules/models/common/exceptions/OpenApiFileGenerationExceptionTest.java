@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Test of OpenApiFileGenerationException.
- */
+/** Test of OpenApiFileGenerationException. */
 class OpenApiFileGenerationExceptionTest {
 
     private static final String message = "Failed to generate OpenAPI file";
@@ -28,5 +26,4 @@ class OpenApiFileGenerationExceptionTest {
     void testConstructorAndGetMessage() {
         assertEquals(message, exception.getMessage());
     }
-
 }

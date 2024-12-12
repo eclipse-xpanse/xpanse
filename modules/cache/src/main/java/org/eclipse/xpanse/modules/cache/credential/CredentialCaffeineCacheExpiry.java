@@ -12,9 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 
-/**
- * Class to configure caffeine cache eviction policy for Credential Cache entries.
- */
+/** Class to configure caffeine cache eviction policy for Credential Cache entries. */
 public class CredentialCaffeineCacheExpiry implements Expiry<Object, Object> {
     @Override
     public long expireAfterCreate(Object key, Object value, long currentTime) {
@@ -25,16 +23,14 @@ public class CredentialCaffeineCacheExpiry implements Expiry<Object, Object> {
     }
 
     @Override
-    public long expireAfterUpdate(Object key,
-                                  Object value, long currentTime,
-                                  @NonNegative long currentDuration) {
+    public long expireAfterUpdate(
+            Object key, Object value, long currentTime, @NonNegative long currentDuration) {
         return currentDuration;
     }
 
     @Override
-    public long expireAfterRead(Object key,
-                                Object value, long currentTime,
-                                @NonNegative long currentDuration) {
+    public long expireAfterRead(
+            Object key, Object value, long currentTime, @NonNegative long currentDuration) {
         return currentDuration;
     }
 }

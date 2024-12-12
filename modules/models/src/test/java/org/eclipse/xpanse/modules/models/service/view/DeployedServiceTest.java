@@ -24,9 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Test of DeployedService.
- */
+/** Test of DeployedService. */
 class DeployedServiceTest {
 
     private final UUID uuid = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f5");
@@ -48,7 +46,8 @@ class DeployedServiceTest {
     private final OffsetDateTime LAST_STARTED_AT = OffsetDateTime.now();
     private final OffsetDateTime LAST_STOPPED_AT = OffsetDateTime.now();
     private final ServiceLockConfig LOCK_CONFIG = new ServiceLockConfig();
-    private final ServiceConfigurationDetails serviceConfigurationDetails = new ServiceConfigurationDetails();
+    private final ServiceConfigurationDetails serviceConfigurationDetails =
+            new ServiceConfigurationDetails();
     private DeployedService deployedService;
 
     @BeforeEach
@@ -119,20 +118,52 @@ class DeployedServiceTest {
     @Test
     void testToString() {
         String expectedString =
-                "DeployedService(" + "serviceId=" + uuid + ", category=" + category + ", name=" +
-                        name + ", customerServiceName=" + customerServiceName + ", version=" +
-                        version + ", csp=" + csp + ", flavor=" + flavor + ", billingMode=" + billingMode +
-                        ", region=Region(name=" + region.getName() + ", site=" + region.getSite() +
-                        ", area=" + region.getArea() + "), serviceTemplateId="
-                        + serviceTemplateId + ", userId=" + userId + ", serviceDeploymentState="
-                        + serviceDeploymentState + ", serviceState=" + SERVICE_STATE
-                        + ", serviceHostingType=" + ServiceHostingType.SERVICE_VENDOR
-                        + ", createTime=" + createTime + ", lastModifiedTime=" + lastModifiedTime
-                        + ", lastStartedAt=" + LAST_STARTED_AT + ", lastStoppedAt="
-                        + LAST_STOPPED_AT + ", lockConfig=" + LOCK_CONFIG
-                        + ", serviceConfigurationDetails=" + serviceConfigurationDetails
+                "DeployedService("
+                        + "serviceId="
+                        + uuid
+                        + ", category="
+                        + category
+                        + ", name="
+                        + name
+                        + ", customerServiceName="
+                        + customerServiceName
+                        + ", version="
+                        + version
+                        + ", csp="
+                        + csp
+                        + ", flavor="
+                        + flavor
+                        + ", billingMode="
+                        + billingMode
+                        + ", region=Region(name="
+                        + region.getName()
+                        + ", site="
+                        + region.getSite()
+                        + ", area="
+                        + region.getArea()
+                        + "), serviceTemplateId="
+                        + serviceTemplateId
+                        + ", userId="
+                        + userId
+                        + ", serviceDeploymentState="
+                        + serviceDeploymentState
+                        + ", serviceState="
+                        + SERVICE_STATE
+                        + ", serviceHostingType="
+                        + ServiceHostingType.SERVICE_VENDOR
+                        + ", createTime="
+                        + createTime
+                        + ", lastModifiedTime="
+                        + lastModifiedTime
+                        + ", lastStartedAt="
+                        + LAST_STARTED_AT
+                        + ", lastStoppedAt="
+                        + LAST_STOPPED_AT
+                        + ", lockConfig="
+                        + LOCK_CONFIG
+                        + ", serviceConfigurationDetails="
+                        + serviceConfigurationDetails
                         + ")";
         assertEquals(expectedString, deployedService.toString());
     }
-
 }
