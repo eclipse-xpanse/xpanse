@@ -100,7 +100,7 @@ public class ServiceTemplateApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    @AuditApiRequest(methodName = "getCspFromRequestUri")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ServiceTemplateRequestInfo update(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
@@ -162,7 +162,7 @@ public class ServiceTemplateApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ServiceTemplateRequestInfo fetchUpdate(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable(name = "serviceTemplateId")
@@ -199,7 +199,7 @@ public class ServiceTemplateApi {
     @PutMapping("/service_templates/unregister/{serviceTemplateId}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ServiceTemplateRequestInfo unregister(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
@@ -223,7 +223,7 @@ public class ServiceTemplateApi {
     @PutMapping("/service_templates/re-register/{serviceTemplateId}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ServiceTemplateRequestInfo reRegisterServiceTemplate(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
@@ -246,7 +246,7 @@ public class ServiceTemplateApi {
     @DeleteMapping("/service_templates/{serviceTemplateId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public void deleteServiceTemplate(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
@@ -336,7 +336,7 @@ public class ServiceTemplateApi {
             value = "/service_templates/{serviceTemplateId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ServiceTemplateDetailVo getServiceTemplateDetailsById(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
@@ -364,7 +364,7 @@ public class ServiceTemplateApi {
             value = "/service_templates/{serviceTemplateId}/history",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public List<ServiceTemplateRequestHistory> getServiceTemplateHistoryByServiceTemplateId(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
