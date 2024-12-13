@@ -135,7 +135,7 @@ public class CspServiceTemplateApi {
             value = "/csp/service_templates/{serviceTemplateId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ServiceTemplateDetailVo getServiceTemplateDetails(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
@@ -187,7 +187,7 @@ public class CspServiceTemplateApi {
             value = "/csp/service_templates/requests/review/{requestId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateRequestId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateRequestId", paramTypes = UUID.class)
     public void reviewServiceTemplateRequest(
             @Parameter(name = "requestId", description = "id of service template request")
                     @PathVariable(name = "requestId")
