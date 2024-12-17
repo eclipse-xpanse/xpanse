@@ -112,12 +112,12 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
 
     void testCallbackApiWithOcl(Ocl ocl) throws Exception {
         // Setup
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplate =
+                registerServiceTemplateAndApproveRegistration(ocl);
         if (Objects.isNull(serviceTemplate)) {
             log.error("Failed to register service template.");
             return;
         }
-        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
 
         // deploy a service
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);

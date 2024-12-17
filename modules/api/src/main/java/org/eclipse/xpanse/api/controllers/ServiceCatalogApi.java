@@ -97,7 +97,7 @@ public class ServiceCatalogApi {
                         .serviceName(serviceName)
                         .serviceVersion(serviceVersion)
                         .serviceHostingType(serviceHostingType)
-                        .availableInCatalog(true)
+                        .isAvailableInCatalog(true)
                         .checkNamespace(false)
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
@@ -128,7 +128,7 @@ public class ServiceCatalogApi {
                     String id) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManage.getServiceTemplateDetails(UUID.fromString(id), false, false);
-        if (Objects.equals(false, serviceTemplateEntity.getAvailableInCatalog())) {
+        if (Objects.equals(false, serviceTemplateEntity.getIsAvailableInCatalog())) {
             String errMsg = "Service template with id " + id + " is disabled to order service.";
             log.error(errMsg);
             throw new ServiceTemplateDisabledException(errMsg);

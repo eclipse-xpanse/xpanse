@@ -67,12 +67,12 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
                         .getOcl(
                                 URI.create("file:src/test/resources/ocl_terraform_test.yml")
                                         .toURL());
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplate =
+                registerServiceTemplateAndApproveRegistration(ocl);
         if (Objects.isNull(serviceTemplate)) {
             log.error("Register service template failed.");
             return;
         }
-        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         addCredentialForHuaweiCloud();
         testServiceOrderManageApisWell(serviceTemplate);
         testServiceOrderManageApisThrowsException(serviceTemplate);

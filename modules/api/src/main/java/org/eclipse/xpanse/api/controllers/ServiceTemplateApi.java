@@ -189,23 +189,23 @@ public class ServiceTemplateApi {
     }
 
     /**
-     * Unregister service template using id.
+     * Remove service template from catalog using id.
      *
      * @param serviceTemplateId id of service template.
      * @return response
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Unregister service template using id.")
-    @PutMapping("/service_templates/unregister/{serviceTemplateId}")
+    @Operation(description = "Remove service template from catalog using id.")
+    @PutMapping("/service_templates/remove_from_catalog/{serviceTemplateId}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
-    public ServiceTemplateRequestInfo unregister(
+    public ServiceTemplateRequestInfo removeFromCatalog(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
         ServiceTemplateRequestHistoryEntity unregisterHistory =
-                serviceTemplateManage.unregisterServiceTemplate(serviceTemplateId);
+                serviceTemplateManage.removeFromCatalog(serviceTemplateId);
         return new ServiceTemplateRequestInfo(
                 unregisterHistory.getServiceTemplate().getId(),
                 unregisterHistory.getRequestId(),
@@ -219,17 +219,17 @@ public class ServiceTemplateApi {
      * @return response
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Re-register the unregistered service template using id.")
-    @PutMapping("/service_templates/re-register/{serviceTemplateId}")
+    @Operation(description = "Re-add the service template to catalog using id.")
+    @PutMapping("/service_templates/re_add_to_catalog/{serviceTemplateId}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
-    public ServiceTemplateRequestInfo reRegisterServiceTemplate(
+    public ServiceTemplateRequestInfo reAddToCatalog(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
         ServiceTemplateRequestHistoryEntity reRegisterHistory =
-                serviceTemplateManage.reRegisterServiceTemplate(serviceTemplateId);
+                serviceTemplateManage.reAddToCatalog(serviceTemplateId);
         return new ServiceTemplateRequestInfo(
                 reRegisterHistory.getServiceTemplate().getId(),
                 reRegisterHistory.getRequestId(),
@@ -237,12 +237,12 @@ public class ServiceTemplateApi {
     }
 
     /**
-     * Delete service template using id.
+     * Delete service template not in catalog using id.
      *
      * @param serviceTemplateId id of service template.
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Delete unregistered service template using id.")
+    @Operation(description = "Delete service template not in catalog using id.")
     @DeleteMapping("/service_templates/{serviceTemplateId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
@@ -292,12 +292,14 @@ public class ServiceTemplateApi {
                             description = "state of service template registration")
                     @RequestParam(name = "serviceTemplateRegistrationState", required = false)
                     ServiceTemplateRegistrationState serviceTemplateRegistrationState,
-            @Parameter(name = "availableInCatalog", description = "is available in catalog")
-                    @RequestParam(name = "availableInCatalog", required = false)
-                    Boolean availableInCatalog,
-            @Parameter(name = "isUpdatePending", description = "is service template updating")
-                    @RequestParam(name = "isUpdatePending", required = false)
-                    Boolean isUpdatePending) {
+            @Parameter(name = "isAvailableInCatalog", description = "is available in catalog")
+                    @RequestParam(name = "isAvailableInCatalog", required = false)
+                    Boolean isAvailableInCatalog,
+            @Parameter(
+                            name = "isReviewInProgress",
+                            description = "is any request in review progress")
+                    @RequestParam(name = "isReviewInProgress", required = false)
+                    Boolean isReviewInProgress) {
         ServiceTemplateQueryModel queryRequest =
                 ServiceTemplateQueryModel.builder()
                         .category(category)
@@ -306,8 +308,8 @@ public class ServiceTemplateApi {
                         .serviceVersion(serviceVersion)
                         .serviceHostingType(serviceHostingType)
                         .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
-                        .availableInCatalog(availableInCatalog)
-                        .isUpdatePending(isUpdatePending)
+                        .isAvailableInCatalog(isAvailableInCatalog)
+                        .isReviewInProgress(isReviewInProgress)
                         .checkNamespace(true)
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
@@ -361,11 +363,11 @@ public class ServiceTemplateApi {
                             + " requests is sorted by the ascending order of the change requested"
                             + " time.")
     @GetMapping(
-            value = "/service_templates/{serviceTemplateId}/history",
+            value = "/service_templates/{serviceTemplateId}/requests",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
-    public List<ServiceTemplateRequestHistory> getServiceTemplateHistoryByServiceTemplateId(
+    public List<ServiceTemplateRequestHistory> getServiceTemplateRequestHistoryByServiceTemplateId(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId,
@@ -375,7 +377,7 @@ public class ServiceTemplateApi {
             @Parameter(name = "requestStatus", description = "status of service template request")
                     @RequestParam(name = "requestStatus", required = false)
                     ServiceTemplateRequestStatus requestStatus) {
-        return serviceTemplateManage.getServiceTemplateHistoryByServiceTemplateId(
+        return serviceTemplateManage.getServiceTemplateRequestHistoryByServiceTemplateId(
                 serviceTemplateId, requestType, requestStatus);
     }
 
@@ -388,7 +390,7 @@ public class ServiceTemplateApi {
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
     @Operation(description = "Get requested service template request using request id.")
     @GetMapping(
-            value = "/service_templates/request/{requestId}",
+            value = "/service_templates/requests/{requestId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceTemplateRequestId")

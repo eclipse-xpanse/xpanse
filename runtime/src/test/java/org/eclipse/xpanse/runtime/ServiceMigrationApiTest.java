@@ -45,8 +45,8 @@ class ServiceMigrationApiTest extends ApisTestCommon {
                         .getOcl(
                                 URI.create("file:src/test/resources/ocl_terraform_test.yml")
                                         .toURL());
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
+        ServiceTemplateDetailVo serviceTemplate =
+                registerServiceTemplateAndApproveRegistration(ocl);
         addCredentialForHuaweiCloud();
         testServiceMigrationApisWell(serviceTemplate);
         testServiceMigrationApisThrowsException(serviceTemplate);

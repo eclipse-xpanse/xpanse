@@ -37,6 +37,8 @@ class ServiceTemplateEntityTest {
     private final ServiceTemplateRegistrationState serviceTemplateRegistrationState =
             ServiceTemplateRegistrationState.APPROVED;
     private final String namespace = "namespace";
+    private final Boolean isAvailableInCatalog = false;
+    private final Boolean isReviewInProgress = false;
     private Category category;
     private Csp csp;
     private String name;
@@ -77,8 +79,8 @@ class ServiceTemplateEntityTest {
         testEntity.setOcl(ocl);
         testEntity.setServiceHostingType(serviceHostingType);
         testEntity.setServiceTemplateRegistrationState(serviceTemplateRegistrationState);
-        testEntity.setIsUpdatePending(false);
-        testEntity.setAvailableInCatalog(true);
+        testEntity.setIsReviewInProgress(isReviewInProgress);
+        testEntity.setIsAvailableInCatalog(isAvailableInCatalog);
         testEntity.setJsonObjectSchema(jsonObjectSchema);
         testEntity.setServiceProviderContactDetails(serviceProviderContactDetails);
         testEntity.setServicePolicyList(mockServicePolicyList);
@@ -95,11 +97,13 @@ class ServiceTemplateEntityTest {
         assertEquals(serviceHostingType, testEntity.getServiceHostingType());
         assertEquals(
                 serviceTemplateRegistrationState, testEntity.getServiceTemplateRegistrationState());
-        assertEquals(true, testEntity.getAvailableInCatalog());
-        assertEquals(false, testEntity.getIsUpdatePending());
+        assertEquals(isAvailableInCatalog, testEntity.getIsAvailableInCatalog());
+        assertEquals(isReviewInProgress, testEntity.getIsReviewInProgress());
         assertEquals(jsonObjectSchema, testEntity.getJsonObjectSchema());
         assertEquals(ocl, testEntity.getOcl());
         assertEquals(id, testEntity.getId());
+        assertEquals(isAvailableInCatalog, testEntity.getIsAvailableInCatalog());
+        assertEquals(isReviewInProgress, testEntity.getIsReviewInProgress());
         assertEquals(serviceProviderContactDetails, testEntity.getServiceProviderContactDetails());
         assertEquals(mockServicePolicyList, testEntity.getServicePolicyList());
         assertEquals(mockServiceTemplateHistory, testEntity.getServiceTemplateHistory());
@@ -142,8 +146,10 @@ class ServiceTemplateEntityTest {
                         + ocl
                         + ", serviceTemplateRegistrationState="
                         + serviceTemplateRegistrationState
-                        + ", isUpdatePending=false"
-                        + ", availableInCatalog=true"
+                        + ", isReviewInProgress="
+                        + isReviewInProgress
+                        + ", isAvailableInCatalog="
+                        + isAvailableInCatalog
                         + ", serviceProviderContactDetails="
                         + serviceProviderContactDetails
                         + ", jsonObjectSchema="

@@ -179,7 +179,7 @@ public class DeployResultManager {
                 deployResult);
         ServiceDeploymentEntity serviceDeploymentToUpdate = new ServiceDeploymentEntity();
         BeanUtils.copyProperties(serviceDeployment, serviceDeploymentToUpdate);
-        handlerDeploymentResult(deployResult, serviceDeploymentToUpdate);
+        handleDeploymentResult(deployResult, serviceDeploymentToUpdate);
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         ServiceDeploymentState deploymentState =
                 getServiceDeploymentState(taskType, isTaskSuccessful);
@@ -253,7 +253,7 @@ public class DeployResultManager {
                 && (taskType == ServiceOrderType.DEPLOY || taskType == ServiceOrderType.RETRY);
     }
 
-    private void handlerDeploymentResult(
+    private void handleDeploymentResult(
             DeployResult deployResult, ServiceDeploymentEntity serviceDeploymentEntity) {
         // If the tfState is null, try to use the stored tfState
         if (Objects.isNull(deployResult.getTfStateContent())) {

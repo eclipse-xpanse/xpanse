@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
@@ -64,21 +65,24 @@ class ServiceCatalogApiTest extends ApisTestCommon {
                         .getOcl(
                                 URI.create("file:src/test/resources/ocl_terraform_test.yml")
                                         .toURL());
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        ServiceTemplateRequestInfo requestInfo = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplate =
+                getServiceTemplateDetailsVo(requestInfo.getServiceTemplateId());
         waitUntilServiceTemplateFilesAreFullyGenerated(
                 serviceTemplate.getServiceTemplateId().toString());
         testGetOrderableServiceDetailsThrowsException(serviceTemplate);
+        // approve service template registration request
+        reviewServiceTemplateRequest(requestInfo.getRequestId(), true);
         testOpenApi(serviceTemplate);
         testListOrderableServices(serviceTemplate);
         testGetOrderableServiceDetails(serviceTemplate);
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
-    private UserOrderableServiceVo approveServiceTemplateRegistration(
-            ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
-        UUID id = serviceTemplateDetailVo.getServiceTemplateId();
-        approveServiceTemplateRegistration(id);
-        final MockHttpServletResponse response = getOrderableServiceDetailsWithId(id);
+    private UserOrderableServiceVo getOrderableServiceDetails(UUID serviceTemplateId)
+            throws Exception {
+        final MockHttpServletResponse response =
+                getOrderableServiceDetailsWithId(serviceTemplateId);
         return objectMapper.readValue(response.getContentAsString(), UserOrderableServiceVo.class);
     }
 
@@ -105,7 +109,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
 
         // Setup request 3
         UserOrderableServiceVo userOrderableServiceVo =
-                approveServiceTemplateRegistration(serviceTemplateDetailVo);
+                getOrderableServiceDetails(serviceTemplateDetailVo.getServiceTemplateId());
 
         String result3 = objectMapper.writeValueAsString(List.of(userOrderableServiceVo));
         // Run the test case 3
