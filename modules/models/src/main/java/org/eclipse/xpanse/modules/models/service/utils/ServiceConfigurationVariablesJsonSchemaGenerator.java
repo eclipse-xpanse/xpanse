@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
@@ -39,11 +39,10 @@ public class ServiceConfigurationVariablesJsonSchemaGenerator {
      * @return JsonObjectSchema jsonObjectSchema.
      */
     public JsonObjectSchema buildServiceConfigurationJsonSchema(
-            List<ServiceConfigurationParameter> serviceConfigurationParameters) {
+            List<ServiceChangeParameter> serviceConfigurationParameters) {
         JsonObjectSchema jsonObjectSchema = new JsonObjectSchema();
         Map<String, Map<String, Object>> serviceConfigurationJsonSchemaProperties = new HashMap<>();
-        for (ServiceConfigurationParameter configurationParameter :
-                serviceConfigurationParameters) {
+        for (ServiceChangeParameter configurationParameter : serviceConfigurationParameters) {
             if (configurationParameter.getKind() == DeployVariableKind.VARIABLE
                     || configurationParameter.getKind() == DeployVariableKind.ENV) {
                 Map<String, Object> validationProperties = new HashMap<>();

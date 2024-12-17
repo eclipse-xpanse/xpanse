@@ -106,5 +106,5 @@ public class Ocl implements Serializable {
     private String eula;
 
     @Schema(description = "manage service configuration.")
-    private ServiceConfigurationManage serviceConfigurationManage;
+    private ServiceChangeManage serviceConfigurationManage;
 }

@@ -18,8 +18,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.stereotype.Component;
@@ -79,10 +79,10 @@ public class DeployServiceEntityConverter {
         Map<String, Object> configuration = new HashMap<>();
         DeployTask deployTask =
                 getDeployTaskByStoredService(ServiceOrderType.DEPLOY, serviceDeployment);
-        ServiceConfigurationManage serviceConfigurationManage =
+        ServiceChangeManage serviceConfigurationManage =
                 deployTask.getOcl().getServiceConfigurationManage();
         if (Objects.nonNull(serviceConfigurationManage)) {
-            List<ServiceConfigurationParameter> configurationParameters =
+            List<ServiceChangeParameter> configurationParameters =
                     serviceConfigurationManage.getConfigurationParameters();
             List<ServiceFlavorWithPrice> serviceFlavors =
                     deployTask.getOcl().getFlavors().getServiceFlavors();

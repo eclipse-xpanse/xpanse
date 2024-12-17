@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -51,8 +51,7 @@ class ServiceTemplateDetailVoTest {
             ServiceTemplateRegistrationState.APPROVED;
     private final Boolean availableInCatalog = true;
     private final Boolean isUpdatePending = false;
-    private final ServiceConfigurationManage serviceConfigurationManage =
-            new ServiceConfigurationManage();
+    private final ServiceChangeManage serviceConfigurationManage = new ServiceChangeManage();
     @Mock private ServiceProviderContactDetails serviceProviderContactDetails;
     private List<Region> regions;
     private List<DeployVariable> variables;

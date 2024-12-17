@@ -34,7 +34,7 @@ class OclTest {
     @Mock private FlavorsWithPrice flavors;
     @Mock private Billing billing;
     @Mock private ServiceProviderContactDetails serviceProviderContactDetails;
-    @Mock private ServiceConfigurationManage serviceConfigurationManage;
+    @Mock private ServiceChangeManage serviceConfigurationManage;
 
     private Ocl ocl;
 

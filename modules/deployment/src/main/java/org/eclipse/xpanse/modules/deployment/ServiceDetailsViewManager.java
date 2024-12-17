@@ -30,7 +30,7 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.security.access.AccessDeniedException;
@@ -255,7 +255,7 @@ public class ServiceDetailsViewManager {
                         deployedService.getServiceTemplateId());
         if (Objects.nonNull(serviceTemplate)
                 && Objects.nonNull(serviceTemplate.getOcl().getServiceConfigurationManage())) {
-            List<ServiceConfigurationParameter> configurationParameters =
+            List<ServiceChangeParameter> configurationParameters =
                     serviceTemplate
                             .getOcl()
                             .getServiceConfigurationManage()
@@ -279,7 +279,7 @@ public class ServiceDetailsViewManager {
      * was deployed.
      */
     private ServiceConfigurationDetails mergeConfigurationParametersFromTemplate(
-            List<ServiceConfigurationParameter> parameters,
+            List<ServiceChangeParameter> parameters,
             Map<String, Object> configuration,
             OffsetDateTime updateTime) {
         Map<String, Object> configurationParameterMap = new HashMap<>();

@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 
 /** Defines for the service config parameter. */
 @Data
-public class ServiceConfigurationParameter implements Serializable {
+public class ServiceChangeParameter implements Serializable {
 
     @Serial private static final long serialVersionUID = 4180720936204332216L;
 

@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Valid
 @Data
 @Slf4j
-public class ConfigManageScript implements Serializable {
+public class ServiceChangeScript implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
 
@@ -27,7 +27,7 @@ public class ConfigManageScript implements Serializable {
     @NotBlank
     @NotEmpty
     @Schema(description = "should be the name of the resource available in the deployer script.")
-    private String configManager;
+    private String changeHandler;
 
     @NotNull
     @Schema(
