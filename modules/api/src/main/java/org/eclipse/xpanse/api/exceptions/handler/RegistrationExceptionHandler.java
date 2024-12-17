@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.MandatoryValueMissingForFixedVariablesException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateDisabledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
@@ -111,6 +112,16 @@ public class RegistrationExceptionHandler {
     @ResponseBody
     public ErrorResponse handleInvalidServiceFlavorsException(InvalidServiceFlavorsException ex) {
         return getErrorResponse(ErrorType.INVALID_SERVICE_FLAVORS, ex.getErrorReasons());
+    }
+
+    /** Exception handler for MandatoryValueMissingForFixedVariablesException. */
+    @ExceptionHandler({MandatoryValueMissingForFixedVariablesException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleMandatoryValueMissingForFixedVariablesException(
+            MandatoryValueMissingForFixedVariablesException ex) {
+        return getErrorResponse(
+                ErrorType.MANDATORY_VALUE_MISSING, Collections.singletonList(ex.getMessage()));
     }
 
     /** Exception handler for UnavailableServiceRegionsException. */
