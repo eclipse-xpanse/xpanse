@@ -36,6 +36,7 @@ public enum ErrorType {
     SERVICE_TEMPLATE_REQUEST_ALREADY_REVIEWED("Service Template Request Already Reviewed"),
     INVALID_SERVICE_VERSION("Invalid Service Version"),
     INVALID_SERVICE_FLAVORS("Invalid Service Flavors"),
+    MANDATORY_VALUE_MISSING("Mandatory Value Missing"),
     INVALID_BILLING_CONFIG("Invalid Billing Config"),
     UNAVAILABLE_SERVICE_REGIONS("Unavailable Service Regions"),
     SERVICE_DEPLOYMENT_NOT_FOUND("Service Deployment Not Found"),
