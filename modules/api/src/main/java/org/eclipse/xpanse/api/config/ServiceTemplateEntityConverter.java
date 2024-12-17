@@ -40,7 +40,8 @@ public class ServiceTemplateEntityConverter {
             if (StringUtils.isNotEmpty(serviceTemplateEntity.getNamespace())) {
                 serviceTemplateDetailVo.setNamespace(serviceTemplateEntity.getNamespace());
             } else {
-                serviceTemplateDetailVo.setNamespace(serviceTemplateEntity.getOcl().getNamespace());
+                serviceTemplateDetailVo.setNamespace(serviceTemplateEntity.getOcl()
+                        .getServiceVendor());
             }
             serviceTemplateDetailVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
             serviceTemplateDetailVo.setFlavors(serviceTemplateEntity.getOcl().getFlavors());

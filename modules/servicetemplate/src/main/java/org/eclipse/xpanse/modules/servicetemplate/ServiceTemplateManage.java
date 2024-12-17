@@ -197,7 +197,7 @@ public class ServiceTemplateManage {
         compare(oldServiceHostingType, newServiceHostingType, "service hosting type");
 
         String oldNamespace = existingTemplate.getNamespace();
-        String newNamespace = ocl.getNamespace();
+        String newNamespace = ocl.getServiceVendor();
         compare(oldNamespace, newNamespace, "namespace");
     }
 
@@ -226,7 +226,7 @@ public class ServiceTemplateManage {
         validateServiceDeployment(ocl.getDeployment(), newServiceTemplate);
 
         if (!userServiceHelper.isAuthEnable()) {
-            newServiceTemplate.setNamespace(ocl.getNamespace());
+            newServiceTemplate.setNamespace(ocl.getServiceVendor());
         } else {
             String userManageNamespace = userServiceHelper.getCurrentUserManageNamespace();
             if (StringUtils.isEmpty(userManageNamespace)) {
@@ -234,12 +234,12 @@ public class ServiceTemplateManage {
                         "Current user's namespace is null, please set it " + "first.");
             }
             if (StringUtils.isNotEmpty(userManageNamespace)
-                    && !StringUtils.equals(ocl.getNamespace(), userManageNamespace)) {
+                    && !StringUtils.equals(ocl.getServiceVendor(), userManageNamespace)) {
                 throw new AccessDeniedException(
                         "No permissions to view or manage service template "
                                 + "belonging to other namespaces.");
             }
-            newServiceTemplate.setNamespace(ocl.getNamespace());
+            newServiceTemplate.setNamespace(ocl.getServiceVendor());
         }
 
         return newServiceTemplate;
