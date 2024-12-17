@@ -29,9 +29,9 @@ public class ServiceTemplateQueryModel {
 
     private ServiceTemplateRegistrationState serviceTemplateRegistrationState;
 
-    private Boolean availableInCatalog;
+    private Boolean isAvailableInCatalog;
 
-    private Boolean isUpdatePending;
+    private Boolean isReviewInProgress;
 
     private Boolean checkNamespace;
 

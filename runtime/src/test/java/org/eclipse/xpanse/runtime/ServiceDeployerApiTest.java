@@ -61,6 +61,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
@@ -330,11 +331,11 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testDeployerWithOclAndPolicy(Ocl ocl) throws Exception {
         UUID uuid = UUID.randomUUID();
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplate =
+                registerServiceTemplateAndApproveRegistration(ocl);
         if (Objects.isNull(serviceTemplate)) {
             return;
         }
-        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         setMockPoliciesValidateApi();
         UserPolicyCreateRequest userPolicyCreateRequest = new UserPolicyCreateRequest();
         userPolicyCreateRequest.setCsp(serviceTemplate.getCsp());
@@ -422,9 +423,13 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         lowerPriorityFlavor.setName("lower-priority-flavor");
         lowerPriorityFlavor.setPriority(10);
         ocl.getFlavors().getServiceFlavors().add(lowerPriorityFlavor);
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        ServiceTemplateRequestInfo requestInfo = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplate =
+                getServiceTemplateDetailsVo(requestInfo.getServiceTemplateId());
         testDeployThrowsServiceTemplateNotRegistered(serviceTemplate);
-        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
+
+        // approve service template registration.
+        reviewServiceTemplateRequest(requestInfo.getRequestId(), true);
         setMockPoliciesValidateApi();
         addServicePolicies(serviceTemplate);
         testDeployThrowPolicyEvaluationFailed(serviceTemplate);
@@ -755,8 +760,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         zoneConfig2.setMandatory(true);
         List<AvailabilityZoneConfig> zoneConfigs = List.of(zoneConfig, zoneConfig2);
         ocl.getDeployment().setServiceAvailabilityConfig(zoneConfigs);
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
-        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
+        ServiceTemplateDetailVo serviceTemplate =
+                registerServiceTemplateAndApproveRegistration(ocl);
         // Run the test
         DeployRequest deployRequest1 = getDeployRequest(serviceTemplate);
         deployRequest1.getServiceRequestProperties().clear();

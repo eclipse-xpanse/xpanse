@@ -139,8 +139,8 @@ class ServiceTemplateOpenApiGeneratorTest {
                 ServiceTemplateRegistrationState.APPROVED);
         serviceTemplateEntity.setServiceProviderContactDetails(
                 ocl.getServiceProviderContactDetails());
-        serviceTemplateEntity.setAvailableInCatalog(true);
-        serviceTemplateEntity.setIsUpdatePending(false);
+        serviceTemplateEntity.setIsAvailableInCatalog(true);
+        serviceTemplateEntity.setIsReviewInProgress(false);
         serviceTemplateEntity.setJsonObjectSchema(jsonObjectSchema);
         return serviceTemplateEntity;
     }

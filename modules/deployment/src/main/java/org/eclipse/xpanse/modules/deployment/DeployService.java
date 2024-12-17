@@ -280,7 +280,7 @@ public class DeployService {
                 existingServiceTemplates.stream()
                         .filter(
                                 serviceTemplate ->
-                                        serviceTemplate.getAvailableInCatalog()
+                                        serviceTemplate.getIsAvailableInCatalog()
                                                 && Objects.nonNull(serviceTemplate.getOcl()))
                         .findFirst()
                         .orElseThrow(

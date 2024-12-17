@@ -129,7 +129,7 @@ public class ServiceMigrationApi {
                 existingServiceTemplates.stream()
                         .filter(
                                 serviceTemplate ->
-                                        serviceTemplate.getAvailableInCatalog()
+                                        serviceTemplate.getIsAvailableInCatalog()
                                                 && Objects.nonNull(serviceTemplate.getOcl()))
                         .findFirst()
                         .orElseThrow(

@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
@@ -67,7 +68,9 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
                         .getOcl(
                                 URI.create("file:src/test/resources/ocl_terraform_test.yml")
                                         .toURL());
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        ServiceTemplateRequestInfo requestInfo = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplate =
+                getServiceTemplateDetailsVo(requestInfo.getServiceTemplateId());
         testServicePoliciesManageApisWell(serviceTemplate);
         testServicePoliciesManage_ThrowsExceptions(serviceTemplate);
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());

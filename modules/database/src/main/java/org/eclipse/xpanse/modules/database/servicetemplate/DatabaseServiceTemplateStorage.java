@@ -87,19 +87,19 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
                                         root.get("serviceTemplateRegistrationState"),
                                         queryModel.getServiceTemplateRegistrationState()));
                     }
-                    if (Objects.nonNull(queryModel.getAvailableInCatalog())) {
+                    if (Objects.nonNull(queryModel.getIsAvailableInCatalog())) {
                         predicateList.add(
                                 criteriaBuilder.equal(
-                                        root.get("availableInCatalog"),
-                                        queryModel.getAvailableInCatalog()));
+                                        root.get("isAvailableInCatalog"),
+                                        queryModel.getIsAvailableInCatalog()));
                     }
-                    if (Objects.nonNull(queryModel.getIsUpdatePending())) {
+                    if (Objects.nonNull(queryModel.getIsReviewInProgress())) {
                         predicateList.add(
                                 criteriaBuilder.equal(
-                                        root.get("isUpdatePending"),
-                                        queryModel.getIsUpdatePending()));
+                                        root.get("isReviewInProgress"),
+                                        queryModel.getIsReviewInProgress()));
                     }
-                    assert query != null;
+                    query.distinct(true);
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
                 };

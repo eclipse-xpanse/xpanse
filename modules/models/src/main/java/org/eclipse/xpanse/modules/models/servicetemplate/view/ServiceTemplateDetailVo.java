@@ -115,16 +115,16 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
     private OffsetDateTime lastModifiedTime;
 
     @NotNull
-    @Schema(description = "State of registered service template.")
+    @Schema(description = "Registration state of service template.")
     private ServiceTemplateRegistrationState serviceTemplateRegistrationState;
 
     @NotNull
-    @Schema(description = "Is service template in updating.")
-    private Boolean isUpdatePending;
+    @Schema(description = "If any request for the service template has a review in-progress.")
+    private Boolean isReviewInProgress;
 
     @NotNull
     @Schema(description = "Is available in catalog.")
-    private Boolean availableInCatalog;
+    private Boolean isAvailableInCatalog;
 
     @NotNull
     @Schema(description = "The contact details of the service provider.")

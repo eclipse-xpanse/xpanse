@@ -81,11 +81,11 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Enumerated(EnumType.STRING)
     private ServiceTemplateRegistrationState serviceTemplateRegistrationState;
 
-    @Column(name = "IS_UPDATE_PENDING", nullable = false)
-    private Boolean isUpdatePending;
+    @Column(name = "IS_REVIEW_IN_PROGRESS", nullable = false)
+    private Boolean isReviewInProgress = false;
 
-    @Column(name = "AVAILABLE_IN_CATALOG", nullable = false)
-    private Boolean availableInCatalog;
+    @Column(name = "IS_AVAILABLE_IN_CATALOG", nullable = false)
+    private Boolean isAvailableInCatalog = false;
 
     @Column(name = "SERVICE_PROVIDER_CONTACT_DETAILS", columnDefinition = "json", nullable = false)
     @Type(value = JsonType.class)

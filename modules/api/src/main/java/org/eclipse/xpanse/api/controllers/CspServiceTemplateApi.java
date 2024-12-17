@@ -94,12 +94,14 @@ public class CspServiceTemplateApi {
                             description = "state of service template registration")
                     @RequestParam(name = "serviceTemplateRegistrationState", required = false)
                     ServiceTemplateRegistrationState serviceTemplateRegistrationState,
-            @Parameter(name = "availableInCatalog", description = "is available in catalog")
-                    @RequestParam(name = "availableInCatalog", required = false)
-                    Boolean availableInCatalog,
-            @Parameter(name = "isUpdatePending", description = "is service template updating")
-                    @RequestParam(name = "isUpdatePending", required = false)
-                    Boolean isUpdatePending) {
+            @Parameter(name = "isAvailableInCatalog", description = "is available in catalog")
+                    @RequestParam(name = "isAvailableInCatalog", required = false)
+                    Boolean isAvailableInCatalog,
+            @Parameter(
+                            name = "isReviewInProgress",
+                            description = "is any request in review progress")
+                    @RequestParam(name = "isReviewInProgress", required = false)
+                    Boolean isReviewInProgress) {
         Csp csp = userServiceHelper.getCurrentUserManageCsp();
         ServiceTemplateQueryModel queryRequest =
                 ServiceTemplateQueryModel.builder()
@@ -109,8 +111,8 @@ public class CspServiceTemplateApi {
                         .serviceVersion(serviceVersion)
                         .serviceHostingType(serviceHostingType)
                         .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
-                        .availableInCatalog(availableInCatalog)
-                        .isUpdatePending(isUpdatePending)
+                        .isAvailableInCatalog(isAvailableInCatalog)
+                        .isReviewInProgress(isReviewInProgress)
                         .checkNamespace(false)
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =

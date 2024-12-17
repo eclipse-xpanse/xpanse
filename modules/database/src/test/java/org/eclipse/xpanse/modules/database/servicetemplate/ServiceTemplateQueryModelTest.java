@@ -30,8 +30,8 @@ class ServiceTemplateQueryModelTest {
             ServiceTemplateRegistrationState.APPROVED;
     private final Boolean checkNamespace = true;
     private final String namespace = "HuaweiCloud";
-    private final Boolean availableInCatalog = true;
-    private final Boolean isUpdatePending = false;
+    private final Boolean isAvailableInCatalog = true;
+    private final Boolean isReviewInProgress = false;
     private ServiceTemplateQueryModel testModel;
 
     @BeforeEach
@@ -45,8 +45,8 @@ class ServiceTemplateQueryModelTest {
                         .serviceHostingType(serviceHostingType)
                         .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
                         .checkNamespace(checkNamespace)
-                        .availableInCatalog(availableInCatalog)
-                        .isUpdatePending(isUpdatePending)
+                        .isAvailableInCatalog(isAvailableInCatalog)
+                        .isReviewInProgress(isReviewInProgress)
                         .namespace(namespace)
                         .build();
     }
@@ -62,8 +62,8 @@ class ServiceTemplateQueryModelTest {
         assertEquals(
                 serviceTemplateRegistrationState, testModel.getServiceTemplateRegistrationState());
         assertEquals(checkNamespace, testModel.getCheckNamespace());
-        assertEquals(availableInCatalog, testModel.getAvailableInCatalog());
-        assertEquals(isUpdatePending, testModel.getIsUpdatePending());
+        assertEquals(isAvailableInCatalog, testModel.getIsAvailableInCatalog());
+        assertEquals(isReviewInProgress, testModel.getIsReviewInProgress());
     }
 
     @Test
@@ -99,10 +99,10 @@ class ServiceTemplateQueryModelTest {
                         + serviceHostingType
                         + ", serviceTemplateRegistrationState="
                         + serviceTemplateRegistrationState
-                        + ", availableInCatalog="
-                        + availableInCatalog
-                        + ", isUpdatePending="
-                        + isUpdatePending
+                        + ", isAvailableInCatalog="
+                        + isAvailableInCatalog
+                        + ", isReviewInProgress="
+                        + isReviewInProgress
                         + ", checkNamespace="
                         + checkNamespace
                         + ", namespace="

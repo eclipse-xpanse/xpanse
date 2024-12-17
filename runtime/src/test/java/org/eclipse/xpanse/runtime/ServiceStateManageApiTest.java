@@ -98,11 +98,11 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                         .getOcl(
                                 URI.create("file:src/test/resources/ocl_terraform_test.yml")
                                         .toURL());
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplate =
+                registerServiceTemplateAndApproveRegistration(ocl);
         if (Objects.isNull(serviceTemplate)) {
             return;
         }
-        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         mockDeploymentWitPolicies();
         ServiceOrder serviceOrder = deployService(serviceTemplate);
         if (waitServiceDeploymentIsCompleted(serviceOrder.getServiceId())) {

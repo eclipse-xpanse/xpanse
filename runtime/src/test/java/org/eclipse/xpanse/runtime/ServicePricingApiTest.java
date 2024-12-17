@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
@@ -225,7 +226,9 @@ class ServicePricingApiTest extends ApisTestCommon {
     private void testGetServicePricing(
             Ocl ocl, String flavorName, String regionName, String siteName) throws Exception {
         // Setup
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        ServiceTemplateRequestInfo registerInfo = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplate =
+                getServiceTemplateDetailsVo(registerInfo.getServiceTemplateId());
         UUID templateId = serviceTemplate.getServiceTemplateId();
         int flavorCount = ocl.getFlavors().getServiceFlavors().size();
         MockHttpServletResponse serviceFixedPricesResponse =
@@ -295,7 +298,9 @@ class ServicePricingApiTest extends ApisTestCommon {
         Ocl ocl =
                 oclLoader.getOcl(
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ServiceTemplateDetailVo serviceTemplateDetails = registerServiceTemplate(ocl);
+        ServiceTemplateRequestInfo registerRequestInfo = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplateDetails =
+                getServiceTemplateDetailsVo(registerRequestInfo.getServiceTemplateId());
         UUID templateId = serviceTemplateDetails.getServiceTemplateId();
         expectedResult.setErrorMessage(
                 String.format(

@@ -49,8 +49,8 @@ class ServiceTemplateDetailVoTest {
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private final ServiceTemplateRegistrationState serviceTemplateRegistrationState =
             ServiceTemplateRegistrationState.APPROVED;
-    private final Boolean availableInCatalog = true;
-    private final Boolean isUpdatePending = false;
+    private final Boolean isAvailableInCatalog = true;
+    private final Boolean isReviewInProgress = false;
     private final ServiceChangeManage serviceConfigurationManage = new ServiceChangeManage();
     @Mock private ServiceProviderContactDetails serviceProviderContactDetails;
     private List<Region> regions;
@@ -96,8 +96,8 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setLastModifiedTime(lastModifiedTime);
         serviceTemplateDetailVo.setServiceTemplateRegistrationState(
                 serviceTemplateRegistrationState);
-        serviceTemplateDetailVo.setAvailableInCatalog(availableInCatalog);
-        serviceTemplateDetailVo.setIsUpdatePending(isUpdatePending);
+        serviceTemplateDetailVo.setIsAvailableInCatalog(isAvailableInCatalog);
+        serviceTemplateDetailVo.setIsReviewInProgress(isReviewInProgress);
         serviceTemplateDetailVo.setServiceHostingType(serviceHostingType);
         serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
         serviceTemplateDetailVo.setEula(eula);
@@ -123,8 +123,8 @@ class ServiceTemplateDetailVoTest {
         assertEquals(
                 serviceTemplateRegistrationState,
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
-        assertEquals(availableInCatalog, serviceTemplateDetailVo.getAvailableInCatalog());
-        assertEquals(isUpdatePending, serviceTemplateDetailVo.getIsUpdatePending());
+        assertEquals(isAvailableInCatalog, serviceTemplateDetailVo.getIsAvailableInCatalog());
+        assertEquals(isReviewInProgress, serviceTemplateDetailVo.getIsReviewInProgress());
         assertEquals(serviceHostingType, serviceTemplateDetailVo.getServiceHostingType());
         assertEquals(
                 serviceProviderContactDetails,
@@ -186,10 +186,10 @@ class ServiceTemplateDetailVoTest {
                         + lastModifiedTime
                         + ", serviceTemplateRegistrationState="
                         + serviceTemplateRegistrationState
-                        + ", isUpdatePending="
-                        + isUpdatePending
-                        + ", availableInCatalog="
-                        + availableInCatalog
+                        + ", isReviewInProgress="
+                        + isReviewInProgress
+                        + ", isAvailableInCatalog="
+                        + isAvailableInCatalog
                         + ", serviceProviderContactDetails="
                         + serviceProviderContactDetails
                         + ", eula="

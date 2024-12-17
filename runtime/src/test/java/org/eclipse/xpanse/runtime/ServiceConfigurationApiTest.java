@@ -137,12 +137,12 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
                         .getOcl(
                                 URI.create("file:src/test/resources/ocl_terraform_kafka_test.yml")
                                         .toURL());
-        ServiceTemplateDetailVo serviceTemplate = registerServiceTemplate(ocl);
+        ServiceTemplateDetailVo serviceTemplate =
+                registerServiceTemplateAndApproveRegistration(ocl);
         if (Objects.isNull(serviceTemplate)) {
             log.error("Register service template failed.");
             return null;
         }
-        approveServiceTemplateRegistration(serviceTemplate.getServiceTemplateId());
         mockDeploymentWitPolicies();
         return deployService(serviceTemplate);
     }

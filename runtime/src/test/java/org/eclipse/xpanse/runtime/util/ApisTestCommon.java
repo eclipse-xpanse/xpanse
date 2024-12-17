@@ -44,6 +44,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.ServiceResultReFetchManager;
@@ -108,11 +109,9 @@ public class ApisTestCommon {
     @Resource public ServiceOrderManager serviceOrderManager;
     @Resource protected ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource protected ServiceTemplateStorage serviceTemplateStorage;
+    @Resource protected ServiceTemplateRequestHistoryStorage serviceTemplateRequestHistoryStorage;
     @Resource protected ServiceOrderStorage serviceOrderStorage;
     @Resource protected MockMvc mockMvc;
-    @Resource private TerraformBootResultRefetchManager terraformBootResultRefetchManager;
-    @Resource private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
-    @Resource private ServiceResultReFetchManager serviceResultReFetchManager;
     @MockitoBean protected HuaweiCloudClient huaweiCloudClient;
     @MockitoBean protected FlexibleEngineClient flexibleEngineClient;
     @MockitoBean protected EcsClient mockEcsClient;
@@ -123,6 +122,9 @@ public class ApisTestCommon {
     @MockitoBean protected BssClient mockBssClient;
     @MockitoBean protected BssintlClient mockBssintlClient;
     protected MockedStatic<OSFactory> mockOsFactory;
+    @Resource private TerraformBootResultRefetchManager terraformBootResultRefetchManager;
+    @Resource private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
+    @Resource private ServiceResultReFetchManager serviceResultReFetchManager;
 
     @BeforeAll
     static void configureObjectMapper() {
@@ -403,8 +405,22 @@ public class ApisTestCommon {
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
     }
 
-    protected ServiceTemplateDetailVo registerServiceTemplate(Ocl ocl) throws Exception {
+    protected ServiceTemplateDetailVo registerServiceTemplateAndApproveRegistration(Ocl ocl)
+            throws Exception {
+        ServiceTemplateRequestInfo registerRequestInfo = registerServiceTemplate(ocl);
+        if (Objects.nonNull(registerRequestInfo)) {
+            if (reviewServiceTemplateRequest(registerRequestInfo.getRequestId(), true)) {
+                return getServiceTemplateDetailsVo(registerRequestInfo.getServiceTemplateId());
+            } else {
+                log.error("Review service template register request failed.");
+            }
+        } else {
+            log.error("Register service template failed.");
+        }
+        return null;
+    }
 
+    protected ServiceTemplateRequestInfo registerServiceTemplate(Ocl ocl) throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         ocl.setName(UUID.randomUUID().toString());
         String requestBody = yamlMapper.writeValueAsString(ocl);
@@ -418,11 +434,9 @@ public class ApisTestCommon {
                         .getResponse();
         assertNotNull(registerResponse.getHeader(HEADER_TRACKING_ID));
         if (registerResponse.getStatus() == HttpStatus.OK.value()) {
-            ServiceTemplateRequestInfo serviceTemplateRequestInfo =
-                    objectMapper.readValue(
-                            registerResponse.getContentAsString(),
-                            ServiceTemplateRequestInfo.class);
-            return getServiceTemplateDetailsVo(serviceTemplateRequestInfo.getServiceTemplateId());
+            return objectMapper.readValue(
+                    registerResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+
         } else {
             ErrorResponse errorResponse =
                     objectMapper.readValue(
@@ -430,6 +444,28 @@ public class ApisTestCommon {
             log.error("Register service template failed. Error: " + errorResponse.getDetails());
             return null;
         }
+    }
+
+    protected boolean reviewServiceTemplateRequest(UUID requestId, boolean isApproved)
+            throws Exception {
+        ReviewServiceTemplateRequest request = new ReviewServiceTemplateRequest();
+        ServiceReviewResult reviewResult =
+                isApproved ? ServiceReviewResult.APPROVED : ServiceReviewResult.REJECTED;
+        request.setReviewResult(reviewResult);
+        request.setReviewComment(reviewResult.toValue());
+        String requestBody = objectMapper.writeValueAsString(request);
+        MockHttpServletResponse response =
+                mockMvc.perform(
+                                put(
+                                                "/xpanse/csp/service_templates/requests/review/{requestId}",
+                                                requestId)
+                                        .content(requestBody)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andReturn()
+                        .getResponse();
+        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
+        return response.getStatus() == HttpStatus.NO_CONTENT.value();
     }
 
     protected ServiceTemplateDetailVo getServiceTemplateDetailsVo(UUID id) throws Exception {
@@ -457,31 +493,6 @@ public class ApisTestCommon {
                         .andReturn()
                         .getResponse();
         return objectMapper.readValue(response.getContentAsString(), new TypeReference<>() {});
-    }
-
-    protected void approveServiceTemplateRegistration(UUID serviceTemplateId) throws Exception {
-        List<ServiceTemplateRequestToReview> serviceTemplateRequestToReviews =
-                listPendingServiceTemplateRequests(serviceTemplateId);
-        if (serviceTemplateRequestToReviews.isEmpty()) {
-            return;
-        }
-        UUID requestId = serviceTemplateRequestToReviews.getFirst().getRequestId();
-        ReviewServiceTemplateRequest request = new ReviewServiceTemplateRequest();
-        request.setReviewResult(ServiceReviewResult.APPROVED);
-        request.setReviewComment("Approved");
-        String requestBody = objectMapper.writeValueAsString(request);
-        MockHttpServletResponse response =
-                mockMvc.perform(
-                                put(
-                                                "/xpanse/csp/service_templates/requests/review/{requestId}",
-                                                requestId)
-                                        .content(requestBody)
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .accept(MediaType.APPLICATION_JSON))
-                        .andReturn()
-                        .getResponse();
-        assertEquals(HttpStatus.NO_CONTENT.value(), response.getStatus());
-        assertNotNull(response.getHeader(HEADER_TRACKING_ID));
     }
 
     protected void deleteServiceTemplate(UUID serviceTemplateId) throws Exception {

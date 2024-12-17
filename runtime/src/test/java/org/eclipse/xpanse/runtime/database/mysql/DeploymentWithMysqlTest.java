@@ -133,7 +133,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
                         serviceTemplate.getServiceTemplateId());
         serviceTemplateEntity.setServiceTemplateRegistrationState(
                 ServiceTemplateRegistrationState.APPROVED);
-        serviceTemplateEntity.setAvailableInCatalog(true);
+        serviceTemplateEntity.setIsAvailableInCatalog(true);
         serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
     }
 
