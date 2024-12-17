@@ -53,10 +53,10 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfi
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationChangeDetailsEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationNotFoundException;
-import org.eclipse.xpanse.modules.models.servicetemplate.ConfigManageScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
@@ -201,24 +201,24 @@ public class ServiceConfigurationManager {
                 deployResources.stream()
                         .collect(Collectors.groupingBy(DeployResource::getGroupName));
 
-        List<ConfigManageScript> configManageScripts =
+        List<ServiceChangeScript> configManageScripts =
                 ocl.getServiceConfigurationManage().getConfigManageScripts();
-        List<ServiceConfigurationParameter> configurationParameters =
+        List<ServiceChangeParameter> configurationParameters =
                 ocl.getServiceConfigurationManage().getConfigurationParameters();
 
         List<ServiceConfigurationChangeDetailsEntity> requests = new ArrayList<>();
         deployResourceMap.forEach(
                 (groupName, deployResourceList) ->
                         configManageScripts.forEach(
-                                configManageScript -> {
-                                    if (configManageScript.getConfigManager().equals(groupName)) {
+                                serviceChangeScript -> {
+                                    if (serviceChangeScript.getChangeHandler().equals(groupName)) {
                                         if (!CollectionUtils.isEmpty(deployResourceList)) {
                                             Map<String, Object> properties =
                                                     getServiceConfigurationChangeProperties(
                                                             groupName,
                                                             configurationParameters,
                                                             updateRequestMap);
-                                            if (configManageScript.getRunOnlyOnce()) {
+                                            if (serviceChangeScript.getRunOnlyOnce()) {
                                                 ServiceConfigurationChangeDetailsEntity request =
                                                         getServiceConfigurationChangeDetails(
                                                                 orderId,
@@ -255,7 +255,7 @@ public class ServiceConfigurationManager {
 
     private Map<String, Object> getServiceConfigurationChangeProperties(
             String groupName,
-            List<ServiceConfigurationParameter> params,
+            List<ServiceChangeParameter> params,
             Map<String, Object> updateRequestMap) {
 
         Map<String, Object> existsServiceConfig = new HashMap<>();
@@ -317,7 +317,7 @@ public class ServiceConfigurationManager {
     private void validate(
             ServiceTemplateEntity serviceTemplateEntity,
             ServiceConfigurationUpdate serviceConfigurationUpdate) {
-        ServiceConfigurationManage serviceConfigurationManage =
+        ServiceChangeManage serviceConfigurationManage =
                 serviceTemplateEntity.getOcl().getServiceConfigurationManage();
         if (Objects.isNull(serviceConfigurationManage)) {
             String errorMsg =
@@ -327,7 +327,7 @@ public class ServiceConfigurationManager {
             log.error(errorMsg);
             throw new ServiceConfigurationInvalidException(List.of(errorMsg));
         }
-        List<ServiceConfigurationParameter> configurationParameters =
+        List<ServiceChangeParameter> configurationParameters =
                 serviceConfigurationManage.getConfigurationParameters();
         JsonObjectSchema jsonObjectSchema =
                 serviceConfigurationVariablesJsonSchemaGenerator
@@ -465,17 +465,17 @@ public class ServiceConfigurationManager {
         ServiceConfigurationChangeRequest serviceConfigurationChangeRequest =
                 new ServiceConfigurationChangeRequest();
         serviceConfigurationChangeRequest.setChangeId(request.getId());
-        Optional<ConfigManageScript> configManageScriptOptional = getConfigManageScript(request);
+        Optional<ServiceChangeScript> configManageScriptOptional = getConfigManageScript(request);
         configManageScriptOptional.ifPresent(
-                configManageScript ->
+                serviceChangeScript ->
                         serviceConfigurationChangeRequest.setAnsibleScriptConfig(
-                                configManageScript.getAnsibleScriptConfig()));
+                                serviceChangeScript.getAnsibleScriptConfig()));
         serviceConfigurationChangeRequest.setConfigParameters(request.getProperties());
         serviceConfigurationChangeRequest.setAnsibleInventory(getAnsibleInventory(deployResources));
         return serviceConfigurationChangeRequest;
     }
 
-    private Optional<ConfigManageScript> getConfigManageScript(
+    private Optional<ServiceChangeScript> getConfigManageScript(
             ServiceConfigurationChangeDetailsEntity request) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(
@@ -488,18 +488,18 @@ public class ServiceConfigurationManager {
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
-        Optional<ConfigManageScript> configManageScriptOptional =
+        Optional<ServiceChangeScript> configManageScriptOptional =
                 serviceTemplateEntity
                         .getOcl()
                         .getServiceConfigurationManage()
                         .getConfigManageScripts()
                         .stream()
                         .filter(
-                                configManageScript -> {
+                                serviceChangeScript -> {
                                     String configManager = request.getConfigManager();
                                     return configManager != null
                                             && configManager.equals(
-                                                    configManageScript.getConfigManager());
+                                                    serviceChangeScript.getChangeHandler());
                                 })
                         .findFirst();
         return configManageScriptOptional;

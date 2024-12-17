@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -41,7 +41,7 @@ public class ServiceConfigurationVariablesJsonSchemaValidator {
      * @param configurations service configuration map
      */
     public void validateServiceConfiguration(
-            List<ServiceConfigurationParameter> configurationParameters,
+            List<ServiceChangeParameter> configurationParameters,
             Map<String, Object> configurations,
             JsonObjectSchema jsonObjectSchema) {
 

@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationManage;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -58,7 +58,7 @@ class ServiceDeploymentEntityConverterTest {
         ocl.setBilling(new Billing());
         ocl.setServiceHostingType(ServiceHostingType.SELF);
         ocl.setServiceProviderContactDetails(new ServiceProviderContactDetails());
-        ocl.setServiceConfigurationManage(new ServiceConfigurationManage());
+        ocl.setServiceConfigurationManage(new ServiceChangeManage());
 
         serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceDeploymentEntity.getServiceTemplateId());

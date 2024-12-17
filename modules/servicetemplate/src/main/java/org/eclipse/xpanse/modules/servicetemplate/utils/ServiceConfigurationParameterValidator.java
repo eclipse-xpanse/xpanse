@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.springframework.stereotype.Component;
@@ -38,7 +38,7 @@ public class ServiceConfigurationParameterValidator {
         OrchestratorPlugin plugin =
                 pluginManager.getOrchestratorPlugin(ocl.getCloudServiceProvider().getName());
         List<File> scriptFiles = prepareDeployWorkspaceWithScripts(ocl);
-        List<ServiceConfigurationParameter> configurationParameters =
+        List<ServiceChangeParameter> configurationParameters =
                 ocl.getServiceConfigurationManage().getConfigurationParameters();
         if (CollectionUtils.isEmpty(scriptFiles)
                 || CollectionUtils.isEmpty(configurationParameters)) {

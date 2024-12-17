@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /** Test of DeployVariable. */
-class ServiceConfigurationParameterTest {
+class ServiceChangeParameterTest {
 
     private static final String name = "service_configuration_parameter_name";
     private static final DeployVariableKind kind = DeployVariableKind.VARIABLE;
@@ -29,161 +29,146 @@ class ServiceConfigurationParameterTest {
     private static final Map<String, Object> validatorMap = Map.of("minLength", "10");
     private static final SensitiveScope sensitiveScope = SensitiveScope.ONCE;
     private static final String managedBy = "kafka-broker";
-    private static ServiceConfigurationParameter serviceConfigurationParameter;
+    private static ServiceChangeParameter serviceChangeParameter;
     private static AutoFill autoFill = null;
     private static ModificationImpact modificationImpact;
 
     @BeforeEach
     void setUp() {
-        serviceConfigurationParameter = new ServiceConfigurationParameter();
-        serviceConfigurationParameter.setName(name);
-        serviceConfigurationParameter.setKind(kind);
-        serviceConfigurationParameter.setDataType(dataType);
-        serviceConfigurationParameter.setExample(example);
-        serviceConfigurationParameter.setDescription(description);
-        serviceConfigurationParameter.setValue(value);
-        serviceConfigurationParameter.setInitialValue(initialValue);
-        serviceConfigurationParameter.setValueSchema(validatorMap);
-        serviceConfigurationParameter.setSensitiveScope(sensitiveScope);
-        serviceConfigurationParameter.setAutoFill(autoFill);
-        serviceConfigurationParameter.setModificationImpact(modificationImpact);
-        serviceConfigurationParameter.setIsReadOnly(true);
-        serviceConfigurationParameter.setManagedBy(managedBy);
+        serviceChangeParameter = new ServiceChangeParameter();
+        serviceChangeParameter.setName(name);
+        serviceChangeParameter.setKind(kind);
+        serviceChangeParameter.setDataType(dataType);
+        serviceChangeParameter.setExample(example);
+        serviceChangeParameter.setDescription(description);
+        serviceChangeParameter.setValue(value);
+        serviceChangeParameter.setInitialValue(initialValue);
+        serviceChangeParameter.setValueSchema(validatorMap);
+        serviceChangeParameter.setSensitiveScope(sensitiveScope);
+        serviceChangeParameter.setAutoFill(autoFill);
+        serviceChangeParameter.setModificationImpact(modificationImpact);
+        serviceChangeParameter.setIsReadOnly(true);
+        serviceChangeParameter.setManagedBy(managedBy);
     }
 
     @Test
     void testGetterAndSetter() {
-        assertEquals(name, serviceConfigurationParameter.getName());
-        assertEquals(kind, serviceConfigurationParameter.getKind());
-        assertEquals(dataType, serviceConfigurationParameter.getDataType());
-        assertEquals(example, serviceConfigurationParameter.getExample());
-        assertEquals(description, serviceConfigurationParameter.getDescription());
-        assertEquals(value, serviceConfigurationParameter.getValue());
-        assertEquals(initialValue, serviceConfigurationParameter.getInitialValue());
-        assertEquals(validatorMap, serviceConfigurationParameter.getValueSchema());
-        assertEquals(sensitiveScope, serviceConfigurationParameter.getSensitiveScope());
-        assertEquals(modificationImpact, serviceConfigurationParameter.getModificationImpact());
-        assertEquals(true, serviceConfigurationParameter.getIsReadOnly());
-        assertEquals(managedBy, serviceConfigurationParameter.getManagedBy());
+        assertEquals(name, serviceChangeParameter.getName());
+        assertEquals(kind, serviceChangeParameter.getKind());
+        assertEquals(dataType, serviceChangeParameter.getDataType());
+        assertEquals(example, serviceChangeParameter.getExample());
+        assertEquals(description, serviceChangeParameter.getDescription());
+        assertEquals(value, serviceChangeParameter.getValue());
+        assertEquals(initialValue, serviceChangeParameter.getInitialValue());
+        assertEquals(validatorMap, serviceChangeParameter.getValueSchema());
+        assertEquals(sensitiveScope, serviceChangeParameter.getSensitiveScope());
+        assertEquals(modificationImpact, serviceChangeParameter.getModificationImpact());
+        assertEquals(true, serviceChangeParameter.getIsReadOnly());
+        assertEquals(managedBy, serviceChangeParameter.getManagedBy());
     }
 
     @Test
     void testEqualsAndHashCode() {
-        assertEquals(serviceConfigurationParameter, serviceConfigurationParameter);
-        assertEquals(
-                serviceConfigurationParameter.hashCode(), serviceConfigurationParameter.hashCode());
+        assertEquals(serviceChangeParameter, serviceChangeParameter);
+        assertEquals(serviceChangeParameter.hashCode(), serviceChangeParameter.hashCode());
 
         Object obj = new Object();
-        assertNotEquals(serviceConfigurationParameter, obj);
-        assertNotEquals(serviceConfigurationParameter, null);
-        assertNotEquals(serviceConfigurationParameter.hashCode(), obj.hashCode());
+        assertNotEquals(serviceChangeParameter, obj);
+        assertNotEquals(serviceChangeParameter, null);
+        assertNotEquals(serviceChangeParameter.hashCode(), obj.hashCode());
 
-        ServiceConfigurationParameter configurationParameter1 = new ServiceConfigurationParameter();
-        ServiceConfigurationParameter configurationParameter2 = new ServiceConfigurationParameter();
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter2);
+        ServiceChangeParameter configurationParameter1 = new ServiceChangeParameter();
+        ServiceChangeParameter configurationParameter2 = new ServiceChangeParameter();
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter2);
         assertEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter2.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter2.hashCode());
         assertEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setName(name);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setKind(kind);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setDataType(dataType);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setExample(example);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setDescription(description);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setValue(value);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setInitialValue(initialValue);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setValueSchema(validatorMap);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setSensitiveScope(sensitiveScope);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setAutoFill(autoFill);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setModificationImpact(modificationImpact);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setIsReadOnly(true);
-        assertNotEquals(serviceConfigurationParameter, configurationParameter1);
+        assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertNotEquals(
-                serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
         configurationParameter1.setManagedBy(managedBy);
-        assertEquals(serviceConfigurationParameter, configurationParameter1);
+        assertEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
-        assertEquals(serviceConfigurationParameter.hashCode(), configurationParameter1.hashCode());
+        assertEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
     }
 
     @Test
     void testToString() {
         String expectedString =
-                "ServiceConfigurationParameter("
+                "ServiceChangeParameter("
                         + "name="
                         + name
                         + ", kind="
@@ -223,6 +208,6 @@ class ServiceConfigurationParameterTest {
                         + managedBy
                         + ""
                         + ")";
-        assertEquals(expectedString, serviceConfigurationParameter.toString());
+        assertEquals(expectedString, serviceChangeParameter.toString());
     }
 }

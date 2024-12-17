@@ -21,7 +21,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 @Valid
 @Data
 @Slf4j
-public class ServiceConfigurationManage implements Serializable {
+public class ServiceChangeManage implements Serializable {
 
     @Serial private static final long serialVersionUID = 1L;
 
@@ -36,10 +36,10 @@ public class ServiceConfigurationManage implements Serializable {
     @Size(min = 1)
     @UniqueElements
     @Schema(description = "The collection of the configuration manage script.")
-    private List<ConfigManageScript> configManageScripts;
+    private List<ServiceChangeScript> configManageScripts;
 
     @Size(min = 1)
     @UniqueElements
     @Schema(description = "The collection of service configuration parameters.")
-    private List<ServiceConfigurationParameter> configurationParameters;
+    private List<ServiceChangeParameter> configurationParameters;
 }

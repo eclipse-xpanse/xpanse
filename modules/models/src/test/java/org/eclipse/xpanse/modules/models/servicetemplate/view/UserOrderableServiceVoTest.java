@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceConfigurationParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +33,7 @@ class UserOrderableServiceVoTest {
     private final UUID id = UUID.randomUUID();
     private final String name = "name";
     private final String version = "version";
-    private final List<ServiceConfigurationParameter> configurationParameters = List.of();
+    private final List<ServiceChangeParameter> configurationParameters = List.of();
     @Mock private Category mockCategory;
     @Mock private Csp mockCsp;
     @Mock private List<Region> mockRegions;
