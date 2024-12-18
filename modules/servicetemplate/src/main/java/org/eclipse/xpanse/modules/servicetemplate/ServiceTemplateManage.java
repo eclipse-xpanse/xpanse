@@ -58,6 +58,7 @@ import org.eclipse.xpanse.modules.servicetemplate.price.BillingConfigValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
+import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceActionTemplateValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceConfigurationParameterValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.semver4j.Semver;
@@ -86,6 +87,7 @@ public class ServiceTemplateManage {
     @Resource private BillingConfigValidator billingConfigValidator;
     @Resource private PluginManager pluginManager;
     @Resource private ServiceConfigurationParameterValidator serviceConfigurationParameterValidator;
+    @Resource private ServiceActionTemplateValidator serviceActionTemplateValidator;
 
     /**
      * Update service template using id and the ocl model.
@@ -138,6 +140,9 @@ public class ServiceTemplateManage {
         if (Objects.nonNull(serviceTemplateToUpdate.getOcl().getServiceConfigurationManage())
                 && Objects.nonNull(ocl.getServiceConfigurationManage())) {
             serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
+        }
+        if (!CollectionUtils.isEmpty(ocl.getServiceActions())) {
+            serviceActionTemplateValidator.validateServiceAction(ocl);
         }
         serviceTemplateToUpdate.setOcl(ocl);
         return serviceTemplateToUpdate;
@@ -350,6 +355,9 @@ public class ServiceTemplateManage {
         billingConfigValidator.validateBillingConfig(ocl);
         if (Objects.nonNull(ocl.getServiceConfigurationManage())) {
             serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
+        }
+        if (!CollectionUtils.isEmpty(ocl.getServiceActions())) {
+            serviceActionTemplateValidator.validateServiceAction(ocl);
         }
         ServiceTemplateEntity serviceTemplateToRegister = createServiceTemplateEntity(ocl);
         boolean isAutoApprovedEnabled =
