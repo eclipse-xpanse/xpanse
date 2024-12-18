@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.billing.Billing;
@@ -107,4 +108,7 @@ public class Ocl implements Serializable {
 
     @Schema(description = "manage service configuration.")
     private ServiceChangeManage serviceConfigurationManage;
+
+    @Schema(description = "manage service action.")
+    private List<ServiceAction> serviceActions;
 }
