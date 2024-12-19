@@ -44,7 +44,7 @@ class ServicePolicyManagerTest {
 
     private final UUID policyId = UUID.randomUUID();
     private final UUID serviceTemplateId = UUID.randomUUID();
-    private final String namespace = "userNamespace";
+    private final String serviceVendor = "userServiceVendor";
     private final OffsetDateTime createTime =
             OffsetDateTime.of(LocalDateTime.of(2023, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
 
@@ -68,7 +68,7 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
-        serviceTemplateEntity.setNamespace(namespace);
+        serviceTemplateEntity.setServiceVendor(serviceVendor);
         final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
         servicePolicyEntity.setId(policyId);
         servicePolicyEntity.setPolicy("policy");
@@ -78,7 +78,7 @@ class ServicePolicyManagerTest {
 
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Run the test
         final List<ServicePolicy> result = test.listServicePolicies(serviceTemplateId.toString());
@@ -105,11 +105,11 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
-        serviceTemplateEntity.setNamespace(namespace);
+        serviceTemplateEntity.setServiceVendor(serviceVendor);
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> test.listServicePolicies(serviceTemplateId.toString()))
@@ -136,7 +136,7 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
-        serviceTemplateEntity.setNamespace(namespace);
+        serviceTemplateEntity.setServiceVendor(serviceVendor);
         final ServicePolicyEntity existingPolicy = new ServicePolicyEntity();
         existingPolicy.setId(policyId);
         existingPolicy.setPolicy("policy");
@@ -146,7 +146,7 @@ class ServicePolicyManagerTest {
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
         final ServicePolicyEntity newServicePolicy = new ServicePolicyEntity();
@@ -157,7 +157,7 @@ class ServicePolicyManagerTest {
         newServicePolicy.setServiceTemplate(serviceTemplateEntity);
 
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(newServicePolicy);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Run the test
         final ServicePolicy result = test.addServicePolicy(createRequest);
@@ -189,7 +189,7 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
-        serviceTemplateEntity.setNamespace(namespace);
+        serviceTemplateEntity.setServiceVendor(serviceVendor);
         FlavorsWithPrice flavors = new FlavorsWithPrice();
         ServiceFlavorWithPrice flavor1 = new ServiceFlavorWithPrice();
         flavor1.setName("flavor1");
@@ -222,7 +222,7 @@ class ServicePolicyManagerTest {
         newServicePolicy.setServiceTemplate(serviceTemplateEntity);
 
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(newServicePolicy);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Run the test
         final ServicePolicy result = test.addServicePolicy(createRequest);
@@ -245,7 +245,7 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
-        serviceTemplateEntity.setNamespace(namespace);
+        serviceTemplateEntity.setServiceVendor(serviceVendor);
         ServiceFlavorWithPrice flavor = new ServiceFlavorWithPrice();
         flavor.setName("flavor");
         FlavorsWithPrice flavors = new FlavorsWithPrice();
@@ -261,7 +261,7 @@ class ServicePolicyManagerTest {
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         assertThatThrownBy(() -> test.addServicePolicy(createRequest))
                 .isInstanceOf(FlavorInvalidException.class);
@@ -293,11 +293,11 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
-        serviceTemplateEntity.setNamespace(namespace);
+        serviceTemplateEntity.setServiceVendor(serviceVendor);
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> test.addServicePolicy(createRequest))
@@ -314,12 +314,12 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
-        serviceTemplateEntity.setNamespace(namespace);
+        serviceTemplateEntity.setServiceVendor(serviceVendor);
 
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         doThrow(new PoliciesValidationFailedException("test"))
                 .when(mockPolicyManager)
@@ -350,7 +350,7 @@ class ServicePolicyManagerTest {
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceTemplateId);
-        serviceTemplateEntity.setNamespace(namespace);
+        serviceTemplateEntity.setServiceVendor(serviceVendor);
         final ServicePolicyEntity existingPolicy = new ServicePolicyEntity();
         existingPolicy.setId(policyId);
         existingPolicy.setPolicy("policy");
@@ -360,7 +360,7 @@ class ServicePolicyManagerTest {
         when(mockServiceTemplateStorage.getServiceTemplateById(serviceTemplateId))
                 .thenReturn(serviceTemplateEntity);
 
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
         // Run the test
         assertThatThrownBy(() -> test.addServicePolicy(createRequest))
                 .isInstanceOf(PolicyDuplicateException.class);
@@ -387,12 +387,12 @@ class ServicePolicyManagerTest {
         existingPolicy.setEnabled(false);
         final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
         existingTemplate.setId(serviceTemplateId);
-        existingTemplate.setNamespace(namespace);
+        existingTemplate.setServiceVendor(serviceVendor);
         existingTemplate.setServicePolicyList(List.of(existingPolicy));
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
         final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
@@ -401,7 +401,7 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setEnabled(true);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setId(serviceTemplateId);
-        serviceTemplate.setNamespace(namespace);
+        serviceTemplate.setServiceVendor(serviceVendor);
         serviceTemplate.setServicePolicyList(List.of(servicePolicyEntity));
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
@@ -438,7 +438,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setEnabled(false);
         final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
         existingTemplate.setId(serviceTemplateId);
-        existingTemplate.setNamespace(namespace);
+        existingTemplate.setServiceVendor(serviceVendor);
         ServiceFlavorWithPrice flavor1 = new ServiceFlavorWithPrice();
         flavor1.setName("flavor1");
         ServiceFlavorWithPrice flavor2 = new ServiceFlavorWithPrice();
@@ -456,7 +456,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Configure DatabaseServicePolicyStorage.storeAndFlush(...).
         final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
@@ -466,7 +466,7 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setEnabled(true);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setId(serviceTemplateId);
-        serviceTemplate.setNamespace(namespace);
+        serviceTemplate.setServiceVendor(serviceVendor);
         serviceTemplate.setOcl(ocl);
         serviceTemplate.setServicePolicyList(List.of(servicePolicyEntity));
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
@@ -504,7 +504,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setEnabled(false);
         final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
         existingTemplate.setId(serviceTemplateId);
-        existingTemplate.setNamespace(namespace);
+        existingTemplate.setServiceVendor(serviceVendor);
         ServiceFlavorWithPrice flavor1 = new ServiceFlavorWithPrice();
         flavor1.setName("flavor1");
         ServiceFlavorWithPrice flavor2 = new ServiceFlavorWithPrice();
@@ -522,7 +522,7 @@ class ServicePolicyManagerTest {
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         assertThatThrownBy(() -> test.updateServicePolicy(policyId, updateRequest))
                 .isInstanceOf(FlavorInvalidException.class);
@@ -558,12 +558,12 @@ class ServicePolicyManagerTest {
         existingPolicy.setEnabled(false);
         final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
         existingTemplate.setId(serviceTemplateId);
-        existingTemplate.setNamespace(namespace);
+        existingTemplate.setServiceVendor(serviceVendor);
         existingTemplate.setServicePolicyList(List.of(existingPolicy));
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> test.updateServicePolicy(policyId, updateRequest))
@@ -592,12 +592,12 @@ class ServicePolicyManagerTest {
         existingPolicy.setEnabled(false);
         final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
         existingTemplate.setId(serviceTemplateId);
-        existingTemplate.setNamespace(namespace);
+        existingTemplate.setServiceVendor(serviceVendor);
         existingTemplate.setServicePolicyList(List.of(existingPolicy));
         existingPolicy.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
         doThrow(new PoliciesValidationFailedException("error"))
                 .when(mockPolicyManager)
                 .validatePolicy(updatePolicy);
@@ -628,13 +628,13 @@ class ServicePolicyManagerTest {
 
         final ServiceTemplateEntity existingTemplate = new ServiceTemplateEntity();
         existingTemplate.setId(serviceTemplateId);
-        existingTemplate.setNamespace(namespace);
+        existingTemplate.setServiceVendor(serviceVendor);
         existingTemplate.setServicePolicyList(List.of(existingPolicy1, existingPolicy2));
         existingPolicy1.setServiceTemplate(existingTemplate);
         existingPolicy2.setServiceTemplate(existingTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(existingPolicy1);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Run the test
         assertThatThrownBy(() -> test.updateServicePolicy(policyId, updateRequest))
@@ -658,12 +658,12 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setEnabled(false);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setId(serviceTemplateId);
-        serviceTemplate.setNamespace(namespace);
+        serviceTemplate.setServiceVendor(serviceVendor);
         serviceTemplate.setServicePolicyList(List.of(servicePolicyEntity));
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(servicePolicyEntity);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Run the test
         final ServicePolicy result = test.getServicePolicyDetails(policyId);
@@ -689,12 +689,12 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setEnabled(false);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setId(serviceTemplateId);
-        serviceTemplate.setNamespace(namespace);
+        serviceTemplate.setServiceVendor(serviceVendor);
         serviceTemplate.setServicePolicyList(List.of(servicePolicyEntity));
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(servicePolicyEntity);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> test.getServicePolicyDetails(policyId))
@@ -720,12 +720,12 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setEnabled(false);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setId(serviceTemplateId);
-        serviceTemplate.setNamespace(namespace);
+        serviceTemplate.setServiceVendor(serviceVendor);
         serviceTemplate.setServicePolicyList(List.of(servicePolicyEntity));
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(servicePolicyEntity);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(true);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Run the test
         test.deleteServicePolicy(policyId);
@@ -751,12 +751,12 @@ class ServicePolicyManagerTest {
         servicePolicyEntity.setEnabled(false);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setId(serviceTemplateId);
-        serviceTemplate.setNamespace(namespace);
+        serviceTemplate.setServiceVendor(serviceVendor);
         serviceTemplate.setServicePolicyList(List.of(servicePolicyEntity));
         servicePolicyEntity.setServiceTemplate(serviceTemplate);
 
         when(mockServicePolicyStorage.findPolicyById(policyId)).thenReturn(servicePolicyEntity);
-        when(mockUserServiceHelper.currentUserCanManageNamespace(namespace)).thenReturn(false);
+        when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(false);
 
         // Run the test
         assertThatThrownBy(() -> test.deleteServicePolicy(policyId))

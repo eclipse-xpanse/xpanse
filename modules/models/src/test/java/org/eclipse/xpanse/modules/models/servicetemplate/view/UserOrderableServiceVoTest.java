@@ -26,7 +26,7 @@ import org.springframework.beans.BeanUtils;
 @ExtendWith(MockitoExtension.class)
 class UserOrderableServiceVoTest {
 
-    final String namespace = "ISV-A";
+    final String serviceVendor = "ISV-A";
     final String description = "description";
     final String icon = "icon";
     final String eula = "eula";
@@ -51,7 +51,7 @@ class UserOrderableServiceVoTest {
         test.setServiceTemplateId(id);
         test.setName(name);
         test.setVersion(version);
-        test.setNamespace(namespace);
+        test.setServiceVendor(serviceVendor);
         test.setDescription(description);
         test.setIcon(icon);
         test.setCategory(mockCategory);
@@ -70,7 +70,7 @@ class UserOrderableServiceVoTest {
     @Test
     void testGetters() {
         assertThat(test.getServiceTemplateId()).isEqualTo(id);
-        assertThat(test.getNamespace()).isEqualTo(namespace);
+        assertThat(test.getServiceVendor()).isEqualTo(serviceVendor);
         assertThat(test.getDescription()).isEqualTo(description);
         assertThat(test.getCategory()).isEqualTo(mockCategory);
         assertThat(test.getName()).isEqualTo(name);
@@ -118,8 +118,8 @@ class UserOrderableServiceVoTest {
                         + mockCsp
                         + ", regions="
                         + mockRegions
-                        + ", namespace="
-                        + namespace
+                        + ", serviceVendor="
+                        + serviceVendor
                         + ", description="
                         + description
                         + ", icon="

@@ -39,7 +39,7 @@ class ServiceDeploymentEntityTest {
     private final String NAME = "kafka";
     private final String CUSTOMER_SERVICE_NAME = "kafka-cluster";
     private final String VERSION = "2.0";
-    private final String NAMESPACE = "defaultUserId";
+    private final String SERVICE_VENDOR = "defaultUserId";
     private final Csp CSP = Csp.HUAWEI_CLOUD;
     private final String FLAVOR = "1-zookeeper-with-3-worker-nodes-normal";
     private final ServiceDeploymentState SERVICE_STATE = ServiceDeploymentState.DEPLOYING;
@@ -62,7 +62,7 @@ class ServiceDeploymentEntityTest {
         test.setName(NAME);
         test.setCustomerServiceName(CUSTOMER_SERVICE_NAME);
         test.setVersion(VERSION);
-        test.setNamespace(NAMESPACE);
+        test.setServiceVendor(SERVICE_VENDOR);
         test.setCsp(CSP);
         test.setFlavor(FLAVOR);
         test.setServiceDeploymentState(SERVICE_STATE);
@@ -86,7 +86,7 @@ class ServiceDeploymentEntityTest {
         assertEquals(NAME, test.getName());
         assertEquals(CUSTOMER_SERVICE_NAME, test.getCustomerServiceName());
         assertEquals(VERSION, test.getVersion());
-        assertEquals(NAMESPACE, test.getNamespace());
+        assertEquals(SERVICE_VENDOR, test.getServiceVendor());
         assertEquals(CSP, test.getCsp());
         assertEquals(FLAVOR, test.getFlavor());
         assertEquals(SERVICE_STATE, test.getServiceDeploymentState());
@@ -117,8 +117,8 @@ class ServiceDeploymentEntityTest {
                         + CUSTOMER_SERVICE_NAME
                         + ", version="
                         + VERSION
-                        + ", namespace="
-                        + NAMESPACE
+                        + ", serviceVendor="
+                        + SERVICE_VENDOR
                         + ", csp="
                         + CSP
                         + ", flavor="

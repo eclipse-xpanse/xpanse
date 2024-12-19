@@ -68,8 +68,8 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
     /** The version of the Service. */
     private String version;
 
-    /** Namespace of the user who registered service template. */
-    private String namespace;
+    /** ServiceVendor of the user who registered service template. */
+    private String serviceVendor;
 
     /** The csp of the Service. */
     @Enumerated(EnumType.STRING)

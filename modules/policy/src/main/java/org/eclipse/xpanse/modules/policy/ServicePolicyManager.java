@@ -83,12 +83,12 @@ public class ServicePolicyManager {
         ServiceTemplateEntity existedServiceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
         boolean hasManagePermission =
-                userServiceHelper.currentUserCanManageNamespace(
-                        existedServiceTemplate.getNamespace());
+                userServiceHelper.currentUserCanManageIsv(
+                        existedServiceTemplate.getServiceVendor());
         if (!hasManagePermission) {
             throw new AccessDeniedException(
                     "No permissions to view or manage policy belonging to "
-                            + "the service template belonging to other namespaces.");
+                            + "the service template belonging to other serviceVendors.");
         }
         return existedServiceTemplate;
     }
@@ -152,12 +152,12 @@ public class ServicePolicyManager {
         }
 
         boolean hasManagePermission =
-                userServiceHelper.currentUserCanManageNamespace(
-                        existingPolicy.getServiceTemplate().getNamespace());
+                userServiceHelper.currentUserCanManageIsv(
+                        existingPolicy.getServiceTemplate().getServiceVendor());
         if (!hasManagePermission) {
             throw new AccessDeniedException(
                     "No permissions to view or manage policy belonging to "
-                            + "the service templates belonging to other namespaces.");
+                            + "the service templates belonging to other serviceVendors.");
         }
         return existingPolicy;
     }
