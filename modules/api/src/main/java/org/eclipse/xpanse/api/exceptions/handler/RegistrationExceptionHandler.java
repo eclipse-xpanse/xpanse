@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
-import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestAlreadyReviewed;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ReviewServiceTemplateRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotFound;
 import org.springframework.core.Ordered;
@@ -152,14 +152,14 @@ public class RegistrationExceptionHandler {
                 Collections.singletonList(ex.getMessage()));
     }
 
-    /** Exception handler for ServiceTemplateRequestAlreadyReviewed. */
-    @ExceptionHandler({ServiceTemplateRequestAlreadyReviewed.class})
+    /** Exception handler for ReviewServiceTemplateRequestNotAllowed. */
+    @ExceptionHandler({ReviewServiceTemplateRequestNotAllowed.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorResponse handleServiceTemplateRequestAlreadyReviewed(
-            ServiceTemplateRequestAlreadyReviewed ex) {
+    public ErrorResponse handleReviewServiceTemplateRequestNotAllowed(
+            ReviewServiceTemplateRequestNotAllowed ex) {
         return getErrorResponse(
-                ErrorType.SERVICE_TEMPLATE_REQUEST_ALREADY_REVIEWED,
+                ErrorType.REVIEW_SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED,
                 Collections.singletonList(ex.getMessage()));
     }
 }

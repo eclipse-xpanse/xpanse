@@ -46,7 +46,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplate
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
-import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestAlreadyReviewed;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ReviewServiceTemplateRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
@@ -101,10 +101,23 @@ public class ServiceTemplateManage {
     public ServiceTemplateRequestHistoryEntity updateServiceTemplate(
             UUID id, Ocl ocl, boolean isRemoveFromCatalogUntilApproved) {
         ServiceTemplateEntity existingServiceTemplate = getServiceTemplateDetails(id, true, false);
+        ServiceTemplateRegistrationState registrationState =
+                existingServiceTemplate.getServiceTemplateRegistrationState();
+        if (registrationState == ServiceTemplateRegistrationState.APPROVED) {
+            return updateServiceTemplateWhenRegistrationApproved(
+                    ocl, existingServiceTemplate, isRemoveFromCatalogUntilApproved);
+        }
+        return updateServiceTemplateWhenRegistrationNotApproved(ocl, existingServiceTemplate);
+    }
+
+    private ServiceTemplateRequestHistoryEntity updateServiceTemplateWhenRegistrationApproved(
+            Ocl ocl,
+            ServiceTemplateEntity serviceTemplate,
+            Boolean isRemoveFromCatalogUntilApproved) {
         ServiceTemplateRequestType requestType = ServiceTemplateRequestType.UPDATE;
-        checkAnyInProgressRequestForServiceTemplate(existingServiceTemplate);
+        checkAnyInProgressRequestForServiceTemplate(serviceTemplate);
         ServiceTemplateEntity serviceTemplateToUpdate =
-                getServiceTemplateEntityToUpdate(ocl, existingServiceTemplate);
+                getServiceTemplateEntityToUpdate(ocl, serviceTemplate);
         boolean isAutoApprovedEnabled =
                 isAutoApproveEnabledForCsp(ocl.getCloudServiceProvider().getName());
         final ServiceTemplateRequestHistoryEntity storedUpdateHistory =
@@ -117,13 +130,46 @@ public class ServiceTemplateManage {
                     templateStorage.storeAndFlush(serviceTemplateToUpdate);
             serviceTemplateOpenApiGenerator.updateServiceApi(updatedServiceTemplate);
         } else {
-            existingServiceTemplate.setIsReviewInProgress(true);
-            if (existingServiceTemplate.getIsAvailableInCatalog()
-                    && isRemoveFromCatalogUntilApproved) {
-                existingServiceTemplate.setIsAvailableInCatalog(false);
+            serviceTemplate.setIsReviewInProgress(true);
+            if (serviceTemplate.getIsAvailableInCatalog() && isRemoveFromCatalogUntilApproved) {
+                serviceTemplate.setIsAvailableInCatalog(false);
             }
-            templateStorage.storeAndFlush(existingServiceTemplate);
+            templateStorage.storeAndFlush(serviceTemplate);
         }
+        return storedUpdateHistory;
+    }
+
+    private ServiceTemplateRequestHistoryEntity updateServiceTemplateWhenRegistrationNotApproved(
+            Ocl ocl, ServiceTemplateEntity serviceTemplate) {
+        ServiceTemplateRequestType requestType = ServiceTemplateRequestType.REGISTER;
+        List<ServiceTemplateRequestHistoryEntity> oldRegisterRequestsInReview =
+                serviceTemplate.getServiceTemplateHistory().stream()
+                        .filter(
+                                history ->
+                                        history.getRequestType()
+                                                        == ServiceTemplateRequestType.REGISTER
+                                                && history.getStatus()
+                                                        == ServiceTemplateRequestStatus.IN_REVIEW)
+                        .toList();
+        templateRequestStorage.cancelRequestsInBatch(oldRegisterRequestsInReview);
+
+        ServiceTemplateEntity serviceTemplateToUpdate =
+                getServiceTemplateEntityToUpdate(ocl, serviceTemplate);
+        boolean isAutoApprovedEnabled =
+                isAutoApproveEnabledForCsp(ocl.getCloudServiceProvider().getName());
+        final ServiceTemplateRequestHistoryEntity storedUpdateHistory =
+                createServiceTemplateHistory(
+                        isAutoApprovedEnabled, requestType, serviceTemplateToUpdate);
+        if (isAutoApprovedEnabled) {
+            serviceTemplateToUpdate.setServiceTemplateRegistrationState(
+                    ServiceTemplateRegistrationState.APPROVED);
+        } else {
+            serviceTemplateToUpdate.setIsReviewInProgress(true);
+            serviceTemplateToUpdate.setServiceTemplateRegistrationState(
+                    ServiceTemplateRegistrationState.IN_REVIEW);
+        }
+        serviceTemplateToUpdate.setIsAvailableInCatalog(isAutoApprovedEnabled);
+        templateStorage.storeAndFlush(serviceTemplateToUpdate);
         return storedUpdateHistory;
     }
 
@@ -233,10 +279,6 @@ public class ServiceTemplateManage {
             newServiceTemplate.setNamespace(ocl.getNamespace());
         } else {
             String userManageNamespace = userServiceHelper.getCurrentUserManageNamespace();
-            if (StringUtils.isEmpty(userManageNamespace)) {
-                throw new AccessDeniedException(
-                        "Current user's namespace is null, please set it " + "first.");
-            }
             if (StringUtils.isNotEmpty(userManageNamespace)
                     && !StringUtils.equals(ocl.getNamespace(), userManageNamespace)) {
                 throw new AccessDeniedException(
@@ -356,9 +398,6 @@ public class ServiceTemplateManage {
         if (Objects.nonNull(ocl.getServiceConfigurationManage())) {
             serviceConfigurationParameterValidator.validateServiceConfigurationParameters(ocl);
         }
-        if (!CollectionUtils.isEmpty(ocl.getServiceActions())) {
-            serviceActionTemplateValidator.validateServiceAction(ocl);
-        }
         ServiceTemplateEntity serviceTemplateToRegister = createServiceTemplateEntity(ocl);
         boolean isAutoApprovedEnabled =
                 isAutoApproveEnabledForCsp(serviceTemplateToRegister.getCsp());
@@ -459,15 +498,16 @@ public class ServiceTemplateManage {
         ServiceTemplateRequestHistoryEntity existingTemplateRequest =
                 templateRequestStorage.getEntityByRequestId(requestId);
         ServiceTemplateEntity serviceTemplate = existingTemplateRequest.getServiceTemplate();
-        Csp csp = userServiceHelper.getCurrentUserManageCsp();
-        if (csp != serviceTemplate.getCsp()) {
+        boolean hasManagePermissions =
+                userServiceHelper.currentUserCanManageCsp(serviceTemplate.getCsp());
+        if (!hasManagePermissions) {
             throw new AccessDeniedException(
                     "No permissions to review service template request "
                             + "belonging to other cloud service providers.");
         }
         if (ServiceTemplateRequestStatus.IN_REVIEW != existingTemplateRequest.getStatus()) {
-            throw new ServiceTemplateRequestAlreadyReviewed(
-                    "Service template request is already reviewed.");
+            throw new ReviewServiceTemplateRequestNotAllowed(
+                    "Service template request is not allowed to be reviewed.");
         }
         if (ServiceReviewResult.APPROVED == review.getReviewResult()) {
             existingTemplateRequest.setStatus(ServiceTemplateRequestStatus.ACCEPTED);
