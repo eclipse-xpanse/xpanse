@@ -132,6 +132,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 reviewServiceTemplateRequest(registerRequestId, reviewRequest);
         assertEquals(HttpStatus.NO_CONTENT.value(), reviewResponse.getStatus());
 
+        String errorMessage = "Service template request is not allowed to be reviewed.";
         MockHttpServletResponse reviewAgainResponse =
                 reviewServiceTemplateRequest(registerRequestId, reviewRequest);
         assertEquals(HttpStatus.BAD_REQUEST.value(), reviewAgainResponse.getStatus());
@@ -139,10 +140,9 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         reviewAgainResponse.getContentAsString(), ErrorResponse.class);
         assertEquals(
-                ErrorType.SERVICE_TEMPLATE_REQUEST_ALREADY_REVIEWED, errorResponse.getErrorType());
-        assertEquals(
-                errorResponse.getDetails(),
-                List.of("Service template request is already reviewed."));
+                ErrorType.REVIEW_SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED,
+                errorResponse.getErrorType());
+        assertEquals(errorResponse.getDetails(), List.of(errorMessage));
 
         // List pending service template requests
         pendingServiceTemplateRequests = listPendingServiceTemplateRequests(serviceTemplateId);

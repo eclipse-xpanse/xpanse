@@ -33,7 +33,7 @@ public enum ErrorType {
     SERVICE_TEMPLATE_DISABLED("Service Template Disabled"),
     SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED("Service Template Request Not Allowed"),
     SERVICE_TEMPLATE_REQUEST_NOT_FOUND("Service Template Request Not Found"),
-    SERVICE_TEMPLATE_REQUEST_ALREADY_REVIEWED("Service Template Request Already Reviewed"),
+    REVIEW_SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED("Review Service Template Request Not Allowed"),
     INVALID_SERVICE_VERSION("Invalid Service Version"),
     INVALID_SERVICE_FLAVORS("Invalid Service Flavors"),
     MANDATORY_VALUE_MISSING("Mandatory Value Missing"),

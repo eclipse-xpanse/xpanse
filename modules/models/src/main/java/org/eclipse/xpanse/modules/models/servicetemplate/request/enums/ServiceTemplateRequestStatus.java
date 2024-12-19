@@ -14,7 +14,8 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 public enum ServiceTemplateRequestStatus {
     IN_REVIEW("in-review"),
     ACCEPTED("accepted"),
-    REJECTED("rejected");
+    REJECTED("rejected"),
+    CANCELED("canceled");
 
     private final String state;
 

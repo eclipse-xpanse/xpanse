@@ -360,7 +360,7 @@ public class ServiceTemplateApi {
     @Operation(
             description =
                     "Get service template requests using id of service template. The returned"
-                            + " requests is sorted by the ascending order of the change requested"
+                            + " requests is sorted by the ascending order of the requested"
                             + " time.")
     @GetMapping(
             value = "/service_templates/{serviceTemplateId}/requests",
@@ -384,7 +384,7 @@ public class ServiceTemplateApi {
     /**
      * Get ocl of service template request using change id.
      *
-     * @param requestId id of service template change request.
+     * @param requestId id of service template request.
      * @return ocl data of service template request.
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")

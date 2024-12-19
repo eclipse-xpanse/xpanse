@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -84,5 +85,13 @@ public class DatabaseServiceTemplateRequestHistoryStorage
                 };
 
         return repository.findAll(spec);
+    }
+
+    @Override
+    public void cancelRequestsInBatch(List<ServiceTemplateRequestHistoryEntity> requests) {
+        for (ServiceTemplateRequestHistoryEntity request : requests) {
+            request.setStatus(ServiceTemplateRequestStatus.CANCELED);
+        }
+        repository.saveAll(requests);
     }
 }

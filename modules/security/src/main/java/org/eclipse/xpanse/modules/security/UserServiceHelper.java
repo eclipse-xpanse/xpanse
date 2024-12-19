@@ -15,6 +15,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
 import org.eclipse.xpanse.modules.security.common.CurrentUserInfo;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -118,7 +119,10 @@ public class UserServiceHelper {
             return null;
         }
         CurrentUserInfo userInfo = getCurrentUserInfo();
-        return StringUtils.isBlank(userInfo.getNamespace()) ? "" : userInfo.getNamespace();
+        if (StringUtils.isNotBlank(userInfo.getNamespace())) {
+            return userInfo.getNamespace();
+        }
+        throw new AccessDeniedException("Current user's namespace is null, please set it first.");
     }
 
     /** Get the auth enable result. */
@@ -136,10 +140,12 @@ public class UserServiceHelper {
             try {
                 return Csp.getByValue(currentUserInfo.getCsp());
             } catch (UnsupportedEnumValueException e) {
-                log.error("Unsupported csp value:{}", currentUserInfo.getCsp());
-                return null;
+                String errorMsg =
+                        "Unsupported csp value: " + currentUserInfo.getCsp() + " of current user.";
+                throw new AccessDeniedException(errorMsg);
             }
         }
-        return null;
+        String errorMsg = "Current user's csp is null, please set it first.";
+        throw new AccessDeniedException(errorMsg);
     }
 }
