@@ -46,7 +46,7 @@ public class UserPolicyEntity extends CreateModifiedTime {
 
     /** The csp which the policy belongs to. */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "CSP", nullable = false)
     private Csp csp;
 
     /** Is the policy enabled. */

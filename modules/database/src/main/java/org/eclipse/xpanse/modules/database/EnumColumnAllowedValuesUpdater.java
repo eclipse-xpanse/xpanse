@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 /** Service to update database tables column values by code generation automatically. */
 @Slf4j
@@ -52,11 +51,11 @@ public class EnumColumnAllowedValuesUpdater implements ApplicationListener<Conte
             for (Field field : enumFields) {
                 Class<?> filedClass = field.getType();
                 Column columnAnnotation = field.getAnnotation(Column.class);
-                String columnName =
-                        StringUtils.toRootUpperCase(
-                                Objects.nonNull(columnAnnotation)
-                                        ? columnAnnotation.name()
-                                        : field.getName());
+                String columnName = StringUtils.toRootUpperCase(field.getName());
+                if (Objects.nonNull(columnAnnotation)
+                        && StringUtils.isNotBlank(columnAnnotation.name())) {
+                    columnName = columnAnnotation.name();
+                }
                 if (filedClass.isEnum()) {
                     List<String> enumNames = getEnumNames(filedClass);
                     String enumNamesStr =
@@ -99,22 +98,13 @@ public class EnumColumnAllowedValuesUpdater implements ApplicationListener<Conte
             String tableName, String columnName, String enumValuesStr) {
         try {
             if (enumColumnConstraintManage.queryTableColumnExisted(tableName, columnName)) {
-                List<String> oldConstraintNames =
-                        enumColumnConstraintManage.queryConstraintForH2TableEnumColumn(
-                                tableName, columnName);
-                if (!CollectionUtils.isEmpty(oldConstraintNames)) {
-                    for (String constraintName : oldConstraintNames) {
-                        enumColumnConstraintManage.dropOldConstraintForH2TableEnumColumn(
-                                tableName, constraintName);
-                        enumColumnConstraintManage.addNewConstraintForH2TableEnumColumn(
-                                tableName, columnName, constraintName, enumValuesStr);
-                        log.info(
-                                "Update H2 table:{} enum column:{} to values:[{}] completed.",
-                                tableName,
-                                columnName,
-                                enumValuesStr);
-                    }
-                }
+                enumColumnConstraintManage.updateTableEnumColumnValuesForH2(
+                        tableName, columnName, enumValuesStr);
+                log.info(
+                        "Update H2 table:{} enum column:{} to values:[{}] completed.",
+                        tableName,
+                        columnName,
+                        enumValuesStr);
             }
         } catch (RuntimeException e) {
             log.error(
