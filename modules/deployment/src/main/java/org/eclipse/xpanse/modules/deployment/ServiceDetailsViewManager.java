@@ -65,8 +65,8 @@ public class ServiceDetailsViewManager {
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
         boolean isManagedByCurrentUser =
-                userServiceHelper.currentUserCanManageNamespace(
-                        serviceDeploymentEntity.getNamespace());
+                userServiceHelper.currentUserCanManageIsv(
+                        serviceDeploymentEntity.getServiceVendor());
         if (!isManagedByCurrentUser) {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
@@ -223,8 +223,8 @@ public class ServiceDetailsViewManager {
 
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
-        String namespace = userServiceHelper.getCurrentUserManageNamespace();
-        query.setNamespace(namespace);
+        String isv = userServiceHelper.getCurrentUserManageIsv();
+        query.setServiceVendor(isv);
         List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
         deployServices.forEach(
                 serviceDeployment ->

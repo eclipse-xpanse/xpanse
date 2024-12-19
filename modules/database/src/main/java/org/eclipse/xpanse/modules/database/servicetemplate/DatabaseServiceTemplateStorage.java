@@ -70,10 +70,10 @@ public class DatabaseServiceTemplateStorage implements ServiceTemplateStorage {
                                         root.get("version"),
                                         StringUtils.lowerCase(queryModel.getServiceVersion())));
                     }
-                    if (StringUtils.isNotBlank(queryModel.getNamespace())) {
+                    if (StringUtils.isNotBlank(queryModel.getServiceVendor())) {
                         predicateList.add(
                                 criteriaBuilder.equal(
-                                        root.get("namespace"), queryModel.getNamespace()));
+                                        root.get("serviceVendor"), queryModel.getServiceVendor()));
                     }
                     if (Objects.nonNull(queryModel.getServiceHostingType())) {
                         predicateList.add(

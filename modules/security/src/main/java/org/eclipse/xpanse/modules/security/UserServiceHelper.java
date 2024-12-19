@@ -66,16 +66,16 @@ public class UserServiceHelper {
     }
 
     /**
-     * Check if the current user can manage the namespace.
+     * Check if the current user can manage the serviceVendor.
      *
-     * @param ownerNamespace the owner namespace.
-     * @return true if the current user has the owner namespace, false otherwise.
+     * @param ownerIsv the owner serviceVendor.
+     * @return true if the current user has the owner serviceVendor, false otherwise.
      */
-    public boolean currentUserCanManageNamespace(String ownerNamespace) {
+    public boolean currentUserCanManageIsv(String ownerIsv) {
         if (!webSecurityIsEnabled) {
             return true;
         }
-        return StringUtils.equals(ownerNamespace, getCurrentUserManageNamespace());
+        return StringUtils.equals(ownerIsv, getCurrentUserManageIsv());
     }
 
     /**
@@ -112,13 +112,13 @@ public class UserServiceHelper {
         return currentUserInfo;
     }
 
-    /** Get the namespace managed by the current user . */
-    public String getCurrentUserManageNamespace() {
+    /** Get the serviceVendor managed by the current user . */
+    public String getCurrentUserManageIsv() {
         if (!webSecurityIsEnabled) {
             return null;
         }
         CurrentUserInfo userInfo = getCurrentUserInfo();
-        return StringUtils.isBlank(userInfo.getNamespace()) ? "" : userInfo.getNamespace();
+        return StringUtils.isBlank(userInfo.getIsv()) ? "" : userInfo.getIsv();
     }
 
     /** Get the auth enable result. */

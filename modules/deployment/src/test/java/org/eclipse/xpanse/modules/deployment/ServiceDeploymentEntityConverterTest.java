@@ -50,7 +50,7 @@ class ServiceDeploymentEntityConverterTest {
         ocl.setName("Test Service");
         ocl.setServiceVersion("1.0");
         ocl.setDescription("Test Description");
-        ocl.setNamespace("testNamespace");
+        ocl.setServiceVendor("testServiceVendor");
         ocl.setIcon("icon.png");
         ocl.setCloudServiceProvider(new CloudServiceProvider());
         ocl.setDeployment(new Deployment());

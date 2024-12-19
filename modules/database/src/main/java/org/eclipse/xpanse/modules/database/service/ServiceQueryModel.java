@@ -27,7 +27,7 @@ public class ServiceQueryModel {
 
     private String userId;
 
-    private String namespace;
+    private String serviceVendor;
 
     private UUID serviceTemplateId;
 }

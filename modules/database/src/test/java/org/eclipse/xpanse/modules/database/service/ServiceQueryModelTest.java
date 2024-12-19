@@ -26,7 +26,7 @@ class ServiceQueryModelTest {
     private final String serviceVersion = "1.0.0";
     private final ServiceDeploymentState serviceState = ServiceDeploymentState.DEPLOY_SUCCESS;
     private final String userId = "defaultUserId";
-    private final String namespace = "defaultNamespace";
+    private final String serviceVendor = "defaultServiceVendor";
     private final UUID serviceTemplateId = UUID.randomUUID();
     private ServiceQueryModel serviceQueryTest;
 
@@ -39,7 +39,7 @@ class ServiceQueryModelTest {
         serviceQueryTest.setServiceVersion(serviceVersion);
         serviceQueryTest.setServiceState(serviceState);
         serviceQueryTest.setUserId(userId);
-        serviceQueryTest.setNamespace(namespace);
+        serviceQueryTest.setServiceVendor(serviceVendor);
         serviceQueryTest.setServiceTemplateId(serviceTemplateId);
     }
 
@@ -51,7 +51,7 @@ class ServiceQueryModelTest {
         assertEquals(serviceVersion, serviceQueryTest.getServiceVersion());
         assertEquals(userId, serviceQueryTest.getUserId());
         assertEquals(serviceState, serviceQueryTest.getServiceState());
-        assertEquals(namespace, serviceQueryTest.getNamespace());
+        assertEquals(serviceVendor, serviceQueryTest.getServiceVendor());
         assertEquals(serviceTemplateId, serviceQueryTest.getServiceTemplateId());
     }
 
@@ -85,8 +85,8 @@ class ServiceQueryModelTest {
                         + serviceState
                         + ", userId="
                         + userId
-                        + ", namespace="
-                        + namespace
+                        + ", serviceVendor="
+                        + serviceVendor
                         + ", serviceTemplateId="
                         + serviceTemplateId
                         + ")";

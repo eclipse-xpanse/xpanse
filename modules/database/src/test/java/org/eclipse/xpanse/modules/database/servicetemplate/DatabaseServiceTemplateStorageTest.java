@@ -93,7 +93,7 @@ class DatabaseServiceTemplateStorageTest {
                 ServiceTemplateQueryModel.builder()
                         .category(Category.AI)
                         .csp(Csp.HUAWEI_CLOUD)
-                        .checkNamespace(false)
+                        .checkServiceVendor(false)
                         .build();
 
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
@@ -132,7 +132,7 @@ class DatabaseServiceTemplateStorageTest {
                         .serviceName("serviceName")
                         .serviceVersion("serviceVersion")
                         .serviceTemplateRegistrationState(ServiceTemplateRegistrationState.APPROVED)
-                        .checkNamespace(false)
+                        .checkServiceVendor(false)
                         .build();
         when(mockServiceTemplateRepository.findAll(any(Specification.class)))
                 .thenReturn(Collections.emptyList());

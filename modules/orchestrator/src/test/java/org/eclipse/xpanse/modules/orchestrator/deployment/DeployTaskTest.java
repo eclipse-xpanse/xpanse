@@ -21,7 +21,7 @@ class DeployTaskTest {
     private final UUID uuid = UUID.fromString("5956ede6-d19b-4f43-ad99-4a187eafefad");
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
     private final String userId = "userId";
-    private final String namespace = "namespace";
+    private final String serviceVendor = "serviceVendor";
     @Mock private DeployRequest mockDeployRequest;
     @Mock private Object mockRequest;
     @Mock private Ocl mockOcl;
@@ -37,7 +37,7 @@ class DeployTaskTest {
         test.setWorkflowId(uuid.toString());
         test.setTaskType(taskType);
         test.setUserId(userId);
-        test.setNamespace(namespace);
+        test.setServiceVendor(serviceVendor);
         test.setDeployRequest(mockDeployRequest);
         test.setRequest(mockRequest);
         test.setOcl(mockOcl);
@@ -53,7 +53,7 @@ class DeployTaskTest {
         assertThat(test.getWorkflowId()).isEqualTo(uuid.toString());
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
-        assertThat(test.getNamespace()).isEqualTo(namespace);
+        assertThat(test.getServiceVendor()).isEqualTo(serviceVendor);
         assertThat(test.getOcl()).isEqualTo(mockOcl);
         assertThat(test.getServiceTemplateId()).isEqualTo(uuid);
         assertThat(test.getDeployRequest()).isEqualTo(mockDeployRequest);
@@ -92,8 +92,8 @@ class DeployTaskTest {
                         + uuid
                         + ", workflowId="
                         + uuid
-                        + ", namespace="
-                        + namespace
+                        + ", serviceVendor="
+                        + serviceVendor
                         + ", deployRequest="
                         + mockDeployRequest
                         + ", request="

@@ -79,8 +79,8 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     @Value("${authorization.metadata.key}")
     private String metadataKey;
 
-    @Value("${authorization.namespace.key}")
-    private String namespaceKey;
+    @Value("${authorization.isv.key}")
+    private String isvKey;
 
     private static Map<String, String> initCodeChallengeMap() {
         Map<String, String> map = new HashMap<>(2);
@@ -170,8 +170,8 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                                             Base64.getDecoder().decode(metadataMap.get(key)),
                                             StandardCharsets.UTF_8);
                             userMetadata.put(key, value);
-                            if (StringUtils.equals(namespaceKey, key)) {
-                                currentUserInfo.setNamespace(value);
+                            if (StringUtils.equals(isvKey, key)) {
+                                currentUserInfo.setIsv(value);
                             }
                             if (StringUtils.equals(cspKey, key)) {
                                 currentUserInfo.setCsp(value);

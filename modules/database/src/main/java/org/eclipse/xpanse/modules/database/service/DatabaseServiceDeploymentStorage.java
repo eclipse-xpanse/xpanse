@@ -96,10 +96,11 @@ public class DatabaseServiceDeploymentStorage implements ServiceDeploymentStorag
                                         root.get("userId"), serviceQuery.getUserId()));
                     }
 
-                    if (Objects.nonNull(serviceQuery.getNamespace())) {
+                    if (Objects.nonNull(serviceQuery.getServiceVendor())) {
                         predicateList.add(
                                 criteriaBuilder.equal(
-                                        root.get("namespace"), serviceQuery.getNamespace()));
+                                        root.get("serviceVendor"),
+                                        serviceQuery.getServiceVendor()));
                     }
 
                     query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))

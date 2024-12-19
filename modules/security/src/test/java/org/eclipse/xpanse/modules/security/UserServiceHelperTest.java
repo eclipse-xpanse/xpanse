@@ -20,7 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 class UserServiceHelperTest {
 
     private final String userId = "userId";
-    private final String namespace = "namespace";
+    private final String isv = "isv";
     private final Csp csp = Csp.HUAWEI_CLOUD;
     private final List<String> roles = List.of("admin", "csp", "isv", "user");
     @Mock private IdentityProviderManager mockIdentityProviderManager;
@@ -37,8 +37,8 @@ class UserServiceHelperTest {
         final CurrentUserInfo currentUserInfo = new CurrentUserInfo();
         currentUserInfo.setUserId(userId);
         currentUserInfo.setRoles(roles);
-        currentUserInfo.setMetadata(Map.of(namespace, namespace, "csp", csp.toValue()));
-        currentUserInfo.setNamespace(namespace);
+        currentUserInfo.setMetadata(Map.of(isv, isv, "csp", csp.toValue()));
+        currentUserInfo.setIsv(isv);
         currentUserInfo.setCsp(csp.toValue());
         return currentUserInfo;
     }
@@ -119,17 +119,16 @@ class UserServiceHelperTest {
     }
 
     @Test
-    void testCurrentUserCanManageNamespace() {
+    void testCurrentUserCanManageIsv() {
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final boolean result = userServiceHelperUnderTest.currentUserCanManageNamespace(namespace);
+        final boolean result = userServiceHelperUnderTest.currentUserCanManageIsv(isv);
         // Verify the results
         assertThat(result).isTrue();
 
         // Run the test
-        final boolean result1 =
-                userServiceHelperUnderTest.currentUserCanManageNamespace("namespace1");
+        final boolean result1 = userServiceHelperUnderTest.currentUserCanManageIsv("isv1");
         // Verify the results
         assertThat(result1).isTrue();
 
@@ -137,36 +136,33 @@ class UserServiceHelperTest {
         setUpSecurityConfig(true, true);
         when(mockIdentityProviderManager.getCurrentUserInfo()).thenReturn(getMockCurrentUserInfo());
         // Run the test
-        final boolean result2 = userServiceHelperUnderTest.currentUserCanManageNamespace(namespace);
+        final boolean result2 = userServiceHelperUnderTest.currentUserCanManageIsv(isv);
         // Verify the results
         assertThat(result2).isTrue();
         // Run the test
-        final boolean result3 =
-                userServiceHelperUnderTest.currentUserCanManageNamespace("namespace1");
+        final boolean result3 = userServiceHelperUnderTest.currentUserCanManageIsv("isv1");
         // Verify the results
         assertThat(result3).isFalse();
     }
 
     @Test
-    void testCurrentUserCanManageNamespace_IdentityProviderManagerReturnsAbsent() {
+    void testCurrentUserCanManageIsv_IdentityProviderManagerReturnsAbsent() {
         when(mockIdentityProviderManager.getCurrentUserInfo()).thenReturn(null);
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final boolean result = userServiceHelperUnderTest.currentUserCanManageNamespace(namespace);
+        final boolean result = userServiceHelperUnderTest.currentUserCanManageIsv(isv);
         // Verify the results
         assertThat(result).isTrue();
         // Run the test
-        final boolean result1 =
-                userServiceHelperUnderTest.currentUserCanManageNamespace("namespace1");
+        final boolean result1 = userServiceHelperUnderTest.currentUserCanManageIsv("isv1");
         // Verify the results
         assertThat(result1).isTrue();
 
         // Setup without auth
         setUpSecurityConfig(true, true);
         // Run the test
-        assertThatThrownBy(
-                        () -> userServiceHelperUnderTest.currentUserCanManageNamespace(namespace))
+        assertThatThrownBy(() -> userServiceHelperUnderTest.currentUserCanManageIsv(isv))
                 .isInstanceOf(UserNotLoggedInException.class);
     }
 
@@ -262,40 +258,40 @@ class UserServiceHelperTest {
     }
 
     @Test
-    void testGetNamespaceManagedByCurrentUser() {
+    void testGetIsvManagedByCurrentUser() {
         when(mockIdentityProviderManager.getCurrentUserInfo()).thenReturn(getMockCurrentUserInfo());
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final String result = userServiceHelperUnderTest.getCurrentUserManageNamespace();
+        final String result = userServiceHelperUnderTest.getCurrentUserManageIsv();
         // Verify the results
         assertThat(result).isNull();
 
         // Setup
         setUpSecurityConfig(true, true);
         // Run the test
-        final String result1 = userServiceHelperUnderTest.getCurrentUserManageNamespace();
+        final String result1 = userServiceHelperUnderTest.getCurrentUserManageIsv();
         // Verify the results
         assertThat(result1).isNotNull();
-        assertThat(result1).isEqualTo(namespace);
+        assertThat(result1).isEqualTo(isv);
     }
 
     @Test
-    void testGetNamespaceManagedByCurrentUser_IdentityProviderManagerReturnsAbsent() {
+    void testGetIsvManagedByCurrentUser_IdentityProviderManagerReturnsAbsent() {
         // Setup
         when(mockIdentityProviderManager.getCurrentUserInfo()).thenReturn(null);
 
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final String result = userServiceHelperUnderTest.getCurrentUserManageNamespace();
+        final String result = userServiceHelperUnderTest.getCurrentUserManageIsv();
         // Verify the results
         assertThat(result).isNull();
 
         // Setup
         setUpSecurityConfig(true, true);
         // Run the test
-        assertThatThrownBy(() -> userServiceHelperUnderTest.getCurrentUserManageNamespace())
+        assertThatThrownBy(() -> userServiceHelperUnderTest.getCurrentUserManageIsv())
                 .isInstanceOf(UserNotLoggedInException.class);
     }
 

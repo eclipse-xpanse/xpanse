@@ -33,7 +33,7 @@ public class ServiceTemplateQueryModel {
 
     private Boolean isReviewInProgress;
 
-    private Boolean checkNamespace;
+    private Boolean checkServiceVendor;
 
-    private String namespace;
+    private String serviceVendor;
 }

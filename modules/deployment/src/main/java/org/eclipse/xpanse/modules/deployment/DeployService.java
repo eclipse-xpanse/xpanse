@@ -321,7 +321,7 @@ public class DeployService {
         deployTask.setDeployRequest(deployRequest);
         deployTask.setRequest(deployRequest);
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
-        deployTask.setNamespace(existingServiceTemplate.getNamespace());
+        deployTask.setServiceVendor(existingServiceTemplate.getServiceVendor());
         deployTask.setOcl(existingServiceTemplate.getOcl());
         deployTask.setServiceTemplateId(existingServiceTemplate.getId());
         return deployTask;
@@ -380,7 +380,7 @@ public class DeployService {
         entity.setUserId(deployTask.getUserId());
         entity.setDeployRequest(deployTask.getDeployRequest());
         entity.setDeployResourceList(new ArrayList<>());
-        entity.setNamespace(deployTask.getNamespace());
+        entity.setServiceVendor(deployTask.getServiceVendor());
         entity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
         entity.setServiceTemplateId(deployTask.getServiceTemplateId());
         ServiceLockConfig defaultLockConfig = new ServiceLockConfig();
