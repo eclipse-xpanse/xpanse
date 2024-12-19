@@ -180,10 +180,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                                                 ServiceTemplateDetailVo[].class))
                                 .toList());
 
-        // approve register request
-        reviewServiceTemplateRequest(registerRequestInfo.getRequestId(), true);
-
-        // Setup update request
+        // Setup update request when the register request is in-review
         ocl.setDescription("update-test");
         // Run the update test with 'isRemoveServiceTemplateUntilApproved' is false
         boolean isRemoveServiceTemplateUntilApproved = true;
@@ -203,19 +200,24 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 ServiceTemplateRegistrationState.IN_REVIEW,
                 serviceTemplateDetailVo.getServiceTemplateRegistrationState());
 
-        // Setup listHistory request
-        final MockHttpServletResponse listUpdateHistoryResponse =
-                listServiceTemplateHistoryWithParams(
-                        serviceTemplateId,
-                        ServiceTemplateRequestType.UPDATE.toValue(),
-                        ServiceTemplateRequestStatus.IN_REVIEW.toValue());
-        assertEquals(HttpStatus.OK.value(), listUpdateHistoryResponse.getStatus());
-        List<ServiceTemplateRequestHistory> updateHistoryVos =
+        // Setup list request history.
+        final MockHttpServletResponse listRequestHistoryResponse =
+                listServiceTemplateHistoryWithParams(serviceTemplateId, null, null);
+        assertEquals(HttpStatus.OK.value(), listRequestHistoryResponse.getStatus());
+        List<ServiceTemplateRequestHistory> requestHistoryVos =
                 objectMapper.readValue(
-                        listUpdateHistoryResponse.getContentAsString(), new TypeReference<>() {});
-        assertEquals(1, updateHistoryVos.size());
-        assertEquals(updateRequestInfo.getRequestId(), updateHistoryVos.getFirst().getRequestId());
-        // approve update request
+                        listRequestHistoryResponse.getContentAsString(), new TypeReference<>() {});
+        assertEquals(2, requestHistoryVos.size());
+
+        ServiceTemplateRequestHistory oldRegisterHistory = requestHistoryVos.getLast();
+        assertEquals(registerRequestInfo.getRequestId(), oldRegisterHistory.getRequestId());
+        assertEquals(ServiceTemplateRequestStatus.CANCELED, oldRegisterHistory.getStatus());
+
+        ServiceTemplateRequestHistory newRegisterHistory = requestHistoryVos.getFirst();
+        assertEquals(updateRequestInfo.getRequestId(), newRegisterHistory.getRequestId());
+        assertEquals(ServiceTemplateRequestStatus.IN_REVIEW, newRegisterHistory.getStatus());
+
+        // approve update (new register) request
         reviewServiceTemplateRequest(updateRequestInfo.getRequestId(), true);
 
         // Setup removeFromCatalog request
@@ -278,10 +280,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(
                 reAddToCatalogRequestInfo.getRequestId(),
                 reAddToCatalogHistoryVos.getFirst().getRequestId());
-        // approve re_add_to_catalog request
-        reviewServiceTemplateRequest(reAddToCatalogRequestInfo.getRequestId(), true);
+        // reject re_add_to_catalog request
+        reviewServiceTemplateRequest(reAddToCatalogRequestInfo.getRequestId(), false);
         // Setup delete request
-        removeFromCatalog(serviceTemplateId);
         // Run the test
         final MockHttpServletResponse deleteResponse = deleteTemplate(serviceTemplateId);
         // Verify the results
