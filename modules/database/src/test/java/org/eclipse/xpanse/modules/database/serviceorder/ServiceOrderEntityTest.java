@@ -34,9 +34,7 @@ class ServiceOrderEntityTest {
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
     private final Handler handler = Handler.TERRAFORM_LOCAL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
-    private final Map<String, Object> newConfigRequest = Map.of();
     @Mock private DeployRequest mockPreviousDeployRequest;
-    @Mock private DeployRequest mockNewDeployRequest;
     @Mock private List<DeployResource> mockPreviousDeployedResources;
     @Mock private Map<String, String> mockPreviousDeployedResultProperties;
     @Mock private Map<String, String> mockPreviousDeployedServiceProperties;
@@ -59,12 +57,10 @@ class ServiceOrderEntityTest {
         test.setErrorResponse(errorResponse);
         test.setTaskStatus(taskStatus);
         test.setPreviousDeployRequest(mockPreviousDeployRequest);
-        test.setNewDeployRequest(mockNewDeployRequest);
         test.setRequestBody(mockRequest);
         test.setPreviousDeployedResources(mockPreviousDeployedResources);
         test.setPreviousDeployedResultProperties(mockPreviousDeployedResultProperties);
         test.setPreviousDeployedServiceProperties(mockPreviousDeployedServiceProperties);
-        test.setNewConfigRequest(newConfigRequest);
         test.setHandler(handler);
     }
 
@@ -82,14 +78,12 @@ class ServiceOrderEntityTest {
         assertThat(test.getCompletedTime()).isEqualTo(completedTime);
         assertThat(test.getStartedTime()).isEqualTo(startedTime);
         assertThat(test.getPreviousDeployRequest()).isEqualTo(mockPreviousDeployRequest);
-        assertThat(test.getNewDeployRequest()).isEqualTo(mockNewDeployRequest);
         assertThat(test.getPreviousDeployedResources()).isEqualTo(mockPreviousDeployedResources);
         assertThat(test.getPreviousDeployedResultProperties())
                 .isEqualTo(mockPreviousDeployedResultProperties);
         assertThat(test.getPreviousDeployedServiceProperties())
                 .isEqualTo(mockPreviousDeployedServiceProperties);
         assertThat(test.getRequestBody()).isEqualTo(mockRequest);
-        assertThat(this.test.getNewConfigRequest()).isEqualTo(newConfigRequest);
         assertThat(test.getHandler()).isEqualTo(handler);
     }
 
@@ -135,16 +129,12 @@ class ServiceOrderEntityTest {
                         + completedTime
                         + ", previousDeployRequest="
                         + mockPreviousDeployRequest
-                        + ", newDeployRequest="
-                        + mockNewDeployRequest
                         + ", previousDeployedResources="
                         + mockPreviousDeployedResources
                         + ", previousDeployedServiceProperties="
                         + mockPreviousDeployedServiceProperties
                         + ", previousDeployedResultProperties="
                         + mockPreviousDeployedResultProperties
-                        + ", newConfigRequest="
-                        + newConfigRequest
                         + ", requestBody="
                         + mockRequest
                         + ", handler="

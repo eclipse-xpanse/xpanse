@@ -13,9 +13,9 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 
-/** service configuration change request order details. */
+/** service change request order details. */
 @Data
-public class ServiceConfigurationChangeOrderDetails {
+public class ServiceChangeOrderDetails {
 
     @NotNull
     @Schema(description = "The id of the order.")
@@ -32,7 +32,7 @@ public class ServiceConfigurationChangeOrderDetails {
     @NotNull
     @Schema(
             description =
-                    "Collection of service configuration change requests"
+                    "Collection of service change details requests"
                             + " generated for the specific change order.")
-    private List<ServiceConfigurationChangeDetails> changeRequests;
+    private List<ServiceChangeDetails> changeRequests;
 }

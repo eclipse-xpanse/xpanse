@@ -13,6 +13,7 @@ import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -66,9 +67,18 @@ public class ServiceOrderManager {
         orderTask.setServiceDeploymentEntity(serviceDeploymentEntity);
         orderTask.setOriginalServiceId(task.getOriginalServiceId());
         orderTask.setWorkflowId(task.getWorkflowId());
-        orderTask.setNewDeployRequest(task.getDeployRequest());
         orderTask.setTaskStatus(TaskStatus.CREATED);
-        orderTask.setRequestBody(task.getRequest());
+        Map<String, Object> requestBody = new HashMap<>();
+        if (Objects.nonNull(task.getDeployRequest())) {
+            requestBody.put("deployRequest", task.getDeployRequest());
+        }
+        if (Objects.nonNull(task.getRequest())) {
+            requestBody.put("request", task.getRequest());
+        }
+        if (Objects.nonNull(task.getOcl()) && Objects.nonNull(task.getOcl().getServiceActions())) {
+            requestBody.put("serviceAction", task.getOcl().getServiceActions());
+        }
+        orderTask.setRequestBody(requestBody);
         if (Objects.nonNull(serviceDeploymentEntity)) {
             orderTask.setPreviousDeployRequest(serviceDeploymentEntity.getDeployRequest());
             orderTask.setPreviousDeployedResources(

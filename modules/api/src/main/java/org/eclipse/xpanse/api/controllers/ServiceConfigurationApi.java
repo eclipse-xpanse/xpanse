@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
@@ -81,8 +81,7 @@ public class ServiceConfigurationApi {
     @PutMapping(value = "/services/config/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(
-            description =
-                    "Update the service's configuration to the registered service " + "template.")
+            description = "Update the service's configuration to the registered service template.")
     @AuditApiRequest(methodName = "getCspFromServiceId")
     public ServiceOrder changeServiceConfiguration(
             @Parameter(name = "serviceId", description = "The id of the deployed service")
@@ -99,7 +98,7 @@ public class ServiceConfigurationApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List service's configuration.")
     @AuditApiRequest(methodName = "getCspFromServiceId")
-    public List<ServiceConfigurationChangeOrderDetails> getAllServiceConfigurationChangeDetails(
+    public List<ServiceChangeOrderDetails> getAllServiceConfigurationChangeDetails(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
                     @RequestParam(name = "serviceId")
                     String serviceId,

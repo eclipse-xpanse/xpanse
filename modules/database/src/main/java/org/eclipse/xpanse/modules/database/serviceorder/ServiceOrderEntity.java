@@ -93,11 +93,6 @@ public class ServiceOrderEntity implements Serializable {
     @Convert(converter = ObjectJsonConverter.class)
     private DeployRequest previousDeployRequest;
 
-    @Column(name = "NEW_DEPLOY_REQUEST", columnDefinition = "json")
-    @Type(value = JsonType.class)
-    @Convert(converter = ObjectJsonConverter.class)
-    private DeployRequest newDeployRequest;
-
     @Column(name = "PREVIOUS_DEPLOYED_RESOURCES", columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
@@ -112,11 +107,6 @@ public class ServiceOrderEntity implements Serializable {
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private Map<String, String> previousDeployedResultProperties;
-
-    @Column(name = "NEW_CONFIG_REQUEST", columnDefinition = "json")
-    @Type(value = JsonType.class)
-    @Convert(converter = ObjectJsonConverter.class)
-    private Map<String, Object> newConfigRequest;
 
     @Column(name = "REQUEST_BODY", columnDefinition = "json")
     @Type(value = JsonType.class)
