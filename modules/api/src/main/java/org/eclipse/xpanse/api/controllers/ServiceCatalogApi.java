@@ -98,7 +98,7 @@ public class ServiceCatalogApi {
                         .serviceVersion(serviceVersion)
                         .serviceHostingType(serviceHostingType)
                         .isAvailableInCatalog(true)
-                        .checkNamespace(false)
+                        .checkServiceVendor(false)
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);

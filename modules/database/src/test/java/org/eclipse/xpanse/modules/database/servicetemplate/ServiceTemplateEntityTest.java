@@ -36,7 +36,7 @@ class ServiceTemplateEntityTest {
     private final UUID id = UUID.randomUUID();
     private final ServiceTemplateRegistrationState serviceTemplateRegistrationState =
             ServiceTemplateRegistrationState.APPROVED;
-    private final String namespace = "namespace";
+    private final String serviceVendor = "serviceVendor";
     private final Boolean isAvailableInCatalog = false;
     private final Boolean isReviewInProgress = false;
     private Category category;
@@ -75,7 +75,7 @@ class ServiceTemplateEntityTest {
         testEntity.setVersion(version);
         testEntity.setCsp(csp);
         testEntity.setCategory(category);
-        testEntity.setNamespace(namespace);
+        testEntity.setServiceVendor(serviceVendor);
         testEntity.setOcl(ocl);
         testEntity.setServiceHostingType(serviceHostingType);
         testEntity.setServiceTemplateRegistrationState(serviceTemplateRegistrationState);
@@ -93,7 +93,7 @@ class ServiceTemplateEntityTest {
         assertEquals(category, testEntity.getCategory());
         assertEquals(name, testEntity.getName());
         assertEquals(version, testEntity.getVersion());
-        assertEquals(namespace, testEntity.getNamespace());
+        assertEquals(serviceVendor, testEntity.getServiceVendor());
         assertEquals(serviceHostingType, testEntity.getServiceHostingType());
         assertEquals(
                 serviceTemplateRegistrationState, testEntity.getServiceTemplateRegistrationState());
@@ -138,8 +138,8 @@ class ServiceTemplateEntityTest {
                         + csp
                         + ", category="
                         + category
-                        + ", namespace="
-                        + namespace
+                        + ", serviceVendor="
+                        + serviceVendor
                         + ", serviceHostingType="
                         + serviceHostingType
                         + ", ocl="

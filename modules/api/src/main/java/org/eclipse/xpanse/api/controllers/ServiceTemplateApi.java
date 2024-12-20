@@ -310,7 +310,7 @@ public class ServiceTemplateApi {
                         .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
                         .isAvailableInCatalog(isAvailableInCatalog)
                         .isReviewInProgress(isReviewInProgress)
-                        .checkNamespace(true)
+                        .checkServiceVendor(true)
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);

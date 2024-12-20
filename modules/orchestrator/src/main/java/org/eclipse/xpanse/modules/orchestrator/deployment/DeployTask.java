@@ -37,8 +37,8 @@ public class DeployTask {
     /** The id of the workflow instance of service migration or service redeployment. */
     private String workflowId;
 
-    /** Namespace of the user who registered service template. */
-    private String namespace;
+    /** ServiceVendor of the user who registered service template. */
+    private String serviceVendor;
 
     /** The deployment request. */
     private DeployRequest deployRequest;

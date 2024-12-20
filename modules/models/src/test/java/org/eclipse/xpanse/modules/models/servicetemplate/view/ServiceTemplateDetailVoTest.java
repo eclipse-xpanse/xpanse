@@ -41,7 +41,7 @@ class ServiceTemplateDetailVoTest {
     private final String eula = "eula";
     private final Csp csp = Csp.HUAWEI_CLOUD;
     private final String description = "description";
-    private final String namespace = "namespace";
+    private final String serviceVendor = "serviceVendor";
     private final String icon = "icon";
     private final Deployment deployment = new Deployment();
     private final OffsetDateTime createTime = OffsetDateTime.now();
@@ -86,7 +86,7 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setCsp(csp);
         serviceTemplateDetailVo.setRegions(regions);
         serviceTemplateDetailVo.setDescription(description);
-        serviceTemplateDetailVo.setNamespace(namespace);
+        serviceTemplateDetailVo.setServiceVendor(serviceVendor);
         serviceTemplateDetailVo.setIcon(icon);
         serviceTemplateDetailVo.setDeployment(deployment);
         serviceTemplateDetailVo.setVariables(variables);
@@ -113,7 +113,7 @@ class ServiceTemplateDetailVoTest {
         assertEquals(csp, serviceTemplateDetailVo.getCsp());
         assertEquals(regions, serviceTemplateDetailVo.getRegions());
         assertEquals(description, serviceTemplateDetailVo.getDescription());
-        assertEquals(namespace, serviceTemplateDetailVo.getNamespace());
+        assertEquals(serviceVendor, serviceTemplateDetailVo.getServiceVendor());
         assertEquals(icon, serviceTemplateDetailVo.getIcon());
         assertEquals(variables, serviceTemplateDetailVo.getVariables());
         assertEquals(flavors, serviceTemplateDetailVo.getFlavors());
@@ -162,8 +162,8 @@ class ServiceTemplateDetailVoTest {
                         + csp
                         + ", category="
                         + category
-                        + ", namespace="
-                        + namespace
+                        + ", serviceVendor="
+                        + serviceVendor
                         + ", regions="
                         + regions
                         + ", description="

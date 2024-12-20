@@ -60,8 +60,8 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
 
     @NotNull
     @NotBlank
-    @Schema(description = "The namespace of the orderable service.")
-    private String namespace;
+    @Schema(description = "The serviceVendor of the orderable service.")
+    private String serviceVendor;
 
     @NotNull
     @NotBlank

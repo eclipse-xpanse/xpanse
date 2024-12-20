@@ -7,7 +7,6 @@ package org.eclipse.xpanse.api.config;
 
 import java.util.List;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.controllers.ServiceCatalogApi;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
@@ -37,11 +36,6 @@ public class ServiceTemplateEntityConverter {
             serviceTemplateDetailVo.setServiceTemplateId(serviceTemplateEntity.getId());
             serviceTemplateDetailVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
             serviceTemplateDetailVo.setDescription(serviceTemplateEntity.getOcl().getDescription());
-            if (StringUtils.isNotEmpty(serviceTemplateEntity.getNamespace())) {
-                serviceTemplateDetailVo.setNamespace(serviceTemplateEntity.getNamespace());
-            } else {
-                serviceTemplateDetailVo.setNamespace(serviceTemplateEntity.getOcl().getNamespace());
-            }
             serviceTemplateDetailVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
             serviceTemplateDetailVo.setFlavors(serviceTemplateEntity.getOcl().getFlavors());
             serviceTemplateDetailVo.setDeployment(serviceTemplateEntity.getOcl().getDeployment());

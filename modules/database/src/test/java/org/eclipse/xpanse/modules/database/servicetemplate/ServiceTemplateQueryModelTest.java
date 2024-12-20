@@ -28,8 +28,8 @@ class ServiceTemplateQueryModelTest {
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private final ServiceTemplateRegistrationState serviceTemplateRegistrationState =
             ServiceTemplateRegistrationState.APPROVED;
-    private final Boolean checkNamespace = true;
-    private final String namespace = "HuaweiCloud";
+    private final Boolean checkServiceVendor = true;
+    private final String serviceVendor = "HuaweiCloud";
     private final Boolean isAvailableInCatalog = true;
     private final Boolean isReviewInProgress = false;
     private ServiceTemplateQueryModel testModel;
@@ -44,10 +44,10 @@ class ServiceTemplateQueryModelTest {
                         .serviceVersion(serviceVersion)
                         .serviceHostingType(serviceHostingType)
                         .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
-                        .checkNamespace(checkNamespace)
+                        .checkServiceVendor(checkServiceVendor)
                         .isAvailableInCatalog(isAvailableInCatalog)
                         .isReviewInProgress(isReviewInProgress)
-                        .namespace(namespace)
+                        .serviceVendor(serviceVendor)
                         .build();
     }
 
@@ -57,11 +57,11 @@ class ServiceTemplateQueryModelTest {
         assertEquals(category, testModel.getCategory());
         assertEquals(serviceName, testModel.getServiceName());
         assertEquals(serviceVersion, testModel.getServiceVersion());
-        assertEquals(namespace, testModel.getNamespace());
+        assertEquals(serviceVendor, testModel.getServiceVendor());
         assertEquals(serviceHostingType, testModel.getServiceHostingType());
         assertEquals(
                 serviceTemplateRegistrationState, testModel.getServiceTemplateRegistrationState());
-        assertEquals(checkNamespace, testModel.getCheckNamespace());
+        assertEquals(checkServiceVendor, testModel.getCheckServiceVendor());
         assertEquals(isAvailableInCatalog, testModel.getIsAvailableInCatalog());
         assertEquals(isReviewInProgress, testModel.getIsReviewInProgress());
     }
@@ -103,10 +103,10 @@ class ServiceTemplateQueryModelTest {
                         + isAvailableInCatalog
                         + ", isReviewInProgress="
                         + isReviewInProgress
-                        + ", checkNamespace="
-                        + checkNamespace
-                        + ", namespace="
-                        + namespace
+                        + ", checkServiceVendor="
+                        + checkServiceVendor
+                        + ", serviceVendor="
+                        + serviceVendor
                         + ")";
         assertEquals(expectedString, testModel.toString());
     }

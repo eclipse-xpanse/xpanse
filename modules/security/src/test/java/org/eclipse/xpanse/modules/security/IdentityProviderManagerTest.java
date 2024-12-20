@@ -30,14 +30,14 @@ class IdentityProviderManagerTest {
 
     CurrentUserInfo getMockCurrentUserInfo() {
         final String userId = "userId";
-        final String namespace = "namespace";
+        final String isv = "isv";
         final Csp csp = Csp.HUAWEI_CLOUD;
         final List<String> roles = List.of("admin", "csp", "isv", "user");
         final CurrentUserInfo currentUserInfo = new CurrentUserInfo();
         currentUserInfo.setUserId(userId);
         currentUserInfo.setRoles(roles);
-        currentUserInfo.setMetadata(Map.of(namespace, namespace, "csp", csp.toValue()));
-        currentUserInfo.setNamespace(namespace);
+        currentUserInfo.setMetadata(Map.of(isv, isv, "csp", csp.toValue()));
+        currentUserInfo.setIsv(isv);
         currentUserInfo.setCsp(csp.toValue());
         return currentUserInfo;
     }

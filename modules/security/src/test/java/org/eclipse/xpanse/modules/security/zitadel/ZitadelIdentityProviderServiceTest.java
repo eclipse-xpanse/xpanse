@@ -30,7 +30,7 @@ class ZitadelIdentityProviderServiceTest {
 
     private static final String GRANTED_ROLES_SCOPE = "urn:zitadel:iam:org:project:roles";
     private static final String METADATA_KEY = "urn:zitadel:iam:user:metadata";
-    private static final String NAMESPACE_KEY = "namespace";
+    private static final String ISV_KEY = "isv";
     private static final String USERID_KEY = "sub";
     private static final String USERNAME_KEY = "name";
     private final String REQUIRED_SCOPES =
@@ -59,8 +59,7 @@ class ZitadelIdentityProviderServiceTest {
 
         ReflectionTestUtils.setField(
                 zitadelIdentityProviderServiceUnderTest, "metadataKey", METADATA_KEY);
-        ReflectionTestUtils.setField(
-                zitadelIdentityProviderServiceUnderTest, "namespaceKey", NAMESPACE_KEY);
+        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "isvKey", ISV_KEY);
     }
 
     Map<String, Object> getAttributesMap(boolean putMetaData) {
@@ -71,7 +70,7 @@ class ZitadelIdentityProviderServiceTest {
         map.put(GRANTED_ROLES_SCOPE, new HashMap<>());
         if (putMetaData) {
             Map<String, String> metadataMap = new HashMap<>();
-            metadataMap.put(NAMESPACE_KEY, "SVNWLUE=");
+            metadataMap.put(ISV_KEY, "SVNWLUE=");
             map.put(METADATA_KEY, metadataMap);
         }
         return map;
@@ -121,8 +120,8 @@ class ZitadelIdentityProviderServiceTest {
         expectedResult.setUserId("userId");
         expectedResult.setUserName("userName");
         expectedResult.setRoles(List.of("isv"));
-        expectedResult.setMetadata(Map.ofEntries(Map.entry(NAMESPACE_KEY, "ISV-A")));
-        expectedResult.setNamespace("ISV-A");
+        expectedResult.setMetadata(Map.ofEntries(Map.entry(ISV_KEY, "ISV-A")));
+        expectedResult.setIsv("ISV-A");
 
         // Run the test
         final CurrentUserInfo result = zitadelIdentityProviderServiceUnderTest.getCurrentUserInfo();
@@ -133,6 +132,7 @@ class ZitadelIdentityProviderServiceTest {
 
     @Test
     void testGetCurrentUserInfoWithNull() {
+        SecurityContextHolder.clearContext();
 
         // Run the test
         final CurrentUserInfo result = zitadelIdentityProviderServiceUnderTest.getCurrentUserInfo();
@@ -142,7 +142,7 @@ class ZitadelIdentityProviderServiceTest {
     }
 
     @Test
-    void testGetCurrentUserInfoWithNullNamespace() {
+    void testGetCurrentUserInfoWithNullIsv() {
         Map<String, Object> attributesMap = getAttributesMap(false);
         mockBearerTokenAuthentication(
                 attributesMap, getGrantedAuthorityList(RoleConstants.ROLE_USER));
@@ -169,8 +169,8 @@ class ZitadelIdentityProviderServiceTest {
         expectedResult.setUserId("userId");
         expectedResult.setUserName("userName");
         expectedResult.setRoles(List.of("isv"));
-        expectedResult.setMetadata(Map.ofEntries(Map.entry(NAMESPACE_KEY, "ISV-A")));
-        expectedResult.setNamespace("ISV-A");
+        expectedResult.setMetadata(Map.ofEntries(Map.entry(ISV_KEY, "ISV-A")));
+        expectedResult.setIsv("ISV-A");
 
         // Run the test
         final CurrentUserInfo result = zitadelIdentityProviderServiceUnderTest.getCurrentUserInfo();

@@ -60,8 +60,8 @@ public class Ocl implements Serializable {
     @NotNull
     @NotBlank
     @NotEmpty
-    @Schema(description = "The namespace of the managed service")
-    private String namespace;
+    @Schema(description = "The serviceVendor of the managed service")
+    private String serviceVendor;
 
     @NotNull
     @NotBlank
