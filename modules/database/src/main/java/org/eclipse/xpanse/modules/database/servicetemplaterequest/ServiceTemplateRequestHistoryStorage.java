@@ -38,6 +38,10 @@ public interface ServiceTemplateRequestHistoryStorage {
     List<ServiceTemplateRequestHistoryEntity> listServiceTemplateRequestHistoryByQueryModel(
             ServiceTemplateRequestHistoryQueryModel queryModel);
 
-    /** cancel requests in batch. */
+    /**
+     * cancel requests in batch.
+     *
+     * @param requests requests to cancel
+     */
     void cancelRequestsInBatch(List<ServiceTemplateRequestHistoryEntity> requests);
 }

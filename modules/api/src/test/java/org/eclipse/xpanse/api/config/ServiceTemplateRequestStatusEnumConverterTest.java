@@ -20,8 +20,8 @@ class ServiceTemplateRequestStatusEnumConverterTest {
                 .isEqualTo(ServiceTemplateRequestStatus.ACCEPTED);
         assertThat(converterTest.convert("rejected"))
                 .isEqualTo(ServiceTemplateRequestStatus.REJECTED);
-        assertThat(converterTest.convert("canceled"))
-                .isEqualTo(ServiceTemplateRequestStatus.CANCELED);
+        assertThat(converterTest.convert("cancelled"))
+                .isEqualTo(ServiceTemplateRequestStatus.CANCELLED);
         assertThrows(UnsupportedEnumValueException.class, () -> converterTest.convert("unknown"));
     }
 }

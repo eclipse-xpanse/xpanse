@@ -18,6 +18,8 @@ class ServiceTemplateRegistrationStateConverterTest {
                 ServiceTemplateRegistrationState.IN_REVIEW, converterTest.convert("in-review"));
         assertEquals(ServiceTemplateRegistrationState.APPROVED, converterTest.convert("approved"));
         assertEquals(ServiceTemplateRegistrationState.REJECTED, converterTest.convert("rejected"));
+        assertEquals(
+                ServiceTemplateRegistrationState.CANCELLED, converterTest.convert("cancelled"));
         assertThrows(UnsupportedEnumValueException.class, () -> converterTest.convert(" "));
         assertThrows(
                 UnsupportedEnumValueException.class, () -> converterTest.convert("error_value"));
