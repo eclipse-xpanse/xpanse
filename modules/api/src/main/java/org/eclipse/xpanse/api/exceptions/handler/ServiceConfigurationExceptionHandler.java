@@ -11,7 +11,7 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationChangeDetailsEntityNotFoundException;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceChangeDetailsEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationNotFoundException;
 import org.springframework.core.Ordered;
@@ -37,12 +37,12 @@ public class ServiceConfigurationExceptionHandler {
         return getErrorResponse(ErrorType.INVALID_SERVICE_CONFIGURATION, ex.getErrorReasons());
     }
 
-    /** Exception handler for ServiceConfigurationUpdateRequestNotFoundException. */
-    @ExceptionHandler({ServiceConfigurationChangeDetailsEntityNotFoundException.class})
+    /** Exception handler for ServiceChangeDetailsEntityNotFoundException. */
+    @ExceptionHandler({ServiceChangeDetailsEntityNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleServiceConfigurationUpdateRequestNotFoundException(
-            ServiceConfigurationChangeDetailsEntityNotFoundException ex) {
+            ServiceChangeDetailsEntityNotFoundException ex) {
         return getErrorResponse(
                 ErrorType.SERVICE_CONFIG_UPDATE_REQUEST_NOT_FOUND,
                 Collections.singletonList(ex.getMessage()));

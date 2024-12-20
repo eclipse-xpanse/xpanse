@@ -12,9 +12,9 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 
-/** service configuration change request details. */
+/** service change request details. */
 @Data
-public class ServiceConfigurationChangeDetails {
+public class ServiceChangeDetails {
 
     @NotNull
     @Schema(description = "ID of the change request created as part of the change order.")

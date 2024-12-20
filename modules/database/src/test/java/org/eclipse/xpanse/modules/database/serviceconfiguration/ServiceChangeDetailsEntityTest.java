@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceConfigurationChangeDetailsEntity;
+import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleTaskResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
@@ -21,12 +21,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
-/** Test for ServiceConfigurationChangeDetailsEntity. */
-public class ServiceConfigurationChangeDetailsEntityTest {
+/** Test for ServiceChangeDetailsEntity. */
+public class ServiceChangeDetailsEntityTest {
 
     final UUID id = UUID.randomUUID();
     final String resourceName = "zookeeper-1234";
-    final String configManager = "zookeeper";
+    final String changeHandler = "zookeeper";
     final String resultMessage = "resultMessage";
     final Map<String, Object> properties = Map.of("k1", "v1", "k2", "v2");
     final ServiceConfigurationStatus status = ServiceConfigurationStatus.PENDING;
@@ -34,16 +34,16 @@ public class ServiceConfigurationChangeDetailsEntityTest {
     @Mock private ServiceDeploymentEntity serviceDeploymentEntity;
     @Mock private ServiceOrderEntity serviceOrderEntity;
 
-    private ServiceConfigurationChangeDetailsEntity test;
+    private ServiceChangeDetailsEntity test;
 
     @BeforeEach
     void setUp() {
-        test = new ServiceConfigurationChangeDetailsEntity();
+        test = new ServiceChangeDetailsEntity();
         test.setId(id);
         test.setServiceDeploymentEntity(serviceDeploymentEntity);
         test.setServiceOrderEntity(serviceOrderEntity);
         test.setResourceName(resourceName);
-        test.setConfigManager(configManager);
+        test.setChangeHandler(changeHandler);
         test.setResultMessage(resultMessage);
         test.setStatus(status);
         test.setProperties(properties);
@@ -56,7 +56,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
         assertThat(test.getServiceDeploymentEntity()).isEqualTo(serviceDeploymentEntity);
         assertThat(test.getServiceOrderEntity()).isEqualTo(serviceOrderEntity);
         assertThat(test.getResourceName()).isEqualTo(resourceName);
-        assertThat(test.getConfigManager()).isEqualTo(configManager);
+        assertThat(test.getChangeHandler()).isEqualTo(changeHandler);
         assertThat(test.getResultMessage()).isEqualTo(resultMessage);
         assertThat(test.getStatus()).isEqualTo(status);
         assertThat(test.getProperties()).isEqualTo(properties);
@@ -66,8 +66,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
     @Test
     void testEquals() {
         assertThat(test.equals(new Object())).isFalse();
-        ServiceConfigurationChangeDetailsEntity test1 =
-                new ServiceConfigurationChangeDetailsEntity();
+        ServiceChangeDetailsEntity test1 = new ServiceChangeDetailsEntity();
         BeanUtils.copyProperties(test, test1);
         assertThat(test.equals(test1)).isTrue();
     }
@@ -75,8 +74,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
     @Test
     void testHashCode() {
         assertThat(test.hashCode() == new Object().hashCode()).isFalse();
-        ServiceConfigurationChangeDetailsEntity test1 =
-                new ServiceConfigurationChangeDetailsEntity();
+        ServiceChangeDetailsEntity test1 = new ServiceChangeDetailsEntity();
         BeanUtils.copyProperties(test, test1);
         assertThat(test.hashCode() == test1.hashCode()).isTrue();
     }
@@ -85,11 +83,11 @@ public class ServiceConfigurationChangeDetailsEntityTest {
     void testToString() {
         String result =
                 String.format(
-                        "ServiceConfigurationChangeDetailsEntity(id=%s, "
+                        "ServiceChangeDetailsEntity(id=%s, "
                                 + "serviceOrderEntity=%s, "
                                 + "serviceDeploymentEntity=%s, "
                                 + "resourceName=%s, "
-                                + "configManager=%s, "
+                                + "changeHandler=%s, "
                                 + "resultMessage=%s, "
                                 + "properties=%s, "
                                 + "status=%s, "
@@ -98,7 +96,7 @@ public class ServiceConfigurationChangeDetailsEntityTest {
                         serviceOrderEntity,
                         serviceDeploymentEntity,
                         resourceName,
-                        configManager,
+                        changeHandler,
                         resultMessage,
                         properties,
                         status,

@@ -29,7 +29,7 @@ import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -95,8 +95,8 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
     private void test_change_service_configuration_well(UUID serviceId) throws Exception {
         ServiceOrder order = changeServiceConfiguration(serviceId);
         if (Objects.nonNull(order) && waitServiceOrderIsCompleted(order.getOrderId())) {
-            List<ServiceConfigurationChangeOrderDetails> requests =
-                    listServiceConfigurationChangeDetails(order.getOrderId(), order.getServiceId());
+            List<ServiceChangeOrderDetails> requests =
+                    listServiceChangeDetails(order.getOrderId(), order.getServiceId());
             assertFalse(requests.isEmpty());
             assertEquals(requests.size(), 1);
             requests.forEach(request -> assertEquals(request.getOrderId(), order.getOrderId()));
@@ -227,8 +227,8 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         }
     }
 
-    List<ServiceConfigurationChangeOrderDetails> listServiceConfigurationChangeDetails(
-            UUID orderId, UUID serviceId) throws Exception {
+    List<ServiceChangeOrderDetails> listServiceChangeDetails(UUID orderId, UUID serviceId)
+            throws Exception {
 
         final MockHttpServletResponse listResponse =
                 mockMvc.perform(
@@ -243,6 +243,6 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         assertNotNull(listResponse.getHeader(HEADER_TRACKING_ID));
         return objectMapper.readValue(
                 listResponse.getContentAsString(),
-                new TypeReference<List<ServiceConfigurationChangeOrderDetails>>() {});
+                new TypeReference<List<ServiceChangeOrderDetails>>() {});
     }
 }

@@ -12,11 +12,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 
-/** The query model for ServiceConfigurationChangeDetailsEntity. */
+/** The query model for ServiceChangeDetailsEntity. */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceConfigurationChangeDetailsQueryModel {
+public class ServiceChangeDetailsQueryModel {
 
     private UUID orderId;
 

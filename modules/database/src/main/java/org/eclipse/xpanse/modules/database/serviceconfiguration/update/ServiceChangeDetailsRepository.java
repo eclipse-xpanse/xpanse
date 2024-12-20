@@ -18,14 +18,14 @@ import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.lang.Nullable;
 
 /** Interface to access default JPA methods. */
-public interface ServiceConfigurationChangeDetailsRepository
-        extends CustomJpaRepository<ServiceConfigurationChangeDetailsEntity, UUID>,
-                JpaSpecificationExecutor<ServiceConfigurationChangeDetailsEntity> {
+public interface ServiceChangeDetailsRepository
+        extends CustomJpaRepository<ServiceChangeDetailsEntity, UUID>,
+                JpaSpecificationExecutor<ServiceChangeDetailsEntity> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     // it is not possible to read this config from spring properties.
     @QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "2000")})
     @Override
-    List<ServiceConfigurationChangeDetailsEntity> findAll(
-            @Nullable Specification<ServiceConfigurationChangeDetailsEntity> spec);
+    List<ServiceChangeDetailsEntity> findAll(
+            @Nullable Specification<ServiceChangeDetailsEntity> spec);
 }

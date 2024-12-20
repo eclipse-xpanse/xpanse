@@ -34,11 +34,11 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 
-/** ServiceConfigurationChangeDetailsEntity for persistence. */
-@Table(name = "SERVICE_CONFIGURATION_CHANGE_DETAILS")
+/** ServiceChangeDetailsEntity for persistence. */
+@Table(name = "SERVICE_CHANGE_DETAILS")
 @Entity
 @Data
-public class ServiceConfigurationChangeDetailsEntity implements Serializable {
+public class ServiceChangeDetailsEntity implements Serializable {
 
     @Serial private static final long serialVersionUID = 8759112725757851274L;
 
@@ -75,7 +75,7 @@ public class ServiceConfigurationChangeDetailsEntity implements Serializable {
 
     private String resourceName;
 
-    private String configManager;
+    private String changeHandler;
 
     private String resultMessage;
 
