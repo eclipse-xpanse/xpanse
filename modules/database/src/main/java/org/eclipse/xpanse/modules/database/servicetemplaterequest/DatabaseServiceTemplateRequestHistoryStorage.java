@@ -90,7 +90,7 @@ public class DatabaseServiceTemplateRequestHistoryStorage
     @Override
     public void cancelRequestsInBatch(List<ServiceTemplateRequestHistoryEntity> requests) {
         for (ServiceTemplateRequestHistoryEntity request : requests) {
-            request.setStatus(ServiceTemplateRequestStatus.CANCELED);
+            request.setStatus(ServiceTemplateRequestStatus.CANCELLED);
         }
         repository.saveAll(requests);
     }

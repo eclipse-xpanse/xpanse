@@ -79,12 +79,9 @@ public class ServiceTemplateApi {
     @Transactional
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public ServiceTemplateRequestInfo register(@Valid @RequestBody Ocl ocl) {
-        ServiceTemplateRequestHistoryEntity serviceTemplateHistory =
+        ServiceTemplateRequestHistoryEntity registerRequest =
                 serviceTemplateManage.registerServiceTemplate(ocl);
-        return new ServiceTemplateRequestInfo(
-                serviceTemplateHistory.getServiceTemplate().getId(),
-                serviceTemplateHistory.getRequestId(),
-                serviceTemplateHistory.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
+        return getServiceTemplateRequestInfo(registerRequest);
     }
 
     /**
@@ -113,13 +110,10 @@ public class ServiceTemplateApi {
                     @RequestParam(name = "isRemoveServiceTemplateUntilApproved")
                     Boolean isRemoveServiceTemplateUntilApproved,
             @Valid @RequestBody Ocl ocl) {
-        ServiceTemplateRequestHistoryEntity updateHistory =
+        ServiceTemplateRequestHistoryEntity updateRequest =
                 serviceTemplateManage.updateServiceTemplate(
                         serviceTemplateId, ocl, isRemoveServiceTemplateUntilApproved);
-        return new ServiceTemplateRequestInfo(
-                updateHistory.getServiceTemplate().getId(),
-                updateHistory.getRequestId(),
-                updateHistory.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
+        return getServiceTemplateRequestInfo(updateRequest);
     }
 
     /**
@@ -140,12 +134,9 @@ public class ServiceTemplateApi {
                     String oclLocation)
             throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        ServiceTemplateRequestHistoryEntity serviceTemplateHistory =
+        ServiceTemplateRequestHistoryEntity registerRequest =
                 serviceTemplateManage.registerServiceTemplate(ocl);
-        return new ServiceTemplateRequestInfo(
-                serviceTemplateHistory.getServiceTemplate().getId(),
-                serviceTemplateHistory.getRequestId(),
-                serviceTemplateHistory.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
+        return getServiceTemplateRequestInfo(registerRequest);
     }
 
     /**
@@ -179,13 +170,10 @@ public class ServiceTemplateApi {
                     String oclLocation)
             throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        ServiceTemplateRequestHistoryEntity updateHistory =
+        ServiceTemplateRequestHistoryEntity updateRequest =
                 serviceTemplateManage.updateServiceTemplate(
                         serviceTemplateId, ocl, isRemoveServiceTemplateUntilApproved);
-        return new ServiceTemplateRequestInfo(
-                updateHistory.getServiceTemplate().getId(),
-                updateHistory.getRequestId(),
-                updateHistory.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
+        return getServiceTemplateRequestInfo(updateRequest);
     }
 
     /**
@@ -204,12 +192,9 @@ public class ServiceTemplateApi {
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
-        ServiceTemplateRequestHistoryEntity unregisterHistory =
+        ServiceTemplateRequestHistoryEntity removeFromCatalogRequest =
                 serviceTemplateManage.removeFromCatalog(serviceTemplateId);
-        return new ServiceTemplateRequestInfo(
-                unregisterHistory.getServiceTemplate().getId(),
-                unregisterHistory.getRequestId(),
-                unregisterHistory.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
+        return getServiceTemplateRequestInfo(removeFromCatalogRequest);
     }
 
     /**
@@ -228,12 +213,9 @@ public class ServiceTemplateApi {
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
-        ServiceTemplateRequestHistoryEntity reRegisterHistory =
+        ServiceTemplateRequestHistoryEntity reAddToCatalogRequest =
                 serviceTemplateManage.reAddToCatalog(serviceTemplateId);
-        return new ServiceTemplateRequestInfo(
-                reRegisterHistory.getServiceTemplate().getId(),
-                reRegisterHistory.getRequestId(),
-                reRegisterHistory.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
+        return getServiceTemplateRequestInfo(reAddToCatalogRequest);
     }
 
     /**
@@ -360,7 +342,7 @@ public class ServiceTemplateApi {
     @Operation(
             description =
                     "Get service template requests using id of service template. The returned"
-                            + " requests is sorted by the ascending order of the requested"
+                            + " requests is sorted in descending order according to the requested"
                             + " time.")
     @GetMapping(
             value = "/service_templates/{serviceTemplateId}/requests",
@@ -382,6 +364,25 @@ public class ServiceTemplateApi {
     }
 
     /**
+     * Cancel service template request using request id.
+     *
+     * @param requestId id of service template request.
+     */
+    @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
+    @Operation(description = "Cancel service template request using request id.")
+    @PutMapping(
+            value = "/service_templates/requests/cancel/{requestId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateRequestId")
+    public void cancelServiceTemplateRequestByRequestId(
+            @Parameter(name = "requestId", description = "id of service template request")
+                    @PathVariable("requestId")
+                    UUID requestId) {
+        serviceTemplateManage.cancelServiceTemplateRequestByRequestId(requestId);
+    }
+
+    /**
      * Get ocl of service template request using change id.
      *
      * @param requestId id of service template request.
@@ -398,6 +399,16 @@ public class ServiceTemplateApi {
             @Parameter(name = "requestId", description = "id of service template request")
                     @PathVariable("requestId")
                     UUID requestId) {
-        return serviceTemplateManage.getRequestedOclByRequestId(requestId);
+        ServiceTemplateRequestHistoryEntity request =
+                serviceTemplateManage.getServiceTemplateRequestByRequestId(requestId);
+        return request.getOcl();
+    }
+
+    private ServiceTemplateRequestInfo getServiceTemplateRequestInfo(
+            ServiceTemplateRequestHistoryEntity requestHistoryEntity) {
+        return new ServiceTemplateRequestInfo(
+                requestHistoryEntity.getServiceTemplate().getId(),
+                requestHistoryEntity.getRequestId(),
+                requestHistoryEntity.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
     }
 }

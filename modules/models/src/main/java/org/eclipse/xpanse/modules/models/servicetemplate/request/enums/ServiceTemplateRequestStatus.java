@@ -15,7 +15,7 @@ public enum ServiceTemplateRequestStatus {
     IN_REVIEW("in-review"),
     ACCEPTED("accepted"),
     REJECTED("rejected"),
-    CANCELED("canceled");
+    CANCELLED("cancelled");
 
     private final String state;
 
