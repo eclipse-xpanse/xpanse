@@ -246,9 +246,9 @@ public class ServiceTemplateManage {
         String newServiceHostingType = ocl.getServiceHostingType().toValue();
         compare(oldServiceHostingType, newServiceHostingType, "service hosting type");
 
-        String oldNamespace = existingTemplate.getNamespace();
-        String newNamespace = ocl.getNamespace();
-        compare(oldNamespace, newNamespace, "namespace");
+        String oldServiceVendor = existingTemplate.getServiceVendor();
+        String newServiceVendor = ocl.getServiceVendor();
+        compare(oldServiceVendor, newServiceVendor, "serviceVendor");
     }
 
     private void compare(String oldParams, String newParams, String type) {
@@ -276,16 +276,16 @@ public class ServiceTemplateManage {
         validateServiceDeployment(ocl.getDeployment(), newServiceTemplate);
 
         if (!userServiceHelper.isAuthEnable()) {
-            newServiceTemplate.setNamespace(ocl.getNamespace());
+            newServiceTemplate.setServiceVendor(ocl.getServiceVendor());
         } else {
-            String userManageNamespace = userServiceHelper.getCurrentUserManageNamespace();
-            if (StringUtils.isNotEmpty(userManageNamespace)
-                    && !StringUtils.equals(ocl.getNamespace(), userManageNamespace)) {
+            String userManageIsv = userServiceHelper.getCurrentUserManageIsv();
+            if (StringUtils.isNotEmpty(userManageIsv)
+                    && !StringUtils.equals(ocl.getServiceVendor(), userManageIsv)) {
                 throw new AccessDeniedException(
                         "No permissions to view or manage service template "
-                                + "belonging to other namespaces.");
+                                + "belonging to other serviceVendors.");
             }
-            newServiceTemplate.setNamespace(ocl.getNamespace());
+            newServiceTemplate.setServiceVendor(ocl.getServiceVendor());
         }
 
         return newServiceTemplate;
@@ -466,14 +466,14 @@ public class ServiceTemplateManage {
      * Get details of service template using id.
      *
      * @param serviceTemplateId the id of service template.
-     * @param checkNamespace check the namespace of the service template belonging to.
+     * @param checkServiceVendor check the serviceVendor of the service template belonging to.
      * @param checkCsp check the cloud service provider of the service template.
      * @return Returns service template DB newTemplate.
      */
     public ServiceTemplateEntity getServiceTemplateDetails(
-            UUID serviceTemplateId, boolean checkNamespace, boolean checkCsp) {
+            UUID serviceTemplateId, boolean checkServiceVendor, boolean checkCsp) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateById(serviceTemplateId);
-        checkPermission(existingTemplate, checkNamespace, checkCsp);
+        checkPermission(existingTemplate, checkServiceVendor, checkCsp);
         return existingTemplate;
     }
 
@@ -720,14 +720,14 @@ public class ServiceTemplateManage {
     }
 
     private void checkPermission(
-            ServiceTemplateEntity serviceTemplate, boolean checkNamespace, boolean checkCsp) {
-        if (checkNamespace) {
+            ServiceTemplateEntity serviceTemplate, boolean checkServiceVendor, boolean checkCsp) {
+        if (checkServiceVendor) {
             boolean hasManagePermissions =
-                    userServiceHelper.currentUserCanManageNamespace(serviceTemplate.getNamespace());
+                    userServiceHelper.currentUserCanManageIsv(serviceTemplate.getServiceVendor());
             if (!hasManagePermissions) {
                 throw new AccessDeniedException(
                         "No permissions to view or manage service template belonging to other"
-                                + " namespaces.");
+                                + " serviceVendors.");
             }
         }
         if (checkCsp) {
@@ -773,9 +773,9 @@ public class ServiceTemplateManage {
     }
 
     private void fillParamFromUserMetadata(ServiceTemplateQueryModel query) {
-        if (Objects.nonNull(query.getCheckNamespace()) && query.getCheckNamespace()) {
-            String namespace = userServiceHelper.getCurrentUserManageNamespace();
-            query.setNamespace(namespace);
+        if (Objects.nonNull(query.getCheckServiceVendor()) && query.getCheckServiceVendor()) {
+            String serviceVendor = userServiceHelper.getCurrentUserManageIsv();
+            query.setServiceVendor(serviceVendor);
         }
     }
 }

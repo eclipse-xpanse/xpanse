@@ -50,7 +50,7 @@ public class DeployServiceEntityConverter {
         deployTask.setServiceId(serviceDeploymentEntity.getId());
         deployTask.setUserId(serviceDeploymentEntity.getUserId());
         deployTask.setDeployRequest(serviceDeploymentEntity.getDeployRequest());
-        deployTask.setNamespace(serviceDeploymentEntity.getNamespace());
+        deployTask.setServiceVendor(serviceDeploymentEntity.getServiceVendor());
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(
                         serviceDeploymentEntity.getServiceTemplateId());

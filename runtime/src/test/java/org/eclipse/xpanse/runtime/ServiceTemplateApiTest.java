@@ -475,7 +475,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ErrorType.ACCESS_DENIED,
                         Collections.singletonList(
                                 "No permissions to view or manage service template "
-                                        + "belonging to other namespaces."));
+                                        + "belonging to other serviceVendors."));
         // Setup
         Ocl ocl =
                 oclLoader.getOcl(
@@ -488,7 +488,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         UUID id = serviceTemplateRequestInfo.getServiceTemplateId();
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(id);
-        serviceTemplateEntity.setNamespace("test");
+        serviceTemplateEntity.setServiceVendor("test");
         serviceTemplateStorage.storeAndFlush(serviceTemplateEntity);
 
         // Run the test detail

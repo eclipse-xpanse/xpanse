@@ -26,7 +26,7 @@ class OclTest {
     private final String name = "kafka";
     private final String serviceVersion = "1.0.0";
     private final String description = "description";
-    private final String namespace = "nameSpace";
+    private final String serviceVendor = "serviceVendor";
     private final String icon = "icon";
     private final String eula = "eula";
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
@@ -48,7 +48,7 @@ class OclTest {
         ocl.setName(name);
         ocl.setServiceVersion(serviceVersion);
         ocl.setDescription(description);
-        ocl.setNamespace(namespace);
+        ocl.setServiceVendor(serviceVendor);
         ocl.setIcon(icon);
         ocl.setCloudServiceProvider(cloudServiceProvider);
         ocl.setDeployment(deployment);
@@ -68,7 +68,7 @@ class OclTest {
         assertEquals(name, ocl.getName());
         assertEquals(serviceVersion, ocl.getServiceVersion());
         assertEquals(description, ocl.getDescription());
-        assertEquals(namespace, ocl.getNamespace());
+        assertEquals(serviceVendor, ocl.getServiceVendor());
         assertEquals(icon, ocl.getIcon());
         assertEquals(cloudServiceProvider, ocl.getCloudServiceProvider());
         assertEquals(deployment, ocl.getDeployment());
@@ -110,8 +110,8 @@ class OclTest {
                         + serviceVersion
                         + ", description="
                         + description
-                        + ", namespace="
-                        + namespace
+                        + ", serviceVendor="
+                        + serviceVendor
                         + ", icon="
                         + icon
                         + ", cloudServiceProvider="

@@ -60,8 +60,8 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
 
     @NotNull
     @NotBlank
-    @Schema(description = "Namespace of the user who registered service template.")
-    private String namespace;
+    @Schema(description = "ServiceVendor of the user who registered service template.")
+    private String serviceVendor;
 
     @NotEmpty
     @Schema(description = "The regions of the Cloud Service Provider.")

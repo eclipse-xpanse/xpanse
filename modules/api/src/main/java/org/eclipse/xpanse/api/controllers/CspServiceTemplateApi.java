@@ -113,7 +113,7 @@ public class CspServiceTemplateApi {
                         .serviceTemplateRegistrationState(serviceTemplateRegistrationState)
                         .isAvailableInCatalog(isAvailableInCatalog)
                         .isReviewInProgress(isReviewInProgress)
-                        .checkNamespace(false)
+                        .checkServiceVendor(false)
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);

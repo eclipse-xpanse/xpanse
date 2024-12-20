@@ -65,8 +65,8 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @Column(name = "NAMESPACE")
-    private String namespace;
+    @Column(name = "SERVICE_VENDOR")
+    private String serviceVendor;
 
     @Column(name = "SERVICE_HOSTING_TYPE")
     @Enumerated(EnumType.STRING)

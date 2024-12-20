@@ -22,7 +22,7 @@ public class CurrentUserInfo {
 
     private Map<String, String> metadata;
 
-    private String namespace;
+    private String isv;
 
     private String csp;
 
