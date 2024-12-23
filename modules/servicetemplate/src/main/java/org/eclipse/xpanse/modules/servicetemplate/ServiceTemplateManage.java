@@ -525,8 +525,7 @@ public class ServiceTemplateManage {
                 serviceTemplateOpenApiGenerator.updateServiceApi(serviceTemplateToUpdate);
             }
             boolean isAvailableInCatalog =
-                    ServiceTemplateRequestType.REMOVE_FROM_CATALOG
-                            != reviewedRequest.getRequestType();
+                    ServiceTemplateRequestType.UNPUBLISH != reviewedRequest.getRequestType();
             serviceTemplateToUpdate.setIsAvailableInCatalog(isAvailableInCatalog);
         } else if (ServiceTemplateRequestStatus.REJECTED == reviewedRequest.getStatus()) {
             if (ServiceTemplateRequestType.REGISTER == reviewedRequest.getRequestType()) {
@@ -544,14 +543,14 @@ public class ServiceTemplateManage {
      * @param id ID of service template.
      * @return Returns updated service template.
      */
-    public ServiceTemplateRequestHistoryEntity removeFromCatalog(UUID id) {
+    public ServiceTemplateRequestHistoryEntity unpublish(UUID id) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
         if (existingTemplate.getServiceTemplateRegistrationState()
                 != ServiceTemplateRegistrationState.APPROVED) {
             String errMsg =
                     String.format(
                             "The registration of service template with id %s not approved. The"
-                                    + " request to remove_from_catalog is not allowed.",
+                                    + " request to unpublish is not allowed.",
                             id);
             throw new ServiceTemplateRequestNotAllowed(errMsg);
         }
@@ -560,26 +559,27 @@ public class ServiceTemplateManage {
         existingTemplate.setIsAvailableInCatalog(false);
         existingTemplate.setIsReviewInProgress(false);
         ServiceTemplateEntity updatedTemplate = templateStorage.storeAndFlush(existingTemplate);
-        ServiceTemplateRequestType requestType = ServiceTemplateRequestType.REMOVE_FROM_CATALOG;
+        ServiceTemplateRequestType requestType = ServiceTemplateRequestType.UNPUBLISH;
         // auto-approve the request to remove from catalog.
         return createServiceTemplateHistory(true, requestType, updatedTemplate);
     }
 
     /**
-     * Re-register service template using the ID of service template.
+     * Republish the service template to catalog again.
      *
-     * @param id ID of service template.
+     * @param serviceTemplateId id of service template.
      * @return Returns updated service template.
      */
-    public ServiceTemplateRequestHistoryEntity reAddToCatalog(UUID id) {
-        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
+    public ServiceTemplateRequestHistoryEntity republish(UUID serviceTemplateId) {
+        ServiceTemplateEntity existingTemplate =
+                getServiceTemplateDetails(serviceTemplateId, true, false);
         if (existingTemplate.getServiceTemplateRegistrationState()
                 != ServiceTemplateRegistrationState.APPROVED) {
             String errMsg =
                     String.format(
                             "The registration of service template with id %s not approved. The"
-                                    + " request to re_add_to_catalog is not allowed.",
-                            id);
+                                    + " request to republish is not allowed.",
+                            serviceTemplateId);
             throw new ServiceTemplateRequestNotAllowed(errMsg);
         }
         checkAnyInProgressRequestForServiceTemplate(existingTemplate);
@@ -590,7 +590,7 @@ public class ServiceTemplateManage {
             existingTemplate.setIsReviewInProgress(true);
         }
         ServiceTemplateEntity updatedTemplate = templateStorage.storeAndFlush(existingTemplate);
-        ServiceTemplateRequestType requestType = ServiceTemplateRequestType.RE_ADD_TO_CATALOG;
+        ServiceTemplateRequestType requestType = ServiceTemplateRequestType.REPUBLISH;
         return createServiceTemplateHistory(isAutoApprovedEnabled, requestType, updatedTemplate);
     }
 

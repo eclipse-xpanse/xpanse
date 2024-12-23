@@ -101,11 +101,10 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
 
         // Setup update request
         ocl.setDescription("update-test");
-        // Run the update test with 'isRemoveServiceTemplateUntilApproved' is true
-        boolean isRemoveServiceTemplateUntilApproved = true;
+        // Run the update test with 'isUnpublishUntilApproved' is true
+        boolean isUnpublishUntilApproved = true;
         ServiceTemplateRequestInfo updateRequestInfo =
-                serviceTemplateApi.update(
-                        serviceTemplateId, isRemoveServiceTemplateUntilApproved, ocl);
+                serviceTemplateApi.update(serviceTemplateId, isUnpublishUntilApproved, ocl);
         // Verify the results
         assertEquals(serviceTemplateId, updateRequestInfo.getServiceTemplateId());
         assertFalse(updateRequestInfo.isRequestSubmittedForReview());
@@ -126,10 +125,10 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
         assertEquals(updateHistoryVos.size(), 1);
         assertEquals(updateHistoryVos.getFirst().getRequestId(), updateRequestInfo.getRequestId());
 
-        // Setup unregister request
+        // Setup unpublish request
         // Run the test
         ServiceTemplateRequestInfo unregisterRequest =
-                serviceTemplateApi.removeFromCatalog(serviceTemplateId);
+                serviceTemplateApi.unpublish(serviceTemplateId);
         // Verify the results
         assertEquals(serviceTemplateId, unregisterRequest.getServiceTemplateId());
         assertFalse(unregisterRequest.isRequestSubmittedForReview());
@@ -141,7 +140,7 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
         List<ServiceTemplateRequestHistory> unregisterHistoryVos =
                 serviceTemplateApi.getServiceTemplateRequestHistoryByServiceTemplateId(
                         serviceTemplateId,
-                        ServiceTemplateRequestType.REMOVE_FROM_CATALOG,
+                        ServiceTemplateRequestType.UNPUBLISH,
                         ServiceTemplateRequestStatus.ACCEPTED);
         assertEquals(unregisterHistoryVos.size(), 1);
         assertEquals(
@@ -150,7 +149,7 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
         // Setup reRegister request
         // Run the test
         ServiceTemplateRequestInfo reRegisterRequest =
-                serviceTemplateApi.reAddToCatalog(serviceTemplateId);
+                serviceTemplateApi.republish(serviceTemplateId);
         // Verify the results
         assertEquals(serviceTemplateId, reRegisterRequest.getServiceTemplateId());
         assertFalse(reRegisterRequest.isRequestSubmittedForReview());
@@ -162,14 +161,14 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
         List<ServiceTemplateRequestHistory> reRegisterHistoryVos =
                 serviceTemplateApi.getServiceTemplateRequestHistoryByServiceTemplateId(
                         serviceTemplateId,
-                        ServiceTemplateRequestType.RE_ADD_TO_CATALOG,
+                        ServiceTemplateRequestType.REPUBLISH,
                         ServiceTemplateRequestStatus.ACCEPTED);
         assertEquals(reRegisterHistoryVos.size(), 1);
         assertEquals(
                 reRegisterHistoryVos.getFirst().getRequestId(), reRegisterRequest.getRequestId());
 
         // Setup delete request
-        serviceTemplateApi.removeFromCatalog(serviceTemplateId);
+        serviceTemplateApi.unpublish(serviceTemplateId);
         // Run the test
         assertDoesNotThrow(() -> serviceTemplateApi.deleteServiceTemplate(serviceTemplateId));
 

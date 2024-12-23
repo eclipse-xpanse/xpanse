@@ -17,10 +17,10 @@ class ServiceTemplateRequestTypeEnumConverterTest {
         assertThat(converterTest.convert("register"))
                 .isEqualTo(ServiceTemplateRequestType.REGISTER);
         assertThat(converterTest.convert("update")).isEqualTo(ServiceTemplateRequestType.UPDATE);
-        assertThat(converterTest.convert("remove from catalog"))
-                .isEqualTo(ServiceTemplateRequestType.REMOVE_FROM_CATALOG);
-        assertThat(converterTest.convert("re-add to catalog"))
-                .isEqualTo(ServiceTemplateRequestType.RE_ADD_TO_CATALOG);
+        assertThat(converterTest.convert("unpublish"))
+                .isEqualTo(ServiceTemplateRequestType.UNPUBLISH);
+        assertThat(converterTest.convert("republish"))
+                .isEqualTo(ServiceTemplateRequestType.REPUBLISH);
         assertThrows(UnsupportedEnumValueException.class, () -> converterTest.convert("unknown"));
     }
 }

@@ -14,8 +14,8 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 public enum ServiceTemplateRequestType {
     REGISTER("register"),
     UPDATE("update"),
-    REMOVE_FROM_CATALOG("remove from catalog"),
-    RE_ADD_TO_CATALOG("re-add to catalog");
+    UNPUBLISH("unpublish"),
+    REPUBLISH("republish");
 
     private final String type;
 

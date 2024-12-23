@@ -84,15 +84,15 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 .getResponse();
     }
 
-    MockHttpServletResponse update(UUID id, boolean isRemoveServiceTemplateUntilApproved, Ocl ocl)
-            throws Exception {
+    MockHttpServletResponse update(
+            UUID serviceTemplateId, boolean isUnpublishUntilApproved, Ocl ocl) throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
         return mockMvc.perform(
-                        put("/xpanse/service_templates/{id}", id)
+                        put("/xpanse/service_templates/{serviceTemplateId}", serviceTemplateId)
                                 .param(
-                                        "isRemoveServiceTemplateUntilApproved",
-                                        String.valueOf(isRemoveServiceTemplateUntilApproved))
+                                        "isUnpublishUntilApproved",
+                                        String.valueOf(isUnpublishUntilApproved))
                                 .content(requestBody)
                                 .contentType("application/x-yaml")
                                 .accept(MediaType.APPLICATION_JSON))
@@ -100,17 +100,21 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 .getResponse();
     }
 
-    MockHttpServletResponse unregister(UUID id) throws Exception {
+    MockHttpServletResponse unregister(UUID serviceTemplateId) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/remove_from_catalog/{id}", id)
+                        put(
+                                        "/xpanse/service_templates/unpublish/{serviceTemplateId}",
+                                        serviceTemplateId)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
     }
 
-    MockHttpServletResponse reAddToCatalog(UUID id) throws Exception {
+    MockHttpServletResponse republish(UUID serviceTemplateId) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/re_add_to_catalog/{id}", id)
+                        put(
+                                        "/xpanse/service_templates/republish/{serviceTemplateId}",
+                                        serviceTemplateId)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -202,32 +206,28 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         serviceTemplate = getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
         assertFalse(serviceTemplate.getIsAvailableInCatalog());
 
-        // re-add_to_catalog service template
-        MockHttpServletResponse reAddToCatalogResponse = reAddToCatalog(serviceTemplateId);
-        ServiceTemplateRequestInfo reAddToCatalogRequestInfo =
+        // republish service template
+        MockHttpServletResponse republishResponse = republish(serviceTemplateId);
+        ServiceTemplateRequestInfo republishRequestInfo =
                 objectMapper.readValue(
-                        reAddToCatalogResponse.getContentAsString(),
-                        ServiceTemplateRequestInfo.class);
+                        republishResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
         // List pending service template requests
         List<ServiceTemplateRequestToReview> pendingServiceTemplateRequests3 =
                 listPendingServiceTemplateRequests(serviceTemplateId);
         assertEquals(1, pendingServiceTemplateRequests3.size());
-        ServiceTemplateRequestToReview reAddToCatalogRequest =
+        ServiceTemplateRequestToReview republishRequest =
                 pendingServiceTemplateRequests3.getFirst();
+        assertEquals(ServiceTemplateRequestType.REPUBLISH, republishRequest.getRequestType());
         assertEquals(
-                ServiceTemplateRequestType.RE_ADD_TO_CATALOG,
-                reAddToCatalogRequest.getRequestType());
-        assertEquals(
-                reAddToCatalogRequestInfo.getServiceTemplateId(),
-                reAddToCatalogRequest.getServiceTemplateId());
-        assertEquals(
-                reAddToCatalogRequestInfo.getRequestId(), reAddToCatalogRequest.getRequestId());
+                republishRequestInfo.getServiceTemplateId(),
+                republishRequest.getServiceTemplateId());
+        assertEquals(republishRequestInfo.getRequestId(), republishRequest.getRequestId());
 
-        // review service template re-add_to_catalog request
+        // review service template republish request
         reviewRequest.setReviewResult(ServiceReviewResult.REJECTED);
-        reviewRequest.setReviewComment("reject the re-add_to_catalog");
+        reviewRequest.setReviewComment("reject the republish");
         reviewResponse =
-                reviewServiceTemplateRequest(reAddToCatalogRequest.getRequestId(), reviewRequest);
+                reviewServiceTemplateRequest(republishRequest.getRequestId(), reviewRequest);
         assertEquals(HttpStatus.NO_CONTENT.value(), reviewResponse.getStatus());
         serviceTemplate = getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
         assertFalse(serviceTemplate.getIsAvailableInCatalog());
@@ -244,17 +244,16 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         serviceTemplate.getOcl().getCloudServiceProvider().setName(Csp.FLEXIBLE_ENGINE);
         serviceTemplate = serviceTemplateStorage.storeAndFlush(serviceTemplate);
 
-        MockHttpServletResponse reAddToCatalogResponse = reAddToCatalog(serviceTemplateId);
-        ServiceTemplateRequestInfo reAddToCatalogRequestInfo =
+        MockHttpServletResponse republishResponse = republish(serviceTemplateId);
+        ServiceTemplateRequestInfo republishRequestInfo =
                 objectMapper.readValue(
-                        reAddToCatalogResponse.getContentAsString(),
-                        ServiceTemplateRequestInfo.class);
-        assertNotNull(reAddToCatalogRequestInfo.getRequestId());
+                        republishResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+        assertNotNull(republishRequestInfo.getRequestId());
         List<ServiceTemplateRequestToReview> pendingServiceTemplateRequests =
                 listPendingServiceTemplateRequests(serviceTemplateId);
         assertThat(pendingServiceTemplateRequests).isEmpty();
 
-        testReviewRegistrationThrowsAccessDeniedException(reAddToCatalogRequestInfo.getRequestId());
+        testReviewRegistrationThrowsAccessDeniedException(republishRequestInfo.getRequestId());
         testGetRegistrationDetailsThrowsAccessDeniedException(serviceTemplateId);
         testListManagedServiceTemplatesReturnsEmptyList(serviceTemplate);
         deleteServiceTemplate(serviceTemplateId);
@@ -367,9 +366,9 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         assertThat(response.getContentAsString()).isEqualTo("[]");
     }
 
-    MockHttpServletResponse getRegistrationDetails(UUID id) throws Exception {
+    MockHttpServletResponse getRegistrationDetails(UUID serviceTemplateId) throws Exception {
         return mockMvc.perform(
-                        get("/xpanse/csp/service_templates/{id}", id)
+                        get("/xpanse/csp/service_templates/{serviceTemplateId}", serviceTemplateId)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
