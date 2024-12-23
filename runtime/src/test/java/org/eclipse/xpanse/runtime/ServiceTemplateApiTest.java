@@ -127,7 +127,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertTrue(serviceTemplateDetailVo.getIsReviewInProgress());
         assertFalse(serviceTemplateDetailVo.getIsAvailableInCatalog());
 
-        // Setup listHistory request
+        // Setup listRequests
         final MockHttpServletResponse listRegisterHistoryResponse =
                 listServiceTemplateHistoryWithParams(
                         serviceTemplateId,
@@ -169,7 +169,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         ocl.getServiceHostingType().toValue(),
                         ServiceTemplateRegistrationState.IN_REVIEW.toValue(),
                         false,
-                        false);
+                        true);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertThat(serviceTemplateDetailVos)
@@ -183,10 +183,10 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         // Setup update request when the register request is in-review
         ocl.setDescription("update-test");
-        // Run the update test with 'isRemoveServiceTemplateUntilApproved' is false
-        boolean isRemoveServiceTemplateUntilApproved = true;
+        // Run the update test with 'isUnpublishUntilApproved' is false
+        boolean isUnpublishUntilApproved = true;
         final MockHttpServletResponse updateResponse =
-                update(serviceTemplateId, isRemoveServiceTemplateUntilApproved, ocl);
+                update(serviceTemplateId, isUnpublishUntilApproved, ocl);
         // Verify the results
         assertEquals(HttpStatus.OK.value(), updateResponse.getStatus());
         ServiceTemplateRequestInfo updateRequestInfo =
@@ -221,68 +221,62 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // approve update (new register) request
         reviewServiceTemplateRequest(updateRequestInfo.getRequestId(), true);
 
-        // Setup removeFromCatalog request
+        // Setup unpublish request
         // Run the test
-        final MockHttpServletResponse removeFromCatalogResponse =
-                removeFromCatalog(serviceTemplateId);
+        final MockHttpServletResponse unpublishResponse = unpublish(serviceTemplateId);
         // Verify the results
-        assertEquals(HttpStatus.OK.value(), removeFromCatalogResponse.getStatus());
-        ServiceTemplateRequestInfo removeFromCatalogRequestInfo =
+        assertEquals(HttpStatus.OK.value(), unpublishResponse.getStatus());
+        ServiceTemplateRequestInfo unpublishRequestInfo =
                 objectMapper.readValue(
-                        removeFromCatalogResponse.getContentAsString(),
-                        ServiceTemplateRequestInfo.class);
-        assertFalse(removeFromCatalogRequestInfo.isRequestSubmittedForReview());
-        ServiceTemplateDetailVo removeFromCatalogedServiceTemplateDetailVo =
-                getServiceTemplateDetailsVo(removeFromCatalogRequestInfo.getServiceTemplateId());
-        assertFalse(removeFromCatalogedServiceTemplateDetailVo.getIsAvailableInCatalog());
+                        unpublishResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+        assertFalse(unpublishRequestInfo.isRequestSubmittedForReview());
+        ServiceTemplateDetailVo unpublishedServiceTemplateDetailVo =
+                getServiceTemplateDetailsVo(unpublishRequestInfo.getServiceTemplateId());
+        assertFalse(unpublishedServiceTemplateDetailVo.getIsAvailableInCatalog());
 
-        // Setup listHistory request
+        // Setup listRequests request
         final MockHttpServletResponse listUnregisterHistoryResponse =
                 listServiceTemplateHistoryWithParams(
                         serviceTemplateId,
-                        ServiceTemplateRequestType.REMOVE_FROM_CATALOG.toValue(),
+                        ServiceTemplateRequestType.UNPUBLISH.toValue(),
                         ServiceTemplateRequestStatus.ACCEPTED.toValue());
         assertEquals(HttpStatus.OK.value(), listUnregisterHistoryResponse.getStatus());
-        List<ServiceTemplateRequestHistory> removeFromCatalogHistoryVos =
+        List<ServiceTemplateRequestHistory> unpublishHistoryVos =
                 objectMapper.readValue(
                         listUnregisterHistoryResponse.getContentAsString(),
                         new TypeReference<>() {});
-        assertEquals(1, removeFromCatalogHistoryVos.size());
+        assertEquals(1, unpublishHistoryVos.size());
         assertEquals(
-                removeFromCatalogRequestInfo.getRequestId(),
-                removeFromCatalogHistoryVos.getFirst().getRequestId());
+                unpublishRequestInfo.getRequestId(), unpublishHistoryVos.getFirst().getRequestId());
 
-        // Setup reAddToCatalog request
+        // Setup republish request
         // Run the test
-        final MockHttpServletResponse reAddToCatalogResponse = reAddToCatalog(serviceTemplateId);
+        final MockHttpServletResponse republishResponse = republish(serviceTemplateId);
         // Verify the results
-        assertEquals(HttpStatus.OK.value(), reAddToCatalogResponse.getStatus());
-        ServiceTemplateRequestInfo reAddToCatalogRequestInfo =
+        assertEquals(HttpStatus.OK.value(), republishResponse.getStatus());
+        ServiceTemplateRequestInfo republishRequestInfo =
                 objectMapper.readValue(
-                        reAddToCatalogResponse.getContentAsString(),
-                        ServiceTemplateRequestInfo.class);
-        assertTrue(reAddToCatalogRequestInfo.isRequestSubmittedForReview());
-        ServiceTemplateDetailVo reAddToCatalogedServiceTemplateDetailVo =
-                getServiceTemplateDetailsVo(reAddToCatalogRequestInfo.getServiceTemplateId());
-        assertFalse(reAddToCatalogedServiceTemplateDetailVo.getIsAvailableInCatalog());
+                        republishResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
+        assertTrue(republishRequestInfo.isRequestSubmittedForReview());
+        ServiceTemplateDetailVo republishedServiceTemplateDetailVo =
+                getServiceTemplateDetailsVo(republishRequestInfo.getServiceTemplateId());
+        assertFalse(republishedServiceTemplateDetailVo.getIsAvailableInCatalog());
 
-        // Setup listHistory request
-        final MockHttpServletResponse reAddToCatalogHistoryResponse =
+        // Setup listRequests request
+        final MockHttpServletResponse republishHistoryResponse =
                 listServiceTemplateHistoryWithParams(
                         serviceTemplateId,
-                        ServiceTemplateRequestType.RE_ADD_TO_CATALOG.toValue(),
+                        ServiceTemplateRequestType.REPUBLISH.toValue(),
                         ServiceTemplateRequestStatus.IN_REVIEW.toValue());
-        assertEquals(HttpStatus.OK.value(), reAddToCatalogHistoryResponse.getStatus());
-        List<ServiceTemplateRequestHistory> reAddToCatalogHistoryVos =
+        assertEquals(HttpStatus.OK.value(), republishHistoryResponse.getStatus());
+        List<ServiceTemplateRequestHistory> republishHistoryVos =
                 objectMapper.readValue(
-                        reAddToCatalogHistoryResponse.getContentAsString(),
-                        new TypeReference<>() {});
-        assertEquals(1, reAddToCatalogHistoryVos.size());
+                        republishHistoryResponse.getContentAsString(), new TypeReference<>() {});
+        assertEquals(1, republishHistoryVos.size());
         assertEquals(
-                reAddToCatalogRequestInfo.getRequestId(),
-                reAddToCatalogHistoryVos.getFirst().getRequestId());
-        // reject re_add_to_catalog request
-        reviewServiceTemplateRequest(reAddToCatalogRequestInfo.getRequestId(), false);
+                republishRequestInfo.getRequestId(), republishHistoryVos.getFirst().getRequestId());
+        // reject republish request
+        reviewServiceTemplateRequest(republishRequestInfo.getRequestId(), false);
         // Setup delete request
         // Run the test
         final MockHttpServletResponse deleteResponse = deleteTemplate(serviceTemplateId);
@@ -389,12 +383,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         // Setup fetch update request when the service template is cancelled.
         URL updateUrl = URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL();
         // Run the test
-        boolean isRemoveServiceTemplateUntilApproved = false;
+        boolean isUnpublishUntilApproved = false;
         final MockHttpServletResponse fetchUpdateResponse =
-                fetchUpdate(
-                        serviceTemplateId,
-                        isRemoveServiceTemplateUntilApproved,
-                        updateUrl.toString());
+                fetchUpdate(serviceTemplateId, isUnpublishUntilApproved, updateUrl.toString());
         // Verify the results
         assertEquals(HttpStatus.OK.value(), fetchUpdateResponse.getStatus());
         ServiceTemplateRequestInfo updateRequestInfo =
@@ -475,13 +466,13 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(result, detailResponse.getContentAsString());
 
         // Run the test list service template history
-        final MockHttpServletResponse listHistoryResponse =
+        final MockHttpServletResponse listRequestsResponse =
                 listServiceTemplateHistoryWithParams(id, "register", "in-review");
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), listHistoryResponse.getStatus());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), listRequestsResponse.getStatus());
         assertEquals(
                 objectMapper.writeValueAsString(expectedResponse),
-                listHistoryResponse.getContentAsString());
+                listRequestsResponse.getContentAsString());
 
         URL updateUrl =
                 URI.create("file:src/test/resources/ocl_terraform_from_git_test.yml").toURL();
@@ -499,11 +490,11 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), fetchUpdateResponse.getStatus());
         assertEquals(result, fetchUpdateResponse.getContentAsString());
 
-        // Run the test -removeFromCatalog
-        final MockHttpServletResponse removeFromCatalogResponse = removeFromCatalog(id);
+        // Run the test -unpublish
+        final MockHttpServletResponse unpublishResponse = unpublish(id);
         // Verify the results
-        assertEquals(HttpStatus.BAD_REQUEST.value(), removeFromCatalogResponse.getStatus());
-        assertEquals(result, removeFromCatalogResponse.getContentAsString());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), unpublishResponse.getStatus());
+        assertEquals(result, unpublishResponse.getContentAsString());
     }
 
     void testGetHistoryDetailsThrowsServiceTemplateRequestNotFound() throws Exception {
@@ -555,13 +546,13 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 detailResponse.getContentAsString());
 
         // Run the test list service template history
-        final MockHttpServletResponse listHistoryResponse =
+        final MockHttpServletResponse listRequestsResponse =
                 listServiceTemplateHistoryWithParams(id, "register", null);
 
-        assertEquals(HttpStatus.FORBIDDEN.value(), listHistoryResponse.getStatus());
+        assertEquals(HttpStatus.FORBIDDEN.value(), listRequestsResponse.getStatus());
         assertEquals(
                 objectMapper.writeValueAsString(accessDeniedResponse),
-                listHistoryResponse.getContentAsString());
+                listRequestsResponse.getContentAsString());
 
         // Run the test -getRequestByRequestId()
         final MockHttpServletResponse getRequestByRequestIdResponse =
@@ -593,21 +584,21 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.writeValueAsString(accessDeniedResponse),
                 fetchUpdateResponse.getContentAsString());
 
-        // Run the test removeFromCatalog
-        final MockHttpServletResponse removeFromCatalogResponse = removeFromCatalog(id);
+        // Run the test unpublish
+        final MockHttpServletResponse unpublishResponse = unpublish(id);
         // Verify the results
-        assertEquals(HttpStatus.FORBIDDEN.value(), removeFromCatalogResponse.getStatus());
+        assertEquals(HttpStatus.FORBIDDEN.value(), unpublishResponse.getStatus());
         assertEquals(
                 objectMapper.writeValueAsString(accessDeniedResponse),
-                removeFromCatalogResponse.getContentAsString());
+                unpublishResponse.getContentAsString());
 
         // Run the test re-register
-        final MockHttpServletResponse reAddToCatalogResponse = reAddToCatalog(id);
+        final MockHttpServletResponse republishResponse = republish(id);
         // Verify the results
-        assertEquals(HttpStatus.FORBIDDEN.value(), reAddToCatalogResponse.getStatus());
+        assertEquals(HttpStatus.FORBIDDEN.value(), republishResponse.getStatus());
         assertEquals(
                 objectMapper.writeValueAsString(accessDeniedResponse),
-                reAddToCatalogResponse.getContentAsString());
+                republishResponse.getContentAsString());
 
         // Run the test deleteTemplate
         final MockHttpServletResponse deleteResponse = deleteTemplate(id);
@@ -865,7 +856,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 registerResponse2.getContentAsString(),
                 objectMapper.writeValueAsString(expectedResponse2));
 
-        removeFromCatalog(serviceTemplateId);
+        unpublish(serviceTemplateId);
         deleteTemplate(serviceTemplateId);
     }
 
@@ -1004,32 +995,29 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         registerResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
         UUID serviceTemplateId = registerRequestInfo.getServiceTemplateId();
-        // Run the removeFromCatalog test
+        // Run the unpublish test
         String errorMsg =
                 String.format(
                         "The registration of service template with id %s not approved. The request"
-                                + " to remove_from_catalog is not allowed.",
+                                + " to unpublish is not allowed.",
                         serviceTemplateId);
-        final MockHttpServletResponse removeFromCatalogResponse =
-                removeFromCatalog(serviceTemplateId);
+        final MockHttpServletResponse unpublishResponse = unpublish(serviceTemplateId);
         ErrorResponse errorResponse =
-                objectMapper.readValue(
-                        removeFromCatalogResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), removeFromCatalogResponse.getStatus());
+                objectMapper.readValue(unpublishResponse.getContentAsString(), ErrorResponse.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), unpublishResponse.getStatus());
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
         errorMsg =
                 String.format(
                         "The registration of service template with id %s not approved. The request"
-                                + " to re_add_to_catalog is not allowed.",
+                                + " to republish is not allowed.",
                         serviceTemplateId);
-        // Run the reAddToCatalog test
-        final MockHttpServletResponse reAddToCatalogResponse = reAddToCatalog(serviceTemplateId);
+        // Run the republish test
+        final MockHttpServletResponse republishResponse = republish(serviceTemplateId);
         errorResponse =
-                objectMapper.readValue(
-                        reAddToCatalogResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), reAddToCatalogResponse.getStatus());
+                objectMapper.readValue(republishResponse.getContentAsString(), ErrorResponse.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), republishResponse.getStatus());
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
@@ -1074,22 +1062,21 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
-        // Run the removeFromCatalog test
-        final MockHttpServletResponse removeFromCatalogResponse1 =
-                removeFromCatalog(serviceTemplateId);
+        // Run the unpublish test
+        final MockHttpServletResponse unpublishResponse1 = unpublish(serviceTemplateId);
         errorResponse =
                 objectMapper.readValue(
-                        removeFromCatalogResponse1.getContentAsString(), ErrorResponse.class);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), removeFromCatalogResponse1.getStatus());
+                        unpublishResponse1.getContentAsString(), ErrorResponse.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), unpublishResponse1.getStatus());
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
-        // Run the reAddToCatalog test
-        final MockHttpServletResponse reAddToCatalogResponse1 = reAddToCatalog(serviceTemplateId);
+        // Run the republish test
+        final MockHttpServletResponse republishResponse1 = republish(serviceTemplateId);
         errorResponse =
                 objectMapper.readValue(
-                        reAddToCatalogResponse1.getContentAsString(), ErrorResponse.class);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), reAddToCatalogResponse1.getStatus());
+                        republishResponse1.getContentAsString(), ErrorResponse.class);
+        assertEquals(HttpStatus.BAD_REQUEST.value(), republishResponse1.getStatus());
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
@@ -1102,7 +1089,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         MockHttpServletResponse deleteResponse = deleteTemplate(serviceTemplateId);
         errorResponse =
                 objectMapper.readValue(deleteResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), reAddToCatalogResponse.getStatus());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), republishResponse.getStatus());
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
@@ -1188,15 +1175,15 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 .getResponse();
     }
 
-    MockHttpServletResponse update(UUID id, boolean isRemoveServiceTemplateUntilApproved, Ocl ocl)
+    MockHttpServletResponse update(UUID id, boolean isUnpublishUntilApproved, Ocl ocl)
             throws Exception {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         String requestBody = yamlMapper.writeValueAsString(ocl);
         return mockMvc.perform(
                         put("/xpanse/service_templates/{id}", id)
                                 .param(
-                                        "isRemoveServiceTemplateUntilApproved",
-                                        String.valueOf(isRemoveServiceTemplateUntilApproved))
+                                        "isUnpublishUntilApproved",
+                                        String.valueOf(isUnpublishUntilApproved))
                                 .content(requestBody)
                                 .contentType("application/x-yaml")
                                 .accept(MediaType.APPLICATION_JSON))
@@ -1213,13 +1200,13 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 .getResponse();
     }
 
-    MockHttpServletResponse fetchUpdate(
-            UUID id, boolean isRemoveServiceTemplateUntilApproved, String url) throws Exception {
+    MockHttpServletResponse fetchUpdate(UUID id, boolean isUnpublishUntilApproved, String url)
+            throws Exception {
         return mockMvc.perform(
                         put("/xpanse/service_templates/file/{id}", id)
                                 .param(
-                                        "isRemoveServiceTemplateUntilApproved",
-                                        String.valueOf(isRemoveServiceTemplateUntilApproved))
+                                        "isUnpublishUntilApproved",
+                                        String.valueOf(isUnpublishUntilApproved))
                                 .param("oclLocation", url)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
@@ -1234,17 +1221,17 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 .getResponse();
     }
 
-    MockHttpServletResponse removeFromCatalog(UUID id) throws Exception {
+    MockHttpServletResponse unpublish(UUID id) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/remove_from_catalog/{id}", id)
+                        put("/xpanse/service_templates/unpublish/{id}", id)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
     }
 
-    MockHttpServletResponse reAddToCatalog(UUID id) throws Exception {
+    MockHttpServletResponse republish(UUID id) throws Exception {
         return mockMvc.perform(
-                        put("/xpanse/service_templates/re_add_to_catalog/{id}", id)
+                        put("/xpanse/service_templates/republish/{id}", id)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
@@ -1266,7 +1253,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
             String serviceHostingType,
             String serviceTemplateRegistrationState,
             Boolean isAvailableInCatalog,
-            Boolean reviewInProgress)
+            Boolean isReviewInProgress)
             throws Exception {
         MockHttpServletRequestBuilder getRequestBuilder = get("/xpanse/service_templates");
         if (StringUtils.isNotBlank(categoryName)) {
@@ -1294,9 +1281,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                     getRequestBuilder.param(
                             "isAvailableInCatalog", isAvailableInCatalog.toString());
         }
-        if (Objects.nonNull(reviewInProgress)) {
+        if (Objects.nonNull(isReviewInProgress)) {
             getRequestBuilder =
-                    getRequestBuilder.param("reviewInProgress", reviewInProgress.toString());
+                    getRequestBuilder.param("isReviewInProgress", isReviewInProgress.toString());
         }
         return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
     }

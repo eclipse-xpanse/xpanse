@@ -73,7 +73,10 @@ public class ServiceTemplateApi {
      * @return response
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Register new service template using ocl model.")
+    @Operation(
+            description =
+                    "Submits a new service template using Ocl model. When the request is approved,"
+                            + " the service template will be published to catalog.")
     @PostMapping(value = "/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
@@ -91,7 +94,10 @@ public class ServiceTemplateApi {
      * @return response
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Update service template using id and ocl model.")
+    @Operation(
+            description =
+                    "Updates an existing service template using Ocl model.  When the request is"
+                        + " approved, the updated service template will be published to catalog.")
     @PutMapping(
             value = "/service_templates/{serviceTemplateId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -103,16 +109,16 @@ public class ServiceTemplateApi {
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId,
             @Parameter(
-                            name = "isRemoveServiceTemplateUntilApproved",
+                            name = "isUnpublishUntilApproved",
                             description =
                                     "If true, the old service template is also removed from catalog"
                                             + " until the updated one is reviewed and approved.")
-                    @RequestParam(name = "isRemoveServiceTemplateUntilApproved")
-                    Boolean isRemoveServiceTemplateUntilApproved,
+                    @RequestParam(name = "isUnpublishUntilApproved")
+                    Boolean isUnpublishUntilApproved,
             @Valid @RequestBody Ocl ocl) {
         ServiceTemplateRequestHistoryEntity updateRequest =
                 serviceTemplateManage.updateServiceTemplate(
-                        serviceTemplateId, ocl, isRemoveServiceTemplateUntilApproved);
+                        serviceTemplateId, ocl, isUnpublishUntilApproved);
         return getServiceTemplateRequestInfo(updateRequest);
     }
 
@@ -123,7 +129,10 @@ public class ServiceTemplateApi {
      * @return response
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Register new service template using URL of Ocl file.")
+    @Operation(
+            description =
+                    "Submits a new service template using URL of Ocl file. When the request is"
+                            + " approved, the service template will be published to catalog.")
     @PostMapping(value = "/service_templates/file", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Transactional
@@ -147,7 +156,11 @@ public class ServiceTemplateApi {
      * @return response
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Update service template using id and URL of Ocl file.")
+    @Operation(
+            description =
+                    "Updates an existing service template using URL of Ocl file. When the request"
+                            + " is approved, the updated service template will be published to"
+                            + " catalog.")
     @PutMapping(
             value = "/service_templates/file/{serviceTemplateId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -159,12 +172,12 @@ public class ServiceTemplateApi {
                     @PathVariable(name = "serviceTemplateId")
                     UUID serviceTemplateId,
             @Parameter(
-                            name = "isRemoveServiceTemplateUntilApproved",
+                            name = "isUnpublishUntilApproved",
                             description =
                                     "If true, the old service template is also removed from catalog"
                                             + " until the updated one is reviewed and approved.")
-                    @RequestParam(name = "isRemoveServiceTemplateUntilApproved")
-                    Boolean isRemoveServiceTemplateUntilApproved,
+                    @RequestParam(name = "isUnpublishUntilApproved")
+                    Boolean isUnpublishUntilApproved,
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
                     @RequestParam(name = "oclLocation")
                     String oclLocation)
@@ -172,7 +185,7 @@ public class ServiceTemplateApi {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
         ServiceTemplateRequestHistoryEntity updateRequest =
                 serviceTemplateManage.updateServiceTemplate(
-                        serviceTemplateId, ocl, isRemoveServiceTemplateUntilApproved);
+                        serviceTemplateId, ocl, isUnpublishUntilApproved);
         return getServiceTemplateRequestInfo(updateRequest);
     }
 
@@ -183,18 +196,18 @@ public class ServiceTemplateApi {
      * @return response
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Remove service template from catalog using id.")
-    @PutMapping("/service_templates/remove_from_catalog/{serviceTemplateId}")
+    @Operation(description = "Remove the service template from catalog.")
+    @PutMapping("/service_templates/unpublish/{serviceTemplateId}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
-    public ServiceTemplateRequestInfo removeFromCatalog(
+    public ServiceTemplateRequestInfo unpublish(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
-        ServiceTemplateRequestHistoryEntity removeFromCatalogRequest =
-                serviceTemplateManage.removeFromCatalog(serviceTemplateId);
-        return getServiceTemplateRequestInfo(removeFromCatalogRequest);
+        ServiceTemplateRequestHistoryEntity unpublishRequest =
+                serviceTemplateManage.unpublish(serviceTemplateId);
+        return getServiceTemplateRequestInfo(unpublishRequest);
     }
 
     /**
@@ -204,18 +217,18 @@ public class ServiceTemplateApi {
      * @return response
      */
     @Tag(name = "ServiceVendor", description = "APIs to manage service templates.")
-    @Operation(description = "Re-add the service template to catalog using id.")
-    @PutMapping("/service_templates/re_add_to_catalog/{serviceTemplateId}")
+    @Operation(description = "Publishes the same service template to catalog again.")
+    @PutMapping("/service_templates/republish/{serviceTemplateId}")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
-    public ServiceTemplateRequestInfo reAddToCatalog(
+    public ServiceTemplateRequestInfo republish(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
-        ServiceTemplateRequestHistoryEntity reAddToCatalogRequest =
-                serviceTemplateManage.reAddToCatalog(serviceTemplateId);
-        return getServiceTemplateRequestInfo(reAddToCatalogRequest);
+        ServiceTemplateRequestHistoryEntity republishRequest =
+                serviceTemplateManage.republish(serviceTemplateId);
+        return getServiceTemplateRequestInfo(republishRequest);
     }
 
     /**
