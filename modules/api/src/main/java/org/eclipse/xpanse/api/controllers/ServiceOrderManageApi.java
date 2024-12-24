@@ -59,19 +59,18 @@ public class ServiceOrderManageApi {
     @Operation(description = "List service orders of the service")
     @GetMapping(value = "/services/{serviceId}/orders", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public List<ServiceOrderDetails> getAllOrdersByServiceId(
             @Parameter(name = "serviceId", description = "Id of the service")
                     @PathVariable(name = "serviceId")
-                    String serviceId,
+                    UUID serviceId,
             @Parameter(name = "taskType", description = "Task type of the service order.")
                     @RequestParam(name = "taskType", required = false)
                     ServiceOrderType taskType,
             @Parameter(name = "taskStatus", description = "Task status of the service order")
                     @RequestParam(name = "taskStatus", required = false)
                     TaskStatus taskStatus) {
-        return serviceOrderManager.listServiceOrders(
-                UUID.fromString(serviceId), taskType, taskStatus);
+        return serviceOrderManager.listServiceOrders(serviceId, taskType, taskStatus);
     }
 
     /**
@@ -85,12 +84,12 @@ public class ServiceOrderManageApi {
             value = "/services/{serviceId}/orders",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public void deleteOrdersByServiceId(
             @Parameter(name = "serviceId", description = "Id of the service")
                     @PathVariable(name = "serviceId")
-                    String serviceId) {
-        serviceOrderManager.deleteOrdersByServiceId(UUID.fromString(serviceId));
+                    UUID serviceId) {
+        serviceOrderManager.deleteOrdersByServiceId(serviceId);
     }
 
     /**
@@ -103,12 +102,12 @@ public class ServiceOrderManageApi {
     @Operation(description = "Get details of the service order by the order id.")
     @GetMapping(value = "/services/orders/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceOrderId")
+    @AuditApiRequest(methodName = "getCspFromServiceOrderId", paramTypes = UUID.class)
     public ServiceOrderDetails getOrderDetailsByOrderId(
             @Parameter(name = "orderId", description = "Id of the service order")
                     @PathVariable(name = "orderId")
-                    String orderId) {
-        return serviceOrderManager.getOrderDetailsByOrderId(UUID.fromString(orderId));
+                    UUID orderId) {
+        return serviceOrderManager.getOrderDetailsByOrderId(orderId);
     }
 
     /**
@@ -122,12 +121,12 @@ public class ServiceOrderManageApi {
             value = "/services/orders/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @AuditApiRequest(methodName = "getCspFromServiceOrderId")
+    @AuditApiRequest(methodName = "getCspFromServiceOrderId", paramTypes = UUID.class)
     public void deleteOrderByOrderId(
             @Parameter(name = "orderId", description = "Id of the service order")
                     @PathVariable(name = "orderId")
-                    String orderId) {
-        serviceOrderManager.deleteOrderByOrderId(UUID.fromString(orderId));
+                    UUID orderId) {
+        serviceOrderManager.deleteOrderByOrderId(orderId);
     }
 
     /** Method to fetch status of service deployment. */
@@ -139,12 +138,12 @@ public class ServiceOrderManageApi {
             description =
                     "Long-polling method to get the latest or updated task status of the service"
                             + " order.")
-    @AuditApiRequest(methodName = "getCspFromServiceOrderId")
+    @AuditApiRequest(methodName = "getCspFromServiceOrderId", paramTypes = UUID.class)
     @ResponseStatus(HttpStatus.OK)
     public DeferredResult<ServiceOrderStatusUpdate> getLatestServiceOrderStatus(
             @Parameter(name = "orderId", description = "Id of the service order")
                     @PathVariable(name = "orderId")
-                    String orderId,
+                    UUID orderId,
             @Parameter(
                             name = "lastKnownServiceDeploymentState",
                             description =
@@ -154,8 +153,7 @@ public class ServiceOrderManageApi {
                                             + " state.")
                     @RequestParam(name = "lastKnownServiceOrderTaskStatus", required = false)
                     TaskStatus lastKnownServiceOrderTaskStatus) {
-        UUID serviceOrderId = UUID.fromString(orderId);
         return serviceOrderManager.getLatestServiceOrderStatus(
-                serviceOrderId, lastKnownServiceOrderTaskStatus);
+                orderId, lastKnownServiceOrderTaskStatus);
     }
 }

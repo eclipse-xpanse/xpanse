@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
 import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.ServiceMetricsApi;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.MetricsDataNotYetAvailableException;
@@ -62,7 +63,8 @@ class ServiceMetricsExceptionHandlerTest {
 
     @Test
     void testResourceNotSupportedForMonitoringException() throws Exception {
-        when(serviceMetricsAdapter.getMetricsByResourceId(resourceId, null, null, null, null, true))
+        when(serviceMetricsAdapter.getMetricsByResourceId(
+                        UUID.fromString(resourceId), null, null, null, null, true))
                 .thenThrow(new ResourceNotSupportedForMonitoringException("test error"));
 
         this.mockMvc
@@ -78,7 +80,8 @@ class ServiceMetricsExceptionHandlerTest {
 
     @Test
     void testResourceNotFoundException() throws Exception {
-        when(serviceMetricsAdapter.getMetricsByResourceId(resourceId, null, null, null, null, true))
+        when(serviceMetricsAdapter.getMetricsByResourceId(
+                        UUID.fromString(resourceId), null, null, null, null, true))
                 .thenThrow(new ResourceNotFoundException("test error"));
 
         this.mockMvc
@@ -94,7 +97,8 @@ class ServiceMetricsExceptionHandlerTest {
 
     @Test
     void testMetricsDataNotYetAvailableException() throws Exception {
-        when(serviceMetricsAdapter.getMetricsByResourceId(resourceId, null, null, null, null, true))
+        when(serviceMetricsAdapter.getMetricsByResourceId(
+                        UUID.fromString(resourceId), null, null, null, null, true))
                 .thenThrow(new MetricsDataNotYetAvailableException("test error"));
 
         this.mockMvc

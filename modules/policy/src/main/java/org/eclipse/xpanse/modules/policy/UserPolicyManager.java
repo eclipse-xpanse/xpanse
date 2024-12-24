@@ -102,11 +102,11 @@ public class UserPolicyManager {
     /**
      * Get details of the policy.
      *
-     * @param id the id of the policy.
+     * @param policyId the id of the policy.
      * @return Returns the policy view object.
      */
-    public UserPolicy getUserPolicyDetails(UUID id) {
-        UserPolicyEntity existingEntity = getUserPolicyEntity(id);
+    public UserPolicy getUserPolicyDetails(UUID policyId) {
+        UserPolicyEntity existingEntity = getUserPolicyEntity(policyId);
         return conventToUserPolicy(existingEntity);
     }
 

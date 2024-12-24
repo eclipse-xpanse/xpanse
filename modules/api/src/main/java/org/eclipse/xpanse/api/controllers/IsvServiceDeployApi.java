@@ -86,12 +86,11 @@ public class IsvServiceDeployApi {
             value = "/services/isv/details/vendor_hosted/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public DeployedServiceDetails getServiceDetailsByIdForIsv(
             @Parameter(name = "serviceId", description = "Id of deployed service")
                     @PathVariable("serviceId")
-                    String serviceId) {
-        return this.serviceDetailsViewManager.getServiceDetailsByIdForIsv(
-                UUID.fromString(serviceId));
+                    UUID serviceId) {
+        return this.serviceDetailsViewManager.getServiceDetailsByIdForIsv(serviceId);
     }
 }

@@ -47,14 +47,14 @@ public class ServiceMetricsAdapter {
 
     /** Get metrics of the service instance. */
     public List<Metric> getMetricsByServiceId(
-            String id,
+            UUID serviceId,
             MonitorResourceType monitorType,
             Long from,
             Long to,
             Integer granularity,
             boolean onlyLastKnownMetric) {
         validateToAndFromValues(from, to);
-        ServiceDeploymentEntity serviceEntity = findDeployServiceEntity(UUID.fromString(id));
+        ServiceDeploymentEntity serviceEntity = findDeployServiceEntity(serviceId);
         List<ServiceResourceEntity> vmEntities =
                 serviceEntity.getDeployResourceList().stream()
                         .filter(entity -> entity.getResourceKind().equals(DeployResourceKind.VM))
@@ -76,7 +76,7 @@ public class ServiceMetricsAdapter {
         List<DeployResource> vmResources = EntityTransUtils.transToDeployResourceList(vmEntities);
         ServiceMetricsRequest serviceMetricRequest =
                 getServiceMetricRequest(
-                        UUID.fromString(id),
+                        serviceId,
                         region,
                         vmResources,
                         monitorType,
@@ -90,7 +90,7 @@ public class ServiceMetricsAdapter {
 
     /** Get metrics of the resource instance. */
     public List<Metric> getMetricsByResourceId(
-            String id,
+            UUID resourceId,
             MonitorResourceType monitorType,
             Long from,
             Long to,
@@ -98,7 +98,7 @@ public class ServiceMetricsAdapter {
             boolean onlyLastKnownMetric) {
         validateToAndFromValues(from, to);
         ServiceResourceEntity resourceEntity =
-                serviceResourceStorage.findServiceResourceByResourceId(id);
+                serviceResourceStorage.findServiceResourceByResourceId(String.valueOf(resourceId));
         if (Objects.isNull(resourceEntity)) {
             throw new ResourceNotFoundException("Resource not found.");
         }

@@ -77,16 +77,16 @@ public class UserPolicyManageApi {
     /**
      * Get the details of the policy created by the user.
      *
-     * @param id The id of the policy.
+     * @param policyId The id of the policy.
      * @return Returns list of the policies defined by the user.
      */
     @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
-    @GetMapping(value = "/policies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/policies/{policyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the details of the policy created by the user.")
-    @AuditApiRequest(methodName = "getCspFromUserPolicyId")
-    public UserPolicy getPolicyDetails(@PathVariable String id) {
-        return userPolicyManager.getUserPolicyDetails(UUID.fromString(id));
+    @AuditApiRequest(methodName = "getCspFromUserPolicyId", paramTypes = UUID.class)
+    public UserPolicy getPolicyDetails(@PathVariable UUID policyId) {
+        return userPolicyManager.getUserPolicyDetails(policyId);
     }
 
     /**
@@ -123,14 +123,14 @@ public class UserPolicyManageApi {
     /**
      * Delete the policy created by the user.
      *
-     * @param id The id of policy.
+     * @param policyId The id of policy.
      */
     @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
-    @DeleteMapping(value = "/policies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/policies/{policyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete the policy created by the user.")
-    @AuditApiRequest(methodName = "getCspFromUserPolicyId")
-    public void deleteUserPolicy(@PathVariable("id") String id) {
-        userPolicyManager.deleteUserPolicy(UUID.fromString(id));
+    @AuditApiRequest(methodName = "getCspFromUserPolicyId", paramTypes = UUID.class)
+    public void deleteUserPolicy(@PathVariable("policyId") UUID policyId) {
+        userPolicyManager.deleteUserPolicy(policyId);
     }
 }
