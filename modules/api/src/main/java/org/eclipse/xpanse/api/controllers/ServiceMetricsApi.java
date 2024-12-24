@@ -14,8 +14,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
@@ -53,14 +53,14 @@ public class ServiceMetricsApi {
     @Operation(description = "Get metrics of a deployed service or a resource.")
     @GetMapping(value = "/metrics", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public List<Metric> getMetrics(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
                     @RequestParam(name = "serviceId")
-                    String serviceId,
+                    UUID serviceId,
             @Parameter(name = "resourceId", description = "Id of resource in the deployed service")
                     @RequestParam(name = "resourceId", required = false)
-                    String resourceId,
+                    UUID resourceId,
             @Parameter(name = "monitorResourceType", description = "Types of the monitor resource.")
                     @RequestParam(name = "monitorResourceType", required = false)
                     MonitorResourceType monitorResourceType,
@@ -100,7 +100,7 @@ public class ServiceMetricsApi {
                             required = false,
                             defaultValue = "false")
                     boolean onlyLastKnownMetric) {
-        if (StringUtils.isNotBlank(resourceId)) {
+        if (resourceId != null) {
             return serviceMetricsAdapter.getMetricsByResourceId(
                     resourceId, monitorResourceType, from, to, granularity, onlyLastKnownMetric);
         }

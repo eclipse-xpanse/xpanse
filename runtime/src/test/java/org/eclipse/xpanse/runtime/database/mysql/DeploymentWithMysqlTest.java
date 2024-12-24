@@ -100,7 +100,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
             DeployedServiceDetails deployedServiceDetails = getDeployedServiceDetails(serviceId);
 
             UserOrderableServiceVo orderableServiceDetails =
-                    serviceDeployerApi.getOrderableServiceDetailsByServiceId(serviceId.toString());
+                    serviceDeployerApi.getOrderableServiceDetailsByServiceId(serviceId);
             assertEquals(
                     orderableServiceDetails.getServiceTemplateId(),
                     serviceTemplateHistory.getServiceTemplateId());
@@ -113,7 +113,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
                 if (waitServiceOrderIsCompleted(migrateOrder.getOrderId())) {
                     ServiceOrderDetails serviceOrderDetails =
                             serviceOrderManageApi.getOrderDetailsByOrderId(
-                                    migrateOrder.getOrderId().toString());
+                                    migrateOrder.getOrderId());
                     testDestroyAndGetDetails(serviceOrderDetails.getServiceId());
                     testListServiceOrders(serviceId);
                     testDeleteServiceOrders(serviceId);
@@ -149,7 +149,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     }
 
     DeployedServiceDetails getDeployedServiceDetails(UUID serviceId) {
-        return serviceDeployerApi.getSelfHostedServiceDetailsById(serviceId.toString());
+        return serviceDeployerApi.getSelfHostedServiceDetailsById(serviceId);
     }
 
     private boolean waitServiceOrderIsCompleted(UUID orderId) throws Exception {
@@ -164,7 +164,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     private boolean serviceOrderIsCompleted(UUID orderId) throws InterruptedException {
         DeferredResult<ServiceOrderStatusUpdate> deferredResult =
-                serviceOrderManageApi.getLatestServiceOrderStatus(orderId.toString(), null);
+                serviceOrderManageApi.getLatestServiceOrderStatus(orderId, null);
         while (Objects.isNull(deferredResult.getResult())) {
             Thread.sleep(1000);
         }
@@ -228,14 +228,13 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         serviceRequestProperties.put("admin_passwd", "2222222222@Qq");
         modifyRequest.setServiceRequestProperties(serviceRequestProperties);
         // Run the test
-        ServiceOrder serviceOrder = serviceDeployerApi.modify(serviceId.toString(), modifyRequest);
+        ServiceOrder serviceOrder = serviceDeployerApi.modify(serviceId, modifyRequest);
         // Verify the results
         Assertions.assertNotNull(serviceOrder.getOrderId());
         Assertions.assertNotNull(serviceOrder.getServiceId());
         if (waitServiceOrderIsCompleted(serviceOrder.getOrderId())) {
             ServiceOrderDetails serviceOrderDetails =
-                    serviceOrderManageApi.getOrderDetailsByOrderId(
-                            serviceOrder.getOrderId().toString());
+                    serviceOrderManageApi.getOrderDetailsByOrderId(serviceOrder.getOrderId());
             assertEquals(serviceOrderDetails.getTaskStatus(), TaskStatus.SUCCESSFUL);
             assertEquals(serviceOrderDetails.getTaskType(), ServiceOrderType.MODIFY);
         }
@@ -244,11 +243,10 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     void testDestroyAndGetDetails(UUID serviceId) throws Exception {
 
         // Run the test
-        ServiceOrder serviceOrder = serviceDeployerApi.destroy(serviceId.toString());
+        ServiceOrder serviceOrder = serviceDeployerApi.destroy(serviceId);
         if (waitServiceOrderIsCompleted(serviceOrder.getOrderId())) {
             ServiceOrderDetails serviceOrderDetails =
-                    serviceOrderManageApi.getOrderDetailsByOrderId(
-                            serviceOrder.getOrderId().toString());
+                    serviceOrderManageApi.getOrderDetailsByOrderId(serviceOrder.getOrderId());
             assertEquals(serviceOrderDetails.getTaskStatus(), TaskStatus.SUCCESSFUL);
             assertEquals(serviceOrderDetails.getTaskType(), ServiceOrderType.DESTROY);
         }
@@ -256,7 +254,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     void testPurgeAndGetDetails(UUID serviceId) {
         // Run the test
-        ServiceOrder serviceOrder = serviceDeployerApi.purge(serviceId.toString());
+        ServiceOrder serviceOrder = serviceDeployerApi.purge(serviceId);
         try {
             waitServiceOrderIsCompleted(serviceOrder.getOrderId());
         } catch (Exception e) {
@@ -268,12 +266,12 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
     void testListServiceOrders(UUID serviceId) {
         List<ServiceOrderDetails> serviceOrders =
-                serviceOrderManageApi.getAllOrdersByServiceId(serviceId.toString(), null, null);
+                serviceOrderManageApi.getAllOrdersByServiceId(serviceId, null, null);
         Assertions.assertNotNull(serviceOrders);
     }
 
     void testDeleteServiceOrders(UUID serviceId) {
-        serviceOrderManageApi.deleteOrdersByServiceId(serviceId.toString());
+        serviceOrderManageApi.deleteOrdersByServiceId(serviceId);
     }
 
     private void addCredentialForHuaweiCloud() {

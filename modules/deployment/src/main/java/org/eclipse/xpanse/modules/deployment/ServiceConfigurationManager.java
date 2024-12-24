@@ -20,7 +20,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
@@ -102,10 +101,9 @@ public class ServiceConfigurationManager {
      * @param serviceId id of the deployed service
      * @return ServiceConfigurationEntity.
      */
-    public ServiceConfigurationDetails getCurrentConfigurationOfService(String serviceId) {
+    public ServiceConfigurationDetails getCurrentConfigurationOfService(UUID serviceId) {
         ServiceConfigurationEntity entity =
-                serviceConfigurationStorage.findServiceConfigurationById(
-                        UUID.fromString(serviceId));
+                serviceConfigurationStorage.findServiceConfigurationById(serviceId);
         if (Objects.isNull(entity)) {
             String errorMsg =
                     String.format("Service Configuration with service id %s not found.", serviceId);
@@ -122,11 +120,10 @@ public class ServiceConfigurationManager {
      * @param configurationUpdate serviceConfigurationUpdate.
      */
     public ServiceOrder changeServiceConfiguration(
-            String serviceId, ServiceConfigurationUpdate configurationUpdate) {
+            UUID serviceId, ServiceConfigurationUpdate configurationUpdate) {
         try {
             ServiceDeploymentEntity serviceDeploymentEntity =
-                    serviceDeploymentEntityHandler.getServiceDeploymentEntity(
-                            UUID.fromString(serviceId));
+                    serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
                             serviceDeploymentEntity.getServiceTemplateId());
@@ -146,7 +143,7 @@ public class ServiceConfigurationManager {
                     serviceDeploymentEntity,
                     serviceTemplateEntity.getOcl(),
                     configurationUpdate.getConfiguration());
-            return new ServiceOrder(orderId, UUID.fromString(serviceId));
+            return new ServiceOrder(orderId, serviceId);
         } catch (ServiceConfigurationInvalidException e) {
             String errorMsg =
                     String.format("Change service configuration error, %s", e.getErrorReasons());
@@ -157,19 +154,15 @@ public class ServiceConfigurationManager {
 
     /** Query service change details update request by queryModel. */
     public List<ServiceChangeOrderDetails> getAllServiceConfigurationChangeDetails(
-            String orderId,
-            String serviceId,
+            UUID orderId,
+            UUID serviceId,
             String resourceName,
             String configManager,
             ServiceConfigurationStatus status) {
-        UUID uuidOrderId = StringUtils.isEmpty(orderId) ? null : UUID.fromString(orderId);
+        UUID uuidOrderId = Objects.isNull(orderId) ? null : orderId;
         ServiceChangeDetailsQueryModel queryModel =
                 new ServiceChangeDetailsQueryModel(
-                        uuidOrderId,
-                        UUID.fromString(serviceId),
-                        resourceName,
-                        configManager,
-                        status);
+                        uuidOrderId, serviceId, resourceName, configManager, status);
         List<ServiceChangeDetailsEntity> requests =
                 serviceChangeDetailsStorage.listServiceChangeDetails(queryModel);
 
@@ -186,15 +179,13 @@ public class ServiceConfigurationManager {
 
     private void addServiceChangeDetails(
             UUID orderId,
-            String serviceId,
+            UUID serviceId,
             ServiceDeploymentEntity serviceDeployment,
             Ocl ocl,
             Map<String, Object> updateRequestMap) {
-
         Map<String, List<DeployResource>> deployResourceMap =
                 deployService
-                        .listResourcesOfDeployedService(
-                                UUID.fromString(serviceId), DeployResourceKind.VM)
+                        .listResourcesOfDeployedService(serviceId, DeployResourceKind.VM)
                         .stream()
                         .collect(Collectors.groupingBy(DeployResource::getGroupName));
 

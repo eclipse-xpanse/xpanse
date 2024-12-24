@@ -51,9 +51,9 @@ public class ServiceStateManageApi {
     @Operation(description = "Start a task to start the service instance.")
     @PutMapping(value = "/services/start/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
-    public ServiceOrder startService(@PathVariable("serviceId") String serviceId) {
-        return serviceStateManager.startService(UUID.fromString(serviceId));
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
+    public ServiceOrder startService(@PathVariable("serviceId") UUID serviceId) {
+        return serviceStateManager.startService(serviceId);
     }
 
     /**
@@ -68,9 +68,9 @@ public class ServiceStateManageApi {
     @Operation(description = "Start a task to stop the service instance.")
     @PutMapping(value = "/services/stop/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
-    public ServiceOrder stopService(@PathVariable("serviceId") String serviceId) {
-        return serviceStateManager.stopService(UUID.fromString(serviceId));
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
+    public ServiceOrder stopService(@PathVariable("serviceId") UUID serviceId) {
+        return serviceStateManager.stopService(serviceId);
     }
 
     /**
@@ -87,8 +87,8 @@ public class ServiceStateManageApi {
             value = "/services/restart/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
-    public ServiceOrder restartService(@PathVariable("serviceId") String serviceId) {
-        return serviceStateManager.restartService(UUID.fromString(serviceId));
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
+    public ServiceOrder restartService(@PathVariable("serviceId") UUID serviceId) {
+        return serviceStateManager.restartService(serviceId);
     }
 }

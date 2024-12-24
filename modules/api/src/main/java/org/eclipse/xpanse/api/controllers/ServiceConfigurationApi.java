@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
@@ -62,11 +63,11 @@ public class ServiceConfigurationApi {
     @Operation(
             description =
                     "Query the service's current configuration by" + " id of the deployed service.")
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public ServiceConfigurationDetails getCurrentConfigurationOfService(
             @Parameter(name = "serviceId", description = "The id of the deployed service")
                     @PathVariable("serviceId")
-                    String serviceId) {
+                    UUID serviceId) {
         return serviceConfigurationManager.getCurrentConfigurationOfService(serviceId);
     }
 
@@ -86,7 +87,7 @@ public class ServiceConfigurationApi {
     public ServiceOrder changeServiceConfiguration(
             @Parameter(name = "serviceId", description = "The id of the deployed service")
                     @PathVariable("serviceId")
-                    String serviceId,
+                    UUID serviceId,
             @Valid @RequestBody ServiceConfigurationUpdate serviceConfigurationUpdate) {
         return serviceConfigurationManager.changeServiceConfiguration(
                 serviceId, serviceConfigurationUpdate);
@@ -97,14 +98,14 @@ public class ServiceConfigurationApi {
     @GetMapping(value = "/services/config/requests", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List service's configuration.")
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public List<ServiceChangeOrderDetails> getAllServiceConfigurationChangeDetails(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
                     @RequestParam(name = "serviceId")
-                    String serviceId,
+                    UUID serviceId,
             @Parameter(name = "orderId", description = "id of the service order")
                     @RequestParam(name = "orderId", required = false)
-                    String orderId,
+                    UUID orderId,
             @Parameter(name = "resourceName", description = "name of the service resource")
                     @RequestParam(name = "resourceName", required = false)
                     String resourceName,

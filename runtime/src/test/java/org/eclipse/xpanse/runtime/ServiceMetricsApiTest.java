@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.eclipse.xpanse.api.controllers.ServiceMetricsApi;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.MetricItem;
@@ -41,9 +42,9 @@ class ServiceMetricsApiTest {
 
     private final Long to = System.currentTimeMillis();
 
-    private final String serviceId = "e034af0c-be03-453e-92cd-fd69acbfe526";
+    private final UUID serviceId = UUID.fromString("e034af0c-be03-453e-92cd-fd69acbfe526");
 
-    private final String resourceId = "e034af0c-be03-453e-92cd-fd69acbfe526";
+    private final UUID resourceId = UUID.fromString("e034af0c-be03-453e-92cd-fd69acbfe526");
 
     @MockitoBean private ServiceMetricsAdapter mockServiceMetricsAdapter;
 

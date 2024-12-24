@@ -126,22 +126,22 @@ public class ServicePolicyManager {
     /**
      * Get details of the policy belonging to the registered service template.
      *
-     * @param id the id of the policy.
+     * @param policyId the id of the policy.
      * @return Returns the policy view object.
      */
-    public ServicePolicy getServicePolicyDetails(UUID id) {
-        ServicePolicyEntity existingEntity = getServicePolicyEntity(id);
+    public ServicePolicy getServicePolicyDetails(UUID policyId) {
+        ServicePolicyEntity existingEntity = getServicePolicyEntity(policyId);
         return conventToServicePolicy(existingEntity);
     }
 
     /**
      * Delete the policy belonging to the registered service template.
      *
-     * @param id the id of policy.
+     * @param policyId the id of policy.
      */
-    public void deleteServicePolicy(UUID id) {
-        getServicePolicyEntity(id);
-        servicePolicyStorage.deletePolicyById(id);
+    public void deleteServicePolicy(UUID policyId) {
+        getServicePolicyEntity(policyId);
+        servicePolicyStorage.deletePolicyById(policyId);
     }
 
     private ServicePolicyEntity getServicePolicyEntity(UUID policyId) {

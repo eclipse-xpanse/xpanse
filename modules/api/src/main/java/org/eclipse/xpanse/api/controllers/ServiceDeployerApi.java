@@ -90,13 +90,12 @@ public class ServiceDeployerApi {
             value = "/services/details/self_hosted/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public DeployedServiceDetails getSelfHostedServiceDetailsById(
             @Parameter(name = "serviceId", description = "Id of the service")
                     @PathVariable("serviceId")
-                    String serviceId) {
-        return this.serviceDetailsViewManager.getSelfHostedServiceDetailsByIdForEndUser(
-                UUID.fromString(serviceId));
+                    UUID serviceId) {
+        return this.serviceDetailsViewManager.getSelfHostedServiceDetailsByIdForEndUser(serviceId);
     }
 
     /**
@@ -110,13 +109,13 @@ public class ServiceDeployerApi {
             value = "/services/details/vendor_hosted/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public VendorHostedDeployedServiceDetails getVendorHostedServiceDetailsById(
             @Parameter(name = "serviceId", description = "Id of the service")
                     @PathVariable("serviceId")
-                    String serviceId) {
+                    UUID serviceId) {
         return this.serviceDetailsViewManager.getVendorHostedServiceDetailsByIdForEndUser(
-                UUID.fromString(serviceId));
+                serviceId);
     }
 
     /**
@@ -211,10 +210,10 @@ public class ServiceDeployerApi {
             value = "/services/deploy/retry/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     @OrderFailedApiResponses
-    public ServiceOrder redeployFailedDeployment(@PathVariable("serviceId") String serviceId) {
-        return this.deployService.createOrderToRedeployFailedService(UUID.fromString(serviceId));
+    public ServiceOrder redeployFailedDeployment(@PathVariable("serviceId") UUID serviceId) {
+        return this.deployService.createOrderToRedeployFailedService(serviceId);
     }
 
     /**
@@ -227,15 +226,14 @@ public class ServiceDeployerApi {
     @Operation(description = "Create an order task to modify the deployed service.")
     @PutMapping(value = "/services/modify/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     @OrderFailedApiResponses
     public ServiceOrder modify(
             @Parameter(name = "serviceId", description = "Id of the service")
                     @PathVariable("serviceId")
-                    String serviceId,
+                    UUID serviceId,
             @Valid @RequestBody ModifyRequest modifyRequest) {
-        return this.deployService.createOrderToModifyDeployedService(
-                UUID.fromString(serviceId), modifyRequest);
+        return this.deployService.createOrderToModifyDeployedService(serviceId, modifyRequest);
     }
 
     /**
@@ -249,14 +247,13 @@ public class ServiceDeployerApi {
             value = "/services/changelock/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public ServiceOrder changeServiceLockConfig(
             @Parameter(name = "serviceId", description = "Id of the service")
                     @PathVariable("serviceId")
-                    String serviceId,
+                    UUID serviceId,
             @Valid @RequestBody ServiceLockConfig serviceLockConfig) {
-        return this.lockConfigService.changeServiceLockConfig(
-                UUID.fromString(serviceId), serviceLockConfig);
+        return this.lockConfigService.changeServiceLockConfig(serviceId, serviceLockConfig);
     }
 
     /**
@@ -269,13 +266,13 @@ public class ServiceDeployerApi {
     @Operation(description = "Create an order task to destroy the deployed service using id.")
     @DeleteMapping(value = "/services/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     @OrderFailedApiResponses
     public ServiceOrder destroy(
             @Parameter(name = "serviceId", description = "Id of the service")
                     @PathVariable("serviceId")
-                    String serviceId) {
-        return this.deployService.createOrderToDestroyDeployedService(UUID.fromString(serviceId));
+                    UUID serviceId) {
+        return this.deployService.createOrderToDestroyDeployedService(serviceId);
     }
 
     /**
@@ -290,13 +287,13 @@ public class ServiceDeployerApi {
             value = "/services/purge/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     @OrderFailedApiResponses
     public ServiceOrder purge(
             @Parameter(name = "serviceId", description = "Id of the service")
                     @PathVariable("serviceId")
-                    String serviceId) {
-        return this.deployService.createOrderToPurgeDestroyedService(UUID.fromString(serviceId));
+                    UUID serviceId) {
+        return this.deployService.createOrderToPurgeDestroyedService(serviceId);
     }
 
     /**
@@ -352,13 +349,13 @@ public class ServiceDeployerApi {
             description =
                     "Long-polling method to get the latest service deployment or service update"
                             + " status.")
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
     public DeferredResult<DeploymentStatusUpdate> getLatestServiceDeploymentStatus(
             @Parameter(name = "serviceId", description = "ID of the service")
                     @PathVariable(name = "serviceId")
-                    String serviceId,
+                    UUID serviceId,
             @Parameter(
                             name = "lastKnownServiceDeploymentState",
                             description =
@@ -368,7 +365,7 @@ public class ServiceDeployerApi {
                     @RequestParam(name = "lastKnownServiceDeploymentState", required = false)
                     ServiceDeploymentState lastKnownServiceDeploymentState) {
         return deployService.getLatestServiceDeploymentStatus(
-                UUID.fromString(serviceId), lastKnownServiceDeploymentState);
+                serviceId, lastKnownServiceDeploymentState);
     }
 
     /**
@@ -383,14 +380,14 @@ public class ServiceDeployerApi {
             value = "/services/{serviceId}/service_template",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
     public UserOrderableServiceVo getOrderableServiceDetailsByServiceId(
             @Parameter(name = "serviceId", description = "The id of deployed service.")
                     @PathVariable("serviceId")
-                    String serviceId) {
+                    UUID serviceId) {
         ServiceTemplateEntity usedServiceTemplate =
-                deployService.getOrderableServiceDetailsByServiceId(UUID.fromString(serviceId));
+                deployService.getOrderableServiceDetailsByServiceId(serviceId);
         return convertToUserOrderableServiceVo(usedServiceTemplate);
     }
 
@@ -406,13 +403,12 @@ public class ServiceDeployerApi {
             value = "/services/{serviceId}/resources/compute",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public List<DeployResource> getComputeResourceInventoryOfService(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
                     @PathVariable(name = "serviceId")
-                    String serviceId) {
-        return this.deployService.listResourcesOfDeployedService(
-                UUID.fromString(serviceId), DeployResourceKind.VM);
+                    UUID serviceId) {
+        return this.deployService.listResourcesOfDeployedService(serviceId, DeployResourceKind.VM);
     }
 
     private CacheControl getCacheControl() {
