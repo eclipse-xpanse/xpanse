@@ -337,6 +337,8 @@ public class ServiceTemplateManage {
             serviceTemplateHistory.setReviewComment(AUTO_APPROVED_REVIEW_COMMENT);
         } else {
             serviceTemplateHistory.setStatus(ServiceTemplateRequestStatus.IN_REVIEW);
+            serviceTemplateHistory.setReviewComment(
+                    ServiceTemplateRequestStatus.IN_REVIEW.toValue());
         }
         return templateRequestStorage.storeAndFlush(serviceTemplateHistory);
     }
@@ -501,11 +503,7 @@ public class ServiceTemplateManage {
         } else if (ServiceReviewResult.REJECTED == review.getReviewResult()) {
             requestToReview.setStatus(ServiceTemplateRequestStatus.REJECTED);
         }
-        if (Objects.nonNull(review.getReviewComment())) {
-            requestToReview.setReviewComment(review.getReviewComment());
-        } else {
-            requestToReview.setReviewComment(review.getReviewResult().toValue());
-        }
+        requestToReview.setReviewComment(review.getReviewComment());
         ServiceTemplateRequestHistoryEntity reviewedRequest =
                 templateRequestStorage.storeAndFlush(requestToReview);
         updateServiceTemplateByReviewedRequest(reviewedRequest);

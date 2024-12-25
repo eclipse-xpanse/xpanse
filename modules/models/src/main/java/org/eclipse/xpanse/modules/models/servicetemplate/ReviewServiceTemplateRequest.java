@@ -7,6 +7,7 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,8 @@ public class ReviewServiceTemplateRequest {
     @Schema(description = "The result of review registration.")
     private ServiceReviewResult reviewResult;
 
+    @NotNull
+    @NotBlank
     @Schema(description = "The comment of review registration.")
     private String reviewComment;
 }
