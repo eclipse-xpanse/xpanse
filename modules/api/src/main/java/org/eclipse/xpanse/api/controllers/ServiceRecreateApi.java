@@ -76,11 +76,10 @@ public class ServiceRecreateApi {
             value = "/services/recreate/{serviceId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @AuditApiRequest(methodName = "getCspFromServiceId")
-    public ServiceOrder recreateService(@Valid @PathVariable("serviceId") String serviceId) {
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
+    public ServiceOrder recreateService(@Valid @PathVariable("serviceId") UUID serviceId) {
         ServiceDeploymentEntity serviceDeploymentEntity =
-                this.serviceDeploymentEntityHandler.getServiceDeploymentEntity(
-                        UUID.fromString(serviceId));
+                this.serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
         String userId = getUserId();
         if (!StringUtils.equals(userId, serviceDeploymentEntity.getUserId())) {
             throw new AccessDeniedException(
@@ -90,9 +89,7 @@ public class ServiceRecreateApi {
         if (Objects.nonNull(serviceDeploymentEntity.getLockConfig())
                 && serviceDeploymentEntity.getLockConfig().isModifyLocked()) {
             String errorMsg =
-                    String.format(
-                            "Service with id %s is locked from recreate.",
-                            UUID.fromString(serviceId));
+                    String.format("Service with id %s is locked from recreate.", serviceId);
             throw new ServiceLockedException(errorMsg);
         }
 

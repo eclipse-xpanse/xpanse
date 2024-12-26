@@ -87,18 +87,18 @@ public class GetCspInfoFromRequest {
     /**
      * Get Csp with id of service.
      *
-     * @param id id of service.
+     * @param serviceId id of service.
      * @return csp.
      */
-    public Csp getCspFromServiceId(String id) {
+    public Csp getCspFromServiceId(UUID serviceId) {
         try {
             ServiceDeploymentEntity deployService =
-                    deployServiceStorage.findServiceDeploymentById(UUID.fromString(id));
+                    deployServiceStorage.findServiceDeploymentById(serviceId);
             if (Objects.nonNull(deployService)) {
                 return deployService.getCsp();
             }
         } catch (Exception e) {
-            log.error("Get csp with service id:{} failed.", id, e);
+            log.error("Get csp with service id:{} failed.", serviceId, e);
         }
         return null;
     }
@@ -106,17 +106,17 @@ public class GetCspInfoFromRequest {
     /**
      * Get Csp with id of user policy.
      *
-     * @param id id of user policy.
+     * @param policyId id of user policy.
      * @return csp.
      */
-    public Csp getCspFromUserPolicyId(String id) {
+    public Csp getCspFromUserPolicyId(UUID policyId) {
         try {
-            UserPolicyEntity userPolicy = userPolicyStorage.findPolicyById(UUID.fromString(id));
+            UserPolicyEntity userPolicy = userPolicyStorage.findPolicyById(policyId);
             if (Objects.nonNull(userPolicy)) {
                 return userPolicy.getCsp();
             }
         } catch (Exception e) {
-            log.error("Get csp with user policy id:{} failed.", id, e);
+            log.error("Get csp with user policy id:{} failed.", policyId, e);
         }
         return null;
     }
@@ -124,18 +124,17 @@ public class GetCspInfoFromRequest {
     /**
      * Get Csp with id of user policy.
      *
-     * @param id id of user policy.
+     * @param policyId id of user policy.
      * @return csp.
      */
-    public Csp getCspFromServicePolicyId(String id) {
+    public Csp getCspFromServicePolicyId(UUID policyId) {
         try {
-            ServicePolicyEntity servicePolicy =
-                    servicePolicyStorage.findPolicyById(UUID.fromString(id));
+            ServicePolicyEntity servicePolicy = servicePolicyStorage.findPolicyById(policyId);
             if (Objects.nonNull(servicePolicy)) {
                 return servicePolicy.getServiceTemplate().getCsp();
             }
         } catch (Exception e) {
-            log.error("Get csp with service policy id:{} failed.", id, e);
+            log.error("Get csp with service policy id:{} failed.", policyId, e);
         }
         return null;
     }
@@ -146,7 +145,7 @@ public class GetCspInfoFromRequest {
      * @param taskId id of migrate task.
      * @return csp.
      */
-    public Csp getCsFromWorkflowTaskId(String taskId) {
+    public Csp getCspFromWorkflowTaskId(String taskId) {
         try {
             Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
             if (Objects.nonNull(task)) {
@@ -176,10 +175,9 @@ public class GetCspInfoFromRequest {
      * @param orderId id of the service order.
      * @return csp.
      */
-    public Csp getCspFromServiceOrderId(String orderId) {
+    public Csp getCspFromServiceOrderId(UUID orderId) {
         try {
-            ServiceOrderEntity order =
-                    serviceOrderTaskStorage.getEntityById(UUID.fromString(orderId));
+            ServiceOrderEntity order = serviceOrderTaskStorage.getEntityById(orderId);
             if (Objects.nonNull(order)
                     && Objects.nonNull(order.getServiceDeploymentEntity().getId())) {
                 ServiceDeploymentEntity deployService =

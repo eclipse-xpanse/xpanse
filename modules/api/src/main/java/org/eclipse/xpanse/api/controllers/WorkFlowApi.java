@@ -67,14 +67,16 @@ public class WorkFlowApi {
     /** Complete tasks based on task ID and set global process variables. */
     @Tag(name = "Workflow", description = "APIs to manage the Workflow")
     @Operation(description = "Complete tasks by task ID and set global process variables .")
-    @PutMapping(value = "/workflow/complete/task/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(
+            value = "/workflow/complete/task/{taskId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCsFromWorkflowTaskId")
+    @AuditApiRequest(methodName = "getCspFromWorkflowTaskId")
     public void completeTask(
             @Parameter(
-                            name = "id",
+                            name = "taskId",
                             description = "ID of the workflow task that needs to be handled")
-                    @PathVariable("id")
+                    @PathVariable("taskId")
                     String taskId,
             @RequestBody Map<String, Object> variables) {
         workflowUtils.completeTask(taskId, variables);
@@ -83,14 +85,14 @@ public class WorkFlowApi {
     /** Manage failed workflow tasks. */
     @Tag(name = "Workflow", description = "APIs to manage the Workflow")
     @Operation(description = "Manage failed task orders.")
-    @PutMapping(value = "/workflow/task/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/workflow/task/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCsFromWorkflowTaskId")
+    @AuditApiRequest(methodName = "getCspFromWorkflowTaskId")
     public void manageFailedOrder(
             @Parameter(
-                            name = "id",
+                            name = "taskId",
                             description = "ID of the workflow task that needs to be handled")
-                    @PathVariable("id")
+                    @PathVariable("taskId")
                     String taskId,
             @Parameter(
                             name = "retryOrder",
