@@ -58,7 +58,7 @@ public class ServiceTemplateRequestHistoryEntity extends CreateModifiedTime {
     @Convert(converter = ObjectJsonConverter.class)
     private Ocl ocl;
 
-    @Column(name = "REVIEW_COMMENT", length = Integer.MAX_VALUE)
+    @Column(name = "REVIEW_COMMENT", length = Integer.MAX_VALUE, nullable = false)
     private String reviewComment;
 
     @Column(name = "BLOCK_TEMPLATE_UNTIL_REVIEWED", nullable = false)

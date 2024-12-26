@@ -132,6 +132,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         // review service template register request
         ReviewServiceTemplateRequest reviewRequest = new ReviewServiceTemplateRequest();
         reviewRequest.setReviewResult(ServiceReviewResult.APPROVED);
+        reviewRequest.setReviewComment(ServiceReviewResult.APPROVED.toValue());
         MockHttpServletResponse reviewResponse =
                 reviewServiceTemplateRequest(registerRequestId, reviewRequest);
         assertEquals(HttpStatus.NO_CONTENT.value(), reviewResponse.getStatus());
