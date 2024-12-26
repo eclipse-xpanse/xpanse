@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
@@ -56,7 +57,7 @@ public class ServicePricingApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the price of one specific flavor of the service.")
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ResponseEntity<FlavorPriceResult> getServicePriceByFlavor(
             @Parameter(name = "templateId", description = "id of the service template")
                     @PathVariable(name = "templateId")
@@ -100,7 +101,7 @@ public class ServicePricingApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the prices of all flavors of the service")
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ResponseEntity<List<FlavorPriceResult>> getPricesByService(
             @Parameter(name = "templateId", description = "id of the service template")
                     @PathVariable(name = "templateId")

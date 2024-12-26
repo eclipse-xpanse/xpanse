@@ -68,7 +68,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator " + "version: 7.10.0")
+        comments = "Generator version: 7.10.0")
 @Component(
         "org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.ApiClient")
 public class ApiClient extends JavaTimeFormatter {

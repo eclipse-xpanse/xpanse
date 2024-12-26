@@ -62,17 +62,17 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith({MockitoExtension.class})
 class OpenTofuLocalDeploymentTest {
 
-    private final String errorDeployer = "error_deployer";
-    private final String invalidDeployer =
+    private final String errorScript = "error_script";
+    private final String invalidScript =
             """
-            resource "random_id" "new" {
-              byte_length = 4
-            }
+                    resource "random_id" "new" {
+                      byte_length = 4
+                    }
 
-            output "random_id" {
-              value = resource.random_id_2.new.id
-            }
-            """;
+                    output "random_id" {
+                      value = resource.random_id_2.new.id
+                    }
+                    """;
     @InjectMocks OpenTofuLocalDeployment openTofuLocalDeployment;
     @InjectMocks DeploymentScriptsHelper scriptsHelper;
     @Mock OpenTofuInstaller openTofuInstaller;
@@ -242,7 +242,7 @@ class OpenTofuLocalDeploymentTest {
     @Test
     void testDeploy_FailedCausedByOpenTofuExecutorException() {
         when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
-        ocl.getDeployment().setDeployer(invalidDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         DeployResult deployResult = this.openTofuLocalDeployment.deploy(deployTask);
         assertNotNull(deployResult);
@@ -262,7 +262,7 @@ class OpenTofuLocalDeploymentTest {
                     Map.of(TF_STATE_FILE_NAME, tfState));
             when(serviceDeploymentEntityHandler.getServiceDeploymentEntity(any()))
                     .thenReturn(serviceDeploymentEntity);
-            ocl.getDeployment().setDeployer(errorDeployer);
+            ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
             DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.MODIFY);
             DeployResult deployResult = this.openTofuLocalDeployment.modify(deployTask);
             assertNotNull(deployResult);
@@ -277,7 +277,7 @@ class OpenTofuLocalDeploymentTest {
             tfResourceTransUtils
                     .when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
-            ocl.getDeployment().setDeployer(errorDeployer);
+            ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
             DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
             DeployResult deployResult = this.openTofuLocalDeployment.destroy(deployTask);
             Assertions.assertTrue(deployResult.getOutputProperties().isEmpty());
@@ -309,7 +309,7 @@ class OpenTofuLocalDeploymentTest {
     @Test
     void testGetDeployPlanAsJson_ThrowsException() {
         when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
-        ocl.getDeployment().setDeployer(errorDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         Assertions.assertThrows(
                 OpenTofuExecutorException.class,
@@ -343,7 +343,7 @@ class OpenTofuLocalDeploymentTest {
     @Test
     void testValidateFailed() {
         when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
-        ocl.getDeployment().setDeployer(invalidDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(false);
@@ -362,7 +362,7 @@ class OpenTofuLocalDeploymentTest {
     @Test
     void testValidate_ThrowsTerraformExecutorException() {
         when(openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(any())).thenReturn("tofu");
-        ocl.getDeployment().setDeployer(errorDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
         Assertions.assertThrows(
                 OpenTofuExecutorException.class,
                 () -> openTofuLocalDeployment.validate(ocl.getDeployment()));

@@ -47,7 +47,7 @@ public class TerraformBootDeploymentPlanManage {
         TerraformPlanWithScriptsRequest request = new TerraformPlanWithScriptsRequest();
         request.setRequestId(task.getOrderId());
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
-        request.setScripts(terraformBootHelper.getFiles(task));
+        request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
         return request;

@@ -83,7 +83,7 @@ public class ServiceConfigurationApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(
             description = "Update the service's configuration to the registered service template.")
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public ServiceOrder changeServiceConfiguration(
             @Parameter(name = "serviceId", description = "The id of the deployed service")
                     @PathVariable("serviceId")

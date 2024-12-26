@@ -91,7 +91,7 @@ public class TofuMakerServiceDestroyer {
                 new OpenTofuAsyncDestroyFromScriptsRequest();
         request.setRequestId(task.getOrderId());
         request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
-        request.setScripts(tofuMakerHelper.getFiles(task));
+        request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));

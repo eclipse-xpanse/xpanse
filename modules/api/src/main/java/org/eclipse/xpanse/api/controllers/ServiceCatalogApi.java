@@ -121,7 +121,7 @@ public class ServiceCatalogApi {
     @Operation(description = "Get deployable service by id.")
     @GetMapping(value = "/catalog/services/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public UserOrderableServiceVo getOrderableServiceDetailsById(
             @Parameter(name = "id", description = "The id of orderable service.")
                     @PathVariable("id")
@@ -152,7 +152,7 @@ public class ServiceCatalogApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the API document of the orderable service.")
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public Link openApi(@PathVariable("id") String id) {
         String apiUrl = this.serviceTemplateManage.getOpenApiUrl(UUID.fromString(id));
         String successMsg =

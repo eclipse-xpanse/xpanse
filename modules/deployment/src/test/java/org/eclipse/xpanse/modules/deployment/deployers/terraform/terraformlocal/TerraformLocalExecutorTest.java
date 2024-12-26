@@ -6,7 +6,6 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_SCRIPT_FILE_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -60,10 +59,13 @@ class TerraformLocalExecutorTest {
         Ocl ocl =
                 oclLoader.getOcl(
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        String script = ocl.getDeployment().getDeployer();
-        String scriptPath = workspace + File.separator + TF_SCRIPT_FILE_NAME;
-        try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
-            scriptWriter.write(script);
+        Map<String, String> scriptsMap = ocl.getDeployment().getScriptFiles();
+        for (Map.Entry<String, String> entry : scriptsMap.entrySet()) {
+            String script = entry.getValue();
+            String scriptPath = taskWorkspace + File.separator + entry.getKey();
+            try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
+                scriptWriter.write(script);
+            }
         }
     }
 

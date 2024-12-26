@@ -15,9 +15,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -30,12 +28,12 @@ import java.util.UUID;
     TerraformModifyWithScriptsRequest.JSON_PROPERTY_VARIABLES,
     TerraformModifyWithScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
     TerraformModifyWithScriptsRequest.JSON_PROPERTY_TASK_ID,
-    TerraformModifyWithScriptsRequest.JSON_PROPERTY_SCRIPTS,
+    TerraformModifyWithScriptsRequest.JSON_PROPERTY_SCRIPT_FILES,
     TerraformModifyWithScriptsRequest.JSON_PROPERTY_TF_STATE
 })
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator " + "version: 7.10.0")
+        comments = "Generator version: 7.10.0")
 public class TerraformModifyWithScriptsRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
     @jakarta.annotation.Nullable private UUID requestId;
@@ -55,8 +53,8 @@ public class TerraformModifyWithScriptsRequest {
     public static final String JSON_PROPERTY_TASK_ID = "taskId";
     @jakarta.annotation.Nullable private UUID taskId;
 
-    public static final String JSON_PROPERTY_SCRIPTS = "scripts";
-    @jakarta.annotation.Nonnull private List<String> scripts = new ArrayList<>();
+    public static final String JSON_PROPERTY_SCRIPT_FILES = "scriptFiles";
+    @jakarta.annotation.Nonnull private Map<String, String> scriptFiles = new HashMap<>();
 
     public static final String JSON_PROPERTY_TF_STATE = "tfState";
     @jakarta.annotation.Nonnull private String tfState;
@@ -228,37 +226,35 @@ public class TerraformModifyWithScriptsRequest {
         this.taskId = taskId;
     }
 
-    public TerraformModifyWithScriptsRequest scripts(
-            @jakarta.annotation.Nonnull List<String> scripts) {
+    public TerraformModifyWithScriptsRequest scriptFiles(
+            @jakarta.annotation.Nonnull Map<String, String> scriptFiles) {
 
-        this.scripts = scripts;
+        this.scriptFiles = scriptFiles;
         return this;
     }
 
-    public TerraformModifyWithScriptsRequest addScriptsItem(String scriptsItem) {
-        if (this.scripts == null) {
-            this.scripts = new ArrayList<>();
-        }
-        this.scripts.add(scriptsItem);
+    public TerraformModifyWithScriptsRequest putScriptFilesItem(
+            String key, String scriptFilesItem) {
+        this.scriptFiles.put(key, scriptFilesItem);
         return this;
     }
 
     /**
-     * List of script files for modify requests deployed via scripts
+     * Map stores file name and content of all script files for modify request.
      *
-     * @return scripts
+     * @return scriptFiles
      */
     @jakarta.annotation.Nonnull
-    @JsonProperty(JSON_PROPERTY_SCRIPTS)
+    @JsonProperty(JSON_PROPERTY_SCRIPT_FILES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-    public List<String> getScripts() {
-        return scripts;
+    public Map<String, String> getScriptFiles() {
+        return scriptFiles;
     }
 
-    @JsonProperty(JSON_PROPERTY_SCRIPTS)
+    @JsonProperty(JSON_PROPERTY_SCRIPT_FILES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-    public void setScripts(@jakarta.annotation.Nonnull List<String> scripts) {
-        this.scripts = scripts;
+    public void setScriptFiles(@jakarta.annotation.Nonnull Map<String, String> scriptFiles) {
+        this.scriptFiles = scriptFiles;
     }
 
     public TerraformModifyWithScriptsRequest tfState(@jakarta.annotation.Nonnull String tfState) {
@@ -302,7 +298,7 @@ public class TerraformModifyWithScriptsRequest {
                 && Objects.equals(this.variables, terraformModifyWithScriptsRequest.variables)
                 && Objects.equals(this.envVariables, terraformModifyWithScriptsRequest.envVariables)
                 && Objects.equals(this.taskId, terraformModifyWithScriptsRequest.taskId)
-                && Objects.equals(this.scripts, terraformModifyWithScriptsRequest.scripts)
+                && Objects.equals(this.scriptFiles, terraformModifyWithScriptsRequest.scriptFiles)
                 && Objects.equals(this.tfState, terraformModifyWithScriptsRequest.tfState);
     }
 
@@ -315,7 +311,7 @@ public class TerraformModifyWithScriptsRequest {
                 variables,
                 envVariables,
                 taskId,
-                scripts,
+                scriptFiles,
                 tfState);
     }
 
@@ -329,7 +325,7 @@ public class TerraformModifyWithScriptsRequest {
         sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
         sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
         sb.append("    taskId: ").append(toIndentedString(taskId)).append("\n");
-        sb.append("    scripts: ").append(toIndentedString(scripts)).append("\n");
+        sb.append("    scriptFiles: ").append(toIndentedString(scriptFiles)).append("\n");
         sb.append("    tfState: ").append(toIndentedString(tfState)).append("\n");
         sb.append("}");
         return sb.toString();

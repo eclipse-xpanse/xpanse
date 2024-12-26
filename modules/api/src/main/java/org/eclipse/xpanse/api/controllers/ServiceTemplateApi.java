@@ -387,7 +387,7 @@ public class ServiceTemplateApi {
             value = "/service_templates/requests/cancel/{requestId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateRequestId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateRequestId", paramTypes = UUID.class)
     public void cancelServiceTemplateRequestByRequestId(
             @Parameter(name = "requestId", description = "id of service template request")
                     @PathVariable("requestId")
@@ -407,7 +407,7 @@ public class ServiceTemplateApi {
             value = "/service_templates/requests/{requestId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateRequestId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateRequestId", paramTypes = UUID.class)
     public Ocl getRequestedServiceTemplateByRequestId(
             @Parameter(name = "requestId", description = "id of service template request")
                     @PathVariable("requestId")

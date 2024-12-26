@@ -74,8 +74,8 @@ class TerraformBootDeploymentTest {
 
     private final UUID serviceId = UUID.randomUUID();
     private final UUID orderId = UUID.randomUUID();
-    private final String errorDeployer = "error_deployer";
-    private final String invalidDeployer =
+    private final String errorScript = "error_script";
+    private final String invalidScript =
             """
             resource "random_id" "new" {
               byte_length = 4
@@ -171,13 +171,13 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testDeploy_ThrowsRestClientException() {
-        ocl.getDeployment().setDeployer(errorDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
         Mockito.doThrow(new TerraformBootRequestFailedException("IO error"))
                 .when(terraformApi)
                 .asyncDeployWithScripts(any());
 
-        ocl.getDeployment().setDeployer(invalidDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
 
         Assertions.assertThrows(
                 TerraformBootRequestFailedException.class,
@@ -253,7 +253,7 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testValidateFailed() {
-        ocl.getDeployment().setDeployer(invalidDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(false);
@@ -276,7 +276,7 @@ class TerraformBootDeploymentTest {
 
     @Test
     void testValidate_ThrowsTerraformExecutorException() {
-        ocl.getDeployment().setDeployer(errorDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
         when(terraformBootScriptValidator.validateTerraformScripts(any()))
                 .thenThrow(new TerraformBootRequestFailedException("IO error"));
 

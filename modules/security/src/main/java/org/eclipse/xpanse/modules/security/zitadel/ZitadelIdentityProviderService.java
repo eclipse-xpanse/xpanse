@@ -36,6 +36,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -105,6 +107,10 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     }
 
     @Override
+    @Retryable(
+            retryFor = RestClientException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public BackendSystemStatus getIdentityProviderStatus() {
         BackendSystemStatus status = new BackendSystemStatus();
         status.setBackendSystemType(BackendSystemType.IDENTITY_PROVIDER);

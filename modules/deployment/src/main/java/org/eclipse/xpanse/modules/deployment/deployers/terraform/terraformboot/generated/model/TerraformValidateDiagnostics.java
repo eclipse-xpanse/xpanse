@@ -21,7 +21,7 @@ import java.util.Objects;
 @JsonPropertyOrder({TerraformValidateDiagnostics.JSON_PROPERTY_DETAIL})
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator " + "version: 7.10.0")
+        comments = "Generator version: 7.10.0")
 public class TerraformValidateDiagnostics {
     public static final String JSON_PROPERTY_DETAIL = "detail";
     @jakarta.annotation.Nullable private String detail;

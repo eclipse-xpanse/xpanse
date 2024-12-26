@@ -23,7 +23,7 @@ import java.util.Objects;
 @JsonPropertyOrder({WebhookConfig.JSON_PROPERTY_URL, WebhookConfig.JSON_PROPERTY_AUTH_TYPE})
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator " + "version: 7.10.0")
+        comments = "Generator version: 7.10.0")
 public class WebhookConfig {
     public static final String JSON_PROPERTY_URL = "url";
     @jakarta.annotation.Nonnull private String url;

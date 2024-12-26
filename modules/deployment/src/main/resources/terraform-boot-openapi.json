@@ -59,8 +59,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -79,8 +79,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -89,8 +89,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -130,8 +130,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -150,8 +150,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -160,8 +160,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -201,8 +201,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -221,8 +221,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -231,8 +231,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -272,8 +272,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -292,8 +292,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -302,8 +302,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -336,8 +336,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -356,8 +356,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -366,8 +366,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -407,8 +407,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -427,8 +427,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -437,8 +437,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -478,8 +478,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -498,8 +498,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -508,8 +508,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -542,8 +542,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -562,8 +562,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -572,8 +572,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -613,8 +613,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -633,8 +633,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -643,8 +643,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -684,8 +684,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -704,8 +704,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -714,8 +714,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -755,8 +755,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -775,8 +775,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -785,8 +785,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -819,8 +819,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -839,8 +839,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -849,8 +849,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -890,8 +890,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -910,8 +910,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -920,8 +920,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -961,8 +961,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -981,8 +981,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -991,8 +991,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1045,8 +1045,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1065,8 +1065,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1075,8 +1075,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1127,8 +1127,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1147,8 +1147,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1157,8 +1157,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1209,8 +1209,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1229,8 +1229,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1239,8 +1239,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1284,8 +1284,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1304,8 +1304,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1314,8 +1314,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1366,8 +1366,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1386,8 +1386,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1396,8 +1396,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1431,8 +1431,8 @@
           }
         ],
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1451,8 +1451,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1461,8 +1461,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1492,8 +1492,8 @@
         "description": "Check health of Terraform Boot API service",
         "operationId": "healthCheck",
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1512,8 +1512,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1522,8 +1522,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1574,8 +1574,8 @@
           }
         ],
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1594,8 +1594,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1604,8 +1604,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1645,8 +1645,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1665,8 +1665,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1675,8 +1675,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1709,8 +1709,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1729,8 +1729,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1739,8 +1739,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1784,8 +1784,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1804,8 +1804,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1814,8 +1814,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1866,8 +1866,8 @@
           "required": true
         },
         "responses": {
-          "502": {
-            "description": "Bad Gateway",
+          "422": {
+            "description": "Unprocessable Entity",
             "content": {
               "*/*": {
                 "schema": {
@@ -1886,8 +1886,8 @@
               }
             }
           },
-          "422": {
-            "description": "Unprocessable Entity",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1896,8 +1896,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1956,7 +1956,7 @@
       "TerraformDeployWithScriptsRequest": {
         "required": [
           "isPlanOnly",
-          "scripts",
+          "scriptFiles",
           "terraformVersion",
           "variables"
         ],
@@ -1992,13 +1992,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of Terraform script files to be considered for deploying changes.",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of Terraform script files to be considered for deploying changes."
-            }
+              "description": "Map stores file name and content of all script files for deploy request."
+            },
+            "description": "Map stores file name and content of all script files for deploy request."
           }
         }
       },
@@ -2037,7 +2037,7 @@
       },
       "TerraformPlanWithScriptsRequest": {
         "required": [
-          "scripts",
+          "scriptFiles",
           "terraformVersion",
           "variables"
         ],
@@ -2069,13 +2069,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of terraform script files to be considered for generating terraform plan",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of terraform script files to be considered for generating terraform plan"
-            }
+              "description": "Map stores file name and content of all script files for generating terraform plan."
+            },
+            "description": "Map stores file name and content of all script files for generating terraform plan."
           }
         }
       },
@@ -2098,7 +2098,7 @@
       "TerraformModifyWithScriptsRequest": {
         "required": [
           "isPlanOnly",
-          "scripts",
+          "scriptFiles",
           "terraformVersion",
           "tfState",
           "variables"
@@ -2140,13 +2140,13 @@
             "description": "Id of the request.",
             "format": "uuid"
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of script files for modify requests deployed via scripts",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of script files for modify requests deployed via scripts"
-            }
+              "description": "Map stores file name and content of all script files for modify request."
+            },
+            "description": "Map stores file name and content of all script files for modify request."
           },
           "tfState": {
             "type": "string",
@@ -2194,7 +2194,7 @@
       "TerraformAsyncModifyFromScriptsRequest": {
         "required": [
           "isPlanOnly",
-          "scripts",
+          "scriptFiles",
           "terraformVersion",
           "tfState",
           "variables",
@@ -2237,13 +2237,13 @@
             "description": "Id of the request.",
             "format": "uuid"
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of script files for modify requests deployed via scripts",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of script files for modify requests deployed via scripts"
-            }
+              "description": "Map stores file name and content of all script files for modify request."
+            },
+            "description": "Map stores file name and content of all script files for modify request."
           },
           "tfState": {
             "type": "string",
@@ -2278,7 +2278,7 @@
       },
       "TerraformDestroyWithScriptsRequest": {
         "required": [
-          "scripts",
+          "scriptFiles",
           "terraformVersion",
           "tfState",
           "variables"
@@ -2311,13 +2311,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of script files for destroy requests deployed via scripts",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of script files for destroy requests deployed via scripts"
-            }
+              "description": "Map stores file name and content of all script files for destroy request."
+            },
+            "description": "Map stores file name and content of all script files for destroy request."
           },
           "tfState": {
             "type": "string",
@@ -2328,7 +2328,7 @@
       "TerraformAsyncDeployFromScriptsRequest": {
         "required": [
           "isPlanOnly",
-          "scripts",
+          "scriptFiles",
           "terraformVersion",
           "variables",
           "webhookConfig"
@@ -2365,13 +2365,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of Terraform script files to be considered for deploying changes.",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of Terraform script files to be considered for deploying changes."
-            }
+              "description": "Map stores file name and content of all script files for deploy request."
+            },
+            "description": "Map stores file name and content of all script files for deploy request."
           },
           "webhookConfig": {
             "$ref": "#/components/schemas/WebhookConfig"
@@ -2894,7 +2894,7 @@
       },
       "TerraformAsyncDestroyFromScriptsRequest": {
         "required": [
-          "scripts",
+          "scriptFiles",
           "terraformVersion",
           "tfState",
           "variables",
@@ -2928,13 +2928,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of script files for destroy requests deployed via scripts",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of script files for destroy requests deployed via scripts"
-            }
+              "description": "Map stores file name and content of all script files for destroy request."
+            },
+            "description": "Map stores file name and content of all script files for destroy request."
           },
           "tfState": {
             "type": "string",

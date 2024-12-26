@@ -43,7 +43,6 @@ import org.springframework.stereotype.Component;
 public class DeploymentScriptsHelper {
 
     public static final String TF_SCRIPT_FILE_EXTENSION = ".tf";
-    public static final String TF_SCRIPT_FILE_NAME = "resources.tf";
     public static final String TF_VARS_FILE_NAME = "variables.tfvars.json";
     public static final String TF_STATE_FILE_NAME = "terraform.tfstate";
     private static final List<String> EXCLUDED_FILE_SUFFIX_LIST =
@@ -95,9 +94,10 @@ public class DeploymentScriptsHelper {
                     "Create workspace for task failed, File path not created: " + taskWorkspace);
         }
         List<File> files = new ArrayList<>();
-        if (Objects.nonNull(deployment.getDeployer())) {
-            File scriptFile = createScriptFile(taskWorkspace, deployment.getDeployer());
-            files.add(scriptFile);
+        Map<String, String> scriptsMap = deployment.getScriptFiles();
+        if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
+            List<File> scriptFiles = createScriptFiles(taskWorkspace, deployment.getScriptFiles());
+            files.addAll(scriptFiles);
             if (StringUtils.isNotBlank(tfState)) {
                 File stateFile = createServiceStateFile(taskWorkspace, tfState);
                 files.add(stateFile);
@@ -211,11 +211,24 @@ public class DeploymentScriptsHelper {
         return taskWorkspace;
     }
 
-    private File createScriptFile(String taskWorkspace, String scriptContent) {
-        String scriptPath = taskWorkspace + File.separator + TF_SCRIPT_FILE_NAME;
+    private List<File> createScriptFiles(String taskWorkspace, Map<String, String> scriptsMap) {
+        List<File> files = new ArrayList<>();
+        for (Map.Entry<String, String> entry : scriptsMap.entrySet()) {
+            String scriptName = entry.getKey();
+            String scriptContent = entry.getValue();
+            if (StringUtils.isNotBlank(scriptName) && StringUtils.isNotBlank(scriptContent)) {
+                File scriptFile = createScriptFile(taskWorkspace, scriptName, scriptContent);
+                files.add(scriptFile);
+            }
+        }
+        return files;
+    }
+
+    private File createScriptFile(String taskWorkspace, String scriptName, String scriptContent) {
+        String scriptPath = taskWorkspace + File.separator + scriptName;
         try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
             scriptWriter.write(scriptContent);
-            log.info("Created deployment script files successful");
+            log.info("Created deployment script file {} successfully.", scriptPath);
             return new File(scriptPath);
         } catch (IOException ex) {
             log.error("Created deployment script files failed.", ex);

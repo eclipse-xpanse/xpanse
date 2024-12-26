@@ -15,9 +15,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -29,12 +27,12 @@ import java.util.UUID;
     TerraformAsyncDeployFromScriptsRequest.JSON_PROPERTY_IS_PLAN_ONLY,
     TerraformAsyncDeployFromScriptsRequest.JSON_PROPERTY_VARIABLES,
     TerraformAsyncDeployFromScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
-    TerraformAsyncDeployFromScriptsRequest.JSON_PROPERTY_SCRIPTS,
+    TerraformAsyncDeployFromScriptsRequest.JSON_PROPERTY_SCRIPT_FILES,
     TerraformAsyncDeployFromScriptsRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator " + "version: 7.10.0")
+        comments = "Generator version: 7.10.0")
 public class TerraformAsyncDeployFromScriptsRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
     @jakarta.annotation.Nullable private UUID requestId;
@@ -51,8 +49,8 @@ public class TerraformAsyncDeployFromScriptsRequest {
     public static final String JSON_PROPERTY_ENV_VARIABLES = "envVariables";
     @jakarta.annotation.Nullable private Map<String, String> envVariables = new HashMap<>();
 
-    public static final String JSON_PROPERTY_SCRIPTS = "scripts";
-    @jakarta.annotation.Nonnull private List<String> scripts = new ArrayList<>();
+    public static final String JSON_PROPERTY_SCRIPT_FILES = "scriptFiles";
+    @jakarta.annotation.Nonnull private Map<String, String> scriptFiles = new HashMap<>();
 
     public static final String JSON_PROPERTY_WEBHOOK_CONFIG = "webhookConfig";
     @jakarta.annotation.Nonnull private WebhookConfig webhookConfig;
@@ -201,37 +199,35 @@ public class TerraformAsyncDeployFromScriptsRequest {
         this.envVariables = envVariables;
     }
 
-    public TerraformAsyncDeployFromScriptsRequest scripts(
-            @jakarta.annotation.Nonnull List<String> scripts) {
+    public TerraformAsyncDeployFromScriptsRequest scriptFiles(
+            @jakarta.annotation.Nonnull Map<String, String> scriptFiles) {
 
-        this.scripts = scripts;
+        this.scriptFiles = scriptFiles;
         return this;
     }
 
-    public TerraformAsyncDeployFromScriptsRequest addScriptsItem(String scriptsItem) {
-        if (this.scripts == null) {
-            this.scripts = new ArrayList<>();
-        }
-        this.scripts.add(scriptsItem);
+    public TerraformAsyncDeployFromScriptsRequest putScriptFilesItem(
+            String key, String scriptFilesItem) {
+        this.scriptFiles.put(key, scriptFilesItem);
         return this;
     }
 
     /**
-     * List of Terraform script files to be considered for deploying changes.
+     * Map stores file name and content of all script files for deploy request.
      *
-     * @return scripts
+     * @return scriptFiles
      */
     @jakarta.annotation.Nonnull
-    @JsonProperty(JSON_PROPERTY_SCRIPTS)
+    @JsonProperty(JSON_PROPERTY_SCRIPT_FILES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-    public List<String> getScripts() {
-        return scripts;
+    public Map<String, String> getScriptFiles() {
+        return scriptFiles;
     }
 
-    @JsonProperty(JSON_PROPERTY_SCRIPTS)
+    @JsonProperty(JSON_PROPERTY_SCRIPT_FILES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-    public void setScripts(@jakarta.annotation.Nonnull List<String> scripts) {
-        this.scripts = scripts;
+    public void setScriptFiles(@jakarta.annotation.Nonnull Map<String, String> scriptFiles) {
+        this.scriptFiles = scriptFiles;
     }
 
     public TerraformAsyncDeployFromScriptsRequest webhookConfig(
@@ -278,7 +274,8 @@ public class TerraformAsyncDeployFromScriptsRequest {
                 && Objects.equals(this.variables, terraformAsyncDeployFromScriptsRequest.variables)
                 && Objects.equals(
                         this.envVariables, terraformAsyncDeployFromScriptsRequest.envVariables)
-                && Objects.equals(this.scripts, terraformAsyncDeployFromScriptsRequest.scripts)
+                && Objects.equals(
+                        this.scriptFiles, terraformAsyncDeployFromScriptsRequest.scriptFiles)
                 && Objects.equals(
                         this.webhookConfig, terraformAsyncDeployFromScriptsRequest.webhookConfig);
     }
@@ -291,7 +288,7 @@ public class TerraformAsyncDeployFromScriptsRequest {
                 isPlanOnly,
                 variables,
                 envVariables,
-                scripts,
+                scriptFiles,
                 webhookConfig);
     }
 
@@ -304,7 +301,7 @@ public class TerraformAsyncDeployFromScriptsRequest {
         sb.append("    isPlanOnly: ").append(toIndentedString(isPlanOnly)).append("\n");
         sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
         sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
-        sb.append("    scripts: ").append(toIndentedString(scripts)).append("\n");
+        sb.append("    scriptFiles: ").append(toIndentedString(scriptFiles)).append("\n");
         sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");
         sb.append("}");
         return sb.toString();

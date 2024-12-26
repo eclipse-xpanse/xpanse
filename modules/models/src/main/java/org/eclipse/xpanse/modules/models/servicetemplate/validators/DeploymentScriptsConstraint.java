@@ -24,7 +24,7 @@ public @interface DeploymentScriptsConstraint {
      *
      * @return Error message.
      */
-    String message() default "Either deployer or deployFromGitRepo must be provided";
+    String message() default "Either scriptFiles or scriptsRepo must be provided";
 
     /** standard field to be provided to javax validator. We just provide an empty array. */
     Class<?>[] groups() default {};

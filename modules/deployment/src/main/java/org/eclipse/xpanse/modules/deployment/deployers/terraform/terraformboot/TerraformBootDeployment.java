@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
+import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -46,7 +47,8 @@ public class TerraformBootDeployment implements Deployer {
 
     @Override
     public DeployResult deploy(DeployTask deployTask) {
-        if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
+        Map<String, String> scriptsMap = deployTask.getOcl().getDeployment().getScriptFiles();
+        if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             return terraformBootServiceDeployer.deployFromScripts(deployTask);
         }
         return terraformBootServiceDeployer.deployFromGitRepo(deployTask);
@@ -54,7 +56,8 @@ public class TerraformBootDeployment implements Deployer {
 
     @Override
     public DeployResult modify(DeployTask deployTask) {
-        if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
+        Map<String, String> scriptsMap = deployTask.getOcl().getDeployment().getScriptFiles();
+        if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             return terraformBootServiceModifier.modifyFromScripts(deployTask);
         }
         return terraformBootServiceModifier.modifyFromGitRepo(deployTask);
@@ -62,7 +65,8 @@ public class TerraformBootDeployment implements Deployer {
 
     @Override
     public DeployResult destroy(DeployTask deployTask) {
-        if (Objects.nonNull(deployTask.getOcl().getDeployment().getDeployer())) {
+        Map<String, String> scriptsMap = deployTask.getOcl().getDeployment().getScriptFiles();
+        if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             return terraformBootServiceDestroyer.destroyFromScripts(deployTask);
         }
         return terraformBootServiceDestroyer.destroyFromGitRepo(deployTask);
@@ -78,7 +82,8 @@ public class TerraformBootDeployment implements Deployer {
     @Override
     public DeploymentScriptValidationResult validate(Deployment deployment) {
         DeploymentScriptValidationResult result = null;
-        if (Objects.nonNull(deployment.getDeployer())) {
+        Map<String, String> scriptsMap = deployment.getScriptFiles();
+        if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             result = terraformBootScriptValidator.validateTerraformScripts(deployment);
         }
         if (Objects.nonNull(deployment.getScriptsRepo())) {
@@ -89,7 +94,8 @@ public class TerraformBootDeployment implements Deployer {
 
     @Override
     public String getDeploymentPlanAsJson(DeployTask task) {
-        if (Objects.nonNull(task.getOcl().getDeployment().getDeployer())) {
+        Map<String, String> scriptsMap = task.getOcl().getDeployment().getScriptFiles();
+        if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             return terraformBootDeploymentPlanManage.getTerraformPlanFromScripts(task).getPlan();
         }
         return terraformBootDeploymentPlanManage.getTerraformPlanFromGitRepo(task).getPlan();

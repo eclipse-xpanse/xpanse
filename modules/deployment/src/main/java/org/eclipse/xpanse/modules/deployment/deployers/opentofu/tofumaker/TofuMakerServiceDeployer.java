@@ -76,7 +76,7 @@ public class TofuMakerServiceDeployer {
         request.setRequestId(task.getOrderId());
         request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
-        request.setScripts(tofuMakerHelper.getFiles(task));
+        request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
         request.setVariables(tofuMakerHelper.getInputVariables(task, true));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
         request.setWebhookConfig(tofuMakerHelper.getWebhookConfigWithTask(task));
