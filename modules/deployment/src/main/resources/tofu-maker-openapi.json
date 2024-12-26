@@ -3,7 +3,7 @@
   "info": {
     "title": "Tofu-Maker API",
     "description": "RESTful Services to interact with Tofu-Maker runtime",
-    "version": "1.0.10-SNAPSHOT"
+    "version": "1.0.11-SNAPSHOT"
   },
   "servers": [
     {
@@ -79,8 +79,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -89,8 +89,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -150,8 +150,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -160,8 +160,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -221,8 +221,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -231,8 +231,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -292,8 +292,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -302,8 +302,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -356,8 +356,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -366,8 +366,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -427,8 +427,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -437,8 +437,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -498,8 +498,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -508,8 +508,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -562,8 +562,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -572,8 +572,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -633,8 +633,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -643,8 +643,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -704,8 +704,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -714,8 +714,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -775,8 +775,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -785,8 +785,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -839,8 +839,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -849,8 +849,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -910,8 +910,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -920,8 +920,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -981,8 +981,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -991,8 +991,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1056,8 +1056,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1066,8 +1066,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1138,8 +1138,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1148,8 +1148,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1220,8 +1220,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1230,8 +1230,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1295,8 +1295,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1305,8 +1305,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1377,8 +1377,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1387,8 +1387,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1442,8 +1442,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1452,8 +1452,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1503,8 +1503,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1513,8 +1513,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1585,8 +1585,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1595,8 +1595,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1656,8 +1656,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1666,8 +1666,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1720,8 +1720,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1730,8 +1730,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1795,8 +1795,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1805,8 +1805,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1877,8 +1877,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1887,8 +1887,8 @@
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1948,7 +1948,7 @@
         "required": [
           "isPlanOnly",
           "openTofuVersion",
-          "scripts",
+          "scriptFiles",
           "variables"
         ],
         "type": "object",
@@ -1983,13 +1983,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of OpenTofu script files to be considered for deploying changes.",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of OpenTofu script files to be considered for deploying changes."
-            }
+              "description": "Map stores file name and content of all script files for deploy request."
+            },
+            "description": "Map stores file name and content of all script files for deploy request."
           }
         }
       },
@@ -2029,7 +2029,7 @@
       "OpenTofuPlanWithScriptsRequest": {
         "required": [
           "openTofuVersion",
-          "scripts",
+          "scriptFiles",
           "variables"
         ],
         "type": "object",
@@ -2060,13 +2060,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of openTofu script files to be considered for generating openTofu plan",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of openTofu script files to be considered for generating openTofu plan"
-            }
+              "description": "Map stores file name and content of all script files for generating terraform plan."
+            },
+            "description": "Map stores file name and content of all script files for generating terraform plan."
           }
         }
       },
@@ -2090,7 +2090,7 @@
         "required": [
           "isPlanOnly",
           "openTofuVersion",
-          "scripts",
+          "scriptFiles",
           "tfState",
           "variables"
         ],
@@ -2126,13 +2126,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of script files for modify requests deployed via scripts",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of script files for modify requests deployed via scripts"
-            }
+              "description": "Map stores file name and content of all script files for modify request"
+            },
+            "description": "Map stores file name and content of all script files for modify request"
           },
           "tfState": {
             "type": "string",
@@ -2181,7 +2181,7 @@
         "required": [
           "isPlanOnly",
           "openTofuVersion",
-          "scripts",
+          "scriptFiles",
           "tfState",
           "variables",
           "webhookConfig"
@@ -2218,13 +2218,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of script files for modify requests deployed via scripts",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of script files for modify requests deployed via scripts"
-            }
+              "description": "Map stores file name and content of all script files for modify request"
+            },
+            "description": "Map stores file name and content of all script files for modify request"
           },
           "tfState": {
             "type": "string",
@@ -2260,7 +2260,7 @@
       "OpenTofuDestroyWithScriptsRequest": {
         "required": [
           "openTofuVersion",
-          "scripts",
+          "scriptFiles",
           "tfState",
           "variables"
         ],
@@ -2292,13 +2292,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of script files for destroy requests deployed via scripts",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of script files for destroy requests deployed via scripts"
-            }
+              "description": "Map stores file name and content of all script files for destroy request"
+            },
+            "description": "Map stores file name and content of all script files for destroy request"
           },
           "tfState": {
             "type": "string",
@@ -2310,7 +2310,7 @@
         "required": [
           "isPlanOnly",
           "openTofuVersion",
-          "scripts",
+          "scriptFiles",
           "variables",
           "webhookConfig"
         ],
@@ -2346,13 +2346,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of OpenTofu script files to be considered for deploying changes.",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of OpenTofu script files to be considered for deploying changes."
-            }
+              "description": "Map stores file name and content of all script files for deploy request."
+            },
+            "description": "Map stores file name and content of all script files for deploy request."
           },
           "webhookConfig": {
             "$ref": "#/components/schemas/WebhookConfig"
@@ -2876,7 +2876,7 @@
       "OpenTofuAsyncDestroyFromScriptsRequest": {
         "required": [
           "openTofuVersion",
-          "scripts",
+          "scriptFiles",
           "tfState",
           "variables",
           "webhookConfig"
@@ -2909,13 +2909,13 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
           },
-          "scripts": {
-            "type": "array",
-            "description": "List of script files for destroy requests deployed via scripts",
-            "items": {
+          "scriptFiles": {
+            "type": "object",
+            "additionalProperties": {
               "type": "string",
-              "description": "List of script files for destroy requests deployed via scripts"
-            }
+              "description": "Map stores file name and content of all script files for destroy request"
+            },
+            "description": "Map stores file name and content of all script files for destroy request"
           },
           "tfState": {
             "type": "string",

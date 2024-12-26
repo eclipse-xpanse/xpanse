@@ -27,7 +27,7 @@ import java.util.Objects;
 })
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator " + "version: 7.10.0")
+        comments = "Generator version: 7.10.0")
 public class TerraformValidationResult {
     public static final String JSON_PROPERTY_VALID = "valid";
     @jakarta.annotation.Nonnull private Boolean valid;

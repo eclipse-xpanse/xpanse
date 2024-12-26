@@ -91,7 +91,7 @@ public class TerraformBootServiceModifier {
                 new TerraformAsyncModifyFromScriptsRequest();
         request.setRequestId(task.getOrderId());
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
-        request.setScripts(terraformBootHelper.getFiles(task));
+        request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
         request.setTfState(stateFile);
         request.setVariables(terraformBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));

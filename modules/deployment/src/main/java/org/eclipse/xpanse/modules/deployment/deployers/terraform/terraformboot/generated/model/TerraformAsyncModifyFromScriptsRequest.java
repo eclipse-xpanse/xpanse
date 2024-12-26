@@ -15,9 +15,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -30,13 +28,13 @@ import java.util.UUID;
     TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_VARIABLES,
     TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_ENV_VARIABLES,
     TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_TASK_ID,
-    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_SCRIPTS,
+    TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_SCRIPT_FILES,
     TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_TF_STATE,
     TerraformAsyncModifyFromScriptsRequest.JSON_PROPERTY_WEBHOOK_CONFIG
 })
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator " + "version: 7.10.0")
+        comments = "Generator version: 7.10.0")
 public class TerraformAsyncModifyFromScriptsRequest {
     public static final String JSON_PROPERTY_REQUEST_ID = "requestId";
     @jakarta.annotation.Nullable private UUID requestId;
@@ -56,8 +54,8 @@ public class TerraformAsyncModifyFromScriptsRequest {
     public static final String JSON_PROPERTY_TASK_ID = "taskId";
     @jakarta.annotation.Nullable private UUID taskId;
 
-    public static final String JSON_PROPERTY_SCRIPTS = "scripts";
-    @jakarta.annotation.Nonnull private List<String> scripts = new ArrayList<>();
+    public static final String JSON_PROPERTY_SCRIPT_FILES = "scriptFiles";
+    @jakarta.annotation.Nonnull private Map<String, String> scriptFiles = new HashMap<>();
 
     public static final String JSON_PROPERTY_TF_STATE = "tfState";
     @jakarta.annotation.Nonnull private String tfState;
@@ -233,37 +231,35 @@ public class TerraformAsyncModifyFromScriptsRequest {
         this.taskId = taskId;
     }
 
-    public TerraformAsyncModifyFromScriptsRequest scripts(
-            @jakarta.annotation.Nonnull List<String> scripts) {
+    public TerraformAsyncModifyFromScriptsRequest scriptFiles(
+            @jakarta.annotation.Nonnull Map<String, String> scriptFiles) {
 
-        this.scripts = scripts;
+        this.scriptFiles = scriptFiles;
         return this;
     }
 
-    public TerraformAsyncModifyFromScriptsRequest addScriptsItem(String scriptsItem) {
-        if (this.scripts == null) {
-            this.scripts = new ArrayList<>();
-        }
-        this.scripts.add(scriptsItem);
+    public TerraformAsyncModifyFromScriptsRequest putScriptFilesItem(
+            String key, String scriptFilesItem) {
+        this.scriptFiles.put(key, scriptFilesItem);
         return this;
     }
 
     /**
-     * List of script files for modify requests deployed via scripts
+     * Map stores file name and content of all script files for modify request.
      *
-     * @return scripts
+     * @return scriptFiles
      */
     @jakarta.annotation.Nonnull
-    @JsonProperty(JSON_PROPERTY_SCRIPTS)
+    @JsonProperty(JSON_PROPERTY_SCRIPT_FILES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-    public List<String> getScripts() {
-        return scripts;
+    public Map<String, String> getScriptFiles() {
+        return scriptFiles;
     }
 
-    @JsonProperty(JSON_PROPERTY_SCRIPTS)
+    @JsonProperty(JSON_PROPERTY_SCRIPT_FILES)
     @JsonInclude(value = JsonInclude.Include.ALWAYS)
-    public void setScripts(@jakarta.annotation.Nonnull List<String> scripts) {
-        this.scripts = scripts;
+    public void setScriptFiles(@jakarta.annotation.Nonnull Map<String, String> scriptFiles) {
+        this.scriptFiles = scriptFiles;
     }
 
     public TerraformAsyncModifyFromScriptsRequest tfState(
@@ -336,7 +332,8 @@ public class TerraformAsyncModifyFromScriptsRequest {
                 && Objects.equals(
                         this.envVariables, terraformAsyncModifyFromScriptsRequest.envVariables)
                 && Objects.equals(this.taskId, terraformAsyncModifyFromScriptsRequest.taskId)
-                && Objects.equals(this.scripts, terraformAsyncModifyFromScriptsRequest.scripts)
+                && Objects.equals(
+                        this.scriptFiles, terraformAsyncModifyFromScriptsRequest.scriptFiles)
                 && Objects.equals(this.tfState, terraformAsyncModifyFromScriptsRequest.tfState)
                 && Objects.equals(
                         this.webhookConfig, terraformAsyncModifyFromScriptsRequest.webhookConfig);
@@ -351,7 +348,7 @@ public class TerraformAsyncModifyFromScriptsRequest {
                 variables,
                 envVariables,
                 taskId,
-                scripts,
+                scriptFiles,
                 tfState,
                 webhookConfig);
     }
@@ -366,7 +363,7 @@ public class TerraformAsyncModifyFromScriptsRequest {
         sb.append("    variables: ").append(toIndentedString(variables)).append("\n");
         sb.append("    envVariables: ").append(toIndentedString(envVariables)).append("\n");
         sb.append("    taskId: ").append(toIndentedString(taskId)).append("\n");
-        sb.append("    scripts: ").append(toIndentedString(scripts)).append("\n");
+        sb.append("    scriptFiles: ").append(toIndentedString(scriptFiles)).append("\n");
         sb.append("    tfState: ").append(toIndentedString(tfState)).append("\n");
         sb.append("    webhookConfig: ").append(toIndentedString(webhookConfig)).append("\n");
         sb.append("}");

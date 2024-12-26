@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrder
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -216,15 +217,16 @@ public class EntityTransUtils {
     /**
      * ServiceTemplateRequestHistoryEntity converted to ServiceTemplateRequestToReview.
      *
-     * @param serviceTemplateRequestHistoryEntity ServiceTemplateRequestHistoryEntity.
+     * @param requestEntity ServiceTemplateRequestHistoryEntity.
      * @return serviceTemplateRequestVo
      */
     public static ServiceTemplateRequestToReview convertToServiceTemplateRequestVo(
-            ServiceTemplateRequestHistoryEntity serviceTemplateRequestHistoryEntity) {
+            ServiceTemplateRequestHistoryEntity requestEntity) {
         ServiceTemplateRequestToReview requestVo = new ServiceTemplateRequestToReview();
-        requestVo.setServiceTemplateId(
-                serviceTemplateRequestHistoryEntity.getServiceTemplate().getId());
-        BeanUtils.copyProperties(serviceTemplateRequestHistoryEntity, requestVo);
+        requestVo.setServiceTemplateId(requestEntity.getServiceTemplate().getId());
+        BeanUtils.copyProperties(requestEntity, requestVo);
+        requestVo.setRequestSubmittedForReview(
+                requestEntity.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
         return requestVo;
     }
 }

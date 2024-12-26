@@ -43,9 +43,9 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>503</b> - Service Unavailable
      *
      * <p><b>200</b> - OK
      *
@@ -66,9 +66,9 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>503</b> - Service Unavailable
      *
      * <p><b>200</b> - OK
      *

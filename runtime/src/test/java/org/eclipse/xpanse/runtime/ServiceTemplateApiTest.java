@@ -696,7 +696,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl =
                 oclLoader.getOcl(
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.getDeployment().setDeployer("error_" + ocl.getDeployment().getDeployer());
+        ocl.getDeployment().getScriptFiles().put("error.tf", "error_script");
         ErrorResponse expectedResponse =
                 ErrorResponse.errorResponse(
                         ErrorType.TERRAFORM_EXECUTION_FAILED,
@@ -1059,15 +1059,6 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse1.getStatus());
         errorResponse =
                 objectMapper.readValue(updateResponse1.getContentAsString(), ErrorResponse.class);
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
-        assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
-
-        // Run the unpublish test
-        final MockHttpServletResponse unpublishResponse1 = unpublish(serviceTemplateId);
-        errorResponse =
-                objectMapper.readValue(
-                        unpublishResponse1.getContentAsString(), ErrorResponse.class);
-        assertEquals(HttpStatus.BAD_REQUEST.value(), unpublishResponse1.getStatus());
         assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 

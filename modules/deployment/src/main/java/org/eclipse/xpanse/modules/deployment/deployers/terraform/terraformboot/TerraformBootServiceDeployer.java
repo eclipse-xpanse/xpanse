@@ -77,7 +77,7 @@ public class TerraformBootServiceDeployer {
         request.setRequestId(task.getOrderId());
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
-        request.setScripts(terraformBootHelper.getFiles(task));
+        request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
         request.setVariables(terraformBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraformBootHelper.getEnvironmentVariables(task));
         request.setWebhookConfig(terraformBootHelper.getWebhookConfigWithTask(task));

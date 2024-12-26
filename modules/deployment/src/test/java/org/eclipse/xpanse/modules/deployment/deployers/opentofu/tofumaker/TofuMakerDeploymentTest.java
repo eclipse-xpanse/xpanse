@@ -73,8 +73,8 @@ class TofuMakerDeploymentTest {
 
     private final UUID serviceId = UUID.randomUUID();
     private final UUID orderId = UUID.randomUUID();
-    private final String errorDeployer = "error_deployer";
-    private final String invalidDeployer =
+    private final String errorScript = "error_script";
+    private final String invalidScript =
             """
             resource "random_id" "new" {
               byte_length = 4
@@ -170,13 +170,13 @@ class TofuMakerDeploymentTest {
 
     @Test
     void testDeploy_ThrowsRestClientException() {
-        ocl.getDeployment().setDeployer(errorDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
 
         Mockito.doThrow(new OpenTofuMakerRequestFailedException("IO error"))
                 .when(terraformApi)
                 .asyncDeployWithScripts(any());
 
-        ocl.getDeployment().setDeployer(invalidDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
         Assertions.assertThrows(
                 OpenTofuMakerRequestFailedException.class,
                 () -> this.openTofuMakerDeployment.deploy(deployTask));
@@ -249,7 +249,7 @@ class TofuMakerDeploymentTest {
 
     @Test
     void testValidateFailed() {
-        ocl.getDeployment().setDeployer(invalidDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(false);
@@ -271,7 +271,7 @@ class TofuMakerDeploymentTest {
 
     @Test
     void testValidate_ThrowsOpenTofuExecutorException() {
-        ocl.getDeployment().setDeployer(errorDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
         when(tofuMakerScriptValidator.validateOpenTofuScripts(any()))
                 .thenThrow(new OpenTofuMakerRequestFailedException("IO error"));
 

@@ -23,7 +23,7 @@ import java.time.format.DateTimeParseException;
  */
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator " + "version: 7.10.0")
+        comments = "Generator version: 7.10.0")
 public class JavaTimeFormatter {
 
     private DateTimeFormatter offsetDateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;

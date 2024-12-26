@@ -7,8 +7,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -53,12 +51,6 @@ public class TerraformBootHelper {
         terraformScriptGitRepoDetails.setBranch(scriptsRepo.getBranch());
         terraformScriptGitRepoDetails.setScriptPath(scriptsRepo.getScriptsPath());
         return terraformScriptGitRepoDetails;
-    }
-
-    /** Returns all terraform script files. */
-    public List<String> getFiles(DeployTask task) {
-        String deployer = task.getOcl().getDeployment().getDeployer();
-        return Collections.singletonList(deployer);
     }
 
     /** Builds a map of all variables that must be passed to terraform executor. */

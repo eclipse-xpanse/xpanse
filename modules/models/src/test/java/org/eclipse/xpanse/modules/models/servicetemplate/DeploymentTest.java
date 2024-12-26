@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
+import java.util.Map;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,7 @@ import org.springframework.beans.BeanUtils;
 
 /** Test of Deployment. */
 class DeploymentTest {
-    private final String deployer = "deployer";
+    private final Map<String, String> scriptFiles = Map.of("test.tf", "value");
     private final CredentialType credentialType = CredentialType.API_KEY;
     private DeployerTool deployerTool;
     private ScriptsRepo scriptsRepo;
@@ -48,7 +49,7 @@ class DeploymentTest {
         deployerTool.setVersion("=1.6.1");
 
         test = new Deployment();
-        test.setDeployer(deployer);
+        test.setScriptFiles(scriptFiles);
         test.setDeployerTool(deployerTool);
         test.setVariables(variables);
         test.setCredentialType(credentialType);
@@ -59,7 +60,7 @@ class DeploymentTest {
     @Test
     void testGetters() {
         assertEquals(deployerTool, test.getDeployerTool());
-        assertEquals(deployer, test.getDeployer());
+        assertEquals(scriptFiles, test.getScriptFiles());
         assertEquals(variables, test.getVariables());
         assertEquals(credentialType, test.getCredentialType());
         assertEquals(availabilityZoneConfig, test.getServiceAvailabilityConfig());
@@ -97,8 +98,8 @@ class DeploymentTest {
                         + credentialType
                         + ", serviceAvailabilityConfig="
                         + availabilityZoneConfig
-                        + ", deployer="
-                        + deployer
+                        + ", scriptFiles="
+                        + scriptFiles
                         + ", scriptsRepo="
                         + scriptsRepo
                         + ")";

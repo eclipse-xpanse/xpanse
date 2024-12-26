@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -54,13 +55,13 @@ public class Deployment implements Serializable {
 
     @Schema(
             description =
-                    "The real deployer, something like terraform scripts. "
-                            + "Either deployer or deployFromGitRepo must be provided.")
-    private String deployer;
+                    "Deployment scripts stored in a Map. file name as the key and content as the"
+                            + " value. Either scriptFiles or scriptsRepo must be provided.")
+    private Map<String, String> scriptFiles;
 
     @Schema(
             description =
                     "Deployment scripts hosted on a GIT repo. "
-                            + "Either deployer or deployFromGitRepo must be provided.")
+                            + "Either scriptFiles or scriptsRepo must be provided.")
     private ScriptsRepo scriptsRepo;
 }

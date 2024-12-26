@@ -19,7 +19,7 @@ import org.springframework.web.client.RestClientException;
 
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator " + "version: 7.10.0")
+        comments = "Generator version: 7.10.0")
 public abstract class BaseApi {
 
     protected ApiClient apiClient;

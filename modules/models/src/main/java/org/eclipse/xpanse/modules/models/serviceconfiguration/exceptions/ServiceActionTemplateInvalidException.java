@@ -7,8 +7,10 @@ package org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions;
 
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /** Exception thrown when service action is invalid. */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class ServiceActionTemplateInvalidException extends RuntimeException {
 

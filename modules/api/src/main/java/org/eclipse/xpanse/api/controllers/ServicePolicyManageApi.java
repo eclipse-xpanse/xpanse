@@ -60,7 +60,7 @@ public class ServicePolicyManageApi {
     @GetMapping(value = "/service/policies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the policies belongs to the service.")
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public List<ServicePolicy> listServicePolicies(
             @Parameter(
                             name = "serviceTemplateId",
@@ -98,7 +98,7 @@ public class ServicePolicyManageApi {
             description = "APIs for managing service's infra policies.")
     @PostMapping(value = "/service/policies", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Add policy for the registered service template.")
-    @AuditApiRequest(methodName = "getCspFromServiceTemplateId")
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ServicePolicy addServicePolicy(
             @Valid @RequestBody ServicePolicyCreateRequest servicePolicyCreateRequest) {
         return servicePolicyManager.addServicePolicy(servicePolicyCreateRequest);

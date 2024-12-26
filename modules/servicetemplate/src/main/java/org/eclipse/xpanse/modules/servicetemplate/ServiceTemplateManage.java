@@ -552,10 +552,9 @@ public class ServiceTemplateManage {
                             id);
             throw new ServiceTemplateRequestNotAllowed(errMsg);
         }
-        checkAnyInProgressRequestForServiceTemplate(existingTemplate);
         // set isAvailableInCatalog to false directly.
         existingTemplate.setIsAvailableInCatalog(false);
-        existingTemplate.setIsReviewInProgress(false);
+        updateIsReviewInProgressInServiceTemplate(existingTemplate);
         ServiceTemplateEntity updatedTemplate = templateStorage.storeAndFlush(existingTemplate);
         ServiceTemplateRequestType requestType = ServiceTemplateRequestType.UNPUBLISH;
         // auto-approve the request to remove from catalog.

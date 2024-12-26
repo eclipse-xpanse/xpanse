@@ -10,8 +10,6 @@ import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.TRACKING_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -99,7 +97,7 @@ public class TofuMakerScriptValidator {
         request.setRequestId(getRequestId());
         request.setOpenTofuVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
-        request.setScripts(getFilesByOcl(deployment));
+        request.setScriptFiles(deployment.getScriptFiles());
         return request;
     }
 
@@ -113,11 +111,6 @@ public class TofuMakerScriptValidator {
                 tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
                         deployment.getScriptsRepo()));
         return request;
-    }
-
-    private List<String> getFilesByOcl(Deployment deployment) {
-        String deployer = deployment.getDeployer();
-        return Collections.singletonList(deployer);
     }
 
     private UUID getRequestId() {

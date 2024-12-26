@@ -60,8 +60,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith({MockitoExtension.class})
 class TerraformLocalDeploymentTest {
 
-    private final String errorDeployer = "error_deployer";
-    private final String invalidDeployer =
+    private final String errorScript = "error_script";
+    private final String invalidScript =
             """
             resource "random_id" "new" {
               byte_length = 4
@@ -235,7 +235,7 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testDeploy_FailedCausedByTerraformExecutorException() {
-        ocl.getDeployment().setDeployer(invalidDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         DeployResult deployResult = this.terraformLocalDeployment.deploy(deployTask);
         Assertions.assertNotNull(deployResult);
@@ -250,7 +250,7 @@ class TerraformLocalDeploymentTest {
             tfResourceTransUtils
                     .when(() -> TfResourceTransUtils.getStoredStateContent(any()))
                     .thenReturn("Test");
-            ocl.getDeployment().setDeployer(errorDeployer);
+            ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
             DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DESTROY);
             DeployResult deployResult = this.terraformLocalDeployment.destroy(deployTask);
             Assertions.assertTrue(deployResult.getOutputProperties().isEmpty());
@@ -284,7 +284,7 @@ class TerraformLocalDeploymentTest {
     void testGetDeployPlanAsJson_ThrowsException() {
         when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any()))
                 .thenReturn("terraform");
-        ocl.getDeployment().setDeployer(errorDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
         DeployTask deployTask = getDeployTask(ocl, ServiceOrderType.DEPLOY);
         Assertions.assertThrows(
                 TerraformExecutorException.class,
@@ -320,7 +320,7 @@ class TerraformLocalDeploymentTest {
     void testValidateFailed() {
         when(terraformInstaller.getExecutorPathThatMatchesRequiredVersion(any()))
                 .thenReturn("terraform");
-        ocl.getDeployment().setDeployer(invalidDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(false);
@@ -340,7 +340,7 @@ class TerraformLocalDeploymentTest {
 
     @Test
     void testValidate_ThrowsTerraformExecutorException() {
-        ocl.getDeployment().setDeployer(errorDeployer);
+        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
         Assertions.assertThrows(
                 TerraformExecutorException.class,
                 () -> this.terraformLocalDeployment.validate(ocl.getDeployment()));
