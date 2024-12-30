@@ -17,18 +17,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.service.DatabaseServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.database.serviceorder.DatabaseServiceOrderStorage;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
-import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryStorage;
-import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
 import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
+import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyStorage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.springframework.stereotype.Component;
@@ -40,12 +40,12 @@ import org.springframework.util.CollectionUtils;
 public class GetCspInfoFromRequest {
 
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-    @Resource private DatabaseServiceTemplateStorage serviceTemplateStorage;
-    @Resource private DatabaseServiceDeploymentStorage deployServiceStorage;
-    @Resource private DatabaseServicePolicyStorage servicePolicyStorage;
-    @Resource private DatabaseUserPolicyStorage userPolicyStorage;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
+    @Resource private ServiceDeploymentStorage deployServiceStorage;
+    @Resource private ServicePolicyStorage servicePolicyStorage;
+    @Resource private UserPolicyStorage userPolicyStorage;
     @Resource private TaskService taskService;
-    @Resource private DatabaseServiceOrderStorage serviceOrderTaskStorage;
+    @Resource private ServiceOrderStorage serviceOrderTaskStorage;
     @Resource private ServiceTemplateRequestHistoryStorage serviceTemplateHistoryStorage;
 
     /**
@@ -106,35 +106,36 @@ public class GetCspInfoFromRequest {
     /**
      * Get Csp with id of user policy.
      *
-     * @param policyId id of user policy.
+     * @param userPolicyId id of user policy.
      * @return csp.
      */
-    public Csp getCspFromUserPolicyId(UUID policyId) {
+    public Csp getCspFromUserPolicyId(UUID userPolicyId) {
         try {
-            UserPolicyEntity userPolicy = userPolicyStorage.findPolicyById(policyId);
+            UserPolicyEntity userPolicy = userPolicyStorage.findUserPolicyById(userPolicyId);
             if (Objects.nonNull(userPolicy)) {
                 return userPolicy.getCsp();
             }
         } catch (Exception e) {
-            log.error("Get csp with user policy id:{} failed.", policyId, e);
+            log.error("Get csp with user policy id:{} failed.", userPolicyId, e);
         }
         return null;
     }
 
     /**
-     * Get Csp with id of user policy.
+     * Get Csp with id of service policy.
      *
-     * @param policyId id of user policy.
+     * @param servicePolicyId id of service policy.
      * @return csp.
      */
-    public Csp getCspFromServicePolicyId(UUID policyId) {
+    public Csp getCspFromServicePolicyId(UUID servicePolicyId) {
         try {
-            ServicePolicyEntity servicePolicy = servicePolicyStorage.findPolicyById(policyId);
+            ServicePolicyEntity servicePolicy =
+                    servicePolicyStorage.findPolicyById(servicePolicyId);
             if (Objects.nonNull(servicePolicy)) {
                 return servicePolicy.getServiceTemplate().getCsp();
             }
         } catch (Exception e) {
-            log.error("Get csp with service policy id:{} failed.", policyId, e);
+            log.error("Get csp with service policy id:{} failed.", servicePolicyId, e);
         }
         return null;
     }

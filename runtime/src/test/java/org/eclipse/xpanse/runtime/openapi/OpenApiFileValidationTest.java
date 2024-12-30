@@ -15,6 +15,7 @@ import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.io.FileOutputStream;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+@Slf4j
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {"spring.profiles.active=generate-openapi-doc,noauth,test"})
@@ -48,6 +50,7 @@ public class OpenApiFileValidationTest {
         }
         SwaggerParseResult result =
                 new OpenAPIV3Parser().readLocation(DOWNLOAD_OPENAPI_JSON_PATH, null, null);
+        log.info("OpenAPI validation result: {}", result.getMessages());
         assertTrue(
                 Objects.isNull(result.getMessages()) || result.getMessages().isEmpty(),
                 String.join(",", result.getMessages()));

@@ -13,8 +13,8 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
 import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
+import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyStorage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
@@ -36,7 +36,7 @@ public class UserPolicyManager {
     @Resource private PolicyManager policyManager;
 
     @Resource private UserServiceHelper userServiceHelper;
-    @Resource private DatabaseUserPolicyStorage userPolicyStorage;
+    @Resource private UserPolicyStorage userPolicyStorage;
 
     /**
      * Get the query model for listing policies.
@@ -65,7 +65,7 @@ public class UserPolicyManager {
      * @return Returns all policies matched the query model.
      */
     public List<UserPolicy> listUserPolicies(UserPolicyQueryRequest queryModel) {
-        List<UserPolicyEntity> policyEntities = userPolicyStorage.listPolicies(queryModel);
+        List<UserPolicyEntity> policyEntities = userPolicyStorage.listUserPolicies(queryModel);
         return policyEntities.stream()
                 .sorted(Comparator.comparing(UserPolicyEntity::getCsp))
                 .map(this::conventToUserPolicy)
@@ -111,7 +111,7 @@ public class UserPolicyManager {
     }
 
     private UserPolicyEntity getUserPolicyEntity(UUID policyId) {
-        UserPolicyEntity existingEntity = userPolicyStorage.findPolicyById(policyId);
+        UserPolicyEntity existingEntity = userPolicyStorage.findUserPolicyById(policyId);
         if (Objects.isNull(existingEntity)) {
             String errorMsg = String.format("The user policy with id %s not found.", policyId);
             throw new PolicyNotFoundException(errorMsg);
@@ -133,7 +133,7 @@ public class UserPolicyManager {
      */
     public void deleteUserPolicy(UUID id) {
         getUserPolicyEntity(id);
-        userPolicyStorage.deletePolicyById(id);
+        userPolicyStorage.deleteUserPolicyById(id);
     }
 
     private void checkIfUserPolicyIsDuplicate(Csp csp, String policy) {
@@ -143,7 +143,8 @@ public class UserPolicyManager {
         queryModel.setUserId(currentUserId);
         queryModel.setCsp(csp);
         queryModel.setPolicy(policy);
-        List<UserPolicyEntity> userPolicyEntityList = userPolicyStorage.listPolicies(queryModel);
+        List<UserPolicyEntity> userPolicyEntityList =
+                userPolicyStorage.listUserPolicies(queryModel);
         if (!CollectionUtils.isEmpty(userPolicyEntityList)) {
             String policyKey = userPolicyEntityList.getFirst().getId().toString();
             String errMsg =

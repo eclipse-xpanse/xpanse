@@ -15,10 +15,10 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
@@ -41,9 +41,9 @@ public class ServicePolicyManager {
 
     @Resource private UserServiceHelper userServiceHelper;
 
-    @Resource private DatabaseServicePolicyStorage servicePolicyStorage;
+    @Resource private ServicePolicyStorage servicePolicyStorage;
 
-    @Resource private DatabaseServiceTemplateStorage serviceTemplateStorage;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
      * List policies belonging to the registered service template.
@@ -51,9 +51,8 @@ public class ServicePolicyManager {
      * @param serviceTemplateId id of the registered service template.
      * @return list of service's policies.
      */
-    public List<ServicePolicy> listServicePolicies(String serviceTemplateId) {
-        ServiceTemplateEntity existingServiceTemplate =
-                getServiceTemplateEntity(UUID.fromString(serviceTemplateId));
+    public List<ServicePolicy> listServicePolicies(UUID serviceTemplateId) {
+        ServiceTemplateEntity existingServiceTemplate = getServiceTemplateEntity(serviceTemplateId);
         if (CollectionUtils.isEmpty(existingServiceTemplate.getServicePolicyList())) {
             return Collections.emptyList();
         }

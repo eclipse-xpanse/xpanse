@@ -77,16 +77,16 @@ public class UserPolicyManageApi {
     /**
      * Get the details of the policy created by the user.
      *
-     * @param policyId The id of the policy.
+     * @param userPolicyId The id of the policy.
      * @return Returns list of the policies defined by the user.
      */
     @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
-    @GetMapping(value = "/policies/{policyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/policies/{userPolicyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the details of the policy created by the user.")
     @AuditApiRequest(methodName = "getCspFromUserPolicyId", paramTypes = UUID.class)
-    public UserPolicy getPolicyDetails(@PathVariable UUID policyId) {
-        return userPolicyManager.getUserPolicyDetails(policyId);
+    public UserPolicy getPolicyDetails(@PathVariable UUID userPolicyId) {
+        return userPolicyManager.getUserPolicyDetails(userPolicyId);
     }
 
     /**
@@ -109,28 +109,35 @@ public class UserPolicyManageApi {
      * @param updateRequest The policy to be updated.
      */
     @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
-    @PutMapping(value = "/policies/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/policies/{userPolicyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update the policy created by the user.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public UserPolicy updateUserPolicy(
-            @Parameter(name = "id", description = "ID of the policy to be updated")
-                    @PathVariable("id")
-                    String id,
+            @Parameter(
+                            name = "userPolicyId",
+                            description = "id of the policy created by user to be updated")
+                    @PathVariable("userPolicyId")
+                    UUID userPolicyId,
             @Valid @RequestBody UserPolicyUpdateRequest updateRequest) {
-        return userPolicyManager.updateUserPolicy(UUID.fromString(id), updateRequest);
+        return userPolicyManager.updateUserPolicy(userPolicyId, updateRequest);
     }
 
     /**
      * Delete the policy created by the user.
      *
-     * @param policyId The id of policy.
+     * @param userPolicyId The id of the policy created by user.
      */
     @Tag(name = "UserPoliciesManagement", description = "APIs for managing user's infra policies.")
-    @DeleteMapping(value = "/policies/{policyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/policies/{userPolicyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete the policy created by the user.")
     @AuditApiRequest(methodName = "getCspFromUserPolicyId", paramTypes = UUID.class)
-    public void deleteUserPolicy(@PathVariable("policyId") UUID policyId) {
-        userPolicyManager.deleteUserPolicy(policyId);
+    public void deleteUserPolicy(
+            @Parameter(
+                            name = "userPolicyId",
+                            description = "id of the policy created by user to be updated")
+                    @PathVariable("userPolicyId")
+                    UUID userPolicyId) {
+        userPolicyManager.deleteUserPolicy(userPolicyId);
     }
 }

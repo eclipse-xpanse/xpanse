@@ -10,8 +10,8 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.userpolicy.DatabaseUserPolicyStorage;
 import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
+import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyStorage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
@@ -37,7 +37,7 @@ class UserPolicyManagerTest {
     private final String userId = "userId";
     @Mock private PolicyManager mockPolicyManager;
     @Mock private UserServiceHelper mockUserServiceHelper;
-    @Mock private DatabaseUserPolicyStorage mockUserPolicyStorage;
+    @Mock private UserPolicyStorage mockUserPolicyStorage;
     @InjectMocks private UserPolicyManager userPolicyManagerUnderTest;
 
     @Test
@@ -55,7 +55,7 @@ class UserPolicyManagerTest {
         userPolicy.setCsp(Csp.HUAWEI_CLOUD);
         userPolicy.setEnabled(true);
         final List<UserPolicy> expectedResult = List.of(userPolicy);
-        // Configure DatabaseUserPolicyStorage.listPolicies(...).
+        // Configure DatabaseUserPolicyStorage.listUserPolicies(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(policyId);
         userPolicyEntity.setUserId(userId);
@@ -67,7 +67,7 @@ class UserPolicyManagerTest {
         queryModel1.setUserId(userId);
         queryModel1.setCsp(Csp.HUAWEI_CLOUD);
         queryModel1.setPolicy("userPolicy");
-        when(mockUserPolicyStorage.listPolicies(queryModel1)).thenReturn(policyEntities);
+        when(mockUserPolicyStorage.listUserPolicies(queryModel1)).thenReturn(policyEntities);
 
         // Run the test
         final List<UserPolicy> result = userPolicyManagerUnderTest.listUserPolicies(queryModel);
@@ -84,13 +84,14 @@ class UserPolicyManagerTest {
         queryModel.setCsp(Csp.HUAWEI_CLOUD);
         queryModel.setPolicy("policy");
 
-        // Configure DatabaseUserPolicyStorage.listPolicies(...).
+        // Configure DatabaseUserPolicyStorage.listUserPolicies(...).
         final UserPolicyQueryRequest queryModel1 = new UserPolicyQueryRequest();
 
         queryModel1.setUserId(userId);
         queryModel1.setCsp(Csp.HUAWEI_CLOUD);
         queryModel1.setPolicy("policy");
-        when(mockUserPolicyStorage.listPolicies(queryModel1)).thenReturn(Collections.emptyList());
+        when(mockUserPolicyStorage.listUserPolicies(queryModel1))
+                .thenReturn(Collections.emptyList());
 
         // Run the test
         final List<UserPolicy> result = userPolicyManagerUnderTest.listUserPolicies(queryModel);
@@ -114,13 +115,14 @@ class UserPolicyManagerTest {
 
         when(mockUserServiceHelper.getCurrentUserId()).thenReturn(userId);
 
-        // Configure DatabaseUserPolicyStorage.listPolicies(...).
+        // Configure DatabaseUserPolicyStorage.listUserPolicies(...).
         final UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
         queryModel.setUserId(userId);
         queryModel.setCsp(Csp.HUAWEI_CLOUD);
         queryModel.setPolicy("policy");
 
-        when(mockUserPolicyStorage.listPolicies(queryModel)).thenReturn(Collections.emptyList());
+        when(mockUserPolicyStorage.listUserPolicies(queryModel))
+                .thenReturn(Collections.emptyList());
 
         // Configure DatabaseUserPolicyStorage.storeAndFlush(...).
         final UserPolicyEntity userPolicyEntity1 = new UserPolicyEntity();
@@ -150,7 +152,7 @@ class UserPolicyManagerTest {
 
         when(mockUserServiceHelper.getCurrentUserId()).thenReturn(userId);
 
-        // Configure DatabaseUserPolicyStorage.listPolicies(...).
+        // Configure DatabaseUserPolicyStorage.listUserPolicies(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(policyId);
         userPolicyEntity.setUserId(userId);
@@ -163,7 +165,7 @@ class UserPolicyManagerTest {
         queryModel.setCsp(Csp.HUAWEI_CLOUD);
         queryModel.setPolicy("policy");
 
-        when(mockUserPolicyStorage.listPolicies(queryModel)).thenReturn(policyEntities);
+        when(mockUserPolicyStorage.listUserPolicies(queryModel)).thenReturn(policyEntities);
         // Run the test
         assertThatThrownBy(() -> userPolicyManagerUnderTest.addUserPolicy(createRequest))
                 .isInstanceOf(PolicyDuplicateException.class);
@@ -205,19 +207,19 @@ class UserPolicyManagerTest {
         expectedResult.setCsp(Csp.HUAWEI_CLOUD);
         expectedResult.setEnabled(false);
 
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(policyId);
         userPolicyEntity.setUserId(userId);
         userPolicyEntity.setPolicy("policy");
         userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(true);
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(userPolicyEntity);
 
         when(mockUserServiceHelper.getCurrentUserId()).thenReturn(userId);
         when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
 
-        // Configure DatabaseUserPolicyStorage.listPolicies(...).
+        // Configure DatabaseUserPolicyStorage.listUserPolicies(...).
         final UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
 
         queryModel.setUserId(userId);
@@ -254,18 +256,18 @@ class UserPolicyManagerTest {
         expectedResult.setCsp(Csp.OPENSTACK_TESTLAB);
         expectedResult.setEnabled(false);
 
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(policyId);
         userPolicyEntity.setUserId(userId);
         userPolicyEntity.setPolicy("policy");
         userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(true);
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(userPolicyEntity);
 
         when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
 
-        // Configure DatabaseUserPolicyStorage.listPolicies(...).
+        // Configure DatabaseUserPolicyStorage.listUserPolicies(...).
         final UserPolicyQueryRequest queryModel = new UserPolicyQueryRequest();
 
         queryModel.setUserId(userId);
@@ -296,8 +298,8 @@ class UserPolicyManagerTest {
         final UserPolicyUpdateRequest updateRequest = new UserPolicyUpdateRequest();
         updateRequest.setCsp(Csp.HUAWEI_CLOUD);
         updateRequest.setPolicy("policy");
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(null);
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(null);
         // Run the test
         assertThatThrownBy(
                         () -> userPolicyManagerUnderTest.updateUserPolicy(policyId, updateRequest))
@@ -311,14 +313,14 @@ class UserPolicyManagerTest {
         updateRequest.setCsp(Csp.HUAWEI_CLOUD);
         updateRequest.setPolicy("policy");
 
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(policyId);
         userPolicyEntity.setUserId(userId);
         userPolicyEntity.setPolicy("policy");
         userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(true);
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(userPolicyEntity);
 
         when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(false);
 
@@ -337,7 +339,7 @@ class UserPolicyManagerTest {
         updateRequest.setPolicy("policy2");
         updateRequest.setEnabled(false);
 
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(id1);
         userPolicyEntity.setUserId(userId);
@@ -352,7 +354,7 @@ class UserPolicyManagerTest {
         userPolicyEntity2.setCsp(Csp.OPENSTACK_TESTLAB);
         userPolicyEntity2.setEnabled(true);
 
-        when(mockUserPolicyStorage.findPolicyById(id1)).thenReturn(userPolicyEntity);
+        when(mockUserPolicyStorage.findUserPolicyById(id1)).thenReturn(userPolicyEntity);
 
         when(mockUserServiceHelper.getCurrentUserId()).thenReturn(userId);
 
@@ -364,7 +366,8 @@ class UserPolicyManagerTest {
         queryModel.setCsp(Csp.OPENSTACK_TESTLAB);
         queryModel.setPolicy("policy2");
 
-        when(mockUserPolicyStorage.listPolicies(queryModel)).thenReturn(List.of(userPolicyEntity2));
+        when(mockUserPolicyStorage.listUserPolicies(queryModel))
+                .thenReturn(List.of(userPolicyEntity2));
 
         // Run the test
         assertThatThrownBy(() -> userPolicyManagerUnderTest.updateUserPolicy(id1, updateRequest))
@@ -380,14 +383,14 @@ class UserPolicyManagerTest {
         expectedResult.setCsp(Csp.HUAWEI_CLOUD);
         expectedResult.setEnabled(true);
 
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(policyId);
         userPolicyEntity.setUserId(userId);
         userPolicyEntity.setPolicy("policy");
         userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(true);
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(userPolicyEntity);
 
         when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
 
@@ -407,8 +410,8 @@ class UserPolicyManagerTest {
         expectedResult.setCsp(Csp.HUAWEI_CLOUD);
         expectedResult.setEnabled(true);
 
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(null);
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(null);
 
         // Run the test
         assertThatThrownBy(() -> userPolicyManagerUnderTest.getUserPolicyDetails(policyId))
@@ -424,14 +427,14 @@ class UserPolicyManagerTest {
         expectedResult.setCsp(Csp.HUAWEI_CLOUD);
         expectedResult.setEnabled(true);
 
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(policyId);
         userPolicyEntity.setUserId(userId);
         userPolicyEntity.setPolicy("policy");
         userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(true);
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(userPolicyEntity);
 
         when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(false);
 
@@ -443,14 +446,14 @@ class UserPolicyManagerTest {
     @Test
     void testDeleteUserPolicy() {
         // Setup
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(policyId);
         userPolicyEntity.setUserId(userId);
         userPolicyEntity.setPolicy("policy");
         userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(true);
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(userPolicyEntity);
 
         when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(true);
 
@@ -458,20 +461,20 @@ class UserPolicyManagerTest {
         userPolicyManagerUnderTest.deleteUserPolicy(policyId);
 
         // Verify the results
-        verify(mockUserPolicyStorage).deletePolicyById(policyId);
+        verify(mockUserPolicyStorage).deleteUserPolicyById(policyId);
     }
 
     @Test
     void testDeleteUserPolicy_ThrowsAccessDeniedException() {
         // Setup
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
         final UserPolicyEntity userPolicyEntity = new UserPolicyEntity();
         userPolicyEntity.setId(policyId);
         userPolicyEntity.setUserId(userId);
         userPolicyEntity.setPolicy("policy");
         userPolicyEntity.setCsp(Csp.HUAWEI_CLOUD);
         userPolicyEntity.setEnabled(true);
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(userPolicyEntity);
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(userPolicyEntity);
 
         when(mockUserServiceHelper.currentUserIsOwner(userId)).thenReturn(false);
 
@@ -483,8 +486,8 @@ class UserPolicyManagerTest {
     @Test
     void testDeleteUserPolicy_ThrowsPolicyNotFoundException() {
         // Setup
-        // Configure DatabaseUserPolicyStorage.findPolicyById(...).
-        when(mockUserPolicyStorage.findPolicyById(policyId)).thenReturn(null);
+        // Configure DatabaseUserPolicyStorage.findUserPolicyById(...).
+        when(mockUserPolicyStorage.findUserPolicyById(policyId)).thenReturn(null);
 
         // Run the test
         assertThatThrownBy(() -> userPolicyManagerUnderTest.deleteUserPolicy(policyId))

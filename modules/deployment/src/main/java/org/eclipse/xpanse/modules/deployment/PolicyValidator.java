@@ -14,8 +14,8 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesEvaluationFailedException;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
@@ -37,7 +37,7 @@ public class PolicyValidator {
     @Resource private PolicyManager policyManager;
     @Resource private UserPolicyManager userPolicyManager;
     @Resource private ServicePolicyManager servicePolicyManager;
-    @Resource private DatabaseServiceTemplateStorage serviceTemplateStorage;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
     @Resource private DeployerKindManager deployerKindManager;
 
     private List<ServicePolicy> getServicePolicies(UUID serviceTemplateId) {

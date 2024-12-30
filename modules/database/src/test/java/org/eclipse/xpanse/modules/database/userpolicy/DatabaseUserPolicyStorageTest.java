@@ -99,7 +99,7 @@ class DatabaseUserPolicyStorageTest {
 
         // Run the test
         final List<UserPolicyEntity> result =
-                databasePolicyStorageUnderTest.listPolicies(queryModel);
+                databasePolicyStorageUnderTest.listUserPolicies(queryModel);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -116,7 +116,7 @@ class DatabaseUserPolicyStorageTest {
 
         // Run the test
         final List<UserPolicyEntity> result =
-                databasePolicyStorageUnderTest.listPolicies(queryModel);
+                databasePolicyStorageUnderTest.listUserPolicies(queryModel);
 
         // Verify the results
         assertThat(result).isEqualTo(Collections.emptyList());
@@ -146,7 +146,7 @@ class DatabaseUserPolicyStorageTest {
 
         // Run the test
         final UserPolicyEntity result =
-                databasePolicyStorageUnderTest.findPolicyById(
+                databasePolicyStorageUnderTest.findUserPolicyById(
                         UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983"));
 
         // Verify the results
@@ -162,7 +162,7 @@ class DatabaseUserPolicyStorageTest {
 
         // Run the test
         final UserPolicyEntity result =
-                databasePolicyStorageUnderTest.findPolicyById(
+                databasePolicyStorageUnderTest.findUserPolicyById(
                         UUID.fromString("3a680860-8484-428b-a39a-04cef6eaf983"));
 
         // Verify the results
@@ -180,7 +180,7 @@ class DatabaseUserPolicyStorageTest {
         userPolicyEntity.setEnabled(false);
 
         // Run the test
-        databasePolicyStorageUnderTest.deletePolicies(userPolicyEntity);
+        databasePolicyStorageUnderTest.deleteUserPolicies(userPolicyEntity);
 
         // Verify the results
         // Confirm UserPolicyRepository.delete(...).
@@ -197,7 +197,7 @@ class DatabaseUserPolicyStorageTest {
     void testDeletePolicyById() {
         // Setup
         // Run the test
-        databasePolicyStorageUnderTest.deletePolicyById(
+        databasePolicyStorageUnderTest.deleteUserPolicyById(
                 UUID.fromString("c74096c4-710b-4767-be2b-77ff462d2cb3"));
 
         // Verify the results

@@ -36,7 +36,7 @@ public class DatabaseUserPolicyStorage implements UserPolicyStorage {
     }
 
     @Override
-    public List<UserPolicyEntity> listPolicies(UserPolicyQueryRequest queryModel) {
+    public List<UserPolicyEntity> listUserPolicies(UserPolicyQueryRequest queryModel) {
         Specification<UserPolicyEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
@@ -67,18 +67,18 @@ public class DatabaseUserPolicyStorage implements UserPolicyStorage {
     }
 
     @Override
-    public UserPolicyEntity findPolicyById(UUID id) {
+    public UserPolicyEntity findUserPolicyById(UUID id) {
         Optional<UserPolicyEntity> optional = userPolicyRepository.findById(id);
         return optional.orElse(null);
     }
 
     @Override
-    public void deletePolicies(UserPolicyEntity userPolicyEntity) {
+    public void deleteUserPolicies(UserPolicyEntity userPolicyEntity) {
         userPolicyRepository.delete(userPolicyEntity);
     }
 
     @Override
-    public void deletePolicyById(UUID id) {
+    public void deleteUserPolicyById(UUID id) {
         userPolicyRepository.deleteById(id);
     }
 }

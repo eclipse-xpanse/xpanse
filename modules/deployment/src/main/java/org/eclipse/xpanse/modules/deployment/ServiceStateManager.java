@@ -17,8 +17,8 @@ import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.database.serviceorder.DatabaseServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
@@ -48,7 +48,7 @@ public class ServiceStateManager {
     @Resource private ServiceDeploymentEntityHandler serviceHandler;
     @Resource private PluginManager pluginManager;
     @Resource private UserServiceHelper userServiceHelper;
-    @Resource private DatabaseServiceOrderStorage serviceOrderStorage;
+    @Resource private ServiceOrderStorage serviceOrderStorage;
 
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;

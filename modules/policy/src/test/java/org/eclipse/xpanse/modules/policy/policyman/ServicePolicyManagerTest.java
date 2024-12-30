@@ -13,10 +13,10 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.servicepolicy.DatabaseServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.DatabaseServiceTemplateStorage;
+import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
@@ -50,8 +50,8 @@ class ServicePolicyManagerTest {
 
     @Mock private PolicyManager mockPolicyManager;
     @Mock private UserServiceHelper mockUserServiceHelper;
-    @Mock private DatabaseServicePolicyStorage mockServicePolicyStorage;
-    @Mock private DatabaseServiceTemplateStorage mockServiceTemplateStorage;
+    @Mock private ServicePolicyStorage mockServicePolicyStorage;
+    @Mock private ServiceTemplateStorage mockServiceTemplateStorage;
 
     @InjectMocks private ServicePolicyManager test;
 
@@ -81,7 +81,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(true);
 
         // Run the test
-        final List<ServicePolicy> result = test.listServicePolicies(serviceTemplateId.toString());
+        final List<ServicePolicy> result = test.listServicePolicies(serviceTemplateId);
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
@@ -95,7 +95,7 @@ class ServicePolicyManagerTest {
                 .thenThrow(new ServiceTemplateNotRegistered("serviceTemplateId"));
 
         // Run the test
-        assertThatThrownBy(() -> test.listServicePolicies(serviceTemplateId.toString()))
+        assertThatThrownBy(() -> test.listServicePolicies(serviceTemplateId))
                 .isInstanceOf(ServiceTemplateNotRegistered.class);
     }
 
@@ -112,7 +112,7 @@ class ServicePolicyManagerTest {
         when(mockUserServiceHelper.currentUserCanManageIsv(serviceVendor)).thenReturn(false);
 
         // Run the test
-        assertThatThrownBy(() -> test.listServicePolicies(serviceTemplateId.toString()))
+        assertThatThrownBy(() -> test.listServicePolicies(serviceTemplateId))
                 .isInstanceOf(AccessDeniedException.class);
     }
 
