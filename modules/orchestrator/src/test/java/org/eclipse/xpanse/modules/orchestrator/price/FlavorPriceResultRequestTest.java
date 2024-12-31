@@ -15,7 +15,7 @@ import org.springframework.beans.BeanUtils;
 @ExtendWith(MockitoExtension.class)
 class FlavorPriceResultRequestTest {
 
-    private final String serviceTemplateId = UUID.randomUUID().toString();
+    private final UUID serviceTemplateId = UUID.randomUUID();
     private final String flavorName = "flavorName";
     private final String userId = "userId";
     private final String regionName = "any";

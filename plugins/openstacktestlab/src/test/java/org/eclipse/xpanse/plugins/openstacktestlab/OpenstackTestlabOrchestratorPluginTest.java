@@ -35,8 +35,8 @@ import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
-import org.eclipse.xpanse.modules.database.service.DatabaseServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -149,8 +149,8 @@ class OpenstackTestlabOrchestratorPluginTest {
     @MockitoBean private OpenstackServersManager mockServersManager;
     @MockitoBean private OpenstackResourceManager mockResourceManager;
     @MockitoBean private OpenstackServicePriceCalculator mockPriceCalculator;
-    @MockitoBean private DatabaseServiceDeploymentStorage databaseServiceDeploymentStorage;
-    @MockitoBean private ServiceTemplateStorage serviceTemplateStorage;
+    @MockitoBean private ServiceDeploymentStorage mockServiceDeploymentStorage;
+    @MockitoBean private ServiceTemplateStorage mockServiceTemplateStorage;
     @MockitoBean private DeployEnvironments deployEnvironments;
 
     @Resource private OpenstackTestlabOrchestratorPlugin plugin;
@@ -332,9 +332,9 @@ class OpenstackTestlabOrchestratorPluginTest {
         deployment.setVariables(variables);
         ocl.setDeployment(deployment);
         serviceTemplateEntity.setOcl(ocl);
-        when(this.databaseServiceDeploymentStorage.findServiceDeploymentById(any()))
+        when(this.mockServiceDeploymentStorage.findServiceDeploymentById(any()))
                 .thenReturn(serviceDeploymentEntity);
-        when(this.serviceTemplateStorage.getServiceTemplateById(any()))
+        when(this.mockServiceTemplateStorage.getServiceTemplateById(any()))
                 .thenReturn(serviceTemplateEntity);
         when(this.deployEnvironments.getAllDeploymentVariablesForService(
                         any(), any(), any(), any()))

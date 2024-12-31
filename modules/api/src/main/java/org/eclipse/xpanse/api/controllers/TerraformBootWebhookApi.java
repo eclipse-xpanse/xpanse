@@ -49,11 +49,11 @@ public class TerraformBootWebhookApi {
             value = "${webhook.terraform-boot.orderCallbackUri}/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @AuditApiRequest(enabled = false)
+    @AuditApiRequest(methodName = "getCspFromServiceOrderId", paramTypes = UUID.class)
     public void orderCallback(
             @Parameter(name = "orderId", description = "Id of the order.") @PathVariable("orderId")
-                    String orderId,
+                    UUID orderId,
             @Valid @RequestBody TerraformResult result) {
-        terraformDeploymentResultCallbackManager.orderCallback(UUID.fromString(orderId), result);
+        terraformDeploymentResultCallbackManager.orderCallback(orderId, result);
     }
 }

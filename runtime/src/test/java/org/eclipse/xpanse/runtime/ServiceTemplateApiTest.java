@@ -32,8 +32,8 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.database.service.DatabaseServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.PriceWithRegion;
@@ -82,7 +82,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class ServiceTemplateApiTest extends ApisTestCommon {
 
     private final OclLoader oclLoader = new OclLoader();
-    @MockitoBean private DatabaseServiceDeploymentStorage mockDeployServiceStorage;
+    @MockitoBean private ServiceDeploymentStorage mockServiceDeploymentStorage;
 
     @Test
     @WithJwt(file = "jwt_csp_isv.json")
@@ -1091,7 +1091,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         serviceTemplateId);
         updateServiceTemplateState(
                 serviceTemplateId, ServiceTemplateRegistrationState.APPROVED, false);
-        when(mockDeployServiceStorage.listServices(any(ServiceQueryModel.class)))
+        when(mockServiceDeploymentStorage.listServices(any(ServiceQueryModel.class)))
                 .thenReturn(List.of(new ServiceDeploymentEntity()));
         MockHttpServletResponse deleteResponse2 = deleteTemplate(serviceTemplateId);
         errorResponse =

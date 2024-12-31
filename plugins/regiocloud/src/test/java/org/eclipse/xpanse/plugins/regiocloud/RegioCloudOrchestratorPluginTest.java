@@ -450,8 +450,9 @@ class RegioCloudOrchestratorPluginTest {
     @Test
     void testGetServiceFlavorPrice() {
         // Setup
+        UUID serviceTemplateId = UUID.fromString("15c8f06e-d7d5-4620-a3b4-6a98f201fa21");
         final ServiceFlavorPriceRequest request = new ServiceFlavorPriceRequest();
-        request.setServiceTemplateId("serviceTemplateId");
+        request.setServiceTemplateId(serviceTemplateId);
         request.setFlavorName("flavorName");
         request.setUserId(userId);
         request.setSiteName(siteName);
@@ -476,7 +477,7 @@ class RegioCloudOrchestratorPluginTest {
         recurringPrice1.setCurrency(Currency.USD);
         flavorPriceResult.setRecurringPrice(recurringPrice1);
         final ServiceFlavorPriceRequest request1 = new ServiceFlavorPriceRequest();
-        request1.setServiceTemplateId("serviceTemplateId");
+        request1.setServiceTemplateId(serviceTemplateId);
         request1.setFlavorName("flavorName");
         request1.setUserId(userId);
         request1.setSiteName(siteName);

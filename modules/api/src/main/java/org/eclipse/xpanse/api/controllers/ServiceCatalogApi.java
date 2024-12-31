@@ -112,28 +112,34 @@ public class ServiceCatalogApi {
     /**
      * Get deployable service by id.
      *
-     * @param id The id of deployable service.
+     * @param serviceTemplateId The id of deployable service.
      * @return userOrderableServiceVo
      */
     @Tag(
             name = "ServiceCatalog",
             description = "APIs to query the services which are available for the user to order.")
     @Operation(description = "Get deployable service by id.")
-    @GetMapping(value = "/catalog/services/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(
+            value = "/catalog/services/{serviceTemplateId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public UserOrderableServiceVo getOrderableServiceDetailsById(
-            @Parameter(name = "id", description = "The id of orderable service.")
-                    @PathVariable("id")
-                    String id) {
+            @Parameter(name = "serviceTemplateId", description = "The id of orderable service.")
+                    @PathVariable("serviceTemplateId")
+                    UUID serviceTemplateId) {
         ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateManage.getServiceTemplateDetails(UUID.fromString(id), false, false);
+                serviceTemplateManage.getServiceTemplateDetails(serviceTemplateId, false, false);
         if (Objects.equals(false, serviceTemplateEntity.getIsAvailableInCatalog())) {
-            String errMsg = "Service template with id " + id + " is disabled to order service.";
+            String errMsg =
+                    "Service template with id "
+                            + serviceTemplateId
+                            + " is disabled to order service.";
             log.error(errMsg);
             throw new ServiceTemplateDisabledException(errMsg);
         }
-        String successMsg = String.format("Get orderable service with id %s successful.", id);
+        String successMsg =
+                String.format("Get orderable service with id %s successful.", serviceTemplateId);
         log.info(successMsg);
         return convertToUserOrderableServiceVo(serviceTemplateEntity);
     }
@@ -141,20 +147,20 @@ public class ServiceCatalogApi {
     /**
      * Get the API document of the deployable service.
      *
-     * @param id The id of deployable service.
+     * @param serviceTemplateId The id of deployable service.
      */
     @Tag(
             name = "ServiceCatalog",
             description = "APIs to query the services which are available for the user to order.")
     @GetMapping(
-            value = "/catalog/services/{id}/openapi",
+            value = "/catalog/services/{serviceTemplateId}/openapi",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the API document of the orderable service.")
     @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
-    public Link openApi(@PathVariable("id") String id) {
-        String apiUrl = this.serviceTemplateManage.getOpenApiUrl(UUID.fromString(id));
+    public Link openApi(@PathVariable("serviceTemplateId") UUID serviceTemplateId) {
+        String apiUrl = this.serviceTemplateManage.getOpenApiUrl(serviceTemplateId);
         String successMsg =
                 String.format(
                         "Get API document of the orderable service successful with Url %s.",

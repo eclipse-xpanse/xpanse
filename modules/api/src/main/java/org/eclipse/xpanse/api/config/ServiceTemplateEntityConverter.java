@@ -46,7 +46,7 @@ public class ServiceTemplateEntityConverter {
             serviceTemplateDetailVo.add(
                     WebMvcLinkBuilder.linkTo(
                                     WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
-                                            .openApi(serviceTemplateEntity.getId().toString()))
+                                            .openApi(serviceTemplateEntity.getId()))
                             .withRel("openApi"));
             serviceTemplateDetailVo.setServiceHostingType(
                     serviceTemplateEntity.getOcl().getServiceHostingType());
@@ -87,7 +87,7 @@ public class ServiceTemplateEntityConverter {
             userOrderableServiceVo.add(
                     WebMvcLinkBuilder.linkTo(
                                     WebMvcLinkBuilder.methodOn(ServiceCatalogApi.class)
-                                            .openApi(serviceTemplateEntity.getId().toString()))
+                                            .openApi(serviceTemplateEntity.getId()))
                             .withRel("openApi"));
             userOrderableServiceVo.setServiceHostingType(
                     serviceTemplateEntity.getOcl().getServiceHostingType());

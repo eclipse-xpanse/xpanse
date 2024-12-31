@@ -64,28 +64,28 @@ public class ServicePolicyManageApi {
     public List<ServicePolicy> listServicePolicies(
             @Parameter(
                             name = "serviceTemplateId",
-                            description =
-                                    "The id of registered service template which the policy belongs"
-                                            + " to.")
-                    String serviceTemplateId) {
+                            description = "The id of service template which the policy belongs to.")
+                    UUID serviceTemplateId) {
         return servicePolicyManager.listServicePolicies(serviceTemplateId);
     }
 
     /**
      * Get the details of the policy belongs to the registered service template.
      *
-     * @param policyId The id of the policy.
+     * @param servicePolicyId The id of the policy.
      * @return Returns list of the policies defined by the service.
      */
     @Tag(
             name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
-    @GetMapping(value = "/service/policies/{policyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(
+            value = "/service/policies/{servicePolicyId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get details of policy belongs to the registered service template.")
     @AuditApiRequest(methodName = "getCspFromServicePolicyId", paramTypes = UUID.class)
-    public ServicePolicy getServicePolicyDetails(@PathVariable UUID policyId) {
-        return servicePolicyManager.getServicePolicyDetails(policyId);
+    public ServicePolicy getServicePolicyDetails(@PathVariable UUID servicePolicyId) {
+        return servicePolicyManager.getServicePolicyDetails(servicePolicyId);
     }
 
     /**
@@ -112,32 +112,34 @@ public class ServicePolicyManageApi {
     @Tag(
             name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
-    @PutMapping(value = "/service/policies/{policyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(
+            value = "/service/policies/{servicePolicyId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Update the policy belongs to the registered service template.")
     @AuditApiRequest(methodName = "getCspFromServicePolicyId", paramTypes = UUID.class)
     public ServicePolicy updateServicePolicy(
-            @Parameter(name = "policyId", description = "ID of the policy to be updated")
-                    @PathVariable("policyId")
-                    UUID policyId,
+            @Parameter(name = "servicePolicyId", description = "ID of the policy to be updated")
+                    @PathVariable("servicePolicyId")
+                    UUID servicePolicyId,
             @Valid @RequestBody ServicePolicyUpdateRequest updateRequest) {
-        return servicePolicyManager.updateServicePolicy(policyId, updateRequest);
+        return servicePolicyManager.updateServicePolicy(servicePolicyId, updateRequest);
     }
 
     /**
      * Delete the policy belongs to the registered service template.
      *
-     * @param policyId The id of policy.
+     * @param servicePolicyId The id of policy.
      */
     @Tag(
             name = "ServicePoliciesManagement",
             description = "APIs for managing service's infra policies.")
     @DeleteMapping(
-            value = "/service/policies/{policyId}",
+            value = "/service/policies/{servicePolicyId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete the policy belongs to the registered service template.")
     @AuditApiRequest(methodName = "getCspFromServicePolicyId", paramTypes = UUID.class)
-    public void deleteServicePolicy(@PathVariable("policyId") UUID policyId) {
-        servicePolicyManager.deleteServicePolicy(policyId);
+    public void deleteServicePolicy(@PathVariable("servicePolicyId") UUID servicePolicyId) {
+        servicePolicyManager.deleteServicePolicy(servicePolicyId);
     }
 }

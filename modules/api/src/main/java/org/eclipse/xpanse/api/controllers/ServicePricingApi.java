@@ -53,15 +53,16 @@ public class ServicePricingApi {
             name = "ServicePrices",
             description = "API to manage prices of the flavors of the service.")
     @GetMapping(
-            value = "/pricing/{templateId}/{regionName}/{siteName}/{billingMode}/{flavorName}",
+            value =
+                    "/pricing/{serviceTemplateId}/{regionName}/{siteName}/{billingMode}/{flavorName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the price of one specific flavor of the service.")
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ResponseEntity<FlavorPriceResult> getServicePriceByFlavor(
-            @Parameter(name = "templateId", description = "id of the service template")
-                    @PathVariable(name = "templateId")
-                    String templateId,
+            @Parameter(name = "serviceTemplateId", description = "id of the service template")
+                    @PathVariable(name = "serviceTemplateId")
+                    UUID serviceTemplateId,
             @Parameter(name = "regionName", description = "region name of the service")
                     @PathVariable(name = "regionName")
                     String regionName,
@@ -77,7 +78,7 @@ public class ServicePricingApi {
         try {
             FlavorPriceResult flavorPriceResult =
                     servicePricesManager.getServicePriceByFlavor(
-                            templateId, regionName, siteName, billingMode, flavorName);
+                            serviceTemplateId, regionName, siteName, billingMode, flavorName);
             return ResponseEntity.ok().cacheControl(getCacheControl()).body(flavorPriceResult);
         } catch (Exception ex) {
             FlavorPriceResult errorResult = new FlavorPriceResult();
@@ -97,15 +98,15 @@ public class ServicePricingApi {
             name = "ServicePrices",
             description = "API to manage prices of the flavors of the service.")
     @GetMapping(
-            value = "/pricing/service/{templateId}/{regionName}/{siteName}/{billingMode}",
+            value = "/pricing/service/{serviceTemplateId}/{regionName}/{siteName}/{billingMode}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Get the prices of all flavors of the service")
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
     public ResponseEntity<List<FlavorPriceResult>> getPricesByService(
-            @Parameter(name = "templateId", description = "id of the service template")
-                    @PathVariable(name = "templateId")
-                    String templateId,
+            @Parameter(name = "serviceTemplateId", description = "id of the service template")
+                    @PathVariable(name = "serviceTemplateId")
+                    UUID serviceTemplateId,
             @Parameter(name = "regionName", description = "region name of the service")
                     @PathVariable(name = "regionName")
                     String regionName,
@@ -117,7 +118,7 @@ public class ServicePricingApi {
                     BillingMode billingMode) {
         List<FlavorPriceResult> allFlavorPriceResult =
                 servicePricesManager.getPricesByService(
-                        templateId, regionName, siteName, billingMode);
+                        serviceTemplateId, regionName, siteName, billingMode);
         boolean findFailed =
                 allFlavorPriceResult.stream()
                         .anyMatch(flavorPriceResult -> !flavorPriceResult.isSuccessful());
