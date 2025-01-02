@@ -33,6 +33,7 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateReviewPluginResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
@@ -50,6 +51,8 @@ import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineT
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
@@ -107,9 +110,15 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public boolean autoApproveServiceTemplateIsEnabled() {
-        return autoApproveServiceTemplateEnabled;
+    public ServiceTemplateReviewPluginResultType validateServiceTemplate(Ocl ocl) {
+        if (autoApproveServiceTemplateEnabled) {
+            return ServiceTemplateReviewPluginResultType.APPROVED;
+        }
+        return ServiceTemplateReviewPluginResultType.MANUAL_REVIEW_REQUIRED;
     }
+
+    @Override
+    public void prepareServiceTemplate(Ocl ocl) {}
 
     @Override
     public List<String> getSites() {
@@ -117,6 +126,10 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
+    @Retryable(
+            retryFor = UnavailableServiceRegionsException.class,
+            maxAttemptsExpression = "${http.request.retry.max.attempts}",
+            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public boolean validateRegionsOfService(Ocl ocl) {
         List<String> errors = new ArrayList<>();
         ocl.getCloudServiceProvider()

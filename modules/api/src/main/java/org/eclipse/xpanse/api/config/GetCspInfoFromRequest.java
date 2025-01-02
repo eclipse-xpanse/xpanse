@@ -45,7 +45,7 @@ public class GetCspInfoFromRequest {
     @Resource private ServicePolicyStorage servicePolicyStorage;
     @Resource private UserPolicyStorage userPolicyStorage;
     @Resource private TaskService taskService;
-    @Resource private ServiceOrderStorage serviceOrderTaskStorage;
+    @Resource private ServiceOrderStorage serviceOrderStorage;
     @Resource private ServiceTemplateRequestHistoryStorage serviceTemplateHistoryStorage;
 
     /**
@@ -155,7 +155,7 @@ public class GetCspInfoFromRequest {
                     ServiceOrderEntity queryOrderEntity = new ServiceOrderEntity();
                     queryOrderEntity.setWorkflowId(processInstanceId);
                     List<ServiceOrderEntity> orderEntities =
-                            serviceOrderTaskStorage.queryEntities(queryOrderEntity);
+                            serviceOrderStorage.queryEntities(queryOrderEntity);
                     if (!CollectionUtils.isEmpty(orderEntities)) {
                         UUID serviceId = orderEntities.getFirst().getOriginalServiceId();
                         ServiceDeploymentEntity deployService =
@@ -178,7 +178,7 @@ public class GetCspInfoFromRequest {
      */
     public Csp getCspFromServiceOrderId(UUID orderId) {
         try {
-            ServiceOrderEntity order = serviceOrderTaskStorage.getEntityById(orderId);
+            ServiceOrderEntity order = serviceOrderStorage.getEntityById(orderId);
             if (Objects.nonNull(order)
                     && Objects.nonNull(order.getServiceDeploymentEntity().getId())) {
                 ServiceDeploymentEntity deployService =

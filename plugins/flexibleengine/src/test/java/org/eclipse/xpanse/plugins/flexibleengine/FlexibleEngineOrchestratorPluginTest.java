@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateReviewPluginResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
@@ -33,11 +34,14 @@ import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceMa
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class FlexibleEngineOrchestratorPluginTest {
@@ -46,6 +50,11 @@ class FlexibleEngineOrchestratorPluginTest {
     @Mock private FlexibleEngineVmStateManager mockFlexibleEngineVmStateManagerService;
     @Mock private FlexibleEngineResourceManager flexibleEngineResourceManager;
     @InjectMocks private FlexibleEngineOrchestratorPlugin plugin;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(plugin, "autoApproveServiceTemplateEnabled", true);
+    }
 
     @Test
     void testGetResourceHandler() {
@@ -89,8 +98,10 @@ class FlexibleEngineOrchestratorPluginTest {
     }
 
     @Test
-    void testAutoApproveServiceTemplateIsEnabled() {
-        assertThat(plugin.autoApproveServiceTemplateIsEnabled()).isFalse();
+    void testValidateServiceTemplate() {
+        Ocl ocl = Mockito.mock(Ocl.class);
+        assertThat(plugin.validateServiceTemplate(ocl))
+                .isEqualTo(ServiceTemplateReviewPluginResultType.APPROVED);
     }
 
     @Test
