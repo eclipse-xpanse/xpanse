@@ -62,6 +62,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateReviewPluginResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
@@ -91,6 +92,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mockito;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -157,7 +159,7 @@ class OpenstackTestlabOrchestratorPluginTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(plugin, "autoApproveServiceTemplateEnabled", false);
+        ReflectionTestUtils.setField(plugin, "autoApproveServiceTemplateEnabled", true);
     }
 
     @BeforeAll
@@ -215,8 +217,10 @@ class OpenstackTestlabOrchestratorPluginTest {
     }
 
     @Test
-    void testAutoApproveServiceTemplateIsEnabled() {
-        assertThat(plugin.autoApproveServiceTemplateIsEnabled()).isFalse();
+    void testValidateServiceTemplate() {
+        Ocl ocl = Mockito.mock(Ocl.class);
+        assertThat(plugin.validateServiceTemplate(ocl))
+                .isEqualTo(ServiceTemplateReviewPluginResultType.APPROVED);
     }
 
     @Test

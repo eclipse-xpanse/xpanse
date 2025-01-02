@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateReviewPluginResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
@@ -89,8 +90,16 @@ public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     @Override
-    public boolean autoApproveServiceTemplateIsEnabled() {
-        return autoApproveServiceTemplateEnabled;
+    public ServiceTemplateReviewPluginResultType validateServiceTemplate(Ocl ocl) {
+        if (autoApproveServiceTemplateEnabled) {
+            return ServiceTemplateReviewPluginResultType.APPROVED;
+        }
+        return ServiceTemplateReviewPluginResultType.MANUAL_REVIEW_REQUIRED;
+    }
+
+    @Override
+    public void prepareServiceTemplate(Ocl ocl) {
+        log.info("prepare service template.");
     }
 
     @Override

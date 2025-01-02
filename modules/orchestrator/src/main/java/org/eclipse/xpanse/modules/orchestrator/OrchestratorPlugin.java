@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.ServiceResourceHandler
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsExporter;
 import org.eclipse.xpanse.modules.orchestrator.price.ServicePriceCalculator;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManager;
+import org.eclipse.xpanse.modules.orchestrator.servicetemplate.ServiceTemplateManager;
 
 /**
  * This interface describes orchestrator plugin in charge of interacting with backend fundamental
@@ -28,7 +29,8 @@ public interface OrchestratorPlugin
                 ServiceMetricsExporter,
                 ServiceStateManager,
                 OperationalAudit,
-                ServicePriceCalculator {
+                ServicePriceCalculator,
+                ServiceTemplateManager {
 
     /**
      * Get the Csp of the plugin.
@@ -43,13 +45,6 @@ public interface OrchestratorPlugin
      * @return required properties.
      */
     List<String> requiredProperties();
-
-    /**
-     * Check if auto approve service template is enabled.
-     *
-     * @return true if auto approve service template is enabled.
-     */
-    boolean autoApproveServiceTemplateIsEnabled();
 
     /** Get all sites of the cloud service provider. */
     List<String> getSites();

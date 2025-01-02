@@ -28,7 +28,6 @@ import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplat
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
-import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -38,6 +37,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateReviewPluginResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.OpenTofuScriptFormatInvalidException;
@@ -106,8 +106,7 @@ public class ServiceTemplateManage {
         List<ServiceTemplateEntity> existingServiceTemplates =
                 templateStorage.listServiceTemplates(queryModel);
         validateServiceVersion(ocl.getServiceVersion(), existingServiceTemplates);
-        boolean isAutoApprovedEnabled =
-                isAutoApproveEnabledForCsp(ocl.getCloudServiceProvider().getName());
+        boolean isAutoApprovedEnabled = isAutoApproveEnabledForCsp(ocl);
         ServiceTemplateEntity serviceTemplateToRegister = createServiceTemplateEntity(ocl);
         updateServiceTemplateRegistrationState(serviceTemplateToRegister, isAutoApprovedEnabled);
         ServiceTemplateEntity registeredServiceTemplate =
@@ -147,8 +146,7 @@ public class ServiceTemplateManage {
         ServiceTemplateEntity serviceTemplateToUpdate = new ServiceTemplateEntity();
         BeanUtils.copyProperties(existingServiceTemplate, serviceTemplateToUpdate);
         updateServiceTemplateWithOcl(ocl, serviceTemplateToUpdate);
-        boolean isAutoApprovedEnabled =
-                isAutoApproveEnabledForCsp(serviceTemplateToUpdate.getCsp());
+        boolean isAutoApprovedEnabled = isAutoApproveEnabledForCsp(ocl);
         ServiceTemplateRequestType requestType = ServiceTemplateRequestType.UPDATE;
         final ServiceTemplateRequestHistoryEntity storedUpdateHistory =
                 createServiceTemplateHistory(
@@ -185,8 +183,7 @@ public class ServiceTemplateManage {
             templateRequestStorage.cancelRequestsInBatch(oldRegisterRequestsInReview);
         }
         updateServiceTemplateWithOcl(ocl, serviceTemplateToUpdate);
-        boolean isAutoApprovedEnabled =
-                isAutoApproveEnabledForCsp(ocl.getCloudServiceProvider().getName());
+        boolean isAutoApprovedEnabled = isAutoApproveEnabledForCsp(ocl);
         updateServiceTemplateRegistrationState(serviceTemplateToUpdate, isAutoApprovedEnabled);
         templateStorage.storeAndFlush(serviceTemplateToUpdate);
         ServiceTemplateRequestType requestType = ServiceTemplateRequestType.REGISTER;
@@ -343,9 +340,16 @@ public class ServiceTemplateManage {
         return templateRequestStorage.storeAndFlush(serviceTemplateHistory);
     }
 
-    private boolean isAutoApproveEnabledForCsp(Csp csp) {
-        OrchestratorPlugin cspPlugin = pluginManager.getOrchestratorPlugin(csp);
-        return cspPlugin.autoApproveServiceTemplateIsEnabled();
+    private boolean isAutoApproveEnabledForCsp(Ocl ocl) {
+        OrchestratorPlugin cspPlugin =
+                pluginManager.getOrchestratorPlugin(ocl.getCloudServiceProvider().getName());
+        ServiceTemplateReviewPluginResultType cspReviewType =
+                cspPlugin.validateServiceTemplate(ocl);
+        if (cspReviewType == ServiceTemplateReviewPluginResultType.APPROVED) {
+            cspPlugin.prepareServiceTemplate(ocl);
+            return true;
+        }
+        return false;
     }
 
     private Semver getSemverVersion(String serviceVersion) {
@@ -525,6 +529,9 @@ public class ServiceTemplateManage {
             boolean isAvailableInCatalog =
                     ServiceTemplateRequestType.UNPUBLISH != reviewedRequest.getRequestType();
             serviceTemplateToUpdate.setIsAvailableInCatalog(isAvailableInCatalog);
+            OrchestratorPlugin cspPlugin =
+                    pluginManager.getOrchestratorPlugin(serviceTemplateToUpdate.getCsp());
+            cspPlugin.prepareServiceTemplate(reviewedRequest.getOcl());
         } else if (ServiceTemplateRequestStatus.REJECTED == reviewedRequest.getStatus()) {
             if (ServiceTemplateRequestType.REGISTER == reviewedRequest.getRequestType()) {
                 serviceTemplateToUpdate.setServiceTemplateRegistrationState(
@@ -580,7 +587,7 @@ public class ServiceTemplateManage {
             throw new ServiceTemplateRequestNotAllowed(errMsg);
         }
         checkAnyInProgressRequestForServiceTemplate(existingTemplate);
-        boolean isAutoApprovedEnabled = isAutoApproveEnabledForCsp(existingTemplate.getCsp());
+        boolean isAutoApprovedEnabled = isAutoApproveEnabledForCsp(existingTemplate.getOcl());
         if (isAutoApprovedEnabled) {
             existingTemplate.setIsAvailableInCatalog(true);
         } else {
