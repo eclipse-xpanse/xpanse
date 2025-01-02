@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,28 +107,47 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(
                 () -> {
-                    TerraformResult terraformResult = new TerraformResult();
-                    terraformResult.setRequestId(task.getOrderId());
+                    Exception exception = null;
                     try {
                         executor.deploy();
-                        terraformResult.setCommandSuccessful(true);
-                    } catch (RuntimeException tfEx) {
+                    } catch (Exception tfEx) {
                         log.error("Execute Terraform deploy script failed. {}", tfEx.getMessage());
-                        terraformResult.setCommandSuccessful(false);
-                        terraformResult.setCommandStdError(tfEx.getMessage());
+                        exception = tfEx;
                     }
-                    terraformResult.setTerraformState(
-                            scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
-                    terraformResult.setTerraformVersionUsed(
-                            terraformInstaller.getExactVersionOfTerraform(
-                                    executor.getExecutorPath()));
-                    terraformResult.setGeneratedFileContentMap(
-                            scriptsHelper.getGeneratedFileContents(
-                                    executor.getTaskWorkspace(), preparedFiles));
+                    TerraformResult terraformResult =
+                            getTerraformResult(
+                                    executor, task.getOrderId(), exception, preparedFiles);
                     terraformResultCallbackManager.orderCallback(
-                            task.getOrderId(), terraformResult);
+                            terraformResult.getRequestId(), terraformResult);
                     scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
                 });
+    }
+
+    private TerraformResult getTerraformResult(
+            TerraformLocalExecutor executor,
+            UUID orderId,
+            Exception exception,
+            List<File> preparedFiles) {
+        TerraformResult terraformResult = new TerraformResult();
+        terraformResult.setRequestId(orderId);
+        if (Objects.nonNull(exception)) {
+            terraformResult.setCommandSuccessful(false);
+            terraformResult.setCommandStdError(exception.getMessage());
+        } else {
+            terraformResult.setCommandSuccessful(true);
+        }
+        try {
+            terraformResult.setTerraformState(
+                    scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
+            terraformResult.setTerraformVersionUsed(
+                    terraformInstaller.getExactVersionOfTerraform(executor.getExecutorPath()));
+            terraformResult.setGeneratedFileContentMap(
+                    scriptsHelper.getGeneratedFileContents(
+                            executor.getTaskWorkspace(), preparedFiles));
+        } catch (Exception e) {
+            log.error("Failed to fill TerraformResult.", e);
+        }
+        return terraformResult;
     }
 
     private void asyncExecDestroy(DeployTask task, String tfState) {
@@ -141,26 +161,18 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(
                 () -> {
-                    TerraformResult terraformResult = new TerraformResult();
-                    terraformResult.setRequestId(task.getOrderId());
+                    Exception exception = null;
                     try {
                         executor.destroy();
-                        terraformResult.setCommandSuccessful(true);
-                    } catch (RuntimeException tfEx) {
+                    } catch (Exception tfEx) {
                         log.error("Execute terraform destroy script failed. {}", tfEx.getMessage());
-                        terraformResult.setCommandSuccessful(false);
-                        terraformResult.setCommandStdError(tfEx.getMessage());
+                        exception = tfEx;
                     }
-                    terraformResult.setTerraformState(
-                            scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
-                    terraformResult.setTerraformVersionUsed(
-                            terraformInstaller.getExactVersionOfTerraform(
-                                    executor.getExecutorPath()));
-                    terraformResult.setGeneratedFileContentMap(
-                            scriptsHelper.getGeneratedFileContents(
-                                    executor.getTaskWorkspace(), preparedFiles));
+                    TerraformResult terraformResult =
+                            getTerraformResult(
+                                    executor, task.getOrderId(), exception, preparedFiles);
                     terraformResultCallbackManager.orderCallback(
-                            task.getOrderId(), terraformResult);
+                            terraformResult.getRequestId(), terraformResult);
                     scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
                 });
     }
@@ -176,26 +188,18 @@ public class TerraformLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(
                 () -> {
-                    TerraformResult terraformResult = new TerraformResult();
-                    terraformResult.setRequestId(task.getOrderId());
+                    Exception exception = null;
                     try {
                         executor.deploy();
-                        terraformResult.setCommandSuccessful(true);
-                    } catch (RuntimeException tfEx) {
+                    } catch (Exception tfEx) {
                         log.error("Execute terraform modify script failed. {}", tfEx.getMessage());
-                        terraformResult.setCommandSuccessful(false);
-                        terraformResult.setCommandStdError(tfEx.getMessage());
+                        exception = tfEx;
                     }
-                    terraformResult.setTerraformState(
-                            scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
-                    terraformResult.setTerraformVersionUsed(
-                            terraformInstaller.getExactVersionOfTerraform(
-                                    executor.getExecutorPath()));
-                    terraformResult.setGeneratedFileContentMap(
-                            scriptsHelper.getGeneratedFileContents(
-                                    executor.getTaskWorkspace(), preparedFiles));
+                    TerraformResult terraformResult =
+                            getTerraformResult(
+                                    executor, task.getOrderId(), exception, preparedFiles);
                     terraformResultCallbackManager.orderCallback(
-                            task.getOrderId(), terraformResult);
+                            terraformResult.getRequestId(), terraformResult);
                     scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
                 });
     }

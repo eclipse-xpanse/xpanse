@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
@@ -107,27 +108,46 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(
                 () -> {
-                    OpenTofuResult openTofuResult = new OpenTofuResult();
-                    openTofuResult.setRequestId(task.getOrderId());
+                    Exception exception = null;
                     try {
                         executor.deploy();
-                        openTofuResult.setCommandSuccessful(true);
-                    } catch (RuntimeException tfEx) {
+                    } catch (Exception tfEx) {
                         log.error("Execute OpenTofu deploy script failed. {}", tfEx.getMessage());
-                        openTofuResult.setCommandSuccessful(false);
-                        openTofuResult.setCommandStdError(tfEx.getMessage());
+                        exception = tfEx;
                     }
-                    openTofuResult.setTerraformState(
-                            scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
-                    openTofuResult.setOpenTofuVersionUsed(
-                            openTofuInstaller.getExactVersionOfOpenTofu(
-                                    executor.getExecutorPath()));
-                    openTofuResult.setGeneratedFileContentMap(
-                            scriptsHelper.getGeneratedFileContents(
-                                    executor.getTaskWorkspace(), preparedFiles));
+                    OpenTofuResult openTofuResult =
+                            getOpenTofuResult(
+                                    executor, task.getOrderId(), exception, preparedFiles);
                     openTofuResultCallbackManager.orderCallback(task.getOrderId(), openTofuResult);
                     scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
                 });
+    }
+
+    private OpenTofuResult getOpenTofuResult(
+            OpenTofuLocalExecutor executor,
+            UUID orderId,
+            Exception exception,
+            List<File> preparedFiles) {
+        OpenTofuResult openTofuResult = new OpenTofuResult();
+        openTofuResult.setRequestId(orderId);
+        if (Objects.nonNull(exception)) {
+            openTofuResult.setCommandSuccessful(false);
+            openTofuResult.setCommandStdError(exception.getMessage());
+        } else {
+            openTofuResult.setCommandSuccessful(true);
+        }
+        try {
+            openTofuResult.setTerraformState(
+                    scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
+            openTofuResult.setOpenTofuVersionUsed(
+                    openTofuInstaller.getExactVersionOfOpenTofu(executor.getExecutorPath()));
+            openTofuResult.setGeneratedFileContentMap(
+                    scriptsHelper.getGeneratedFileContents(
+                            executor.getTaskWorkspace(), preparedFiles));
+        } catch (Exception e) {
+            log.error("Failed to fill OpenTofuResult.", e);
+        }
+        return openTofuResult;
     }
 
     private void asyncExecDestroy(DeployTask task, String tfState) {
@@ -141,24 +161,16 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the openTofu command asynchronously.
         taskExecutor.execute(
                 () -> {
-                    OpenTofuResult openTofuResult = new OpenTofuResult();
-                    openTofuResult.setRequestId(task.getOrderId());
+                    Exception exception = null;
                     try {
                         executor.destroy();
-                        openTofuResult.setCommandSuccessful(true);
-                    } catch (RuntimeException tfEx) {
+                    } catch (Exception tfEx) {
                         log.error("Execute openTofu destroy script failed. {}", tfEx.getMessage());
-                        openTofuResult.setCommandSuccessful(false);
-                        openTofuResult.setCommandStdError(tfEx.getMessage());
+                        exception = tfEx;
                     }
-                    openTofuResult.setTerraformState(
-                            scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
-                    openTofuResult.setOpenTofuVersionUsed(
-                            openTofuInstaller.getExactVersionOfOpenTofu(
-                                    executor.getExecutorPath()));
-                    openTofuResult.setGeneratedFileContentMap(
-                            scriptsHelper.getGeneratedFileContents(
-                                    executor.getTaskWorkspace(), preparedFiles));
+                    OpenTofuResult openTofuResult =
+                            getOpenTofuResult(
+                                    executor, task.getOrderId(), exception, preparedFiles);
                     openTofuResultCallbackManager.orderCallback(task.getOrderId(), openTofuResult);
                     scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
                 });
@@ -175,24 +187,16 @@ public class OpenTofuLocalDeployment implements Deployer {
         // Execute the terraform command asynchronously.
         taskExecutor.execute(
                 () -> {
-                    OpenTofuResult openTofuResult = new OpenTofuResult();
-                    openTofuResult.setRequestId(task.getOrderId());
+                    Exception exception = null;
                     try {
                         executor.deploy();
-                        openTofuResult.setCommandSuccessful(true);
-                    } catch (RuntimeException tfEx) {
+                    } catch (Exception tfEx) {
                         log.error("Execute terraform modify script failed. {}", tfEx.getMessage());
-                        openTofuResult.setCommandSuccessful(false);
-                        openTofuResult.setCommandStdError(tfEx.getMessage());
+                        exception = tfEx;
                     }
-                    openTofuResult.setTerraformState(
-                            scriptsHelper.getTaskTerraformState(executor.getTaskWorkspace()));
-                    openTofuResult.setOpenTofuVersionUsed(
-                            openTofuInstaller.getExactVersionOfOpenTofu(
-                                    executor.getExecutorPath()));
-                    openTofuResult.setGeneratedFileContentMap(
-                            scriptsHelper.getGeneratedFileContents(
-                                    executor.getTaskWorkspace(), preparedFiles));
+                    OpenTofuResult openTofuResult =
+                            getOpenTofuResult(
+                                    executor, task.getOrderId(), exception, preparedFiles);
                     openTofuResultCallbackManager.orderCallback(task.getOrderId(), openTofuResult);
                     scriptsHelper.deleteTaskWorkspace(executor.getTaskWorkspace());
                 });
