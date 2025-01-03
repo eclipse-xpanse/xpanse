@@ -46,7 +46,6 @@ public class WorkFlowTask {
     @Schema(description = "The name of the task")
     private String taskName;
 
-    @NotEmpty
     @Schema(description = "The businessKey of the Process")
     private String businessKey;
 
