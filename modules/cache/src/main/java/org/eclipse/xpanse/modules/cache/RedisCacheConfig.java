@@ -137,7 +137,7 @@ public class RedisCacheConfig {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))
                 .serializeKeysWith(getStringRedisSerializer())
-                .serializeValuesWith(getJsonRedisSerializer());
+                .serializeValuesWith(getJdkRedisSerializer());
     }
 
     private RedisCacheConfiguration getCredentialCache() {
