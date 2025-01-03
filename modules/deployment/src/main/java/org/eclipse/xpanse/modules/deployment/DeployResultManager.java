@@ -126,7 +126,6 @@ public class DeployResultManager {
                 return;
             }
         }
-
         updateServiceOrderEntityWithDeployResult(deployResult, storedServiceOrder);
     }
 
@@ -183,6 +182,7 @@ public class DeployResultManager {
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         ServiceDeploymentState deploymentState =
                 getServiceDeploymentState(taskType, isTaskSuccessful);
+        updateServiceState(deploymentState, serviceDeploymentToUpdate);
         if (Objects.nonNull(deploymentState)) {
             if (deploymentState == ServiceDeploymentState.DEPLOY_FAILED) {
                 // when the task failed and task type is deploy or retry, and tfState is null,
@@ -216,7 +216,6 @@ public class DeployResultManager {
                         serviceTemplateEntity.getOcl().getServiceConfigurationManage())) {
             updateServiceConfiguration(deploymentState, serviceDeployment);
         }
-        updateServiceState(deploymentState, serviceDeployment);
 
         if (CollectionUtils.isEmpty(deployResult.getDeploymentGeneratedFiles())) {
             if (isTaskSuccessful) {
@@ -312,6 +311,7 @@ public class DeployResultManager {
         if (state == ServiceDeploymentState.DEPLOY_FAILED
                 || state == ServiceDeploymentState.DESTROY_SUCCESS) {
             serviceDeploymentEntity.setServiceState(ServiceState.NOT_RUNNING);
+            serviceDeploymentEntity.setLastStoppedAt(OffsetDateTime.now());
         }
         // case other cases, do not change the state of service.
     }
