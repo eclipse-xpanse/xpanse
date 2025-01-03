@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,8 +71,12 @@ public class DeployerToolUtils {
         if (!installDir.exists() || !installDir.isDirectory()) {
             return null;
         }
+        File[] files = installDir.listFiles();
+        if (Objects.isNull(files) || files.length == 0) {
+            return null;
+        }
         Map<String, File> executorVersionFileMap = new HashMap<>();
-        Arrays.stream(installDir.listFiles())
+        Arrays.stream(files)
                 .filter(
                         f ->
                                 f.isFile()
@@ -375,10 +380,12 @@ public class DeployerToolUtils {
     public String getExactVersionOfExecutor(
             String executorPath, Pattern versionCommandOutputPattern) {
         String versionOutput = getVersionCommandOutput(new File(executorPath));
-        Matcher matcher = versionCommandOutputPattern.matcher(versionOutput);
-        if (matcher.find()) {
-            // return only the version number.
-            return matcher.group(1);
+        if (StringUtils.isNotBlank(versionOutput)) {
+            Matcher matcher = versionCommandOutputPattern.matcher(versionOutput);
+            if (matcher.find()) {
+                // return only the version number.
+                return matcher.group(1);
+            }
         }
         return null;
     }

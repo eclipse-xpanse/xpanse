@@ -153,14 +153,15 @@ public class DeploymentScriptsHelper {
             File[] files = workPath.listFiles();
             if (Objects.nonNull(files)) {
                 Arrays.stream(files)
+                        .filter(
+                                file ->
+                                        !preparedFiles.contains(file)
+                                                && file.isFile()
+                                                && !isExcludedFile(file.getName()))
                         .forEach(
                                 file -> {
-                                    if (file.isFile()
-                                            && !isExcludedFile(file.getName())
-                                            && !preparedFiles.contains(file)) {
-                                        String content = readFileContent(file);
-                                        fileContentMap.put(file.getName(), content);
-                                    }
+                                    String content = readFileContent(file);
+                                    fileContentMap.put(file.getName(), content);
                                 });
             }
         }
@@ -250,8 +251,11 @@ public class DeploymentScriptsHelper {
     }
 
     private boolean isExcludedFile(String fileName) {
-        String fileSuffix = fileName.substring(fileName.lastIndexOf("."));
-        return EXCLUDED_FILE_SUFFIX_LIST.contains(fileSuffix);
+        if (StringUtils.isNotBlank(fileName) && fileName.contains(".")) {
+            String fileSuffix = fileName.substring(fileName.lastIndexOf("."));
+            return EXCLUDED_FILE_SUFFIX_LIST.contains(fileSuffix);
+        }
+        return false;
     }
 
     private String readFileContent(File file) {

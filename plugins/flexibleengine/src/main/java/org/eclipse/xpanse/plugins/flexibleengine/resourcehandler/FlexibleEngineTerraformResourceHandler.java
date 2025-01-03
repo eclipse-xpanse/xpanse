@@ -45,7 +45,7 @@ public class FlexibleEngineTerraformResourceHandler implements DeployResourceHan
             var stateFile = deployResult.getTfStateContent();
             tfState = objectMapper.readValue(stateFile, TfState.class);
         } catch (IOException ex) {
-            log.error("Parse terraform state content failed.");
+            log.error("Parse terraform state content failed.", ex);
             throw new TerraformExecutorException("Parse terraform state content failed.", ex);
         }
         if (Objects.nonNull(tfState)) {
