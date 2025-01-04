@@ -15,10 +15,10 @@ public class ServicePolicyUpdateRequest {
     /** The flavor name list which the policy belongs to. */
     @Schema(
             description =
-                    "The flavor name list which the policy belongs to. If the list is empty, then"
+                    "The flavor names to which the policy belongs. If the list is empty, then"
                             + " the policy will be executed for during service deployment of all"
                             + " flavors.")
-    private List<String> flavorNameList;
+    private List<String> flavorNames;
 
     /** The policy. */
     @Schema(description = "The policy.")

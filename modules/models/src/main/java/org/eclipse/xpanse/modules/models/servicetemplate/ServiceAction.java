@@ -36,6 +36,10 @@ public class ServiceAction {
 
     @Size(min = 1)
     @UniqueElements
-    @Schema(description = "The collection of service action parameters.")
+    @Schema(
+            description =
+                    "The configuration parameters of service .The list elements must be unique. All"
+                            + " parameters are put together to build a JSON 'object' with each"
+                            + " parameter as a property of this object.")
     private List<ServiceChangeParameter> actionParameters;
 }

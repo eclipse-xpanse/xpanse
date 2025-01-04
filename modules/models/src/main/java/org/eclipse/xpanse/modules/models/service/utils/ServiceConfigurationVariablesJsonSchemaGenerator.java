@@ -74,6 +74,7 @@ public class ServiceConfigurationVariablesJsonSchemaGenerator {
         }
 
         jsonObjectSchema.setProperties(serviceConfigurationJsonSchemaProperties);
+        jsonObjectSchema.setAdditionalProperties(false);
         validateSchemaDefinition(jsonObjectSchema);
         return jsonObjectSchema;
     }

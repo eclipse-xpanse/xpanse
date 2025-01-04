@@ -232,15 +232,14 @@ public class ServicePolicyManager {
             ServicePolicyUpdateRequest updateRequest, ServicePolicyEntity existingPolicy) {
         ServicePolicyEntity policyToUpdate = new ServicePolicyEntity();
         BeanUtils.copyProperties(existingPolicy, policyToUpdate);
-        if (Objects.nonNull(updateRequest.getFlavorNameList())) {
-            if (CollectionUtils.isEmpty(updateRequest.getFlavorNameList())) {
+        if (Objects.nonNull(updateRequest.getFlavorNames())) {
+            if (CollectionUtils.isEmpty(updateRequest.getFlavorNames())) {
                 policyToUpdate.setFlavorNames(null);
             } else {
                 validFlavorNames(
-                        updateRequest.getFlavorNameList(), existingPolicy.getServiceTemplate());
+                        updateRequest.getFlavorNames(), existingPolicy.getServiceTemplate());
                 String flavorNames =
-                        StringUtils.join(
-                                new HashSet<>(updateRequest.getFlavorNameList()), SEPARATOR);
+                        StringUtils.join(new HashSet<>(updateRequest.getFlavorNames()), SEPARATOR);
                 policyToUpdate.setFlavorNames(flavorNames);
             }
         }
