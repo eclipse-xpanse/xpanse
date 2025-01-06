@@ -55,16 +55,14 @@ public class ServiceChangeParameter implements Serializable {
 
     @Schema(
             description =
-                    "valueSchema of the service config parameter. The key be any keyword that is"
-                            + " part of the JSON schema definition which can be found here"
-                            + " https://json-schema.org/draft/2020-12/schema")
+                    "valueSchema of the variable. The key be any keyword that is part of the JSON"
+                            + " schema definition which can be found here"
+                            + " https://json-schema.org/draft/2020-12/meta/validation."
+                            + " Only the type field is taken from dataType parameter directly. ")
     private Map<String, Object> valueSchema;
 
     @Schema(description = "Sensitive scope of service config parameter storage")
     private SensitiveScope sensitiveScope = SensitiveScope.NONE;
-
-    @Schema(description = "Service config parameter autofill")
-    private AutoFill autoFill;
 
     @NotNull
     @Schema(description = "Service config parameter modificationImpact")

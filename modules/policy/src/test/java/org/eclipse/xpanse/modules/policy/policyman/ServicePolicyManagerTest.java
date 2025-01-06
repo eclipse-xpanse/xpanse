@@ -419,7 +419,7 @@ class ServicePolicyManagerTest {
         final List<String> flavorNameList = List.of("flavor1", "flavor2");
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setFlavorNameList(flavorNameList);
+        updateRequest.setFlavorNames(flavorNameList);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
 
@@ -485,7 +485,7 @@ class ServicePolicyManagerTest {
         final List<String> flavorNameList = List.of("flavor1", "invalid_flavor");
         // Setup
         final ServicePolicyUpdateRequest updateRequest = new ServicePolicyUpdateRequest();
-        updateRequest.setFlavorNameList(flavorNameList);
+        updateRequest.setFlavorNames(flavorNameList);
         updateRequest.setPolicy(updatePolicy);
         updateRequest.setEnabled(true);
 

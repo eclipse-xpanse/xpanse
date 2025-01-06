@@ -30,7 +30,6 @@ class ServiceChangeParameterTest {
     private static final SensitiveScope sensitiveScope = SensitiveScope.ONCE;
     private static final String managedBy = "kafka-broker";
     private static ServiceChangeParameter serviceChangeParameter;
-    private static AutoFill autoFill = null;
     private static ModificationImpact modificationImpact;
 
     @BeforeEach
@@ -45,7 +44,6 @@ class ServiceChangeParameterTest {
         serviceChangeParameter.setInitialValue(initialValue);
         serviceChangeParameter.setValueSchema(validatorMap);
         serviceChangeParameter.setSensitiveScope(sensitiveScope);
-        serviceChangeParameter.setAutoFill(autoFill);
         serviceChangeParameter.setModificationImpact(modificationImpact);
         serviceChangeParameter.setIsReadOnly(true);
         serviceChangeParameter.setManagedBy(managedBy);
@@ -140,7 +138,6 @@ class ServiceChangeParameterTest {
         assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
         assertNotEquals(configurationParameter1.hashCode(), configurationParameter2.hashCode());
 
-        configurationParameter1.setAutoFill(autoFill);
         assertNotEquals(serviceChangeParameter, configurationParameter1);
         assertNotEquals(configurationParameter1, configurationParameter2);
         assertNotEquals(serviceChangeParameter.hashCode(), configurationParameter1.hashCode());
@@ -194,9 +191,6 @@ class ServiceChangeParameterTest {
                         + ""
                         + ", sensitiveScope="
                         + sensitiveScope
-                        + ""
-                        + ", autoFill="
-                        + autoFill
                         + ""
                         + ", modificationImpact="
                         + modificationImpact

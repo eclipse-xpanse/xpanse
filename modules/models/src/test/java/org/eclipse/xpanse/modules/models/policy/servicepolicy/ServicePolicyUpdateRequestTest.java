@@ -20,13 +20,13 @@ class ServicePolicyUpdateRequestTest {
     void setUp() {
         test = new ServicePolicyUpdateRequest();
         test.setEnabled(enabled);
-        test.setFlavorNameList(flavorNameList);
+        test.setFlavorNames(flavorNameList);
         test.setPolicy(policy);
     }
 
     @Test
     void testGetters() {
-        assertThat(test.getFlavorNameList()).isEqualTo(flavorNameList);
+        assertThat(test.getFlavorNames()).isEqualTo(flavorNameList);
         assertThat(test.getPolicy()).isEqualTo(policy);
         assertThat(test.getEnabled()).isEqualTo(enabled);
     }
@@ -56,7 +56,7 @@ class ServicePolicyUpdateRequestTest {
     void testToString() {
         String result =
                 String.format(
-                        "ServicePolicyUpdateRequest(flavorNameList=%s, " + "policy=%s, enabled=%s)",
+                        "ServicePolicyUpdateRequest(flavorNames=%s, " + "policy=%s, enabled=%s)",
                         flavorNameList, policy, enabled);
         assertThat(test.toString()).isEqualTo(result);
     }

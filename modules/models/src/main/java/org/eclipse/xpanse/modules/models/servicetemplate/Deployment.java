@@ -37,8 +37,9 @@ public class Deployment implements Serializable {
     @UniqueElements
     @Schema(
             description =
-                    "The variables for the deployment, which will be passed to the deployer."
-                            + "The list elements must be unique.")
+                    "The variables for the deployment, which will be passed to the deployer.The"
+                        + " list elements must be unique. All variables are put together to build a"
+                        + " JSON 'object' with each variable as a property of this object.")
     private List<DeployVariable> variables;
 
     @Schema(description = "The credential type to do the deployment")
