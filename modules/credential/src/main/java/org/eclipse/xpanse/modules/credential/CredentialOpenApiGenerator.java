@@ -294,249 +294,249 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
         // CHECKSTYLE OFF: LineLength
         return String.format(
                 """
-                        {
-                            "openapi": "3.0.1",
-                            "info": {
-                                "title": "OpenAPI definition",
-                                "description": "OpenAPI for users adding credential to connect the cloud service provider %s",
-                                "version": "%s"
-                            },
-                            "servers": [
-                                {
-                                   "url": "%s",
-                                   "description": "Generated server url"
-                                }
-                            ],
-                            %s
-                            "tags": [
-                                {
-                                    "name": "User Credentials Management",
-                                    "description": "APIs to manage user's credentials for authentication."
-                                }
-                            ],
-                            "paths": {
-                                "/xpanse/user/credentials": {
-                                    "post": {
-                                        "tags": [
-                                            "User Credentials Management"
-                                        ],
-                                        "description": "Add user's credential for connecting to the cloud service provider.%s",
-                                        "operationId": "addUserCredential",
-                                        "requestBody": {
-                                            "content": {
-                                                "application/json": {
-                                                    "schema": {
-                                                        "$ref": "#/components/schemas/CreateCredential"
-                                                    }
-                                                }
-                                            },
-                                            "required": true
-                                        },
-                                        "responses": {
-                                            "204": {
-                                                "description": "No Content"
-                                            },
-                                            "400": {
-                                                "description": "Bad Request",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/Response"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "401": {
-                                                "description": "Unauthorized",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/Response"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "403": {
-                                                "description": "Forbidden",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/Response"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "422": {
-                                                "description": "Unprocessable Entity",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/Response"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "500": {
-                                                "description": "Internal Server Error",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/Response"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "502": {
-                                                "description": "Bad Gateway",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/Response"
-                                                        }
-                                                    }
-                                                }
-                                            }                                       \s
-                                        }
-                                    }
-                                }
-                            },
-                            "components": {
-                                "schemas": {
-                                    "Response": {
-                                        "required": [
-                                            "details",
-                                            "errorType",
-                                            "success"
-                                        ],
-                                        "type": "object",
-                                        "properties": {
-                                            "errorType": {
-                                                "type": "string",
-                                                "description": "The result code of response.",
-                                                "enum": [
-                                                    "Success",
-                                                    "Runtime Failure",
-                                                    "Parameters Invalid",
-                                                    "Credential Capability Not Found",
-                                                    "Credentials Not Found",
-                                                    "Credential Variables Not Complete",
-                                                    "Unprocessable Entity",
-                                                    "Response Not Valid",
-                                                    "No Credential Definition Available",
-                                                    "Unhandled Exception",
-                                                    "Unauthorized",
-                                                    "Access Denied",
-                                                    "Unsupported Enum Value",
-                                                    "Current Login User No Found"
-                                                ]
-                                            },
-                                            "details": {
-                                                "type": "array",
-                                                "description": "Details of the errors occurred",
-                                                "items": {
-                                                    "type": "string",
-                                                    "description": "Details of the errors occurred"
-                                                }
-                                            },
-                                            "success": {
-                                                "type": "boolean",
-                                                "description": "Describes if the request is successful"
-                                            }
-                                        }
-                                    },
-                                    "CreateCredential": {
-                                        "required": [
-                                            "csp",
-                                            "site",
-                                            "name",
-                                            "timeToLive",
-                                            "type",
-                                            "variables"
-                                        ],
-                                        "type": "object",
-                                        "properties": {
-                                            "csp": {
-                                                "type": "string",
-                                                "example": "%s",
-                                                "description": "The cloud service provider of the credential.",
-                                                "enum": %s
-                                            },
-                                            "site": {
-                                                "type": "string",
-                                                "example": "%s",
-                                                "description": "The site to which the credentials belong to.",
-                                                "enum": %s
-                                            },
-                                            "type": {
-                                                "type": "string",
-                                                "example": "%s",
-                                                "description": "The type of the credential",
-                                                "enum": [
-                                                    "variables",
-                                                    "http_authentication",
-                                                    "api_key",
-                                                    "oauth2"
-                                                ]
-                                            },
-                                            "name": {
-                                                "type": "string",
-                                                "example": "%s",
-                                                "description": "The name of the credential"
-                                            },
-                                            "description": {
-                                                "type": "string",
-                                                "example": "%s",
-                                                "description": "The description of the credential"
-                                            },
-                                            "variables": {
-                                                "type": "array",
-                                                "example": %s,
-                                                "description": "The variables list of the credential",
-                                                "items": {
-                                                    "$ref": "#/components/schemas/CredentialVariable"
-                                                }
-                                            },
-                                            "timeToLive": {
-                                                "type": "integer",
-                                                "description": "The time in seconds to live of the credential",
-                                                "format": "int32",
-                                                "example": 3600
-                                            }
-                                        }
-                                    },
-                                    "CredentialVariable": {
-                                        "required": ["description", "isSensitive", "name", "value"],
-                                        "type": "object",
-                                        "properties": {
-                                            "name": {
-                                                "type": "string",
-                                                "description": "The name of the CredentialVariable,this field is provided by the plugin of cloud service provider."
-                                            },
-                                            "description": {
-                                                "type": "string",
-                                                "description": "The description of the CredentialVariable,this field is provided by the plugin of cloud service provider."
-                                            },
-                                            "isMandatory": {
-                                                "type": "boolean",
-                                                "description": "If the variable is mandatory. If is optional then the credential completeness check will ignore this variable. It is upto the plugin to decide what needs to be done if this optional credential variable is present.",
-                                                "default": true
-                                            },
-                                            "isSensitive": {
-                                                "type": "boolean",
-                                                "example": true,
-                                                "description": "Defines if the particular variable contains sensitive data. For example the value is false for username and true for password variables respectively."
-                                            },
-                                            "value": {
-                                                "type": "string",
-                                                "description": "The value of the CredentialVariable, this field is filled by the user."
-                                            }
-                                        },
-                                        "description": "The variables list of the credential. The list elements must be unique."
-                                    }
-                                }%s
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "OpenAPI definition",
+        "description": "OpenAPI for users adding credential to connect the cloud service provider %s",
+        "version": "%s"
+    },
+    "servers": [
+        {
+           "url": "%s",
+           "description": "Generated server url"
+        }
+    ],
+    %s
+    "tags": [
+        {
+            "name": "User Credentials Management",
+            "description": "APIs to manage user's credentials for authentication."
+        }
+    ],
+    "paths": {
+        "/xpanse/user/credentials": {
+            "post": {
+                "tags": [
+                    "User Credentials Management"
+                ],
+                "description": "Add user's credential for connecting to the cloud service provider.%s",
+                "operationId": "addUserCredential",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCredential"
                             }
                         }
-                        """,
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    }                                       \s
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Response": {
+                "required": [
+                    "details",
+                    "errorType",
+                    "success"
+                ],
+                "type": "object",
+                "properties": {
+                    "errorType": {
+                        "type": "string",
+                        "description": "The result code of response.",
+                        "enum": [
+                            "Success",
+                            "Runtime Failure",
+                            "Parameters Invalid",
+                            "Credential Capability Not Found",
+                            "Credentials Not Found",
+                            "Credential Variables Not Complete",
+                            "Unprocessable Entity",
+                            "Response Not Valid",
+                            "No Credential Definition Available",
+                            "Unhandled Exception",
+                            "Unauthorized",
+                            "Access Denied",
+                            "Unsupported Enum Value",
+                            "Current Login User No Found"
+                        ]
+                    },
+                    "details": {
+                        "type": "array",
+                        "description": "Details of the errors occurred",
+                        "items": {
+                            "type": "string",
+                            "description": "Details of the errors occurred"
+                        }
+                    },
+                    "success": {
+                        "type": "boolean",
+                        "description": "Describes if the request is successful"
+                    }
+                }
+            },
+            "CreateCredential": {
+                "required": [
+                    "csp",
+                    "site",
+                    "name",
+                    "timeToLive",
+                    "type",
+                    "variables"
+                ],
+                "type": "object",
+                "properties": {
+                    "csp": {
+                        "type": "string",
+                        "example": "%s",
+                        "description": "The cloud service provider of the credential.",
+                        "enum": %s
+                    },
+                    "site": {
+                        "type": "string",
+                        "example": "%s",
+                        "description": "The site to which the credentials belong to.",
+                        "enum": %s
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "%s",
+                        "description": "The type of the credential",
+                        "enum": [
+                            "variables",
+                            "http_authentication",
+                            "api_key",
+                            "oauth2"
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "%s",
+                        "description": "The name of the credential"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "%s",
+                        "description": "The description of the credential"
+                    },
+                    "variables": {
+                        "type": "array",
+                        "example": %s,
+                        "description": "The variables list of the credential",
+                        "items": {
+                            "$ref": "#/components/schemas/CredentialVariable"
+                        }
+                    },
+                    "timeToLive": {
+                        "type": "integer",
+                        "description": "The time in seconds to live of the credential",
+                        "format": "int32",
+                        "example": 3600
+                    }
+                }
+            },
+            "CredentialVariable": {
+                "required": ["description", "isSensitive", "name", "value"],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the CredentialVariable,this field is provided by the plugin of cloud service provider."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the CredentialVariable,this field is provided by the plugin of cloud service provider."
+                    },
+                    "isMandatory": {
+                        "type": "boolean",
+                        "description": "If the variable is mandatory. If is optional then the credential completeness check will ignore this variable. It is upto the plugin to decide what needs to be done if this optional credential variable is present.",
+                        "default": true
+                    },
+                    "isSensitive": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Defines if the particular variable contains sensitive data. For example the value is false for username and true for password variables respectively."
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value of the CredentialVariable, this field is filled by the user."
+                    }
+                },
+                "description": "The variables list of the credential. The list elements must be unique."
+            }
+        }%s
+    }
+}
+""",
                 csp,
                 appVersion,
                 serviceUrl,
@@ -584,26 +584,28 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
 
     private String getSecuritySchemes() {
         if (Objects.nonNull(zitadelIdentityProviderService)) {
+            // CHECKSTYLE OFF: Indentation
             return """
-                    ,
-                    "securitySchemes": {
-                        "OAuth2Flow": {
-                            "type": "oauth2",
-                            "flows": {
-                                "authorizationCode": {
-                                    "authorizationUrl": "https://iam.xpanse.site/oauth/v2/authorize",
-                                    "tokenUrl": "https://iam.xpanse.site/oauth/v2/token",
-                                    "scopes": {
-                                        "openid": "mandatory must be selected.",
-                                        "profile": "mandatory must be selected.",
-                                        "urn:zitadel:iam:org:project:roles": "mandatory must be selected.",
-                                        "urn:zitadel:iam:user:metadata": "mandatory must be selected."
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    """;
+,
+"securitySchemes": {
+    "OAuth2Flow": {
+        "type": "oauth2",
+        "flows": {
+            "authorizationCode": {
+                "authorizationUrl": "https://iam.xpanse.site/oauth/v2/authorize",
+                "tokenUrl": "https://iam.xpanse.site/oauth/v2/token",
+                "scopes": {
+                    "openid": "mandatory must be selected.",
+                    "profile": "mandatory must be selected.",
+                    "urn:zitadel:iam:org:project:roles": "mandatory must be selected.",
+                    "urn:zitadel:iam:user:metadata": "mandatory must be selected."
+                }
+            }
+        }
+    }
+}
+""";
+            // CHECKSTYLE ON: Indentation
         }
         return "";
     }

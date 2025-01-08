@@ -329,284 +329,284 @@ public class ServiceTemplateOpenApiGenerator {
         // CHECKSTYLE OFF: LineLength
         return String.format(
                 """
-                        {
-                            "openapi": "3.0.1",
-                            "info": {
-                                "title": "OpenAPI definition",
-                                "version": "%s",
-                                "description": "OpenAPI for creating an order task to deploy new service using approved service template."
-                            },
-                            "servers": [
-                                {
-                                    "url": "%s",
-                                    "description": "Generated server url"
-                                }
-                            ],
-                            %s
-                            "tags": [
-                                {
-                                    "name": "Service",
-                                    "description": "APIs to manage the service instances"
-                                }
-                            ],
-                            "paths": {
-                                "/xpanse/services": {
-                                    "post": {
-                                        "tags": [
-                                            "Service"
-                                        ],
-                                        "description": "Create an order task to deploy new service using approved service template.%s",
-                                        "operationId": "deploy",
-                                        "requestBody": {
-                                            "content": {
-                                                "application/json": {
-                                                    "schema": {
-                                                        "$ref": "#/components/schemas/DeployRequest"
-                                                    }
-                                                }
-                                            },
-                                            "required": true
-                                        },
-                                        "responses": {
-                                            "202": {
-                                                "description": "Accepted",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/ServiceOrder"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "400": {
-                                                "description": "Bad Request",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/OrderFailedResponse"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "401": {
-                                                "description": "Unauthorized",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/OrderFailedResponse"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "403": {
-                                                "description": "Forbidden",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/OrderFailedResponse"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "422": {
-                                                "description": "Unprocessable Entity",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/OrderFailedResponse"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "500": {
-                                                "description": "Internal Server Error",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/OrderFailedResponse"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "502": {
-                                                "description": "Bad Gateway",
-                                                "content": {
-                                                    "application/json": {
-                                                        "schema": {
-                                                            "$ref": "#/components/schemas/OrderFailedResponse"
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "components": {
-                                "schemas": {
-                                    "OrderFailedResponse": {
-                                        "required": ["details", "errorType", "success"],
-                                        "type": "object",
-                                        "properties": {
-                                            "errorType": {
-                                                "type": "string",
-                                                "description": "The result code of response.",
-                                                "enum": [
-                                                    "Success",
-                                                    "Runtime Error",
-                                                    "Parameters Invalid",
-                                                    "Terraform Script Invalid",
-                                                    "Unprocessable Entity",
-                                                    "Response Not Valid",
-                                                    "Credentials Not Found",
-                                                    "Flavor Invalid",
-                                                    "Terraform Execution Failed",
-                                                    "Plugin Not Found",
-                                                    "Deployer Not Found",
-                                                    "Unhandled Exception",
-                                                    "Unavailable Service Regions",
-                                                    "Service Deployment Not Found",
-                                                    "Deployment Variable Invalid",
-                                                    "Unauthorized",
-                                                    "Access Denied",
-                                                    "Sensitive Field Encryption Or Decryption Failed Exception",
-                                                    "Unsupported Enum Value",
-                                                    "Terraform Boot Request Failed",
-                                                    "Tofu Maker Request Failed",
-                                                    "Variable Validation Failed",
-                                                    "Variable Schema Definition Invalid",
-                                                    "Policy Evaluation Failed",
-                                                    "Current Login User No Found",
-                                                    "Eula Not Accepted",
-                                                    "Service Flavor Downgrade Not Allowed",
-                                                    "Service Order Not Found",
-                                                    "Service Price Calculation Failed",
-                                                    "Invalid Git Repo Details",
-                                                    "File Locked",
-                                                    "Service Configuration Invalid"
-                                                  ]
-                                              },
-                                              "details": {
-                                                  "type": "array",
-                                                  "description": "Details of the errors occurred",
-                                                  "items": {
-                                                      "type": "string",
-                                                      "description": "Details of the errors occurred"
-                                                  }
-                                              },
-                                              "success": {
-                                                  "type": "boolean",
-                                                  "description": "Describes if the request is successful"
-                                              },
-                                              "serviceId": {
-                                                  "type": "string",
-                                                  "description": "The service id associated with the request."
-                                              },
-                                              "orderId": {
-                                                  "type": "string",
-                                                  "description": "The order id associated with the request."
-                                              }
-                                          }
-                                      },
-                                      "ServiceOrder": {
-                                          "required": ["orderId", "serviceId"],
-                                          "type": "object",
-                                          "properties": {
-                                              "orderId": {
-                                                  "type": "string",
-                                                  "description": "The id of the service order.",
-                                                  "format": "uuid"
-                                              },
-                                              "serviceId": {
-                                                  "type": "string",
-                                                  "description": "The id of the deployed service.",
-                                                  "format": "uuid"
-                                              }
-                                          }
-                                      },
-                                    "DeployRequest": {
-                                        "required": %s,
-                                        "type": "object",
-                                        "properties": {
-                                            "category": {
-                                                "default": "%s",
-                                                "type": "string",
-                                                "description": "The category of the service",
-                                                "enum": %s
-                                            },
-                                            "serviceName": {
-                                                "default": "%s",
-                                                "type": "string",
-                                                "description": "The name of the service ordered."
-                                            },
-                                            "customerServiceName": {
-                                                "type": "string",
-                                                "description": "Customer's name for the service. Used only for customer's reference.If not provided, this value will be auto-generated"
-                                            },
-                                            "version": {
-                                                "default": "%s",
-                                                "type": "string",
-                                                "description": "The version of service"
-                                            },
-                                            "region": {
-                                               "required": [
-                                                   "area",
-                                                   "name",
-                                                   "site"
-                                               ],
-                                               "type": "object",
-                                               "properties": {
-                                                   "name": {
-                                                       "example": "%s",
-                                                       "type": "string",
-                                                       "description": "The name of the Region",
-                                                       "enum": %s
-                                                   },
-                                                   "site": {
-                                                       "example": "%s",
-                                                       "type": "string",
-                                                       "description": "The site which the region belongs to, such as default, International, Chinese Mainland",
-                                                       "enum": %s
-                                                   },
-                                                   "area": {
-                                                       "example": "%s",
-                                                       "type": "string",
-                                                       "description": "The area which the region belongs to, such as Asia, Europe, Africa",
-                                                       "enum": %s
-                                                   }
-                                               },
-                                               "description": "The regions of the Cloud Service Provider"
-                                            },
-                                            "csp": {
-                                                "default": "%s",
-                                                "type": "string",
-                                                "description": "The csp of the Service.",
-                                                "enum": %s
-                                            },
-                                            "flavor": {
-                                                "example": "%s",
-                                                "type": "string",
-                                                "description": "The flavor of the Service.",
-                                                "enum": %s
-                                            },
-                                            "serviceHostingType": {
-                                                "default": "%s",
-                                                "type": "string",
-                                                "description": "Defines which cloud service account is used for deploying cloud resources.",
-                                                "enum": %s
-                                            },
-                                            "serviceRequestProperties": {
-                                                 "required": %s,
-                                                 "description": "The variables to deploy the service instance.",
-                                                 "type": "object",
-                                                 "properties": %s
-                                            }%s                          \s
-                                        }
-                                    }                                                       \s
-                                }%s                                     \s
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "OpenAPI definition",
+        "version": "%s",
+        "description": "OpenAPI for creating an order task to deploy new service using approved service template."
+    },
+    "servers": [
+        {
+            "url": "%s",
+            "description": "Generated server url"
+        }
+    ],
+    %s
+    "tags": [
+        {
+            "name": "Service",
+            "description": "APIs to manage the service instances"
+        }
+    ],
+    "paths": {
+        "/xpanse/services": {
+            "post": {
+                "tags": [
+                    "Service"
+                ],
+                "description": "Create an order task to deploy new service using approved service template.%s",
+                "operationId": "deploy",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployRequest"
                             }
                         }
-                        """,
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceOrder"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderFailedResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderFailedResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderFailedResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderFailedResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderFailedResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderFailedResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "OrderFailedResponse": {
+                "required": ["details", "errorType", "success"],
+                "type": "object",
+                "properties": {
+                    "errorType": {
+                        "type": "string",
+                        "description": "The result code of response.",
+                        "enum": [
+                            "Success",
+                            "Runtime Error",
+                            "Parameters Invalid",
+                            "Terraform Script Invalid",
+                            "Unprocessable Entity",
+                            "Response Not Valid",
+                            "Credentials Not Found",
+                            "Flavor Invalid",
+                            "Terraform Execution Failed",
+                            "Plugin Not Found",
+                            "Deployer Not Found",
+                            "Unhandled Exception",
+                            "Unavailable Service Regions",
+                            "Service Deployment Not Found",
+                            "Deployment Variable Invalid",
+                            "Unauthorized",
+                            "Access Denied",
+                            "Sensitive Field Encryption Or Decryption Failed Exception",
+                            "Unsupported Enum Value",
+                            "Terraform Boot Request Failed",
+                            "Tofu Maker Request Failed",
+                            "Variable Validation Failed",
+                            "Variable Schema Definition Invalid",
+                            "Policy Evaluation Failed",
+                            "Current Login User No Found",
+                            "Eula Not Accepted",
+                            "Service Flavor Downgrade Not Allowed",
+                            "Service Order Not Found",
+                            "Service Price Calculation Failed",
+                            "Invalid Git Repo Details",
+                            "File Locked",
+                            "Service Configuration Invalid"
+                          ]
+                      },
+                      "details": {
+                          "type": "array",
+                          "description": "Details of the errors occurred",
+                          "items": {
+                              "type": "string",
+                              "description": "Details of the errors occurred"
+                          }
+                      },
+                      "success": {
+                          "type": "boolean",
+                          "description": "Describes if the request is successful"
+                      },
+                      "serviceId": {
+                          "type": "string",
+                          "description": "The service id associated with the request."
+                      },
+                      "orderId": {
+                          "type": "string",
+                          "description": "The order id associated with the request."
+                      }
+                  }
+              },
+              "ServiceOrder": {
+                  "required": ["orderId", "serviceId"],
+                  "type": "object",
+                  "properties": {
+                      "orderId": {
+                          "type": "string",
+                          "description": "The id of the service order.",
+                          "format": "uuid"
+                      },
+                      "serviceId": {
+                          "type": "string",
+                          "description": "The id of the deployed service.",
+                          "format": "uuid"
+                      }
+                  }
+              },
+            "DeployRequest": {
+                "required": %s,
+                "type": "object",
+                "properties": {
+                    "category": {
+                        "default": "%s",
+                        "type": "string",
+                        "description": "The category of the service",
+                        "enum": %s
+                    },
+                    "serviceName": {
+                        "default": "%s",
+                        "type": "string",
+                        "description": "The name of the service ordered."
+                    },
+                    "customerServiceName": {
+                        "type": "string",
+                        "description": "Customer's name for the service. Used only for customer's reference.If not provided, this value will be auto-generated"
+                    },
+                    "version": {
+                        "default": "%s",
+                        "type": "string",
+                        "description": "The version of service"
+                    },
+                    "region": {
+                       "required": [
+                           "area",
+                           "name",
+                           "site"
+                       ],
+                       "type": "object",
+                       "properties": {
+                           "name": {
+                               "example": "%s",
+                               "type": "string",
+                               "description": "The name of the Region",
+                               "enum": %s
+                           },
+                           "site": {
+                               "example": "%s",
+                               "type": "string",
+                               "description": "The site which the region belongs to, such as default, International, Chinese Mainland",
+                               "enum": %s
+                           },
+                           "area": {
+                               "example": "%s",
+                               "type": "string",
+                               "description": "The area which the region belongs to, such as Asia, Europe, Africa",
+                               "enum": %s
+                           }
+                       },
+                       "description": "The regions of the Cloud Service Provider"
+                    },
+                    "csp": {
+                        "default": "%s",
+                        "type": "string",
+                        "description": "The csp of the Service.",
+                        "enum": %s
+                    },
+                    "flavor": {
+                        "example": "%s",
+                        "type": "string",
+                        "description": "The flavor of the Service.",
+                        "enum": %s
+                    },
+                    "serviceHostingType": {
+                        "default": "%s",
+                        "type": "string",
+                        "description": "Defines which cloud service account is used for deploying cloud resources.",
+                        "enum": %s
+                    },
+                    "serviceRequestProperties": {
+                         "required": %s,
+                         "description": "The variables to deploy the service instance.",
+                         "type": "object",
+                         "properties": %s
+                    }%s                          \s
+                }
+            }                                                       \s
+        }%s                                     \s
+    }
+}
+""",
                 appVersion,
                 serviceUrl,
                 securityConfigList,
@@ -665,26 +665,28 @@ public class ServiceTemplateOpenApiGenerator {
 
     private String getSecuritySchemes() {
         if (Objects.nonNull(zitadelIdentityProviderService)) {
+            // CHECKSTYLE OFF: Indentation
             return """
-                    ,
-                    "securitySchemes": {
-                        "OAuth2Flow": {
-                            "type": "oauth2",
-                            "flows": {
-                                "authorizationCode": {
-                                    "authorizationUrl": "https://iam.xpanse.site/oauth/v2/authorize",
-                                    "tokenUrl": "https://iam.xpanse.site/oauth/v2/token",
-                                    "scopes": {
-                                        "openid": "mandatory must be selected.",
-                                        "profile": "mandatory must be selected.",
-                                        "urn:zitadel:iam:org:project:roles": "mandatory must be selected.",
-                                        "urn:zitadel:iam:user:metadata": "mandatory must be selected."
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    """;
+,
+"securitySchemes": {
+    "OAuth2Flow": {
+        "type": "oauth2",
+        "flows": {
+            "authorizationCode": {
+                "authorizationUrl": "https://iam.xpanse.site/oauth/v2/authorize",
+                "tokenUrl": "https://iam.xpanse.site/oauth/v2/token",
+                "scopes": {
+                    "openid": "mandatory must be selected.",
+                    "profile": "mandatory must be selected.",
+                    "urn:zitadel:iam:org:project:roles": "mandatory must be selected.",
+                    "urn:zitadel:iam:user:metadata": "mandatory must be selected."
+                }
+            }
+        }
+    }
+}
+""";
+            // CHECKSTYLE ON: Indentation
         }
         return "";
     }
@@ -738,14 +740,14 @@ public class ServiceTemplateOpenApiGenerator {
                 availabilityZonesSchemaStr =
                         String.format(
                                 """
-                                                   ,
-                                                   "availabilityZones": {
-                                                       "required": %s,
-                                                       "description": "The availability zones to deploy the service instance.",
-                                                       "type": "object",
-                                                       "properties": %s
-                                                   }
-                                """,
+                   ,
+                   "availabilityZones": {
+                       "required": %s,
+                       "description": "The availability zones to deploy the service instance.",
+                       "type": "object",
+                       "properties": %s
+                   }
+""",
                                 mapper.writeValueAsString(
                                         getRequiredAvailabilityZones(availabilityZones)),
                                 mapper.writeValueAsString(
