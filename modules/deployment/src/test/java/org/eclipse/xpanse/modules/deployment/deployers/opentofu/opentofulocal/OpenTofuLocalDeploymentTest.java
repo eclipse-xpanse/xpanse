@@ -65,14 +65,14 @@ class OpenTofuLocalDeploymentTest {
     private final String errorScript = "error_script";
     private final String invalidScript =
             """
-                    resource "random_id" "new" {
-                      byte_length = 4
-                    }
+            resource "random_id" "new" {
+              byte_length = 4
+            }
 
-                    output "random_id" {
-                      value = resource.random_id_2.new.id
-                    }
-                    """;
+            output "random_id" {
+              value = resource.random_id_2.new.id
+            }
+            """;
     @InjectMocks OpenTofuLocalDeployment openTofuLocalDeployment;
     @InjectMocks DeploymentScriptsHelper scriptsHelper;
     @Mock OpenTofuInstaller openTofuInstaller;
