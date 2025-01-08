@@ -334,8 +334,6 @@ public class ServiceTemplateManage {
             serviceTemplateHistory.setReviewComment(AUTO_APPROVED_REVIEW_COMMENT);
         } else {
             serviceTemplateHistory.setStatus(ServiceTemplateRequestStatus.IN_REVIEW);
-            serviceTemplateHistory.setReviewComment(
-                    ServiceTemplateRequestStatus.IN_REVIEW.toValue());
         }
         return templateRequestStorage.storeAndFlush(serviceTemplateHistory);
     }
