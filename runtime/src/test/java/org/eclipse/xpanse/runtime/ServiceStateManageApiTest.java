@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -20,7 +19,6 @@ import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersRequest;
 import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersResponse;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobRequest;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse;
-import jakarta.transaction.Transactional;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +28,6 @@ import java.util.UUID;
 import org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
@@ -60,20 +57,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@Transactional
 @SuppressWarnings("unchecked")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
 class ServiceStateManageApiTest extends ApisTestCommon {
-    @MockitoBean private PolicyValidator mockPolicyValidator;
-
-    void mockDeploymentWitPolicies() {
-        doNothing().when(mockPolicyValidator).validateDeploymentWithPolicies(any());
-    }
 
     @BeforeEach
     void setUp() {
@@ -103,14 +93,13 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         if (Objects.isNull(serviceTemplate)) {
             return;
         }
-        mockDeploymentWitPolicies();
         ServiceOrder serviceOrder = deployService(serviceTemplate);
-        if (waitServiceDeploymentIsCompleted(serviceOrder.getServiceId())) {
-            ServiceDeploymentEntity serviceDeploymentEntity =
-                    serviceDeploymentStorage.findServiceDeploymentById(serviceOrder.getServiceId());
-            testServiceStateManageApisThrowExceptions(serviceDeploymentEntity);
-
-            serviceDeploymentEntity = setResources(serviceDeploymentEntity);
+        UUID serviceId = serviceOrder.getServiceId();
+        assertThat(waitServiceDeploymentIsCompleted(serviceId)).isTrue();
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                serviceDeploymentStorage.findServiceDeploymentById(serviceOrder.getServiceId());
+        testServiceStateManageApisThrowExceptions(serviceDeploymentEntity);
+        if (setResources(serviceDeploymentEntity)) {
             testServiceStateManageApisForHuaweiCloud(serviceDeploymentEntity);
             testServiceStateManageApisForFlexibleEngine(serviceDeploymentEntity);
             testServiceStateManageApisForOpenstack(serviceDeploymentEntity);
@@ -120,41 +109,31 @@ class ServiceStateManageApiTest extends ApisTestCommon {
     void testServiceStateManageApisThrowExceptions(ServiceDeploymentEntity service)
             throws Exception {
         // Setup
-        UUID uuid = UUID.randomUUID();
-        String taskIdPrefix = "Task ";
-        // run the test
-        final MockHttpServletResponse response = startService(uuid);
-
+        UUID serviceId = UUID.randomUUID();
+        String errorMsg = "Service with id " + serviceId + " not found.";
         ErrorResponse result =
                 CommonExceptionHandler.getErrorResponse(
                         ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                        Collections.singletonList(
-                                String.format("Service with id %s not found.", uuid)));
+                        Collections.singletonList(errorMsg));
+        // run the test
+        final MockHttpServletResponse response = startService(serviceId);
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.getContentAsString())
                 .isEqualTo(objectMapper.writeValueAsString(result));
 
-        Region region = new Region();
-        region.setName("cn-southwest-2");
-        region.setSite("Chinese Mainland");
+        serviceId = service.getId();
         // Setup
-
-        // run the test
-        final MockHttpServletResponse response1 = startService(service.getId());
-
-        int taskIdStartIndex1 = response1.getContentAsString().indexOf(taskIdPrefix);
-        int taskIdEndIndex1 = response1.getContentAsString().indexOf(":", taskIdStartIndex1);
-        String taskId1 =
-                response1.getContentAsString().substring(taskIdStartIndex1, taskIdEndIndex1 + 1);
-
+        service.setServiceState(ServiceState.NOT_RUNNING);
+        service = serviceDeploymentStorage.storeAndFlush(service);
+        String errorMsg1 = String.format("Service with id %s has no vm resources.", serviceId);
         ErrorResponse result1 =
                 ErrorResponse.errorResponse(
                         ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND,
-                        Collections.singletonList(
-                                String.format(
-                                        "%s Service with id %s has no vm resources.",
-                                        taskId1, service.getId())));
+                        Collections.singletonList(errorMsg1));
+        // run the test
+        final MockHttpServletResponse response1 = startService(serviceId);
+
         // Verify the results
         assertThat(response1.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response1.getContentAsString())
@@ -163,41 +142,30 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Setup
         service.setCsp(Csp.AWS);
         service = serviceDeploymentStorage.storeAndFlush(service);
+        String errorMsg2 =
+                String.format("Can't find suitable plugin for the Csp %s", Csp.AWS.toValue());
         ErrorResponse result2 =
                 ErrorResponse.errorResponse(
-                        ErrorType.PLUGIN_NOT_FOUND,
-                        Collections.singletonList(
-                                String.format(
-                                        "Can't find suitable plugin for the Csp %s",
-                                        Csp.AWS.toValue())));
-
+                        ErrorType.PLUGIN_NOT_FOUND, Collections.singletonList(errorMsg2));
         // run the test
-        final MockHttpServletResponse response2 = startService(service.getId());
-
+        final MockHttpServletResponse response2 = startService(serviceId);
         // Verify the results
         assertThat(response2.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response2.getContentAsString())
                 .isEqualTo(objectMapper.writeValueAsString(result2));
 
         // Setup
+        String originalUserId = service.getUserId();
         service.setCsp(Csp.HUAWEI_CLOUD);
         service.setUserId("1");
         service = serviceDeploymentStorage.storeAndFlush(service);
-        // run the test
-        final MockHttpServletResponse response3 = startService(service.getId());
-
-        int taskIdStartIndex3 = response3.getContentAsString().indexOf(taskIdPrefix);
-        int taskIdEndIndex3 = response3.getContentAsString().indexOf(":", taskIdStartIndex3);
-        String taskId3 =
-                response3.getContentAsString().substring(taskIdStartIndex3, taskIdEndIndex3 + 1);
+        String errorMsg3 =
+                "No permissions to manage state of the service belonging to other users.";
         ErrorResponse result3 =
                 ErrorResponse.errorResponse(
-                        ErrorType.ACCESS_DENIED,
-                        Collections.singletonList(
-                                String.format(
-                                        "%s No permissions to manage status of the service "
-                                                + "belonging to other users.",
-                                        taskId3)));
+                        ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg3));
+        // run the test
+        final MockHttpServletResponse response3 = startService(serviceId);
 
         // Verify the results
         assertThat(response3.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
@@ -205,26 +173,19 @@ class ServiceStateManageApiTest extends ApisTestCommon {
                 .isEqualTo(objectMapper.writeValueAsString(result3));
 
         // Setup
+        service.setUserId(originalUserId);
         service.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
         service = serviceDeploymentStorage.storeAndFlush(service);
-
-        // run the test
-        final MockHttpServletResponse response4 = startService(service.getId());
-
-        int taskIdStartIndex4 = response4.getContentAsString().indexOf(taskIdPrefix);
-        int taskIdEndIndex4 = response4.getContentAsString().indexOf(":", taskIdStartIndex4);
-        String taskId4 =
-                response4.getContentAsString().substring(taskIdStartIndex4, taskIdEndIndex4 + 1);
-
         String errorMsg4 =
                 String.format(
-                        "%s Service %s with deployment state %s is not supported"
-                                + " to manage status.",
-                        taskId4, service.getId(), service.getServiceDeploymentState());
+                        "Service %s with deployment state %s is not supported to manage power"
+                                + " state.",
+                        serviceId, service.getServiceDeploymentState().toValue());
         ErrorResponse result4 =
                 ErrorResponse.errorResponse(
                         ErrorType.SERVICE_STATE_INVALID, Collections.singletonList(errorMsg4));
-
+        // run the test
+        final MockHttpServletResponse response4 = startService(serviceId);
         // Verify the results
         assertThat(response4.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response4.getContentAsString())
@@ -234,23 +195,15 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         service.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
         service.setServiceState(ServiceState.STARTING);
         service = serviceDeploymentStorage.storeAndFlush(service);
-
-        // run the test
-        final MockHttpServletResponse response5 = startService(service.getId());
-        int taskIdStartIndex5 = response5.getContentAsString().indexOf(taskIdPrefix);
-        int taskIdEndIndex5 = response5.getContentAsString().indexOf(":", taskIdStartIndex5);
-        String taskId5 =
-                response5.getContentAsString().substring(taskIdStartIndex5, taskIdEndIndex5 + 1);
-
+        String errorMsg5 =
+                String.format(
+                        "Service %s with a running management task, please try again later.",
+                        serviceId);
         ErrorResponse errorResult5 =
                 ErrorResponse.errorResponse(
-                        ErrorType.SERVICE_STATE_INVALID,
-                        Collections.singletonList(
-                                String.format(
-                                        "%s Service %s with a running management task, please try"
-                                                + " again later.",
-                                        taskId5, service.getId())));
-
+                        ErrorType.SERVICE_STATE_INVALID, Collections.singletonList(errorMsg5));
+        // run the test
+        final MockHttpServletResponse response5 = startService(serviceId);
         // Verify the results
         assertThat(response5.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response5.getContentAsString())
@@ -259,95 +212,94 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Setup
         service.setServiceState(ServiceState.RUNNING);
         service = serviceDeploymentStorage.storeAndFlush(service);
-        // run the test
-        final MockHttpServletResponse response6 = startService(service.getId());
-
-        int taskIdStartIndex6 = response6.getContentAsString().indexOf(taskIdPrefix);
-        int taskIdEndIndex6 = response6.getContentAsString().indexOf(":", taskIdStartIndex6);
-        String taskId6 =
-                response6.getContentAsString().substring(taskIdStartIndex6, taskIdEndIndex6 + 1);
-
+        String errorMsg6 =
+                String.format(
+                        "Service %s with state %s is not supported to start.",
+                        serviceId, service.getServiceState().toValue());
         ErrorResponse errorResult6 =
                 ErrorResponse.errorResponse(
-                        ErrorType.SERVICE_STATE_INVALID,
-                        Collections.singletonList(
-                                String.format(
-                                        "%s Service %s with state RUNNING is not supported to "
-                                                + "start.",
-                                        taskId6, service.getId())));
-
+                        ErrorType.SERVICE_STATE_INVALID, Collections.singletonList(errorMsg6));
+        // run the test
+        final MockHttpServletResponse response6 = startService(serviceId);
         // Verify the results
         assertThat(response6.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response6.getContentAsString())
                 .isEqualTo(objectMapper.writeValueAsString(errorResult6));
 
         // Setup
-        service.setServiceState(ServiceState.STOPPING);
+        service.setServiceState(ServiceState.NOT_RUNNING);
         service = serviceDeploymentStorage.storeAndFlush(service);
-        // run the test
-        final MockHttpServletResponse response7 = stopService(service.getId());
-        int taskIdStartIndex7 = response7.getContentAsString().indexOf(taskIdPrefix);
-        int taskIdEndIndex7 = response7.getContentAsString().indexOf(":", taskIdStartIndex7);
-        String taskId7 =
-                response7.getContentAsString().substring(taskIdStartIndex7, taskIdEndIndex7 + 1);
+        String errorMsg7 =
+                String.format(
+                        "Service %s with state %s is not supported to stop.",
+                        serviceId, service.getServiceState().toValue());
         ErrorResponse errorResult7 =
                 ErrorResponse.errorResponse(
-                        ErrorType.SERVICE_STATE_INVALID,
-                        Collections.singletonList(
-                                String.format(
-                                        "%s Service %s with a running management task, please try"
-                                                + " again later.",
-                                        taskId7, service.getId())));
-
+                        ErrorType.SERVICE_STATE_INVALID, Collections.singletonList(errorMsg7));
+        // run the test
+        final MockHttpServletResponse response7 = stopService(serviceId);
         // Verify the results
         assertThat(response7.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response7.getContentAsString())
                 .isEqualTo(objectMapper.writeValueAsString(errorResult7));
 
+        // Setup
         service.setServiceState(ServiceState.STOPPED);
         service = serviceDeploymentStorage.storeAndFlush(service);
-
-        // run the test
-        final MockHttpServletResponse response8 = stopService(service.getId());
-        int taskIdStartIndex8 = response8.getContentAsString().indexOf(taskIdPrefix);
-        int taskIdEndIndex8 = response8.getContentAsString().indexOf(":", taskIdStartIndex8);
-        String taskId8 =
-                response8.getContentAsString().substring(taskIdStartIndex8, taskIdEndIndex8 + 1);
-
+        String errorMsg8 =
+                String.format(
+                        "Service %s with state %s is not supported to stop.",
+                        serviceId, service.getServiceState().toValue());
         ErrorResponse errorResult8 =
                 ErrorResponse.errorResponse(
-                        ErrorType.SERVICE_STATE_INVALID,
-                        Collections.singletonList(
-                                String.format(
-                                        "%s Service %s with state STOPPED is not supported to"
-                                                + " stop.",
-                                        taskId8, service.getId())));
-
+                        ErrorType.SERVICE_STATE_INVALID, Collections.singletonList(errorMsg8));
+        // run the test
+        final MockHttpServletResponse response8 = stopService(serviceId);
         // Verify the results
         assertThat(response8.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response8.getContentAsString())
                 .isEqualTo(objectMapper.writeValueAsString(errorResult8));
 
-        service.setServiceState(ServiceState.STOPPED);
-        service = serviceDeploymentStorage.storeAndFlush(service);
-        // run the test
-        final MockHttpServletResponse response9 = restartService(service.getId());
-        int taskIdStartIndex9 = response9.getContentAsString().indexOf(taskIdPrefix);
-        int taskIdEndIndex9 = response9.getContentAsString().indexOf(":", taskIdStartIndex9);
-        String taskId9 =
-                response9.getContentAsString().substring(taskIdStartIndex9, taskIdEndIndex9 + 1);
+        // Setup
+        String errorMsg9 =
+                String.format(
+                        "Service %s with state %s is not supported to restart.",
+                        serviceId, service.getServiceState().toValue());
         ErrorResponse errorResult9 =
                 ErrorResponse.errorResponse(
-                        ErrorType.SERVICE_STATE_INVALID,
-                        Collections.singletonList(
-                                String.format(
-                                        "%s Service %s with state STOPPED is not supported to "
-                                                + "restart.",
-                                        taskId9, service.getId())));
+                        ErrorType.SERVICE_STATE_INVALID, Collections.singletonList(errorMsg9));
+        // run the test
+        final MockHttpServletResponse response9 = restartService(serviceId);
         // Verify the results
         assertThat(response9.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response9.getContentAsString())
                 .isEqualTo(objectMapper.writeValueAsString(errorResult9));
+
+        // Setup
+        service.getLockConfig().setModifyLocked(true);
+        serviceDeploymentStorage.storeAndFlush(service);
+        String errorMsg10 = String.format("Service with id %s is locked from restart.", serviceId);
+        ErrorResponse errorResult10 =
+                ErrorResponse.errorResponse(
+                        ErrorType.SERVICE_LOCKED, Collections.singletonList(errorMsg10));
+        // run the test
+        final MockHttpServletResponse response10 = restartService(serviceId);
+        // Verify the results
+        assertThat(response10.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response10.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(errorResult10));
+
+        // Setup
+        String errorMsg11 = String.format("Service with id %s is locked from stop.", serviceId);
+        ErrorResponse errorResult11 =
+                ErrorResponse.errorResponse(
+                        ErrorType.SERVICE_LOCKED, Collections.singletonList(errorMsg11));
+        // run the test
+        final MockHttpServletResponse response11 = stopService(serviceId);
+        // Verify the results
+        assertThat(response11.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response11.getContentAsString())
+                .isEqualTo(objectMapper.writeValueAsString(errorResult11));
     }
 
     void testServiceStateManageApisForHuaweiCloud(ServiceDeploymentEntity service)
@@ -367,12 +319,13 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
     void testServiceStateManageApisWithHuaweiCloudSdk(ServiceDeploymentEntity service)
             throws Exception {
+        UUID serviceId = service.getId();
         ShowJobResponse startFailedJobResponse = new ShowJobResponse();
         startFailedJobResponse.setHttpStatusCode(200);
         startFailedJobResponse.setStatus(ShowJobResponse.StatusEnum.FAIL);
         mockShowJobInvoker(startFailedJobResponse);
         // Run the test
-        final MockHttpServletResponse startFailedResponse = startService(service.getId());
+        final MockHttpServletResponse startFailedResponse = startService(serviceId);
         ServiceOrder serviceOrder =
                 objectMapper.readValue(
                         startFailedResponse.getContentAsString(), ServiceOrder.class);
@@ -393,7 +346,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         startJobResponse.setStatus(ShowJobResponse.StatusEnum.SUCCESS);
         mockShowJobInvoker(startJobResponse);
         // Run the test
-        final MockHttpServletResponse startResponse = startService(service.getId());
+        final MockHttpServletResponse startResponse = startService(serviceId);
         ServiceOrder serviceOrder1 =
                 objectMapper.readValue(startResponse.getContentAsString(), ServiceOrder.class);
         UUID startTaskId = serviceOrder1.getOrderId();
@@ -409,7 +362,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         restartFailedJobResponse.setStatus(ShowJobResponse.StatusEnum.FAIL);
         mockShowJobInvoker(restartFailedJobResponse);
         // Run the test
-        final MockHttpServletResponse restartFailedResponse = restartService(service.getId());
+        final MockHttpServletResponse restartFailedResponse = restartService(serviceId);
         OrderFailedErrorResponse restartServiceOrder =
                 objectMapper.readValue(
                         restartFailedResponse.getContentAsString(), OrderFailedErrorResponse.class);
@@ -429,7 +382,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         rebootJobResponse.setStatus(ShowJobResponse.StatusEnum.SUCCESS);
         mockShowJobInvoker(rebootJobResponse);
         // Run the test
-        final MockHttpServletResponse restartResponse = restartService(service.getId());
+        final MockHttpServletResponse restartResponse = restartService(serviceId);
         OrderFailedErrorResponse restartServiceOrder1 =
                 objectMapper.readValue(
                         restartResponse.getContentAsString(), OrderFailedErrorResponse.class);
@@ -447,7 +400,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
         mockShowJobInvoker(stopFailedJobResponse);
         // Run the test
-        final MockHttpServletResponse stopFailedResponse = stopService(service.getId());
+        final MockHttpServletResponse stopFailedResponse = stopService(serviceId);
         ServiceOrder stopServiceOrder =
                 objectMapper.readValue(stopFailedResponse.getContentAsString(), ServiceOrder.class);
         UUID stopFailedTaskId = stopServiceOrder.getOrderId();
@@ -467,7 +420,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         stopJobResponse.setStatus(ShowJobResponse.StatusEnum.SUCCESS);
         mockShowJobInvoker(stopJobResponse);
         // Run the test
-        final MockHttpServletResponse stopResponse = stopService(service.getId());
+        final MockHttpServletResponse stopResponse = stopService(serviceId);
         ServiceOrder stopServiceOrder1 =
                 objectMapper.readValue(stopResponse.getContentAsString(), ServiceOrder.class);
         UUID stopTaskId = stopServiceOrder1.getOrderId();
@@ -548,15 +501,16 @@ class ServiceStateManageApiTest extends ApisTestCommon {
             throws Exception {
         OSClient.OSClientV3 mockOsClient = getMockOsClientWithMockServices();
 
+        UUID serviceId = service.getId();
         Server mockServer = mock(Server.class);
         when(mockOsClient.compute().servers().get(anyString())).thenReturn(mockServer);
         when(mockServer.getStatus()).thenReturn(Server.Status.STOPPED);
 
         ActionResponse startActionFailedResponse = ActionResponse.actionFailed("failed", 403);
-        when(mockOsClient.compute().servers().action(service.getId().toString(), Action.START))
+        when(mockOsClient.compute().servers().action(serviceId.toString(), Action.START))
                 .thenReturn(startActionFailedResponse);
         // Run the test
-        final MockHttpServletResponse startFailedResponse = startService(service.getId());
+        final MockHttpServletResponse startFailedResponse = startService(serviceId);
         OrderFailedErrorResponse startServiceOrder =
                 objectMapper.readValue(
                         startFailedResponse.getContentAsString(), OrderFailedErrorResponse.class);
@@ -570,10 +524,10 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         service.setServiceState(ServiceState.STOPPED);
 
         ActionResponse startActionResponse = ActionResponse.actionSuccess();
-        when(mockOsClient.compute().servers().action(service.getId().toString(), Action.START))
+        when(mockOsClient.compute().servers().action(serviceId.toString(), Action.START))
                 .thenReturn(startActionResponse);
         // Run the test
-        final MockHttpServletResponse startResponse = startService(service.getId());
+        final MockHttpServletResponse startResponse = startService(serviceId);
         OrderFailedErrorResponse startServiceOrder1 =
                 objectMapper.readValue(
                         startResponse.getContentAsString(), OrderFailedErrorResponse.class);
@@ -587,11 +541,11 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         // Setup
         when(mockServer.getStatus()).thenReturn(Server.Status.ACTIVE);
         ActionResponse restartActionFailedResponse = ActionResponse.actionFailed("failed", 403);
-        when(mockOsClient.compute().servers().reboot(service.getId().toString(), RebootType.SOFT))
+        when(mockOsClient.compute().servers().reboot(serviceId.toString(), RebootType.SOFT))
                 .thenReturn(restartActionFailedResponse);
 
         // Run the test
-        final MockHttpServletResponse restartFailedResponse = restartService(service.getId());
+        final MockHttpServletResponse restartFailedResponse = restartService(serviceId);
         OrderFailedErrorResponse restartServiceOrder =
                 objectMapper.readValue(
                         restartFailedResponse.getContentAsString(), OrderFailedErrorResponse.class);
@@ -604,10 +558,10 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         service.setServiceState(ServiceState.RUNNING);
 
         ActionResponse restartActionResponse = ActionResponse.actionSuccess();
-        when(mockOsClient.compute().servers().reboot(service.getId().toString(), RebootType.SOFT))
+        when(mockOsClient.compute().servers().reboot(serviceId.toString(), RebootType.SOFT))
                 .thenReturn(restartActionResponse);
         // Run the test
-        final MockHttpServletResponse restartResponse = restartService(service.getId());
+        final MockHttpServletResponse restartResponse = restartService(serviceId);
         OrderFailedErrorResponse restartServiceOrder1 =
                 objectMapper.readValue(
                         restartResponse.getContentAsString(), OrderFailedErrorResponse.class);
@@ -621,11 +575,11 @@ class ServiceStateManageApiTest extends ApisTestCommon {
 
         // Setup
         ActionResponse stopActionFailedResponse = ActionResponse.actionFailed("failed", 403);
-        when(mockOsClient.compute().servers().action(service.getId().toString(), Action.STOP))
+        when(mockOsClient.compute().servers().action(serviceId.toString(), Action.STOP))
                 .thenReturn(stopActionFailedResponse);
 
         // Run the test
-        final MockHttpServletResponse stopFailedResponse = stopService(service.getId());
+        final MockHttpServletResponse stopFailedResponse = stopService(serviceId);
         OrderFailedErrorResponse stopServiceOrder =
                 objectMapper.readValue(
                         stopFailedResponse.getContentAsString(), OrderFailedErrorResponse.class);
@@ -638,11 +592,11 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         service.setServiceState(ServiceState.RUNNING);
 
         ActionResponse stopActionResponse = ActionResponse.actionSuccess();
-        when(mockOsClient.compute().servers().action(service.getId().toString(), Action.STOP))
+        when(mockOsClient.compute().servers().action(serviceId.toString(), Action.STOP))
                 .thenReturn(stopActionResponse);
 
         // Run the test
-        final MockHttpServletResponse stopSdkResponse = stopService(service.getId());
+        final MockHttpServletResponse stopSdkResponse = stopService(serviceId);
         OrderFailedErrorResponse stopServiceOrder1 =
                 objectMapper.readValue(
                         stopFailedResponse.getContentAsString(), OrderFailedErrorResponse.class);
@@ -655,17 +609,22 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         service.setServiceState(ServiceState.STOPPED);
     }
 
-    ServiceDeploymentEntity setResources(ServiceDeploymentEntity deployService) {
+    boolean setResources(ServiceDeploymentEntity deployService) {
         UUID id = UUID.randomUUID();
         ServiceResourceEntity deployedResource = new ServiceResourceEntity();
         deployedResource.setId(id);
-        deployedResource.setResourceId(id.toString());
+        deployedResource.setResourceId("test-resource-id");
         deployedResource.setResourceName("test-service-ecs");
         deployedResource.setResourceKind(DeployResourceKind.VM);
         deployedResource.setProperties(Map.of("region", "cn-southwest-2"));
         deployedResource.setServiceDeploymentEntity(deployService);
         deployService.setDeployResourceList(List.of(deployedResource));
-        return serviceDeploymentStorage.storeAndFlush(deployService);
+        try {
+            serviceDeploymentStorage.storeAndFlush(deployService);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     MockHttpServletResponse startService(UUID serviceId) throws Exception {
