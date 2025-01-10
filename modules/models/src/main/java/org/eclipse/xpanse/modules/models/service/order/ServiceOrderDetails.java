@@ -13,15 +13,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 
 /** Define view object for details of the service order. */
 @Data
@@ -38,6 +38,9 @@ public class ServiceOrderDetails {
     @NotNull
     @Schema(description = "The task type of the service order.")
     private ServiceOrderType taskType;
+
+    @Schema(description = "The request json of the service order.")
+    private Object requestBody;
 
     @NotNull
     @Schema(description = "The task status of the service order.")
@@ -58,6 +61,7 @@ public class ServiceOrderDetails {
     @Schema(description = "The id of the user who created the service order.")
     private String userId;
 
+    @NotNull
     @Schema(description = "The started time of the service order.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
@@ -68,25 +72,16 @@ public class ServiceOrderDetails {
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime completedTime;
 
-    @Schema(description = "The request json of the service order.")
-    private Object requestBody;
-
-    @Schema(description = "The deploy request of the service before this service order.")
-    private DeployRequest previousDeployRequest;
-
-    @Schema(description = "The deploy request of the service from this service order.")
-    private DeployRequest newDeployRequest;
-
-    @Schema(description = "The deployed resources of the service before this service order.")
-    private List<DeployResource> previousDeployedResources;
-
-    @Schema(description = "The properties of the deployed service before this service order.")
-    private Map<String, String> previousDeployedServiceProperties;
-
-    @Schema(description = "The properties of the deployed result before this service order.")
-    private Map<String, String> previousDeployedResultProperties;
-
     @NotNull
     @Schema(description = " The service order handler.")
     private Handler handler;
+
+    @Schema(description = "The request of executed deployment for this service order.")
+    private DeployRequest deployRequest;
+
+    @Schema(description = "The result of executed deployment for this service order.")
+    private DeployResult deployResult;
+
+    @Schema(description = "The service actions of executed deployment for this service order.")
+    private List<ServiceAction> serviceActions;
 }

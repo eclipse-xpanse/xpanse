@@ -14,7 +14,10 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,6 +39,7 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
 
     @Override
     public ServiceOrderEntity storeAndFlush(ServiceOrderEntity serviceOrderEntity) {
+        checkEntityData(serviceOrderEntity);
         return repository.saveAndFlush(serviceOrderEntity);
     }
 
@@ -73,6 +77,7 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
                                 criteriaBuilder.equal(
                                         root.get("workflowId"), entity.getWorkflowId()));
                     }
+                    assert query != null;
                     query.orderBy(criteriaBuilder.desc(root.get("startedTime")));
                     query.distinct(true);
                     return query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
@@ -112,5 +117,80 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
     @Override
     public void delete(ServiceOrderEntity taskEntity) {
         repository.delete(taskEntity);
+    }
+
+    private void checkEntityData(ServiceOrderEntity entity) {
+        ServiceOrderType taskType = entity.getTaskType();
+        switch (taskType) {
+            case DEPLOY:
+            case MODIFY:
+            case MIGRATE:
+            case LOCK_CHANGE:
+            case CONFIG_CHANGE:
+                if (Objects.isNull(entity.getRequestBody())) {
+                    String errorMsg =
+                            "The request body could not be null when the order type is " + taskType;
+                    log.error(errorMsg);
+                    throw new IllegalArgumentException(errorMsg);
+                }
+                break;
+            default:
+                break;
+        }
+
+        TaskStatus taskStatus = entity.getTaskStatus();
+        if (taskStatus == TaskStatus.CREATED || taskStatus == TaskStatus.IN_PROGRESS) {
+            return;
+        }
+
+        if (Objects.isNull(entity.getCompletedTime())) {
+            String errorMsg =
+                    "The completed time could not be null when the order task is completed.";
+            log.error(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
+        }
+
+        if (taskStatus == TaskStatus.FAILED) {
+            if (Objects.isNull(entity.getErrorResponse())) {
+                String errorMsg =
+                        "The error response could not be null when the order task is failed.";
+                log.error(errorMsg);
+                throw new IllegalArgumentException(errorMsg);
+            }
+        }
+
+        Handler handler = entity.getHandler();
+        switch (handler) {
+            case TERRAFORM_LOCAL:
+            case TERRAFORM_BOOT:
+            case OPEN_TOFU_LOCAL:
+            case TOFU_MAKER:
+                if (Objects.isNull(entity.getDeployRequest())) {
+                    String errorMsg =
+                            "The deployment request could not be null when the task handled by"
+                                    + " deployer.";
+                    log.error(errorMsg);
+                    throw new IllegalArgumentException(errorMsg);
+                }
+                if (Objects.isNull(entity.getDeployResult())) {
+                    String errorMsg =
+                            "The deployment result could not be null when the task handled by"
+                                    + " deployer.";
+                    log.error(errorMsg);
+                    throw new IllegalArgumentException(errorMsg);
+                }
+                break;
+            case AGENT:
+                if (Objects.isNull(entity.getServiceActions())) {
+                    String errorMsg =
+                            "The service actions could not be null when the task executed by "
+                                    + handler;
+                    log.error(errorMsg);
+                    throw new IllegalArgumentException(errorMsg);
+                }
+                break;
+            default:
+                break;
+        }
     }
 }

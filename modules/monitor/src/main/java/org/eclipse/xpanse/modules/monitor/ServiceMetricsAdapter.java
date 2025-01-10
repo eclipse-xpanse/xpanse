@@ -20,8 +20,8 @@ import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupportedForMonitoringException;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
@@ -56,7 +56,7 @@ public class ServiceMetricsAdapter {
         validateToAndFromValues(from, to);
         ServiceDeploymentEntity serviceEntity = findDeployServiceEntity(serviceId);
         List<ServiceResourceEntity> vmEntities =
-                serviceEntity.getDeployResourceList().stream()
+                serviceEntity.getDeployResources().stream()
                         .filter(entity -> entity.getResourceKind().equals(DeployResourceKind.VM))
                         .toList();
         if (CollectionUtils.isEmpty(vmEntities)) {
@@ -73,7 +73,7 @@ public class ServiceMetricsAdapter {
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
         Region region = serviceEntity.getDeployRequest().getRegion();
-        List<DeployResource> vmResources = EntityTransUtils.transToDeployResourceList(vmEntities);
+        List<DeployResource> vmResources = EntityTransUtils.transToDeployResources(vmEntities);
         ServiceMetricsRequest serviceMetricRequest =
                 getServiceMetricRequest(
                         serviceId,

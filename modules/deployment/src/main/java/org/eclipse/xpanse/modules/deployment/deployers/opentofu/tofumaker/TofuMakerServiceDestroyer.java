@@ -14,7 +14,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDestroyFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDestroyFromScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -56,11 +56,7 @@ public class TofuMakerServiceDestroyer {
             result.setOrderId(deployTask.getOrderId());
             return result;
         } catch (RestClientException e) {
-            log.error(
-                    "tofu-maker destroy service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(),
-                    e.getMessage());
-            throw new OpenTofuMakerRequestFailedException(e.getMessage());
+            throw new OpenTofuMakerRequestFailedException(getErrorMessage(deployTask, e));
         }
     }
 
@@ -77,11 +73,7 @@ public class TofuMakerServiceDestroyer {
             result.setOrderId(deployTask.getOrderId());
             return result;
         } catch (RestClientException e) {
-            log.error(
-                    "tofu-maker deploy service failed. service id: {} , error:{} ",
-                    deployTask.getServiceId(),
-                    e.getMessage());
-            throw new OpenTofuMakerRequestFailedException(e.getMessage());
+            throw new OpenTofuMakerRequestFailedException(getErrorMessage(deployTask, e));
         }
     }
 
@@ -113,5 +105,14 @@ public class TofuMakerServiceDestroyer {
                 tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
         return request;
+    }
+
+    private String getErrorMessage(DeployTask deployTask, RestClientException e) {
+        String errorMsg =
+                String.format(
+                        "Failed to destroy service %s by order %s using tofu-maker. Error: %s",
+                        deployTask.getServiceId(), deployTask.getOrderId(), e.getMessage());
+        log.error(errorMsg, e);
+        return errorMsg;
     }
 }

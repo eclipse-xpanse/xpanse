@@ -37,7 +37,7 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MetricItemType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricUnit;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.orchestrator.monitor.MetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;

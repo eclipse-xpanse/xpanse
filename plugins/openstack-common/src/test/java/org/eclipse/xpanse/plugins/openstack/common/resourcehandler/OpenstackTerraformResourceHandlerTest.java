@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfState;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.CollectionUtils;

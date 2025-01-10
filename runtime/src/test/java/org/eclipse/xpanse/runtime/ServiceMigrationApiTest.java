@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;

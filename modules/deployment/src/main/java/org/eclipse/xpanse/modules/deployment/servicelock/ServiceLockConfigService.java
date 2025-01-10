@@ -57,9 +57,11 @@ public class ServiceLockConfigService {
             throw new AccessDeniedException(errorMsg);
         }
 
-        DeployTask lockChangeTask =
-                deployServiceEntityConverter.getDeployTaskByStoredService(
-                        ServiceOrderType.LOCK_CHANGE, deployedService);
+        DeployTask lockChangeTask = new DeployTask();
+        lockChangeTask.setOrderId(UUID.randomUUID());
+        lockChangeTask.setServiceId(serviceId);
+        lockChangeTask.setTaskType(ServiceOrderType.LOCK_CHANGE);
+        lockChangeTask.setUserId(deployedService.getUserId());
         lockChangeTask.setRequest(lockConfig);
         ServiceOrderEntity serviceOrder =
                 serviceOrderManager.storeNewServiceOrderEntity(

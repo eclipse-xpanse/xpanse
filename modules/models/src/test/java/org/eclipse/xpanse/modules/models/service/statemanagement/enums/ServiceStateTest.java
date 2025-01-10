@@ -10,22 +10,22 @@ class ServiceStateTest {
 
     @Test
     void testGetByValue() {
-        assertEquals(ServiceState.getByValue("not running"), ServiceState.NOT_RUNNING);
-        assertEquals(ServiceState.getByValue("running"), ServiceState.RUNNING);
-        assertEquals(ServiceState.getByValue("starting"), ServiceState.STARTING);
-        assertEquals(ServiceState.getByValue("stopping"), ServiceState.STOPPING);
-        assertEquals(ServiceState.getByValue("stopped"), ServiceState.STOPPED);
-        assertEquals(ServiceState.getByValue("restarting"), ServiceState.RESTARTING);
+        assertEquals(ServiceState.NOT_RUNNING, ServiceState.getByValue("not running"));
+        assertEquals(ServiceState.RUNNING, ServiceState.getByValue("running"));
+        assertEquals(ServiceState.STARTING, ServiceState.getByValue("starting"));
+        assertEquals(ServiceState.STOPPING, ServiceState.getByValue("stopping"));
+        assertEquals(ServiceState.STOPPED, ServiceState.getByValue("stopped"));
+        assertEquals(ServiceState.RESTARTING, ServiceState.getByValue("restarting"));
         assertThrows(UnsupportedEnumValueException.class, () -> ServiceState.getByValue("unknown"));
     }
 
     @Test
     void testToValue() {
-        assertEquals(ServiceState.NOT_RUNNING.toValue(), "not running");
-        assertEquals(ServiceState.RUNNING.toValue(), "running");
-        assertEquals(ServiceState.STARTING.toValue(), "starting");
-        assertEquals(ServiceState.STOPPING.toValue(), "stopping");
-        assertEquals(ServiceState.STOPPED.toValue(), "stopped");
-        assertEquals(ServiceState.RESTARTING.toValue(), "restarting");
+        assertEquals("not running", ServiceState.NOT_RUNNING.toValue());
+        assertEquals("running", ServiceState.RUNNING.toValue());
+        assertEquals("starting", ServiceState.STARTING.toValue());
+        assertEquals("stopping", ServiceState.STOPPING.toValue());
+        assertEquals("stopped", ServiceState.STOPPED.toValue());
+        assertEquals("restarting", ServiceState.RESTARTING.toValue());
     }
 }

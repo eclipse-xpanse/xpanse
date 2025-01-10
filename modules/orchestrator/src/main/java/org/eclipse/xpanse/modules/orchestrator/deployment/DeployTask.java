@@ -8,7 +8,7 @@ package org.eclipse.xpanse.modules.orchestrator.deployment;
 
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 

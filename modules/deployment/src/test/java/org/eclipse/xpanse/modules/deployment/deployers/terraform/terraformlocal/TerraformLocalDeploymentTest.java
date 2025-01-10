@@ -32,14 +32,14 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourc
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
 import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;

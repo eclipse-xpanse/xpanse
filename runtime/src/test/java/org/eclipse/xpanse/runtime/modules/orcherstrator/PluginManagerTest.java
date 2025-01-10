@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.junit.jupiter.api.Assertions;

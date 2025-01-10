@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentScriptsCreationFailedException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FileLockedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FileLockedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

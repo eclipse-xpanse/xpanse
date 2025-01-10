@@ -33,7 +33,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -323,10 +323,10 @@ public class ServiceConfigurationManager {
             UUID orderId, ServiceDeploymentEntity entity, Map<String, Object> updateRequestMap) {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
         serviceOrderEntity.setOrderId(orderId);
-        if (Objects.nonNull(entity.getServiceOrderList())) {
-            entity.getServiceOrderList().add(serviceOrderEntity);
+        if (Objects.nonNull(entity.getServiceOrders())) {
+            entity.getServiceOrders().add(serviceOrderEntity);
         } else {
-            entity.setServiceOrderList(List.of(serviceOrderEntity));
+            entity.setServiceOrders(List.of(serviceOrderEntity));
         }
         serviceOrderEntity.setServiceDeploymentEntity(entity);
         serviceOrderEntity.setTaskType(ServiceOrderType.CONFIG_CHANGE);
@@ -554,14 +554,14 @@ public class ServiceConfigurationManager {
         ServiceDeploymentEntity deployedService =
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
         Stream<ServiceResourceEntity> resourceEntities =
-                deployedService.getDeployResourceList().stream();
+                deployedService.getDeployResources().stream();
         if (Objects.nonNull(resourceKind)) {
             resourceEntities =
                     resourceEntities.filter(
                             resourceEntity ->
                                     resourceEntity.getResourceKind().equals(resourceKind));
         }
-        return EntityTransUtils.transToDeployResourceList(resourceEntities.toList());
+        return EntityTransUtils.transToDeployResources(resourceEntities.toList());
     }
 
     /**
@@ -649,7 +649,7 @@ public class ServiceConfigurationManager {
 
     private void updateServiceConfiguration(ServiceChangeDetailsEntity request) {
         ServiceConfigurationEntity serviceConfigurationEntity =
-                request.getServiceDeploymentEntity().getServiceConfigurationEntity();
+                request.getServiceDeploymentEntity().getServiceConfiguration();
         Map<String, Object> config =
                 (Map<String, Object>) request.getServiceOrderEntity().getRequestBody();
         serviceConfigurationEntity.setConfiguration(config);

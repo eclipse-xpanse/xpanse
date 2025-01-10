@@ -10,7 +10,7 @@ import jakarta.annotation.Resource;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.DeployerNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.DeployerNotFoundException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.springframework.context.ApplicationContext;
