@@ -16,6 +16,8 @@ public class MigrateConstants {
     public static final String MIGRATE_REQUEST = "migrateRequest";
     public static final String IS_DEPLOY_SUCCESS = "isDeploySuccess";
     public static final String IS_DESTROY_SUCCESS = "isDestroySuccess";
+    public static final String DEPLOY_RESULT = "deployResult";
+    public static final String DESTROY_RESULT = "destroyResult";
     public static final String DEPLOY_RETRY_NUM = "deployRetryNum";
     public static final String DESTROY_RETRY_NUM = "destroyRetryNum";
     public static final String IS_RETRY_TASK = "isRetryTask";

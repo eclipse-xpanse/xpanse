@@ -11,9 +11,7 @@ import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMI
 
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -25,7 +23,9 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceOrderStatusChangePolling;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
@@ -36,7 +36,6 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.async.DeferredResult;
 
 /** Bean to manage service order tasks. */
@@ -68,32 +67,12 @@ public class ServiceOrderManager {
         orderTask.setOriginalServiceId(task.getOriginalServiceId());
         orderTask.setWorkflowId(task.getWorkflowId());
         orderTask.setTaskStatus(TaskStatus.CREATED);
-        Map<String, Object> requestBody = new HashMap<>();
-        if (Objects.nonNull(task.getDeployRequest())) {
-            requestBody.put("deployRequest", task.getDeployRequest());
-        }
-        if (Objects.nonNull(task.getRequest())) {
-            requestBody.put("request", task.getRequest());
-        }
+        orderTask.setRequestBody(task.getRequest());
         if (Objects.nonNull(task.getOcl()) && Objects.nonNull(task.getOcl().getServiceActions())) {
-            requestBody.put("serviceAction", task.getOcl().getServiceActions());
-        }
-        orderTask.setRequestBody(requestBody);
-        if (Objects.nonNull(serviceDeploymentEntity)) {
-            orderTask.setPreviousDeployRequest(serviceDeploymentEntity.getDeployRequest());
-            orderTask.setPreviousDeployedResources(
-                    EntityTransUtils.transToDeployResourceList(
-                            serviceDeploymentEntity.getDeployResourceList()));
-            if (!CollectionUtils.isEmpty(serviceDeploymentEntity.getDeploymentGeneratedFiles())) {
-                serviceDeploymentEntity.setDeploymentGeneratedFiles(
-                        new HashMap<>(serviceDeploymentEntity.getDeploymentGeneratedFiles()));
-            }
-            if (!CollectionUtils.isEmpty(serviceDeploymentEntity.getOutputProperties())) {
-                orderTask.setPreviousDeployedServiceProperties(
-                        new HashMap<>(serviceDeploymentEntity.getOutputProperties()));
-            }
+            orderTask.setServiceActions(task.getOcl().getServiceActions());
         }
         orderTask.setHandler(handler);
+        orderTask.setDeployRequest(task.getDeployRequest());
         return serviceOrderStorage.storeAndFlush(orderTask);
     }
 
@@ -132,6 +111,29 @@ public class ServiceOrderManager {
         if (Objects.nonNull(errorResponse)) {
             serviceOrder.setErrorResponse(errorResponse);
         }
+        serviceOrderStorage.storeAndFlush(serviceOrder);
+    }
+
+    /**
+     * Complete order progress.
+     *
+     * @param orderId id of service order.
+     * @param deployResult deploy result of this order.
+     */
+    public void completeOrderProgressWithDeployResult(UUID orderId, DeployResult deployResult) {
+        ServiceOrderEntity serviceOrder = serviceOrderStorage.getEntityById(orderId);
+        if (deployResult.getIsTaskSuccessful()) {
+            serviceOrder.setTaskStatus(TaskStatus.SUCCESSFUL);
+        } else {
+            serviceOrder.setTaskStatus(TaskStatus.FAILED);
+            ErrorResponse errorResponse =
+                    ErrorResponse.errorResponse(
+                            ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                            List.of(deployResult.getMessage()));
+            serviceOrder.setErrorResponse(errorResponse);
+        }
+        serviceOrder.setCompletedTime(OffsetDateTime.now());
+        serviceOrder.setDeployResult(deployResult);
         serviceOrderStorage.storeAndFlush(serviceOrder);
     }
 

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.VariableValidationFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.springframework.util.CollectionUtils;
 

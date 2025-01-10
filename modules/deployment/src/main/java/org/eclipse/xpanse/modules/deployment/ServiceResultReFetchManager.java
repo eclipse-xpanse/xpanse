@@ -44,7 +44,7 @@ public class ServiceResultReFetchManager {
 
     private ServiceOrderEntity getServiceOrderEntityForDeployedService(
             ServiceDeploymentEntity serviceDeployment) {
-        List<ServiceOrderEntity> serviceOrderEntities = serviceDeployment.getServiceOrderList();
+        List<ServiceOrderEntity> serviceOrderEntities = serviceDeployment.getServiceOrders();
         ServiceOrderEntity serviceOrderEntity = null;
         if (serviceDeployment
                 .getServiceDeploymentState()

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.VariableValidationFailedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

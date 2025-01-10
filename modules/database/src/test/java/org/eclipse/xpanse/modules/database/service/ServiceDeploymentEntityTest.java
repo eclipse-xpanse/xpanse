@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,7 +69,7 @@ class ServiceDeploymentEntityTest {
         test.setServiceState(SERVICE_RUN_STATE);
         test.setServiceTemplateId(SERVICE_TEMPLATE_ID);
         test.setDeployRequest(CREATE_REQUEST);
-        test.setDeployResourceList(DEPLOY_RESOURCE_LIST);
+        test.setDeployResources(DEPLOY_RESOURCE_LIST);
         test.setOutputProperties(OUTPUT_PROPERTIES);
         test.setDeploymentGeneratedFiles(DEPLOYMENT_GENERATED_FILES);
         test.setResultMessage(RESULT_MESSAGE);
@@ -93,7 +93,7 @@ class ServiceDeploymentEntityTest {
         assertEquals(SERVICE_RUN_STATE, test.getServiceState());
         assertEquals(SERVICE_TEMPLATE_ID, test.getServiceTemplateId());
         assertEquals(CREATE_REQUEST, test.getDeployRequest());
-        assertEquals(DEPLOY_RESOURCE_LIST, test.getDeployResourceList());
+        assertEquals(DEPLOY_RESOURCE_LIST, test.getDeployResources());
         assertEquals(OUTPUT_PROPERTIES, test.getOutputProperties());
         assertEquals(DEPLOYMENT_GENERATED_FILES, test.getDeploymentGeneratedFiles());
         assertEquals(RESULT_MESSAGE, test.getResultMessage());

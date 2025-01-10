@@ -6,15 +6,15 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,12 +34,11 @@ class ServiceOrderEntityTest {
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
     private final Handler handler = Handler.TERRAFORM_LOCAL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
-    @Mock private DeployRequest mockPreviousDeployRequest;
-    @Mock private List<DeployResource> mockPreviousDeployedResources;
-    @Mock private Map<String, String> mockPreviousDeployedResultProperties;
-    @Mock private Map<String, String> mockPreviousDeployedServiceProperties;
-    @Mock private Object mockRequest;
+    @Mock private DeployRequest mockDeployRequest;
+    @Mock private DeployResult mockDeployResult;
+    @Mock private Object mockRequestBody;
     @Mock private ServiceDeploymentEntity mockServiceDeploymentEntity;
+    @Mock private List<ServiceAction> mockServiceActions;
     private ServiceOrderEntity test;
 
     @BeforeEach
@@ -51,17 +50,16 @@ class ServiceOrderEntityTest {
         test.setServiceDeploymentEntity(mockServiceDeploymentEntity);
         test.setOriginalServiceId(uuid);
         test.setTaskType(taskType);
+        test.setRequestBody(mockRequestBody);
         test.setUserId(userId);
         test.setStartedTime(startedTime);
         test.setCompletedTime(completedTime);
-        test.setErrorResponse(errorResponse);
         test.setTaskStatus(taskStatus);
-        test.setPreviousDeployRequest(mockPreviousDeployRequest);
-        test.setRequestBody(mockRequest);
-        test.setPreviousDeployedResources(mockPreviousDeployedResources);
-        test.setPreviousDeployedResultProperties(mockPreviousDeployedResultProperties);
-        test.setPreviousDeployedServiceProperties(mockPreviousDeployedServiceProperties);
+        test.setErrorResponse(errorResponse);
         test.setHandler(handler);
+        test.setDeployRequest(mockDeployRequest);
+        test.setDeployResult(mockDeployResult);
+        test.setServiceActions(mockServiceActions);
     }
 
     @Test
@@ -72,19 +70,16 @@ class ServiceOrderEntityTest {
         assertThat(test.getOriginalServiceId()).isEqualTo(uuid);
         assertThat(test.getWorkflowId()).isEqualTo(uuid.toString());
         assertThat(test.getTaskType()).isEqualTo(taskType);
+        assertThat(test.getRequestBody()).isEqualTo(mockRequestBody);
         assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
         assertThat(test.getErrorResponse()).isEqualTo(errorResponse);
         assertThat(test.getCompletedTime()).isEqualTo(completedTime);
         assertThat(test.getStartedTime()).isEqualTo(startedTime);
-        assertThat(test.getPreviousDeployRequest()).isEqualTo(mockPreviousDeployRequest);
-        assertThat(test.getPreviousDeployedResources()).isEqualTo(mockPreviousDeployedResources);
-        assertThat(test.getPreviousDeployedResultProperties())
-                .isEqualTo(mockPreviousDeployedResultProperties);
-        assertThat(test.getPreviousDeployedServiceProperties())
-                .isEqualTo(mockPreviousDeployedServiceProperties);
-        assertThat(test.getRequestBody()).isEqualTo(mockRequest);
         assertThat(test.getHandler()).isEqualTo(handler);
+        assertThat(test.getDeployRequest()).isEqualTo(mockDeployRequest);
+        assertThat(test.getDeployResult()).isEqualTo(mockDeployResult);
+        assertThat(test.getServiceActions()).isEqualTo(mockServiceActions);
     }
 
     @Test
@@ -117,6 +112,8 @@ class ServiceOrderEntityTest {
                         + uuid
                         + ", taskType="
                         + taskType
+                        + ", requestBody="
+                        + mockRequestBody
                         + ", userId="
                         + userId
                         + ", taskStatus="
@@ -127,18 +124,14 @@ class ServiceOrderEntityTest {
                         + startedTime
                         + ", completedTime="
                         + completedTime
-                        + ", previousDeployRequest="
-                        + mockPreviousDeployRequest
-                        + ", previousDeployedResources="
-                        + mockPreviousDeployedResources
-                        + ", previousDeployedServiceProperties="
-                        + mockPreviousDeployedServiceProperties
-                        + ", previousDeployedResultProperties="
-                        + mockPreviousDeployedResultProperties
-                        + ", requestBody="
-                        + mockRequest
                         + ", handler="
                         + handler
+                        + ", deployRequest="
+                        + mockDeployRequest
+                        + ", deployResult="
+                        + mockDeployResult
+                        + ", serviceActions="
+                        + mockServiceActions
                         + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

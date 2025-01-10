@@ -6,14 +6,14 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,11 +38,9 @@ class ServiceOrderDetailsTest {
     private final Handler handler = Handler.INTERNAL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
     @Mock private Object requestBody;
-    @Mock private DeployRequest mockPreviousDeployRequest;
-    @Mock private DeployRequest mockNewDeployRequest;
-    @Mock private List<DeployResource> mockPreviousDeployedResources;
-    @Mock private Map<String, String> mockPreviousDeployedResultProperties;
-    @Mock private Map<String, String> mockPreviousDeployedServiceProperties;
+    @Mock private DeployRequest mockDeployRequest;
+    @Mock private DeployResult mockDeployResult;
+    @Mock private List<ServiceAction> mockServiceActions;
 
     private ServiceOrderDetails test;
 
@@ -61,12 +59,10 @@ class ServiceOrderDetailsTest {
         test.setErrorResponse(errorResponse);
         test.setTaskStatus(taskStatus);
         test.setRequestBody(requestBody);
-        test.setPreviousDeployRequest(mockPreviousDeployRequest);
-        test.setNewDeployRequest(mockNewDeployRequest);
-        test.setPreviousDeployedResources(mockPreviousDeployedResources);
-        test.setPreviousDeployedResultProperties(mockPreviousDeployedResultProperties);
-        test.setPreviousDeployedServiceProperties(mockPreviousDeployedServiceProperties);
         test.setHandler(handler);
+        test.setDeployRequest(mockDeployRequest);
+        test.setDeployResult(mockDeployResult);
+        test.setServiceActions(mockServiceActions);
     }
 
     @Test
@@ -83,14 +79,10 @@ class ServiceOrderDetailsTest {
         assertThat(test.getCompletedTime()).isEqualTo(completedTime);
         assertThat(test.getStartedTime()).isEqualTo(startedTime);
         assertThat(test.getRequestBody()).isEqualTo(requestBody);
-        assertThat(test.getPreviousDeployRequest()).isEqualTo(mockPreviousDeployRequest);
-        assertThat(test.getNewDeployRequest()).isEqualTo(mockNewDeployRequest);
-        assertThat(test.getPreviousDeployedResources()).isEqualTo(mockPreviousDeployedResources);
-        assertThat(test.getPreviousDeployedResultProperties())
-                .isEqualTo(mockPreviousDeployedResultProperties);
-        assertThat(test.getPreviousDeployedServiceProperties())
-                .isEqualTo(mockPreviousDeployedServiceProperties);
         assertThat(test.getHandler()).isEqualTo(handler);
+        assertThat(test.getDeployRequest()).isEqualTo(mockDeployRequest);
+        assertThat(test.getDeployResult()).isEqualTo(mockDeployResult);
+        assertThat(test.getServiceActions()).isEqualTo(mockServiceActions);
     }
 
     @Test
@@ -117,6 +109,8 @@ class ServiceOrderDetailsTest {
                         + serviceId
                         + ", taskType="
                         + taskType
+                        + ", requestBody="
+                        + requestBody
                         + ", taskStatus="
                         + taskStatus
                         + ", originalServiceId="
@@ -133,20 +127,14 @@ class ServiceOrderDetailsTest {
                         + startedTime
                         + ", completedTime="
                         + completedTime
-                        + ", requestBody="
-                        + requestBody
-                        + ", previousDeployRequest="
-                        + mockPreviousDeployRequest
-                        + ", newDeployRequest="
-                        + mockNewDeployRequest
-                        + ", previousDeployedResources="
-                        + mockPreviousDeployedResources
-                        + ", previousDeployedServiceProperties="
-                        + mockPreviousDeployedServiceProperties
-                        + ", previousDeployedResultProperties="
-                        + mockPreviousDeployedResultProperties
                         + ", handler="
                         + handler
+                        + ", deployRequest="
+                        + mockDeployRequest
+                        + ", deployResult="
+                        + mockDeployResult
+                        + ", serviceActions="
+                        + mockServiceActions
                         + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

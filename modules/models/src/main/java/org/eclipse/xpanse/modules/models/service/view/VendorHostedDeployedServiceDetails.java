@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 
 /** Define view object for vendor hosted detail of the deployed service. */
 @EqualsAndHashCode(callSuper = true)

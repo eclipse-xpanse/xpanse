@@ -34,20 +34,21 @@ import org.eclipse.xpanse.modules.deployment.polling.ServiceDeploymentStatusChan
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.deploy.DeploymentStatusUpdate;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceFlavorDowngradeNotAllowed;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceModifyParamsNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deployment.DeploymentStatusUpdate;
+import org.eclipse.xpanse.modules.models.service.deployment.ModifyRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.BillingModeNotSupported;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.EulaNotAccepted;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceFlavorDowngradeNotAllowed;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceModifyParamsNotFoundException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaValidator;
@@ -59,7 +60,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
@@ -147,10 +147,10 @@ public class DeployService {
     public ServiceOrder createOrderToModifyDeployedService(
             UUID serviceId, ModifyRequest modifyRequest) {
         MDC.put(SERVICE_ID, serviceId.toString());
-        modifyRequest.setUserId(this.userServiceHelper.getCurrentUserId());
         String errMsg = "No permissions to modify services belonging to other users.";
         ServiceDeploymentEntity serviceDeploymentEntity =
                 getServiceOwnedByCurrentUser(serviceId, errMsg);
+        modifyRequest.setUserId(this.userServiceHelper.getCurrentUserId());
         DeployTask modifyTask = getModifyTask(modifyRequest, serviceDeploymentEntity);
         modifyService(modifyTask, serviceDeploymentEntity);
         log.info(
@@ -229,14 +229,14 @@ public class DeployService {
         String errorMsg = "No permissions to view resources of services belonging to other users.";
         ServiceDeploymentEntity deployedService = getServiceOwnedByCurrentUser(serviceId, errorMsg);
         Stream<ServiceResourceEntity> resourceEntities =
-                deployedService.getDeployResourceList().stream();
+                deployedService.getDeployResources().stream();
         if (Objects.nonNull(resourceKind)) {
             resourceEntities =
                     resourceEntities.filter(
                             resourceEntity ->
                                     resourceEntity.getResourceKind().equals(resourceKind));
         }
-        return EntityTransUtils.transToDeployResourceList(resourceEntities.toList());
+        return EntityTransUtils.transToDeployResources(resourceEntities.toList());
     }
 
     /**
@@ -379,7 +379,7 @@ public class DeployService {
         entity.setFlavor(deployTask.getDeployRequest().getFlavor());
         entity.setUserId(deployTask.getUserId());
         entity.setDeployRequest(deployTask.getDeployRequest());
-        entity.setDeployResourceList(new ArrayList<>());
+        entity.setDeployResources(new ArrayList<>());
         entity.setServiceVendor(deployTask.getServiceVendor());
         entity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
         entity.setServiceTemplateId(deployTask.getServiceTemplateId());
@@ -618,7 +618,7 @@ public class DeployService {
         ServiceOrderEntity serviceOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(
                         purgeTask, serviceDeployment, handler);
-        if (!CollectionUtils.isEmpty(serviceDeployment.getDeployResourceList())) {
+        if (!CollectionUtils.isEmpty(serviceDeployment.getDeployResources())) {
             try {
                 log.info(
                         "Resources of service {} need to clear with order task {}",
