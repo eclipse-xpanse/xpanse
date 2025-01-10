@@ -9,7 +9,6 @@ package org.eclipse.xpanse.modules.deployment;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -43,7 +41,6 @@ import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNo
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleHostInfo;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeRequest;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
@@ -58,7 +55,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.hibernate.exception.LockTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,7 +81,7 @@ public class ServiceConfigurationManager {
 
     @Resource private ServiceOrderStorage serviceOrderStorage;
 
-    @Resource private UserServiceHelper userServiceHelper;
+    @Resource private ServiceChangeDetailsManager serviceChangeDetailsManager;
 
     @Resource
     private ServiceConfigurationVariablesJsonSchemaValidator
@@ -119,6 +115,7 @@ public class ServiceConfigurationManager {
      * @param serviceId The id of the deployed service.
      * @param configurationUpdate serviceConfigurationUpdate.
      */
+    @Transactional
     public ServiceOrder changeServiceConfiguration(
             UUID serviceId, ServiceConfigurationUpdate configurationUpdate) {
         try {
@@ -152,31 +149,6 @@ public class ServiceConfigurationManager {
         }
     }
 
-    /** Query service change details update request by queryModel. */
-    public List<ServiceChangeOrderDetails> getAllServiceConfigurationChangeDetails(
-            UUID orderId,
-            UUID serviceId,
-            String resourceName,
-            String configManager,
-            ServiceConfigurationStatus status) {
-        UUID uuidOrderId = Objects.isNull(orderId) ? null : orderId;
-        ServiceChangeDetailsQueryModel queryModel =
-                new ServiceChangeDetailsQueryModel(
-                        uuidOrderId, serviceId, resourceName, configManager, status);
-        List<ServiceChangeDetailsEntity> requests =
-                serviceChangeDetailsStorage.listServiceChangeDetails(queryModel);
-
-        if (CollectionUtils.isEmpty(requests)) {
-            String errorMsg =
-                    String.format(
-                            "Service change details request with service id %s not found, ",
-                            serviceId);
-            log.error(errorMsg);
-            throw new ServiceChangeDetailsEntityNotFoundException(errorMsg);
-        }
-        return EntityTransUtils.transToServiceChangeOrderDetails(requests);
-    }
-
     private void addServiceChangeDetails(
             UUID orderId,
             UUID serviceId,
@@ -194,148 +166,19 @@ public class ServiceConfigurationManager {
         List<ServiceChangeParameter> configurationParameters =
                 configManage.getConfigurationParameters();
 
-        List<ServiceChangeScript> actionManageScripts =
-                ocl.getServiceActions().stream()
-                        .flatMap(action -> action.getActionManageScripts().stream())
-                        .collect(Collectors.toList());
-
-        List<ServiceChangeParameter> actionParameters =
-                ocl.getServiceActions().stream()
-                        .flatMap(action -> action.getActionParameters().stream())
-                        .collect(Collectors.toList());
-
-        List<ServiceChangeDetailsEntity> requests = new ArrayList<>();
-        requests.addAll(
-                getAllServiceChangeDetails(
+        List<ServiceChangeDetailsEntity> requests =
+                serviceChangeDetailsManager.getAllServiceChangeDetails(
                         orderId,
                         serviceDeployment,
                         updateRequestMap,
                         deployResourceMap,
                         configManageScripts,
-                        configurationParameters));
-        requests.addAll(
-                getAllServiceChangeDetails(
-                        orderId,
-                        serviceDeployment,
-                        updateRequestMap,
-                        deployResourceMap,
-                        actionManageScripts,
-                        actionParameters));
+                        configurationParameters,
+                        ServiceOrderType.CONFIG_CHANGE);
 
         if (!CollectionUtils.isEmpty(requests)) {
             serviceChangeDetailsStorage.saveAll(requests);
         }
-    }
-
-    private List<ServiceChangeDetailsEntity> getAllServiceChangeDetails(
-            UUID orderId,
-            ServiceDeploymentEntity serviceDeployment,
-            Map<String, Object> updateRequestMap,
-            Map<String, List<DeployResource>> deployResourceMap,
-            List<ServiceChangeScript> configManageScripts,
-            List<ServiceChangeParameter> configurationParameters) {
-
-        List<ServiceChangeDetailsEntity> requests = new ArrayList<>();
-        deployResourceMap.forEach(
-                (groupName, deployResourceList) ->
-                        configManageScripts.forEach(
-                                serviceChangeScript -> {
-                                    if (serviceChangeScript.getChangeHandler().equals(groupName)) {
-                                        if (!CollectionUtils.isEmpty(deployResourceList)) {
-                                            Map<String, Object> properties =
-                                                    getServiceChangeDetailsProperties(
-                                                            groupName,
-                                                            configurationParameters,
-                                                            updateRequestMap);
-                                            if (serviceChangeScript.getRunOnlyOnce()) {
-                                                ServiceChangeDetailsEntity request =
-                                                        getServiceChangeDetails(
-                                                                orderId,
-                                                                groupName,
-                                                                serviceDeployment,
-                                                                properties,
-                                                                updateRequestMap);
-                                                requests.add(request);
-                                            } else {
-                                                deployResourceList.forEach(
-                                                        deployResource -> {
-                                                            ServiceChangeDetailsEntity request =
-                                                                    getServiceChangeDetails(
-                                                                            orderId,
-                                                                            groupName,
-                                                                            serviceDeployment,
-                                                                            properties,
-                                                                            updateRequestMap);
-                                                            request.setResourceName(
-                                                                    deployResource
-                                                                            .getResourceName());
-                                                            requests.add(request);
-                                                        });
-                                            }
-                                        }
-                                    }
-                                }));
-        return requests;
-    }
-
-    private Map<String, Object> getServiceChangeDetailsProperties(
-            String groupName,
-            List<ServiceChangeParameter> params,
-            Map<String, Object> updateRequestMap) {
-
-        Map<String, Object> existsServiceConfig = new HashMap<>();
-        params.forEach(
-                serviceConfigurationParameter -> {
-                    if (groupName.equals(serviceConfigurationParameter.getManagedBy())) {
-                        existsServiceConfig.put(
-                                serviceConfigurationParameter.getName(),
-                                serviceConfigurationParameter.getInitialValue());
-                    }
-                });
-        updateRequestMap.forEach(
-                (k, v) -> {
-                    if (existsServiceConfig.containsKey(k)) {
-                        existsServiceConfig.put(k, v);
-                    }
-                });
-        return existsServiceConfig;
-    }
-
-    private ServiceChangeDetailsEntity getServiceChangeDetails(
-            UUID orderId,
-            String groupName,
-            ServiceDeploymentEntity entity,
-            Map<String, Object> properties,
-            Map<String, Object> updateRequestMap) {
-
-        ServiceChangeDetailsEntity request = new ServiceChangeDetailsEntity();
-        request.setId(UUID.randomUUID());
-        ServiceOrderEntity serviceOrderEntity = saveServiceOrder(orderId, entity, updateRequestMap);
-        request.setServiceOrderEntity(serviceOrderEntity);
-        request.setServiceDeploymentEntity(entity);
-        request.setChangeHandler(groupName);
-        request.setProperties(properties);
-        request.setStatus(ServiceConfigurationStatus.PENDING);
-        return request;
-    }
-
-    private ServiceOrderEntity saveServiceOrder(
-            UUID orderId, ServiceDeploymentEntity entity, Map<String, Object> updateRequestMap) {
-        ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
-        serviceOrderEntity.setOrderId(orderId);
-        if (Objects.nonNull(entity.getServiceOrderList())) {
-            entity.getServiceOrderList().add(serviceOrderEntity);
-        } else {
-            entity.setServiceOrderList(List.of(serviceOrderEntity));
-        }
-        serviceOrderEntity.setServiceDeploymentEntity(entity);
-        serviceOrderEntity.setTaskType(ServiceOrderType.CONFIG_CHANGE);
-        serviceOrderEntity.setUserId(userServiceHelper.getCurrentUserId());
-        serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
-        serviceOrderEntity.setStartedTime(OffsetDateTime.now());
-        serviceOrderEntity.setRequestBody(updateRequestMap);
-        serviceOrderEntity.setHandler(Handler.AGENT);
-        return serviceOrderStorage.storeAndFlush(serviceOrderEntity);
     }
 
     private void validate(

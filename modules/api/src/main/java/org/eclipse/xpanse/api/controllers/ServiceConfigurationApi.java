@@ -14,16 +14,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,7 +31,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -91,33 +87,5 @@ public class ServiceConfigurationApi {
             @Valid @RequestBody ServiceConfigurationUpdate serviceConfigurationUpdate) {
         return serviceConfigurationManager.changeServiceConfiguration(
                 serviceId, serviceConfigurationUpdate);
-    }
-
-    /** List all service configuration update request. */
-    @Tag(name = "ServiceConfiguration", description = "APIs for managing service's configuration.")
-    @GetMapping(value = "/services/config/requests", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(description = "List service's configuration.")
-    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
-    public List<ServiceChangeOrderDetails> getAllServiceConfigurationChangeDetails(
-            @Parameter(name = "serviceId", description = "Id of the deployed service")
-                    @RequestParam(name = "serviceId")
-                    UUID serviceId,
-            @Parameter(name = "orderId", description = "id of the service order")
-                    @RequestParam(name = "orderId", required = false)
-                    UUID orderId,
-            @Parameter(name = "resourceName", description = "name of the service resource")
-                    @RequestParam(name = "resourceName", required = false)
-                    String resourceName,
-            @Parameter(
-                            name = "configManager",
-                            description = "Manager of the service configuration parameter.")
-                    @RequestParam(name = "configManager", required = false)
-                    String configManager,
-            @Parameter(name = "status", description = "Status of the service configuration")
-                    @RequestParam(name = "status", required = false)
-                    ServiceConfigurationStatus status) {
-        return serviceConfigurationManager.getAllServiceConfigurationChangeDetails(
-                orderId, serviceId, resourceName, configManager, status);
     }
 }

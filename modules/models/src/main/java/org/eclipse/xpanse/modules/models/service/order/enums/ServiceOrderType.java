@@ -21,6 +21,7 @@ public enum ServiceOrderType {
     RECREATE("recreate"),
     LOCK_CHANGE("lockChange"),
     CONFIG_CHANGE("configChange"),
+    SERVICE_ACTION("service_action"),
     PURGE("purge"),
     SERVICE_START("serviceStart"),
     SERVICE_STOP("serviceStop"),
