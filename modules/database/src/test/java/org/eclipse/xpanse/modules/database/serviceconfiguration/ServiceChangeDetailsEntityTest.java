@@ -15,7 +15,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleTaskResult;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -29,7 +29,7 @@ public class ServiceChangeDetailsEntityTest {
     final String changeHandler = "zookeeper";
     final String resultMessage = "resultMessage";
     final Map<String, Object> properties = Map.of("k1", "v1", "k2", "v2");
-    final ServiceConfigurationStatus status = ServiceConfigurationStatus.PENDING;
+    final ServiceChangeStatus status = ServiceChangeStatus.PENDING;
     final List<AnsibleTaskResult> tasks = List.of();
     @Mock private ServiceDeploymentEntity serviceDeploymentEntity;
     @Mock private ServiceOrderEntity serviceOrderEntity;

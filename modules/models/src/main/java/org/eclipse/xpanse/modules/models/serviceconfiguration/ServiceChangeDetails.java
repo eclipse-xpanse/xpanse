@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 
 /** service change request details. */
 @Data
@@ -44,5 +44,5 @@ public class ServiceChangeDetails {
 
     @NotNull
     @Schema(description = "status of change service configuration update request.")
-    private ServiceConfigurationStatus status;
+    private ServiceChangeStatus status;
 }

@@ -10,7 +10,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 
 /** The query model for ServiceChangeDetailsEntity. */
 @Data
@@ -26,5 +26,5 @@ public class ServiceChangeDetailsQueryModel {
 
     private String configManager;
 
-    private ServiceConfigurationStatus status;
+    private ServiceChangeStatus status;
 }

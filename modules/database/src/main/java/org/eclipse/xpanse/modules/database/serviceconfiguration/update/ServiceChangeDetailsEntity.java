@@ -29,7 +29,7 @@ import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleTaskResult;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
@@ -86,7 +86,7 @@ public class ServiceChangeDetailsEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
-    private ServiceConfigurationStatus status;
+    private ServiceChangeStatus status;
 
     @Column(name = "TASK_RESULT", columnDefinition = "json")
     @Type(value = JsonType.class)

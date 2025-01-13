@@ -41,11 +41,11 @@ import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNo
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleHostInfo;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeRequest;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeRequest;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceChangeDetailsEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationNotFoundException;
@@ -205,9 +205,9 @@ public class ServiceConfigurationManager {
                 jsonObjectSchema);
     }
 
-    /** Query pending configuration change request for agent. */
+    /** Query pending service change request for agent. */
     @Transactional
-    public ResponseEntity<ServiceConfigurationChangeRequest> getPendingConfigurationChangeRequest(
+    public ResponseEntity<ServiceChangeRequest> getPendingServiceChangeRequest(
             String serviceId, String resourceName) {
         try {
             ServiceChangeDetailsEntity oldestRequest =
@@ -255,7 +255,7 @@ public class ServiceConfigurationManager {
         if (Objects.isNull(request.getResourceName())) {
             request.setResourceName(resourceName);
         }
-        request.setStatus(ServiceConfigurationStatus.PROCESSING);
+        request.setStatus(ServiceChangeStatus.PROCESSING);
         return serviceChangeDetailsStorage.storeAndFlush(request);
     }
 
@@ -263,11 +263,7 @@ public class ServiceConfigurationManager {
             String serviceId, String resourceName) {
         ServiceChangeDetailsQueryModel model =
                 new ServiceChangeDetailsQueryModel(
-                        null,
-                        UUID.fromString(serviceId),
-                        null,
-                        null,
-                        ServiceConfigurationStatus.PENDING);
+                        null, UUID.fromString(serviceId), null, null, ServiceChangeStatus.PENDING);
         List<ServiceChangeDetailsEntity> requests =
                 serviceChangeDetailsStorage.listServiceChangeDetails(model);
         if (CollectionUtils.isEmpty(requests)) {
@@ -325,19 +321,18 @@ public class ServiceConfigurationManager {
                 });
     }
 
-    private ServiceConfigurationChangeRequest getServiceConfigurationChangeRequest(
+    private ServiceChangeRequest getServiceConfigurationChangeRequest(
             ServiceChangeDetailsEntity request, List<DeployResource> deployResources) {
-        ServiceConfigurationChangeRequest serviceConfigurationChangeRequest =
-                new ServiceConfigurationChangeRequest();
-        serviceConfigurationChangeRequest.setChangeId(request.getId());
+        ServiceChangeRequest serviceChangeRequest = new ServiceChangeRequest();
+        serviceChangeRequest.setChangeId(request.getId());
         Optional<ServiceChangeScript> configManageScriptOptional = getConfigManageScript(request);
         configManageScriptOptional.ifPresent(
                 serviceChangeScript ->
-                        serviceConfigurationChangeRequest.setAnsibleScriptConfig(
+                        serviceChangeRequest.setAnsibleScriptConfig(
                                 serviceChangeScript.getAnsibleScriptConfig()));
-        serviceConfigurationChangeRequest.setConfigParameters(request.getProperties());
-        serviceConfigurationChangeRequest.setAnsibleInventory(getAnsibleInventory(deployResources));
-        return serviceConfigurationChangeRequest;
+        serviceChangeRequest.setConfigParameters(request.getProperties());
+        serviceChangeRequest.setAnsibleInventory(getAnsibleInventory(deployResources));
+        return serviceChangeRequest;
     }
 
     private Optional<ServiceChangeScript> getConfigManageScript(
@@ -408,36 +403,36 @@ public class ServiceConfigurationManager {
     }
 
     /**
-     * Method to update service configuration update result.
+     * Method to update service change result.
      *
      * @param changeId id of the update request.
-     * @param result result of the service configuration update request.
+     * @param result result of the service change request.
      */
-    public void updateConfigurationChangeResult(
+    public void updateServiceChangeResult(
             String changeId, ServiceConfigurationChangeResult result) {
         ServiceChangeDetailsEntity request =
                 serviceChangeDetailsStorage.findById(UUID.fromString(changeId));
         if (Objects.isNull(request)
-                || !ServiceConfigurationStatus.PROCESSING.equals(request.getStatus())) {
+                || !ServiceChangeStatus.PROCESSING.equals(request.getStatus())) {
             String errorMsg =
                     String.format(
-                            "Service Configuration change details with id %s , status %s not found",
-                            changeId, ServiceConfigurationStatus.PROCESSING);
+                            "Service change details with id %s , status %s not found",
+                            changeId, ServiceChangeStatus.PROCESSING);
             log.error(errorMsg);
             throw new ServiceChangeDetailsEntityNotFoundException(errorMsg);
         }
         if (result.getIsSuccessful()) {
-            request.setStatus(ServiceConfigurationStatus.SUCCESSFUL);
+            request.setStatus(ServiceChangeStatus.SUCCESSFUL);
         } else {
-            request.setStatus(ServiceConfigurationStatus.ERROR);
+            request.setStatus(ServiceChangeStatus.ERROR);
             request.setResultMessage(result.getError());
         }
         request.setTasks(result.getTasks());
         serviceChangeDetailsStorage.storeAndFlush(request);
-        updateServiceConfigurationChangeResult(request);
+        updateServiceChangeResult(request);
     }
 
-    private void updateServiceConfigurationChangeResult(ServiceChangeDetailsEntity request) {
+    private void updateServiceChangeResult(ServiceChangeDetailsEntity request) {
         ServiceChangeDetailsQueryModel model =
                 new ServiceChangeDetailsQueryModel(
                         request.getServiceOrderEntity().getOrderId(),
@@ -461,10 +456,9 @@ public class ServiceConfigurationManager {
                 requests.stream()
                         .allMatch(
                                 changeDetails ->
-                                        changeDetails.getStatus()
-                                                        == ServiceConfigurationStatus.SUCCESSFUL
+                                        changeDetails.getStatus() == ServiceChangeStatus.SUCCESSFUL
                                                 || changeDetails.getStatus()
-                                                        == ServiceConfigurationStatus.ERROR);
+                                                        == ServiceChangeStatus.ERROR);
         if (isNeedUpdateServiceConfigurationChange) {
             ServiceOrderEntity entity = request.getServiceOrderEntity();
             if (Objects.nonNull(entity)) {
@@ -473,7 +467,7 @@ public class ServiceConfigurationManager {
                                 .allMatch(
                                         changeDetails ->
                                                 request.getStatus()
-                                                        == ServiceConfigurationStatus.SUCCESSFUL);
+                                                        == ServiceChangeStatus.SUCCESSFUL);
                 if (isAllSuccessful) {
                     updateServiceOrderByResult(entity, TaskStatus.SUCCESSFUL);
                     updateServiceConfiguration(request);

@@ -10,14 +10,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-public class ServiceConfigurationChangeRequestTest {
+public class ServiceChangeRequestTest {
 
     public static final UUID CHANGE_ID = UUID.randomUUID();
     public static final Map<String, Object> configParameters = Map.of("changeId", CHANGE_ID);
     public static final Map<String, Object> ansibleInventory = Map.of("changeId", CHANGE_ID);
     public static final AnsibleScriptConfig ansibleScriptConfig = new AnsibleScriptConfig();
-    private final ServiceConfigurationChangeRequest changeRequestForAgent =
-            new ServiceConfigurationChangeRequest();
+    private final ServiceChangeRequest changeRequestForAgent = new ServiceChangeRequest();
 
     @BeforeEach
     void setUp() {
@@ -41,10 +40,10 @@ public class ServiceConfigurationChangeRequestTest {
         Object obj = new Object();
         assertThat(changeRequestForAgent).isNotEqualTo(obj);
         assertThat(changeRequestForAgent.hashCode()).isNotEqualTo(obj.hashCode());
-        ServiceConfigurationChangeRequest test1 = new ServiceConfigurationChangeRequest();
+        ServiceChangeRequest test1 = new ServiceChangeRequest();
         assertThat(changeRequestForAgent).isNotEqualTo(test1);
         assertThat(changeRequestForAgent.hashCode()).isNotEqualTo(test1.hashCode());
-        ServiceConfigurationChangeRequest test2 = new ServiceConfigurationChangeRequest();
+        ServiceChangeRequest test2 = new ServiceChangeRequest();
         BeanUtils.copyProperties(changeRequestForAgent, test2);
         assertThat(changeRequestForAgent).isEqualTo(test2);
         assertThat(changeRequestForAgent.hashCode()).isEqualTo(test2.hashCode());
@@ -53,14 +52,13 @@ public class ServiceConfigurationChangeRequestTest {
     @Test
     void testCanEqual() {
         assertThat(changeRequestForAgent.canEqual("other")).isFalse();
-        assertThat(changeRequestForAgent.canEqual(new ServiceConfigurationChangeRequest()))
-                .isTrue();
+        assertThat(changeRequestForAgent.canEqual(new ServiceChangeRequest())).isTrue();
     }
 
     @Test
     void testToString() {
         String result =
-                "ServiceConfigurationChangeRequest(changeId="
+                "ServiceChangeRequest(changeId="
                         + CHANGE_ID
                         + ", configParameters="
                         + configParameters

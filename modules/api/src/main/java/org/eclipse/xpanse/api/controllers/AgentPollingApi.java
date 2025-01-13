@@ -16,7 +16,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeRequest;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeRequest;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,36 +40,31 @@ public class AgentPollingApi {
     @Resource private ServiceConfigurationManager serviceConfigurationManager;
 
     /**
-     * Query pending configuration change request for agent.
+     * Query pending service change request for agent.
      *
      * @param serviceId the id of service.
      * @param resourceName the name of service`s resource.
-     * @return ServiceConfigurationChangeRequest.
+     * @return ServiceChangeRequest.
      */
     @Tag(
             name = "Agent Api",
-            description = "APIs for agent to poll pending configuration change requests.")
+            description = "APIs for agent to poll pending service change requests.")
     @GetMapping(
             value = "/agent/poll/{serviceId}/{resourceName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(description = "Get pending configuration change request for agents to poll.")
+    @Operation(description = "Get pending service change request for agents to poll.")
     @AuditApiRequest(enabled = false)
     @ApiResponses({
         @ApiResponse(
                 responseCode = "204",
-                description = "no pending configuration update requests",
+                description = "no pending service change update requests",
                 content = @Content),
         @ApiResponse(
                 responseCode = "200",
-                description = "pending configuration update request details",
-                content =
-                        @Content(
-                                schema =
-                                        @Schema(
-                                                implementation =
-                                                        ServiceConfigurationChangeRequest.class)))
+                description = "pending service change update request details",
+                content = @Content(schema = @Schema(implementation = ServiceChangeRequest.class)))
     })
-    public ResponseEntity<ServiceConfigurationChangeRequest> getPendingConfigurationChangeRequest(
+    public ResponseEntity<ServiceChangeRequest> getPendingServiceChangeRequest(
             @Parameter(name = "serviceId", description = "The id of the deployed service")
                     @PathVariable("serviceId")
                     String serviceId,
@@ -78,34 +73,31 @@ public class AgentPollingApi {
                             description = "The name of the resource of deployed service")
                     @PathVariable("resourceName")
                     String resourceName) {
-        return serviceConfigurationManager.getPendingConfigurationChangeRequest(
-                serviceId, resourceName);
+        return serviceConfigurationManager.getPendingServiceChangeRequest(serviceId, resourceName);
     }
 
     /**
-     * Method to update service configuration update result.
+     * Method to update service change result.
      *
      * @param changeId id of the update request.
-     * @param result result of the service configuration update request.
+     * @param result result of the service change request.
      */
     @Tag(
             name = "Agent Api",
-            description = "APIs for agent to poll pending configuration change requests.")
+            description = "APIs for agent to poll pending service change requests.")
     @PutMapping(
             value = "/agent/update/status/{changeId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(description = "Update configuration change result for agents.")
+    @Operation(description = "Update service change result for agents.")
     @AuditApiRequest(enabled = false)
-    public void updateConfigurationChangeResult(
+    public void updateServiceChangeResult(
             @Parameter(name = "changeId", description = "id of the update request.")
                     @PathVariable("changeId")
                     String changeId,
-            @Parameter(
-                            name = "result",
-                            description = "result of the service configuration update request.")
+            @Parameter(name = "result", description = "result of the service change request.")
                     @RequestBody
                     ServiceConfigurationChangeResult result) {
-        serviceConfigurationManager.updateConfigurationChangeResult(changeId, result);
+        serviceConfigurationManager.updateServiceChangeResult(changeId, result);
     }
 }
