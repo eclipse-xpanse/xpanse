@@ -28,7 +28,7 @@ import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceChangeDetailsEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
@@ -108,7 +108,7 @@ public class ServiceChangeDetailsManager {
             String serviceId,
             String resourceName,
             String configManager,
-            ServiceConfigurationStatus status) {
+            ServiceChangeStatus status) {
         UUID uuidOrderId = StringUtils.isEmpty(orderId) ? null : UUID.fromString(orderId);
         ServiceChangeDetailsQueryModel queryModel =
                 new ServiceChangeDetailsQueryModel(
@@ -169,7 +169,7 @@ public class ServiceChangeDetailsManager {
         request.setServiceDeploymentEntity(entity);
         request.setChangeHandler(groupName);
         request.setProperties(properties);
-        request.setStatus(ServiceConfigurationStatus.PENDING);
+        request.setStatus(ServiceChangeStatus.PENDING);
         return request;
     }
 

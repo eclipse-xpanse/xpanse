@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/** ServiceConfigurationUpdate status. */
-public enum ServiceConfigurationStatus {
+/** Service Change Status. */
+public enum ServiceChangeStatus {
     PENDING("pending"),
     PROCESSING("processing"),
     SUCCESSFUL("successful"),
@@ -20,23 +20,23 @@ public enum ServiceConfigurationStatus {
 
     private final String status;
 
-    ServiceConfigurationStatus(String status) {
+    ServiceChangeStatus(String status) {
         this.status = status;
     }
 
-    /** For ServiceConfigurationStatus serialize. */
+    /** For ServiceChangeStatus serialize. */
     @JsonCreator
-    public static ServiceConfigurationStatus getByValue(String status) {
-        for (ServiceConfigurationStatus serviceConfigurationStatus : values()) {
-            if (StringUtils.equalsIgnoreCase(serviceConfigurationStatus.status, status)) {
-                return serviceConfigurationStatus;
+    public static ServiceChangeStatus getByValue(String status) {
+        for (ServiceChangeStatus serviceChangeStatus : values()) {
+            if (StringUtils.equalsIgnoreCase(serviceChangeStatus.status, status)) {
+                return serviceChangeStatus;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("ServiceConfigurationStatus value %s is not supported.", status));
+                String.format("ServiceChangeStatus value %s is not supported.", status));
     }
 
-    /** For ServiceConfigurationStatus deserialize. */
+    /** For ServiceChangeStatus deserialize. */
     @JsonValue
     public String toValue() {
         return this.status;

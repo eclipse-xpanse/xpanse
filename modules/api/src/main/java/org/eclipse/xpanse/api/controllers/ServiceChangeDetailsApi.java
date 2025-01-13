@@ -13,7 +13,7 @@ import java.util.List;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceChangeDetailsManager;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +48,7 @@ public class ServiceChangeDetailsApi {
                     String configManager,
             @Parameter(name = "status", description = "Status of the service configuration")
                     @RequestParam(name = "status", required = false)
-                    ServiceConfigurationStatus status) {
+                    ServiceChangeStatus status) {
         return serviceChangeDetailsManager.getServiceChangeRequestDetails(
                 orderId, serviceId, resourceName, configManager, status);
     }

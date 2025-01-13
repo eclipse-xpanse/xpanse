@@ -22,7 +22,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.DatabaseServiceChangeDetailsStorage;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceChangeDetailsRepository;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +48,7 @@ public class DatabaseServiceChangeDetailsStorageTest {
         request.setChangeHandler("TestConfigManager");
         request.setResultMessage("TestResult");
         request.setProperties(Map.of("key", "value"));
-        request.setStatus(ServiceConfigurationStatus.PENDING);
+        request.setStatus(ServiceChangeStatus.PENDING);
     }
 
     @Test

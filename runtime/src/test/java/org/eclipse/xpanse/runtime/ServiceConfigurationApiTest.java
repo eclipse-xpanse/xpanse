@@ -31,7 +31,7 @@ import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceConfigurationStatus;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
@@ -107,7 +107,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
                                             requestDetails ->
                                                     assertEquals(
                                                             requestDetails.getStatus(),
-                                                            ServiceConfigurationStatus.PENDING)));
+                                                            ServiceChangeStatus.PENDING)));
             requests.forEach(
                     request ->
                             request.getChangeRequests()
