@@ -20,6 +20,7 @@ class DeployVariableSchemaValidatorTest {
         deployVariable.setKind(DeployVariableKind.FIX_ENV);
         deployVariable.setDataType(DeployVariableDataType.STRING);
         deployVariable.setExample("example");
+        deployVariable.setValue("value");
         deployVariable.setMandatory(true);
         final AutoFill autoFill = new AutoFill();
         autoFill.setDeployResourceKind(DeployResourceKind.VPC);
@@ -39,6 +40,7 @@ class DeployVariableSchemaValidatorTest {
         deployVariable.setKind(DeployVariableKind.FIX_ENV);
         deployVariable.setDataType(DeployVariableDataType.STRING);
         deployVariable.setExample("example");
+        deployVariable.setValue("value");
         deployVariable.setMandatory(true);
         final AutoFill autoFill = new AutoFill();
         autoFill.setDeployResourceKind(DeployResourceKind.SUBNET);
