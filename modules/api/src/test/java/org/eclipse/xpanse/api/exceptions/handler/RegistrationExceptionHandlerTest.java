@@ -19,8 +19,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.IconProcessi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceFlavorsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateDisabledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotAllowed;
@@ -105,12 +105,12 @@ class RegistrationExceptionHandlerTest {
     @Test
     void testUnavailableServiceTemplateException() throws Exception {
         when(serviceTemplateManage.registerServiceTemplate(any()))
-                .thenThrow(new ServiceTemplateDisabledException("test error"));
+                .thenThrow(new ServiceTemplateUnavailableException("test error"));
 
         this.mockMvc
                 .perform(post("/xpanse/service_templates/file").param("oclLocation", oclLocation))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.errorType").value("Service Template Disabled"))
+                .andExpect(jsonPath("$.errorType").value("Service Template Unavailable"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 

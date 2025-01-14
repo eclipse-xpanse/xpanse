@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.VariableValidationFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;

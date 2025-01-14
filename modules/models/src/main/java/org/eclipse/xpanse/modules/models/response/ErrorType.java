@@ -30,7 +30,7 @@ public enum ErrorType {
     UNHANDLED_EXCEPTION("Unhandled Exception"),
     ICON_PROCESSING_FAILED("Icon Processing Failed"),
     SERVICE_TEMPLATE_NOT_REGISTERED("Service Template Not Registered"),
-    SERVICE_TEMPLATE_DISABLED("Service Template Disabled"),
+    SERVICE_TEMPLATE_UNAVAILABLE("Service Template Unavailable"),
     SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED("Service Template Request Not Allowed"),
     SERVICE_TEMPLATE_REQUEST_NOT_FOUND("Service Template Request Not Found"),
     REVIEW_SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED("Review Service Template Request Not Allowed"),
@@ -112,11 +112,6 @@ public enum ErrorType {
     /** For ResultType serialize. */
     @JsonCreator
     public ErrorType getByValue(String value) {
-        for (ErrorType errorType : values()) {
-            if (StringUtils.endsWithIgnoreCase(errorType.value, value)) {
-                return errorType;
-            }
-        }
-        return null;
+        return getResultTypeByValue(value);
     }
 }

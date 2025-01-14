@@ -170,7 +170,7 @@ public class CspServiceTemplateApi {
                 ServiceTemplateRequestHistoryQueryModel.builder()
                         .csp(csp)
                         .serviceTemplateId(serviceTemplateId)
-                        .status(ServiceTemplateRequestStatus.IN_REVIEW)
+                        .requestStatus(ServiceTemplateRequestStatus.IN_REVIEW)
                         .build();
         return serviceTemplateManage.getPendingServiceTemplateRequests(queryModel);
     }

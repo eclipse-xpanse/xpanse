@@ -618,7 +618,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         deployedResource.setResourceKind(DeployResourceKind.VM);
         deployedResource.setProperties(Map.of("region", "cn-southwest-2"));
         deployedResource.setServiceDeploymentEntity(deployService);
-        deployService.setDeployResourceList(List.of(deployedResource));
+        deployService.setDeployResources(List.of(deployedResource));
         try {
             serviceDeploymentStorage.storeAndFlush(deployService);
             return true;

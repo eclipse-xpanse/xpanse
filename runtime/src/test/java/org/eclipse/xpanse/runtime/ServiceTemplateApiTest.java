@@ -212,11 +212,11 @@ class ServiceTemplateApiTest extends ApisTestCommon {
 
         ServiceTemplateRequestHistory oldRegisterHistory = requestHistoryVos.getLast();
         assertEquals(registerRequestInfo.getRequestId(), oldRegisterHistory.getRequestId());
-        assertEquals(ServiceTemplateRequestStatus.CANCELLED, oldRegisterHistory.getStatus());
+        assertEquals(ServiceTemplateRequestStatus.CANCELLED, oldRegisterHistory.getRequestStatus());
 
         ServiceTemplateRequestHistory newRegisterHistory = requestHistoryVos.getFirst();
         assertEquals(updateRequestInfo.getRequestId(), newRegisterHistory.getRequestId());
-        assertEquals(ServiceTemplateRequestStatus.IN_REVIEW, newRegisterHistory.getStatus());
+        assertEquals(ServiceTemplateRequestStatus.IN_REVIEW, newRegisterHistory.getRequestStatus());
 
         // approve update (new register) request
         reviewServiceTemplateRequest(updateRequestInfo.getRequestId(), true);
@@ -341,7 +341,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(
                 registerRequestInfo.getServiceTemplateId(),
                 registerHistoryVo.getServiceTemplateId());
-        assertEquals(registerHistoryVo.getStatus(), ServiceTemplateRequestStatus.IN_REVIEW);
+        assertEquals(ServiceTemplateRequestStatus.IN_REVIEW, registerHistoryVo.getRequestStatus());
 
         // cancel the register request
         final MockHttpServletResponse cancelRegisterResponse =
@@ -365,7 +365,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(
                 registerRequestInfo.getServiceTemplateId(),
                 registerHistoryVo1.getServiceTemplateId());
-        assertEquals(registerHistoryVo1.getStatus(), ServiceTemplateRequestStatus.CANCELLED);
+        assertEquals(ServiceTemplateRequestStatus.CANCELLED, registerHistoryVo1.getRequestStatus());
 
         // Setup detail request again.
         final MockHttpServletResponse detailResponse1 = detail(serviceTemplateId);
@@ -407,13 +407,13 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(2, requests.size());
         ServiceTemplateRequestHistory inReviewRequest = requests.getFirst();
         assertEquals(updateRequestInfo.getRequestId(), inReviewRequest.getRequestId());
-        assertEquals(inReviewRequest.getRequestType(), ServiceTemplateRequestType.REGISTER);
-        assertEquals(inReviewRequest.getStatus(), ServiceTemplateRequestStatus.IN_REVIEW);
+        assertEquals(ServiceTemplateRequestType.REGISTER, inReviewRequest.getRequestType());
+        assertEquals(ServiceTemplateRequestStatus.IN_REVIEW, inReviewRequest.getRequestStatus());
 
         ServiceTemplateRequestHistory cancelledRequest = requests.getLast();
         assertEquals(registerRequestInfo.getRequestId(), cancelledRequest.getRequestId());
-        assertEquals(cancelledRequest.getRequestType(), ServiceTemplateRequestType.REGISTER);
-        assertEquals(cancelledRequest.getStatus(), ServiceTemplateRequestStatus.CANCELLED);
+        assertEquals(ServiceTemplateRequestType.REGISTER, cancelledRequest.getRequestType());
+        assertEquals(ServiceTemplateRequestStatus.CANCELLED, cancelledRequest.getRequestStatus());
 
         MockHttpServletResponse cancelRegisterAgainResponse =
                 cancelServiceTemplateRequestByRequestId(registerRequestInfo.getRequestId());
@@ -642,7 +642,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
-        assertEquals(result.getErrorType(), ErrorType.UNPROCESSABLE_ENTITY);
+        assertEquals(ErrorType.UNPROCESSABLE_ENTITY, result.getErrorType());
         assertFalse(result.getDetails().isEmpty());
 
         Ocl oclTest =
@@ -655,7 +655,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(response1.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response1.getStatus());
-        assertEquals(result1.getErrorType(), ErrorType.UNPROCESSABLE_ENTITY);
+        assertEquals(ErrorType.UNPROCESSABLE_ENTITY, result1.getErrorType());
         assertFalse(result1.getDetails().isEmpty());
 
         oclTest.getDeployment().getDeployerTool().setVersion("> v1.6.0");
@@ -665,7 +665,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(response2.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response2.getStatus());
-        assertEquals(result2.getErrorType(), ErrorType.UNPROCESSABLE_ENTITY);
+        assertEquals(ErrorType.UNPROCESSABLE_ENTITY, result2.getErrorType());
         assertFalse(result2.getDetails().isEmpty());
     }
 
@@ -934,7 +934,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(registerResponse.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
-        assertEquals(errorResponse.getErrorType(), ErrorType.INVALID_BILLING_CONFIG);
+        assertEquals(ErrorType.INVALID_BILLING_CONFIG, errorResponse.getErrorType());
         assertTrue(errorResponse.getDetails().containsAll(expectedDetails));
     }
 
@@ -955,7 +955,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(registerResponse.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
-        assertEquals(errorResponse.getErrorType(), ErrorType.INVALID_SERVICE_FLAVORS);
+        assertEquals(ErrorType.INVALID_SERVICE_FLAVORS, errorResponse.getErrorType());
         assertTrue(errorResponse.getDetails().containsAll(expectedDetails));
     }
 
@@ -979,7 +979,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(registerResponse.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerResponse.getStatus());
-        assertEquals(errorResponse.getErrorType(), ErrorType.UNAVAILABLE_SERVICE_REGIONS);
+        assertEquals(ErrorType.UNAVAILABLE_SERVICE_REGIONS, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
     }
 
@@ -1005,7 +1005,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         ErrorResponse errorResponse =
                 objectMapper.readValue(unpublishResponse.getContentAsString(), ErrorResponse.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), unpublishResponse.getStatus());
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
+        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
         errorMsg =
@@ -1018,7 +1018,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         errorResponse =
                 objectMapper.readValue(republishResponse.getContentAsString(), ErrorResponse.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), republishResponse.getStatus());
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
+        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
         // Set up the register same
@@ -1034,7 +1034,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         registerSameResponse.getContentAsString(), ErrorResponse.class);
         // Verify the results
         assertEquals(HttpStatus.BAD_REQUEST.value(), registerSameResponse.getStatus());
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
+        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
         // approve the registration.
         reviewServiceTemplateRequest(registerRequestInfo.getRequestId(), true);
@@ -1059,7 +1059,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse1.getStatus());
         errorResponse =
                 objectMapper.readValue(updateResponse1.getContentAsString(), ErrorResponse.class);
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
+        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
         // Run the republish test
@@ -1068,7 +1068,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         republishResponse1.getContentAsString(), ErrorResponse.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), republishResponse1.getStatus());
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
+        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
         // Run the delete test
@@ -1081,7 +1081,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         errorResponse =
                 objectMapper.readValue(deleteResponse.getContentAsString(), ErrorResponse.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), republishResponse.getStatus());
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
+        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
         errorMsg =
@@ -1097,7 +1097,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         errorResponse =
                 objectMapper.readValue(deleteResponse2.getContentAsString(), ErrorResponse.class);
         assertEquals(HttpStatus.BAD_REQUEST.value(), deleteResponse2.getStatus());
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED);
+        assertEquals(ErrorType.SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), Collections.singletonList(errorMsg));
 
         // clear data

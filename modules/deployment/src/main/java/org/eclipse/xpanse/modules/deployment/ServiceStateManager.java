@@ -21,11 +21,10 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -81,7 +80,7 @@ public class ServiceStateManager {
         deployTask.setServiceId(service.getId());
         deployTask.setTaskType(taskType);
         deployTask.setUserId(getUserId());
-        return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service, Handler.PLUGIN);
+        return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service);
     }
 
     private void asyncStartService(
@@ -318,9 +317,9 @@ public class ServiceStateManager {
         ServiceStateManageRequest serviceStateManageRequest = new ServiceStateManageRequest();
         serviceStateManageRequest.setServiceId(service.getId());
         List<ServiceResourceEntity> vmResources =
-                CollectionUtils.isEmpty(service.getDeployResourceList())
+                CollectionUtils.isEmpty(service.getDeployResources())
                         ? Collections.emptyList()
-                        : service.getDeployResourceList().stream()
+                        : service.getDeployResources().stream()
                                 .filter(
                                         resource ->
                                                 resource.getResourceKind() == DeployResourceKind.VM)

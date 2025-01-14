@@ -21,16 +21,12 @@ import jakarta.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.hibernate.annotations.Type;
@@ -88,32 +84,13 @@ public class ServiceOrderEntity implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     private OffsetDateTime completedTime;
 
-    @Column(name = "PREVIOUS_DEPLOY_REQUEST", columnDefinition = "json")
-    @Type(value = JsonType.class)
-    @Convert(converter = ObjectJsonConverter.class)
-    private DeployRequest previousDeployRequest;
-
-    @Column(name = "PREVIOUS_DEPLOYED_RESOURCES", columnDefinition = "json")
-    @Type(value = JsonType.class)
-    @Convert(converter = ObjectJsonConverter.class)
-    private List<DeployResource> previousDeployedResources;
-
-    @Column(name = "PREVIOUS_DEPLOYED_SERVICE_PROPERTY", columnDefinition = "json")
-    @Type(value = JsonType.class)
-    @Convert(converter = ObjectJsonConverter.class)
-    private Map<String, String> previousDeployedServiceProperties;
-
-    @Column(name = "PREVIOUS_DEPLOYED_RESULT_PROPERTY", columnDefinition = "json")
-    @Type(value = JsonType.class)
-    @Convert(converter = ObjectJsonConverter.class)
-    private Map<String, String> previousDeployedResultProperties;
-
     @Column(name = "REQUEST_BODY", columnDefinition = "json")
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
-    private Object requestBody;
+    private Map<String, Object> requestBody;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "HANDLER", nullable = false)
-    private Handler handler;
+    @Column(name = "RESULT_PROPERTIES", columnDefinition = "json", length = Integer.MAX_VALUE)
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private Map<String, Object> resultProperties;
 }

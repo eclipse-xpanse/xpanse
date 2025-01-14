@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;

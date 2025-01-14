@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -21,6 +22,7 @@ import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -29,6 +31,7 @@ import org.springframework.util.CollectionUtils;
  * Bean to create DeployTask object from DeployServiceEntity. This is needed for everything other
  * than deploy tasks.
  */
+@Slf4j
 @Component
 public class DeployServiceEntityConverter {
 
@@ -54,6 +57,14 @@ public class DeployServiceEntityConverter {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(
                         serviceDeploymentEntity.getServiceTemplateId());
+        if (!serviceTemplateEntity.getIsAvailableInCatalog()) {
+            String errorMsg =
+                    String.format(
+                            "Used service template %s is unavailable to be used to %s service.",
+                            serviceTemplateEntity.getId(), orderType.toValue());
+            log.error(errorMsg);
+            throw new ServiceTemplateUnavailableException(errorMsg);
+        }
         deployTask.setOcl(serviceTemplateEntity.getOcl());
         deployTask.setServiceTemplateId(serviceTemplateEntity.getId());
         return deployTask;

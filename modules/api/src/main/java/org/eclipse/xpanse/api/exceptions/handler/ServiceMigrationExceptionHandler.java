@@ -11,7 +11,7 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceMigrationNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceMigrationNotFoundException;
 import org.eclipse.xpanse.modules.models.workflow.migrate.exceptions.ServiceMigrationFailedException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

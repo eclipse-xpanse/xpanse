@@ -5,7 +5,12 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import java.net.URI;
@@ -80,7 +85,7 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                         serviceTemplateId,
                         ServiceTemplateRequestType.REGISTER,
                         ServiceTemplateRequestStatus.ACCEPTED);
-        assertEquals(registeredHistoryVos.size(), 1);
+        assertEquals(1, registeredHistoryVos.size());
         assertEquals(
                 registeredHistoryVos.getFirst().getRequestId(), registerRequestInfo.getRequestId());
 
@@ -122,7 +127,7 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                         serviceTemplateId,
                         ServiceTemplateRequestType.UPDATE,
                         ServiceTemplateRequestStatus.ACCEPTED);
-        assertEquals(updateHistoryVos.size(), 1);
+        assertEquals(1, updateHistoryVos.size());
         assertEquals(updateHistoryVos.getFirst().getRequestId(), updateRequestInfo.getRequestId());
 
         // Setup unpublish request
@@ -142,7 +147,7 @@ class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {
                         serviceTemplateId,
                         ServiceTemplateRequestType.UNPUBLISH,
                         ServiceTemplateRequestStatus.ACCEPTED);
-        assertEquals(unregisterHistoryVos.size(), 1);
+        assertEquals(1, unregisterHistoryVos.size());
         assertEquals(
                 unregisterHistoryVos.getFirst().getRequestId(), unregisterRequest.getRequestId());
 

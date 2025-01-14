@@ -26,9 +26,9 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;

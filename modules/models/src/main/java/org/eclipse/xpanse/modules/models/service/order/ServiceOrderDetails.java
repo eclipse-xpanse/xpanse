@@ -12,14 +12,10 @@ import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 
@@ -58,6 +54,7 @@ public class ServiceOrderDetails {
     @Schema(description = "The id of the user who created the service order.")
     private String userId;
 
+    @NotNull
     @Schema(description = "The started time of the service order.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
@@ -68,25 +65,10 @@ public class ServiceOrderDetails {
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime completedTime;
 
-    @Schema(description = "The request json of the service order.")
-    private Object requestBody;
-
-    @Schema(description = "The deploy request of the service before this service order.")
-    private DeployRequest previousDeployRequest;
-
-    @Schema(description = "The deploy request of the service from this service order.")
-    private DeployRequest newDeployRequest;
-
-    @Schema(description = "The deployed resources of the service before this service order.")
-    private List<DeployResource> previousDeployedResources;
-
-    @Schema(description = "The properties of the deployed service before this service order.")
-    private Map<String, String> previousDeployedServiceProperties;
-
-    @Schema(description = "The properties of the deployed result before this service order.")
-    private Map<String, String> previousDeployedResultProperties;
-
     @NotNull
-    @Schema(description = " The service order handler.")
-    private Handler handler;
+    @Schema(description = "The requests of the service order.")
+    private Map<String, Object> requestBody;
+
+    @Schema(description = "The result properties of the service order.")
+    private Map<String, Object> resultProperties;
 }

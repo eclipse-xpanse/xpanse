@@ -24,7 +24,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.springframework.stereotype.Component;

@@ -27,7 +27,7 @@ public class ServiceTemplateRequestHistory extends ServiceTemplateRequestInfo {
 
     @NotNull
     @Schema(description = "Status of the request.")
-    private ServiceTemplateRequestStatus status;
+    private ServiceTemplateRequestStatus requestStatus;
 
     @Schema(description = "Comment of the review request.")
     private String reviewComment;

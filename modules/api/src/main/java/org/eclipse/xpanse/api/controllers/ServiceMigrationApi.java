@@ -31,13 +31,11 @@ import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.BillingModeNotSupported;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.EulaNotAccepted;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.BillingModeNotSupported;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
 import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
@@ -100,8 +98,7 @@ public class ServiceMigrationApi {
         migrateRequest.setUserId(userId);
         DeployTask migrateTask = getMigrateTask(migrateRequest);
         ServiceOrderEntity migrateOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(
-                        migrateTask, deployServiceEntity, Handler.WORKFLOW);
+                serviceOrderManager.storeNewServiceOrderEntity(migrateTask, deployServiceEntity);
         Map<String, Object> variable =
                 getMigrateProcessVariable(migrateRequest, migrateOrderEntity);
         ProcessInstance instance =
@@ -132,14 +129,11 @@ public class ServiceMigrationApi {
                                         serviceTemplate.getIsAvailableInCatalog()
                                                 && Objects.nonNull(serviceTemplate.getOcl()))
                         .findFirst()
-                        .orElseThrow(
-                                () ->
-                                        new ServiceTemplateNotRegistered(
-                                                "No available service templates found"));
-        if (StringUtils.isNotBlank(existingTemplate.getOcl().getEula())
-                && !migrateRequest.isEulaAccepted()) {
-            log.error("Service not accepted Eula.");
-            throw new EulaNotAccepted("Service not accepted Eula.");
+                        .orElse(null);
+        if (Objects.isNull(existingTemplate)) {
+            String errorMsg = "No service template is available to be used to migrate service";
+            log.error(errorMsg);
+            throw new ServiceTemplateUnavailableException(errorMsg);
         }
         if (!existingTemplate
                 .getOcl()

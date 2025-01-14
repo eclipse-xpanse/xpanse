@@ -24,7 +24,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;

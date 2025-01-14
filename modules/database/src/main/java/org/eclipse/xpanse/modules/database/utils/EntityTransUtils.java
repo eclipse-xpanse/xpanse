@@ -19,7 +19,7 @@ import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigura
 import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
@@ -47,7 +47,7 @@ public class EntityTransUtils {
      * @param entities list of deployResourceEntity
      * @return list of DeployResource
      */
-    public static List<DeployResource> transToDeployResourceList(
+    public static List<DeployResource> transToDeployResources(
             List<ServiceResourceEntity> entities) {
         List<DeployResource> resources = new ArrayList<>();
         if (!CollectionUtils.isEmpty(entities)) {
@@ -94,14 +94,11 @@ public class EntityTransUtils {
         details.setRegion(entity.getDeployRequest().getRegion());
         BeanUtils.copyProperties(entity, details);
         details.setServiceId(entity.getId());
-        if (!CollectionUtils.isEmpty(entity.getDeployResourceList())) {
-            details.setDeployResources(transToDeployResourceList(entity.getDeployResourceList()));
+        if (!CollectionUtils.isEmpty(entity.getDeployResources())) {
+            details.setDeployResources(transToDeployResources(entity.getDeployResources()));
         }
         if (!CollectionUtils.isEmpty(entity.getOutputProperties())) {
             details.setDeployedServiceProperties(entity.getOutputProperties());
-        }
-        if (Objects.nonNull(entity.getServiceTemplateId())) {
-            details.setServiceTemplateId(entity.getServiceTemplateId());
         }
         return details;
     }
@@ -122,9 +119,6 @@ public class EntityTransUtils {
         details.setRegion(entity.getDeployRequest().getRegion());
         if (!CollectionUtils.isEmpty(entity.getOutputProperties())) {
             details.setDeployedServiceProperties(entity.getOutputProperties());
-        }
-        if (Objects.nonNull(entity.getServiceTemplateId())) {
-            details.setServiceTemplateId(entity.getServiceTemplateId());
         }
         return details;
     }
@@ -176,8 +170,7 @@ public class EntityTransUtils {
                     ServiceChangeOrderDetails orderDetails = new ServiceChangeOrderDetails();
                     orderDetails.setOrderId(orderId);
                     ServiceOrderEntity orderEntity = requestList.getFirst().getServiceOrderEntity();
-                    orderDetails.setConfigRequest(
-                            (Map<String, Object>) orderEntity.getRequestBody());
+                    orderDetails.setConfigRequest(orderEntity.getRequestBody());
                     orderDetails.setOrderStatus(orderEntity.getTaskStatus());
                     List<ServiceChangeDetails> detailsList = new ArrayList<>();
                     requestList.forEach(
@@ -211,6 +204,9 @@ public class EntityTransUtils {
                 serviceTemplateRequestHistoryEntity.getServiceTemplate().getId());
         BeanUtils.copyProperties(
                 serviceTemplateRequestHistoryEntity, serviceTemplateRequestHistory);
+        serviceTemplateRequestHistory.setRequestSubmittedForReview(
+                serviceTemplateRequestHistoryEntity.getRequestStatus()
+                        == ServiceTemplateRequestStatus.IN_REVIEW);
         return serviceTemplateRequestHistory;
     }
 
@@ -226,7 +222,7 @@ public class EntityTransUtils {
         requestVo.setServiceTemplateId(requestEntity.getServiceTemplate().getId());
         BeanUtils.copyProperties(requestEntity, requestVo);
         requestVo.setRequestSubmittedForReview(
-                requestEntity.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
+                requestEntity.getRequestStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
         return requestVo;
     }
 }

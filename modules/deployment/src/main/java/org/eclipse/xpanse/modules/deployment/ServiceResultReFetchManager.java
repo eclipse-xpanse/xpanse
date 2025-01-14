@@ -14,12 +14,14 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerResultRefetchManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootResultRefetchManager;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -33,18 +35,19 @@ public class ServiceResultReFetchManager {
 
     @Resource private TerraformBootResultRefetchManager terraformBootResultRefetchManager;
     @Resource private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     /** ReFetch deploymentState for missing service orders. */
-    public void refetchDeploymentStateForMissingOrdersFromDeployers(
+    public void reFetchDeploymentStateForMissingOrdersFromDeployers(
             ServiceDeploymentEntity serviceDeployment) {
         ServiceOrderEntity serviceOrderEntity =
                 getServiceOrderEntityForDeployedService(serviceDeployment);
-        reFetchDeploymentStateForMissingOrdersFromDeployers(serviceDeployment, serviceOrderEntity);
+        refetchDeploymentStateForMissingOrdersFromDeployers(serviceDeployment, serviceOrderEntity);
     }
 
     private ServiceOrderEntity getServiceOrderEntityForDeployedService(
             ServiceDeploymentEntity serviceDeployment) {
-        List<ServiceOrderEntity> serviceOrderEntities = serviceDeployment.getServiceOrderList();
+        List<ServiceOrderEntity> serviceOrderEntities = serviceDeployment.getServiceOrders();
         ServiceOrderEntity serviceOrderEntity = null;
         if (serviceDeployment
                 .getServiceDeploymentState()
@@ -103,22 +106,25 @@ public class ServiceResultReFetchManager {
                                                                 + " serviceId %s, ServiceOrderType"
                                                                 + " MODIFY",
                                                             serviceDeployment.getId())));
-        } else {
-            return serviceOrderEntity;
         }
         return serviceOrderEntity;
     }
 
-    private void reFetchDeploymentStateForMissingOrdersFromDeployers(
+    private void refetchDeploymentStateForMissingOrdersFromDeployers(
             ServiceDeploymentEntity serviceDeployment, ServiceOrderEntity serviceOrder) {
         if (Objects.nonNull(serviceOrder)) {
+            ServiceTemplateEntity serviceTemplate =
+                    serviceTemplateStorage.getServiceTemplateById(
+                            serviceDeployment.getServiceTemplateId());
+            DeployerKind deployerKind =
+                    serviceTemplate.getOcl().getDeployment().getDeployerTool().getKind();
             if (Duration.between(serviceOrder.getStartedTime(), OffsetDateTime.now()).getSeconds()
                     > maxServiceOrderProcessingDuration) {
-                if (serviceOrder.getHandler().equals(Handler.TERRAFORM_BOOT)) {
+                if (DeployerKind.TERRAFORM == deployerKind) {
                     terraformBootResultRefetchManager.retrieveTerraformResult(
                             serviceDeployment, serviceOrder);
                 }
-                if (serviceOrder.getHandler().equals(Handler.TOFU_MAKER)) {
+                if (DeployerKind.OPEN_TOFU == deployerKind) {
                     tofuMakerResultRefetchManager.retrieveOpenTofuResult(
                             serviceDeployment, serviceOrder);
                 }

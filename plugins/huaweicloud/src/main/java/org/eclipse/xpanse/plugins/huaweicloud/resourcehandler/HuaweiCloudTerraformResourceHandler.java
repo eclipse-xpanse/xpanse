@@ -19,10 +19,10 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfSta
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfStateResource;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.resources.TfStateResourceInstance;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceHandler;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResourceProperties;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
 import org.springframework.stereotype.Component;
 
 /** Terraform resource handler for HuaweiCloud. */

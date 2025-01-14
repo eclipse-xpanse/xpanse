@@ -11,7 +11,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -20,6 +20,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,10 @@ class ServiceDeploymentEntityConverterTest {
         serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceDeploymentEntity.getServiceTemplateId());
         serviceTemplateEntity.setOcl(ocl);
+        serviceTemplateEntity.setServiceTemplateRegistrationState(
+                ServiceTemplateRegistrationState.APPROVED);
+        serviceTemplateEntity.setIsAvailableInCatalog(true);
+        serviceTemplateEntity.setIsReviewInProgress(false);
 
         when(serviceTemplateStorage.getServiceTemplateById(
                         serviceDeploymentEntity.getServiceTemplateId()))

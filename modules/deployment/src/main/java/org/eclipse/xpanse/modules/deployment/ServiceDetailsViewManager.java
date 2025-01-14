@@ -24,7 +24,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceDetailsNotAccessible;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceDetailsNotAccessible;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
@@ -71,7 +71,7 @@ public class ServiceDetailsViewManager {
             throw new AccessDeniedException(
                     "No permissions to view details of services belonging to other users.");
         }
-        serviceResultReFetchManager.refetchDeploymentStateForMissingOrdersFromDeployers(
+        serviceResultReFetchManager.reFetchDeploymentStateForMissingOrdersFromDeployers(
                 serviceDeploymentEntity);
         return EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
     }
@@ -101,7 +101,7 @@ public class ServiceDetailsViewManager {
         serviceDeploymentEntities.forEach(
                 serviceDeployment ->
                         serviceResultReFetchManager
-                                .refetchDeploymentStateForMissingOrdersFromDeployers(
+                                .reFetchDeploymentStateForMissingOrdersFromDeployers(
                                         serviceDeployment));
         return setServiceConfigurationForDeployedServiceList(serviceDeploymentEntities);
     }
@@ -165,7 +165,7 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
-        serviceResultReFetchManager.refetchDeploymentStateForMissingOrdersFromDeployers(
+        serviceResultReFetchManager.reFetchDeploymentStateForMissingOrdersFromDeployers(
                 serviceDeploymentEntity);
         DeployedServiceDetails details =
                 EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
@@ -229,7 +229,7 @@ public class ServiceDetailsViewManager {
         deployServices.forEach(
                 serviceDeployment ->
                         serviceResultReFetchManager
-                                .refetchDeploymentStateForMissingOrdersFromDeployers(
+                                .reFetchDeploymentStateForMissingOrdersFromDeployers(
                                         serviceDeployment));
         return setServiceConfigurationForDeployedServiceList(deployServices);
     }

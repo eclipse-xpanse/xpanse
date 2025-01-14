@@ -14,7 +14,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.genera
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncModifyFromGitRepoRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncModifyFromScriptsRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -112,5 +112,14 @@ public class TofuMakerServiceModifier {
                 tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
         return request;
+    }
+
+    private String getErrorMessage(DeployTask deployTask, RestClientException e) {
+        String errorMsg =
+                String.format(
+                        "Failed to modify service %s by order %s using tofu-maker. Error: %s",
+                        deployTask.getServiceId(), deployTask.getOrderId(), e.getMessage());
+        log.error(errorMsg, e);
+        return errorMsg;
     }
 }

@@ -23,16 +23,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.InvalidServiceStateException;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.ServiceLockedException;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
@@ -58,11 +60,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServiceRecreateApi {
 
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-
     @Resource private ServiceOrderManager serviceOrderManager;
-
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
     @Resource private UserServiceHelper userServiceHelper;
-
     @Resource private WorkflowUtils workflowUtils;
 
     /**
@@ -111,12 +111,22 @@ public class ServiceRecreateApi {
                             serviceDeploymentEntity.getId(),
                             serviceDeploymentEntity.getServiceDeploymentState()));
         }
-
+        ServiceTemplateEntity existingServiceTemplate =
+                serviceTemplateStorage.getServiceTemplateById(
+                        serviceDeploymentEntity.getServiceTemplateId());
+        if (!existingServiceTemplate.getIsAvailableInCatalog()) {
+            String errorMsg =
+                    String.format(
+                            "Service template %s is unavailable to be used to recreate service.",
+                            existingServiceTemplate.getId());
+            log.error(errorMsg);
+            throw new ServiceTemplateUnavailableException(errorMsg);
+        }
         // prepare parent recreate service order entity
         DeployTask recreateTask = getRecreateTask(serviceDeploymentEntity);
         ServiceOrderEntity recreateOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(
-                        recreateTask, serviceDeploymentEntity, Handler.WORKFLOW);
+                        recreateTask, serviceDeploymentEntity);
 
         // prepare recreate process variables
         Map<String, Object> variable =
@@ -140,7 +150,7 @@ public class ServiceRecreateApi {
         recreateTask.setServiceId(serviceDeploymentEntity.getId());
         recreateTask.setOriginalServiceId(serviceDeploymentEntity.getId());
         recreateTask.setUserId(getUserId());
-        recreateTask.setRequest(serviceDeploymentEntity.getDeployRequest());
+        recreateTask.setDeployRequest(serviceDeploymentEntity.getDeployRequest());
         return recreateTask;
     }
 

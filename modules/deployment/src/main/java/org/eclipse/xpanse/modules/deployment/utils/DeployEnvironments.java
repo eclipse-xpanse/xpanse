@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;

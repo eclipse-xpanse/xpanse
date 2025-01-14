@@ -24,7 +24,7 @@ import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundExcepti
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.FlavorInvalidException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;

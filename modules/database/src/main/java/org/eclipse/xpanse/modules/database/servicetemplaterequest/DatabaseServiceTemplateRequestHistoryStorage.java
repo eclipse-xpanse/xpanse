@@ -75,10 +75,12 @@ public class DatabaseServiceTemplateRequestHistoryStorage
                                 criteriaBuilder.equal(
                                         root.get("requestType"), queryModel.getRequestType()));
                     }
-                    if (Objects.nonNull(queryModel.getStatus())) {
+                    if (Objects.nonNull(queryModel.getRequestStatus())) {
                         predicateList.add(
-                                criteriaBuilder.equal(root.get("status"), queryModel.getStatus()));
+                                criteriaBuilder.equal(
+                                        root.get("requestStatus"), queryModel.getRequestStatus()));
                     }
+                    assert query != null;
                     query.distinct(true);
                     query.orderBy(criteriaBuilder.asc(root.get("createTime")));
                     return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
@@ -90,7 +92,7 @@ public class DatabaseServiceTemplateRequestHistoryStorage
     @Override
     public void cancelRequestsInBatch(List<ServiceTemplateRequestHistoryEntity> requests) {
         for (ServiceTemplateRequestHistoryEntity request : requests) {
-            request.setStatus(ServiceTemplateRequestStatus.CANCELLED);
+            request.setRequestStatus(ServiceTemplateRequestStatus.CANCELLED);
         }
         repository.saveAll(requests);
     }

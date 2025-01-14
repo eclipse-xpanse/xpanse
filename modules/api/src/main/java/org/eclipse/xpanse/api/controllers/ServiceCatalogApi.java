@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
@@ -27,7 +26,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryM
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateDisabledException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -102,7 +101,7 @@ public class ServiceCatalogApi {
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);
-        log.info(serviceTemplateEntities.size() + " orderable services found.");
+        log.info("{} orderable services found.", serviceTemplateEntities.size());
         return serviceTemplateEntities.stream()
                 .sorted(Comparator.comparingInt(template -> template.getCsp().ordinal()))
                 .map(ServiceTemplateEntityConverter::convertToUserOrderableServiceVo)
@@ -130,13 +129,13 @@ public class ServiceCatalogApi {
                     UUID serviceTemplateId) {
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateManage.getServiceTemplateDetails(serviceTemplateId, false, false);
-        if (Objects.equals(false, serviceTemplateEntity.getIsAvailableInCatalog())) {
-            String errMsg =
-                    "Service template with id "
-                            + serviceTemplateId
-                            + " is disabled to order service.";
-            log.error(errMsg);
-            throw new ServiceTemplateDisabledException(errMsg);
+        if (!serviceTemplateEntity.getIsAvailableInCatalog()) {
+            String errorMsg =
+                    String.format(
+                            "Service template %s is unavailable to be used to order service",
+                            serviceTemplateId);
+            log.error(errorMsg);
+            throw new ServiceTemplateUnavailableException(errorMsg);
         }
         String successMsg =
                 String.format("Get orderable service with id %s successful.", serviceTemplateId);

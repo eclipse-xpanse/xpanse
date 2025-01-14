@@ -176,7 +176,7 @@ public class ServiceTemplateManage {
                                 history ->
                                         history.getRequestType()
                                                         == ServiceTemplateRequestType.REGISTER
-                                                && history.getStatus()
+                                                && history.getRequestStatus()
                                                         == ServiceTemplateRequestStatus.IN_REVIEW)
                         .toList();
         if (!CollectionUtils.isEmpty(oldRegisterRequestsInReview)) {
@@ -229,7 +229,7 @@ public class ServiceTemplateManage {
                             .filter(
                                     request ->
                                             ServiceTemplateRequestStatus.IN_REVIEW
-                                                    == request.getStatus())
+                                                    == request.getRequestStatus())
                             .findFirst()
                             .orElse(null);
             if (Objects.nonNull(inProgressRequest)) {
@@ -249,7 +249,7 @@ public class ServiceTemplateManage {
         ServiceTemplateRequestHistoryQueryModel queryModel =
                 ServiceTemplateRequestHistoryQueryModel.builder()
                         .serviceTemplateId(serviceTemplateId)
-                        .status(ServiceTemplateRequestStatus.IN_REVIEW)
+                        .requestStatus(ServiceTemplateRequestStatus.IN_REVIEW)
                         .build();
         return templateRequestStorage.listServiceTemplateRequestHistoryByQueryModel(queryModel);
     }
@@ -330,10 +330,10 @@ public class ServiceTemplateManage {
         serviceTemplateHistory.setRequestType(requestType);
         serviceTemplateHistory.setBlockTemplateUntilReviewed(false);
         if (isAutoApproveEnabled) {
-            serviceTemplateHistory.setStatus(ServiceTemplateRequestStatus.ACCEPTED);
+            serviceTemplateHistory.setRequestStatus(ServiceTemplateRequestStatus.ACCEPTED);
             serviceTemplateHistory.setReviewComment(AUTO_APPROVED_REVIEW_COMMENT);
         } else {
-            serviceTemplateHistory.setStatus(ServiceTemplateRequestStatus.IN_REVIEW);
+            serviceTemplateHistory.setRequestStatus(ServiceTemplateRequestStatus.IN_REVIEW);
         }
         return templateRequestStorage.storeAndFlush(serviceTemplateHistory);
     }
@@ -493,7 +493,7 @@ public class ServiceTemplateManage {
                     "No permissions to review service template request "
                             + "belonging to other cloud service providers.");
         }
-        if (ServiceTemplateRequestStatus.IN_REVIEW != existingTemplateRequest.getStatus()) {
+        if (ServiceTemplateRequestStatus.IN_REVIEW != existingTemplateRequest.getRequestStatus()) {
             throw new ReviewServiceTemplateRequestNotAllowed(
                     "Service template request is not allowed to be reviewed.");
         }
@@ -501,9 +501,9 @@ public class ServiceTemplateManage {
                 new ServiceTemplateRequestHistoryEntity();
         BeanUtils.copyProperties(existingTemplateRequest, requestToReview);
         if (ServiceReviewResult.APPROVED == review.getReviewResult()) {
-            requestToReview.setStatus(ServiceTemplateRequestStatus.ACCEPTED);
+            requestToReview.setRequestStatus(ServiceTemplateRequestStatus.ACCEPTED);
         } else if (ServiceReviewResult.REJECTED == review.getReviewResult()) {
-            requestToReview.setStatus(ServiceTemplateRequestStatus.REJECTED);
+            requestToReview.setRequestStatus(ServiceTemplateRequestStatus.REJECTED);
         }
         requestToReview.setReviewComment(review.getReviewComment());
         ServiceTemplateRequestHistoryEntity reviewedRequest =
@@ -515,7 +515,7 @@ public class ServiceTemplateManage {
             ServiceTemplateRequestHistoryEntity reviewedRequest) {
         ServiceTemplateEntity serviceTemplateToUpdate = new ServiceTemplateEntity();
         BeanUtils.copyProperties(reviewedRequest.getServiceTemplate(), serviceTemplateToUpdate);
-        if (ServiceTemplateRequestStatus.ACCEPTED == reviewedRequest.getStatus()) {
+        if (ServiceTemplateRequestStatus.ACCEPTED == reviewedRequest.getRequestStatus()) {
             if (ServiceTemplateRequestType.REGISTER == reviewedRequest.getRequestType()) {
                 serviceTemplateToUpdate.setServiceTemplateRegistrationState(
                         ServiceTemplateRegistrationState.APPROVED);
@@ -530,7 +530,7 @@ public class ServiceTemplateManage {
             OrchestratorPlugin cspPlugin =
                     pluginManager.getOrchestratorPlugin(serviceTemplateToUpdate.getCsp());
             cspPlugin.prepareServiceTemplate(reviewedRequest.getOcl());
-        } else if (ServiceTemplateRequestStatus.REJECTED == reviewedRequest.getStatus()) {
+        } else if (ServiceTemplateRequestStatus.REJECTED == reviewedRequest.getRequestStatus()) {
             if (ServiceTemplateRequestType.REGISTER == reviewedRequest.getRequestType()) {
                 serviceTemplateToUpdate.setServiceTemplateRegistrationState(
                         ServiceTemplateRegistrationState.REJECTED);
@@ -664,7 +664,7 @@ public class ServiceTemplateManage {
         if (Objects.nonNull(changeStatus)) {
             historyList =
                     historyList.stream()
-                            .filter(history -> history.getStatus() == changeStatus)
+                            .filter(history -> history.getRequestStatus() == changeStatus)
                             .toList();
         }
         return historyList.stream()
@@ -700,8 +700,8 @@ public class ServiceTemplateManage {
                 templateRequestStorage.getEntityByRequestId(requestId);
         checkPermission(requestToCancel.getServiceTemplate(), true, false);
 
-        if (requestToCancel.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW) {
-            requestToCancel.setStatus(ServiceTemplateRequestStatus.CANCELLED);
+        if (requestToCancel.getRequestStatus() == ServiceTemplateRequestStatus.IN_REVIEW) {
+            requestToCancel.setRequestStatus(ServiceTemplateRequestStatus.CANCELLED);
             ServiceTemplateRequestHistoryEntity cancelledRequest =
                     templateRequestStorage.storeAndFlush(requestToCancel);
             ServiceTemplateEntity serviceTemplateToUpdate = requestToCancel.getServiceTemplate();

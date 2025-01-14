@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.resources.TfStateResourceInstance;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

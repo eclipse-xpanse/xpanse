@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
@@ -38,8 +39,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDet
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -49,6 +48,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /** Test for ServiceConfigurationApi. */
+@Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
@@ -75,7 +75,6 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
     public static final String ZOOKEEPER = "zookeeper";
     public static final String KAFKA_BROKER = "kafka-broker";
     public static final String USER_ID = "userId";
-    private static final Logger log = LoggerFactory.getLogger(ServiceConfigurationApiTest.class);
     @MockitoBean private PolicyValidator mockPolicyValidator;
 
     void mockDeploymentWitPolicies() {
@@ -98,7 +97,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
             List<ServiceChangeOrderDetails> requests =
                     listServiceChangeDetails(order.getOrderId(), order.getServiceId());
             assertFalse(requests.isEmpty());
-            assertEquals(requests.size(), 1);
+            assertEquals(1, requests.size());
             requests.forEach(request -> assertEquals(request.getOrderId(), order.getOrderId()));
             requests.forEach(
                     request ->
@@ -106,8 +105,8 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
                                     .forEach(
                                             requestDetails ->
                                                     assertEquals(
-                                                            requestDetails.getStatus(),
-                                                            ServiceChangeStatus.PENDING)));
+                                                            ServiceChangeStatus.PENDING,
+                                                            requestDetails.getStatus())));
             requests.forEach(
                     request ->
                             request.getChangeRequests()
