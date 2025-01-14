@@ -51,7 +51,7 @@ public class ServiceTemplateRequestHistoryEntity extends CreateModifiedTime {
 
     @Column(name = "STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ServiceTemplateRequestStatus status;
+    private ServiceTemplateRequestStatus requestStatus;
 
     @Column(name = "SERVICE_TEMPLATE_REQUEST", columnDefinition = "json")
     @Type(value = JsonType.class)

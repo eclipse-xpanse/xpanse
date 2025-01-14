@@ -37,7 +37,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.hibernate.annotations.Type;
@@ -106,18 +106,18 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     @ToString.Exclude
-    private List<ServiceResourceEntity> deployResourceList;
+    private List<ServiceResourceEntity> deployResources;
 
     @OneToOne(mappedBy = "serviceDeploymentEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private ServiceConfigurationEntity serviceConfigurationEntity;
+    private ServiceConfigurationEntity serviceConfiguration;
 
     @OneToMany(
             mappedBy = "serviceDeploymentEntity",
             cascade = CascadeType.REMOVE,
             orphanRemoval = true)
     @ToString.Exclude
-    private List<ServiceOrderEntity> serviceOrderList;
+    private List<ServiceOrderEntity> serviceOrders;
 
     /** The output properties of the service deployment. */
     @ElementCollection

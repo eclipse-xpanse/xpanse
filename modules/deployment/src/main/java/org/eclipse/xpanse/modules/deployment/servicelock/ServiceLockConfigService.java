@@ -12,11 +12,9 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -32,8 +30,6 @@ public class ServiceLockConfigService {
     @Resource private ServiceOrderManager serviceOrderManager;
 
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-
-    @Resource private DeployServiceEntityConverter deployServiceEntityConverter;
 
     @Resource private ServiceOrderStorage serviceOrderStorage;
 
@@ -56,14 +52,15 @@ public class ServiceLockConfigService {
                             + "belonging to other users.";
             throw new AccessDeniedException(errorMsg);
         }
-
-        DeployTask lockChangeTask =
-                deployServiceEntityConverter.getDeployTaskByStoredService(
-                        ServiceOrderType.LOCK_CHANGE, deployedService);
+        ServiceOrderType taskType = ServiceOrderType.LOCK_CHANGE;
+        DeployTask lockChangeTask = new DeployTask();
+        lockChangeTask.setOrderId(UUID.randomUUID());
+        lockChangeTask.setTaskType(taskType);
+        lockChangeTask.setServiceId(serviceId);
+        lockChangeTask.setUserId(deployedService.getUserId());
         lockChangeTask.setRequest(lockConfig);
         ServiceOrderEntity serviceOrder =
-                serviceOrderManager.storeNewServiceOrderEntity(
-                        lockChangeTask, deployedService, Handler.INTERNAL);
+                serviceOrderManager.storeNewServiceOrderEntity(lockChangeTask, deployedService);
         serviceOrder.setStartedTime(OffsetDateTime.now());
         deployedService.setLockConfig(lockConfig);
         serviceDeploymentEntityHandler.storeAndFlush(deployedService);

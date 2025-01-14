@@ -19,7 +19,7 @@ import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceCh
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -100,7 +100,7 @@ public class ServiceActionManager {
                 serviceTemplateEntity.getOcl().getServiceActions().stream()
                         .flatMap(action -> action.getActionParameters().stream())
                         .collect(Collectors.toList());
-        if (Objects.isNull(actionParameters)) {
+        if (CollectionUtils.isEmpty(actionParameters)) {
             String errorMsg =
                     String.format(
                             "Service template %s has no service actions manage",

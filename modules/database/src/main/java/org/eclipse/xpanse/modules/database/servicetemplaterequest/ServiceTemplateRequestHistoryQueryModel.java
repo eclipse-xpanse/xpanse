@@ -23,5 +23,5 @@ public class ServiceTemplateRequestHistoryQueryModel {
 
     private ServiceTemplateRequestType requestType;
 
-    private ServiceTemplateRequestStatus status;
+    private ServiceTemplateRequestStatus requestStatus;
 }

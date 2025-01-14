@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 
 /** Define view object for detail of the deployed service. */
 @EqualsAndHashCode(callSuper = true)

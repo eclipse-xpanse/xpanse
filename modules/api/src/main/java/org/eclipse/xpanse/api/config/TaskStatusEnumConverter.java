@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class TaskStatusEnumConverter implements Converter<String, TaskStatus> {
 
     @Override
-    public TaskStatus convert(@Nonnull String status) {
-        return TaskStatus.getByValue(status);
+    public TaskStatus convert(@Nonnull String taskStatus) {
+        return TaskStatus.getByValue(taskStatus);
     }
 }

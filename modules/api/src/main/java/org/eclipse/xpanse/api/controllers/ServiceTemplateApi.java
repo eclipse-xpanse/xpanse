@@ -309,7 +309,7 @@ public class ServiceTemplateApi {
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);
-        log.info(serviceTemplateEntities.size() + " service templates found.");
+        log.info("{} service templates found.", serviceTemplateEntities.size());
         return serviceTemplateEntities.stream()
                 .sorted(
                         Comparator.comparingInt(
@@ -422,6 +422,6 @@ public class ServiceTemplateApi {
         return new ServiceTemplateRequestInfo(
                 requestHistoryEntity.getServiceTemplate().getId(),
                 requestHistoryEntity.getRequestId(),
-                requestHistoryEntity.getStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
+                requestHistoryEntity.getRequestStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
     }
 }

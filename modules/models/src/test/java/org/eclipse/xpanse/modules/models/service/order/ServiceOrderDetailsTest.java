@@ -5,13 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,14 +31,9 @@ class ServiceOrderDetailsTest {
     private final ErrorResponse errorResponse = new ErrorResponse();
     private final String userId = "userId";
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
-    private final Handler handler = Handler.INTERNAL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
-    @Mock private Object requestBody;
-    @Mock private DeployRequest mockPreviousDeployRequest;
-    @Mock private DeployRequest mockNewDeployRequest;
-    @Mock private List<DeployResource> mockPreviousDeployedResources;
-    @Mock private Map<String, String> mockPreviousDeployedResultProperties;
-    @Mock private Map<String, String> mockPreviousDeployedServiceProperties;
+    @Mock private Map<String, Object> mockRequestBody;
+    @Mock private Map<String, Object> mockResultProperties;
 
     private ServiceOrderDetails test;
 
@@ -60,13 +51,8 @@ class ServiceOrderDetailsTest {
         test.setCompletedTime(completedTime);
         test.setErrorResponse(errorResponse);
         test.setTaskStatus(taskStatus);
-        test.setRequestBody(requestBody);
-        test.setPreviousDeployRequest(mockPreviousDeployRequest);
-        test.setNewDeployRequest(mockNewDeployRequest);
-        test.setPreviousDeployedResources(mockPreviousDeployedResources);
-        test.setPreviousDeployedResultProperties(mockPreviousDeployedResultProperties);
-        test.setPreviousDeployedServiceProperties(mockPreviousDeployedServiceProperties);
-        test.setHandler(handler);
+        test.setRequestBody(mockRequestBody);
+        test.setResultProperties(mockResultProperties);
     }
 
     @Test
@@ -82,15 +68,8 @@ class ServiceOrderDetailsTest {
         assertThat(test.getErrorResponse()).isEqualTo(errorResponse);
         assertThat(test.getCompletedTime()).isEqualTo(completedTime);
         assertThat(test.getStartedTime()).isEqualTo(startedTime);
-        assertThat(test.getRequestBody()).isEqualTo(requestBody);
-        assertThat(test.getPreviousDeployRequest()).isEqualTo(mockPreviousDeployRequest);
-        assertThat(test.getNewDeployRequest()).isEqualTo(mockNewDeployRequest);
-        assertThat(test.getPreviousDeployedResources()).isEqualTo(mockPreviousDeployedResources);
-        assertThat(test.getPreviousDeployedResultProperties())
-                .isEqualTo(mockPreviousDeployedResultProperties);
-        assertThat(test.getPreviousDeployedServiceProperties())
-                .isEqualTo(mockPreviousDeployedServiceProperties);
-        assertThat(test.getHandler()).isEqualTo(handler);
+        assertThat(test.getRequestBody()).isEqualTo(mockRequestBody);
+        assertThat(test.getResultProperties()).isEqualTo(mockResultProperties);
     }
 
     @Test
@@ -134,19 +113,9 @@ class ServiceOrderDetailsTest {
                         + ", completedTime="
                         + completedTime
                         + ", requestBody="
-                        + requestBody
-                        + ", previousDeployRequest="
-                        + mockPreviousDeployRequest
-                        + ", newDeployRequest="
-                        + mockNewDeployRequest
-                        + ", previousDeployedResources="
-                        + mockPreviousDeployedResources
-                        + ", previousDeployedServiceProperties="
-                        + mockPreviousDeployedServiceProperties
-                        + ", previousDeployedResultProperties="
-                        + mockPreviousDeployedResultProperties
-                        + ", handler="
-                        + handler
+                        + mockRequestBody
+                        + ", resultProperties="
+                        + mockResultProperties
                         + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

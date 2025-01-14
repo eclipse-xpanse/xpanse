@@ -23,8 +23,7 @@ import org.eclipse.xpanse.modules.database.serviceconfiguration.update.ServiceCh
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
@@ -180,10 +179,10 @@ public class ServiceChangeDetailsManager {
             Map<String, Object> updateRequestMap) {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
         serviceOrderEntity.setOrderId(orderId);
-        if (Objects.nonNull(entity.getServiceOrderList())) {
-            entity.getServiceOrderList().add(serviceOrderEntity);
+        if (Objects.nonNull(entity.getServiceOrders())) {
+            entity.getServiceOrders().add(serviceOrderEntity);
         } else {
-            entity.setServiceOrderList(List.of(serviceOrderEntity));
+            entity.setServiceOrders(List.of(serviceOrderEntity));
         }
         serviceOrderEntity.setServiceDeploymentEntity(entity);
         serviceOrderEntity.setTaskType(type);
@@ -191,7 +190,6 @@ public class ServiceChangeDetailsManager {
         serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
         serviceOrderEntity.setStartedTime(OffsetDateTime.now());
         serviceOrderEntity.setRequestBody(updateRequestMap);
-        serviceOrderEntity.setHandler(Handler.AGENT);
         return serviceOrderStorage.storeAndFlush(serviceOrderEntity);
     }
 }

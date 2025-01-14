@@ -12,7 +12,7 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequestBase;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequestBase;
 
 /** MigrateRequest model. */
 @EqualsAndHashCode(callSuper = true)

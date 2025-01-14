@@ -6,6 +6,8 @@
 
 package org.eclipse.xpanse.modules.orchestrator.deployment;
 
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
+
 /**
  * Handler for the processing the deployment result. The deployer output will be parsed to extract
  * the resources provisioned as part of the deployment process.

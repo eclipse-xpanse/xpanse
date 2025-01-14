@@ -140,13 +140,13 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         // Verify the results
         Assertions.assertFalse(result.isEmpty());
         assertEquals(
-                result.getFirst().getServiceDeploymentState(),
-                ServiceDeploymentState.DEPLOY_SUCCESS);
+                ServiceDeploymentState.DEPLOY_SUCCESS,
+                result.getFirst().getServiceDeploymentState());
 
         Assertions.assertFalse(detailsResult.isEmpty());
         assertEquals(
-                detailsResult.getFirst().getServiceDeploymentState(),
-                ServiceDeploymentState.DEPLOY_SUCCESS);
+                ServiceDeploymentState.DEPLOY_SUCCESS,
+                detailsResult.getFirst().getServiceDeploymentState());
     }
 
     void destroyService(UUID serviceId) throws Exception {

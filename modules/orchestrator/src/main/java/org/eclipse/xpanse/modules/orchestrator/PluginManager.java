@@ -21,7 +21,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.exceptions.DuplicateCredentialDefinition;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.PluginNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.PluginNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;

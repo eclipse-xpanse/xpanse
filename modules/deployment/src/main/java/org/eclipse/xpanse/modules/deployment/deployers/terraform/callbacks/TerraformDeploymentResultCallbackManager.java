@@ -12,8 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model.TerraformResult;
-import org.eclipse.xpanse.modules.models.service.enums.Handler;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployResult;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.springframework.stereotype.Component;
 
 /** Bean for managing deployer terraform callback functions. */
@@ -31,7 +30,7 @@ public class TerraformDeploymentResultCallbackManager {
     public void orderCallback(UUID orderId, TerraformResult result) {
         DeployResult deployResult = getDeployResult(result);
         deployResult.setOrderId(orderId);
-        deployResultManager.updateServiceWithDeployResult(deployResult, Handler.TERRAFORM_BOOT);
+        deployResultManager.updateServiceWithDeployResult(deployResult);
     }
 
     private DeployResult getDeployResult(TerraformResult result) {

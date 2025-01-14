@@ -65,7 +65,7 @@ public class ServiceResourceEntity extends CreateModifiedTime {
     /** The deployService we belonged to. */
     @ManyToOne
     @JoinColumn(name = "SERVICE_ID")
-    @JsonIgnoreProperties({"deployResourceList"})
+    @JsonIgnoreProperties({"deployResources"})
     private ServiceDeploymentEntity serviceDeploymentEntity;
 
     /** The properties of the service resource. */

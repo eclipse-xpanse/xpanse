@@ -175,7 +175,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         // The service template should not be updated yet
         ServiceTemplateDetailVo serviceTemplate =
                 getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
-        assertEquals(updateRequest.getOcl().getDescription(), descriptionToUpdate);
+        assertEquals(descriptionToUpdate, updateRequest.getOcl().getDescription());
         assertNotEquals(descriptionToUpdate, serviceTemplate.getDescription());
         assertFalse(serviceTemplate.getIsAvailableInCatalog());
 
@@ -188,7 +188,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         assertThat(pendingServiceTemplateRequests1).isEmpty();
         // After update is approved, the service template should be updated
         serviceTemplate = getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
-        assertEquals(updateRequest.getOcl().getDescription(), descriptionToUpdate);
+        assertEquals(descriptionToUpdate, updateRequest.getOcl().getDescription());
         assertEquals(descriptionToUpdate, serviceTemplate.getDescription());
         assertTrue(serviceTemplate.getIsAvailableInCatalog());
 

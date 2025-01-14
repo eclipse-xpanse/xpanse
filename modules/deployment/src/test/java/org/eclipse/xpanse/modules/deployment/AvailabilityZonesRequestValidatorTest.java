@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.service.deploy.exceptions.VariableValidationFailedException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.VariableValidationFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

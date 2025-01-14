@@ -47,11 +47,11 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.response.OrderFailedErrorResponse;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deploy.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
+import org.eclipse.xpanse.modules.models.service.deployment.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
-import org.eclipse.xpanse.modules.models.service.modify.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
@@ -293,7 +293,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         final MockHttpServletResponse listAzResponse =
                 getAvailabilityZones(csp, siteName, regionName);
         assertEquals(HttpStatus.BAD_REQUEST.value(), listAzResponse.getStatus());
-        assertEquals(listAzResponse.getHeader("Cache-Control"), "no-cache");
+        assertEquals("no-cache", listAzResponse.getHeader("Cache-Control"));
     }
 
     MockHttpServletResponse getAvailabilityZones(Csp csp, String siteName, String regionName)
@@ -481,7 +481,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         modifyResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(
-                orderFailedResponse.getErrorType(), ErrorType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED);
+                ErrorType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
@@ -505,7 +505,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailResponse.getStatus());
         ErrorResponse errorResponse =
                 objectMapper.readValue(detailResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), List.of(errorMsg));
 
         // SetUp getComputeResourceInventoryOfService
@@ -515,7 +515,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         errorResponse =
                 objectMapper.readValue(
                         getResourcesResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), List.of(errorMsg));
 
         // Setup getOrderableServiceDetailsByServiceId
@@ -525,7 +525,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         errorResponse =
                 objectMapper.readValue(
                         getOrderableDetailsResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), List.of(errorMsg));
 
         ServiceLockConfig lockConfig = new ServiceLockConfig();
@@ -538,7 +538,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         errorResponse =
                 objectMapper.readValue(
                         changeLockResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), List.of(errorMsg));
 
         // Run the test
@@ -549,7 +549,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         OrderFailedErrorResponse orderFailedResponse =
                 objectMapper.readValue(
                         modifyResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
@@ -559,7 +559,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         orderFailedResponse =
                 objectMapper.readValue(
                         redeployResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
@@ -570,7 +570,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         orderFailedResponse =
                 objectMapper.readValue(
                         destroyResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
@@ -580,7 +580,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         orderFailedResponse =
                 objectMapper.readValue(
                         purgeResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
@@ -600,7 +600,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         OrderFailedErrorResponse orderFailedResponse =
                 objectMapper.readValue(
                         modifyResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_STATE_INVALID);
+        assertEquals(ErrorType.SERVICE_STATE_INVALID, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
@@ -614,7 +614,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         orderFailedResponse =
                 objectMapper.readValue(
                         redeployResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_STATE_INVALID);
+        assertEquals(ErrorType.SERVICE_STATE_INVALID, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
@@ -628,7 +628,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         orderFailedResponse =
                 objectMapper.readValue(
                         destroyResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_STATE_INVALID);
+        assertEquals(ErrorType.SERVICE_STATE_INVALID, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
@@ -642,7 +642,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         orderFailedResponse =
                 objectMapper.readValue(
                         purgeResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_STATE_INVALID);
+        assertEquals(ErrorType.SERVICE_STATE_INVALID, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
@@ -777,7 +777,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         OrderFailedErrorResponse response =
                 objectMapper.readValue(
                         deployResponse1.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(response.getErrorType(), ErrorType.VARIABLE_VALIDATION_FAILED);
+        assertEquals(ErrorType.VARIABLE_VALIDATION_FAILED, response.getErrorType());
         assertEquals(response.getDetails(), List.of(refuseMsg1));
 
         // Setup
@@ -804,7 +804,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), deployResponse2.getStatus());
         ErrorResponse errorResponse2 =
                 objectMapper.readValue(deployResponse2.getContentAsString(), ErrorResponse.class);
-        assertEquals(errorResponse2.getErrorType(), ErrorType.VARIABLE_VALIDATION_FAILED);
+        assertEquals(ErrorType.VARIABLE_VALIDATION_FAILED, errorResponse2.getErrorType());
         assertEquals(errorResponse2.getDetails(), List.of(refuseMsg2));
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
@@ -857,8 +857,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(serviceId, serviceOrder.getServiceId());
         ServiceOrderEntity serviceOrderEntity =
                 serviceOrderStorage.getEntityById(serviceOrder.getOrderId());
-        assertEquals(serviceOrderEntity.getTaskType(), ServiceOrderType.LOCK_CHANGE);
-        assertEquals(serviceOrderEntity.getTaskStatus(), TaskStatus.SUCCESSFUL);
+        assertEquals(ServiceOrderType.LOCK_CHANGE, serviceOrderEntity.getTaskType());
+        assertEquals(TaskStatus.SUCCESSFUL, serviceOrderEntity.getTaskStatus());
     }
 
     void testDestroy(UUID serviceId) throws Exception {
@@ -884,7 +884,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         OrderFailedErrorResponse orderFailedResponse =
                 objectMapper.readValue(
                         destroyResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_LOCKED);
+        assertEquals(ErrorType.SERVICE_LOCKED, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
@@ -900,7 +900,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         OrderFailedErrorResponse orderFailedResponse =
                 objectMapper.readValue(
                         modifyResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(orderFailedResponse.getErrorType(), ErrorType.SERVICE_LOCKED);
+        assertEquals(ErrorType.SERVICE_LOCKED, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
@@ -923,7 +923,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.BAD_REQUEST.value(), detailsResponse.getStatus());
         ErrorResponse errorResponse =
                 objectMapper.readValue(detailsResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(errorResponse.getErrorType(), ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND);
+        assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, errorResponse.getErrorType());
         assertEquals(errorResponse.getDetails(), List.of(refuseMsg));
     }
 
@@ -973,7 +973,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
     void testDeployThrowsServiceTemplateNotRegistered(ServiceTemplateDetailVo template)
             throws Exception {
-        String errorMsg = "No available service templates found";
+        String errorMsg = "No service template is available to be used to deploy service";
         DeployRequest deployRequest = getDeployRequest(template);
         // Run the test
         final MockHttpServletResponse deployResponse = deployService(deployRequest);
@@ -982,7 +982,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         OrderFailedErrorResponse response =
                 objectMapper.readValue(
                         deployResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(response.getErrorType(), ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED);
+        assertEquals(ErrorType.SERVICE_TEMPLATE_UNAVAILABLE, response.getErrorType());
         assertEquals(response.getDetails(), List.of(errorMsg));
 
         // SetUp
@@ -995,7 +995,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         OrderFailedErrorResponse response1 =
                 objectMapper.readValue(
                         deployResponse1.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(response1.getErrorType(), ErrorType.SERVICE_TEMPLATE_NOT_REGISTERED);
+        assertEquals(ErrorType.SERVICE_TEMPLATE_UNAVAILABLE, response1.getErrorType());
         assertEquals(response1.getDetails(), List.of(errorMsg));
     }
 
