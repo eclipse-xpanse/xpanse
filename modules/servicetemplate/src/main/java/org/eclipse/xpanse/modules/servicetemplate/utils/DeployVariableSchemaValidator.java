@@ -41,14 +41,9 @@ public class DeployVariableSchemaValidator {
         List<DeployVariable> missingExampleValueVariables = new ArrayList<>();
 
         for (DeployVariable deployVariable : deployVariables) {
-            if (Objects.nonNull(deployVariable.getKind())
-                    && (StringUtils.equals(
-                                    deployVariable.getKind().toValue(),
-                                    DeployVariableKind.FIX_ENV.toValue())
-                            || StringUtils.equals(
-                                    deployVariable.getKind().toValue(),
-                                    DeployVariableKind.FIX_VARIABLE.toValue()))) {
-                if (StringUtils.isEmpty(deployVariable.getExample())) {
+            if (deployVariable.getKind() == DeployVariableKind.FIX_ENV
+                    || deployVariable.getKind() == DeployVariableKind.FIX_VARIABLE) {
+                if (StringUtils.isEmpty(deployVariable.getValue())) {
                     missingExampleValueVariables.add(deployVariable);
                 }
             }
