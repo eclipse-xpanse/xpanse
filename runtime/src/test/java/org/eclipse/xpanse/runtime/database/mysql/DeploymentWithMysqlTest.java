@@ -19,8 +19,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
-import org.eclipse.xpanse.api.controllers.ServiceMigrationApi;
 import org.eclipse.xpanse.api.controllers.ServiceOrderManageApi;
+import org.eclipse.xpanse.api.controllers.ServicePortingApi;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.api.controllers.UserCloudCredentialsApi;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -49,7 +49,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplate
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
-import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
+import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -77,7 +77,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     private ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator;
 
     @Resource private OclLoader oclLoader;
-    @Resource private ServiceMigrationApi serviceMigrationApi;
+    @Resource private ServicePortingApi servicePortingApi;
     @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     @Test
@@ -109,11 +109,11 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
             if (serviceDeploymentState.equals(ServiceDeploymentState.DEPLOY_SUCCESS)) {
                 testModifyAndGetDetails(serviceId, serviceTemplate);
-                ServiceOrder migrateOrder = migrateService(serviceId, serviceTemplate);
-                if (waitServiceOrderIsCompleted(migrateOrder.getOrderId())) {
+                ServiceOrder servicePortingOrder = portService(serviceId, serviceTemplate);
+                if (waitServiceOrderIsCompleted(servicePortingOrder.getOrderId())) {
                     ServiceOrderDetails serviceOrderDetails =
                             serviceOrderManageApi.getOrderDetailsByOrderId(
-                                    migrateOrder.getOrderId());
+                                    servicePortingOrder.getOrderId());
                     testDestroyAndGetDetails(serviceOrderDetails.getServiceId());
                     testListServiceOrders(serviceId);
                     testDeleteServiceOrders(serviceId);
@@ -210,12 +210,12 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return serviceTemplateApi.register(ocl);
     }
 
-    ServiceOrder migrateService(UUID serviceId, ServiceTemplateDetailVo serviceTemplate) {
-        MigrateRequest migrateRequest = new MigrateRequest();
-        migrateRequest.setOriginalServiceId(serviceId);
+    ServiceOrder portService(UUID serviceId, ServiceTemplateDetailVo serviceTemplate) {
+        ServicePortingRequest servicePortingRequest = new ServicePortingRequest();
+        servicePortingRequest.setOriginalServiceId(serviceId);
         DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
-        BeanUtils.copyProperties(deployRequestBase, migrateRequest);
-        return serviceMigrationApi.migrate(migrateRequest);
+        BeanUtils.copyProperties(deployRequestBase, servicePortingRequest);
+        return servicePortingApi.port(servicePortingRequest);
     }
 
     void testModifyAndGetDetails(UUID serviceId, ServiceTemplateDetailVo serviceTemplate)

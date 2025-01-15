@@ -19,7 +19,7 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
+import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,11 +34,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
 @AutoConfigureMockMvc
-class ServiceMigrationApiTest extends ApisTestCommon {
+class ServicePortingApiTest extends ApisTestCommon {
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
-    void testServiceMigrationApis() throws Exception {
+    void testServicePortingApis() throws Exception {
         // prepare data
         Ocl ocl =
                 new OclLoader()
@@ -48,29 +48,30 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         ServiceTemplateDetailVo serviceTemplate =
                 registerServiceTemplateAndApproveRegistration(ocl);
         addCredentialForHuaweiCloud();
-        testServiceMigrationApisWell(serviceTemplate);
-        testServiceMigrationApisThrowsException(serviceTemplate);
+        testServicePortingApisWell(serviceTemplate);
+        testServicePortingApisThrowsException(serviceTemplate);
         deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
-    void testServiceMigrationApisWell(ServiceTemplateDetailVo serviceTemplate) throws Exception {
+    void testServicePortingApisWell(ServiceTemplateDetailVo serviceTemplate) throws Exception {
         ServiceOrder serviceOrder = deployService(serviceTemplate);
         UUID serviceId = serviceOrder.getServiceId();
         assertThat(waitServiceDeploymentIsCompleted(serviceId)).isTrue();
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
-        MigrateRequest migrateRequest = new MigrateRequest();
-        BeanUtils.copyProperties(deployRequest, migrateRequest);
-        migrateRequest.setOriginalServiceId(serviceId);
-        migrateRequest.setCustomerServiceName("newService");
-        MockHttpServletResponse migrateResponse = migrateService(migrateRequest);
-        ServiceOrder migrationOrder =
-                objectMapper.readValue(migrateResponse.getContentAsString(), ServiceOrder.class);
-        assertThat(migrateResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(migrationOrder).isNotNull();
+        ServicePortingRequest servicePortingRequest = new ServicePortingRequest();
+        BeanUtils.copyProperties(deployRequest, servicePortingRequest);
+        servicePortingRequest.setOriginalServiceId(serviceId);
+        servicePortingRequest.setCustomerServiceName("newService");
+        MockHttpServletResponse servicePortingResponse = portService(servicePortingRequest);
+        ServiceOrder servicePortingOrder =
+                objectMapper.readValue(
+                        servicePortingResponse.getContentAsString(), ServiceOrder.class);
+        assertThat(servicePortingResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
+        assertThat(servicePortingOrder).isNotNull();
 
-        assertThat(waitServiceOrderIsCompleted(migrationOrder.getOrderId())).isTrue();
+        assertThat(waitServiceOrderIsCompleted(servicePortingOrder.getOrderId())).isTrue();
         ServiceOrderEntity orderEntity =
-                serviceOrderStorage.getEntityById(migrationOrder.getOrderId());
+                serviceOrderStorage.getEntityById(servicePortingOrder.getOrderId());
         assertThat(orderEntity.getTaskStatus()).isEqualTo(TaskStatus.SUCCESSFUL);
 
         ServiceOrderEntity query = new ServiceOrderEntity();
@@ -82,23 +83,24 @@ class ServiceMigrationApiTest extends ApisTestCommon {
         }
     }
 
-    void testServiceMigrationApisThrowsException(ServiceTemplateDetailVo serviceTemplate)
+    void testServicePortingApisThrowsException(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
         ServiceOrder serviceOrder = deployService(serviceTemplate);
         UUID serviceId = serviceOrder.getServiceId();
         assertThat(waitServiceDeploymentIsCompleted(serviceId)).isTrue();
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
-        MigrateRequest migrateRequest = new MigrateRequest();
-        BeanUtils.copyProperties(deployRequest, migrateRequest);
-        testMigrateThrowsServiceNotFoundException(migrateRequest);
-        migrateRequest.setOriginalServiceId(serviceId);
-        testMigrateThrowsServiceLockedException(migrateRequest);
-        testMigrateThrowsServiceNotFoundException(migrateRequest);
-        testMigrateThrowsAccessDeniedException(serviceId, serviceTemplate);
+        ServicePortingRequest servicePortingRequest = new ServicePortingRequest();
+        BeanUtils.copyProperties(deployRequest, servicePortingRequest);
+        testServicePortingThrowsServiceNotFoundException(servicePortingRequest);
+        servicePortingRequest.setOriginalServiceId(serviceId);
+        testServicePortingThrowsServiceLockedException(servicePortingRequest);
+        testServicePortingThrowsServiceNotFoundException(servicePortingRequest);
+        testServicePortingThrowsAccessDeniedException(serviceId, serviceTemplate);
     }
 
-    void testMigrateThrowsServiceNotFoundException(MigrateRequest migrateRequest) throws Exception {
-        migrateRequest.setOriginalServiceId(UUID.randomUUID());
+    void testServicePortingThrowsServiceNotFoundException(
+            ServicePortingRequest servicePortingRequest) throws Exception {
+        servicePortingRequest.setOriginalServiceId(UUID.randomUUID());
         // Setup
         ErrorResponse expectedErrorResponse =
                 ErrorResponse.errorResponse(
@@ -106,9 +108,9 @@ class ServiceMigrationApiTest extends ApisTestCommon {
                         List.of(
                                 String.format(
                                         "Service with id %s not found.",
-                                        migrateRequest.getOriginalServiceId())));
+                                        servicePortingRequest.getOriginalServiceId())));
         // Run the test
-        final MockHttpServletResponse response = migrateService(migrateRequest);
+        final MockHttpServletResponse response = portService(servicePortingRequest);
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -116,51 +118,52 @@ class ServiceMigrationApiTest extends ApisTestCommon {
                 .isEqualTo(objectMapper.writeValueAsString(expectedErrorResponse));
     }
 
-    void testMigrateThrowsServiceLockedException(MigrateRequest migrateRequest) throws Exception {
+    void testServicePortingThrowsServiceLockedException(ServicePortingRequest servicePortingRequest)
+            throws Exception {
         // Setup
         ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
         serviceLockConfig.setModifyLocked(true);
         ServiceDeploymentEntity deployService =
                 serviceDeploymentStorage.findServiceDeploymentById(
-                        migrateRequest.getOriginalServiceId());
+                        servicePortingRequest.getOriginalServiceId());
         deployService.setLockConfig(serviceLockConfig);
         serviceDeploymentStorage.storeAndFlush(deployService);
 
         String message =
                 String.format(
-                        "Service with id %s is locked from migration.",
-                        migrateRequest.getOriginalServiceId());
+                        "Service with id %s is locked from porting.",
+                        servicePortingRequest.getOriginalServiceId());
         ErrorResponse expectedErrorResponse =
                 ErrorResponse.errorResponse(
                         ErrorType.SERVICE_LOCKED, Collections.singletonList(message));
         String result = objectMapper.writeValueAsString(expectedErrorResponse);
         // Run the test
-        final MockHttpServletResponse response = migrateService(migrateRequest);
+        final MockHttpServletResponse response = portService(servicePortingRequest);
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.getContentAsString()).isEqualTo(result);
     }
 
-    void testMigrateThrowsAccessDeniedException(
+    void testServicePortingThrowsAccessDeniedException(
             UUID serviceId, ServiceTemplateDetailVo serviceTemplate) throws Exception {
 
         ErrorResponse expectedErrorResponse =
                 ErrorResponse.errorResponse(
                         ErrorType.ACCESS_DENIED,
                         Collections.singletonList(
-                                "No permissions to migrate services belonging to other users."));
+                                "No permissions to port services belonging to other users."));
 
         ServiceDeploymentEntity deployService =
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId);
         deployService.setUserId(null);
         serviceDeploymentStorage.storeAndFlush(deployService);
         DeployRequest deployRequest = getDeployRequest(serviceTemplate);
-        MigrateRequest migrateRequest = new MigrateRequest();
-        BeanUtils.copyProperties(deployRequest, migrateRequest);
-        migrateRequest.setOriginalServiceId(serviceId);
+        ServicePortingRequest servicePortingRequest = new ServicePortingRequest();
+        BeanUtils.copyProperties(deployRequest, servicePortingRequest);
+        servicePortingRequest.setOriginalServiceId(serviceId);
 
-        MockHttpServletResponse response = migrateService(migrateRequest);
+        MockHttpServletResponse response = portService(servicePortingRequest);
 
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
@@ -168,10 +171,11 @@ class ServiceMigrationApiTest extends ApisTestCommon {
                 .isEqualTo(objectMapper.writeValueAsString(expectedErrorResponse));
     }
 
-    MockHttpServletResponse migrateService(MigrateRequest migrateRequest) throws Exception {
+    MockHttpServletResponse portService(ServicePortingRequest servicePortingRequest)
+            throws Exception {
         return mockMvc.perform(
-                        post("/xpanse/services/migration")
-                                .content(objectMapper.writeValueAsString(migrateRequest))
+                        post("/xpanse/services/porting")
+                                .content(objectMapper.writeValueAsString(servicePortingRequest))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()

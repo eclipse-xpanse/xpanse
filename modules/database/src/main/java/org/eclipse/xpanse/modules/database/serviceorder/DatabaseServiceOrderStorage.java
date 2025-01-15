@@ -146,7 +146,7 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
             case DEPLOY:
             case RETRY:
             case MODIFY:
-            case MIGRATE:
+            case PORT:
             case RECREATE:
             case DESTROY:
             case ROLLBACK:

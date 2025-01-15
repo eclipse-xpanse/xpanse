@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateReque
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
-import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
+import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.springframework.stereotype.Component;
 
@@ -60,8 +60,8 @@ public class CspPluginValidator {
                 validatePluginForCspIsActive(ocl.getCloudServiceProvider().getName());
             } else if (arg instanceof DeployRequest deployRequest) {
                 validatePluginForCspIsActive(deployRequest.getCsp());
-            } else if (arg instanceof MigrateRequest migrateRequest) {
-                validatePluginForCspIsActive(migrateRequest.getCsp());
+            } else if (arg instanceof ServicePortingRequest servicePortingRequest) {
+                validatePluginForCspIsActive(servicePortingRequest.getCsp());
             } else if (arg instanceof CreateCredential createCredential) {
                 validatePluginForCspIsActive(createCredential.getCsp());
             } else if (arg instanceof UserPolicyCreateRequest userPolicyCreateRequest) {

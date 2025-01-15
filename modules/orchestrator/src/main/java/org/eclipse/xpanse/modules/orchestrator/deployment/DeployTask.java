@@ -34,7 +34,7 @@ public class DeployTask {
     /** The id of the original service. */
     private UUID originalServiceId;
 
-    /** The id of the workflow instance of service migration or service redeployment. */
+    /** The id of the workflow instance of service porting or service redeployment. */
     private String workflowId;
 
     /** ServiceVendor of the user who registered service template. */

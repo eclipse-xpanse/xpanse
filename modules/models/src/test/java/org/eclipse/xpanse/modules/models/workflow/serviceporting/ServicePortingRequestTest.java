@@ -1,4 +1,4 @@
-package org.eclipse.xpanse.modules.models.workflow.migrate;
+package org.eclipse.xpanse.modules.models.workflow.serviceporting;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 
-class MigrateRequestTest {
+class ServicePortingRequestTest {
 
     private final UUID id = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
     private final String userId = "userId";
@@ -33,11 +33,11 @@ class MigrateRequestTest {
     private final Map<String, Object> properties = Collections.singletonMap("key", "value");
     private final Map<String, String> availabilityZones = Collections.singletonMap("key", "value");
     private final BillingMode billingMode = BillingMode.FIXED;
-    private MigrateRequest request;
+    private ServicePortingRequest request;
 
     @BeforeEach
     void setUp() {
-        request = new MigrateRequest();
+        request = new ServicePortingRequest();
         request.setOriginalServiceId(id);
         request.setUserId(userId);
         request.setCategory(category);
@@ -81,10 +81,10 @@ class MigrateRequestTest {
         Object obj = new Object();
         assertThat(request).isNotEqualTo(obj);
         assertThat(request.hashCode()).isNotEqualTo(obj.hashCode());
-        MigrateRequest test1 = new MigrateRequest();
+        ServicePortingRequest test1 = new ServicePortingRequest();
         assertThat(request).isNotEqualTo(test1);
         assertThat(request.hashCode()).isNotEqualTo(test1.hashCode());
-        MigrateRequest test2 = new MigrateRequest();
+        ServicePortingRequest test2 = new ServicePortingRequest();
         BeanUtils.copyProperties(request, test2);
         assertThat(request).isEqualTo(test2);
         assertThat(request.hashCode()).isEqualTo(test2.hashCode());
@@ -93,13 +93,13 @@ class MigrateRequestTest {
     @Test
     void testCanEqual() {
         assertThat(request.canEqual("other")).isFalse();
-        assertThat(request.canEqual(new MigrateRequest())).isTrue();
+        assertThat(request.canEqual(new ServicePortingRequest())).isTrue();
     }
 
     @Test
     void testToString() {
         String expectedToString =
-                "MigrateRequest(super=DeployRequestBase("
+                "ServicePortingRequest(super=DeployRequestBase("
                         + "userId="
                         + userId
                         + ", category="

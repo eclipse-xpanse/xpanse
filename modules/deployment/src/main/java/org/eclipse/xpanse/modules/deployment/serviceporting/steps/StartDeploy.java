@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.deployment.migration.steps;
+package org.eclipse.xpanse.modules.deployment.serviceporting.steps;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -15,15 +15,15 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.eclipse.xpanse.modules.deployment.DeployService;
-import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
-import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
+import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/** Migration process deployment service processing class. */
+/** Service porting process deployment service processing class. */
 @Slf4j
 @Component
 public class StartDeploy implements Serializable, JavaDelegate {
@@ -44,23 +44,26 @@ public class StartDeploy implements Serializable, JavaDelegate {
     public void execute(DelegateExecution execution) {
         String processInstanceId = execution.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        MigrateRequest migrateRequest =
-                (MigrateRequest) variables.get(MigrateConstants.MIGRATE_REQUEST);
+        ServicePortingRequest servicePortingRequest =
+                (ServicePortingRequest)
+                        variables.get(ServicePortingConstants.SERVICE_PORTING_REQUEST);
         DeployRequest deployRequest = new DeployRequest();
-        UUID newServiceId = (UUID) variables.get(MigrateConstants.NEW_SERVICE_ID);
-        BeanUtils.copyProperties(migrateRequest, deployRequest);
+        UUID newServiceId = (UUID) variables.get(ServicePortingConstants.NEW_SERVICE_ID);
+        BeanUtils.copyProperties(servicePortingRequest, deployRequest);
         deployRequest.setServiceId(newServiceId);
-        int retryTimes = (int) variables.get(MigrateConstants.DEPLOY_RETRY_NUM);
+        int retryTimes = (int) variables.get(ServicePortingConstants.DEPLOY_RETRY_NUM);
         log.info(
-                "Start deploy task in migration workflow with id:{}. Request:{}. Retry times:{}",
+                "Start deploy task in service porting workflow with id:{}. Request:{}. Retry"
+                        + " times:{}",
                 processInstanceId,
                 deployRequest,
                 retryTimes);
-        UUID originalServiceId = (UUID) variables.get(MigrateConstants.ORIGINAL_SERVICE_ID);
-        UUID migrateOrderId = (UUID) variables.get(MigrateConstants.MIGRATE_ORDER_ID);
+        UUID originalServiceId = (UUID) variables.get(ServicePortingConstants.ORIGINAL_SERVICE_ID);
+        UUID servicePortingOrderId =
+                (UUID) variables.get(ServicePortingConstants.SERVICE_PORTING_ORDER_ID);
         ServiceOrder serviceOrder =
                 deployService.deployServiceByWorkflow(
-                        originalServiceId, processInstanceId, migrateOrderId, deployRequest);
+                        originalServiceId, processInstanceId, servicePortingOrderId, deployRequest);
         log.info("Started new deploy task with order: {} successfully.", serviceOrder.toString());
     }
 }

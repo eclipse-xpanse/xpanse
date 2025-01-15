@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateReque
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
-import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
+import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.audit.AuditLog;
@@ -114,7 +114,7 @@ public class AuditLogWriter {
             return switch (arg) {
                 case Ocl ocl -> ocl.getCloudServiceProvider().getName();
                 case DeployRequest deployRequest -> deployRequest.getCsp();
-                case MigrateRequest migrateRequest -> migrateRequest.getCsp();
+                case ServicePortingRequest servicePortingRequest -> servicePortingRequest.getCsp();
                 case CreateCredential createCredential -> createCredential.getCsp();
                 case UserPolicyCreateRequest userPolicyCreateRequest ->
                         userPolicyCreateRequest.getCsp();

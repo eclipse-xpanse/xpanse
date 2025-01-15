@@ -6,7 +6,7 @@
 package org.eclipse.xpanse.modules.models.service.deployment.exceptions;
 
 /**
- * Exception thrown when the billing mode selected during service deployment or migration is not
+ * Exception thrown when the billing mode selected during service deployment or porting is not
  * supported.
  */
 public class BillingModeNotSupported extends RuntimeException {

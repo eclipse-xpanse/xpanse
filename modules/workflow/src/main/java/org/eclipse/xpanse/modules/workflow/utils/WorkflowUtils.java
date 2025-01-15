@@ -195,7 +195,7 @@ public class WorkflowUtils {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new ServiceNotDeployedException(
-                    "The migrated activiti task was not found, " + "taskId: " + taskId);
+                    "The ported activiti task was not found, " + "taskId: " + taskId);
         }
     }
 

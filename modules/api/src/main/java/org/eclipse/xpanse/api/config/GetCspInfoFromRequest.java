@@ -141,9 +141,9 @@ public class GetCspInfoFromRequest {
     }
 
     /**
-     * Get Csp with taskId of migrate task.
+     * Get Csp with taskId of porting task.
      *
-     * @param taskId id of migrate task.
+     * @param taskId id of porting task.
      * @return csp.
      */
     public Csp getCspFromWorkflowTaskId(String taskId) {

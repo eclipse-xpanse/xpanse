@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
-import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
@@ -101,7 +101,7 @@ public class WorkFlowApi {
                     @RequestParam(name = "retryOrder")
                     boolean retryOrder) {
         Map<String, Object> variables = new HashMap<>();
-        variables.put(MigrateConstants.IS_RETRY_TASK, retryOrder);
+        variables.put(ServicePortingConstants.IS_RETRY_TASK, retryOrder);
         workflowUtils.completeTask(taskId, variables);
     }
 }

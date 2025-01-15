@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.deployment.migration.steps;
+package org.eclipse.xpanse.modules.deployment.serviceporting.steps;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.activiti.engine.delegate.JavaDelegate;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
-import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
@@ -26,18 +26,18 @@ import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/** Processing class for checking deployment status after deployment callback. */
+/** Processing class for checking destroy status after destroy callback. */
 @Slf4j
 @Component
-public class ProcessDeploymentResult implements Serializable, JavaDelegate {
+public class ProcessDestroyResult implements Serializable, JavaDelegate {
 
     private final RuntimeService runtimeService;
     private final ServiceOrderManager serviceOrderManager;
     private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
-    /** Constructor for ProcessDeploymentResult bean. */
+    /** Constructor for ProcessDestroyResult bean. */
     @Autowired
-    public ProcessDeploymentResult(
+    public ProcessDestroyResult(
             RuntimeService runtimeService,
             ServiceOrderManager serviceOrderManager,
             ServiceDeploymentEntityHandler serviceDeploymentEntityHandler) {
@@ -50,63 +50,66 @@ public class ProcessDeploymentResult implements Serializable, JavaDelegate {
     public void execute(DelegateExecution execution) {
         String processInstanceId = execution.getProcessInstanceId();
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        UUID migrateOrderId = (UUID) variables.get(MigrateConstants.MIGRATE_ORDER_ID);
+        UUID originalServiceId = (UUID) variables.get(ServicePortingConstants.ORIGINAL_SERVICE_ID);
+        UUID servicePortingOrderId =
+                (UUID) variables.get(ServicePortingConstants.SERVICE_PORTING_ORDER_ID);
+        log.info(
+                "Service porting workflow of instance id : {} start check destroy status.",
+                processInstanceId);
         try {
-            UUID newServiceId = (UUID) variables.get(MigrateConstants.NEW_SERVICE_ID);
-            log.info(
-                    "Migration workflow of instance id : {} check deploy service status with id:{}",
-                    processInstanceId,
-                    newServiceId.toString());
             ServiceDeploymentEntity serviceDeploymentEntity =
-                    serviceDeploymentEntityHandler.getServiceDeploymentEntity(newServiceId);
+                    serviceDeploymentEntityHandler.getServiceDeploymentEntity(originalServiceId);
             if (Objects.nonNull(serviceDeploymentEntity)
                     && serviceDeploymentEntity.getServiceDeploymentState()
-                            == ServiceDeploymentState.DEPLOY_SUCCESS) {
+                            == ServiceDeploymentState.DESTROY_SUCCESS) {
                 runtimeService.setVariable(
-                        processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS, true);
+                        processInstanceId, ServicePortingConstants.IS_DESTROY_SUCCESS, true);
+                serviceOrderManager.completeOrderProgress(
+                        servicePortingOrderId, TaskStatus.SUCCESSFUL, null);
             } else {
-                int deployRetryNum = getDeployRetryNum(variables);
+                int destroyRetryNum = getDestroyRetryNum(variables);
                 runtimeService.setVariable(
-                        processInstanceId, MigrateConstants.DEPLOY_RETRY_NUM, deployRetryNum + 1);
+                        processInstanceId, ServicePortingConstants.IS_DESTROY_SUCCESS, false);
                 runtimeService.setVariable(
-                        processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS, false);
+                        processInstanceId,
+                        ServicePortingConstants.DESTROY_RETRY_NUM,
+                        destroyRetryNum + 1);
                 log.info(
-                        "Process failed deployment task of migration workflow with id:{}. "
+                        "Process failed destroy task of service porting workflow with id:{}. "
                                 + "RetryCount:{}",
                         processInstanceId,
-                        deployRetryNum);
-                if (deployRetryNum >= 1) {
-                    String userId = (String) variables.get(MigrateConstants.USER_ID);
+                        destroyRetryNum);
+                if (destroyRetryNum >= 1) {
+                    String userId = (String) variables.get(ServicePortingConstants.USER_ID);
                     runtimeService.setVariable(
-                            processInstanceId, MigrateConstants.ASSIGNEE, userId);
-
+                            processInstanceId, ServicePortingConstants.ASSIGNEE, userId);
                     serviceOrderManager.completeOrderProgress(
-                            migrateOrderId,
+                            servicePortingOrderId,
                             TaskStatus.FAILED,
                             ErrorResponse.errorResponse(
-                                    ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
+                                    ErrorType.DESTROY_FAILED_EXCEPTION,
                                     List.of(serviceDeploymentEntity.getResultMessage())));
                 }
             }
         } catch (Exception e) {
             log.error(
-                    "Failed to process deployment task of migration workflow with id:{}",
+                    "Failed to process destroy task of service porting workflow with id:{}",
                     processInstanceId,
                     e);
             runtimeService.setVariable(
-                    processInstanceId, MigrateConstants.IS_DEPLOY_SUCCESS, false);
+                    processInstanceId, ServicePortingConstants.IS_DESTROY_SUCCESS, false);
             serviceOrderManager.completeOrderProgress(
-                    migrateOrderId,
+                    servicePortingOrderId,
                     TaskStatus.FAILED,
                     ErrorResponse.errorResponse(
-                            ErrorType.DEPLOYMENT_FAILED_EXCEPTION, List.of(e.getMessage())));
+                            ErrorType.DESTROY_FAILED_EXCEPTION, List.of(e.getMessage())));
         }
     }
 
-    private int getDeployRetryNum(Map<String, Object> variables) {
-        if (Objects.isNull(variables.get(MigrateConstants.DEPLOY_RETRY_NUM))) {
+    private int getDestroyRetryNum(Map<String, Object> variables) {
+        if (Objects.isNull(variables.get(ServicePortingConstants.DESTROY_RETRY_NUM))) {
             return 0;
         }
-        return (int) variables.get(MigrateConstants.DEPLOY_RETRY_NUM);
+        return (int) variables.get(ServicePortingConstants.DESTROY_RETRY_NUM);
     }
 }

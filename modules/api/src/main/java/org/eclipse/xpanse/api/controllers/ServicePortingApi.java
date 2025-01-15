@@ -29,14 +29,14 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryM
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
-import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
+import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
-import org.eclipse.xpanse.modules.models.workflow.migrate.MigrateRequest;
+import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
@@ -52,14 +52,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/** REST interface methods for Service Migration. */
+/** REST interface methods for Service Porting. */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
-public class ServiceMigrationApi {
+public class ServicePortingApi {
 
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @Resource private UserServiceHelper userServiceHelper;
@@ -68,57 +68,58 @@ public class ServiceMigrationApi {
     @Resource private ServiceOrderManager serviceOrderManager;
 
     /**
-     * Create a job to migrate the deployed service.
+     * Create a job to port the deployed service.
      *
      * @return response
      */
-    @Tag(name = "Migration", description = "APIs to manage the service migration.")
-    @Operation(description = "Create a job to migrate the deployed service.")
-    @PostMapping(value = "/services/migration", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Tag(name = "ServicePorting", description = "APIs to manage the service porting.")
+    @Operation(description = "Create a job to port the deployed service.")
+    @PostMapping(value = "/services/porting", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public ServiceOrder migrate(@Valid @RequestBody MigrateRequest migrateRequest) {
-        validateData(migrateRequest);
+    public ServiceOrder port(@Valid @RequestBody ServicePortingRequest servicePortingRequest) {
+        validateData(servicePortingRequest);
         ServiceDeploymentEntity deployServiceEntity =
                 this.serviceDeploymentEntityHandler.getServiceDeploymentEntity(
-                        migrateRequest.getOriginalServiceId());
+                        servicePortingRequest.getOriginalServiceId());
         String userId = this.userServiceHelper.getCurrentUserId();
         if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {
             throw new AccessDeniedException(
-                    "No permissions to migrate services belonging to other users.");
+                    "No permissions to port services belonging to other users.");
         }
         if (Objects.nonNull(deployServiceEntity.getLockConfig())
                 && deployServiceEntity.getLockConfig().isModifyLocked()) {
             String errorMsg =
                     String.format(
-                            "Service with id %s is locked from migration.",
-                            migrateRequest.getOriginalServiceId());
+                            "Service with id %s is locked from porting.",
+                            servicePortingRequest.getOriginalServiceId());
             throw new ServiceLockedException(errorMsg);
         }
-        migrateRequest.setUserId(userId);
-        DeployTask migrateTask = getMigrateTask(migrateRequest);
-        ServiceOrderEntity migrateOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(migrateTask, deployServiceEntity);
+        servicePortingRequest.setUserId(userId);
+        DeployTask servicePortingTask = getServicePortingTask(servicePortingRequest);
+        ServiceOrderEntity servicePortingOrderEntity =
+                serviceOrderManager.storeNewServiceOrderEntity(
+                        servicePortingTask, deployServiceEntity);
         Map<String, Object> variable =
-                getMigrateProcessVariable(migrateRequest, migrateOrderEntity);
+                getServicePortingProcessVariable(servicePortingRequest, servicePortingOrderEntity);
         ProcessInstance instance =
-                workflowUtils.startProcess(MigrateConstants.PROCESS_KEY, variable);
-        migrateOrderEntity.setWorkflowId(instance.getProcessInstanceId());
+                workflowUtils.startProcess(ServicePortingConstants.PROCESS_KEY, variable);
+        servicePortingOrderEntity.setWorkflowId(instance.getProcessInstanceId());
         ServiceOrderEntity updatedOrderEntity =
-                serviceOrderManager.startOrderProgress(migrateOrderEntity);
+                serviceOrderManager.startOrderProgress(servicePortingOrderEntity);
         return new ServiceOrder(
                 updatedOrderEntity.getOrderId(),
-                (UUID) variable.get(MigrateConstants.NEW_SERVICE_ID));
+                (UUID) variable.get(ServicePortingConstants.NEW_SERVICE_ID));
     }
 
-    private void validateData(MigrateRequest migrateRequest) {
+    private void validateData(ServicePortingRequest servicePortingRequest) {
         ServiceTemplateQueryModel queryModel =
                 ServiceTemplateQueryModel.builder()
-                        .category(migrateRequest.getCategory())
-                        .csp(migrateRequest.getCsp())
-                        .serviceName(migrateRequest.getServiceName())
-                        .serviceVersion(migrateRequest.getVersion())
-                        .serviceHostingType(migrateRequest.getServiceHostingType())
+                        .category(servicePortingRequest.getCategory())
+                        .csp(servicePortingRequest.getCsp())
+                        .serviceName(servicePortingRequest.getServiceName())
+                        .serviceVersion(servicePortingRequest.getVersion())
+                        .serviceHostingType(servicePortingRequest.getServiceHostingType())
                         .build();
         List<ServiceTemplateEntity> existingServiceTemplates =
                 serviceTemplateStorage.listServiceTemplates(queryModel);
@@ -131,7 +132,7 @@ public class ServiceMigrationApi {
                         .findFirst()
                         .orElse(null);
         if (Objects.isNull(existingTemplate)) {
-            String errorMsg = "No service template is available to be used to migrate service";
+            String errorMsg = "No service template is available to be used to port service";
             log.error(errorMsg);
             throw new ServiceTemplateUnavailableException(errorMsg);
         }
@@ -139,37 +140,42 @@ public class ServiceMigrationApi {
                 .getOcl()
                 .getBilling()
                 .getBillingModes()
-                .contains(migrateRequest.getBillingMode())) {
+                .contains(servicePortingRequest.getBillingMode())) {
             String errorMsg =
                     String.format(
                             "The service template with id %s does not support billing mode %s.",
-                            existingTemplate.getId(), migrateRequest.getBillingMode());
+                            existingTemplate.getId(), servicePortingRequest.getBillingMode());
             log.error(errorMsg);
             throw new BillingModeNotSupported(errorMsg);
         }
     }
 
-    private DeployTask getMigrateTask(MigrateRequest migrateRequest) {
-        DeployTask migrateTask = new DeployTask();
-        migrateTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
-        migrateTask.setTaskType(ServiceOrderType.MIGRATE);
-        migrateTask.setServiceId(migrateRequest.getOriginalServiceId());
-        migrateTask.setOriginalServiceId(migrateRequest.getOriginalServiceId());
-        migrateTask.setUserId(migrateRequest.getUserId());
-        migrateTask.setRequest(migrateRequest);
-        return migrateTask;
+    private DeployTask getServicePortingTask(ServicePortingRequest servicePortingRequest) {
+        DeployTask servicePortingTask = new DeployTask();
+        servicePortingTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
+        servicePortingTask.setTaskType(ServiceOrderType.PORT);
+        servicePortingTask.setServiceId(servicePortingRequest.getOriginalServiceId());
+        servicePortingTask.setOriginalServiceId(servicePortingRequest.getOriginalServiceId());
+        servicePortingTask.setUserId(servicePortingRequest.getUserId());
+        servicePortingTask.setRequest(servicePortingRequest);
+        return servicePortingTask;
     }
 
-    private Map<String, Object> getMigrateProcessVariable(
-            MigrateRequest migrateRequest, ServiceOrderEntity migrateOrderEntity) {
+    private Map<String, Object> getServicePortingProcessVariable(
+            ServicePortingRequest servicePortingRequest,
+            ServiceOrderEntity servicePortingOrderEntity) {
         Map<String, Object> variable = new HashMap<>();
-        variable.put(MigrateConstants.MIGRATE_ORDER_ID, migrateOrderEntity.getOrderId());
-        variable.put(MigrateConstants.ORIGINAL_SERVICE_ID, migrateRequest.getOriginalServiceId());
-        variable.put(MigrateConstants.NEW_SERVICE_ID, UUID.randomUUID());
-        variable.put(MigrateConstants.MIGRATE_REQUEST, migrateRequest);
-        variable.put(MigrateConstants.USER_ID, migrateRequest.getUserId());
-        variable.put(MigrateConstants.DEPLOY_RETRY_NUM, 0);
-        variable.put(MigrateConstants.DESTROY_RETRY_NUM, 0);
+        variable.put(
+                ServicePortingConstants.SERVICE_PORTING_ORDER_ID,
+                servicePortingOrderEntity.getOrderId());
+        variable.put(
+                ServicePortingConstants.ORIGINAL_SERVICE_ID,
+                servicePortingRequest.getOriginalServiceId());
+        variable.put(ServicePortingConstants.NEW_SERVICE_ID, UUID.randomUUID());
+        variable.put(ServicePortingConstants.SERVICE_PORTING_REQUEST, servicePortingRequest);
+        variable.put(ServicePortingConstants.USER_ID, servicePortingRequest.getUserId());
+        variable.put(ServicePortingConstants.DEPLOY_RETRY_NUM, 0);
+        variable.put(ServicePortingConstants.DESTROY_RETRY_NUM, 0);
         return variable;
     }
 }
