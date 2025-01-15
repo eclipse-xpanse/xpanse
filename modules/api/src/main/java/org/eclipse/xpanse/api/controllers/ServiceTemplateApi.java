@@ -344,7 +344,7 @@ public class ServiceTemplateApi {
     }
 
     /**
-     * List service template history using id of service template.
+     * List service template history using id of service template for ISV.
      *
      * @param serviceTemplateId id of service template.
      * @param requestType type of service template request.
@@ -362,7 +362,7 @@ public class ServiceTemplateApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
-    public List<ServiceTemplateRequestHistory> getServiceTemplateRequestHistoryByServiceTemplateId(
+    public List<ServiceTemplateRequestHistory> getServiceTemplateRequestHistoryForIsv(
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId,
@@ -373,7 +373,7 @@ public class ServiceTemplateApi {
                     @RequestParam(name = "requestStatus", required = false)
                     ServiceTemplateRequestStatus requestStatus) {
         return serviceTemplateManage.getServiceTemplateRequestHistoryByServiceTemplateId(
-                serviceTemplateId, requestType, requestStatus);
+                serviceTemplateId, requestType, requestStatus, true, false);
     }
 
     /**

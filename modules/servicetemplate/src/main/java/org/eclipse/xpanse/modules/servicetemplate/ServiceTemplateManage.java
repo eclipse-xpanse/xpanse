@@ -650,9 +650,11 @@ public class ServiceTemplateManage {
     public List<ServiceTemplateRequestHistory> getServiceTemplateRequestHistoryByServiceTemplateId(
             UUID serviceTemplateId,
             ServiceTemplateRequestType requestType,
-            ServiceTemplateRequestStatus changeStatus) {
+            ServiceTemplateRequestStatus changeStatus,
+            boolean checkServiceVendor,
+            boolean checkCsp) {
         ServiceTemplateEntity existingTemplate =
-                getServiceTemplateDetails(serviceTemplateId, true, false);
+                getServiceTemplateDetails(serviceTemplateId, checkServiceVendor, checkCsp);
         List<ServiceTemplateRequestHistoryEntity> historyList =
                 existingTemplate.getServiceTemplateHistory();
         if (Objects.nonNull(requestType)) {

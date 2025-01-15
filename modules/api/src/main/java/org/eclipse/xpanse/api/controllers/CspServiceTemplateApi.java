@@ -28,8 +28,10 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewServiceTemplateRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
@@ -196,5 +198,40 @@ public class CspServiceTemplateApi {
                     UUID requestId,
             @Valid @RequestBody ReviewServiceTemplateRequest reviewServiceTemplateRequest) {
         serviceTemplateManage.reviewServiceTemplateRequest(requestId, reviewServiceTemplateRequest);
+    }
+
+    /**
+     * List service template history using id of service template for CSP.
+     *
+     * @param serviceTemplateId id of service template.
+     * @param requestType type of service template request.
+     * @param requestStatus status of service template request.
+     * @return list of service template history.
+     */
+    @Tag(
+            name = "CloudServiceProvider",
+            description = "APIs for cloud service provider to manage service templates.")
+    @Operation(
+            description =
+                    "Get service template requests using id of service template. The returned"
+                            + " requests is sorted in descending order according to the requested"
+                            + " time.")
+    @GetMapping(
+            value = "/csp/service_templates/{serviceTemplateId}/requests",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
+    public List<ServiceTemplateRequestHistory> getServiceTemplateRequestHistoryForCsp(
+            @Parameter(name = "serviceTemplateId", description = "id of service template")
+                    @PathVariable("serviceTemplateId")
+                    UUID serviceTemplateId,
+            @Parameter(name = "requestType", description = "type of service template request")
+                    @RequestParam(name = "requestType", required = false)
+                    ServiceTemplateRequestType requestType,
+            @Parameter(name = "requestStatus", description = "status of service template request")
+                    @RequestParam(name = "requestStatus", required = false)
+                    ServiceTemplateRequestStatus requestStatus) {
+        return serviceTemplateManage.getServiceTemplateRequestHistoryByServiceTemplateId(
+                serviceTemplateId, requestType, requestStatus, false, true);
     }
 }
