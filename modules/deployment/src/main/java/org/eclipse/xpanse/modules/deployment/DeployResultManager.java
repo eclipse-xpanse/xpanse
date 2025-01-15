@@ -25,8 +25,8 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
-import org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
+import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
@@ -381,8 +381,8 @@ public class DeployResultManager {
 
     private void completeParentServiceOrder(UUID parentOrderId, DeployResult deployResult) {
         ServiceOrderEntity parentOrder = serviceOrderStorage.getEntityById(parentOrderId);
-        // When the parent order is not migrate or recreate task, complete it.
-        if (parentOrder.getTaskType() != ServiceOrderType.MIGRATE
+        // When the parent order is not port or recreate task, complete it.
+        if (parentOrder.getTaskType() != ServiceOrderType.PORT
                 && parentOrder.getTaskType() != ServiceOrderType.RECREATE) {
             ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
             BeanUtils.copyProperties(parentOrder, entityToUpdate);
@@ -404,17 +404,19 @@ public class DeployResultManager {
                 ServiceOrderEntity parentOrder =
                         serviceOrderStorage.getEntityById(serviceOrder.getParentOrderId());
                 serviceOrderManager.updateOrderWithDeployResult(parentOrder, deployResult);
-                if (parentOrder.getTaskType() == ServiceOrderType.MIGRATE) {
+                if (parentOrder.getTaskType() == ServiceOrderType.PORT) {
                     if (serviceOrder.getTaskType() == ServiceOrderType.DEPLOY
                             || serviceOrder.getTaskType() == ServiceOrderType.RETRY) {
                         workflowUtils.completeReceiveTask(
                                 processInstanceId,
-                                MigrateConstants.MIGRATION_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
+                                ServicePortingConstants
+                                        .SERVICE_PORTING_DEPLOY_RECEIVE_TASK_ACTIVITY_ID);
                     }
                     if (serviceOrder.getTaskType() == ServiceOrderType.DESTROY) {
                         workflowUtils.completeReceiveTask(
                                 processInstanceId,
-                                MigrateConstants.MIGRATION_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
+                                ServicePortingConstants
+                                        .SERVICE_PORTING_DESTROY_RECEIVE_TASK_ACTIVITY_ID);
                     }
                 }
                 if (parentOrder.getTaskType() == ServiceOrderType.RECREATE) {

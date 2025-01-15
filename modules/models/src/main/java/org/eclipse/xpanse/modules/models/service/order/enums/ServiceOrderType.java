@@ -17,7 +17,7 @@ public enum ServiceOrderType {
     ROLLBACK("rollback"),
     MODIFY("modify"),
     DESTROY("destroy"),
-    MIGRATE("migrate"),
+    PORT("port"),
     RECREATE("recreate"),
     LOCK_CHANGE("lockChange"),
     CONFIG_CHANGE("configChange"),

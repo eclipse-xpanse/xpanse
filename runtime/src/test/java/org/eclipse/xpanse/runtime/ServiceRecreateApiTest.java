@@ -35,7 +35,7 @@ class ServiceRecreateApiTest extends ApisTestCommon {
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")
-    void testServiceMigrationApis() throws Exception {
+    void testServiceRecreateApis() throws Exception {
         // prepare data
         Ocl ocl =
                 new OclLoader()
@@ -55,14 +55,14 @@ class ServiceRecreateApiTest extends ApisTestCommon {
         UUID serviceId = serviceOrder.getServiceId();
         assertThat(waitServiceDeploymentIsCompleted(serviceId)).isTrue();
         MockHttpServletResponse recreateResponse = recreateService(serviceId);
-        ServiceOrder migrationOrder =
+        ServiceOrder servicePortingOrder =
                 objectMapper.readValue(recreateResponse.getContentAsString(), ServiceOrder.class);
         assertThat(recreateResponse.getStatus()).isEqualTo(HttpStatus.ACCEPTED.value());
-        assertThat(migrationOrder).isNotNull();
+        assertThat(servicePortingOrder).isNotNull();
 
-        assertThat(waitServiceOrderIsCompleted(migrationOrder.getOrderId())).isTrue();
+        assertThat(waitServiceOrderIsCompleted(servicePortingOrder.getOrderId())).isTrue();
         ServiceOrderEntity orderEntity =
-                serviceOrderStorage.getEntityById(migrationOrder.getOrderId());
+                serviceOrderStorage.getEntityById(servicePortingOrder.getOrderId());
         assertThat(orderEntity.getTaskStatus()).isEqualTo(TaskStatus.SUCCESSFUL);
 
         ServiceOrderEntity query = new ServiceOrderEntity();
@@ -79,13 +79,13 @@ class ServiceRecreateApiTest extends ApisTestCommon {
         ServiceOrder serviceOrder = deployService(serviceTemplate);
         UUID serviceId = serviceOrder.getServiceId();
         assertThat(waitServiceDeploymentIsCompleted(serviceId)).isTrue();
-        testMigrateThrowsServiceNotFoundException();
-        testMigrateThrowsServiceLockedException(serviceId);
-        testMigrateThrowsServiceNotFoundException();
-        testMigrateThrowsAccessDeniedException(serviceId);
+        testRecreateThrowsServiceNotFoundException();
+        testRecreateThrowsServiceLockedException(serviceId);
+        testRecreateThrowsServiceNotFoundException();
+        testRecreateThrowsAccessDeniedException(serviceId);
     }
 
-    void testMigrateThrowsServiceNotFoundException() throws Exception {
+    void testRecreateThrowsServiceNotFoundException() throws Exception {
         UUID serviceId = UUID.randomUUID();
         // Setup
         ErrorResponse expectedErrorResponse =
@@ -101,7 +101,7 @@ class ServiceRecreateApiTest extends ApisTestCommon {
                 .isEqualTo(objectMapper.writeValueAsString(expectedErrorResponse));
     }
 
-    void testMigrateThrowsServiceLockedException(UUID serviceId) throws Exception {
+    void testRecreateThrowsServiceLockedException(UUID serviceId) throws Exception {
         // Setup
         ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
         serviceLockConfig.setModifyLocked(true);
@@ -123,7 +123,7 @@ class ServiceRecreateApiTest extends ApisTestCommon {
         assertThat(response.getContentAsString()).isEqualTo(result);
     }
 
-    void testMigrateThrowsAccessDeniedException(UUID serviceId) throws Exception {
+    void testRecreateThrowsAccessDeniedException(UUID serviceId) throws Exception {
 
         ErrorResponse expectedErrorResponse =
                 ErrorResponse.errorResponse(

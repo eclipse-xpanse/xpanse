@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment.recreate.consts;
 
-/** Migrate constant classes. */
+/** Recreate constant classes. */
 public class RecreateConstants {
 
     public static final String PROCESS_KEY = "recreate";

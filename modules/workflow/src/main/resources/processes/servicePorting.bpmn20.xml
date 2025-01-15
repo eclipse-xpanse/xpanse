@@ -8,8 +8,8 @@
              typeLanguage="http://www.w3.org/2001/XMLSchema"
              expressionLanguage="http://www.w3.org/1999/XPath"
              targetNamespace="http://www.activiti.org/processdef">
-  <process id="migrate" name="migrate" isExecutable="true">
-    <documentation>Service Migrate Process</documentation>
+  <process id="servicePorting" name="servicePorting" isExecutable="true">
+    <documentation>Service Porting Process</documentation>
     <startEvent id="sid-448fe061-da08-4592-b466-33ba353d38f0"/>
     <serviceTask id="sid-59d46b05-df91-4a02-b735-d21e025fdeff" activiti:exclusive="true" name="ExportData" activiti:delegateExpression="${exportData}"/>
     <serviceTask id="sid-05accf33-d319-4221-bf3a-db7c6036f8fb" name="StartDeploy" activiti:exclusive="true" activiti:delegateExpression="${startDeploy}"/>
@@ -44,7 +44,7 @@
     </sequenceFlow>
     <userTask id="sid-383c2c42-e7b4-496b-9f83-a75507b6c8b3" name="ManuallyHandleDeployFailure" activiti:assignee="${assignee}">
       <extensionElements>
-        <activiti:executionListener class="org.eclipse.xpanse.modules.deployment.migration.steps.DeployFailedManualHandlerListener" event="end"/>
+        <activiti:executionListener class="org.eclipse.xpanse.modules.deployment.serviceporting.steps.DeployFailedManualHandlerListener" event="end"/>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="sid-65dfefba-0b74-4484-84d1-d755265b6763"/>
@@ -54,7 +54,7 @@
     <sequenceFlow id="sid-36255298-d882-4ce1-9658-6a826871144c" sourceRef="sid-383c2c42-e7b4-496b-9f83-a75507b6c8b3" targetRef="sid-65dfefba-0b74-4484-84d1-d755265b6763"/>
     <userTask id="sid-dfc178f2-6193-48b1-98df-df7328068412" name="ManuallyHandleDestroyFailure" activiti:assignee="${assignee}">
       <extensionElements>
-        <activiti:executionListener class="org.eclipse.xpanse.modules.deployment.migration.steps.DestroyFailedManualHandlerListener" event="end"/>
+        <activiti:executionListener class="org.eclipse.xpanse.modules.deployment.serviceporting.steps.DestroyFailedManualHandlerListener" event="end"/>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="sid-6c1a98d6-76ee-46cb-9734-de529dc71096"/>
@@ -76,8 +76,8 @@
     </sequenceFlow>
     <sequenceFlow id="sid-63f46cb1-10fa-4448-8c23-41cbe9579ba9" sourceRef="sid-05accf33-d319-4221-bf3a-db7c6036f8fb" targetRef="deployCallBack"/>
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_migrate">
-    <bpmndi:BPMNPlane bpmnElement="migrate" id="BPMNPlane_migrate">
+  <bpmndi:BPMNDiagram id="BPMNDiagram_servicePorting">
+    <bpmndi:BPMNPlane bpmnElement="servicePorting" id="BPMNPlane_servicePorting">
       <bpmndi:BPMNShape id="shape-f1bc07be-b40a-438a-a945-40c4694a1265" bpmnElement="sid-448fe061-da08-4592-b466-33ba353d38f0">
         <omgdc:Bounds x="-360.0" y="-130.0" width="30.0" height="30.0"/>
       </bpmndi:BPMNShape>

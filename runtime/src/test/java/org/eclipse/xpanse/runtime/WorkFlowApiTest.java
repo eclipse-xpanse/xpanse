@@ -1,7 +1,7 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.xpanse.modules.deployment.migration.consts.MigrateConstants.IS_RETRY_TASK;
+import static org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants.IS_RETRY_TASK;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,7 +45,7 @@ class WorkFlowApiTest extends ApisTestCommon {
 
     WorkFlowTask getTaskWithStatus(WorkFlowTaskStatus status) {
         String processInstanceId = UUID.randomUUID().toString();
-        String processDefinitionKey = "migrate";
+        String processDefinitionKey = "servicePorting";
         WorkFlowTask task = new WorkFlowTask();
         task.setProcessInstanceId(processInstanceId);
         task.setProcessDefinitionId(processDefinitionKey);

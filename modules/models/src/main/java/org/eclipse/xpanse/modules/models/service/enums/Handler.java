@@ -17,7 +17,7 @@ public enum Handler {
     OPEN_TOFU_LOCAL("open-tofu-local"),
     TOFU_MAKER("tofu-maker"),
     INTERNAL("internal"), // lock/unlock and any other orders
-    WORKFLOW("workFlow"), // migrate, recreate
+    WORKFLOW("workFlow"), // port, recreate
     AGENT("agent"), // config change
     PLUGIN("plugin"); // restart, stop and start
 
