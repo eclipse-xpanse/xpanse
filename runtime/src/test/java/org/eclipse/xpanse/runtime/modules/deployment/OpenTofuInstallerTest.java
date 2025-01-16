@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolEx
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(properties = {"http.request.retry.max.attempts=1"})
+@SpringBootTest(properties = {"http.request.retry.max.attempts=1", "spring.profiles.active=noauth"})
 class OpenTofuInstallerTest {
 
     @Resource private OpenTofuInstaller installer;
