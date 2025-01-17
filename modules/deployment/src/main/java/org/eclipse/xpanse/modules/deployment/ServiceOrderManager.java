@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceOrderStatusChangePolling;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
@@ -154,7 +155,7 @@ public class ServiceOrderManager {
      */
     public List<ServiceOrderDetails> listServiceOrders(
             UUID serviceId, ServiceOrderType taskType, TaskStatus taskStatus) {
-        validateDeployService(serviceId);
+        validateDeployService(serviceId, UserOperation.VIEW_ORDERS_OF_SERVICE);
         ServiceOrderEntity query = new ServiceOrderEntity();
         query.setServiceDeploymentEntity(
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId));
@@ -195,7 +196,7 @@ public class ServiceOrderManager {
      * @param serviceId service id.
      */
     public void deleteOrdersByServiceId(UUID serviceId) {
-        validateDeployService(serviceId);
+        validateDeployService(serviceId, UserOperation.DELETE_ORDERS_OF_SERVICE);
         ServiceOrderEntity query = new ServiceOrderEntity();
         query.setServiceDeploymentEntity(
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId));
@@ -213,7 +214,8 @@ public class ServiceOrderManager {
      * @return service order details.
      */
     public ServiceOrderDetails getOrderDetailsByOrderId(UUID orderId) {
-        ServiceOrderEntity orderEntity = getServiceOrderEntity(orderId);
+        ServiceOrderEntity orderEntity =
+                getServiceOrderEntity(orderId, UserOperation.VIEW_ORDER_DETAILS_OF_SERVICE);
         return EntityTransUtils.transToServiceOrderDetails(orderEntity);
     }
 
@@ -223,19 +225,16 @@ public class ServiceOrderManager {
      * @param orderId order id.
      */
     public void deleteOrderByOrderId(UUID orderId) {
-        ServiceOrderEntity orderEntity = getServiceOrderEntity(orderId);
+        ServiceOrderEntity orderEntity =
+                getServiceOrderEntity(orderId, UserOperation.DELETE_ORDERS_OF_SERVICE);
         serviceOrderStorage.delete(orderEntity);
     }
 
-    private void validateDeployService(UUID serviceId) {
+    private void validateDeployService(UUID serviceId, UserOperation userOperation) {
         ServiceDeploymentEntity deployedService =
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId);
         if (Objects.nonNull(deployedService)) {
-            if (isNotOwnerOrAdminUser(deployedService)) {
-                String errorMsg =
-                        "No permissions to manage service orders belonging to other users.";
-                throw new AccessDeniedException(errorMsg);
-            }
+            checkPermission(deployedService, userOperation);
         } else {
             String errorMsg = "Service with id " + serviceId + " not found.";
             throw new ServiceNotDeployedException(errorMsg);
@@ -248,25 +247,28 @@ public class ServiceOrderManager {
      * @param orderId order id.
      * @return service order entity.
      */
-    private ServiceOrderEntity getServiceOrderEntity(UUID orderId) {
+    private ServiceOrderEntity getServiceOrderEntity(UUID orderId, UserOperation userOperation) {
         ServiceOrderEntity orderEntity = serviceOrderStorage.getEntityById(orderId);
         if (Objects.nonNull(orderEntity)) {
             ServiceDeploymentEntity deployedService = orderEntity.getServiceDeploymentEntity();
             if (Objects.nonNull(deployedService)) {
-                if (isNotOwnerOrAdminUser(deployedService)) {
-                    String errorMsg =
-                            "No permissions to manage service orders belonging to other users.";
-                    throw new AccessDeniedException(errorMsg);
-                }
+                checkPermission(deployedService, userOperation);
             }
         }
         return orderEntity;
     }
 
-    private boolean isNotOwnerOrAdminUser(ServiceDeploymentEntity serviceDeploymentEntity) {
+    private void checkPermission(
+            ServiceDeploymentEntity serviceDeploymentEntity, UserOperation userOperation) {
         boolean isOwner = userServiceHelper.currentUserIsOwner(serviceDeploymentEntity.getUserId());
         boolean isAdmin = userServiceHelper.currentUserHasRole(ROLE_ADMIN);
-        return !isOwner && !isAdmin;
+        if (!isOwner && !isAdmin) {
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other users.", userOperation.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
+        }
     }
 
     private Map<String, Object> getRequestBody(DeployTask task) {

@@ -243,7 +243,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        Assertions.assertEquals(result.getErrorType(), ErrorType.POLICY_VALIDATION_FAILED);
+        Assertions.assertEquals(ErrorType.POLICY_VALIDATION_FAILED, result.getErrorType());
     }
 
     void testAddServicePolicy_ThrowsFlavorInValidationException(
@@ -344,7 +344,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
         Assertions.assertEquals(
                 updatedServicePolicy.getServicePolicyId(), servicePolicy.getServicePolicyId());
-        Assertions.assertEquals(updatedServicePolicy.getPolicy(), "servicePolicyUpdate");
+        Assertions.assertEquals("servicePolicyUpdate", updatedServicePolicy.getPolicy());
         Assertions.assertTrue(updatedServicePolicy.getEnabled());
     }
 

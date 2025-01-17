@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
@@ -207,7 +208,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         getAvailabilityZonesThrowsClientApiCallFailedException(
                 Csp.HUAWEI_CLOUD, "Chinese Mainland", "cn-southwest");
         getAvailabilityZonesThrowsClientApiCallFailedException(
-                Csp.FLEXIBLE_ENGINE, "default", "eu-west-0");
+                Csp.FLEXIBLE_ENGINE, "default", "eu-west-02");
     }
 
     void testGetAvailabilityZonesForHuaweiCloud() throws Exception {
@@ -666,7 +667,9 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
         // SetUp changeLockConfig
         String errorMsg1 =
-                "No permissions to change lock config of services belonging to other users.";
+                String.format(
+                        "No permission to %s owned by other users.",
+                        UserOperation.CHANGE_SERVICE_LOCK_CONFIGURATION.toValue());
         ServiceLockConfig lockConfig = new ServiceLockConfig();
         lockConfig.setDestroyLocked(true);
         lockConfig.setModifyLocked(true);
@@ -681,7 +684,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(List.of(errorMsg1), errorResponse.getDetails());
 
         // SetUp getComputeResourceInventoryOfService
-        String errorMsg2 = "No permissions to view resources of services belonging to other users.";
+        String errorMsg2 =
+                String.format(
+                        "No permission to %s owned by other users.",
+                        UserOperation.VIEW_RESOURCES_OF_SERVICE.toValue());
         final MockHttpServletResponse getResourcesResponse =
                 getComputeResourceInventoryOfService(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), getResourcesResponse.getStatus());
@@ -692,7 +698,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(List.of(errorMsg2), errorResponse.getDetails());
 
         // SetUp modify
-        String errorMsg3 = "No permissions to modify services belonging to other users.";
+        String errorMsg3 =
+                String.format(
+                        "No permission to %s owned by other users.",
+                        UserOperation.MODIFY_SERVICE.toValue());
         ModifyRequest modifyRequest = new ModifyRequest();
         modifyRequest.setFlavor("flavor-error");
         // Run the test
@@ -706,7 +715,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp redeploy
-        String errorMsg4 = "No permissions to redeploy services belonging to other users.";
+        String errorMsg4 =
+                String.format(
+                        "No permission to %s owned by other users.",
+                        UserOperation.REDEPLOY_SERVICE.toValue());
         // Run the test
         final MockHttpServletResponse redeployResponse = redeployService(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), redeployResponse.getStatus());
@@ -718,7 +730,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp destroy
-        String errorMsg5 = "No permissions to destroy services belonging to other users.";
+        String errorMsg5 =
+                String.format(
+                        "No permission to %s owned by other users.",
+                        UserOperation.DESTROY_SERVICE.toValue());
         // Run the test
         final MockHttpServletResponse destroyResponse = destroyService(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), destroyResponse.getStatus());
@@ -730,7 +745,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp purge
-        String errorMsg6 = "No permissions to purge services belonging to other users.";
+        String errorMsg6 =
+                String.format(
+                        "No permission to %s owned by other users.",
+                        UserOperation.PURGE_SERVICE.toValue());
         // Run the test
         final MockHttpServletResponse purgeResponse = purgeService(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), purgeResponse.getStatus());

@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -55,9 +56,11 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.hibernate.exception.LockTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -83,6 +86,8 @@ public class ServiceConfigurationManager {
 
     @Resource private ServiceChangeDetailsManager serviceChangeDetailsManager;
 
+    @Resource private UserServiceHelper userServiceHelper;
+
     @Resource
     private ServiceConfigurationVariablesJsonSchemaValidator
             serviceConfigurationVariablesJsonSchemaValidator;
@@ -106,6 +111,8 @@ public class ServiceConfigurationManager {
             log.error(errorMsg);
             throw new ServiceConfigurationNotFoundException(errorMsg);
         }
+        checkPermission(
+                entity.getServiceDeploymentEntity(), UserOperation.VIEW_CONFIGURATIONS_OF_SERVICE);
         return EntityTransUtils.transToServiceConfigurationDetails(entity);
     }
 
@@ -121,6 +128,7 @@ public class ServiceConfigurationManager {
         try {
             ServiceDeploymentEntity serviceDeploymentEntity =
                     serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
+            checkPermission(serviceDeploymentEntity, UserOperation.CHANGE_SERVICE_CONFIGURATION);
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
                             serviceDeploymentEntity.getServiceTemplateId());
@@ -146,6 +154,19 @@ public class ServiceConfigurationManager {
                     String.format("Change service configuration error, %s", e.getErrorReasons());
             log.error(errorMsg);
             throw e;
+        }
+    }
+
+    private void checkPermission(
+            ServiceDeploymentEntity deployedService, UserOperation userOperation) {
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(deployedService.getUserId());
+        if (!currentUserIsOwner) {
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other users.", userOperation.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
         }
     }
 
@@ -208,15 +229,18 @@ public class ServiceConfigurationManager {
     /** Query pending service change request for agent. */
     @Transactional
     public ResponseEntity<ServiceChangeRequest> getPendingServiceChangeRequest(
-            String serviceId, String resourceName) {
+            UUID serviceId, String resourceName) {
         try {
             ServiceChangeDetailsEntity oldestRequest =
                     getOldestServiceChangeDetails(serviceId, resourceName);
             if (Objects.isNull(oldestRequest)) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
             }
+            checkPermission(
+                    oldestRequest.getServiceDeploymentEntity(),
+                    UserOperation.VIEW_CONFIGURATIONS_OF_SERVICE);
             List<DeployResource> deployResources =
-                    getDeployResources(UUID.fromString(serviceId), DeployResourceKind.VM);
+                    getDeployResources(serviceId, DeployResourceKind.VM);
             if (Objects.isNull(oldestRequest.getResourceName())) {
                 validateConfigManager(
                         serviceId, oldestRequest.getChangeHandler(), resourceName, deployResources);
@@ -240,7 +264,7 @@ public class ServiceConfigurationManager {
         if (Objects.isNull(serviceOrderEntity)) {
             String errorMsg =
                     String.format(
-                            "ServiceOrder with service" + " change details id %s not found.",
+                            "Service order with service change details id %s not found.",
                             oldestRequest.getId());
             log.error(errorMsg);
             throw new ServiceOrderNotFound(errorMsg);
@@ -260,10 +284,10 @@ public class ServiceConfigurationManager {
     }
 
     private ServiceChangeDetailsEntity getOldestServiceChangeDetails(
-            String serviceId, String resourceName) {
+            UUID serviceId, String resourceName) {
         ServiceChangeDetailsQueryModel model =
                 new ServiceChangeDetailsQueryModel(
-                        null, UUID.fromString(serviceId), null, null, ServiceChangeStatus.PENDING);
+                        null, serviceId, null, null, ServiceChangeStatus.PENDING);
         List<ServiceChangeDetailsEntity> requests =
                 serviceChangeDetailsStorage.listServiceChangeDetails(model);
         if (CollectionUtils.isEmpty(requests)) {
@@ -288,7 +312,7 @@ public class ServiceConfigurationManager {
     }
 
     private void validateConfigManager(
-            String serviceId,
+            UUID serviceId,
             String configManager,
             String resourceName,
             List<DeployResource> deployResources) {
@@ -408,10 +432,8 @@ public class ServiceConfigurationManager {
      * @param changeId id of the update request.
      * @param result result of the service change request.
      */
-    public void updateServiceChangeResult(
-            String changeId, ServiceConfigurationChangeResult result) {
-        ServiceChangeDetailsEntity request =
-                serviceChangeDetailsStorage.findById(UUID.fromString(changeId));
+    public void updateServiceChangeResult(UUID changeId, ServiceConfigurationChangeResult result) {
+        ServiceChangeDetailsEntity request = serviceChangeDetailsStorage.findById(changeId);
         if (Objects.isNull(request)
                 || !ServiceChangeStatus.PROCESSING.equals(request.getStatus())) {
             String errorMsg =
@@ -487,8 +509,7 @@ public class ServiceConfigurationManager {
     private void updateServiceConfiguration(ServiceChangeDetailsEntity request) {
         ServiceConfigurationEntity serviceConfigurationEntity =
                 request.getServiceDeploymentEntity().getServiceConfiguration();
-        Map<String, Object> config =
-                (Map<String, Object>) request.getServiceOrderEntity().getRequestBody();
+        Map<String, Object> config = request.getServiceOrderEntity().getRequestBody();
         serviceConfigurationEntity.setConfiguration(config);
         serviceConfigurationEntity.setUpdatedTime(OffsetDateTime.now());
         serviceConfigurationStorage.storeAndFlush(serviceConfigurationEntity);

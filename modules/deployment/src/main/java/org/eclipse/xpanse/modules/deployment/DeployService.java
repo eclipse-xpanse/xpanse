@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceDeploymentStatusChangePolling;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
@@ -119,9 +120,8 @@ public class DeployService {
      */
     public ServiceOrder createOrderToRedeployFailedService(UUID serviceId) {
         MDC.put(SERVICE_ID, serviceId.toString());
-        String errMsg = "No permissions to redeploy services belonging to other users.";
         ServiceDeploymentEntity serviceDeploymentEntity =
-                getServiceOwnedByCurrentUser(serviceId, errMsg);
+                getServiceOwnedByCurrentUser(serviceId, UserOperation.REDEPLOY_SERVICE);
         DeployTask redeployTask = getRedeployTask(serviceDeploymentEntity);
         redeployService(redeployTask, serviceDeploymentEntity);
         log.info(
@@ -141,9 +141,8 @@ public class DeployService {
     public ServiceOrder createOrderToModifyDeployedService(
             UUID serviceId, ModifyRequest modifyRequest) {
         MDC.put(SERVICE_ID, serviceId.toString());
-        String errMsg = "No permissions to modify services belonging to other users.";
         ServiceDeploymentEntity serviceDeploymentEntity =
-                getServiceOwnedByCurrentUser(serviceId, errMsg);
+                getServiceOwnedByCurrentUser(serviceId, UserOperation.MODIFY_SERVICE);
         modifyRequest.setUserId(this.userServiceHelper.getCurrentUserId());
         DeployTask modifyTask = getModifyTask(modifyRequest, serviceDeploymentEntity);
         modifyService(modifyTask, serviceDeploymentEntity);
@@ -162,9 +161,8 @@ public class DeployService {
      */
     public ServiceOrder createOrderToDestroyDeployedService(UUID serviceId) {
         MDC.put(SERVICE_ID, serviceId.toString());
-        String errMsg = "No permissions to destroy services belonging to other users.";
         ServiceDeploymentEntity serviceDeploymentEntity =
-                getServiceOwnedByCurrentUser(serviceId, errMsg);
+                getServiceOwnedByCurrentUser(serviceId, UserOperation.DESTROY_SERVICE);
         DeployTask destroyTask = getDestroyTask(serviceDeploymentEntity);
         destroyService(destroyTask, serviceDeploymentEntity);
         log.info(
@@ -182,9 +180,8 @@ public class DeployService {
      */
     public ServiceOrder createOrderToPurgeDestroyedService(UUID serviceId) {
         MDC.put(SERVICE_ID, serviceId.toString());
-        String errMsg = "No permissions to purge services belonging to other users.";
         ServiceDeploymentEntity serviceDeploymentEntity =
-                getServiceOwnedByCurrentUser(serviceId, errMsg);
+                getServiceOwnedByCurrentUser(serviceId, UserOperation.PURGE_SERVICE);
         DeployTask purgeTask = getPurgeTask(serviceDeploymentEntity);
         purgeService(purgeTask, serviceDeploymentEntity);
         log.info(
@@ -220,8 +217,8 @@ public class DeployService {
      */
     public List<DeployResource> listResourcesOfDeployedService(
             UUID serviceId, DeployResourceKind resourceKind) {
-        String errorMsg = "No permissions to view resources of services belonging to other users.";
-        ServiceDeploymentEntity deployedService = getServiceOwnedByCurrentUser(serviceId, errorMsg);
+        ServiceDeploymentEntity deployedService =
+                getServiceOwnedByCurrentUser(serviceId, UserOperation.VIEW_RESOURCES_OF_SERVICE);
         Stream<ServiceResourceEntity> resourceEntities =
                 deployedService.getDeployResources().stream();
         if (Objects.nonNull(resourceKind)) {
@@ -237,16 +234,21 @@ public class DeployService {
      * Get user managed service.
      *
      * @param serviceId deployed service id.
-     * @param errorMsg the error message.
+     * @param userOperation userOperation.
      * @return DeployServiceEntity.
      * @throws AccessDeniedException if the current user is not the owner of the service.
      */
-    private ServiceDeploymentEntity getServiceOwnedByCurrentUser(UUID serviceId, String errorMsg) {
+    private ServiceDeploymentEntity getServiceOwnedByCurrentUser(
+            UUID serviceId, UserOperation userOperation) {
         ServiceDeploymentEntity deployedService =
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(deployedService.getUserId());
         if (!currentUserIsOwner) {
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other users.", userOperation.toValue());
+            log.error(errorMsg);
             throw new AccessDeniedException(errorMsg);
         }
         return deployedService;
@@ -357,9 +359,11 @@ public class DeployService {
         if (deployRequest.getServiceName().length() > 5) {
             return deployRequest.getServiceName().substring(0, 4)
                     + "-"
-                    + RandomStringUtils.randomAlphanumeric(5);
+                    + RandomStringUtils.secure().nextAlphanumeric(5);
         } else {
-            return deployRequest.getServiceName() + "-" + RandomStringUtils.randomAlphanumeric(5);
+            return deployRequest.getServiceName()
+                    + "-"
+                    + RandomStringUtils.secure().nextAlphanumeric(5);
         }
     }
 

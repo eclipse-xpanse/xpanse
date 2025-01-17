@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.UUID;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceChangeDetailsManager;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
@@ -30,7 +31,7 @@ public class ServiceChangeDetailsApi {
     @GetMapping(value = "/services/change/requests", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List service's change details Request.")
-    @AuditApiRequest(methodName = "getCspFromServiceId")
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public List<ServiceChangeOrderDetails> getServiceChangeRequestDetails(
             @Parameter(name = "serviceId", description = "Id of the deployed service")
                     @RequestParam(name = "serviceId")

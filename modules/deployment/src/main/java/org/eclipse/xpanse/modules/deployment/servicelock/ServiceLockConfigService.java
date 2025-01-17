@@ -9,11 +9,13 @@ package org.eclipse.xpanse.modules.deployment.servicelock;
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -24,6 +26,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 /** Implementation class of ServiceLockConfigService. */
+@Slf4j
 @Component
 public class ServiceLockConfigService {
 
@@ -48,8 +51,10 @@ public class ServiceLockConfigService {
                 userServiceHelper.currentUserIsOwner(deployedService.getUserId());
         if (!currentUserIsOwner) {
             String errorMsg =
-                    "No permissions to change lock config of services "
-                            + "belonging to other users.";
+                    String.format(
+                            "No permission to %s owned by other users.",
+                            UserOperation.CHANGE_SERVICE_LOCK_CONFIGURATION.toValue());
+            log.error(errorMsg);
             throw new AccessDeniedException(errorMsg);
         }
         ServiceOrderType taskType = ServiceOrderType.LOCK_CHANGE;

@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
@@ -293,7 +294,9 @@ public class ServiceStateManager {
             boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(service.getUserId());
             if (!currentUserIsOwner) {
                 String errorMsg =
-                        "No permissions to manage state of the service belonging to other users.";
+                        String.format(
+                                "No permission to %s owned by other users.",
+                                UserOperation.CHANGE_SERVICE_STATE.toValue());
                 log.error(errorMsg);
                 throw new AccessDeniedException(errorMsg);
             }

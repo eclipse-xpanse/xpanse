@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.database.resource.ServiceResourceStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotFoundException;
@@ -63,12 +64,7 @@ public class ServiceMetricsAdapter {
             throw new ResourceNotFoundException("No resource found in the service.");
         }
 
-        boolean currentUserIsOwner =
-                userServiceHelper.currentUserIsOwner(serviceEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to view metrics of services belonging to other users.");
-        }
+        checkPermission(serviceEntity);
 
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
@@ -114,13 +110,6 @@ public class ServiceMetricsAdapter {
         ServiceDeploymentEntity serviceEntity =
                 findDeployServiceEntity(resourceEntity.getServiceDeploymentEntity().getId());
 
-        boolean currentUserIsOwner =
-                userServiceHelper.currentUserIsOwner(serviceEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to view metrics of services belonging to other users.");
-        }
-
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
         Region region = serviceEntity.getDeployRequest().getRegion();
@@ -144,7 +133,21 @@ public class ServiceMetricsAdapter {
         if (Objects.isNull(serviceEntity)) {
             throw new ServiceNotDeployedException("Service not found.");
         }
+        checkPermission(serviceEntity);
         return serviceEntity;
+    }
+
+    private void checkPermission(ServiceDeploymentEntity serviceEntity) {
+        boolean currentUserIsOwner =
+                userServiceHelper.currentUserIsOwner(serviceEntity.getUserId());
+        if (!currentUserIsOwner) {
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other users.",
+                            UserOperation.VIEW_METRICS_OF_SERVICE.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
+        }
     }
 
     private ResourceMetricsRequest getResourceMetricRequest(

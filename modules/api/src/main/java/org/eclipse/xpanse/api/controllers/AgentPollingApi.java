@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
@@ -53,7 +54,6 @@ public class AgentPollingApi {
             value = "/agent/poll/{serviceId}/{resourceName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get pending service change request for agents to poll.")
-    @AuditApiRequest(enabled = false)
     @ApiResponses({
         @ApiResponse(
                 responseCode = "204",
@@ -64,10 +64,11 @@ public class AgentPollingApi {
                 description = "pending service change update request details",
                 content = @Content(schema = @Schema(implementation = ServiceChangeRequest.class)))
     })
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public ResponseEntity<ServiceChangeRequest> getPendingServiceChangeRequest(
             @Parameter(name = "serviceId", description = "The id of the deployed service")
                     @PathVariable("serviceId")
-                    String serviceId,
+                    UUID serviceId,
             @Parameter(
                             name = "resourceName",
                             description = "The name of the resource of deployed service")
@@ -90,11 +91,11 @@ public class AgentPollingApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Update service change result for agents.")
-    @AuditApiRequest(enabled = false)
+    @AuditApiRequest(methodName = "getCspFromServiceChangeRequestId", paramTypes = UUID.class)
     public void updateServiceChangeResult(
             @Parameter(name = "changeId", description = "id of the update request.")
                     @PathVariable("changeId")
-                    String changeId,
+                    UUID changeId,
             @Parameter(name = "result", description = "result of the service change request.")
                     @RequestBody
                     ServiceConfigurationChangeResult result) {

@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryM
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
@@ -338,8 +339,10 @@ public class ServiceTemplateApi {
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
+        UserOperation userOperation = UserOperation.VIEW_DETAILS_OF_SERVICE_TEMPLATE;
         ServiceTemplateEntity templateEntity =
-                serviceTemplateManage.getServiceTemplateDetails(serviceTemplateId, true, false);
+                serviceTemplateManage.getServiceTemplateDetails(
+                        serviceTemplateId, userOperation, true, false);
         return convertToServiceTemplateDetailVo(templateEntity);
     }
 

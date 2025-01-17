@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
 import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyStorage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
@@ -92,8 +93,9 @@ public class UserPolicyManager {
      * @param updateRequest update policy request.
      * @return Returns updated policy view object.
      */
-    public UserPolicy updateUserPolicy(UUID id, UserPolicyUpdateRequest updateRequest) {
-        UserPolicyEntity existingEntity = getUserPolicyEntity(id);
+    public UserPolicy updateUserPolicy(UUID userPolicyId, UserPolicyUpdateRequest updateRequest) {
+        UserPolicyEntity existingEntity =
+                getUserPolicyEntity(userPolicyId, UserOperation.UPDATE_USER_POLICY);
         UserPolicyEntity policyToUpdate = getUserPolicyToUpdate(updateRequest, existingEntity);
         UserPolicyEntity updatedPolicy = userPolicyStorage.storeAndFlush(policyToUpdate);
         return conventToUserPolicy(updatedPolicy);
@@ -106,34 +108,39 @@ public class UserPolicyManager {
      * @return Returns the policy view object.
      */
     public UserPolicy getUserPolicyDetails(UUID policyId) {
-        UserPolicyEntity existingEntity = getUserPolicyEntity(policyId);
+        UserPolicyEntity existingEntity =
+                getUserPolicyEntity(policyId, UserOperation.VIEW_DETAILS_OF_USER_POLICY);
         return conventToUserPolicy(existingEntity);
     }
 
-    private UserPolicyEntity getUserPolicyEntity(UUID policyId) {
+    private UserPolicyEntity getUserPolicyEntity(UUID policyId, UserOperation operation) {
         UserPolicyEntity existingEntity = userPolicyStorage.findUserPolicyById(policyId);
         if (Objects.isNull(existingEntity)) {
             String errorMsg = String.format("The user policy with id %s not found.", policyId);
             throw new PolicyNotFoundException(errorMsg);
         }
-
-        boolean currentUserIsOwner =
-                userServiceHelper.currentUserIsOwner(existingEntity.getUserId());
-        if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to view or manage policy belonging to other users.");
-        }
+        checkPermission(existingEntity, operation);
         return existingEntity;
+    }
+
+    private void checkPermission(UserPolicyEntity userPolicy, UserOperation operation) {
+        boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(userPolicy.getUserId());
+        if (!currentUserIsOwner) {
+            String errorMsg =
+                    String.format("No permission to %s owned by other users.", operation.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
+        }
     }
 
     /**
      * Delete the policy by user.
      *
-     * @param id the id of policy.
+     * @param userPolicyId the id of the user policy.
      */
-    public void deleteUserPolicy(UUID id) {
-        getUserPolicyEntity(id);
-        userPolicyStorage.deleteUserPolicyById(id);
+    public void deleteUserPolicy(UUID userPolicyId) {
+        getUserPolicyEntity(userPolicyId, UserOperation.DELETE_USER_POLICY);
+        userPolicyStorage.deleteUserPolicyById(userPolicyId);
     }
 
     private void checkIfUserPolicyIsDuplicate(Csp csp, String policy) {
@@ -149,7 +156,7 @@ public class UserPolicyManager {
             String policyKey = userPolicyEntityList.getFirst().getId().toString();
             String errMsg =
                     String.format(
-                            "The same policy already exists for Csp: %s." + " with id: %s",
+                            "The same user policy already exists for Csp %s with id %s",
                             csp, policyKey);
             throw new PolicyDuplicateException(errMsg);
         }

@@ -152,7 +152,7 @@ class ServicePortingApiTest extends ApisTestCommon {
                 ErrorResponse.errorResponse(
                         ErrorType.ACCESS_DENIED,
                         Collections.singletonList(
-                                "No permissions to port services belonging to other users."));
+                                "No permission to port the service owned by other users."));
 
         ServiceDeploymentEntity deployService =
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId);
