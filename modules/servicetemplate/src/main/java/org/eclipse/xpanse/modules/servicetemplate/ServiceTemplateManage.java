@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplat
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
@@ -122,13 +123,15 @@ public class ServiceTemplateManage {
      *
      * @param id id of the service template.
      * @param ocl the Ocl model describing the service template.
-     * @param isRemoveFromCatalogUntilApproved If remove the service template from catalog until the
-     *     updated one is approved.
+     * @param isRemoveFromCatalogUntilApproved If remove from catalog until the updated one is
+     *     approved.
      * @return Returns service template history entity.
      */
     public ServiceTemplateRequestHistoryEntity updateServiceTemplate(
             UUID id, Ocl ocl, boolean isRemoveFromCatalogUntilApproved) {
-        ServiceTemplateEntity serviceTemplateToUpdate = getServiceTemplateDetails(id, true, false);
+        UserOperation userOperation = UserOperation.UPDATE_SERVICE_TEMPLATE;
+        ServiceTemplateEntity serviceTemplateToUpdate =
+                getServiceTemplateDetails(id, userOperation, true, false);
         ServiceTemplateRegistrationState registrationState =
                 serviceTemplateToUpdate.getServiceTemplateRegistrationState();
         if (registrationState == ServiceTemplateRegistrationState.APPROVED) {
@@ -235,8 +238,8 @@ public class ServiceTemplateManage {
             if (Objects.nonNull(inProgressRequest)) {
                 String errorMsg =
                         String.format(
-                                "The request with id %s for the service template is waiting for"
-                                        + " review. The new request is not allowed.",
+                                "The request with id %s to the service template is waiting "
+                                        + "for review. The new request is not allowed.",
                                 inProgressRequest.getRequestId());
                 log.error(errorMsg);
                 throw new ServiceTemplateRequestNotAllowed(errorMsg);
@@ -308,9 +311,12 @@ public class ServiceTemplateManage {
             String userManageIsv = userServiceHelper.getCurrentUserManageIsv();
             if (StringUtils.isNotEmpty(userManageIsv)
                     && !StringUtils.equals(ocl.getServiceVendor(), userManageIsv)) {
-                throw new AccessDeniedException(
-                        "No permissions to view or manage service template "
-                                + "belonging to other serviceVendors.");
+                String errorMsg =
+                        String.format(
+                                "No permission to %s owned by other service vendors.",
+                                UserOperation.REGISTER_SERVICE_TEMPLATE.toValue());
+                log.error(errorMsg);
+                throw new AccessDeniedException(errorMsg);
             }
             newServiceTemplate.setServiceVendor(ocl.getServiceVendor());
         }
@@ -454,14 +460,18 @@ public class ServiceTemplateManage {
      * Get details of service template using id.
      *
      * @param serviceTemplateId the id of service template.
-     * @param checkServiceVendor check the serviceVendor of the service template belonging to.
+     * @param userOperation the userOperation to the service template.
+     * @param checkServiceVendor check the serviceVendor of belonging to.
      * @param checkCsp check the cloud service provider of the service template.
      * @return Returns service template DB newTemplate.
      */
     public ServiceTemplateEntity getServiceTemplateDetails(
-            UUID serviceTemplateId, boolean checkServiceVendor, boolean checkCsp) {
+            UUID serviceTemplateId,
+            UserOperation userOperation,
+            boolean checkServiceVendor,
+            boolean checkCsp) {
         ServiceTemplateEntity existingTemplate = getServiceTemplateById(serviceTemplateId);
-        checkPermission(existingTemplate, checkServiceVendor, checkCsp);
+        checkPermission(existingTemplate, userOperation, checkServiceVendor, checkCsp);
         return existingTemplate;
     }
 
@@ -486,13 +496,8 @@ public class ServiceTemplateManage {
         ServiceTemplateRequestHistoryEntity existingTemplateRequest =
                 templateRequestStorage.getEntityByRequestId(requestId);
         ServiceTemplateEntity serviceTemplate = existingTemplateRequest.getServiceTemplate();
-        boolean hasManagePermissions =
-                userServiceHelper.currentUserCanManageCsp(serviceTemplate.getCsp());
-        if (!hasManagePermissions) {
-            throw new AccessDeniedException(
-                    "No permissions to review service template request "
-                            + "belonging to other cloud service providers.");
-        }
+        UserOperation userOperation = UserOperation.REVIEW_REQUEST_OF_SERVICE_TEMPLATE;
+        checkPermission(serviceTemplate, userOperation, false, true);
         if (ServiceTemplateRequestStatus.IN_REVIEW != existingTemplateRequest.getRequestStatus()) {
             throw new ReviewServiceTemplateRequestNotAllowed(
                     "Service template request is not allowed to be reviewed.");
@@ -547,7 +552,9 @@ public class ServiceTemplateManage {
      * @return Returns updated service template.
      */
     public ServiceTemplateRequestHistoryEntity unpublish(UUID id) {
-        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
+        UserOperation userOperation = UserOperation.UNPUBLISH_SERVICE_TEMPLATE;
+        ServiceTemplateEntity existingTemplate =
+                getServiceTemplateDetails(id, userOperation, true, false);
         if (existingTemplate.getServiceTemplateRegistrationState()
                 != ServiceTemplateRegistrationState.APPROVED) {
             String errMsg =
@@ -567,14 +574,15 @@ public class ServiceTemplateManage {
     }
 
     /**
-     * Republish the service template to catalog again.
+     * Republish to catalog again.
      *
      * @param serviceTemplateId id of service template.
      * @return Returns updated service template.
      */
     public ServiceTemplateRequestHistoryEntity republish(UUID serviceTemplateId) {
+        UserOperation userOperation = UserOperation.REPUBLISH_SERVICE_TEMPLATE;
         ServiceTemplateEntity existingTemplate =
-                getServiceTemplateDetails(serviceTemplateId, true, false);
+                getServiceTemplateDetails(serviceTemplateId, userOperation, true, false);
         if (existingTemplate.getServiceTemplateRegistrationState()
                 != ServiceTemplateRegistrationState.APPROVED) {
             String errMsg =
@@ -602,7 +610,9 @@ public class ServiceTemplateManage {
      * @param id ID of service template.
      */
     public void deleteServiceTemplate(UUID id) {
-        ServiceTemplateEntity existingTemplate = getServiceTemplateDetails(id, true, false);
+        UserOperation userOperation = UserOperation.DELETE_SERVICE_TEMPLATE;
+        ServiceTemplateEntity existingTemplate =
+                getServiceTemplateDetails(id, userOperation, true, false);
         if (existingTemplate.getIsAvailableInCatalog()) {
             String errMsg =
                     String.format(
@@ -645,6 +655,8 @@ public class ServiceTemplateManage {
      * @param serviceTemplateId id of service template.
      * @param requestType type of service template request.
      * @param changeStatus status of service template request.
+     * @param checkServiceVendor check service vendor.
+     * @param checkCsp check csp.
      * @return list of service template request history.
      */
     public List<ServiceTemplateRequestHistory> getServiceTemplateRequestHistoryByServiceTemplateId(
@@ -653,8 +665,10 @@ public class ServiceTemplateManage {
             ServiceTemplateRequestStatus changeStatus,
             boolean checkServiceVendor,
             boolean checkCsp) {
+        UserOperation userOperation = UserOperation.VIEW_REQUEST_HISTORY_OF_SERVICE_TEMPLATE;
         ServiceTemplateEntity existingTemplate =
-                getServiceTemplateDetails(serviceTemplateId, checkServiceVendor, checkCsp);
+                getServiceTemplateDetails(
+                        serviceTemplateId, userOperation, checkServiceVendor, checkCsp);
         List<ServiceTemplateRequestHistoryEntity> historyList =
                 existingTemplate.getServiceTemplateHistory();
         if (Objects.nonNull(requestType)) {
@@ -700,7 +714,8 @@ public class ServiceTemplateManage {
     public void cancelServiceTemplateRequestByRequestId(UUID requestId) {
         ServiceTemplateRequestHistoryEntity requestToCancel =
                 templateRequestStorage.getEntityByRequestId(requestId);
-        checkPermission(requestToCancel.getServiceTemplate(), true, false);
+        UserOperation userOperation = UserOperation.CANCEL_REQUEST_OF_SERVICE_TEMPLATE;
+        checkPermission(requestToCancel.getServiceTemplate(), userOperation, true, false);
 
         if (requestToCancel.getRequestStatus() == ServiceTemplateRequestStatus.IN_REVIEW) {
             requestToCancel.setRequestStatus(ServiceTemplateRequestStatus.CANCELLED);
@@ -733,9 +748,11 @@ public class ServiceTemplateManage {
      */
     public ServiceTemplateRequestHistoryEntity getServiceTemplateRequestByRequestId(
             UUID requestId) {
+
         ServiceTemplateRequestHistoryEntity request =
                 templateRequestStorage.getEntityByRequestId(requestId);
-        checkPermission(request.getServiceTemplate(), true, false);
+        UserOperation userOperation = UserOperation.VIEW_REQUEST_DETAILS_OF_SERVICE_TEMPLATE;
+        checkPermission(request.getServiceTemplate(), userOperation, true, false);
         return request;
     }
 
@@ -744,23 +761,32 @@ public class ServiceTemplateManage {
     }
 
     private void checkPermission(
-            ServiceTemplateEntity serviceTemplate, boolean checkServiceVendor, boolean checkCsp) {
+            ServiceTemplateEntity serviceTemplate,
+            UserOperation userOperation,
+            boolean checkServiceVendor,
+            boolean checkCsp) {
         if (checkServiceVendor) {
             boolean hasManagePermissions =
                     userServiceHelper.currentUserCanManageIsv(serviceTemplate.getServiceVendor());
             if (!hasManagePermissions) {
-                throw new AccessDeniedException(
-                        "No permissions to view or manage service template belonging to other"
-                                + " serviceVendors.");
+                String errorMsg =
+                        String.format(
+                                "No permission to %s owned by other service vendors.",
+                                userOperation.toValue());
+                log.error(errorMsg);
+                throw new AccessDeniedException(errorMsg);
             }
         }
         if (checkCsp) {
             boolean hasManagePermissions =
                     userServiceHelper.currentUserCanManageCsp(serviceTemplate.getCsp());
             if (!hasManagePermissions) {
-                throw new AccessDeniedException(
-                        "No permissions to review service template belonging to other cloud service"
-                                + " providers.");
+                String errorMsg =
+                        String.format(
+                                "No permission to %s owned by other cloud service providers.",
+                                userOperation.toValue());
+                log.error(errorMsg);
+                throw new AccessDeniedException(errorMsg);
             }
         }
     }

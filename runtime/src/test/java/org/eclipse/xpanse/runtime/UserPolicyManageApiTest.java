@@ -213,7 +213,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
 
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
-        Assertions.assertEquals(result.getErrorType(), ErrorType.POLICY_VALIDATION_FAILED);
+        Assertions.assertEquals(ErrorType.POLICY_VALIDATION_FAILED, result.getErrorType());
     }
 
     void testAddPolicy_ThrowsPolicyDuplicateException(UserPolicy userPolicy) throws Exception {
@@ -222,7 +222,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         mockPoliciesValidateRequest(true);
         String errMsg =
                 String.format(
-                        "The same policy already exists for Csp: %s." + " with id: %s",
+                        "The same user policy already exists for Csp %s with id %s",
                         userPolicy.getCsp(), userPolicy.getUserPolicyId());
         ErrorResponse result =
                 ErrorResponse.errorResponse(ErrorType.POLICY_DUPLICATE, List.of(errMsg));
@@ -275,8 +275,8 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
         Assertions.assertEquals(updatedUserPolicy.getUserPolicyId(), userPolicy.getUserPolicyId());
-        Assertions.assertEquals(updatedUserPolicy.getCsp(), Csp.OPENSTACK_TESTLAB);
-        Assertions.assertEquals(updatedUserPolicy.getPolicy(), "userPolicyUpdate");
+        Assertions.assertEquals(Csp.OPENSTACK_TESTLAB, updatedUserPolicy.getCsp());
+        Assertions.assertEquals("userPolicyUpdate", updatedUserPolicy.getPolicy());
         Assertions.assertTrue(updatedUserPolicy.getEnabled());
     }
 

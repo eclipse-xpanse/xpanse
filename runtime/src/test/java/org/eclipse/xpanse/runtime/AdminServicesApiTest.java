@@ -61,7 +61,7 @@ class AdminServicesApiTest extends ApisTestCommon {
         assertEquals(response.getStatus(), HttpStatus.OK.value());
         SystemStatus systemStatus =
                 objectMapper.readValue(response.getContentAsString(), SystemStatus.class);
-        assertEquals(systemStatus.getHealthStatus(), HealthStatus.OK);
+        assertEquals(HealthStatus.OK, systemStatus.getHealthStatus());
         List<BackendSystemStatus> backendSystemStatuses = systemStatus.getBackendSystemStatuses();
         assertEquals(BackendSystemType.values().length, backendSystemStatuses.size());
 
@@ -116,7 +116,7 @@ class AdminServicesApiTest extends ApisTestCommon {
         assertEquals(response.getStatus(), HttpStatus.OK.value());
         SystemStatus systemStatus =
                 objectMapper.readValue(response.getContentAsString(), SystemStatus.class);
-        assertEquals(systemStatus.getHealthStatus(), HealthStatus.OK);
+        assertEquals(HealthStatus.OK, systemStatus.getHealthStatus());
         List<BackendSystemStatus> backendSystemStatuses = systemStatus.getBackendSystemStatuses();
         assertEquals(BackendSystemType.values().length, backendSystemStatuses.size());
         assertTrue(

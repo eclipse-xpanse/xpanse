@@ -29,6 +29,7 @@ import org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
@@ -160,7 +161,9 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         service.setUserId("1");
         service = serviceDeploymentStorage.storeAndFlush(service);
         String errorMsg3 =
-                "No permissions to manage state of the service belonging to other users.";
+                String.format(
+                        "No permission to %s owned by other users.",
+                        UserOperation.CHANGE_SERVICE_STATE.toValue());
         ErrorResponse result3 =
                 ErrorResponse.errorResponse(
                         ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg3));

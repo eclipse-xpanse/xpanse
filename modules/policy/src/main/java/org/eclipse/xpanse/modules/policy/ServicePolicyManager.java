@@ -19,6 +19,7 @@ import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyDuplicateException;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PolicyNotFoundException;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
@@ -46,13 +47,15 @@ public class ServicePolicyManager {
     @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
-     * List policies belonging to the registered service template.
+     * List policies owned by the registered service template.
      *
      * @param serviceTemplateId id of the registered service template.
      * @return list of service's policies.
      */
     public List<ServicePolicy> listServicePolicies(UUID serviceTemplateId) {
-        ServiceTemplateEntity existingServiceTemplate = getServiceTemplateEntity(serviceTemplateId);
+        ServiceTemplateEntity existingServiceTemplate =
+                getServiceTemplateEntity(
+                        serviceTemplateId, UserOperation.VIEW_POLICIES_OF_SERVICE_TEMPLATE);
         if (CollectionUtils.isEmpty(existingServiceTemplate.getServicePolicyList())) {
             return Collections.emptyList();
         }
@@ -69,7 +72,9 @@ public class ServicePolicyManager {
      */
     public ServicePolicy addServicePolicy(ServicePolicyCreateRequest createRequest) {
         ServiceTemplateEntity existingServiceTemplate =
-                getServiceTemplateEntity(createRequest.getServiceTemplateId());
+                getServiceTemplateEntity(
+                        createRequest.getServiceTemplateId(),
+                        UserOperation.CREATE_POLICY_OF_SERVICE_TEMPLATE);
 
         ServicePolicyEntity newPolicy =
                 getServicePolicyToCreate(createRequest, existingServiceTemplate);
@@ -78,28 +83,38 @@ public class ServicePolicyManager {
         return conventToServicePolicy(storedPolicy);
     }
 
-    private ServiceTemplateEntity getServiceTemplateEntity(UUID serviceTemplateId) {
+    private ServiceTemplateEntity getServiceTemplateEntity(
+            UUID serviceTemplateId, UserOperation operation) {
         ServiceTemplateEntity existedServiceTemplate =
                 serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
-        boolean hasManagePermission =
-                userServiceHelper.currentUserCanManageIsv(
-                        existedServiceTemplate.getServiceVendor());
-        if (!hasManagePermission) {
-            throw new AccessDeniedException(
-                    "No permissions to view or manage policy belonging to "
-                            + "the service template belonging to other serviceVendors.");
-        }
+        checkPermission(existedServiceTemplate, operation);
         return existedServiceTemplate;
     }
 
+    private void checkPermission(ServiceTemplateEntity serviceTemplate, UserOperation operation) {
+        boolean hasManagePermission =
+                userServiceHelper.currentUserCanManageIsv(serviceTemplate.getServiceVendor());
+        if (!hasManagePermission) {
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other service vendors.",
+                            operation.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
+        }
+    }
+
     /**
-     * Update policy belonging to the registered service template.
+     * Update policy owned by the registered service template.
      *
      * @param updateRequest update policy request.
      * @return Returns updated policy view object.
      */
-    public ServicePolicy updateServicePolicy(UUID id, ServicePolicyUpdateRequest updateRequest) {
-        ServicePolicyEntity existingPolicy = getServicePolicyEntity(id);
+    public ServicePolicy updateServicePolicy(
+            UUID servicePolicyId, ServicePolicyUpdateRequest updateRequest) {
+        ServicePolicyEntity existingPolicy =
+                getServicePolicyEntity(
+                        servicePolicyId, UserOperation.UPDATE_POLICY_OF_SERVICE_TEMPLATE);
         ServicePolicyEntity policyToUpdate =
                 getServicePolicyToUpdate(updateRequest, existingPolicy);
         ServicePolicyEntity updatedPolicy = servicePolicyStorage.storeAndFlush(policyToUpdate);
@@ -123,41 +138,34 @@ public class ServicePolicyManager {
     }
 
     /**
-     * Get details of the policy belonging to the registered service template.
+     * Get details of the policy owned by the registered service template.
      *
      * @param policyId the id of the policy.
      * @return Returns the policy view object.
      */
     public ServicePolicy getServicePolicyDetails(UUID policyId) {
-        ServicePolicyEntity existingEntity = getServicePolicyEntity(policyId);
+        ServicePolicyEntity existingEntity =
+                getServicePolicyEntity(policyId, UserOperation.VIEW_DETAILS_OF_SERVICE_TEMPLATE);
         return conventToServicePolicy(existingEntity);
     }
 
     /**
-     * Delete the policy belonging to the registered service template.
+     * Delete the policy owned by the registered service template.
      *
      * @param policyId the id of policy.
      */
     public void deleteServicePolicy(UUID policyId) {
-        getServicePolicyEntity(policyId);
+        getServicePolicyEntity(policyId, UserOperation.DELETE_POLICY_OF_SERVICE_TEMPLATE);
         servicePolicyStorage.deletePolicyById(policyId);
     }
 
-    private ServicePolicyEntity getServicePolicyEntity(UUID policyId) {
+    private ServicePolicyEntity getServicePolicyEntity(UUID policyId, UserOperation operation) {
         ServicePolicyEntity existingPolicy = servicePolicyStorage.findPolicyById(policyId);
         if (Objects.isNull(existingPolicy)) {
             String errorMsg = String.format("The service policy with id %s not found.", policyId);
             throw new PolicyNotFoundException(errorMsg);
         }
-
-        boolean hasManagePermission =
-                userServiceHelper.currentUserCanManageIsv(
-                        existingPolicy.getServiceTemplate().getServiceVendor());
-        if (!hasManagePermission) {
-            throw new AccessDeniedException(
-                    "No permissions to view or manage policy belonging to "
-                            + "the service templates belonging to other serviceVendors.");
-        }
+        checkPermission(existingPolicy.getServiceTemplate(), operation);
         return existingPolicy;
     }
 

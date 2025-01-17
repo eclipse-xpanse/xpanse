@@ -59,11 +59,10 @@ public class ServiceActionManager {
             serviceConfigurationVariablesJsonSchemaGenerator;
 
     /** create service action. */
-    public ServiceOrder createServiceAction(String serviceId, ServiceActionRequest request) {
+    public ServiceOrder createServiceAction(UUID serviceId, ServiceActionRequest request) {
         try {
             ServiceDeploymentEntity serviceDeploymentEntity =
-                    serviceDeploymentEntityHandler.getServiceDeploymentEntity(
-                            UUID.fromString(serviceId));
+                    serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
                             serviceDeploymentEntity.getServiceTemplateId());
@@ -84,7 +83,7 @@ public class ServiceActionManager {
                     serviceTemplateEntity.getOcl(),
                     request.getActionParameters(),
                     request.getActionName());
-            return new ServiceOrder(orderId, UUID.fromString(serviceId));
+            return new ServiceOrder(orderId, serviceId);
         } catch (ServiceConfigurationInvalidException e) {
             String errorMsg =
                     String.format("Change service configuration error, %s", e.getErrorReasons());
@@ -118,7 +117,7 @@ public class ServiceActionManager {
 
     private void addServiceChangeDetailsForServiceActions(
             UUID orderId,
-            String serviceId,
+            UUID serviceId,
             ServiceDeploymentEntity serviceDeployment,
             Ocl ocl,
             Map<String, Object> updateRequestMap,
@@ -126,8 +125,7 @@ public class ServiceActionManager {
 
         Map<String, List<DeployResource>> deployResourceMap =
                 deployService
-                        .listResourcesOfDeployedService(
-                                UUID.fromString(serviceId), DeployResourceKind.VM)
+                        .listResourcesOfDeployedService(serviceId, DeployResourceKind.VM)
                         .stream()
                         .collect(Collectors.groupingBy(DeployResource::getGroupName));
 

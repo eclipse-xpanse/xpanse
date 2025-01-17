@@ -24,6 +24,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -169,7 +170,10 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         serviceOrderEntity.setUserId(errorUserId);
         serviceOrderStorage.storeAndFlush(serviceOrderEntity);
 
-        String errorMsg = "No permissions to manage service orders belonging to other users.";
+        String errorMsg =
+                String.format(
+                        "No permission to %s owned by other users.",
+                        UserOperation.VIEW_ORDERS_OF_SERVICE.toValue());
         ErrorResponse expectedErrorResponse =
                 ErrorResponse.errorResponse(
                         ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg));
@@ -179,6 +183,14 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         assertEquals(HttpStatus.FORBIDDEN.value(), listOrdersResponse.getStatus());
         assertEquals(result, listOrdersResponse.getContentAsString());
 
+        errorMsg =
+                String.format(
+                        "No permission to %s owned by other users.",
+                        UserOperation.DELETE_ORDERS_OF_SERVICE.toValue());
+        expectedErrorResponse =
+                ErrorResponse.errorResponse(
+                        ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg));
+        result = objectMapper.writeValueAsString(expectedErrorResponse);
         MockHttpServletResponse deleteOrdersResponse = deleteOrdersByServiceId(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), deleteOrdersResponse.getStatus());
         assertEquals(result, deleteOrdersResponse.getContentAsString());

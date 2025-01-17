@@ -220,8 +220,8 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
             ErrorResponse errorResponseError =
                     objectMapper.readValue(response.getContentAsString(), ErrorResponse.class);
             log.error(
-                    "Change service configuration failed. Error: "
-                            + errorResponseError.getDetails());
+                    "Change service configuration failed. Error: {}",
+                    errorResponseError.getDetails());
             return null;
         }
     }

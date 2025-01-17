@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -84,8 +85,12 @@ public class ServicePortingApi {
                         servicePortingRequest.getOriginalServiceId());
         String userId = this.userServiceHelper.getCurrentUserId();
         if (!StringUtils.equals(userId, deployServiceEntity.getUserId())) {
-            throw new AccessDeniedException(
-                    "No permissions to port services belonging to other users.");
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other users.",
+                            UserOperation.PORT_SERVICE.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
         }
         if (Objects.nonNull(deployServiceEntity.getLockConfig())
                 && deployServiceEntity.getLockConfig().isModifyLocked()) {

@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceDetailsNotAccessible;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
@@ -68,8 +69,12 @@ public class ServiceDetailsViewManager {
                 userServiceHelper.currentUserCanManageIsv(
                         serviceDeploymentEntity.getServiceVendor());
         if (!isManagedByCurrentUser) {
-            throw new AccessDeniedException(
-                    "No permissions to view details of services belonging to other users.");
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other service vendors",
+                            UserOperation.VIEW_DETAILS_OF_SERVICE.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
         }
         serviceResultReFetchManager.reFetchDeploymentStateForMissingOrdersFromDeployers(
                 serviceDeploymentEntity);
@@ -152,16 +157,19 @@ public class ServiceDetailsViewManager {
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(serviceDeploymentEntity.getUserId());
         if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to view details of services belonging to other users.");
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other users.",
+                            UserOperation.VIEW_DETAILS_OF_SERVICE.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
         }
         ServiceHostingType serviceHostingType =
                 serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
         if (ServiceHostingType.SELF != serviceHostingType) {
             String errorMsg =
                     String.format(
-                            "details of non service-self hosted with id %s is not " + "accessible",
-                            id);
+                            "details of non service-self hosted with id %s is not accessible", id);
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
@@ -185,8 +193,12 @@ public class ServiceDetailsViewManager {
         boolean currentUserIsOwner =
                 userServiceHelper.currentUserIsOwner(serviceDeploymentEntity.getUserId());
         if (!currentUserIsOwner) {
-            throw new AccessDeniedException(
-                    "No permissions to view details of services belonging to other users.");
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other users.",
+                            UserOperation.VIEW_DETAILS_OF_SERVICE.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
         }
         ServiceHostingType serviceHostingType =
                 serviceDeploymentEntity.getDeployRequest().getServiceHostingType();

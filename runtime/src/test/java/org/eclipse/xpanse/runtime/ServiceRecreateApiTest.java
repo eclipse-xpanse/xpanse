@@ -129,7 +129,7 @@ class ServiceRecreateApiTest extends ApisTestCommon {
                 ErrorResponse.errorResponse(
                         ErrorType.ACCESS_DENIED,
                         Collections.singletonList(
-                                "No permissions to recreate services belonging to other users."));
+                                "No permission to recreate the service owned by other users."));
 
         ServiceDeploymentEntity deployService =
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId);

@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
@@ -82,8 +83,12 @@ public class ServiceRecreateApi {
                 this.serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
         String userId = getUserId();
         if (!StringUtils.equals(userId, serviceDeploymentEntity.getUserId())) {
-            throw new AccessDeniedException(
-                    "No permissions to recreate services belonging to other users.");
+            String errorMsg =
+                    String.format(
+                            "No permission to %s owned by other users.",
+                            UserOperation.RECREATE_SERVICE.toValue());
+            log.error(errorMsg);
+            throw new AccessDeniedException(errorMsg);
         }
 
         if (Objects.nonNull(serviceDeploymentEntity.getLockConfig())

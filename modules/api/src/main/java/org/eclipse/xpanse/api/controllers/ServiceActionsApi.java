@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceActionManager;
@@ -38,11 +39,11 @@ public class ServiceActionsApi {
     @PutMapping(value = "/services/action/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "Create Service Actions.")
-    @AuditApiRequest(enabled = false)
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public ServiceOrder createServiceAction(
             @Parameter(name = "serviceId", description = "The id of the deployed service")
                     @PathVariable("serviceId")
-                    String serviceId,
+                    UUID serviceId,
             @Valid @RequestBody ServiceActionRequest request) {
 
         return serviceActionManager.createServiceAction(serviceId, request);

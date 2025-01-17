@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
@@ -127,8 +128,10 @@ public class ServiceCatalogApi {
             @Parameter(name = "serviceTemplateId", description = "The id of orderable service.")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
+        UserOperation userOperation = UserOperation.VIEW_DETAILS_OF_SERVICE_TEMPLATE;
         ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateManage.getServiceTemplateDetails(serviceTemplateId, false, false);
+                serviceTemplateManage.getServiceTemplateDetails(
+                        serviceTemplateId, userOperation, false, false);
         if (!serviceTemplateEntity.getIsAvailableInCatalog()) {
             String errorMsg =
                     String.format(

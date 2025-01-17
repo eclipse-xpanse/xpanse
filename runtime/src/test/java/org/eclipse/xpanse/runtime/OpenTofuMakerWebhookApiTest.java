@@ -85,7 +85,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
         ErrorResponse deployCallbackResult =
                 objectMapper.readValue(
                         deployCallbackResponse.getContentAsString(), ErrorResponse.class);
-        assertEquals(deployCallbackResult.getErrorType(), expectedErrorType);
+        assertEquals(expectedErrorType, deployCallbackResult.getErrorType());
         assertEquals(deployCallbackResult.getDetails(), expectedDetails);
     }
 

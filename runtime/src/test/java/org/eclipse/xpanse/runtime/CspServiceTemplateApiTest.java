@@ -17,19 +17,23 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewServiceTemplateRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
+import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
@@ -137,6 +141,18 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 reviewServiceTemplateRequest(registerRequestId, reviewRequest);
         assertEquals(HttpStatus.NO_CONTENT.value(), reviewResponse.getStatus());
 
+        // List service template requests
+        MockHttpServletResponse requestHistoryResponse =
+                listServiceTemplateHistoryForCspWithParams(
+                        serviceTemplateId,
+                        ServiceTemplateRequestType.REGISTER.toValue(),
+                        ServiceTemplateRequestStatus.ACCEPTED.toValue());
+        assertEquals(HttpStatus.OK.value(), requestHistoryResponse.getStatus());
+        List<ServiceTemplateRequestHistory> requestHistory =
+                objectMapper.readValue(
+                        requestHistoryResponse.getContentAsString(), new TypeReference<>() {});
+        assertEquals(1, requestHistory.size());
+
         String errorMessage = "Service template request is not allowed to be reviewed.";
         MockHttpServletResponse reviewAgainResponse =
                 reviewServiceTemplateRequest(registerRequestId, reviewRequest);
@@ -186,7 +202,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
 
         pendingServiceTemplateRequests1 = listPendingServiceTemplateRequests(serviceTemplateId);
         assertThat(pendingServiceTemplateRequests1).isEmpty();
-        // After update is approved, the service template should be updated
+        // After update is approved,  should be updated
         serviceTemplate = getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
         assertEquals(descriptionToUpdate, updateRequest.getOcl().getDescription());
         assertEquals(descriptionToUpdate, serviceTemplate.getDescription());
@@ -254,6 +270,25 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 listPendingServiceTemplateRequests(serviceTemplateId);
         assertThat(pendingServiceTemplateRequests).isEmpty();
 
+        // List service template requests
+        UserOperation userOperation = UserOperation.VIEW_REQUEST_HISTORY_OF_SERVICE_TEMPLATE;
+        String errorMsg =
+                String.format(
+                        "No permission to %s owned by other cloud service providers.",
+                        userOperation.toValue());
+        ErrorResponse accessDeniedResponse =
+                ErrorResponse.errorResponse(
+                        ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg));
+        MockHttpServletResponse requestHistoryResponse =
+                listServiceTemplateHistoryForCspWithParams(
+                        serviceTemplateId,
+                        ServiceTemplateRequestType.REGISTER.toValue(),
+                        ServiceTemplateRequestStatus.ACCEPTED.toValue());
+        assertEquals(HttpStatus.FORBIDDEN.value(), requestHistoryResponse.getStatus());
+        assertEquals(
+                objectMapper.writeValueAsString(accessDeniedResponse),
+                requestHistoryResponse.getContentAsString());
+
         testReviewRegistrationThrowsAccessDeniedException(republishRequestInfo.getRequestId());
         testGetRegistrationDetailsThrowsAccessDeniedException(serviceTemplateId);
         testListManagedServiceTemplatesReturnsEmptyList(serviceTemplate);
@@ -270,12 +305,14 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     void testGetRegistrationDetailsThrowsAccessDeniedException(UUID serviceTemplateId)
             throws Exception {
 
+        UserOperation userOperation = UserOperation.VIEW_DETAILS_OF_SERVICE_TEMPLATE;
+        String errorMsg =
+                String.format(
+                        "No permission to %s owned by other cloud service providers.",
+                        userOperation.toValue());
         ErrorResponse accessDeniedErrorResponse =
                 ErrorResponse.errorResponse(
-                        ErrorType.ACCESS_DENIED,
-                        Collections.singletonList(
-                                "No permissions to review service template "
-                                        + "belonging to other cloud service providers."));
+                        ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg));
         // Run the test detail
         final MockHttpServletResponse detailResponse = getRegistrationDetails(serviceTemplateId);
         // Verify the results
@@ -288,12 +325,14 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
     void testReviewRegistrationThrowsAccessDeniedException(UUID requestId) throws Exception {
 
         // Setup request
+        UserOperation userOperation = UserOperation.REVIEW_REQUEST_OF_SERVICE_TEMPLATE;
+        String errorMsg =
+                String.format(
+                        "No permission to %s owned by other cloud service providers.",
+                        userOperation.toValue());
         ErrorResponse accessDeniedErrorResponse =
                 ErrorResponse.errorResponse(
-                        ErrorType.ACCESS_DENIED,
-                        Collections.singletonList(
-                                "No permissions to review service template "
-                                        + "request belonging to other cloud service providers."));
+                        ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg));
         ReviewServiceTemplateRequest request = new ReviewServiceTemplateRequest();
         request.setReviewResult(ServiceReviewResult.APPROVED);
         request.setReviewComment("reviewComment");
@@ -348,6 +387,18 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         // Verify the results
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(detailsList).isNotEmpty();
+
+        // List service template requests
+        MockHttpServletResponse requestHistoryResponse =
+                listServiceTemplateHistoryForCspWithParams(
+                        serviceTemplateDetailVo.getServiceTemplateId(),
+                        ServiceTemplateRequestType.REGISTER.toValue(),
+                        ServiceTemplateRequestStatus.IN_REVIEW.toValue());
+        assertThat(requestHistoryResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+        List<ServiceTemplateRequestHistory> serviceTemplateHistory =
+                objectMapper.readValue(
+                        requestHistoryResponse.getContentAsString(), new TypeReference<>() {});
+        assertEquals(1, serviceTemplateHistory.size());
     }
 
     void testListManagedServiceTemplatesReturnsEmptyList(ServiceTemplateEntity serviceTemplate)
@@ -413,5 +464,20 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
+    }
+
+    MockHttpServletResponse listServiceTemplateHistoryForCspWithParams(
+            UUID serviceTemplateId, String requestType, String changeStatus) throws Exception {
+        MockHttpServletRequestBuilder getRequestBuilder =
+                get(
+                        "/xpanse/csp/service_templates/{serviceTemplateId}/requests",
+                        serviceTemplateId);
+        if (Objects.nonNull(changeStatus)) {
+            getRequestBuilder = getRequestBuilder.param("changeStatus", changeStatus);
+        }
+        if (Objects.nonNull(requestType)) {
+            getRequestBuilder = getRequestBuilder.param("requestType", requestType);
+        }
+        return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
     }
 }

@@ -458,7 +458,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         ErrorResponse vpcErrorResponse =
                 objectMapper.readValue(listVpcResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listVpcResponse.getStatus());
-        Assertions.assertEquals(vpcErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
+        Assertions.assertEquals(ErrorType.BACKEND_FAILURE, vpcErrorResponse.getErrorType());
 
         final MockHttpServletResponse listSubnetResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.SUBNET, csp, site, region);
@@ -466,7 +466,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         listSubnetResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listSubnetResponse.getStatus());
-        Assertions.assertEquals(subnetErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
+        Assertions.assertEquals(ErrorType.BACKEND_FAILURE, subnetErrorResponse.getErrorType());
 
         final MockHttpServletResponse listSecurityGroupResponse =
                 getExistingResourceNamesWithKind(
@@ -477,7 +477,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         Assertions.assertEquals(
                 HttpStatus.BAD_GATEWAY.value(), listSecurityGroupResponse.getStatus());
         Assertions.assertEquals(
-                securityGroupErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
+                ErrorType.BACKEND_FAILURE, securityGroupErrorResponse.getErrorType());
 
         final MockHttpServletResponse listSecurityGroupRuleResponse =
                 getExistingResourceNamesWithKind(
@@ -488,7 +488,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
         Assertions.assertEquals(
                 HttpStatus.BAD_GATEWAY.value(), listSecurityGroupRuleResponse.getStatus());
         Assertions.assertEquals(
-                securityGroupRuleErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
+                ErrorType.BACKEND_FAILURE, securityGroupRuleErrorResponse.getErrorType());
 
         final MockHttpServletResponse listPublicIpResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.PUBLIC_IP, csp, site, region);
@@ -496,7 +496,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         listPublicIpResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listPublicIpResponse.getStatus());
-        Assertions.assertEquals(publicIpErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
+        Assertions.assertEquals(ErrorType.BACKEND_FAILURE, publicIpErrorResponse.getErrorType());
 
         final MockHttpServletResponse listVolumeResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.VOLUME, csp, site, region);
@@ -504,7 +504,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         listVolumeResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listVolumeResponse.getStatus());
-        Assertions.assertEquals(volumeErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
+        Assertions.assertEquals(ErrorType.BACKEND_FAILURE, volumeErrorResponse.getErrorType());
 
         final MockHttpServletResponse listKeypairResponse =
                 getExistingResourceNamesWithKind(DeployResourceKind.KEYPAIR, csp, site, region);
@@ -512,7 +512,7 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         listKeypairResponse.getContentAsString(), ErrorResponse.class);
         Assertions.assertEquals(HttpStatus.BAD_GATEWAY.value(), listKeypairResponse.getStatus());
-        Assertions.assertEquals(keypairErrorResponse.getErrorType(), ErrorType.BACKEND_FAILURE);
+        Assertions.assertEquals(ErrorType.BACKEND_FAILURE, keypairErrorResponse.getErrorType());
     }
 
     void testGetExistingResourceNamesWithKindForCspWithOsClient(Csp csp) throws Exception {

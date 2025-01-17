@@ -25,6 +25,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryM
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryQueryModel;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewServiceTemplateRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
@@ -119,7 +120,10 @@ public class CspServiceTemplateApi {
                         .build();
         List<ServiceTemplateEntity> serviceTemplateEntities =
                 serviceTemplateManage.listServiceTemplates(queryRequest);
-        log.info(serviceTemplateEntities.size() + " service templates found.");
+        log.info(
+                "{} service templates found by query model: {}.",
+                serviceTemplateEntities.size(),
+                queryRequest);
         return serviceTemplateEntities.stream()
                 .map(ServiceTemplateEntityConverter::convertToServiceTemplateDetailVo)
                 .toList();
@@ -144,8 +148,10 @@ public class CspServiceTemplateApi {
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
+        UserOperation userOperation = UserOperation.VIEW_DETAILS_OF_SERVICE_TEMPLATE;
         ServiceTemplateEntity templateEntity =
-                serviceTemplateManage.getServiceTemplateDetails(serviceTemplateId, false, true);
+                serviceTemplateManage.getServiceTemplateDetails(
+                        serviceTemplateId, userOperation, false, true);
         return convertToServiceTemplateDetailVo(templateEntity);
     }
 
