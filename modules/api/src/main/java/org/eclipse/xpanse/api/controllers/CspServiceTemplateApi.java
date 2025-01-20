@@ -105,7 +105,7 @@ public class CspServiceTemplateApi {
                             description = "is any request in review progress")
                     @RequestParam(name = "isReviewInProgress", required = false)
                     Boolean isReviewInProgress) {
-        Csp csp = userServiceHelper.getCurrentUserManageCsp();
+        Csp csp = userServiceHelper.getCspManagedByCurrentUser();
         ServiceTemplateQueryModel queryRequest =
                 ServiceTemplateQueryModel.builder()
                         .csp(csp)
@@ -173,7 +173,7 @@ public class CspServiceTemplateApi {
             @Parameter(name = "serviceTemplateId", description = "id of service template")
                     @RequestParam(name = "serviceTemplateId", required = false)
                     UUID serviceTemplateId) {
-        Csp csp = userServiceHelper.getCurrentUserManageCsp();
+        Csp csp = userServiceHelper.getCspManagedByCurrentUser();
         ServiceTemplateRequestHistoryQueryModel queryModel =
                 ServiceTemplateRequestHistoryQueryModel.builder()
                         .csp(csp)

@@ -76,7 +76,7 @@ public class UserServiceHelper {
         if (!webSecurityIsEnabled) {
             return true;
         }
-        return StringUtils.equals(ownerIsv, getCurrentUserManageIsv());
+        return StringUtils.equals(ownerIsv, getIsvManagedByCurrentUser());
     }
 
     /**
@@ -89,7 +89,7 @@ public class UserServiceHelper {
         if (!webSecurityIsEnabled) {
             return true;
         }
-        return Objects.equals(ownerCsp, getCurrentUserManageCsp());
+        return Objects.equals(ownerCsp, getCspManagedByCurrentUser());
     }
 
     /** Get the current user id. */
@@ -113,8 +113,8 @@ public class UserServiceHelper {
         return currentUserInfo;
     }
 
-    /** Get the serviceVendor managed by the current user . */
-    public String getCurrentUserManageIsv() {
+    /** Get the service vendor managed by the current user . */
+    public String getIsvManagedByCurrentUser() {
         if (!webSecurityIsEnabled) {
             return null;
         }
@@ -131,7 +131,7 @@ public class UserServiceHelper {
     }
 
     /** Get the csp managed by the current user. */
-    public Csp getCurrentUserManageCsp() {
+    public Csp getCspManagedByCurrentUser() {
         if (!webSecurityIsEnabled) {
             return null;
         }

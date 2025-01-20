@@ -115,16 +115,16 @@ public class CredentialCenter {
     }
 
     /**
-     * List the credential info of the @csp and @type and @userId. This method is called from REST
+     * List the credential info of the @csp and @type and @userKey. This method is called from REST
      * API and hence all sensitive fields are masked in the response.
      *
      * @param csp The cloud service provider.
      * @param type The type of the credential.
-     * @param userId The id of user who provided the credential info.
+     * @param userKey The id of user who provided the credential info.
      * @return the credentials.
      */
     public List<AbstractCredentialInfo> listCredentials(
-            Csp csp, CredentialType type, String userId) {
+            Csp csp, CredentialType type, String userKey) {
         List<AbstractCredentialInfo> abstractCredentialInfos = new ArrayList<>();
         if (Objects.isNull(csp)) {
             for (Csp key : pluginManager.getPluginsMap().keySet()) {
@@ -134,7 +134,7 @@ public class CredentialCenter {
                         .forEach(
                                 site -> {
                                     abstractCredentialInfos.addAll(
-                                            listUserCredentials(key, site, type, userId));
+                                            listUserCredentials(key, site, type, userKey));
                                 });
             }
         } else {
@@ -144,14 +144,14 @@ public class CredentialCenter {
                     .forEach(
                             site -> {
                                 abstractCredentialInfos.addAll(
-                                        listUserCredentials(csp, site, type, userId));
+                                        listUserCredentials(csp, site, type, userKey));
                             });
         }
         return maskSensitiveValues(abstractCredentialInfos);
     }
 
     private List<AbstractCredentialInfo> listUserCredentials(
-            Csp csp, String site, CredentialType type, String userId) {
+            Csp csp, String site, CredentialType type, String userKey) {
         List<AbstractCredentialInfo> userCredentials = new ArrayList<>();
         List<AbstractCredentialInfo> definedCredentialInfos =
                 pluginManager.getOrchestratorPlugin(csp).getCredentialDefinitions();
@@ -173,7 +173,7 @@ public class CredentialCenter {
                                         site,
                                         credential.getType(),
                                         credential.getName(),
-                                        userId);
+                                        userKey);
                         if (Objects.nonNull(credentialInfo)) {
                             userCredentials.add(credentialInfo);
                         }
@@ -183,9 +183,9 @@ public class CredentialCenter {
     }
 
     private AbstractCredentialInfo getCredentialFromCache(
-            Csp csp, String site, CredentialType type, String credentialName, String userId) {
+            Csp csp, String site, CredentialType type, String credentialName, String userKey) {
         CredentialCacheKey cacheKey =
-                new CredentialCacheKey(csp, site, type, credentialName, userId);
+                new CredentialCacheKey(csp, site, type, credentialName, userKey);
         AbstractCredentialInfo credentialInfo = null;
         try {
             credentialInfo = credentialsStore.getCredential(cacheKey);
@@ -264,32 +264,32 @@ public class CredentialCenter {
      * @param siteName site name
      * @param credentialType credential type
      * @param credentialName credential name
-     * @param userId user id
+     * @param userKey user id
      */
     public void deleteCredential(
             Csp csp,
             String siteName,
             CredentialType credentialType,
             String credentialName,
-            String userId) {
+            String userKey) {
         CredentialCacheKey cacheKey =
-                new CredentialCacheKey(csp, siteName, credentialType, credentialName, userId);
+                new CredentialCacheKey(csp, siteName, credentialType, credentialName, userKey);
         credentialsStore.deleteCredential(cacheKey);
     }
 
     /**
-     * Get credential for the @Csp with @userId. This method is used only within Xpanse application.
-     * This method joins credential variables from all sources.
+     * Get credential for the @Csp with @userKey. This method is used only within Xpanse
+     * application. This method joins credential variables from all sources.
      *
      * @param csp The cloud service provider.
      * @param site The site which the credential belongs to.
      * @param credentialType Type of the credential
-     * @param userId The user who provided the credential info.
+     * @param userKey The user who provided the credential info.
      */
     public AbstractCredentialInfo getCredential(
-            Csp csp, String site, CredentialType credentialType, String userId) {
+            Csp csp, String site, CredentialType credentialType, String userKey) {
         List<AbstractCredentialInfo> credentialInfos =
-                joinCredentialsFromAllSources(csp, site, credentialType, userId);
+                joinCredentialsFromAllSources(csp, site, credentialType, userKey);
         if (credentialInfos.isEmpty()) {
             throw new CredentialsNotFoundException(
                     String.format(
@@ -310,7 +310,7 @@ public class CredentialCenter {
                             String.format(
                                     "All mandatory variables for credential of type %s for Csp:%s"
                                             + " and user %s is not available",
-                                    csp, credentialType, userId)));
+                                    csp, credentialType, userKey)));
         }
         return decodeSensitiveVariables(credentialWithAllVariables.get());
     }
@@ -515,10 +515,10 @@ public class CredentialCenter {
     }
 
     private List<AbstractCredentialInfo> joinCredentialsFromAllSources(
-            Csp csp, String site, CredentialType requestedCredentialType, String userId) {
+            Csp csp, String site, CredentialType requestedCredentialType, String userKey) {
         List<AbstractCredentialInfo> joinCredentials = new ArrayList<>();
         List<AbstractCredentialInfo> userCredentials =
-                listUserCredentials(csp, site, requestedCredentialType, userId);
+                listUserCredentials(csp, site, requestedCredentialType, userKey);
         if (!CollectionUtils.isEmpty(userCredentials)) {
             for (AbstractCredentialInfo userCredential : userCredentials) {
                 if (Objects.nonNull(userCredential)) {

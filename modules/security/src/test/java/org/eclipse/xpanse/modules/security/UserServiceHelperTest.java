@@ -263,14 +263,14 @@ class UserServiceHelperTest {
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final String result = userServiceHelperUnderTest.getCurrentUserManageIsv();
+        final String result = userServiceHelperUnderTest.getIsvManagedByCurrentUser();
         // Verify the results
         assertThat(result).isNull();
 
         // Setup
         setUpSecurityConfig(true, true);
         // Run the test
-        final String result1 = userServiceHelperUnderTest.getCurrentUserManageIsv();
+        final String result1 = userServiceHelperUnderTest.getIsvManagedByCurrentUser();
         // Verify the results
         assertThat(result1).isNotNull();
         assertThat(result1).isEqualTo(isv);
@@ -284,14 +284,14 @@ class UserServiceHelperTest {
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final String result = userServiceHelperUnderTest.getCurrentUserManageIsv();
+        final String result = userServiceHelperUnderTest.getIsvManagedByCurrentUser();
         // Verify the results
         assertThat(result).isNull();
 
         // Setup
         setUpSecurityConfig(true, true);
         // Run the test
-        assertThatThrownBy(() -> userServiceHelperUnderTest.getCurrentUserManageIsv())
+        assertThatThrownBy(() -> userServiceHelperUnderTest.getIsvManagedByCurrentUser())
                 .isInstanceOf(UserNotLoggedInException.class);
     }
 
@@ -302,14 +302,14 @@ class UserServiceHelperTest {
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final Csp result = userServiceHelperUnderTest.getCurrentUserManageCsp();
+        final Csp result = userServiceHelperUnderTest.getCspManagedByCurrentUser();
         // Verify the results
         assertThat(result).isNull();
 
         // Setup
         setUpSecurityConfig(true, true);
         // Run the test
-        final Csp result1 = userServiceHelperUnderTest.getCurrentUserManageCsp();
+        final Csp result1 = userServiceHelperUnderTest.getCspManagedByCurrentUser();
         // Verify the results
         assertThat(result1).isNotNull();
         assertThat(result1).isEqualTo(csp);
@@ -323,14 +323,14 @@ class UserServiceHelperTest {
         // Setup without auth
         setUpSecurityConfig(false, true);
         // Run the test
-        final Csp result = userServiceHelperUnderTest.getCurrentUserManageCsp();
+        final Csp result = userServiceHelperUnderTest.getCspManagedByCurrentUser();
         // Verify the results
         assertThat(result).isNull();
 
         // Setup
         setUpSecurityConfig(true, true);
         // Run the test
-        assertThatThrownBy(() -> userServiceHelperUnderTest.getCurrentUserManageCsp())
+        assertThatThrownBy(() -> userServiceHelperUnderTest.getCspManagedByCurrentUser())
                 .isInstanceOf(UserNotLoggedInException.class);
     }
 }
