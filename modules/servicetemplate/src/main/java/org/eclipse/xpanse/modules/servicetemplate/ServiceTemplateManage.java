@@ -308,7 +308,7 @@ public class ServiceTemplateManage {
         if (!userServiceHelper.isAuthEnable()) {
             newServiceTemplate.setServiceVendor(ocl.getServiceVendor());
         } else {
-            String userManageIsv = userServiceHelper.getCurrentUserManageIsv();
+            String userManageIsv = userServiceHelper.getIsvManagedByCurrentUser();
             if (StringUtils.isNotEmpty(userManageIsv)
                     && !StringUtils.equals(ocl.getServiceVendor(), userManageIsv)) {
                 String errorMsg =
@@ -824,7 +824,7 @@ public class ServiceTemplateManage {
 
     private void fillParamFromUserMetadata(ServiceTemplateQueryModel query) {
         if (Objects.nonNull(query.getCheckServiceVendor()) && query.getCheckServiceVendor()) {
-            String serviceVendor = userServiceHelper.getCurrentUserManageIsv();
+            String serviceVendor = userServiceHelper.getIsvManagedByCurrentUser();
             query.setServiceVendor(serviceVendor);
         }
     }

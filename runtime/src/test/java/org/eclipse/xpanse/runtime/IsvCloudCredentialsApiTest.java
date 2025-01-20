@@ -43,6 +43,7 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
     private final String site = "Chinese Mainland";
     private final String credentialName = "AK_SK";
     private final CredentialType credentialType = CredentialType.VARIABLES;
+    private final String managedIsv = "ISV-A";
 
     @Test
     @WithJwt(file = "jwt_isv.json")
@@ -60,6 +61,7 @@ class IsvCloudCredentialsApiTest extends ApisTestCommon {
         createCredential.setSite(site);
         createCredential.setType(credentialType);
         createCredential.setName(credentialName);
+        createCredential.setUserId(managedIsv);
         createCredential.setDescription("description");
         List<CredentialVariable> credentialVariables = new ArrayList<>();
         credentialVariables.add(

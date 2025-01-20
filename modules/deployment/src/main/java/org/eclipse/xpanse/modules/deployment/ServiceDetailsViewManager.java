@@ -234,7 +234,7 @@ public class ServiceDetailsViewManager {
 
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
-        String isv = userServiceHelper.getCurrentUserManageIsv();
+        String isv = userServiceHelper.getIsvManagedByCurrentUser();
         query.setServiceVendor(isv);
         List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
         deployServices.forEach(

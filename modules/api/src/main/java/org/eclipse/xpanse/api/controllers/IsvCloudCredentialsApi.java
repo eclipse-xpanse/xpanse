@@ -11,6 +11,7 @@ import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.eclipse.xpanse.modules.security.UserServiceHelper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,12 +46,8 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class IsvCloudCredentialsApi {
 
-    private final CredentialCenter credentialCenter;
-
-    @Autowired
-    public IsvCloudCredentialsApi(CredentialCenter credentialCenter) {
-        this.credentialCenter = credentialCenter;
-    }
+    @Resource private CredentialCenter credentialCenter;
+    @Resource private UserServiceHelper userServiceHelper;
 
     /**
      * Users in the ISV role get all cloud provider credentials added by the user for a cloud
@@ -77,7 +74,8 @@ public class IsvCloudCredentialsApi {
             @Parameter(name = "type", description = "The type of credential.")
                     @RequestParam(name = "type", required = false)
                     CredentialType type) {
-        return credentialCenter.listCredentials(csp, type, null);
+        return credentialCenter.listCredentials(
+                csp, type, userServiceHelper.getIsvManagedByCurrentUser());
     }
 
     /**
@@ -96,6 +94,7 @@ public class IsvCloudCredentialsApi {
                             + "cloud service provider.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public void addIsvCloudCredential(@Valid @RequestBody CreateCredential createCredential) {
+        createCredential.setUserId(userServiceHelper.getIsvManagedByCurrentUser());
         credentialCenter.addCredential(createCredential);
     }
 
@@ -115,6 +114,7 @@ public class IsvCloudCredentialsApi {
                             + " provider.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public void updateIsvCloudCredential(@Valid @RequestBody CreateCredential updateCredential) {
+        updateCredential.setUserId(userServiceHelper.getIsvManagedByCurrentUser());
         credentialCenter.updateCredential(updateCredential);
     }
 
@@ -148,6 +148,7 @@ public class IsvCloudCredentialsApi {
             @Parameter(name = "name", description = "The name of credential.")
                     @RequestParam(name = "name")
                     String name) {
-        credentialCenter.deleteCredential(csp, siteName, type, name, null);
+        credentialCenter.deleteCredential(
+                csp, siteName, type, name, userServiceHelper.getIsvManagedByCurrentUser());
     }
 }
