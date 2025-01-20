@@ -217,16 +217,15 @@ public class ServiceDetailsViewManager {
     }
 
     /**
-     * Use query model to list SV deployment services.
+     * Use query model to list ISV deployment services.
      *
      * @param category of the services to be filtered.
-     * @param csp of the services to be filtered.
      * @param serviceName of the services to be filtered.
      * @param serviceVersion of the services to be filtered.
      * @param state of the services to be filtered.
      * @return serviceVos
      */
-    public List<DeployedService> listDeployedServicesOfIsv(
+    public List<DeployedService> getAllDeployedServicesByIsv(
             Category category,
             Csp csp,
             String serviceName,
@@ -237,6 +236,32 @@ public class ServiceDetailsViewManager {
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
         String isv = userServiceHelper.getCurrentUserManageIsv();
         query.setServiceVendor(isv);
+        List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
+        deployServices.forEach(
+                serviceDeployment ->
+                        serviceResultReFetchManager
+                                .reFetchDeploymentStateForMissingOrdersFromDeployers(
+                                        serviceDeployment));
+        return setServiceConfigurationForDeployedServiceList(deployServices);
+    }
+
+    /**
+     * Use query model to list CSP deployment services.
+     *
+     * @param category of the services to be filtered.
+     * @param serviceName of the services to be filtered.
+     * @param serviceVersion of the services to be filtered.
+     * @param state of the services to be filtered.
+     * @return serviceVos
+     */
+    public List<DeployedService> getAllDeployedServicesByCsp(
+            Category category,
+            String serviceName,
+            String serviceVersion,
+            ServiceDeploymentState state) {
+        Csp csp = userServiceHelper.getCurrentUserManageCsp();
+        ServiceQueryModel query =
+                getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
         List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
         deployServices.forEach(
                 serviceDeployment ->
