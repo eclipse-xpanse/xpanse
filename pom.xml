@@ -54,7 +54,7 @@
         <apache.commons.lang.version>3.17.0</apache.commons.lang.version>
         <apache.commons.collections.version>4.4</apache.commons.collections.version>
         <apache.commons.validator.version>1.9.0</apache.commons.validator.version>
-        <mysql.version>9.1.0</mysql.version>
+        <mysql.version>9.2.0</mysql.version>
         <system.stubs.version>2.1.7</system.stubs.version>
         <junit4.version>4.13.2</junit4.version>
         <json.smart.version>2.5.0</json.smart.version>
