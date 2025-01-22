@@ -259,7 +259,7 @@ public class ServiceDetailsViewManager {
             String serviceName,
             String serviceVersion,
             ServiceDeploymentState state) {
-        Csp csp = userServiceHelper.getCurrentUserManageCsp();
+        Csp csp = userServiceHelper.getCspManagedByCurrentUser();
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
         List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
