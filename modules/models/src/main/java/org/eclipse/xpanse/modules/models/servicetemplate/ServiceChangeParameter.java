@@ -51,7 +51,7 @@ public class ServiceChangeParameter implements Serializable {
 
     @NotNull
     @Schema(description = "The init value of the service config parameter")
-    private String initialValue;
+    private Object initialValue;
 
     @Schema(
             description =

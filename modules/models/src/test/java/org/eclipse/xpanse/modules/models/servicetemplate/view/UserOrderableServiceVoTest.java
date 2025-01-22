@@ -13,6 +13,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -43,6 +44,7 @@ class UserOrderableServiceVoTest {
     @Mock private ServiceHostingType mockServiceHostingType;
     @Mock private ServiceProviderContactDetails mockServiceProviderContactDetails;
     @Mock private List<AvailabilityZoneConfig> mockserviceAvailabilityConfig;
+    private List<ServiceAction> serviceActions = List.of();
     private UserOrderableServiceVo test;
 
     @BeforeEach
@@ -65,6 +67,7 @@ class UserOrderableServiceVoTest {
         test.setServiceAvailabilityConfig(mockserviceAvailabilityConfig);
         test.setEula(eula);
         test.setConfigurationParameters(configurationParameters);
+        test.setServiceActions(serviceActions);
     }
 
     @Test
@@ -87,6 +90,7 @@ class UserOrderableServiceVoTest {
         assertThat(test.getServiceAvailabilityConfig()).isEqualTo(mockserviceAvailabilityConfig);
         assertThat(test.getEula()).isEqualTo(eula);
         assertThat(test.getConfigurationParameters()).isEqualTo(configurationParameters);
+        assertThat(test.getServiceActions()).isEqualTo(serviceActions);
     }
 
     @Test
@@ -140,6 +144,8 @@ class UserOrderableServiceVoTest {
                         + eula
                         + ", configurationParameters="
                         + configurationParameters
+                        + ", serviceActions="
+                        + serviceActions
                         + ")";
         assertEquals(expectedToString, test.toString());
     }

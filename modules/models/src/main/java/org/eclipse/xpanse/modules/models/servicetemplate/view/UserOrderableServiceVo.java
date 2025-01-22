@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -106,4 +107,8 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
     @UniqueElements
     @Schema(description = "The collection of service configuration parameters.")
     private List<ServiceChangeParameter> configurationParameters;
+
+    @UniqueElements
+    @Schema(description = "manage service action.")
+    private List<ServiceAction> serviceActions;
 }

@@ -102,6 +102,10 @@ public class ServiceTemplateEntityConverter {
                 userOrderableServiceVo.setConfigurationParameters(
                         serviceConfigurationManage.getConfigurationParameters());
             }
+            if (Objects.nonNull(serviceTemplateEntity.getOcl().getServiceActions())) {
+                userOrderableServiceVo.setServiceActions(
+                        serviceTemplateEntity.getOcl().getServiceActions());
+            }
             return userOrderableServiceVo;
         }
         return null;
