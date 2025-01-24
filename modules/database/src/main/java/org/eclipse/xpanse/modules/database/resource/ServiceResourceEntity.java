@@ -27,6 +27,8 @@ import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /** ServiceResourceEntity for persistence. */
 @Data
@@ -66,6 +68,7 @@ public class ServiceResourceEntity extends CreateModifiedTime {
     @ManyToOne
     @JoinColumn(name = "SERVICE_ID")
     @JsonIgnoreProperties({"deployResources"})
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ServiceDeploymentEntity serviceDeploymentEntity;
 
     /** The properties of the service resource. */
@@ -75,5 +78,6 @@ public class ServiceResourceEntity extends CreateModifiedTime {
             joinColumns = @JoinColumn(name = "RESOURCE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Map<String, String> properties;
 }

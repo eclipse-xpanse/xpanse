@@ -28,6 +28,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 public class Oauth2ClientConfiguration {
 
     public static final String OAUTH_CLIENT_ID = "oauth2";
+    public static final String[] DEFAULT_SCOPES = {"openid", "profile"};
 
     // Create the Oauth client registration
     @Bean
@@ -39,6 +40,7 @@ public class Oauth2ClientConfiguration {
                 .tokenUri(tokenUri)
                 .clientId(clientId)
                 .clientSecret(clientSecret)
+                .scope(DEFAULT_SCOPES)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .build();
     }
