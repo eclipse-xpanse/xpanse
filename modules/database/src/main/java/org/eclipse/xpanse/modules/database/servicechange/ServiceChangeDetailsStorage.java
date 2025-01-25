@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.serviceconfiguration.update;
+package org.eclipse.xpanse.modules.database.servicechange;
 
 import java.util.List;
 import java.util.UUID;

@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.serviceconfiguration.update;
+package org.eclipse.xpanse.modules.database.servicechange;
 
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;

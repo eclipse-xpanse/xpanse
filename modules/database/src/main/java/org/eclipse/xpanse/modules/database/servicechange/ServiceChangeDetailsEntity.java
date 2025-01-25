@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.serviceconfiguration.update;
+package org.eclipse.xpanse.modules.database.servicechange;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
