@@ -110,6 +110,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
                                 URI.create("file:src/test/resources/ocl_terraform_test.yml")
                                         .toURL());
         ocl.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
+        ocl.setServiceVersion("1.0.1");
         ServiceTemplateDetailVo serviceTemplate =
                 registerServiceTemplateAndApproveRegistration(ocl);
         addIsvCredential();
@@ -197,6 +198,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
                                         .param(
                                                 "serviceState",
                                                 ServiceDeploymentState.DEPLOY_SUCCESS.toValue())
+                                        .param("serviceVersion", "1.0.1")
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .accept(MediaType.APPLICATION_JSON))
                         .andReturn()
