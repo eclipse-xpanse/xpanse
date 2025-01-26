@@ -40,6 +40,8 @@ import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -126,6 +128,7 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
             joinColumns = @JoinColumn(name = "SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Map<String, String> outputProperties;
 
     /**
@@ -138,6 +141,7 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
             joinColumns = @JoinColumn(name = "SERVICE_ID", nullable = false))
     @MapKeyColumn(name = "P_KEY")
     @Column(name = "P_VALUE", length = Integer.MAX_VALUE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Map<String, String> deploymentGeneratedFiles;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")

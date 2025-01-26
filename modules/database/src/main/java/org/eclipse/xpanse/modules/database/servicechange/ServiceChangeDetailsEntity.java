@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.database.serviceconfiguration.update;
+package org.eclipse.xpanse.modules.database.servicechange;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
@@ -12,7 +12,6 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,8 +29,8 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.AnsibleTaskResult;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 /** ServiceChangeDetailsEntity for persistence. */
@@ -48,29 +47,13 @@ public class ServiceChangeDetailsEntity implements Serializable {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(
-            name = "ORDER_ID",
-            nullable = false,
-            foreignKey =
-                    @ForeignKey(
-                            name = "fk_service_configuration_order",
-                            foreignKeyDefinition =
-                                    "FOREIGN KEY (ORDER_ID) REFERENCES SERVICE_ORDER(ORDER_ID) ON"
-                                            + " DELETE CASCADE"))
-    @Cascade(CascadeType.ALL)
+    @JoinColumn(name = "ORDER_ID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ServiceOrderEntity serviceOrderEntity;
 
     @ManyToOne
-    @JoinColumn(
-            name = "SERVICE_ID",
-            nullable = false,
-            foreignKey =
-                    @ForeignKey(
-                            name = "fk_service_configuration_deploy_service",
-                            foreignKeyDefinition =
-                                    "FOREIGN KEY (SERVICE_ID) "
-                                            + "REFERENCES DEPLOY_SERVICE(ID) ON DELETE CASCADE"))
-    @Cascade(CascadeType.ALL)
+    @JoinColumn(name = "SERVICE_ID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ServiceDeploymentEntity serviceDeploymentEntity;
 
     private String resourceName;

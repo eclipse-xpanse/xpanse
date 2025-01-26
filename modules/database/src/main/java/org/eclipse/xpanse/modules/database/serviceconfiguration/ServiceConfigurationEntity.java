@@ -23,6 +23,8 @@ import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -38,6 +40,7 @@ public class ServiceConfigurationEntity {
     @OneToOne
     @JoinColumn(name = "service_id")
     @JsonIgnoreProperties({"deployResourceList", "serviceConfigurationEntity"})
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ServiceDeploymentEntity serviceDeploymentEntity;
 
     @Column(columnDefinition = "json")

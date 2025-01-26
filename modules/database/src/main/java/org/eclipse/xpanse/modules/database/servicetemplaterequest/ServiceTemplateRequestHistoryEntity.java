@@ -27,6 +27,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 /** Represents the SERVICE_TEMPLATE_REQUEST_HISTORY table in the database. */
@@ -43,6 +45,7 @@ public class ServiceTemplateRequestHistoryEntity extends CreateModifiedTime {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SERVICE_TEMPLATE_ID", nullable = false)
     @ToString.Exclude
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ServiceTemplateEntity serviceTemplate;
 
     @Column(name = "REQUEST_TYPE", nullable = false)

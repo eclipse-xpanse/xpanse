@@ -21,6 +21,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /** Represents the SERVICE_POLICY table in the database. */
 @Data
@@ -45,6 +47,7 @@ public class ServicePolicyEntity extends CreateModifiedTime {
     @ManyToOne
     @JoinColumn(name = "SERVICE_TEMPLATE_ID", nullable = false)
     @JsonIgnoreProperties({"servicePolicyEntity"})
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ServiceTemplateEntity serviceTemplate;
 
     @Column(name = "FLAVOR_NAMES")
