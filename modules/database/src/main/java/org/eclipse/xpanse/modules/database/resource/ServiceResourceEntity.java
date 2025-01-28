@@ -52,15 +52,15 @@ public class ServiceResourceEntity extends CreateModifiedTime {
     private String groupName;
 
     /** The id of the service resource. */
-    @Column(name = "RESOURCE_ID")
+    @Column(name = "RESOURCE_ID", nullable = false)
     private String resourceId;
 
     /** The name of the service resource. */
-    @Column(name = "RESOURCE_NAME")
+    @Column(name = "RESOURCE_NAME", nullable = false)
     private String resourceName;
 
     /** The kind of the service resource. */
-    @Column(name = "RESOURCE_KIND")
+    @Column(name = "RESOURCE_KIND", nullable = false)
     @Enumerated(EnumType.STRING)
     private DeployResourceKind resourceKind;
 

@@ -43,7 +43,7 @@ public class ServiceConfigurationEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ServiceDeploymentEntity serviceDeploymentEntity;
 
-    @Column(columnDefinition = "json")
+    @Column(columnDefinition = "json", nullable = false)
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private Map<String, Object> configuration;

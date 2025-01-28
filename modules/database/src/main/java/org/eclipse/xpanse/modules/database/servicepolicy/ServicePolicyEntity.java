@@ -40,7 +40,7 @@ public class ServicePolicyEntity extends CreateModifiedTime {
     private UUID id;
 
     /** The valid policy created by the user. */
-    @Column(name = "POLICY", length = Integer.MAX_VALUE)
+    @Column(name = "POLICY", length = Integer.MAX_VALUE, nullable = false)
     private String policy;
 
     /** The registered service template we belonged to. */

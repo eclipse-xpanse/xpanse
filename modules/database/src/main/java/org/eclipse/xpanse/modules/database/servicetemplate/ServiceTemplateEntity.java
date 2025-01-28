@@ -61,14 +61,14 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Enumerated(EnumType.STRING)
     private Csp csp;
 
-    @Column(name = "CATEGORY")
+    @Column(name = "CATEGORY", nullable = false)
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @Column(name = "SERVICE_VENDOR")
+    @Column(name = "SERVICE_VENDOR", nullable = false)
     private String serviceVendor;
 
-    @Column(name = "SERVICE_HOSTING_TYPE")
+    @Column(name = "SERVICE_HOSTING_TYPE", nullable = false)
     @Enumerated(EnumType.STRING)
     private ServiceHostingType serviceHostingType;
 
@@ -77,7 +77,7 @@ public class ServiceTemplateEntity extends CreateModifiedTime {
     @Convert(converter = ObjectJsonConverter.class)
     private Ocl ocl;
 
-    @Column(name = "SERVICE_TEMPLATE_REGISTRATION_STATE")
+    @Column(name = "SERVICE_TEMPLATE_REGISTRATION_STATE", nullable = false)
     @Enumerated(EnumType.STRING)
     private ServiceTemplateRegistrationState serviceTemplateRegistrationState;
 

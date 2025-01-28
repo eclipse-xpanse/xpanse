@@ -58,6 +58,7 @@ public class ServiceChangeDetailsEntity implements Serializable {
 
     private String resourceName;
 
+    @Column(nullable = false)
     private String changeHandler;
 
     private String resultMessage;
@@ -68,7 +69,7 @@ public class ServiceChangeDetailsEntity implements Serializable {
     private Map<String, Object> properties;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "STATUS")
+    @Column(name = "STATUS", nullable = false)
     private ServiceChangeStatus status;
 
     @Column(name = "TASK_RESULT", columnDefinition = "json")

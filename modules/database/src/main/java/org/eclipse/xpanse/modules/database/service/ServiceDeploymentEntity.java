@@ -59,6 +59,7 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
 
     /** The category of the Service. */
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Category category;
 
     /** The name of the Service. */
@@ -71,18 +72,21 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
     private String version;
 
     /** ServiceVendor of the user who registered service template. */
+    @Column(nullable = false)
     private String serviceVendor;
 
     /** The csp of the Service. */
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Csp csp;
 
     /** The flavor of the Service. */
+    @Column(nullable = false)
     private String flavor;
 
     /** The deployment state of the Service. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "SERVICE_DEPLOYMENT_STATE")
+    @Column(name = "SERVICE_DEPLOYMENT_STATE", nullable = false)
     private ServiceDeploymentState serviceDeploymentState;
 
     /** The result message of the service deployment. */
