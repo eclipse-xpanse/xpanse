@@ -14,7 +14,7 @@ updates:
       spring-boot:
         applies-to: version-updates
         patterns:
-          - 'spring-boot-starter*'
+          - 'org.springframework.boot:spring-boot-starter*'
   - package-ecosystem: docker
     directory: /
     schedule:
