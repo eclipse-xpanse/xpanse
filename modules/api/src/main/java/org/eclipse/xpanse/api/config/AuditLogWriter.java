@@ -140,7 +140,9 @@ public class AuditLogWriter {
         auditLog.setUrl(String.valueOf(request.getRequestURL()));
         auditLog.setCsp(csp);
         auditLog.setOperatingTime(OffsetDateTime.now());
-        auditLog.setUserId(userServiceHelper.getCurrentUserId());
+        if (userServiceHelper.isUserAuthenticated()) {
+            auditLog.setUserId(userServiceHelper.getCurrentUserId());
+        }
         return auditLog;
     }
 }
