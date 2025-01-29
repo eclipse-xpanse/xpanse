@@ -30,19 +30,14 @@ public class RestTemplateLoggingInterceptor implements ClientHttpRequestIntercep
             @NonNull ClientHttpRequestExecution execution)
             throws IOException {
         long startTime = System.currentTimeMillis();
+        logRequest(request, body);
         ClientHttpResponse originalResponse = execution.execute(request, body);
         byte[] responseBodyBytes = StreamUtils.copyToByteArray(originalResponse.getBody());
-        logRequestResponse(request, body, originalResponse, responseBodyBytes, startTime);
+        logResponse(originalResponse, responseBodyBytes, startTime);
         return new CustomClientHttpResponse(originalResponse, responseBodyBytes);
     }
 
-    private void logRequestResponse(
-            HttpRequest request,
-            byte[] body,
-            ClientHttpResponse response,
-            byte[] responseBodyBytes,
-            long startTime)
-            throws IOException {
+    private void logRequest(HttpRequest request, byte[] body) {
         if (log.isInfoEnabled()) {
             String requestBody = new String(body, StandardCharsets.UTF_8);
             final StringBuilder requestResult = new StringBuilder(requestBody.length() + 2048);
@@ -53,7 +48,12 @@ public class RestTemplateLoggingInterceptor implements ClientHttpRequestIntercep
             requestResult.append(' ');
             writeBody(requestBody, requestResult);
             log.info(requestResult.toString());
+        }
+    }
 
+    private void logResponse(ClientHttpResponse response, byte[] responseBodyBytes, long startTime)
+            throws IOException {
+        if (log.isInfoEnabled()) {
             String responseBody = new String(responseBodyBytes, StandardCharsets.UTF_8);
             final StringBuilder responseResult = new StringBuilder(responseBody.length() + 2048);
             responseResult.append("Response: ");
