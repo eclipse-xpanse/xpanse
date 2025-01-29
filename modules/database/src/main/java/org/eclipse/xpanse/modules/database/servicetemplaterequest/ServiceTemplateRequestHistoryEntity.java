@@ -56,7 +56,7 @@ public class ServiceTemplateRequestHistoryEntity extends CreateModifiedTime {
     @Enumerated(EnumType.STRING)
     private ServiceTemplateRequestStatus requestStatus;
 
-    @Column(name = "SERVICE_TEMPLATE_REQUEST", columnDefinition = "json")
+    @Column(name = "SERVICE_TEMPLATE_REQUEST", columnDefinition = "json", nullable = false)
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private Ocl ocl;
