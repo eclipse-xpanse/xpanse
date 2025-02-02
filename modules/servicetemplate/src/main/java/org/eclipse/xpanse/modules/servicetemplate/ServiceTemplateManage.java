@@ -54,7 +54,7 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.eclipse.xpanse.modules.servicetemplate.price.BillingConfigValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;

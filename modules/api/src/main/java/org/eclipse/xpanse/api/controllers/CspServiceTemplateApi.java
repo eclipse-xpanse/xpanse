@@ -7,8 +7,8 @@
 package org.eclipse.xpanse.api.controllers;
 
 import static org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter.convertToServiceTemplateDetailVo;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_CSP;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_CSP;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +34,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplate
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;

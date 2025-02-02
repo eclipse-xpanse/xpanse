@@ -28,7 +28,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.security.common.AesUtil;
+import org.eclipse.xpanse.modules.security.secrets.SecretsManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -44,7 +44,7 @@ public class DeployEnvironments {
     private static final String VAR_AGENT_VERSION = "agent_version";
     private static final String VAR_XPANSE_API_ENDPOINT = "xpanse_api_endpoint";
 
-    private final AesUtil aesUtil;
+    private final SecretsManager secretsManager;
 
     private final CredentialCenter credentialCenter;
 
@@ -56,18 +56,18 @@ public class DeployEnvironments {
      * Constructor to initialize DeployEnvironments bean.
      *
      * @param credentialCenter CredentialCenter bean
-     * @param aesUtil AesUtil bean
+     * @param secretsManager SecretsManager bean
      * @param pluginManager PluginManager bean
      * @param environment Environment bean
      */
     @Autowired
     public DeployEnvironments(
             CredentialCenter credentialCenter,
-            AesUtil aesUtil,
+            SecretsManager secretsManager,
             PluginManager pluginManager,
             Environment environment) {
         this.credentialCenter = credentialCenter;
-        this.aesUtil = aesUtil;
+        this.secretsManager = secretsManager;
         this.pluginManager = pluginManager;
         this.environment = environment;
     }
@@ -104,7 +104,7 @@ public class DeployEnvironments {
                             !SensitiveScope.NONE
                                             .toValue()
                                             .equals(variable.getSensitiveScope().toValue())
-                                    ? aesUtil.decode(
+                                    ? secretsManager.decrypt(
                                             serviceRequestProperties
                                                     .get(variable.getName())
                                                     .toString())
@@ -124,7 +124,7 @@ public class DeployEnvironments {
                         !SensitiveScope.NONE
                                         .toValue()
                                         .equals(variable.getSensitiveScope().toValue())
-                                ? aesUtil.decode(variable.getValue())
+                                ? secretsManager.decrypt(variable.getValue())
                                 : variable.getValue());
             }
         }
@@ -233,7 +233,7 @@ public class DeployEnvironments {
                     variables.put(
                             variable.getName(),
                             (variable.getSensitiveScope() != SensitiveScope.NONE && isDeployRequest)
-                                    ? aesUtil.decodeBackToOriginalType(
+                                    ? secretsManager.decodeBackToOriginalType(
                                             variable.getDataType(),
                                             serviceRequestProperties
                                                     .get(variable.getName())
@@ -252,7 +252,7 @@ public class DeployEnvironments {
                 variables.put(
                         variable.getName(),
                         (variable.getSensitiveScope() != SensitiveScope.NONE && isDeployRequest)
-                                ? aesUtil.decode(variable.getValue())
+                                ? secretsManager.decrypt(variable.getValue())
                                 : variable.getValue());
             }
         }
@@ -353,14 +353,14 @@ public class DeployEnvironments {
                 fixedVariables.put(
                         variable.getName(),
                         (variable.getSensitiveScope() != SensitiveScope.NONE)
-                                ? aesUtil.decode(variable.getValue())
+                                ? secretsManager.decrypt(variable.getValue())
                                 : variable.getValue());
             }
             if (variable.getKind() == DeployVariableKind.FIX_ENV) {
                 fixedVariables.put(
                         variable.getName(),
                         (variable.getSensitiveScope() != SensitiveScope.NONE)
-                                ? aesUtil.decode(variable.getValue())
+                                ? secretsManager.decrypt(variable.getValue())
                                 : variable.getValue());
             }
         }

@@ -9,7 +9,7 @@ import org.eclipse.xpanse.api.controllers.AdminServicesApi;
 import org.eclipse.xpanse.modules.cache.RedisCacheConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
-import org.eclipse.xpanse.modules.security.RequiredRoleDescriptionCustomizer;
+import org.eclipse.xpanse.modules.security.auth.RequiredRoleDescriptionCustomizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

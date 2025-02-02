@@ -56,7 +56,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.hibernate.exception.LockTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

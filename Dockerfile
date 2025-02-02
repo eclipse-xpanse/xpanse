@@ -38,11 +38,6 @@ WORKDIR ${XPANSE_HOME_DIR}
 # Copy jar file
 COPY --chown=${XPANSE_USER}:${XPANSE_USER} runtime/target/xpanse-runtime-*.jar xpanse-runtime.jar
 
-# Generate RSA private key if not already generated
-RUN if [ ! -f "${XPANSE_HOME_DIR}/private_key.pem" ]; then \
-        openssl genpkey -algorithm RSA -out ${XPANSE_HOME_DIR}/private_key.pem; \
-    fi
-
 # Set start command
 ENTRYPOINT ["java", "-Ddeployer.terraform.install.dir=${TERRAFORM_INSTALL_PATH}", "-Ddeployer.terraform.default.supported.versions=${TERRAFORM_VERSIONS}", \
 "-Ddeployer.opentofu.install.dir=${OPENTOFU_INSTALL_PATH}", "-Ddeployer.opentofu.default.supported.versions=${OPENTOFU_VERSIONS}", \

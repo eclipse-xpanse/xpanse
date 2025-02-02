@@ -29,7 +29,7 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariabl
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.security.common.AesUtil;
+import org.eclipse.xpanse.modules.security.secrets.SecretsManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -39,7 +39,7 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class CredentialCenter {
 
-    private final AesUtil aesUtil;
+    private final SecretsManager secretsManager;
     private final PluginManager pluginManager;
     private final CredentialsStore credentialsStore;
     private final CredentialOpenApiGenerator credentialOpenApiGenerator;
@@ -47,11 +47,11 @@ public class CredentialCenter {
     /** Constructor of CredentialCenter. */
     @Autowired
     public CredentialCenter(
-            AesUtil aesUtil,
+            SecretsManager secretsManager,
             PluginManager pluginManager,
             CredentialsStore credentialsStore,
             CredentialOpenApiGenerator credentialOpenApiGenerator) {
-        this.aesUtil = aesUtil;
+        this.secretsManager = secretsManager;
         this.pluginManager = pluginManager;
         this.credentialsStore = credentialsStore;
         this.credentialOpenApiGenerator = credentialOpenApiGenerator;
@@ -321,25 +321,30 @@ public class CredentialCenter {
                 variable -> {
                     if (!Objects.isNull(variable) && variable.getIsSensitive()) {
                         if (StringUtils.isNotBlank(variable.getValue())) {
-                            variable.setValue(aesUtil.encode(variable.getValue()));
+                            variable.setValue(secretsManager.encrypt(variable.getValue()));
                         }
                     }
                 });
     }
 
+    /** This method decrypts the sensitive data and returns a new object back. */
     private CredentialVariables decodeSensitiveVariables(
             AbstractCredentialInfo abstractCredentialInfo) {
         CredentialVariables credentialVariables = (CredentialVariables) abstractCredentialInfo;
-        List<CredentialVariable> variables = credentialVariables.getVariables();
+        // a clone is necessary otherwise we are mutating the actual object which is in cache.
+        // Spring cache always returns the reference to the original object. So any changes to it
+        // must be avoided.
+        CredentialVariables credentialVariablesClone = credentialVariables.clone();
+        List<CredentialVariable> variables = credentialVariablesClone.getVariables();
         variables.forEach(
                 variable -> {
                     if (!Objects.isNull(variable) && variable.getIsSensitive()) {
                         if (StringUtils.isNotBlank(variable.getValue())) {
-                            variable.setValue(aesUtil.decode(variable.getValue()));
+                            variable.setValue(secretsManager.decrypt(variable.getValue()));
                         }
                     }
                 });
-        return credentialVariables;
+        return credentialVariablesClone;
     }
 
     /**

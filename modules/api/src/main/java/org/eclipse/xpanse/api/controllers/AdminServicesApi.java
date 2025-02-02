@@ -5,10 +5,10 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_CSP;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_CSP;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ISV;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,9 +33,9 @@ import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthCheck;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderService;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.auth.IdentityProviderService;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

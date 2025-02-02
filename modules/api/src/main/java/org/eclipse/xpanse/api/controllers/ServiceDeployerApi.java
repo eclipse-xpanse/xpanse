@@ -7,10 +7,10 @@
 package org.eclipse.xpanse.api.controllers;
 
 import static org.eclipse.xpanse.api.config.ServiceTemplateEntityConverter.convertToUserOrderableServiceVo;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_CSP;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ISV;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_CSP;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ISV;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

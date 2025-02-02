@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicy;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;

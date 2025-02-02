@@ -26,7 +26,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableS
 import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

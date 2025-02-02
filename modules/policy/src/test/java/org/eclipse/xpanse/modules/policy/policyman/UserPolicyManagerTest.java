@@ -22,7 +22,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryReques
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.policy.UserPolicyManager;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -69,7 +69,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
-import org.eclipse.xpanse.modules.security.common.AesUtil;
+import org.eclipse.xpanse.modules.security.secrets.SecretsManager;
 import org.eclipse.xpanse.plugins.openstack.common.auth.ProviderAuthInfoResolver;
 import org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.common.auth.keystone.OpenstackKeystoneManager;
@@ -112,7 +112,7 @@ import org.springframework.test.util.ReflectionTestUtils;
             MeasuresService.class,
             MetricsQueryBuilder.class,
             CredentialCenter.class,
-            AesUtil.class,
+            SecretsManager.class,
             MonitorMetricsStore.class,
             OpenstackTerraformResourceHandler.class,
             PluginManager.class,
@@ -123,7 +123,15 @@ import org.springframework.test.util.ReflectionTestUtils;
             ProxyConfigurationManager.class
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestPropertySource(properties = {"OPENSTACK_TESTLAB_AUTH_URL=http://127.0.0.1/identity/v3"})
+@TestPropertySource(
+        properties = {
+            "OPENSTACK_TESTLAB_AUTH_URL=http://127.0.0.1/identity/v3",
+            "xpanse.secrets.encryption.initial.vector=p3zV90BqEf3TquKV",
+            "xpanse.secrets.encryption.algorithm.name=AES",
+            "xpanse.secrets.encryption.algorithm.mode=CBC",
+            "xpanse.secrets.encryption.algorithm.padding=ISO10126Padding",
+            "xpanse.secrets.encryption.secrete.key.value=Bx33eHoeifIxykJfMZVPjDRGMKqA75eH"
+        })
 class OpenstackTestlabOrchestratorPluginTest {
     @RegisterExtension
     static WireMockExtension wireMockExtension =
