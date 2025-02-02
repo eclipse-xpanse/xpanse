@@ -51,7 +51,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
 @AutoConfigureMockMvc
 class ServiceCatalogApiTest extends ApisTestCommon {
 

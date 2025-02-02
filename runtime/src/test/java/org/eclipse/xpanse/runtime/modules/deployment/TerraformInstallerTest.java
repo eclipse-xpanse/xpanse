@@ -23,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
             "http.request.retry.max.attempts=1",
             "enable.redis.distributed.cache=true",
             "support.default.deployment.tool.versions.only=false",
-            "spring.profiles.active=noauth"
+            "spring.profiles.active=noauth,dev"
         })
 class TerraformInstallerTest extends AbstractRedisIntegrationTest {
 

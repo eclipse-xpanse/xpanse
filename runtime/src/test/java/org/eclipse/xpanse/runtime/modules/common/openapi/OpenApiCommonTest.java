@@ -25,7 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ContextConfiguration(classes = {OpenApiUrlManage.class, OpenApiGeneratorJarManage.class})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=test"})
+@SpringBootTest(properties = {"spring.profiles.active=test,dev"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class OpenApiCommonTest {
 

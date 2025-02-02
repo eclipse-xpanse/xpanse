@@ -38,7 +38,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties =
-                "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,opentelemetry,test")
+                "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,opentelemetry,test,dev")
 @AutoConfigureMockMvc
 class AdminServicesApiTest extends ApisTestCommon {
 

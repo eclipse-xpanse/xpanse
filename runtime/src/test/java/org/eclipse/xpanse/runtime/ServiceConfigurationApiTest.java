@@ -50,7 +50,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 /** Test for ServiceConfigurationApi. */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
 @AutoConfigureMockMvc
 class ServiceConfigurationApiTest extends ApisTestCommon {
 

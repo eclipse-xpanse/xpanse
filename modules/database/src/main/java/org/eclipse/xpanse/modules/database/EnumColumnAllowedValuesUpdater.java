@@ -25,11 +25,13 @@ import org.eclipse.xpanse.modules.database.enumcolumn.EnumColumnConstraintManage
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 /** Service to update database tables column values by code generation automatically. */
 @Slf4j
+@Profile("dev")
 @Component
 public class EnumColumnAllowedValuesUpdater implements ApplicationListener<ContextRefreshedEvent> {
 

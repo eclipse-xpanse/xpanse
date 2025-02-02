@@ -31,7 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test",
+            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev",
             "enable.redis.distributed.cache=true"
         })
 @AutoConfigureMockMvc
