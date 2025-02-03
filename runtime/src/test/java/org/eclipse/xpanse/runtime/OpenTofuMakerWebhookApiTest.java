@@ -52,7 +52,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
 @SpringBootTest(
-        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,tofu-maker,test"})
+        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,tofu-maker,test,dev"})
 @AutoConfigureMockMvc
 public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 

@@ -40,7 +40,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql,test",
+            "spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql,test,dev",
             "huaweicloud.auto.approve.service.template.enabled=true"
         })
 @AutoConfigureMockMvc
