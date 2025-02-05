@@ -36,8 +36,8 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNo
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.VariableValidationFailedException;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

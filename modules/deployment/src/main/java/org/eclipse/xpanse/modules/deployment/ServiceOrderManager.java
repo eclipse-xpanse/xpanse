@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.deployment;
 
 import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ADMIN;
 
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
@@ -35,7 +35,7 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;

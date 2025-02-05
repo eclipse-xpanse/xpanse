@@ -15,7 +15,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
-import org.eclipse.xpanse.modules.security.common.AesUtil;
+import org.eclipse.xpanse.modules.security.secrets.SecretsManager;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -24,7 +24,7 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class SensitiveDataHandler {
 
-    @Resource private AesUtil aesUtil;
+    @Resource private SecretsManager secretsManager;
 
     @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
@@ -82,7 +82,7 @@ public class SensitiveDataHandler {
                                     && serviceRequestProperties.containsKey(variable.getName())) {
                                 serviceRequestProperties.put(
                                         variable.getName(),
-                                        aesUtil.encode(
+                                        secretsManager.encrypt(
                                                 serviceRequestProperties
                                                         .get(variable.getName())
                                                         .toString()));

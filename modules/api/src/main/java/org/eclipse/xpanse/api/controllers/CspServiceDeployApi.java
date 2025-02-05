@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_CSP;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_CSP;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

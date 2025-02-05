@@ -6,8 +6,8 @@
 
 package org.eclipse.xpanse.api.controllers;
 
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_ADMIN;
-import static org.eclipse.xpanse.modules.security.common.RoleConstants.ROLE_USER;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_USER;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

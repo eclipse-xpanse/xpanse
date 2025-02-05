@@ -31,7 +31,7 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChang
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceChangeDetailsEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 

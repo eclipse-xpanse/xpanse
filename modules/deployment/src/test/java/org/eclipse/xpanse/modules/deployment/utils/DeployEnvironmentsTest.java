@@ -44,7 +44,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.security.common.AesUtil;
+import org.eclipse.xpanse.modules.security.secrets.SecretsManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ class DeployEnvironmentsTest {
     private DeployVariable deployVariable2;
     private DeployVariable deployVariable3;
     private DeployVariable deployVariable4;
-    @Mock private AesUtil aesUtil;
+    @Mock private SecretsManager secretsManager;
     @Mock private CredentialCenter mockCredentialCenter;
     @Mock private PluginManager pluginManager;
     @Mock private Environment environment;
@@ -143,7 +143,8 @@ class DeployEnvironmentsTest {
         task.setServiceId(serviceId);
 
         deployEnvironmentsUnderTest =
-                new DeployEnvironments(mockCredentialCenter, aesUtil, pluginManager, environment);
+                new DeployEnvironments(
+                        mockCredentialCenter, secretsManager, pluginManager, environment);
     }
 
     @Test

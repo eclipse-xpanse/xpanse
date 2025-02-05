@@ -10,13 +10,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.eclipse.xpanse.modules.models.credential.config.CredentialVariableDeserializer;
 
 /** The class object for the CredentialVariable. */
+@Slf4j
 @Data
 @SuppressWarnings("UnnecessarilyFullyQualified")
 @JsonDeserialize(using = CredentialVariableDeserializer.class)
-public class CredentialVariable {
+public class CredentialVariable implements Cloneable {
 
     @NotNull
     @Schema(
@@ -101,5 +104,15 @@ public class CredentialVariable {
         this.isMandatory = isMandatory;
         this.isSensitive = isSensitive;
         this.value = value;
+    }
+
+    @Override
+    public CredentialVariable clone() {
+        try {
+            return (CredentialVariable) super.clone();
+        } catch (CloneNotSupportedException e) {
+            log.error("failed to clone credentials information", e);
+            throw new SensitiveFieldEncryptionOrDecryptionFailedException(e.getMessage());
+        }
     }
 }

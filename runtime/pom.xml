@@ -302,7 +302,7 @@
                         <configuration>
                             <profiles>
                                 <profile>generate-openapi-doc</profile>
-                                <profile>noauth</profile>
+                                <profile>noauth,dev</profile>
                             </profiles>
                         </configuration>
                         <executions>

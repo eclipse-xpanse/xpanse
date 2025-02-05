@@ -22,8 +22,8 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialVariabl
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.eclipse.xpanse.modules.models.credential.exceptions.NoCredentialDefinitionAvailable;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
-import org.eclipse.xpanse.modules.security.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

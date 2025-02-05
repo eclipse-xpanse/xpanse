@@ -12,17 +12,20 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.eclipse.xpanse.modules.models.credential.config.AbstractCredentialInfoDeserializer;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
 /**
  * The Abstract class which defines the credential basic information required by a cloud provider.
  */
+@Slf4j
 @Getter
 @Schema(allOf = {CredentialVariables.class})
 @JsonDeserialize(using = AbstractCredentialInfoDeserializer.class)
-public abstract class AbstractCredentialInfo {
+public abstract class AbstractCredentialInfo implements Cloneable {
 
     /** The cloud service provider of the credential, this field is provided by the plugins. */
     @Setter
@@ -98,5 +101,15 @@ public abstract class AbstractCredentialInfo {
     @Hidden
     public String getUniqueKey() {
         return this.csp.name() + "-" + this.site + "-" + this.type.name() + "-" + this.name;
+    }
+
+    @Override
+    public AbstractCredentialInfo clone() {
+        try {
+            return (AbstractCredentialInfo) super.clone();
+        } catch (CloneNotSupportedException e) {
+            log.error("failed to clone credentials information", e);
+            throw new SensitiveFieldEncryptionOrDecryptionFailedException(e.getMessage());
+        }
     }
 }

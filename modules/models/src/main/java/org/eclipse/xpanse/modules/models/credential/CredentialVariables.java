@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -17,13 +18,13 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
 /** List credential definition that can be provided from end user. */
 @Getter
-public class CredentialVariables extends AbstractCredentialInfo {
+public class CredentialVariables extends AbstractCredentialInfo implements Cloneable {
 
     /** The variables list of the credential. */
     @NotNull
     @Size(min = 1)
     @Schema(description = "The variables list of the credential.")
-    private final List<CredentialVariable> variables;
+    private List<CredentialVariable> variables;
 
     /** The constructor without filed timeToLive. */
     public CredentialVariables(
@@ -65,5 +66,18 @@ public class CredentialVariables extends AbstractCredentialInfo {
                 createCredential.getUserId());
         super.timeToLive = createCredential.getTimeToLive();
         this.variables = createCredential.getVariables();
+    }
+
+    @Override
+    public CredentialVariables clone() {
+        CredentialVariables clone = (CredentialVariables) super.clone();
+        List<CredentialVariable> newVariables = new ArrayList<>();
+        clone.getVariables()
+                .forEach(
+                        variable -> {
+                            newVariables.add(variable.clone());
+                        });
+        clone.variables = newVariables;
+        return clone;
     }
 }

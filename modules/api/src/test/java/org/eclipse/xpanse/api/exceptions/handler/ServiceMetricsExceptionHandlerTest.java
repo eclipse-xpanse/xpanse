@@ -19,7 +19,7 @@ import org.eclipse.xpanse.modules.models.monitor.exceptions.ResourceNotSupported
 import org.eclipse.xpanse.modules.monitor.ServiceMetricsAdapter;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.security.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
