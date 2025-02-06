@@ -40,9 +40,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class SecretsManager {
 
-    private final Cipher encryptCipher;
-
-    private final Cipher decryptCipher;
+    private final byte[] usedSecretKey;
+    private final String initialVector;
+    private final String algorithmName;
+    private final String algorithmMode;
+    private final String algorithmPadding;
 
     /** Constructor for SecretsManager. */
     @Autowired
@@ -58,22 +60,12 @@ public class SecretsManager {
             throw new SensitiveFieldEncryptionOrDecryptionFailedException(
                     "Secret key is empty. Either a secret key or a secret key file is required.");
         }
-        this.encryptCipher =
-                getCipher(
-                        Cipher.ENCRYPT_MODE,
-                        usedSecretKey,
-                        initialVector,
-                        algorithmName,
-                        algorithmMode,
-                        algorithmPadding);
-        this.decryptCipher =
-                getCipher(
-                        Cipher.DECRYPT_MODE,
-                        usedSecretKey,
-                        initialVector,
-                        algorithmName,
-                        algorithmMode,
-                        algorithmPadding);
+        this.algorithmName = algorithmName;
+        this.algorithmMode = algorithmMode;
+        this.algorithmPadding = algorithmPadding;
+        this.initialVector = initialVector;
+        this.usedSecretKey = usedSecretKey;
+        validateConfiguration();
     }
 
     /** Encrypts the given content using the secret key. */
@@ -81,7 +73,15 @@ public class SecretsManager {
         log.debug("encrypting secret content: {}", content);
         try {
             byte[] byteEncode = content.getBytes(StandardCharsets.UTF_8);
-            byte[] encryptedContent = encryptCipher.doFinal(byteEncode);
+            byte[] encryptedContent =
+                    getCipher(
+                                    Cipher.ENCRYPT_MODE,
+                                    usedSecretKey,
+                                    initialVector,
+                                    algorithmName,
+                                    algorithmMode,
+                                    algorithmPadding)
+                            .doFinal(byteEncode);
             return Base64.encodeBase64String(encryptedContent);
         } catch (Exception e) {
             log.error("Secret encryption error ", e);
@@ -94,7 +94,15 @@ public class SecretsManager {
         log.debug("Decrypting secret content: {}", content);
         try {
             byte[] byteContent = Base64.decodeBase64(content);
-            byte[] byteDecode = decryptCipher.doFinal(byteContent);
+            byte[] byteDecode =
+                    getCipher(
+                                    Cipher.DECRYPT_MODE,
+                                    usedSecretKey,
+                                    initialVector,
+                                    algorithmName,
+                                    algorithmMode,
+                                    algorithmPadding)
+                            .doFinal(byteContent);
             return new String(byteDecode, StandardCharsets.UTF_8);
         } catch (IllegalBlockSizeException | BadPaddingException e) {
             log.error("secret decryption error ", e);
@@ -136,9 +144,7 @@ public class SecretsManager {
         Cipher cipher;
         try {
             SecretKey secretKey = new SecretKeySpec(usedSecretKey, algorithmName);
-            cipher =
-                    Cipher.getInstance(
-                            algorithmName + '/' + algorithmMode + '/' + algorithmPadding);
+            cipher = Cipher.getInstance(getTransformationFullName());
             cipher.init(
                     mode,
                     secretKey,
@@ -176,5 +182,18 @@ public class SecretsManager {
                             + " parameter instead.");
             return secretKeyValue.getBytes(StandardCharsets.UTF_8);
         }
+    }
+
+    private void validateConfiguration() {
+        try {
+            Cipher.getInstance(getTransformationFullName());
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+            log.error("Invalid configuration", e);
+            throw new SensitiveFieldEncryptionOrDecryptionFailedException(e.getMessage());
+        }
+    }
+
+    private String getTransformationFullName() {
+        return this.algorithmName + '/' + this.algorithmMode + '/' + this.algorithmPadding;
     }
 }

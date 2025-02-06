@@ -20,7 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             "xpanse.secrets.encryption.secrete.key.value=Bx33eHoeifIxykJfMZVPjDRGMKqA75eH",
             "xpanse.secrets.encryption.secrete.key.file=src/test/resources/aes_sec_test"
         })
-@ContextConfiguration(classes = {SecretsManager.class, String.class})
+@ContextConfiguration(classes = {SecretsManager.class})
 class SecretsManagerTest {
 
     @Autowired private SecretsManager secretsManagerTest;
