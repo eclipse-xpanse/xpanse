@@ -351,7 +351,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
 
         // Set up the deployment with policy evaluation successful and redeploy.
         mockPolicyEvaluationResult(true);
-        List<DeployedServiceDetails> deployedServices = listDeployedServicesDetails(null);
+        List<DeployedServiceDetails> deployedServices = getAllDeployedServicesDetails(null);
         Assertions.assertNotNull(deployedServices);
         UUID serviceId = deployedServices.getFirst().getServiceId();
         testRedeploy(serviceId);
@@ -367,10 +367,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                 serviceTemplate.getServiceTemplateId(),
                 userOrderableServiceVo.getServiceTemplateId());
 
-        listDeployedServices();
+        getAllDeployedServices();
         testGetComputeResourcesOfService(serviceId);
         List<DeployedServiceDetails> deployedServiceDetailsList =
-                listDeployedServicesDetails(ServiceDeploymentState.DEPLOY_SUCCESS);
+                getAllDeployedServicesDetails(ServiceDeploymentState.DEPLOY_SUCCESS);
         Assertions.assertFalse(deployedServiceDetailsList.isEmpty());
 
         ServiceLockConfig serviceLockConfig = new ServiceLockConfig();
@@ -945,7 +945,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(errorResponse.getDetails(), List.of(refuseMsg));
     }
 
-    void listDeployedServices() throws Exception {
+    void getAllDeployedServices() throws Exception {
 
         final MockHttpServletResponse listResponse =
                 mockMvc.perform(
@@ -970,7 +970,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertTrue(deployResources.isEmpty());
     }
 
-    List<DeployedServiceDetails> listDeployedServicesDetails(ServiceDeploymentState state)
+    List<DeployedServiceDetails> getAllDeployedServicesDetails(ServiceDeploymentState state)
             throws Exception {
 
         MockHttpServletRequestBuilder requestBuilder = get("/xpanse/services/details");

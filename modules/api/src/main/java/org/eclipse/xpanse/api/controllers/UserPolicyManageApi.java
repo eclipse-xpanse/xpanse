@@ -63,7 +63,7 @@ public class UserPolicyManageApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the policies defined by the user.")
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public List<UserPolicy> listUserPolicies(
+    public List<UserPolicy> getAllUserPolicies(
             @Parameter(name = "cspName", description = "Name of csp which the policy belongs to.")
                     @RequestParam(name = "cspName", required = false)
                     Csp csp,

@@ -79,7 +79,7 @@ public class CspServiceTemplateApi {
     @GetMapping(value = "/csp/service_templates", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(enabled = false)
-    public List<ServiceTemplateDetailVo> listManagedServiceTemplates(
+    public List<ServiceTemplateDetailVo> getAllServiceTemplates(
             @Parameter(name = "categoryName", description = "category of the service")
                     @RequestParam(name = "categoryName", required = false)
                     Category categoryName,
