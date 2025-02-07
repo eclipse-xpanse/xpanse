@@ -72,7 +72,7 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
 
     void testTerraformBootWebhookApisThrowsException() throws Exception {
         // Setup
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = UUID.fromString("bf83d609-79f0-486f-a883-6c3187589c90");
         ErrorType expectedErrorType = ErrorType.SERVICE_ORDER_NOT_FOUND;
         String errorMsg = String.format("Service order with id %s not found.", uuid);
         List<String> expectedDetails = Collections.singletonList(errorMsg);
@@ -241,7 +241,13 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
                         post("/webhook/terraform-boot/order/{orderId}", orderId)
                                 .content(objectMapper.writeValueAsString(deployResult))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("x-nonce-signature", "6f9e88eab38a9c5606dda8813f98706b")
+                                .header("x-timestamp-signature", "1738854803851")
+                                .header(
+                                        "x-signature",
+                                        "algorithm=HmacSHA256;headers=x-nonce-signature"
+                                            + " x-timestamp-signature;signature=e8ac82966483e549d8ba1f23418593ea6e7b2829fa26a3186f378eadd3eb3f76"))
                 .andReturn()
                 .getResponse();
     }

@@ -9,7 +9,7 @@ import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.Set;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
-import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolVersionsCache;
+import org.eclipse.xpanse.modules.deployment.deployers.deployertools.cache.DeployerToolVersionsCache;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.TerraformInstaller;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;

@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.common.systemcmd.SystemCmd;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
+import org.eclipse.xpanse.modules.deployment.deployers.deployertools.cache.DeployerToolVersionsCacheManager;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployerTool;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
