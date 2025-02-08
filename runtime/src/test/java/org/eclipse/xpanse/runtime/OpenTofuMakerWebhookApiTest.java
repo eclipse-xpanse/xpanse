@@ -71,8 +71,7 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
     void testOpenTofuBootWebhookApisThrowsException() throws Exception {
         // Setup
-        // Setup
-        UUID uuid = UUID.randomUUID();
+        UUID uuid = UUID.fromString("bf83d609-79f0-486f-a883-6c3187589c90");
         ErrorType expectedErrorType = ErrorType.SERVICE_ORDER_NOT_FOUND;
         String errorMsg = String.format("Service order with id %s not found.", uuid);
         List<String> expectedDetails = Collections.singletonList(errorMsg);
@@ -239,7 +238,13 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                         post("/webhook/tofu-maker/order/{orderId}", orderId)
                                 .content(objectMapper.writeValueAsString(deployResult))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
+                                .accept(MediaType.APPLICATION_JSON)
+                                .header("x-nonce-signature", "6f9e88eab38a9c5606dda8813f98706b")
+                                .header("x-timestamp-signature", "1738854803851")
+                                .header(
+                                        "x-signature",
+                                        "algorithm=HmacSHA256;headers=x-nonce-signature"
+                                            + " x-timestamp-signature;signature=661e18d800b06d7b2f783bab86f9374215f0ffa1f2f0cb0f68ebcf633f66dbfb"))
                 .andReturn()
                 .getResponse();
     }

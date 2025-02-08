@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @CrossOrigin
 @RestController
-@RequestMapping("/xpanse")
+@RequestMapping("/agent/xpanse")
 public class AgentPollingApi {
 
     @Resource private ServiceConfigurationManager serviceConfigurationManager;

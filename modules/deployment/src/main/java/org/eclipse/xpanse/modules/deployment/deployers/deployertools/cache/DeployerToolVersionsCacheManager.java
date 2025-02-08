@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.deployment.deployers.deployertools;
+package org.eclipse.xpanse.modules.deployment.deployers.deployertools.cache;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Resource;
@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolVersionsFetcher;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;

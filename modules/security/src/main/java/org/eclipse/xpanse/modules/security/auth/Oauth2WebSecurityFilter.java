@@ -43,7 +43,6 @@ import org.springframework.security.oauth2.server.resource.introspection.SpringO
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -79,31 +78,14 @@ public class Oauth2WebSecurityFilter {
         http.cors(
                 httpSecurityCorsConfigurer ->
                         httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
-
+        http.securityMatcher("/xpanse/**");
         MvcRequestMatcher.Builder mvcMatcherBuilder =
                 new MvcRequestMatcher.Builder(introspector).servletPath("/");
-
         http.authorizeHttpRequests(
                 arc -> {
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**"))
-                            .permitAll();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/swagger-ui/**"))
-                            .permitAll();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/v3/**")).permitAll();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/favicon.ico"))
-                            .permitAll();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/openapi/**"))
-                            .permitAll();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/xpanse/agent/**"))
-                            .permitAll();
                     arc.requestMatchers(mvcMatcherBuilder.pattern("/xpanse/**")).authenticated();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll();
-                    arc.requestMatchers(AntPathRequestMatcher.antMatcher("/webhook/**"))
-                            .permitAll();
                     arc.anyRequest().authenticated();
                 });
-
         http.csrf(AbstractHttpConfigurer::disable);
 
         http.headers(
@@ -200,7 +182,7 @@ public class Oauth2WebSecurityFilter {
                 @Nullable Converter<Jwt, XpanseAuthentication> jwtAuthenticationConverter,
                 @Nullable OpaqueTokenAuthenticationConverter opaqueTokenAuthenticationConverter)
                 throws Exception {
-            log.info("Enable web security without method authoriztion.");
+            log.info("Enable web security without method authorization.");
             configureHttpSecurity(
                     http,
                     introspector,
