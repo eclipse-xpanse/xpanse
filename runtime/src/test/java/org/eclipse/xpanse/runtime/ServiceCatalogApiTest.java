@@ -32,8 +32,10 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplate
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
@@ -51,7 +53,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @Slf4j
 @Transactional
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,test,dev"})
 @AutoConfigureMockMvc
 class ServiceCatalogApiTest extends ApisTestCommon {
 
@@ -285,5 +287,13 @@ class ServiceCatalogApiTest extends ApisTestCommon {
         Awaitility.await()
                 .atMost(20, TimeUnit.SECONDS)
                 .until(() -> !yamlFile.exists() && htmlFile.exists());
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

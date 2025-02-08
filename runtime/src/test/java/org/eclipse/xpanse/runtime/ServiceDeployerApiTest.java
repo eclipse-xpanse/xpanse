@@ -72,8 +72,10 @@ import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalCmdList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidatePolicyList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidateResponse;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openstack4j.api.OSClient;
@@ -94,7 +96,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev",
+            "spring.profiles.active=oauth,zitadel,test,dev",
         })
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest extends ApisTestCommon {
@@ -1128,5 +1130,13 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         .getResponse();
         assertNotNull(response.getHeader(HEADER_TRACKING_ID));
         return response;
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

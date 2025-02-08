@@ -22,7 +22,9 @@ import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +40,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties =
-                "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,tofu-maker,opentelemetry,test,dev")
+                "spring.profiles.active=oauth,zitadel,terraform-boot,tofu-maker,opentelemetry,test,dev")
 @AutoConfigureMockMvc
 class AdminServicesApiTest extends ApisTestCommon {
 
@@ -46,6 +48,14 @@ class AdminServicesApiTest extends ApisTestCommon {
     private String dataSourceUrl;
 
     @Resource private PluginManager pluginManager;
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
+    }
 
     @Test
     @WithJwt(file = "jwt_all_roles.json")

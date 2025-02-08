@@ -21,6 +21,8 @@ import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,8 +35,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Slf4j
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(
-        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,mysql,test,dev"})
 @AutoConfigureMockMvc
 class AdminHealthCheckWithMysqlDbTest extends AbstractMysqlIntegrationTest {
 
@@ -84,5 +85,13 @@ class AdminHealthCheckWithMysqlDbTest extends AbstractMysqlIntegrationTest {
                                         status.getEndpoint().equals(dataSourceUrl)
                                                 && status.getName()
                                                         .equals(DatabaseType.MYSQL.toValue())));
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

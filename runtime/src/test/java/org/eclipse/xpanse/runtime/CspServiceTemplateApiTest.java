@@ -37,7 +37,9 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTe
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -50,7 +52,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,test,dev"})
 @AutoConfigureMockMvc
 class CspServiceTemplateApiTest extends ApisTestCommon {
 
@@ -202,7 +204,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
 
         pendingServiceTemplateRequests1 = listPendingServiceTemplateRequests(serviceTemplateId);
         assertThat(pendingServiceTemplateRequests1).isEmpty();
-        // After update is approved,  should be updated
+        // After update is approved, should be updated
         serviceTemplate = getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
         assertEquals(descriptionToUpdate, updateRequest.getOcl().getDescription());
         assertEquals(descriptionToUpdate, serviceTemplate.getDescription());
@@ -215,7 +217,8 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                         unregisterResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
 
         assertNotNull(unregisterRequestInfo);
-        // List pending service template requests is empty. Because of the unregister request is
+        // List pending service template requests is empty. Because of the unregister
+        // request is
         // always approved.
         List<ServiceTemplateRequestToReview> pendingServiceTemplateRequests2 =
                 listPendingServiceTemplateRequests(serviceTemplateId);
@@ -479,5 +482,13 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
             getRequestBuilder = getRequestBuilder.param("requestType", requestType);
         }
         return mockMvc.perform(getRequestBuilder).andReturn().getResponse();
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

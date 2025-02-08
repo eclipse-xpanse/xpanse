@@ -38,8 +38,10 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -52,7 +54,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 /** Test for ServiceDeployerApi. */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,test,dev"})
 @AutoConfigureMockMvc
 class IsvServiceDeployerApiTest extends ApisTestCommon {
     void addIsvCredential() throws Exception {
@@ -233,5 +235,10 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         } catch (JsonProcessingException e) {
             return null;
         }
+    }
+
+    @BeforeAll
+    static void initZitadel() {
+        ZitadelTestContainer.startZitadelContainer();
     }
 }

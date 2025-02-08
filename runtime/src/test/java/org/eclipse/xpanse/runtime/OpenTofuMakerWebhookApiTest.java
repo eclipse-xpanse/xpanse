@@ -33,7 +33,9 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
@@ -51,8 +53,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
-@SpringBootTest(
-        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,tofu-maker,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,tofu-maker,test,dev"})
 @AutoConfigureMockMvc
 public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
 
@@ -247,5 +248,13 @@ public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
                                             + " x-timestamp-signature;signature=661e18d800b06d7b2f783bab86f9374215f0ffa1f2f0cb0f68ebcf633f66dbfb"))
                 .andReturn()
                 .getResponse();
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

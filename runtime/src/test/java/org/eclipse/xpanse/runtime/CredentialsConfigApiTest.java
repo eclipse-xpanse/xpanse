@@ -24,7 +24,9 @@ import org.eclipse.xpanse.plugins.huaweicloud.HuaweiCloudOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.openstacktestlab.OpenstackTestlabOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.plusserver.PlusServerOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.regiocloud.RegioCloudOrchestratorPlugin;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,7 +39,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @Transactional
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test, dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,test, dev"})
 @AutoConfigureMockMvc
 class CredentialsConfigApiTest extends ApisTestCommon {
 
@@ -406,5 +408,13 @@ class CredentialsConfigApiTest extends ApisTestCommon {
     String getApiUrl(Csp csp, CredentialType type) {
         return String.format(
                 "http://localhost/openapi/%s_%s_credentialApi.html", csp.toValue(), type.toValue());
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }
