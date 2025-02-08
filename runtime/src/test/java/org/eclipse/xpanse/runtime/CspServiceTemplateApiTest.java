@@ -71,7 +71,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         UUID serviceTemplateId = registerRequestInfo.getServiceTemplateId();
         ServiceTemplateDetailVo serviceTemplate =
                 getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
-        testListManagedServiceTemplatesWithStateApprovalPending(serviceTemplate);
+        testGetAllServiceTemplatesWithStateApprovalPending(serviceTemplate);
         testCspManageServiceTemplatesWell(serviceTemplateId, ocl);
         testCspManageServiceTemplatesBelongToOtherCsp(serviceTemplateId);
     }
@@ -169,7 +169,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         pendingServiceTemplateRequests = listPendingServiceTemplateRequests(serviceTemplateId);
         assertThat(pendingServiceTemplateRequests).isEmpty();
 
-        testListManagedServiceTemplatesWithStateApproved();
+        testGetAllServiceTemplatesWithStateApproved();
 
         // Update service template
         String descriptionToUpdate = "update-test";
@@ -345,7 +345,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                 response.getContentAsString());
     }
 
-    void testListManagedServiceTemplatesWithStateApproved() throws Exception {
+    void testGetAllServiceTemplatesWithStateApproved() throws Exception {
 
         // Setup request 1
         String serviceRegistrationState1 = "errorState";
@@ -370,7 +370,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
         assertThat(detailsList2).isNotEmpty();
     }
 
-    void testListManagedServiceTemplatesWithStateApprovalPending(
+    void testGetAllServiceTemplatesWithStateApprovalPending(
             ServiceTemplateDetailVo serviceTemplateDetailVo) throws Exception {
         // Setup
         String serviceRegistrationState = ServiceTemplateRegistrationState.IN_REVIEW.toValue();

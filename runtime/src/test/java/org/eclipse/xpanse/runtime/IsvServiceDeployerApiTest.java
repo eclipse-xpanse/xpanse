@@ -123,7 +123,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
                 ServiceDeploymentState.DEPLOYING,
                 deployedServiceDetails.getServiceDeploymentState());
         if (waitServiceDeploymentIsCompleted(serviceId)) {
-            testListDeployedServicesOfIsv();
+            testGetAllDeployedServicesOfIsv();
             destroyService(serviceId);
             purgeService(serviceId);
         }
@@ -131,12 +131,12 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         deleteIsvCredential();
     }
 
-    void testListDeployedServicesOfIsv() throws Exception {
+    void testGetAllDeployedServicesOfIsv() throws Exception {
         // Run the test
-        List<DeployedService> result = listDeployedServicesForIsv();
+        List<DeployedService> result = getAllDeployedServicesForIsv();
 
         List<VendorHostedDeployedServiceDetails> detailsResult =
-                listDeployedServicesDetailsForIsv();
+                getAllDeployedServicesDetailsForIsv();
 
         // Verify the results
         Assertions.assertFalse(result.isEmpty());
@@ -190,7 +190,7 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(List.of(refuseMsg), errorResponse.getDetails());
     }
 
-    List<DeployedService> listDeployedServicesForIsv() throws Exception {
+    List<DeployedService> getAllDeployedServicesForIsv() throws Exception {
 
         final MockHttpServletResponse listResponse =
                 mockMvc.perform(
@@ -206,7 +206,8 @@ class IsvServiceDeployerApiTest extends ApisTestCommon {
         return objectMapper.readValue(listResponse.getContentAsString(), new TypeReference<>() {});
     }
 
-    List<VendorHostedDeployedServiceDetails> listDeployedServicesDetailsForIsv() throws Exception {
+    List<VendorHostedDeployedServiceDetails> getAllDeployedServicesDetailsForIsv()
+            throws Exception {
 
         final MockHttpServletResponse listResponse =
                 mockMvc.perform(

@@ -128,7 +128,7 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public List<DeployedService> listDeployedServices(
+    public List<DeployedService> getAllDeployedServices(
             @Parameter(name = "categoryName", description = "category of the service")
                     @RequestParam(name = "categoryName", required = false)
                     Category category,
@@ -158,7 +158,7 @@ public class ServiceDeployerApi {
     @GetMapping(value = "/services/details", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromRequestUri")
-    public List<DeployedService> listDeployedServicesDetails(
+    public List<DeployedService> getAllDeployedServicesWithDetails(
             @Parameter(name = "categoryName", description = "category of the service")
                     @RequestParam(name = "categoryName", required = false)
                     Category category,

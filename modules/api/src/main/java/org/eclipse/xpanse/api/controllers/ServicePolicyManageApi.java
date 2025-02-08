@@ -61,7 +61,7 @@ public class ServicePolicyManageApi {
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List the policies belongs to the service.")
     @AuditApiRequest(methodName = "getCspFromServiceTemplateId", paramTypes = UUID.class)
-    public List<ServicePolicy> listServicePolicies(
+    public List<ServicePolicy> getAllServicePolicies(
             @Parameter(
                             name = "serviceTemplateId",
                             description = "The id of service template which the policy belongs to.")

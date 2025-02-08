@@ -83,17 +83,17 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
                 serviceTemplate.getFlavors().getServiceFlavors().stream()
                         .map(ServiceFlavor::getName)
                         .toList();
-        testListServicePoliciesReturnsEmptyList(serviceTemplate.getServiceTemplateId());
+        testListServicePoliciesReturnsEmptyGetAll(serviceTemplate.getServiceTemplateId());
         ServicePolicyCreateRequest createRequest = new ServicePolicyCreateRequest();
         createRequest.setFlavorNameList(flavorNames);
         createRequest.setServiceTemplateId(serviceTemplate.getServiceTemplateId());
         createRequest.setPolicy("servicePolicy-1");
         ServicePolicy servicePolicy = addServicePolicy(createRequest);
-        testListServicePolicies(servicePolicy);
+        testGetAllServicePolicies(servicePolicy);
         testGetServicePolicyDetails(servicePolicy);
         testUpdateServicePolicy(servicePolicy);
         testDeleteServicePolicy(servicePolicy.getServicePolicyId());
-        testListServicePoliciesReturnsEmptyList(serviceTemplate.getServiceTemplateId());
+        testListServicePoliciesReturnsEmptyGetAll(serviceTemplate.getServiceTemplateId());
     }
 
     void testServicePoliciesManage_ThrowsExceptions(ServiceTemplateDetailVo serviceTemplate)
@@ -184,7 +184,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         Assertions.assertEquals(response.getContentAsString(), exceptedResult);
     }
 
-    void testListServicePolicies(ServicePolicy servicePolicy) throws Exception {
+    void testGetAllServicePolicies(ServicePolicy servicePolicy) throws Exception {
         // Setup
         List<ServicePolicy> servicePolicyList = List.of(servicePolicy);
         String exceptedResult = objectMapper.writeValueAsString(servicePolicyList);
@@ -205,7 +205,7 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         assertThat(response.getContentAsString()).isEqualTo(exceptedResult);
     }
 
-    void testListServicePoliciesReturnsEmptyList(UUID serviceTemplateId) throws Exception {
+    void testListServicePoliciesReturnsEmptyGetAll(UUID serviceTemplateId) throws Exception {
         // Setup
         String exceptedResult = "[]";
         // Run the test
