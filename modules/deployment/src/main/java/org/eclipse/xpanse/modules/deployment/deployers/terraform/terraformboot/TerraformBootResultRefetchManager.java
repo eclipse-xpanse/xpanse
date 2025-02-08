@@ -57,10 +57,17 @@ public class TerraformBootResultRefetchManager {
                         e);
             } else {
                 log.error(
-                        String.format(
-                                "Refetch terraform result failed. requestId %s," + " error %s ",
-                                serviceOrder.getOrderId(), e.getMessage()));
+                        "Re-fetch terraform-boot result failed with known error. Ignoring."
+                                + " requestId {}, error {} ",
+                        serviceOrder.getOrderId(),
+                        e.getMessage());
             }
+        } catch (Exception e) {
+            log.error(
+                    "Re-fetch terraform-boot result failed with unknown error. Ignoring. requestId"
+                            + " {}, error {} ",
+                    serviceOrder.getOrderId(),
+                    e.getMessage());
         }
     }
 }

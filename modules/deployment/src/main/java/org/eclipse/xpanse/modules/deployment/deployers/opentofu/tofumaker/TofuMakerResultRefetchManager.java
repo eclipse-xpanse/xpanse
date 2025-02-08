@@ -54,10 +54,17 @@ public class TofuMakerResultRefetchManager {
                         serviceDeployment, serviceOrder, ErrorType.TOFU_MAKER_REQUEST_FAILED, e);
             } else {
                 log.error(
-                        String.format(
-                                "Refetch openTofu result failed. orderId %s, error %s ",
-                                serviceOrder.getOrderId(), e.getMessage()));
+                        "Re-fetch tofu-maker result failed with known error. requestId {},"
+                                + " error {} ",
+                        serviceOrder.getOrderId(),
+                        e.getMessage());
             }
+        } catch (Exception e) {
+            log.error(
+                    "Re-fetch tofu-maker result failed with unknown error. requestId {},"
+                            + " error {} ",
+                    serviceOrder.getOrderId(),
+                    e.getMessage());
         }
     }
 }
