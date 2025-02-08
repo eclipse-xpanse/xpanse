@@ -35,7 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 /** Test for UserCloudCredentialsApi. */
 @ExtendWith(SpringExtension.class)
 @Transactional
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-local,test,dev"})
 @AutoConfigureMockMvc
 class IsvCloudCredentialsApiTest extends ApisTestCommon {
 

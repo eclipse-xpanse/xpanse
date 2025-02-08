@@ -33,9 +33,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
             OpenApiUrlManage.class,
             PluginManager.class
         },
-        properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,terra-boot,tofu-maker,test,dev"
-        })
+        properties = {"spring.profiles.active=noauth,terra-boot,tofu-maker,test,dev"})
 class CredentialOpenApiGeneratorTest {
 
     @Autowired private CredentialOpenApiGenerator credentialOpenApiGenerator;

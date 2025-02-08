@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
 @SpringBootTest(
-        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,terra-boot,test,dev"})
+        properties = {"spring.profiles.active=oauth,zitadel,zitadel-local,terra-boot,test,dev"})
 @AutoConfigureMockMvc
 public class TerraBootWebhookApiTest extends ApisTestCommon {
 

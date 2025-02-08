@@ -29,8 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /** Test for Health Check with Redis Cache and Database h2. */
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(
-        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev,redis"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-local,test,dev,redis"})
 @AutoConfigureMockMvc
 class AdminHealthCheckWithRedisCacheTest extends AbstractRedisIntegrationTest {
 
