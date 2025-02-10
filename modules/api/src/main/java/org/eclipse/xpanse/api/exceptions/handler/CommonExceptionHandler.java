@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /** Exception handler for the REST API. */
 @Slf4j
@@ -238,6 +239,15 @@ public class CommonExceptionHandler {
     public ErrorResponse handleClientAuthException(ClientAuthenticationFailedException ex) {
         return getErrorResponse(
                 ErrorType.BACKEND_FAILURE, Collections.singletonList(ex.getMessage()));
+    }
+
+    /** Exception handler for NoResourceFoundException. */
+    @ExceptionHandler({NoResourceFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ErrorResponse handleNoResourceFoundException(NoResourceFoundException ex) {
+        return getErrorResponse(
+                ErrorType.RESOURCE_NOT_FOUND, Collections.singletonList(ex.getResourcePath()));
     }
 
     private String findDuplicatesItemsString(List<Object> list) {
