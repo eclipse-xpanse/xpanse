@@ -72,7 +72,7 @@ public class TerraformBootHelper {
         String callbackUrl =
                 getClientRequestBaseUrl(port) + terraformBootConfig.getOrderCallbackUri();
         webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getOrderId());
-        webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
+        webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.HMAC);
         return webhookConfig;
     }
 
