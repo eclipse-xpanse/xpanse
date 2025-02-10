@@ -32,7 +32,9 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
@@ -50,10 +52,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @CrossOrigin
-@SpringBootTest(
-        properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,terraform-boot,test,dev"
-        })
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,terraform-boot,test,dev"})
 @AutoConfigureMockMvc
 public class TerraformBootWebhookApiTest extends ApisTestCommon {
 
@@ -250,5 +249,13 @@ public class TerraformBootWebhookApiTest extends ApisTestCommon {
                                             + " x-timestamp-signature;signature=e8ac82966483e549d8ba1f23418593ea6e7b2829fa26a3186f378eadd3eb3f76"))
                 .andReturn()
                 .getResponse();
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

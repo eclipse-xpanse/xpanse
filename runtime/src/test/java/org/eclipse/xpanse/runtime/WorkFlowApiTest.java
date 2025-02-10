@@ -15,7 +15,9 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,7 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         classes = {XpanseApplication.class, WorkFlowApiTest.class, WorkflowUtils.class},
-        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+        properties = {"spring.profiles.active=oauth,zitadel,test,dev"})
 @AutoConfigureMockMvc
 class WorkFlowApiTest extends ApisTestCommon {
 
@@ -148,5 +150,13 @@ class WorkFlowApiTest extends ApisTestCommon {
         assertThat(response.getContentAsString()).isEqualTo("");
         verify(mockWorkflowUtils)
                 .completeTask(taskId, Map.ofEntries(Map.entry(IS_RETRY_TASK, true)));
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

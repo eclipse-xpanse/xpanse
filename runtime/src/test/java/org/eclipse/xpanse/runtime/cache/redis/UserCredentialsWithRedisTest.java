@@ -20,7 +20,9 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,7 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev",
+            "spring.profiles.active=oauth,zitadel,test,dev",
             "enable.redis.distributed.cache=true"
         })
 @AutoConfigureMockMvc
@@ -120,5 +122,13 @@ class UserCredentialsWithRedisTest extends AbstractRedisIntegrationTest {
         List<AbstractCredentialInfo> credentialInfos =
                 userCloudCredentialsApi.getUserCloudCredentials(csp, credentialType);
         assertTrue(credentialInfos.isEmpty());
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

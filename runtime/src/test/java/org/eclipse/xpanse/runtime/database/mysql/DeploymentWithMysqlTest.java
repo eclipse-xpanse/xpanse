@@ -51,7 +51,9 @@ import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDet
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.BeanUtils;
@@ -64,8 +66,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Slf4j
 @Testcontainers
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(
-        properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,mysql,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,mysql,test,dev"})
 @AutoConfigureMockMvc
 class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
 
@@ -300,5 +301,13 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         createCredential.setVariables(credentialVariables);
         createCredential.setTimeToLive(300);
         userCloudCredentialsApi.addUserCloudCredential(createCredential);
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

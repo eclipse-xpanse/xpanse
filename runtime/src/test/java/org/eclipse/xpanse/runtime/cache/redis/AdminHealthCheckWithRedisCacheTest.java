@@ -20,6 +20,8 @@ import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev",
+            "spring.profiles.active=oauth,zitadel,test,dev",
             "enable.redis.distributed.cache=true"
         })
 @AutoConfigureMockMvc
@@ -86,5 +88,13 @@ class AdminHealthCheckWithRedisCacheTest extends AbstractRedisIntegrationTest {
                                         status.getEndpoint().equals(dataSourceUrl)
                                                 && status.getName()
                                                         .equals(DatabaseType.H2DB.toValue())));
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

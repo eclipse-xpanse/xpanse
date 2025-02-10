@@ -21,8 +21,10 @@ import org.eclipse.xpanse.modules.logging.LoggingKeyConstant;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.security.TokenResponse;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -40,7 +42,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,test,dev"})
 @AutoConfigureMockMvc
 class AuthorizationApiTest extends ApisTestCommon {
 
@@ -172,5 +174,13 @@ class AuthorizationApiTest extends ApisTestCommon {
         TestRestTemplate testRestTemplate = new TestRestTemplate();
         return new ResponseEntity<>(
                 testRestTemplate.postForObject(url, "{}", TokenResponse.class), HttpStatus.OK);
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

@@ -32,8 +32,10 @@ import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDet
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidatePolicyList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidateResponse;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -47,7 +49,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 /** Test for ServicePolicyManageApi. */
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,test,dev"})
 @AutoConfigureMockMvc
 class ServicePolicyManageApiTest extends ApisTestCommon {
 
@@ -408,5 +410,13 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
         Assertions.assertEquals(response.getContentAsString(), exceptedResult);
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

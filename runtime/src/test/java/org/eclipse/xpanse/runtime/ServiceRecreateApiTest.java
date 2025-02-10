@@ -18,7 +18,9 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,7 +31,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,test,dev"})
 @AutoConfigureMockMvc
 class ServiceRecreateApiTest extends ApisTestCommon {
 
@@ -150,5 +152,13 @@ class ServiceRecreateApiTest extends ApisTestCommon {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

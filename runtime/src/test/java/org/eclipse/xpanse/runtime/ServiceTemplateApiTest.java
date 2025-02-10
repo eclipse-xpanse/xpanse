@@ -57,7 +57,9 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTe
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.semver4j.Semver;
@@ -76,7 +78,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev",
+            "spring.profiles.active=oauth,zitadel,test,dev",
             "huaweicloud.auto.approve.service.template.enabled=false"
         })
 @AutoConfigureMockMvc
@@ -544,7 +546,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         registerWell.getContentAsString(), ServiceTemplateRequestInfo.class);
 
-        // Setup service template with service vendor 'test' to test access denied exception
+        // Setup service template with service vendor 'test' to test access denied
+        // exception
         UUID serviceTemplateId = serviceTemplateRequestInfo.getServiceTemplateId();
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
@@ -1378,5 +1381,13 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }

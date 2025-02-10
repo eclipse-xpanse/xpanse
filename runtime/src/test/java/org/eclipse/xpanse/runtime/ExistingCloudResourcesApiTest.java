@@ -41,9 +41,11 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +69,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SuppressWarnings("unchecked")
 @Transactional
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,test,dev"})
 @AutoConfigureMockMvc
 class ExistingCloudResourcesApiTest extends ApisTestCommon {
 
@@ -649,5 +651,13 @@ class ExistingCloudResourcesApiTest extends ApisTestCommon {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
+    }
+
+    @BeforeAll
+    static void setup() {
+        ZitadelTestContainer.startContainer();
+
+        String zitadelUrl = System.getProperty("zitadel.url");
+        System.out.println("Using Zitadel URL: " + zitadelUrl);
     }
 }
