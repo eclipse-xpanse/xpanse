@@ -30,7 +30,7 @@ import org.springframework.web.client.RestClientException;
 
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator version: 7.10.0")
+        comments = "Generator version: 7.11.0")
 @Component(
         "org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromDirectoryApi")
 public class OpenTofuFromDirectoryApi extends BaseApi {
@@ -49,9 +49,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -74,9 +74,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -151,9 +151,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -176,9 +176,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -253,9 +253,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -278,9 +278,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -355,9 +355,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -381,9 +381,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -458,9 +458,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -485,9 +485,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -562,9 +562,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -588,9 +588,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -665,9 +665,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -690,9 +690,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -766,9 +766,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *
@@ -789,9 +789,9 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
      *
      * <p><b>400</b> - Bad Request
      *
-     * <p><b>422</b> - Unprocessable Entity
-     *
      * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>503</b> - Service Unavailable
      *

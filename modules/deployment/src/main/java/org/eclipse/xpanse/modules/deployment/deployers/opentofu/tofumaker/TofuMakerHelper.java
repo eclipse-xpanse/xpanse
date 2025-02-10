@@ -70,7 +70,7 @@ public class TofuMakerHelper {
         WebhookConfig webhookConfig = new WebhookConfig();
         String callbackUrl = getClientRequestBaseUrl(port) + tofuMakerConfig.getOrderCallbackUri();
         webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getOrderId());
-        webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.NONE);
+        webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.HMAC);
         return webhookConfig;
     }
 
