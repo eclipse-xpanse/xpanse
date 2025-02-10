@@ -21,7 +21,7 @@ import org.springframework.web.client.RestClientException;
 
 @jakarta.annotation.Generated(
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
-        comments = "Generator version: 7.10.0")
+        comments = "Generator version: 7.11.0")
 @Component(
         "org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api.RetrieveTerraformResultApi")
 public class RetrieveTerraformResultApi extends BaseApi {
@@ -39,13 +39,13 @@ public class RetrieveTerraformResultApi extends BaseApi {
      * Method to retrieve stored terraform result in case terraform-boot receives a failure while
      * sending the terraform result via callback.
      *
+     * <p><b>502</b> - Bad Gateway
+     *
      * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>400</b> - Bad Request
      *
      * <p><b>503</b> - Service Unavailable
-     *
-     * <p><b>502</b> - Bad Gateway
      *
      * <p><b>200</b> - OK
      *
@@ -62,13 +62,13 @@ public class RetrieveTerraformResultApi extends BaseApi {
      * Method to retrieve stored terraform result in case terraform-boot receives a failure while
      * sending the terraform result via callback.
      *
+     * <p><b>502</b> - Bad Gateway
+     *
      * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>400</b> - Bad Request
      *
      * <p><b>503</b> - Service Unavailable
-     *
-     * <p><b>502</b> - Bad Gateway
      *
      * <p><b>200</b> - OK
      *
