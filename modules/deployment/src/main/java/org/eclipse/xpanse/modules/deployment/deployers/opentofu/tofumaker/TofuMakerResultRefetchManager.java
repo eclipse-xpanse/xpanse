@@ -40,7 +40,7 @@ public class TofuMakerResultRefetchManager {
             }
             if (Objects.nonNull(result.getBody())
                     && result.getBody().getCommandSuccessful() != null) {
-                deployResultManager.updateServiceDeploymentState(
+                deployResultManager.saveDeploymentResultReceived(
                         result.getBody().getCommandSuccessful(), serviceDeployment);
             }
         } catch (HttpClientErrorException e) {
@@ -50,7 +50,7 @@ public class TofuMakerResultRefetchManager {
                     && response.getResultType()
                             == Response.ResultTypeEnum
                                     .RESULT_ALREADY_RETURNED_OR_REQUEST_ID_INVALID) {
-                deployResultManager.updateServiceDeploymentStateAndServiceOrder(
+                deployResultManager.saveDeploymentResultWhenErrorReceived(
                         serviceDeployment, serviceOrder, ErrorType.TOFU_MAKER_REQUEST_FAILED, e);
             } else {
                 log.error(

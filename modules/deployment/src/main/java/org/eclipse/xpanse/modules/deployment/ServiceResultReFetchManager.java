@@ -19,13 +19,14 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerResultRefetchManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootResultRefetchManager;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/** Bean to manage all methods used by the service operation result recapture manager. */
+/** Bean to manage all methods used by the service operation result re-fetch manager. */
 @Slf4j
 @Component
 public class ServiceResultReFetchManager {
@@ -56,9 +57,9 @@ public class ServiceResultReFetchManager {
                     serviceOrderEntities.stream()
                             .filter(
                                     serviceOrder ->
-                                            serviceOrder
-                                                    .getTaskType()
-                                                    .equals(ServiceOrderType.DEPLOY))
+                                            serviceOrder.getTaskType() == ServiceOrderType.DEPLOY
+                                                    && serviceOrder.getTaskStatus()
+                                                            == TaskStatus.IN_PROGRESS)
                             .findFirst()
                             .orElseThrow(
                                     () ->
@@ -75,9 +76,9 @@ public class ServiceResultReFetchManager {
                     serviceOrderEntities.stream()
                             .filter(
                                     serviceOrder ->
-                                            serviceOrder
-                                                    .getTaskType()
-                                                    .equals(ServiceOrderType.DESTROY))
+                                            serviceOrder.getTaskType() == ServiceOrderType.DESTROY
+                                                    && serviceOrder.getTaskStatus()
+                                                            == TaskStatus.IN_PROGRESS)
                             .findFirst()
                             .orElseThrow(
                                     () ->
@@ -94,9 +95,9 @@ public class ServiceResultReFetchManager {
                     serviceOrderEntities.stream()
                             .filter(
                                     serviceOrder ->
-                                            serviceOrder
-                                                    .getTaskType()
-                                                    .equals(ServiceOrderType.MODIFY))
+                                            serviceOrder.getTaskType() == ServiceOrderType.MODIFY
+                                                    && serviceOrder.getTaskStatus()
+                                                            == TaskStatus.IN_PROGRESS)
                             .findFirst()
                             .orElseThrow(
                                     () ->

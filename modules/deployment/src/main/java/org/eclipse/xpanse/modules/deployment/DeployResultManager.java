@@ -441,18 +441,20 @@ public class DeployResultManager {
         }
     }
 
-    /** update service state. */
-    public void updateServiceDeploymentState(
+    /** update service deployment statement and service state. */
+    public void saveDeploymentResultReceived(
             Boolean isSuccess, ServiceDeploymentEntity serviceDeployment) {
         if (isSuccess) {
             if (serviceDeployment
                     .getServiceDeploymentState()
                     .equals(ServiceDeploymentState.DEPLOYING)) {
                 serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
+                serviceDeployment.setServiceState(ServiceState.RUNNING);
             } else if (serviceDeployment
                     .getServiceDeploymentState()
                     .equals(ServiceDeploymentState.DESTROYING)) {
                 serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
+                serviceDeployment.setServiceState(ServiceState.STOPPED);
             } else if (serviceDeployment
                     .getServiceDeploymentState()
                     .equals(ServiceDeploymentState.MODIFYING)) {
@@ -479,7 +481,7 @@ public class DeployResultManager {
     }
 
     /** update service state and service order state by exception. */
-    public void updateServiceDeploymentStateAndServiceOrder(
+    public void saveDeploymentResultWhenErrorReceived(
             ServiceDeploymentEntity serviceEntity,
             ServiceOrderEntity serviceOrder,
             ErrorType errorType,
