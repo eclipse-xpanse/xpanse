@@ -4,7 +4,7 @@
  *
  */
 
-package org.eclipse.xpanse.modules.models.serviceconfiguration.enums;
+package org.eclipse.xpanse.modules.models.servicechange.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

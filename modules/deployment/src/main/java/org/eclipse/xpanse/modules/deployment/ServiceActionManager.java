@@ -6,10 +6,13 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,7 @@ import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVaria
 import org.eclipse.xpanse.modules.models.serviceaction.ServiceActionRequest;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
@@ -39,6 +43,8 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 @Component
 public class ServiceActionManager {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
@@ -140,17 +146,55 @@ public class ServiceActionManager {
                         .filter(serviceAction -> actionName.equals(serviceAction.getName()))
                         .flatMap(action -> action.getActionParameters().stream())
                         .toList();
-        List<ServiceChangeDetailsEntity> requests =
-                serviceChangeDetailsManager.getAllServiceChangeDetails(
-                        orderId,
-                        serviceDeployment,
-                        updateRequestMap,
-                        deployResourceMap,
-                        actionManageScripts,
-                        actionParameters,
-                        ServiceOrderType.SERVICE_ACTION);
-        if (!CollectionUtils.isEmpty(requests)) {
-            serviceChangeDetailsStorage.saveAll(requests);
+
+        serviceChangeDetailsManager.createAndQueueAllServiceChangeRequests(
+                orderId,
+                serviceDeployment,
+                updateRequestMap,
+                deployResourceMap,
+                actionManageScripts,
+                actionParameters,
+                ServiceOrderType.SERVICE_ACTION);
+    }
+
+    /** Returns the specific service action management script from service template. */
+    public Optional<ServiceChangeScript> getServiceActionManageScript(
+            ServiceChangeDetailsEntity serviceChangeDetailsEntity) {
+        try {
+            ServiceTemplateEntity serviceTemplateEntity =
+                    serviceTemplateStorage.getServiceTemplateById(
+                            serviceChangeDetailsEntity
+                                    .getServiceDeploymentEntity()
+                                    .getServiceTemplateId());
+            ServiceActionRequest serviceActionRequest =
+                    objectMapper.readValue(
+                            objectMapper.writeValueAsString(
+                                    serviceChangeDetailsEntity
+                                            .getServiceOrderEntity()
+                                            .getRequestBody()),
+                            ServiceActionRequest.class);
+            Optional<ServiceAction> serviceActionOptional =
+                    serviceTemplateEntity.getOcl().getServiceActions().stream()
+                            .filter(
+                                    serviceAction ->
+                                            serviceAction
+                                                    .getName()
+                                                    .equals(serviceActionRequest.getActionName()))
+                            .findFirst();
+            return serviceActionOptional.flatMap(
+                    serviceAction ->
+                            serviceAction.getActionManageScripts().stream()
+                                    .filter(
+                                            serviceChangeScript ->
+                                                    serviceChangeScript
+                                                            .getChangeHandler()
+                                                            .equals(
+                                                                    serviceChangeDetailsEntity
+                                                                            .getChangeHandler()))
+                                    .findFirst());
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            throw new ServiceConfigurationInvalidException(List.of("Wrong"));
         }
     }
 }

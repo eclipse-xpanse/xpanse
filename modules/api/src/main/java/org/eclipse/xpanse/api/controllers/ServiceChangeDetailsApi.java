@@ -5,23 +5,38 @@
 
 package org.eclipse.xpanse.api.controllers;
 
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ADMIN;
+import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_USER;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceChangeDetailsManager;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
+import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /** service change details Api. */
+@Slf4j
+@RestController
+@RequestMapping("/xpanse")
+@CrossOrigin
+@Secured({ROLE_ADMIN, ROLE_USER})
+@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class ServiceChangeDetailsApi {
 
     @Resource private ServiceChangeDetailsManager serviceChangeDetailsManager;
@@ -50,7 +65,7 @@ public class ServiceChangeDetailsApi {
             @Parameter(name = "status", description = "Status of the service configuration")
                     @RequestParam(name = "status", required = false)
                     ServiceChangeStatus status) {
-        return serviceChangeDetailsManager.getServiceChangeRequestDetails(
+        return serviceChangeDetailsManager.getAllChangeRequests(
                 orderId, serviceId, resourceName, configManager, status);
     }
 }

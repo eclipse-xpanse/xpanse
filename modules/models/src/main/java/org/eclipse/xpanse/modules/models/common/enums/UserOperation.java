@@ -45,7 +45,7 @@ public enum UserOperation {
     PORT_SERVICE("port the service"),
     DESTROY_SERVICE("delete the service"),
     PURGE_SERVICE("purge the service"),
-    CREATE_ACTIONS_OF_SERVICE("create actions of the service"),
+    CREATE_SERVICE_ACTION("create actions of the service"),
     VIEW_DETAILS_OF_SERVICE("view details of the service"),
     VIEW_RESOURCES_OF_SERVICE("view resources of the service"),
     VIEW_METRICS_OF_SERVICE("view metrics of the service"),

@@ -3,14 +3,14 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.serviceconfiguration;
+package org.eclipse.xpanse.modules.models.servicechange;
 
 import java.util.List;
 import lombok.Data;
 
-/** The result of Service Configuration change. */
+/** The result of Service change. */
 @Data
-public class ServiceConfigurationChangeResult {
+public class ServiceChangeResult {
 
     private Boolean isSuccessful;
     private String error;

@@ -30,9 +30,9 @@ import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
@@ -113,13 +113,13 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
                                     .forEach(
                                             requestDetails -> {
                                                 if (ZOOKEEPER.equals(
-                                                        requestDetails.getConfigManager())) {
+                                                        requestDetails.getChangeHandler())) {
                                                     assertEquals(
                                                             requestDetails.getProperties(),
                                                             getZookeeperConfig());
                                                 }
                                                 if (KAFKA_BROKER.equals(
-                                                        requestDetails.getConfigManager())) {
+                                                        requestDetails.getChangeHandler())) {
                                                     assertEquals(
                                                             requestDetails.getProperties(),
                                                             getKafkaBrokerConfig());

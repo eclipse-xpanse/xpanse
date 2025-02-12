@@ -3,14 +3,14 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.serviceconfiguration;
+package org.eclipse.xpanse.modules.models.servicechange;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
+import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
 
 /** service change request details. */
 @Data
@@ -31,18 +31,17 @@ public class ServiceChangeDetails {
     @NotNull
     @Schema(
             description =
-                    "type of the resource in the service "
-                            + "that must execute the change request.")
-    private String configManager;
+                    "type of the resource in the service " + "that must manage the change request.")
+    private String changeHandler;
 
-    @Schema(description = "message of change service configuration update request.")
+    @Schema(description = "result of service change request")
     private String resultMessage;
 
     @NotNull
-    @Schema(description = "service configuration requested in the change request.")
+    @Schema(description = "service change requested in the change request.")
     private Map<String, Object> properties;
 
     @NotNull
-    @Schema(description = "status of change service configuration update request.")
+    @Schema(description = "status of service change request.")
     private ServiceChangeStatus status;
 }

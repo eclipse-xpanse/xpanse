@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.serviceconfiguration;
+package org.eclipse.xpanse.modules.models.servicechange;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -22,12 +22,12 @@ public class ServiceChangeOrderDetails {
     private UUID orderId;
 
     @NotNull
-    @Schema(description = "Order status of service configuration update result.")
+    @Schema(description = "Order status of service update request.")
     private TaskStatus orderStatus;
 
     @NotNull
-    @Schema(description = "service configuration requested in the change request.")
-    private Map<String, Object> configRequest;
+    @Schema(description = "service change request properties.")
+    private Map<String, Object> serviceChangeRequest;
 
     @NotNull
     @Schema(

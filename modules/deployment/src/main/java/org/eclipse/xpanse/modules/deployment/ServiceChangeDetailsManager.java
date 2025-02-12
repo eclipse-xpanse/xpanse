@@ -26,9 +26,9 @@ import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceChangeDetailsEntityNotFoundException;
+import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
+import org.eclipse.xpanse.modules.models.servicechange.exceptions.ServiceChangeDetailsEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
@@ -46,48 +46,51 @@ public class ServiceChangeDetailsManager {
 
     @Resource private UserServiceHelper userServiceHelper;
 
-    /** get service change details. */
-    public List<ServiceChangeDetailsEntity> getAllServiceChangeDetails(
+    /**
+     * Creates one or more service change requests in database depending on the service template
+     * configuration.
+     */
+    public void createAndQueueAllServiceChangeRequests(
             UUID orderId,
             ServiceDeploymentEntity serviceDeployment,
-            Map<String, Object> updateRequestMap,
+            Map<String, Object> userRequestedProperties,
             Map<String, List<DeployResource>> deployResourceMap,
-            List<ServiceChangeScript> configManageScripts,
-            List<ServiceChangeParameter> configurationParameters,
+            List<ServiceChangeScript> serviceChangeScripts,
+            List<ServiceChangeParameter> serviceChangeParameters,
             ServiceOrderType type) {
 
         List<ServiceChangeDetailsEntity> requests = new ArrayList<>();
         deployResourceMap.forEach(
                 (groupName, deployResourceList) ->
-                        configManageScripts.forEach(
+                        serviceChangeScripts.forEach(
                                 serviceChangeScript -> {
                                     if (serviceChangeScript.getChangeHandler().equals(groupName)) {
                                         if (!CollectionUtils.isEmpty(deployResourceList)) {
                                             Map<String, Object> properties =
-                                                    getServiceChangeDetailsProperties(
+                                                    buildFullRequestPropertiesFromServiceTemplateData(
                                                             groupName,
-                                                            configurationParameters,
-                                                            updateRequestMap);
+                                                            serviceChangeParameters,
+                                                            userRequestedProperties);
                                             if (serviceChangeScript.getRunOnlyOnce()) {
                                                 ServiceChangeDetailsEntity request =
-                                                        getServiceChangeDetails(
+                                                        createServiceChangeDetailEntity(
                                                                 orderId,
                                                                 groupName,
                                                                 serviceDeployment,
                                                                 properties,
-                                                                updateRequestMap,
+                                                                userRequestedProperties,
                                                                 type);
                                                 requests.add(request);
                                             } else {
                                                 deployResourceList.forEach(
                                                         deployResource -> {
                                                             ServiceChangeDetailsEntity request =
-                                                                    getServiceChangeDetails(
+                                                                    createServiceChangeDetailEntity(
                                                                             orderId,
                                                                             groupName,
                                                                             serviceDeployment,
                                                                             properties,
-                                                                            updateRequestMap,
+                                                                            userRequestedProperties,
                                                                             type);
                                                             request.setResourceName(
                                                                     deployResource
@@ -98,15 +101,17 @@ public class ServiceChangeDetailsManager {
                                         }
                                     }
                                 }));
-        return requests;
+        if (!requests.isEmpty()) {
+            serviceChangeDetailsStorage.saveAll(requests);
+        }
     }
 
     /** Query service change details update request by queryModel. */
-    public List<ServiceChangeOrderDetails> getServiceChangeRequestDetails(
+    public List<ServiceChangeOrderDetails> getAllChangeRequests(
             String orderId,
             String serviceId,
             String resourceName,
-            String configManager,
+            String changeHandler,
             ServiceChangeStatus status) {
         UUID uuidOrderId = StringUtils.isEmpty(orderId) ? null : UUID.fromString(orderId);
         ServiceChangeDetailsQueryModel queryModel =
@@ -114,7 +119,7 @@ public class ServiceChangeDetailsManager {
                         uuidOrderId,
                         UUID.fromString(serviceId),
                         resourceName,
-                        configManager,
+                        changeHandler,
                         status);
         List<ServiceChangeDetailsEntity> requests =
                 serviceChangeDetailsStorage.listServiceChangeDetails(queryModel);
@@ -130,30 +135,32 @@ public class ServiceChangeDetailsManager {
         return EntityTransUtils.transToServiceChangeOrderDetails(requests);
     }
 
-    private Map<String, Object> getServiceChangeDetailsProperties(
+    private Map<String, Object> buildFullRequestPropertiesFromServiceTemplateData(
             String groupName,
             List<ServiceChangeParameter> params,
             Map<String, Object> updateRequestMap) {
 
-        Map<String, Object> existsServiceConfig = new HashMap<>();
+        Map<String, Object> fullServiceConfig = new HashMap<>();
+        // build map with initial values defined in service template.
         params.forEach(
-                serviceConfigurationParameter -> {
-                    if (groupName.equals(serviceConfigurationParameter.getManagedBy())) {
-                        existsServiceConfig.put(
-                                serviceConfigurationParameter.getName(),
-                                serviceConfigurationParameter.getInitialValue());
+                serviceChangeParameter -> {
+                    if (groupName.equals(serviceChangeParameter.getManagedBy())) {
+                        fullServiceConfig.put(
+                                serviceChangeParameter.getName(),
+                                serviceChangeParameter.getInitialValue());
                     }
                 });
+        // override initial values with values requested by the user.
         updateRequestMap.forEach(
                 (k, v) -> {
-                    if (existsServiceConfig.containsKey(k)) {
-                        existsServiceConfig.put(k, v);
+                    if (fullServiceConfig.containsKey(k)) {
+                        fullServiceConfig.put(k, v);
                     }
                 });
-        return existsServiceConfig;
+        return fullServiceConfig;
     }
 
-    private ServiceChangeDetailsEntity getServiceChangeDetails(
+    private ServiceChangeDetailsEntity createServiceChangeDetailEntity(
             UUID orderId,
             String groupName,
             ServiceDeploymentEntity entity,

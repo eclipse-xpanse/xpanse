@@ -16,9 +16,9 @@ import jakarta.annotation.Resource;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
-import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeRequest;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationChangeResult;
+import org.eclipse.xpanse.modules.deployment.ServiceChangeManager;
+import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeRequest;
+import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/agent/xpanse")
 public class AgentPollingApi {
 
-    @Resource private ServiceConfigurationManager serviceConfigurationManager;
+    @Resource private ServiceChangeManager serviceChangeManager;
 
     /**
      * Query pending service change request for agent.
@@ -74,7 +74,7 @@ public class AgentPollingApi {
                             description = "The name of the resource of deployed service")
                     @PathVariable("resourceName")
                     String resourceName) {
-        return serviceConfigurationManager.getPendingServiceChangeRequest(serviceId, resourceName);
+        return serviceChangeManager.getPendingServiceChangeRequest(serviceId, resourceName);
     }
 
     /**
@@ -98,7 +98,7 @@ public class AgentPollingApi {
                     UUID changeId,
             @Parameter(name = "result", description = "result of the service change request.")
                     @RequestBody
-                    ServiceConfigurationChangeResult result) {
-        serviceConfigurationManager.updateServiceChangeResult(changeId, result);
+                    ServiceChangeResult result) {
+        serviceChangeManager.updateServiceChangeResult(changeId, result);
     }
 }
