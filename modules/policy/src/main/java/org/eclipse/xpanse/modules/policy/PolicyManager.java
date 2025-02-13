@@ -50,8 +50,7 @@ public class PolicyManager {
         policyManStatus.setName(BackendSystemType.POLICY_MAN.toValue());
         policyManStatus.setEndpoint(policyManBaseUrl);
         try {
-            StackStatus
-                    policyManStackStatus = adminApi.healthGet();
+            StackStatus policyManStackStatus = adminApi.healthGet();
             org.eclipse.xpanse.modules.policy.policyman.generated.model.HealthStatus healthStatus =
                     policyManStackStatus.getHealthStatus();
             policyManStatus.setHealthStatus(HealthStatus.valueOf(healthStatus.getValue()));
