@@ -441,45 +441,6 @@ public class DeployResultManager {
         }
     }
 
-    /** update service deployment statement and service state. */
-    public void saveDeploymentResultReceived(
-            Boolean isSuccess, ServiceDeploymentEntity serviceDeployment) {
-        if (isSuccess) {
-            if (serviceDeployment
-                    .getServiceDeploymentState()
-                    .equals(ServiceDeploymentState.DEPLOYING)) {
-                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_SUCCESS);
-                serviceDeployment.setServiceState(ServiceState.RUNNING);
-            } else if (serviceDeployment
-                    .getServiceDeploymentState()
-                    .equals(ServiceDeploymentState.DESTROYING)) {
-                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DESTROY_SUCCESS);
-                serviceDeployment.setServiceState(ServiceState.STOPPED);
-            } else if (serviceDeployment
-                    .getServiceDeploymentState()
-                    .equals(ServiceDeploymentState.MODIFYING)) {
-                serviceDeployment.setServiceDeploymentState(
-                        ServiceDeploymentState.MODIFICATION_SUCCESSFUL);
-            }
-        } else {
-            if (serviceDeployment
-                    .getServiceDeploymentState()
-                    .equals(ServiceDeploymentState.DEPLOYING)) {
-                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DEPLOY_FAILED);
-            } else if (serviceDeployment
-                    .getServiceDeploymentState()
-                    .equals(ServiceDeploymentState.DESTROYING)) {
-                serviceDeployment.setServiceDeploymentState(ServiceDeploymentState.DESTROY_FAILED);
-            } else if (serviceDeployment
-                    .getServiceDeploymentState()
-                    .equals(ServiceDeploymentState.MODIFYING)) {
-                serviceDeployment.setServiceDeploymentState(
-                        ServiceDeploymentState.MODIFICATION_FAILED);
-            }
-        }
-        serviceDeploymentStorage.storeAndFlush(serviceDeployment);
-    }
-
     /** update service state and service order state by exception. */
     public void saveDeploymentResultWhenErrorReceived(
             ServiceDeploymentEntity serviceEntity,
