@@ -33,24 +33,24 @@ Details can be found on the project website [here](https://eclipse.dev/xpanse/do
 
 Details can be found on the project website [here](https://eclipse.dev/xpanse/docs/database).
 
-## Generate terraform-boot client code
+## Generate terra-boot client code
 
-1. Run the terraform-boot project with spring-profile `oauth` with methods mentioned here.
-This is necessary even if the terraform-boot will be actually used without oauth enabled in production.
+1. Run the terra-boot project with spring-profile `oauth` and `dev` with methods mentioned here.
+This is necessary even if the terra-boot will be actually used without oauth enabled in production.
 This will make the client to handle both with and without authentication usecases automatically.
 2. Access http://localhost:9090/v3/api-docs to get the openapi json.
 3. Copy all the JSON content of the openapi json and replace all the content in the JSON file
-[terraform-boot-openapi.json](modules/deployment/src/main/resources/terraform-boot-openapi.json).
-4. Run the below maven command to generate the REST API client and data models for terraform-boot. The command can be
+[terra-boot-openapi.json](modules/deployment/src/main/resources/terra-boot-openapi.json).
+4. Run the below maven command to generate the REST API client and data models for terra-boot. The command can be
 executed directly inside the `deployment` module.
 
 ```ssh
-mvn clean generate-sources -DskipTerraformBootClientGeneration=false
+mvn clean generate-sources -DskipTerraBootClientGeneration=false
 ```
 
 ## Generate tofu-maker client code
 
-1. Run the tofu-maker project with spring-profile `oauth` with methods mentioned here.
+1. Run the tofu-maker project with spring-profile `oauth` and `dev` with methods mentioned here.
 This is necessary even if the tofu-maker will be actually used without oauth enabled in production.
 This will make the client to handle both with and without authentication usecases automatically.
 2. Access http://localhost:9092/v3/api-docs to get the openapi json.

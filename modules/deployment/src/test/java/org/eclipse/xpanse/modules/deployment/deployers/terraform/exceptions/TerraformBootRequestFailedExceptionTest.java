@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class TerraformBootRequestFailedExceptionTest {
+class TerraBootRequestFailedExceptionTest {
 
-    private TerraformBootRequestFailedException exception;
+    private TerraBootRequestFailedException exception;
 
     @BeforeEach
     void setUp() {
-        exception = new TerraformBootRequestFailedException("message");
+        exception = new TerraBootRequestFailedException("message");
     }
 
     @Test

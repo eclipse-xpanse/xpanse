@@ -9,7 +9,7 @@ import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.g
 
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformBootRequestFailedException;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
 import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentScriptsCreationFailedException;
 import org.eclipse.xpanse.modules.models.billing.exceptions.ServicePriceCalculationFailed;
@@ -110,15 +110,13 @@ public class DeploymentExceptionHandler {
                 ErrorType.DEPLOYMENT_VARIABLE_INVALID, Collections.singletonList(ex.getMessage()));
     }
 
-    /** Exception handler for TerraformBootRequestFailedException. */
-    @ExceptionHandler({TerraformBootRequestFailedException.class})
+    /** Exception handler for TerraBootRequestFailedException. */
+    @ExceptionHandler({TerraBootRequestFailedException.class})
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     @ResponseBody
-    public ErrorResponse handleTerraformBootRequestFailedException(
-            TerraformBootRequestFailedException ex) {
+    public ErrorResponse handleTerraBootRequestFailedException(TerraBootRequestFailedException ex) {
         return getErrorResponse(
-                ErrorType.TERRAFORM_BOOT_REQUEST_FAILED,
-                Collections.singletonList(ex.getMessage()));
+                ErrorType.TERRA_BOOT_REQUEST_FAILED, Collections.singletonList(ex.getMessage()));
     }
 
     /** Exception handler for VariableValidationFailedException. */

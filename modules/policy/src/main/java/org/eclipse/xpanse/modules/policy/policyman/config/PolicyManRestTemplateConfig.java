@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
-/** Configuration class to create a RestTemplate bean for terraformBoot. */
+/** Configuration class to create a RestTemplate bean for policy-man service API. */
 @Configuration
 public class PolicyManRestTemplateConfig {
 

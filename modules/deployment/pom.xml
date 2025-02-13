@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>
-        <skipTerraformBootClientGeneration>true</skipTerraformBootClientGeneration>
+        <skipTerraBootClientGeneration>true</skipTerraBootClientGeneration>
         <skipTofuMakerClientGeneration>true</skipTofuMakerClientGeneration>
     </properties>
 
@@ -125,19 +125,19 @@
                 <version>${openapi.generator.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>generate-terraformBoot-client</id>
+                        <id>generate-terraBoot-client</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/terraform-boot-openapi.json</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/terra-boot-openapi.json</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
                             <apiPackage>
-                                org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.api
+                                org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api
                             </apiPackage>
                             <modelPackage>
-                                org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.generated.model
+                                org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model
                             </modelPackage>
                             <generateApiDocumentation>false</generateApiDocumentation>
                             <generateApiTests>false</generateApiTests>
@@ -145,7 +145,7 @@
                             <generateModelTests>false</generateModelTests>
                             <generateApiTests>false</generateApiTests>
                             <library>resttemplate</library>
-                            <skip>${skipTerraformBootClientGeneration}</skip>
+                            <skip>${skipTerraBootClientGeneration}</skip>
                             <supportingFilesToGenerate>
                                 BaseApi.java,ApiClient.java,JavaTimeFormatter.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,ApiKeyAuth.java,Authentication.java,HttpBasicAuth.java,HttpBearerAuth.java,OAuth.java
                             </supportingFilesToGenerate>
@@ -203,7 +203,7 @@
                 <version>${maven.clean.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>clean-terraformBoot-generated-files</id>
+                        <id>clean-terraBoot-generated-files</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>clean</goal>
@@ -220,7 +220,7 @@
                                     </excludes>
                                 </fileset>
                             </filesets>
-                            <skip>${skipTerraformBootClientGeneration}</skip>
+                            <skip>${skipTerraBootClientGeneration}</skip>
                         </configuration>
                     </execution>
                     <execution>

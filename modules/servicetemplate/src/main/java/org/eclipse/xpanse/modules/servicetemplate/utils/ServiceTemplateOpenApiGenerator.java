@@ -471,7 +471,7 @@ public class ServiceTemplateOpenApiGenerator {
                             "Access Denied",
                             "Sensitive Field Encryption Or Decryption Failed Exception",
                             "Unsupported Enum Value",
-                            "Terraform Boot Request Failed",
+                            "Terra Boot Request Failed",
                             "Tofu Maker Request Failed",
                             "Variable Validation Failed",
                             "Variable Schema Definition Invalid",
