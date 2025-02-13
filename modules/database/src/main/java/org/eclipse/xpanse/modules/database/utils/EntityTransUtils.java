@@ -24,8 +24,8 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeDetails;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeDetails;
+import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
@@ -170,7 +170,7 @@ public class EntityTransUtils {
                     ServiceChangeOrderDetails orderDetails = new ServiceChangeOrderDetails();
                     orderDetails.setOrderId(orderId);
                     ServiceOrderEntity orderEntity = requestList.getFirst().getServiceOrderEntity();
-                    orderDetails.setConfigRequest(orderEntity.getRequestBody());
+                    orderDetails.setServiceChangeRequest(orderEntity.getRequestBody());
                     orderDetails.setOrderStatus(orderEntity.getTaskStatus());
                     List<ServiceChangeDetails> detailsList = new ArrayList<>();
                     requestList.forEach(
@@ -178,7 +178,7 @@ public class EntityTransUtils {
                                 ServiceChangeDetails details = new ServiceChangeDetails();
                                 details.setChangeId(request.getId());
                                 details.setResourceName(request.getResourceName());
-                                details.setConfigManager(request.getChangeHandler());
+                                details.setChangeHandler(request.getChangeHandler());
                                 details.setResultMessage(request.getResultMessage());
                                 details.setProperties(request.getProperties());
                                 details.setStatus(request.getStatus());

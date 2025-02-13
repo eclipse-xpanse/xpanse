@@ -22,7 +22,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.database.servicechange.DatabaseServiceChangeDetailsStorage;
 import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsRepository;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.enums.ServiceChangeStatus;
+import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

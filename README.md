@@ -20,10 +20,33 @@ Xpanse unleashes your cloud services by removing vendor lock-in and lock out. It
 providers core services, meaning that your xpanse service is portable (multi-cloud) on any cloud topology and provider.
 It also avoids tight coupling of your service to other cloud service provider services.
 
+## Developer Setup and contribution guide
+
+All details on how to set up and run the project can be found on our documentation website
+1. [Developer setup](https://eclipse.dev/xpanse/docs/developer-setup)
+2. [Pull Requests](https://eclipse.dev/xpanse/docs/Contribute/pull-requests)
+
 ## Configuration Language
 
 Details can be found on the project
 website [here](https://eclipse.dev/xpanse/docs/configuration-language).
+
+## Formatter and Linter
+
+The project follows [google-code-format](https://github.com/google/google-java-format).
+We use the [spotless plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven#google-java-format) to format code and to validate code format.
+We can automatically format the code using the command below.
+
+```shell
+mvn spotless:apply
+```
+
+To validate errors we can run the command below.
+
+```shell
+mvn spotless:check &&  mvn checkstyle:check
+```
+
 
 ## Runtime
 
@@ -95,19 +118,3 @@ The static code analysis framework will also validate if the license exists in t
 ## Dependencies File
 
 All third-party related content is listed in the [DEPENDENCIES](DEPENDENCIES) file.
-
-## Code Formatter
-
-The project follows [google-code-format](https://github.com/google/google-java-format).
-We use the [spotless plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven#google-java-format) to format code and to validate code format.
-We can automatically format the code using the command below.
-
-```shell
-mvn spotless:apply
-```
-
-To validate errors we can run the command below.
-
-```shell
-mvn spotless:check &&  mvn checkstyle:check
-```

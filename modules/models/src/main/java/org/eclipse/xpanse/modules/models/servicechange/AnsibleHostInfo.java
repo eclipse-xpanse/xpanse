@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.serviceconfiguration;
+package org.eclipse.xpanse.modules.models.servicechange;
 
 import lombok.Data;
 

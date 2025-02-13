@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions;
+package org.eclipse.xpanse.modules.models.servicechange.exceptions;
 
 /** Exception thrown when service change details request not found. */
 public class ServiceChangeDetailsEntityNotFoundException extends RuntimeException {
