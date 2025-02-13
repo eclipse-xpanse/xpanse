@@ -134,7 +134,7 @@ public class CredentialCenter {
                         .forEach(
                                 site -> {
                                     abstractCredentialInfos.addAll(
-                                            listUserCredentials(key, site, type, userKey));
+                                            listUserCredentials(key, site, type, userKey, false));
                                 });
             }
         } else {
@@ -144,14 +144,14 @@ public class CredentialCenter {
                     .forEach(
                             site -> {
                                 abstractCredentialInfos.addAll(
-                                        listUserCredentials(csp, site, type, userKey));
+                                        listUserCredentials(csp, site, type, userKey, false));
                             });
         }
         return maskSensitiveValues(abstractCredentialInfos);
     }
 
     private List<AbstractCredentialInfo> listUserCredentials(
-            Csp csp, String site, CredentialType type, String userKey) {
+            Csp csp, String site, CredentialType type, String userKey, boolean isDecryptSecrets) {
         List<AbstractCredentialInfo> userCredentials = new ArrayList<>();
         List<AbstractCredentialInfo> definedCredentialInfos =
                 pluginManager.getOrchestratorPlugin(csp).getCredentialDefinitions();
@@ -173,7 +173,8 @@ public class CredentialCenter {
                                         site,
                                         credential.getType(),
                                         credential.getName(),
-                                        userKey);
+                                        userKey,
+                                        isDecryptSecrets);
                         if (Objects.nonNull(credentialInfo)) {
                             userCredentials.add(credentialInfo);
                         }
@@ -183,7 +184,12 @@ public class CredentialCenter {
     }
 
     private AbstractCredentialInfo getCredentialFromCache(
-            Csp csp, String site, CredentialType type, String credentialName, String userKey) {
+            Csp csp,
+            String site,
+            CredentialType type,
+            String credentialName,
+            String userKey,
+            boolean isDecryptSecrets) {
         CredentialCacheKey cacheKey =
                 new CredentialCacheKey(csp, site, type, credentialName, userKey);
         AbstractCredentialInfo credentialInfo = null;
@@ -195,6 +201,9 @@ public class CredentialCenter {
                     "Get credential from cache by key {} failed. error:{}",
                     cacheKey,
                     e.getMessage());
+        }
+        if (isDecryptSecrets && Objects.nonNull(credentialInfo)) {
+            return decodeSensitiveVariables(credentialInfo);
         }
         return credentialInfo;
     }
@@ -312,7 +321,7 @@ public class CredentialCenter {
                                             + " and user %s is not available",
                                     csp, credentialType, userKey)));
         }
-        return decodeSensitiveVariables(credentialWithAllVariables.get());
+        return credentialWithAllVariables.get();
     }
 
     private void encodeSensitiveVariables(CreateCredential createCredential) {
@@ -523,7 +532,7 @@ public class CredentialCenter {
             Csp csp, String site, CredentialType requestedCredentialType, String userKey) {
         List<AbstractCredentialInfo> joinCredentials = new ArrayList<>();
         List<AbstractCredentialInfo> userCredentials =
-                listUserCredentials(csp, site, requestedCredentialType, userKey);
+                listUserCredentials(csp, site, requestedCredentialType, userKey, true);
         if (!CollectionUtils.isEmpty(userCredentials)) {
             for (AbstractCredentialInfo userCredential : userCredentials) {
                 if (Objects.nonNull(userCredential)) {
