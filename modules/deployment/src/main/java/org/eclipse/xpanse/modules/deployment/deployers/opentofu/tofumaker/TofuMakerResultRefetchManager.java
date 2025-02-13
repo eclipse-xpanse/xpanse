@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.RetrieveOpenTofuResultApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.Response;
@@ -26,6 +27,10 @@ import org.springframework.web.client.HttpClientErrorException;
 public class TofuMakerResultRefetchManager {
 
     @Resource private DeployResultManager deployResultManager;
+
+    @Resource
+    private OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+
     @Resource private RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
 
     /** retrieve openTofu result. */
@@ -38,10 +43,9 @@ public class TofuMakerResultRefetchManager {
             if (result.getStatusCode() == HttpStatus.NO_CONTENT) {
                 return;
             }
-            if (Objects.nonNull(result.getBody())
-                    && result.getBody().getCommandSuccessful() != null) {
-                deployResultManager.saveDeploymentResultReceived(
-                        result.getBody().getCommandSuccessful(), serviceDeployment);
+            if (Objects.nonNull(result.getBody())) {
+                openTofuDeploymentResultCallbackManager.orderCallback(
+                        serviceOrder.getOrderId(), result.getBody());
             }
         } catch (HttpClientErrorException e) {
             Response response = e.getResponseBodyAs(Response.class);

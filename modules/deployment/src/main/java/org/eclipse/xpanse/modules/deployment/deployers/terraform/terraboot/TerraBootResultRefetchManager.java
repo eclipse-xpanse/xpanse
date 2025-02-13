@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.RetrieveTerraformResultApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.Response;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformResult;
@@ -25,6 +26,9 @@ import org.springframework.web.client.HttpClientErrorException;
 @Component
 public class TerraBootResultRefetchManager {
 
+    @Resource
+    private TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+
     @Resource private DeployResultManager deployResultManager;
     @Resource private RetrieveTerraformResultApi retrieveTerraformResultApi;
 
@@ -38,10 +42,9 @@ public class TerraBootResultRefetchManager {
             if (result.getStatusCode() == HttpStatus.NO_CONTENT) {
                 return;
             }
-            if (Objects.nonNull(result.getBody())
-                    && result.getBody().getCommandSuccessful() != null) {
-                deployResultManager.saveDeploymentResultReceived(
-                        result.getBody().getCommandSuccessful(), serviceDeployment);
+            if (Objects.nonNull(result.getBody())) {
+                terraformDeploymentResultCallbackManager.orderCallback(
+                        serviceOrder.getOrderId(), result.getBody());
             }
         } catch (HttpClientErrorException e) {
             Response response = e.getResponseBodyAs(Response.class);
