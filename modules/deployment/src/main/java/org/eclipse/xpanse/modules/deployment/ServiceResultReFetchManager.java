@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerResultRefetchManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootResultRefetchManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootResultRefetchManager;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -34,7 +34,7 @@ public class ServiceResultReFetchManager {
     @Value("${max.service.order.processing.duration.in.seconds}")
     private int maxServiceOrderProcessingDuration;
 
-    @Resource private TerraformBootResultRefetchManager terraformBootResultRefetchManager;
+    @Resource private TerraBootResultRefetchManager terraBootResultRefetchManager;
     @Resource private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
     @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
@@ -122,7 +122,7 @@ public class ServiceResultReFetchManager {
             if (Duration.between(serviceOrder.getStartedTime(), OffsetDateTime.now()).getSeconds()
                     > maxServiceOrderProcessingDuration) {
                 if (DeployerKind.TERRAFORM == deployerKind) {
-                    terraformBootResultRefetchManager.retrieveTerraformResult(
+                    terraBootResultRefetchManager.retrieveTerraformResult(
                             serviceDeployment, serviceOrder);
                 }
                 if (DeployerKind.OPEN_TOFU == deployerKind) {

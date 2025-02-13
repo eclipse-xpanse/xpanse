@@ -227,7 +227,7 @@
                     <skip>${jacoco.skip}</skip>
                     <excludes>
                         <exclude>
-                            **/org/eclipse/xpanse/modules/deployment/deployers/terraform/terraformboot/generated/**
+                            **/org/eclipse/xpanse/modules/deployment/deployers/terraform/terraboot/generated/**
                         </exclude>
                         <exclude>
                             **/org/eclipse/xpanse/modules/deployment/deployers/opentofu/tofumaker/generated/**

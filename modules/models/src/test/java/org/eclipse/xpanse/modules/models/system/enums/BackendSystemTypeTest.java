@@ -18,18 +18,17 @@ class BackendSystemTypeTest {
     @Test
     public void testGetByValue() {
         assertEquals(
-                BackendSystemType.getByValue("identity provider"),
-                BackendSystemType.IDENTITY_PROVIDER);
-        assertEquals(BackendSystemType.getByValue("database"), BackendSystemType.DATABASE);
+                BackendSystemType.IDENTITY_PROVIDER,
+                BackendSystemType.getByValue("identity provider"));
+        assertEquals(BackendSystemType.DATABASE, BackendSystemType.getByValue("database"));
+        assertEquals(BackendSystemType.TERRA_BOOT, BackendSystemType.getByValue("terra boot"));
+        assertEquals(BackendSystemType.TOFU_MAKER, BackendSystemType.getByValue("tofu maker"));
+        assertEquals(BackendSystemType.POLICY_MAN, BackendSystemType.getByValue("policy man"));
         assertEquals(
-                BackendSystemType.getByValue("terraform boot"), BackendSystemType.TERRAFORM_BOOT);
-        assertEquals(BackendSystemType.getByValue("tofu maker"), BackendSystemType.TOFU_MAKER);
-        assertEquals(BackendSystemType.getByValue("policy man"), BackendSystemType.POLICY_MAN);
+                BackendSystemType.CACHE_PROVIDER, BackendSystemType.getByValue("Cache Provider"));
         assertEquals(
-                BackendSystemType.getByValue("Cache Provider"), BackendSystemType.CACHE_PROVIDER);
-        assertEquals(
-                BackendSystemType.getByValue("OpenTelemetry Collector"),
-                BackendSystemType.OPEN_TELEMETRY_COLLECTOR);
+                BackendSystemType.OPEN_TELEMETRY_COLLECTOR,
+                BackendSystemType.getByValue("OpenTelemetry Collector"));
         assertThrows(UnsupportedEnumValueException.class, () -> BackendSystemType.getByValue(null));
     }
 
@@ -37,7 +36,7 @@ class BackendSystemTypeTest {
     public void testToValue() {
         assertEquals("Identity Provider", BackendSystemType.IDENTITY_PROVIDER.toValue());
         assertEquals("Database", BackendSystemType.DATABASE.toValue());
-        assertEquals("Terraform Boot", BackendSystemType.TERRAFORM_BOOT.toValue());
+        assertEquals("Terra Boot", BackendSystemType.TERRA_BOOT.toValue());
         assertEquals("Tofu Maker", BackendSystemType.TOFU_MAKER.toValue());
         assertEquals("Policy Man", BackendSystemType.POLICY_MAN.toValue());
         assertEquals("Cache Provider", BackendSystemType.CACHE_PROVIDER.toValue());

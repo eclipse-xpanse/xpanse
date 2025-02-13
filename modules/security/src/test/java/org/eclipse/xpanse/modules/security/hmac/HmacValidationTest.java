@@ -27,7 +27,7 @@ public class HmacValidationTest {
     void testHmacSignatureHeader() throws IOException {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setMethod("POST");
-        request.setRequestURI("/webhook/terraform-boot/order/bf83d609-79f0-486f-a883-6c3187589c90");
+        request.setRequestURI("/webhook/terra-boot/order/bf83d609-79f0-486f-a883-6c3187589c90");
         request.setServerName("localhost");
         request.setServerPort(8080);
         request.setProtocol("http");
@@ -37,7 +37,7 @@ public class HmacValidationTest {
         request.addHeader(
                 "x-signature",
                 "algorithm=HmacSHA256;headers=x-nonce-signature"
-                    + " x-timestamp-signature;signature=d631342033398238dad36efe2d5df0fc7c6d52e028494f17f930c353dc5c16ad");
+                    + " x-timestamp-signature;signature=848bd434987cc70af0a0892eaf386931ffff4fc70f7415671304e9ea91546bd9");
         request.addHeader("x-nonce-signature", "6f9e88eab38a9c5606dda8813f98706b");
         request.addHeader("x-timestamp-signature", "1738854803851");
         RereadbleBodyHttpServletRequest newRequest = new RereadbleBodyHttpServletRequest(request);
@@ -49,7 +49,7 @@ public class HmacValidationTest {
     void testInvalidHmacAlgorithmThrowsError() throws IOException {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setMethod("POST");
-        request.setRequestURI("/webhook/terraform-boot/order/bf83d609-79f0-486f-a883-6c3187589c90");
+        request.setRequestURI("/webhook/terra-boot/order/bf83d609-79f0-486f-a883-6c3187589c90");
         request.setServerName("localhost");
         request.setServerPort(8080);
         request.setProtocol("http");
@@ -73,7 +73,7 @@ public class HmacValidationTest {
     void testMissingSignatureHeaderThrowsError() throws IOException {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setMethod("POST");
-        request.setRequestURI("/webhook/terraform-boot/order/bf83d609-79f0-486f-a883-6c3187589c90");
+        request.setRequestURI("/webhook/terra-boot/order/bf83d609-79f0-486f-a883-6c3187589c90");
         request.setServerName("localhost");
         request.setServerPort(8080);
         request.setProtocol("http");
@@ -96,7 +96,7 @@ public class HmacValidationTest {
     void testWrongSignatureHeaderFormatThrowsError() throws IOException {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setMethod("POST");
-        request.setRequestURI("/webhook/terraform-boot/order/bf83d609-79f0-486f-a883-6c3187589c90");
+        request.setRequestURI("/webhook/terra-boot/order/bf83d609-79f0-486f-a883-6c3187589c90");
         request.setServerName("localhost");
         request.setServerPort(8080);
         request.setProtocol("http");

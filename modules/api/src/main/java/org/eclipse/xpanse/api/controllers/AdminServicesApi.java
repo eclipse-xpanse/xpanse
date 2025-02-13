@@ -24,7 +24,7 @@ import org.eclipse.xpanse.modules.cache.RedisCacheConfig;
 import org.eclipse.xpanse.modules.cache.consts.CacheConstants;
 import org.eclipse.xpanse.modules.database.DatabaseManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
@@ -56,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
 public class AdminServicesApi {
 
-    private final TerraformBootManager terraformBootManager;
+    private final TerraBootManager terraBootManager;
     private final TofuMakerManager tofuMakerManager;
     private final RedisCacheConfig redisCacheConfig;
     @Resource private IdentityProviderManager identityProviderManager;
@@ -68,10 +68,10 @@ public class AdminServicesApi {
 
     /** Constructor for AdminServicesApi bean. */
     public AdminServicesApi(
-            @Nullable TerraformBootManager terraformBootManager,
+            @Nullable TerraBootManager terraBootManager,
             @Nullable TofuMakerManager tofuMakerManager,
             @Nullable RedisCacheConfig redisCacheConfig) {
-        this.terraformBootManager = terraformBootManager;
+        this.terraBootManager = terraBootManager;
         this.tofuMakerManager = tofuMakerManager;
         this.redisCacheConfig = redisCacheConfig;
     }
@@ -145,11 +145,10 @@ public class AdminServicesApi {
                     backendSystemStatuses.add(databaseStatus);
                 }
             }
-            if (Objects.nonNull(terraformBootManager) && type == BackendSystemType.TERRAFORM_BOOT) {
-                BackendSystemStatus terraformBootStatus =
-                        terraformBootManager.getTerraformBootStatus();
-                if (Objects.nonNull(terraformBootStatus)) {
-                    backendSystemStatuses.add(terraformBootStatus);
+            if (Objects.nonNull(terraBootManager) && type == BackendSystemType.TERRA_BOOT) {
+                BackendSystemStatus terraBootStatus = terraBootManager.getTerraBootStatus();
+                if (Objects.nonNull(terraBootStatus)) {
+                    backendSystemStatuses.add(terraBootStatus);
                 }
             }
             if (Objects.nonNull(tofuMakerManager) && type == BackendSystemType.TOFU_MAKER) {

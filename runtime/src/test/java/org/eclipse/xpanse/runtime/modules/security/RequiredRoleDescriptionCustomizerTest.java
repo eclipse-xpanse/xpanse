@@ -8,7 +8,7 @@ import java.util.List;
 import org.eclipse.xpanse.api.controllers.AdminServicesApi;
 import org.eclipse.xpanse.modules.cache.RedisCacheConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformboot.TerraformBootManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootManager;
 import org.eclipse.xpanse.modules.security.auth.RequiredRoleDescriptionCustomizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ class RequiredRoleDescriptionCustomizerTest {
 
         final AdminServicesApi adminServicesApi =
                 new AdminServicesApi(
-                        new TerraformBootManager(), new TofuMakerManager(), new RedisCacheConfig());
+                        new TerraBootManager(), new TofuMakerManager(), new RedisCacheConfig());
 
         final HandlerMethod handlerMethod = new HandlerMethod(adminServicesApi, "healthCheck");
         final Operation expectedResult = new Operation();

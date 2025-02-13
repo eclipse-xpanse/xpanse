@@ -47,7 +47,7 @@ public enum ErrorType {
     SENSITIVE_FIELD_ENCRYPTION_DECRYPTION_EXCEPTION(
             "Sensitive " + "Field Encryption Or Decryption Failed Exception"),
     UNSUPPORTED_ENUM_VALUE("Unsupported Enum Value"),
-    TERRAFORM_BOOT_REQUEST_FAILED("Terraform Boot Request Failed"),
+    TERRA_BOOT_REQUEST_FAILED("Terra Boot Request Failed"),
     TOFU_MAKER_REQUEST_FAILED("Tofu Maker Request Failed"),
     METRICS_DATA_NOT_READY("Metrics Data Not Ready"),
     VARIABLE_VALIDATION_FAILED("Variable Validation Failed"),

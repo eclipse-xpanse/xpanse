@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 /** The kind of the service order handler. */
 public enum Handler {
     TERRAFORM_LOCAL("terraform-local"),
-    TERRAFORM_BOOT("terraform-boot"),
+    TERRA_BOOT("terra-boot"),
     OPEN_TOFU_LOCAL("open-tofu-local"),
     TOFU_MAKER("tofu-maker"),
     INTERNAL("internal"), // lock/unlock and any other orders
