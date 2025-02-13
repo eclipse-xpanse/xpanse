@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesEvaluat
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalCmdList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.StackStatus;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidatePolicyList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidateResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,10 +50,10 @@ public class PolicyManager {
         policyManStatus.setName(BackendSystemType.POLICY_MAN.toValue());
         policyManStatus.setEndpoint(policyManBaseUrl);
         try {
-            org.eclipse.xpanse.modules.policy.policyman.generated.model.SystemStatus
-                    policyManSystemStatus = adminApi.healthGet();
+            StackStatus
+                    policyManStackStatus = adminApi.healthGet();
             org.eclipse.xpanse.modules.policy.policyman.generated.model.HealthStatus healthStatus =
-                    policyManSystemStatus.getHealthStatus();
+                    policyManStackStatus.getHealthStatus();
             policyManStatus.setHealthStatus(HealthStatus.valueOf(healthStatus.getValue()));
         } catch (RestClientException e) {
             log.error("Get status of policy-man error:{}", e.getMessage());
