@@ -3,7 +3,7 @@ package org.eclipse.xpanse.modules.policy.policyman.generated.api;
 import java.util.Collections;
 import java.util.List;
 import org.eclipse.xpanse.modules.policy.policyman.generated.ApiClient;
-import org.eclipse.xpanse.modules.policy.policyman.generated.model.SystemStatus;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.StackStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -51,7 +51,7 @@ public class AdminApi {
      * @return SystemStatus
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public SystemStatus healthGet() throws RestClientException {
+    public StackStatus healthGet() throws RestClientException {
         return healthGetWithHttpInfo().getBody();
     }
 
@@ -69,7 +69,7 @@ public class AdminApi {
      * @return ResponseEntity&lt;SystemStatus&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<SystemStatus> healthGetWithHttpInfo() throws RestClientException {
+    public ResponseEntity<StackStatus> healthGetWithHttpInfo() throws RestClientException {
         Object localVarPostBody = null;
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -88,8 +88,8 @@ public class AdminApi {
 
         String[] localVarAuthNames = new String[] {};
 
-        ParameterizedTypeReference<SystemStatus> localReturnType =
-                new ParameterizedTypeReference<SystemStatus>() {};
+        ParameterizedTypeReference<StackStatus> localReturnType =
+                new ParameterizedTypeReference<StackStatus>() {};
         return apiClient.invokeAPI(
                 "/health",
                 HttpMethod.GET,

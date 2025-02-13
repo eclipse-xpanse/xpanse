@@ -20,15 +20,15 @@ import jakarta.validation.constraints.*;
 import java.util.Objects;
 
 /** SystemStatus */
-@JsonPropertyOrder({SystemStatus.JSON_PROPERTY_HEALTH_STATUS})
+@JsonPropertyOrder({StackStatus.JSON_PROPERTY_HEALTH_STATUS})
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
-public class SystemStatus {
+public class StackStatus {
     public static final String JSON_PROPERTY_HEALTH_STATUS = "healthStatus";
     private HealthStatus healthStatus;
 
-    public SystemStatus() {}
+    public StackStatus() {}
 
-    public SystemStatus healthStatus(HealthStatus healthStatus) {
+    public StackStatus healthStatus(HealthStatus healthStatus) {
 
         this.healthStatus = healthStatus;
         return this;
@@ -62,8 +62,8 @@ public class SystemStatus {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SystemStatus systemStatus = (SystemStatus) o;
-        return Objects.equals(this.healthStatus, systemStatus.healthStatus);
+        StackStatus stackStatus = (StackStatus) o;
+        return Objects.equals(this.healthStatus, stackStatus.healthStatus);
     }
 
     @Override

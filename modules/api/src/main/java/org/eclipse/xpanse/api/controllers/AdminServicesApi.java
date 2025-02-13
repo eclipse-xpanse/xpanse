@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.cache.RedisCacheConfig;
@@ -83,11 +84,11 @@ public class AdminServicesApi {
      */
     @Tag(name = "Admin", description = "APIs for administrating Xpanse")
     @Operation(description = "Check health of API service and backend systems.")
-    @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/health/stack", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
+    @Secured({ROLE_ADMIN})
     @AuditApiRequest(enabled = false)
-    public SystemStatus healthCheck() {
+    public SystemStatus stackHealthStatus() {
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
         List<BackendSystemStatus> backendSystemStatuses = getBackendSystemStatuses();
@@ -95,6 +96,22 @@ public class AdminServicesApi {
             systemStatus.setBackendSystemStatuses(backendSystemStatuses);
         }
         return systemStatus;
+    }
+
+    /**
+     * List supported backend systems.
+     *
+     * @return Returns list of backend systems {name,healthstatus}.
+     */
+    @Tag(name = "Admin", description = "APIs for administrating Xpanse")
+    @Operation(description = "Get name and status of backend systems")
+    @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
+    @AuditApiRequest(enabled = false)
+    public List<BackendSystemHealthInfo> healthCheck() {
+
+        return getSystemNameAndHealthInfo();
     }
 
     /**
@@ -120,9 +137,7 @@ public class AdminServicesApi {
      * @return list of system status.
      */
     private List<BackendSystemStatus> getBackendSystemStatuses() {
-        List<BackendSystemStatus> systemStatuses = checkHealthOfAllBackendSystems();
-        systemStatuses.forEach(this::processShownFields);
-        return systemStatuses;
+        return checkHealthOfAllBackendSystems();
     }
 
     private List<BackendSystemStatus> checkHealthOfAllBackendSystems() {
@@ -189,11 +204,100 @@ public class AdminServicesApi {
         return backendSystemStatuses;
     }
 
-    private void processShownFields(BackendSystemStatus backendSystemStatus) {
-        boolean userHasRoleAdmin = userServiceHelper.currentUserHasRole(ROLE_ADMIN);
-        if (!userHasRoleAdmin) {
-            backendSystemStatus.setEndpoint(null);
-            backendSystemStatus.setDetails(null);
+    private List<BackendSystemHealthInfo> getSystemNameAndHealthInfo() {
+        List<BackendSystemHealthInfo> backendSystemHealthInfos = new ArrayList<>();
+        for (BackendSystemType type : BackendSystemType.values()) {
+            if (type == BackendSystemType.IDENTITY_PROVIDER) {
+                IdentityProviderService identityProviderService =
+                        identityProviderManager.getActiveIdentityProviderService();
+                if (Objects.nonNull(identityProviderService)) {
+                    BackendSystemStatus identityProviderStatus =
+                            identityProviderService.getIdentityProviderStatus();
+                    if (Objects.nonNull(identityProviderStatus)) {
+                        backendSystemHealthInfos.add(
+                                BackendSystemHealthInfo.builder()
+                                        .healthStatus(identityProviderStatus.getHealthStatus())
+                                        .name(identityProviderStatus.getName())
+                                        .build());
+                    }
+                }
+            }
+            if (type == BackendSystemType.DATABASE) {
+                BackendSystemStatus databaseStatus = databaseManager.getDatabaseStatus();
+                if (Objects.nonNull(databaseStatus)) {
+                    backendSystemHealthInfos.add(
+                            BackendSystemHealthInfo.builder()
+                                    .healthStatus(databaseStatus.getHealthStatus())
+                                    .name(databaseStatus.getName())
+                                    .build());
+                }
+            }
+            if (Objects.nonNull(terraBootManager) && type == BackendSystemType.TERRA_BOOT) {
+                BackendSystemStatus terraformBootStatus = terraBootManager.getTerraBootStatus();
+                if (Objects.nonNull(terraformBootStatus)) {
+                    backendSystemHealthInfos.add(
+                            BackendSystemHealthInfo.builder()
+                                    .healthStatus(terraformBootStatus.getHealthStatus())
+                                    .name(terraformBootStatus.getName())
+                                    .build());
+                }
+            }
+            if (Objects.nonNull(tofuMakerManager) && type == BackendSystemType.TOFU_MAKER) {
+                BackendSystemStatus openTofuMakerStatus = tofuMakerManager.getOpenTofuMakerStatus();
+                if (Objects.nonNull(openTofuMakerStatus)) {
+                    backendSystemHealthInfos.add(
+                            BackendSystemHealthInfo.builder()
+                                    .healthStatus(openTofuMakerStatus.getHealthStatus())
+                                    .name(openTofuMakerStatus.getName())
+                                    .build());
+                }
+            }
+            if (type == BackendSystemType.POLICY_MAN) {
+                BackendSystemStatus policyManStatus = policyManager.getPolicyManStatus();
+                if (Objects.nonNull(policyManStatus)) {
+                    backendSystemHealthInfos.add(
+                            BackendSystemHealthInfo.builder()
+                                    .healthStatus(policyManStatus.getHealthStatus())
+                                    .name(policyManStatus.getName())
+                                    .build());
+                }
+            }
+            if (type == BackendSystemType.CACHE_PROVIDER) {
+                if (Objects.nonNull(redisCacheConfig)) {
+                    BackendSystemStatus redisCacheStatus = redisCacheConfig.getRedisCacheStatus();
+                    if (Objects.nonNull(redisCacheStatus)) {
+                        backendSystemHealthInfos.add(
+                                BackendSystemHealthInfo.builder()
+                                        .healthStatus(redisCacheStatus.getHealthStatus())
+                                        .name(redisCacheStatus.getName())
+                                        .build());
+                    }
+                } else {
+                    backendSystemHealthInfos.add(
+                            BackendSystemHealthInfo.builder()
+                                    .healthStatus(HealthStatus.OK)
+                                    .name(CacheConstants.CACHE_PROVIDER_CAFFEINE)
+                                    .build());
+                }
+            }
+            if (type == BackendSystemType.OPEN_TELEMETRY_COLLECTOR) {
+                BackendSystemStatus otelExporterStatus =
+                        openTelemetryHealthCheck.getOpenTelemetryHealthStatus();
+                if (Objects.nonNull(otelExporterStatus)) {
+                    backendSystemHealthInfos.add(
+                            BackendSystemHealthInfo.builder()
+                                    .healthStatus(otelExporterStatus.getHealthStatus())
+                                    .name(otelExporterStatus.getName())
+                                    .build());
+                }
+            }
         }
+        return backendSystemHealthInfos;
+    }
+
+    @Builder
+    static class BackendSystemHealthInfo {
+        String name;
+        HealthStatus healthStatus;
     }
 }
