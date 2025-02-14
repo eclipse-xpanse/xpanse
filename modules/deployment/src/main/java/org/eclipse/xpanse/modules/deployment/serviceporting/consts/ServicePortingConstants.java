@@ -18,6 +18,7 @@ public class ServicePortingConstants {
     public static final String IS_DESTROY_SUCCESS = "isDestroySuccess";
     public static final String DEPLOY_RETRY_NUM = "deployRetryNum";
     public static final String DESTROY_RETRY_NUM = "destroyRetryNum";
+    public static final String RESULT_MESSAGE = "resultMessage";
     public static final String IS_RETRY_TASK = "isRetryTask";
     public static final String USER_ID = "userId";
     public static final String ASSIGNEE = "assignee";

@@ -1,17 +1,7 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.io.FileWriter;
-import java.net.URI;
-import java.util.Map;
-import java.util.UUID;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.resources.TfState;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
@@ -28,6 +18,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.net.URI;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -74,8 +75,8 @@ class OpenTofuLocalExecutorTest {
         final SystemCmdResult result = openTofuLocalExecutor.tfInit();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
-        assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(), "tofu init -no-color");
+        assertEquals("", result.getCommandStdError());
+        assertEquals("tofu init -no-color", result.getCommandExecuted());
     }
 
     @Test

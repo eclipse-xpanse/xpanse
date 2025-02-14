@@ -12,6 +12,7 @@ import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,6 +48,7 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceFl
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceModifyParamsNotFoundException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -64,6 +66,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -95,6 +98,9 @@ public class DeployService {
 
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
+
+    @Value("${spring.profiles.active}")
+    private String activeProfiles;
 
     /**
      * Create order to deploy new service.
@@ -403,8 +409,9 @@ public class DeployService {
         DeployerKind kind = deployTask.getOcl().getDeployment().getDeployerTool().getKind();
         Deployer deployer = deployerKindManager.getDeployment(kind);
         ServiceDeploymentEntity serviceEntity = storeNewDeployServiceEntity(deployTask);
+        Handler handler = getHandler(activeProfiles, kind);
         ServiceOrderEntity serviceOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(deployTask, serviceEntity);
+                serviceOrderManager.storeNewServiceOrderEntity(deployTask, serviceEntity, handler);
         try {
             policyValidator.validateDeploymentWithPolicies(deployTask);
             serviceOrderManager.startOrderProgress(serviceOrderEntity);
@@ -413,7 +420,7 @@ public class DeployService {
             exception = e;
             deployResult = deployResultManager.getFailedDeployResult(deployTask, exception);
         }
-        deployResultManager.updateServiceWithDeployResult(deployResult);
+        deployResultManager.updateServiceWithDeployResult(deployResult, handler);
         if (Objects.nonNull(exception)) {
             throw exception;
         }
@@ -431,9 +438,10 @@ public class DeployService {
         RuntimeException exception = null;
         DeployerKind kind = redeployTask.getOcl().getDeployment().getDeployerTool().getKind();
         Deployer deployer = deployerKindManager.getDeployment(kind);
+        Handler handler = getHandler(activeProfiles, kind);
         ServiceOrderEntity serviceOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(
-                        redeployTask, serviceDeploymentEntity);
+                        redeployTask, serviceDeploymentEntity, handler);
         try {
             policyValidator.validateDeploymentWithPolicies(redeployTask);
             serviceDeploymentEntityHandler.updateServiceDeploymentStatus(
@@ -444,7 +452,7 @@ public class DeployService {
             exception = e;
             redeployResult = deployResultManager.getFailedDeployResult(redeployTask, exception);
         }
-        deployResultManager.updateServiceWithDeployResult(redeployResult);
+        deployResultManager.updateServiceWithDeployResult(redeployResult, handler);
         if (Objects.nonNull(exception)) {
             throw exception;
         }
@@ -551,8 +559,10 @@ public class DeployService {
         MDC.put(SERVICE_ID, modifyTask.getServiceId().toString());
         DeployerKind kind = modifyTask.getOcl().getDeployment().getDeployerTool().getKind();
         Deployer deployer = deployerKindManager.getDeployment(kind);
+        Handler handler = getHandler(activeProfiles, kind);
         ServiceOrderEntity serviceOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(modifyTask, serviceDeployment);
+                serviceOrderManager.storeNewServiceOrderEntity(
+                        modifyTask, serviceDeployment, handler);
         try {
             serviceDeployment.setDeployRequest(modifyTask.getDeployRequest());
             serviceDeploymentEntityHandler.updateServiceDeploymentStatus(
@@ -563,7 +573,7 @@ public class DeployService {
             exception = e;
             modifyResult = deployResultManager.getFailedDeployResult(modifyTask, e);
         }
-        deployResultManager.updateServiceWithDeployResult(modifyResult);
+        deployResultManager.updateServiceWithDeployResult(modifyResult, handler);
         if (Objects.nonNull(exception)) {
             throw exception;
         }
@@ -582,9 +592,10 @@ public class DeployService {
         MDC.put(SERVICE_ID, destroyTask.getServiceId().toString());
         DeployerKind kind = destroyTask.getOcl().getDeployment().getDeployerTool().getKind();
         Deployer deployer = deployerKindManager.getDeployment(kind);
+        Handler handler = getHandler(activeProfiles, kind);
         ServiceOrderEntity serviceOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(
-                        destroyTask, serviceDeploymentEntity);
+                        destroyTask, serviceDeploymentEntity, handler);
         try {
             if (ServiceOrderType.ROLLBACK != destroyTask.getTaskType()) {
                 serviceDeploymentEntityHandler.updateServiceDeploymentStatus(
@@ -596,7 +607,7 @@ public class DeployService {
             exception = e;
             destroyResult = deployResultManager.getFailedDeployResult(destroyTask, e);
         }
-        deployResultManager.updateServiceWithDeployResult(destroyResult);
+        deployResultManager.updateServiceWithDeployResult(destroyResult, handler);
         if (Objects.nonNull(exception)) {
             throw exception;
         }
@@ -614,8 +625,10 @@ public class DeployService {
         MDC.put(SERVICE_ID, purgeTask.getServiceId().toString());
         DeployerKind kind = purgeTask.getOcl().getDeployment().getDeployerTool().getKind();
         Deployer deployer = deployerKindManager.getDeployment(kind);
+        Handler handler = getHandler(activeProfiles, kind);
         ServiceOrderEntity serviceOrderEntity =
-                serviceOrderManager.storeNewServiceOrderEntity(purgeTask, serviceDeployment);
+                serviceOrderManager.storeNewServiceOrderEntity(
+                        purgeTask, serviceDeployment, handler);
         if (!CollectionUtils.isEmpty(serviceDeployment.getDeployResources())) {
             try {
                 log.info(
@@ -630,7 +643,7 @@ public class DeployService {
                 exception = e;
                 purgeResult = deployResultManager.getFailedDeployResult(purgeTask, e);
             }
-            deployResultManager.updateServiceWithDeployResult(purgeResult);
+            deployResultManager.updateServiceWithDeployResult(purgeResult, handler);
             if (Objects.nonNull(exception)) {
                 throw exception;
             }
@@ -807,5 +820,24 @@ public class DeployService {
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
         return serviceTemplateStorage.getServiceTemplateById(
                 deployedService.getServiceTemplateId());
+    }
+
+    private Handler getHandler(String activeProfile, DeployerKind kind) {
+        List<String> activeProfiles = Arrays.asList(activeProfile.split(","));
+        if (kind.equals(DeployerKind.TERRAFORM)) {
+            if (activeProfiles.contains(Handler.TERRAFORM_BOOT.toValue())) {
+                return Handler.TERRAFORM_BOOT;
+            } else {
+                return Handler.TERRAFORM_LOCAL;
+            }
+        } else if (kind.equals(DeployerKind.OPEN_TOFU)) {
+            if (activeProfiles.contains(Handler.TOFU_MAKER.toValue())) {
+                return Handler.TOFU_MAKER;
+            } else {
+                return Handler.OPEN_TOFU_LOCAL;
+            }
+        } else {
+            return Handler.TERRAFORM_LOCAL;
+        }
     }
 }

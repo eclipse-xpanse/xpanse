@@ -46,18 +46,19 @@ public class WorkflowUtils {
      * @return ProcessInstance Process instance.
      */
     public ProcessInstance startProcess(String processKey) {
-        return startProcess(processKey, null);
+        return startProcessWithVariables(processKey, null);
     }
 
     /**
      * Start the process through the process definition key and set the process variables.
      *
      * @param processKey process definition key.
-     * @param variable Process variables.
+     * @param variables Process variables.
      * @return ProcessInstance Process instance.
      */
-    public ProcessInstance startProcess(String processKey, Map<String, Object> variable) {
-        return runtimeService.startProcessInstanceByKey(processKey, variable);
+    public ProcessInstance startProcessWithVariables(
+            String processKey, Map<String, Object> variables) {
+        return runtimeService.startProcessInstanceByKey(processKey, variables);
     }
 
     /**
@@ -120,8 +121,12 @@ public class WorkflowUtils {
      * Complete ReceiveTask for the given processInstanceId and activityId. The method closes the
      * waiting task and pushes the workflow to the next step.
      */
-    public void completeReceiveTask(String processInstanceId, String activityId) {
+    public void completeReceiveTaskWithVariables(
+            String processInstanceId, String activityId, Map<String, Object> variables) {
         if (StringUtils.isNotBlank(processInstanceId)) {
+            Map<String, Object> processVariables = runtimeService.getVariables(processInstanceId);
+            processVariables.putAll(variables);
+            runtimeService.setVariables(processInstanceId, processVariables);
             ProcessInstance instance =
                     runtimeService
                             .createProcessInstanceQuery()

@@ -84,12 +84,13 @@ public class ProcessDeploymentResult implements Serializable, JavaDelegate {
                     runtimeService.setVariable(
                             processInstanceId, ServicePortingConstants.ASSIGNEE, userId);
 
+                    String resultMessage =
+                            (String) variables.get(ServicePortingConstants.RESULT_MESSAGE);
                     serviceOrderManager.completeOrderProgress(
                             servicePortingOrderId,
                             TaskStatus.FAILED,
                             ErrorResponse.errorResponse(
-                                    ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
-                                    List.of(serviceDeploymentEntity.getResultMessage())));
+                                    ErrorType.DEPLOYMENT_FAILED_EXCEPTION, List.of(resultMessage)));
                 }
             }
         } catch (Exception e) {

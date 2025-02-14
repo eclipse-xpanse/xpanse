@@ -50,7 +50,6 @@ class ServiceDeploymentEntityTest {
     private final List<ServiceResourceEntity> DEPLOY_RESOURCE_LIST = new ArrayList<>();
     private final Map<String, String> OUTPUT_PROPERTIES = new HashMap<>();
     private final Map<String, String> DEPLOYMENT_GENERATED_FILES = new HashMap<>();
-    private final String RESULT_MESSAGE = "RESULT_MESSAGE";
     private ServiceDeploymentEntity test;
 
     @BeforeEach
@@ -72,7 +71,6 @@ class ServiceDeploymentEntityTest {
         test.setDeployResources(DEPLOY_RESOURCE_LIST);
         test.setOutputProperties(OUTPUT_PROPERTIES);
         test.setDeploymentGeneratedFiles(DEPLOYMENT_GENERATED_FILES);
-        test.setResultMessage(RESULT_MESSAGE);
         test.setLastStartedAt(LAST_STARTED_AT);
         test.setLastStoppedAt(LAST_STOPPED_AT);
         test.setLockConfig(LOCK_CONFIG);
@@ -96,7 +94,6 @@ class ServiceDeploymentEntityTest {
         assertEquals(DEPLOY_RESOURCE_LIST, test.getDeployResources());
         assertEquals(OUTPUT_PROPERTIES, test.getOutputProperties());
         assertEquals(DEPLOYMENT_GENERATED_FILES, test.getDeploymentGeneratedFiles());
-        assertEquals(RESULT_MESSAGE, test.getResultMessage());
         assertEquals(LAST_STARTED_AT, test.getLastStartedAt());
         assertEquals(LAST_STOPPED_AT, test.getLastStoppedAt());
         assertEquals(LOCK_CONFIG, test.getLockConfig());
@@ -125,8 +122,6 @@ class ServiceDeploymentEntityTest {
                         + FLAVOR
                         + ", serviceDeploymentState="
                         + SERVICE_STATE
-                        + ", resultMessage="
-                        + RESULT_MESSAGE
                         + ", serviceState="
                         + SERVICE_RUN_STATE
                         + ", serviceTemplateId="

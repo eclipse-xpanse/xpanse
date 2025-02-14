@@ -89,10 +89,6 @@ public class ServiceDeploymentEntity extends CreateModifiedTime {
     @Column(name = "SERVICE_DEPLOYMENT_STATE", nullable = false)
     private ServiceDeploymentState serviceDeploymentState;
 
-    /** The result message of the service deployment. */
-    @Column(name = "RESULT_MESSAGE", length = Integer.MAX_VALUE)
-    private String resultMessage;
-
     /** The run state of the Service. */
     @Enumerated(EnumType.STRING)
     @Column(name = "SERVICE_STATE")

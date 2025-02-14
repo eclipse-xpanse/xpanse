@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -131,13 +132,13 @@ public class ServiceRecreateApi {
         DeployTask recreateTask = getRecreateTask(serviceDeploymentEntity);
         ServiceOrderEntity recreateOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(
-                        recreateTask, serviceDeploymentEntity);
+                        recreateTask, serviceDeploymentEntity, Handler.WORKFLOW);
 
         // prepare recreate process variables
         Map<String, Object> variable =
                 getRecreateProcessVariable(serviceDeploymentEntity, recreateOrderEntity);
         ProcessInstance instance =
-                workflowUtils.startProcess(RecreateConstants.PROCESS_KEY, variable);
+                workflowUtils.startProcessWithVariables(RecreateConstants.PROCESS_KEY, variable);
 
         recreateOrderEntity.setWorkflowId(instance.getProcessInstanceId());
         ServiceOrderEntity updatedRecreateOrderEntity =

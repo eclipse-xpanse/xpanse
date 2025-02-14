@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
@@ -104,11 +105,12 @@ public class ServicePortingApi {
         DeployTask servicePortingTask = getServicePortingTask(servicePortingRequest);
         ServiceOrderEntity servicePortingOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(
-                        servicePortingTask, deployServiceEntity);
+                        servicePortingTask, deployServiceEntity, Handler.WORKFLOW);
         Map<String, Object> variable =
                 getServicePortingProcessVariable(servicePortingRequest, servicePortingOrderEntity);
         ProcessInstance instance =
-                workflowUtils.startProcess(ServicePortingConstants.PROCESS_KEY, variable);
+                workflowUtils.startProcessWithVariables(
+                        ServicePortingConstants.PROCESS_KEY, variable);
         servicePortingOrderEntity.setWorkflowId(instance.getProcessInstanceId());
         ServiceOrderEntity updatedOrderEntity =
                 serviceOrderManager.startOrderProgress(servicePortingOrderEntity);

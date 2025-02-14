@@ -23,7 +23,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,7 +148,7 @@ public class SecretsManager {
             cipher.init(
                     mode,
                     secretKey,
-                    Strings.isNotBlank(initialVector)
+                    StringUtils.isNotBlank(initialVector)
                             ? new IvParameterSpec(initialVector.getBytes())
                             : null);
             return cipher;

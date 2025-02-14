@@ -11,13 +11,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+
+import java.time.OffsetDateTime;
+import java.util.Map;
+import java.util.UUID;
 
 /** Define view object for details of the service order. */
 @Data

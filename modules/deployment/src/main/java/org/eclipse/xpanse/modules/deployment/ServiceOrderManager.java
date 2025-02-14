@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
@@ -59,7 +60,7 @@ public class ServiceOrderManager {
      * @param serviceDeploymentEntity service deployment entity
      */
     public ServiceOrderEntity storeNewServiceOrderEntity(
-            DeployTask task, ServiceDeploymentEntity serviceDeploymentEntity) {
+            DeployTask task, ServiceDeploymentEntity serviceDeploymentEntity, Handler handler) {
         ServiceOrderEntity orderTask = new ServiceOrderEntity();
         orderTask.setOrderId(task.getOrderId());
         orderTask.setParentOrderId(task.getParentOrderId());
@@ -70,6 +71,7 @@ public class ServiceOrderManager {
         orderTask.setWorkflowId(task.getWorkflowId());
         orderTask.setTaskStatus(TaskStatus.CREATED);
         orderTask.setRequestBody(getRequestBody(task));
+        orderTask.setHandler(handler);
         return serviceOrderStorage.storeAndFlush(orderTask);
     }
 

@@ -87,12 +87,12 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
                     String userId = (String) variables.get(RecreateConstants.USER_ID);
                     runtimeService.setVariable(
                             processInstanceId, RecreateConstants.ASSIGNEE, userId);
+                    String resultMessage = (String) variables.get(RecreateConstants.RESULT_MESSAGE);
                     serviceOrderManager.completeOrderProgress(
                             recreateOrderId,
                             TaskStatus.FAILED,
                             ErrorResponse.errorResponse(
-                                    ErrorType.DESTROY_FAILED_EXCEPTION,
-                                    List.of(serviceDeploymentEntity.getResultMessage())));
+                                    ErrorType.DESTROY_FAILED_EXCEPTION, List.of(resultMessage)));
                 }
             }
         } catch (Exception e) {
