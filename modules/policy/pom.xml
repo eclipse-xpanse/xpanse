@@ -67,7 +67,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/policy-man-openapi.json</inputSpec>
+                            <inputSpec>src/main/resources/policy-man-openapi.json</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
                             <apiPackage>

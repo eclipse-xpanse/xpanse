@@ -64,7 +64,7 @@ This will make the client to handle both with and without authentication usecase
 2. Access http://localhost:9090/v3/api-docs to get the openapi json.
 3. Copy all the JSON content of the openapi json and replace all the content in the JSON file
 [terra-boot-openapi.json](modules/deployment/src/main/resources/terra-boot-openapi.json).
-4. Run the below maven command to generate the REST API client and data models for terra-boot. The command can be
+4. Run the below maven command to generate the REST API client and data models for terra-boot. The command must be
 executed directly inside the `deployment` module.
 
 ```ssh
@@ -80,7 +80,7 @@ This will make the client to handle both with and without authentication usecase
 3. Copy all the JSON content of the openapi json and replace all the content in the JSON file
 [tofu-maker-openapi.json](modules/deployment/src/main/resources/tofu-maker-openapi.json).
 4. Run the below maven command to generate the REST API client and data models for tofu-maker. The
-command can be executed directly inside the `deployment` module.
+command must be executed directly inside the `deployment` module.
 
 ```ssh
 mvn clean generate-sources -DskipTofuMakerClientGeneration=false
@@ -91,7 +91,7 @@ mvn clean generate-sources -DskipTofuMakerClientGeneration=false
 1. Run the policy-man project and access “http://localhost:8090/swagger/doc.json” to get the openapi json.
 2. Copy all the JSON content of the openapi json and replace all the content in the JSON file
 [policy-man-openapi.json](modules/policy/src/main/resources/policy-man-openapi.json)
-3. Run the below maven command to generate the REST API client and data models for policy-man. The command can be
+3. Run the below maven command to generate the REST API client and data models for policy-man. The command must be
 executed directly inside the `policy` module.
 
 ```ssh
