@@ -130,7 +130,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/terra-boot-openapi.json</inputSpec>
+                            <inputSpec>src/main/resources/terra-boot-openapi.json</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
                             <apiPackage>
@@ -165,7 +165,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/tofu-maker-openapi.json</inputSpec>
+                            <inputSpec>src/main/resources/tofu-maker-openapi.json</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.basedir}</output>
                             <apiPackage>
