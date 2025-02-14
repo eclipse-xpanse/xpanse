@@ -1,0 +1,27 @@
+services:
+  zitadel:
+    restart: 'always'
+    networks:
+      - 'zitadel-dev'
+    image: ghcr.io/eclipse-xpanse/xpanse-zitadel-dev-server:latest # image built locally by commiting an already initialized zitadel server
+    command: 'start --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
+    depends_on:
+      db:
+        condition: 'service_healthy'
+    ports:
+      - '8088:8080'
+
+  db:
+    restart: 'always'
+    image: ghcr.io/eclipse-xpanse/xpanse-zitadel-dev-db:latest # image built locally by commiting an already initialized zitadel Postgres DB
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres" ]
+      interval: '10s'
+      timeout: '2400s'
+      retries: 500
+      start_period: '20s'
+    networks:
+      - 'zitadel-dev'
+
+networks:
+  zitadel-dev:

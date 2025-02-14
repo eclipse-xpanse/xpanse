@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.runtime.cache.redis;
 
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,5 +29,8 @@ public abstract class AbstractRedisIntegrationTest {
         redis.start();
         System.setProperty("spring.data.redis.host", redis.getHost());
         System.setProperty("spring.data.redis.port", redis.getMappedPort(6379).toString());
+
+        ZitadelTestContainer.setup();
+        System.out.println("Using Zitadel URL: " + System.getProperty("zitadel.url"));
     }
 }

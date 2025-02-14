@@ -72,6 +72,7 @@ import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngine
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.MockedStatic;
@@ -141,6 +142,12 @@ public class ApisTestCommon {
         System.setProperty(OPENSTACK_TESTLAB_AUTH_URL, "http://127.0.0.1/identity/v3");
         System.setProperty(PLUS_SERVER_AUTH_URL, "http://127.0.0.1/identity/v3");
         System.setProperty(REGIO_CLOUD_AUTH_URL, "http://127.0.0.1/identity/v3");
+    }
+
+    @BeforeAll
+    static void setupZitadel() {
+        ZitadelTestContainer.setup();
+        System.out.println("Using Zitadel URL: " + System.getProperty("zitadel.url"));
     }
 
     protected void mockSdkClientsForHuaweiCloud() {
