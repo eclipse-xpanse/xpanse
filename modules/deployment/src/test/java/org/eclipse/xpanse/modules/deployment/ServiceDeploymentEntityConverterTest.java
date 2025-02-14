@@ -97,6 +97,7 @@ class ServiceDeploymentEntityConverterTest {
         assertEquals(
                 serviceDeploymentEntity, serviceConfigurationEntity.getServiceDeploymentEntity());
         assertNotNull(serviceConfigurationEntity.getCreatedTime());
+        assertNotNull(serviceConfigurationEntity.getUpdatedTime());
         assertNotNull(serviceConfigurationEntity.getConfiguration());
     }
 }
