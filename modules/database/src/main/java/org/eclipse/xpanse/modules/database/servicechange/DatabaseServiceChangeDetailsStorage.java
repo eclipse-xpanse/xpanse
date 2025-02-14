@@ -56,7 +56,7 @@ public class DatabaseServiceChangeDetailsStorage implements ServiceChangeDetails
                     if (Objects.nonNull(requestQuery.getServiceId())) {
                         predicateList.add(
                                 criteriaBuilder.equal(
-                                        root.get("deployServiceEntity").get("id"),
+                                        root.get("serviceDeploymentEntity").get("id"),
                                         requestQuery.getServiceId()));
                     }
                     if (StringUtils.isNotBlank(requestQuery.getResourceName())) {
