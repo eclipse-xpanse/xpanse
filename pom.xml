@@ -61,7 +61,7 @@
         <spring.oauth.addon.test.version>8.1.2</spring.oauth.addon.test.version>
         <openstack4j.version>3.12</openstack4j.version>
         <jackson.databind.version>2.15.2</jackson.databind.version>
-        <huaweicloud.sdk.version>3.1.134</huaweicloud.sdk.version>
+        <huaweicloud.sdk.version>3.1.135</huaweicloud.sdk.version>
         <maven.clean.plugin.version>3.4.0</maven.clean.plugin.version>
         <maven.compile.plugin.version>3.13.0</maven.compile.plugin.version>
         <maven.javadoc.plugin.version>3.11.2</maven.javadoc.plugin.version>
