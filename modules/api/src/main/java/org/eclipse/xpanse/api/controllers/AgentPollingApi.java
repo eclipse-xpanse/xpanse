@@ -51,7 +51,7 @@ public class AgentPollingApi {
             name = "Agent Api",
             description = "APIs for agent to poll pending service change requests.")
     @GetMapping(
-            value = "/agent/poll/{serviceId}/{resourceName}",
+            value = "/poll/{serviceId}/{resourceName}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(description = "Get pending service change request for agents to poll.")
     @ApiResponses({
@@ -86,9 +86,7 @@ public class AgentPollingApi {
     @Tag(
             name = "Agent Api",
             description = "APIs for agent to poll pending service change requests.")
-    @PutMapping(
-            value = "/agent/update/status/{changeId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/update/status/{changeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Update service change result for agents.")
     @AuditApiRequest(methodName = "getCspFromServiceChangeRequestId", paramTypes = UUID.class)
