@@ -14,7 +14,7 @@ import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesEvaluat
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalCmdList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
-import org.eclipse.xpanse.modules.policy.policyman.generated.model.SystemStatus;
+import org.eclipse.xpanse.modules.policy.policyman.generated.model.StackStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,10 +49,10 @@ class PolicyManagerTest {
         expectedResult.setEndpoint("endpoint");
 
         // Configure AdminApi.healthGet(...).
-        final SystemStatus systemStatus = new SystemStatus();
-        systemStatus.setHealthStatus(
+        final StackStatus stackStatus = new StackStatus();
+        stackStatus.setHealthStatus(
                 org.eclipse.xpanse.modules.policy.policyman.generated.model.HealthStatus.healthOK);
-        when(mockAdminApi.healthGet()).thenReturn(systemStatus);
+        when(mockAdminApi.healthGet()).thenReturn(stackStatus);
 
         // Run the test
         final BackendSystemStatus result = policyManagerUnderTest.getPolicyManStatus();
