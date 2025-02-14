@@ -81,6 +81,7 @@ public class DeployServiceEntityConverter {
         ServiceConfigurationEntity entity = new ServiceConfigurationEntity();
         entity.setServiceDeploymentEntity(serviceDeploymentEntity);
         entity.setCreatedTime(OffsetDateTime.now());
+        entity.setUpdatedTime(OffsetDateTime.now());
         Map<String, Object> configuration = getServiceConfiguration(serviceDeploymentEntity);
         entity.setConfiguration(configuration);
         return entity;

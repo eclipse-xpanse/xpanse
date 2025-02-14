@@ -59,6 +59,14 @@ class ServiceConfigurationEntityTest {
     }
 
     @Test
+    void testUpdatedTimeGetterAndSetter() {
+        final OffsetDateTime createTime =
+                OffsetDateTime.of(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
+        test.setUpdatedTime(createTime);
+        assertThat(test.getUpdatedTime()).isEqualTo(createTime);
+    }
+
+    @Test
     void testLastModifiedTimeGetterAndSetter() {
         final OffsetDateTime updatedTime =
                 OffsetDateTime.of(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
