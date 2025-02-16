@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.deployment;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsEntity;
 import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsStorage;
@@ -118,13 +120,20 @@ public class ServiceConfigurationManager {
                 throw new ServiceTemplateNotRegistered(errMsg);
             }
             validate(serviceTemplateEntity, configurationUpdate);
+            Map<String, Object> updateRequestMap =
+                    getModifiedConfigurations(
+                            configurationUpdate.getConfiguration(),
+                            serviceDeploymentEntity.getServiceConfiguration().getConfiguration());
             UUID orderId = CustomRequestIdGenerator.generateOrderId();
-            createServiceChangeRequestsInDatabase(
-                    orderId,
-                    serviceId,
-                    serviceDeploymentEntity,
-                    serviceTemplateEntity.getOcl(),
-                    configurationUpdate.getConfiguration());
+            if (MapUtils.isNotEmpty(updateRequestMap)) {
+                createServiceChangeRequestsInDatabase(
+                        orderId,
+                        serviceId,
+                        serviceDeploymentEntity,
+                        serviceTemplateEntity.getOcl(),
+                        updateRequestMap);
+            }
+
             return new ServiceOrder(orderId, serviceId);
         } catch (ServiceConfigurationInvalidException e) {
             String errorMsg =
@@ -132,6 +141,27 @@ public class ServiceConfigurationManager {
             log.error(errorMsg);
             throw e;
         }
+    }
+
+    /**
+     * Compares two configurations, only return modified or added.
+     *
+     * @param updateConfigurations The updated configuration map containing new values.
+     * @param entityConfigurations The existing configuration map for comparison.
+     * @return A map containing only the key-value pairs that have been modified.
+     */
+    private Map<String, Object> getModifiedConfigurations(
+            Map<String, Object> updateConfigurations, Map<String, Object> entityConfigurations) {
+        Map<String, Object> modifiedConfigs = new HashMap<>();
+
+        for (String key : updateConfigurations.keySet()) {
+            Object entityConfig = entityConfigurations.get(key);
+            Object updateConfig = updateConfigurations.get(key);
+            if (Objects.isNull(entityConfig) || !Objects.equals(entityConfig, updateConfig)) {
+                modifiedConfigs.put(key, updateConfig);
+            }
+        }
+        return modifiedConfigs;
     }
 
     private void checkPermission(

@@ -38,7 +38,7 @@ public class ServiceConfigurationVariablesJsonSchemaValidator {
      * registered service.
      *
      * @param configurationParameters list of serviceConfigurationParameter in registered service.
-     * @param configurations service configuration map
+     * @param configurations service configuration map (update request values)
      */
     public void validateServiceConfiguration(
             List<ServiceChangeParameter> configurationParameters,
