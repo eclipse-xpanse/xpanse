@@ -17,33 +17,33 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Implementation of the ServiceChangeDetailsStorage. */
+/** Implementation of the sStorage. */
 @Component
 @Transactional
-public class DatabaseServiceChangeDetailsStorage implements ServiceChangeDetailsStorage {
+public class DatabaseServiceChangeRequestStorage implements ServiceChangeRequestStorage {
 
-    private final ServiceChangeDetailsRepository repository;
+    private final ServiceChangeRequestRepository repository;
 
     @Autowired
-    public DatabaseServiceChangeDetailsStorage(ServiceChangeDetailsRepository repository) {
+    public DatabaseServiceChangeRequestStorage(ServiceChangeRequestRepository repository) {
         this.repository = repository;
     }
 
     @Override
-    public ServiceChangeDetailsEntity storeAndFlush(
-            ServiceChangeDetailsEntity serviceChangeDetailsEntity) {
-        return repository.saveAndFlush(serviceChangeDetailsEntity);
+    public ServiceChangeRequestEntity storeAndFlush(
+            ServiceChangeRequestEntity serviceChangeRequestEntity) {
+        return repository.saveAndFlush(serviceChangeRequestEntity);
     }
 
     @Override
-    public <S extends ServiceChangeDetailsEntity> List<S> saveAll(Iterable<S> entities) {
+    public <S extends ServiceChangeRequestEntity> List<S> saveAll(Iterable<S> entities) {
         return repository.saveAll(entities);
     }
 
     @Override
-    public List<ServiceChangeDetailsEntity> listServiceChangeDetails(
-            ServiceChangeDetailsQueryModel requestQuery) {
-        Specification<ServiceChangeDetailsEntity> specification =
+    public List<ServiceChangeRequestEntity> getServiceChangeRequestEntities(
+            ServiceChangeRequestQueryModel requestQuery) {
+        Specification<ServiceChangeRequestEntity> specification =
                 (root, query, criteriaBuilder) -> {
                     List<Predicate> predicateList = new ArrayList<>();
                     if (Objects.nonNull(requestQuery.getOrderId())) {
@@ -83,7 +83,7 @@ public class DatabaseServiceChangeDetailsStorage implements ServiceChangeDetails
     }
 
     @Override
-    public ServiceChangeDetailsEntity findById(UUID changeId) {
+    public ServiceChangeRequestEntity findById(UUID changeId) {
         return repository.findById(changeId).orElse(null);
     }
 }

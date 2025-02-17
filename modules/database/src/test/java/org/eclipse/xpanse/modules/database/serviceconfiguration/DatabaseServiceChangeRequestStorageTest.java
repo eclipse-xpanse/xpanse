@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.servicechange.DatabaseServiceChangeDetailsStorage;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsEntity;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsRepository;
+import org.eclipse.xpanse.modules.database.servicechange.DatabaseServiceChangeRequestStorage;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestRepository;
 import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,19 +30,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/** Test for DatabaseServiceChangeDetailsStorage. */
+/** Test for DatabaseServiceChangeRequestStorage. */
 @ExtendWith(MockitoExtension.class)
-public class DatabaseServiceChangeDetailsStorageTest {
+public class DatabaseServiceChangeRequestStorageTest {
 
-    @Mock private ServiceChangeDetailsRepository serviceChangeDetailsRepository;
+    @Mock private ServiceChangeRequestRepository serviceChangeRequestRepository;
 
-    @InjectMocks private DatabaseServiceChangeDetailsStorage databaseServiceChangeDetailsStorage;
+    @InjectMocks private DatabaseServiceChangeRequestStorage databaseServiceChangeRequestStorage;
 
-    private ServiceChangeDetailsEntity request;
+    private ServiceChangeRequestEntity request;
 
     @BeforeEach
     public void setUp() {
-        request = new ServiceChangeDetailsEntity();
+        request = new ServiceChangeRequestEntity();
         request.setId(UUID.randomUUID());
         request.setResourceName("TestResource");
         request.setChangeHandler("TestConfigManager");
@@ -53,37 +53,37 @@ public class DatabaseServiceChangeDetailsStorageTest {
 
     @Test
     public void testStoreAndFlush() {
-        when(serviceChangeDetailsRepository.saveAndFlush(any(ServiceChangeDetailsEntity.class)))
+        when(serviceChangeRequestRepository.saveAndFlush(any(ServiceChangeRequestEntity.class)))
                 .thenReturn(request);
-        ServiceChangeDetailsEntity result =
-                databaseServiceChangeDetailsStorage.storeAndFlush(request);
+        ServiceChangeRequestEntity result =
+                databaseServiceChangeRequestStorage.storeAndFlush(request);
         assertNotNull(result);
         assertEquals(request.getId(), result.getId());
         assertEquals("TestResource", result.getResourceName());
-        verify(serviceChangeDetailsRepository, times(1)).saveAndFlush(request);
+        verify(serviceChangeRequestRepository, times(1)).saveAndFlush(request);
     }
 
     @Test
     public void testSaveAll_withNonEmptyList() {
-        ServiceChangeDetailsEntity entity1 = new ServiceChangeDetailsEntity();
+        ServiceChangeRequestEntity entity1 = new ServiceChangeRequestEntity();
         entity1.setId(UUID.randomUUID());
         entity1.setResourceName("Resource1");
-        ServiceChangeDetailsEntity entity2 = new ServiceChangeDetailsEntity();
+        ServiceChangeRequestEntity entity2 = new ServiceChangeRequestEntity();
         entity2.setId(UUID.randomUUID());
         entity2.setResourceName("Resource2");
-        List<ServiceChangeDetailsEntity> entities = Arrays.asList(entity1, entity2);
-        when(serviceChangeDetailsRepository.saveAll(entities)).thenReturn(entities);
-        List<ServiceChangeDetailsEntity> result = serviceChangeDetailsRepository.saveAll(entities);
+        List<ServiceChangeRequestEntity> entities = Arrays.asList(entity1, entity2);
+        when(serviceChangeRequestRepository.saveAll(entities)).thenReturn(entities);
+        List<ServiceChangeRequestEntity> result = serviceChangeRequestRepository.saveAll(entities);
         assertEquals(2, result.size());
         assertEquals("Resource1", result.get(0).getResourceName());
         assertEquals("Resource2", result.get(1).getResourceName());
-        verify(serviceChangeDetailsRepository, times(1)).saveAll(entities);
+        verify(serviceChangeRequestRepository, times(1)).saveAll(entities);
     }
 
     @Test
     public void testSaveAll_withEmptyList() {
-        databaseServiceChangeDetailsStorage.saveAll(Collections.emptyList());
-        verify(serviceChangeDetailsRepository, never())
-                .saveAndFlush(any(ServiceChangeDetailsEntity.class));
+        databaseServiceChangeRequestStorage.saveAll(Collections.emptyList());
+        verify(serviceChangeRequestRepository, never())
+                .saveAndFlush(any(ServiceChangeRequestEntity.class));
     }
 }

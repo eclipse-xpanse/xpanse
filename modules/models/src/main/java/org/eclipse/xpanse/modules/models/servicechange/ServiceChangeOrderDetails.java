@@ -27,12 +27,12 @@ public class ServiceChangeOrderDetails {
 
     @NotNull
     @Schema(description = "service change request properties.")
-    private Map<String, Object> serviceChangeRequest;
+    private Map<String, Object> serviceChangeRequestProperties;
 
     @NotNull
     @Schema(
             description =
                     "Collection of service change details requests"
                             + " generated for the specific change order.")
-    private List<ServiceChangeDetails> changeRequests;
+    private List<ServiceChangeRequestDetails> serviceChangeRequests;
 }

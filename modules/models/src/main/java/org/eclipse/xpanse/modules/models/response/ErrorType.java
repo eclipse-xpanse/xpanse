@@ -80,7 +80,8 @@ public enum ErrorType {
     ASYNC_RESTART_SERVICE_ERROR("Async Restart Service Error"),
     DEPLOYMENT_FAILED_EXCEPTION("Deployment Failed Exception"),
     DESTROY_FAILED_EXCEPTION("Destroy Failed Exception"),
-    INVALID_SERVICE_ACTION("Service Action Invalid");
+    INVALID_SERVICE_ACTION("Service Action Invalid"),
+    SERVICE_CHANGE_FAILED("Service Change Request Failed");
 
     private final String value;
 

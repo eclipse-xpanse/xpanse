@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsEntity;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.servicechange.AnsibleTaskResult;
 import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
-/** Test for ServiceChangeDetailsEntity. */
-public class ServiceChangeDetailsEntityTest {
+/** Test for ServiceChangeRequestEntity. */
+public class ServiceChangeRequestEntityTest {
 
     final UUID id = UUID.randomUUID();
     final String resourceName = "zookeeper-1234";
@@ -34,11 +34,11 @@ public class ServiceChangeDetailsEntityTest {
     @Mock private ServiceDeploymentEntity serviceDeploymentEntity;
     @Mock private ServiceOrderEntity serviceOrderEntity;
 
-    private ServiceChangeDetailsEntity test;
+    private ServiceChangeRequestEntity test;
 
     @BeforeEach
     void setUp() {
-        test = new ServiceChangeDetailsEntity();
+        test = new ServiceChangeRequestEntity();
         test.setId(id);
         test.setServiceDeploymentEntity(serviceDeploymentEntity);
         test.setServiceOrderEntity(serviceOrderEntity);
@@ -66,7 +66,7 @@ public class ServiceChangeDetailsEntityTest {
     @Test
     void testEquals() {
         assertThat(test.equals(new Object())).isFalse();
-        ServiceChangeDetailsEntity test1 = new ServiceChangeDetailsEntity();
+        ServiceChangeRequestEntity test1 = new ServiceChangeRequestEntity();
         BeanUtils.copyProperties(test, test1);
         assertThat(test.equals(test1)).isTrue();
     }
@@ -74,7 +74,7 @@ public class ServiceChangeDetailsEntityTest {
     @Test
     void testHashCode() {
         assertThat(test.hashCode() == new Object().hashCode()).isFalse();
-        ServiceChangeDetailsEntity test1 = new ServiceChangeDetailsEntity();
+        ServiceChangeRequestEntity test1 = new ServiceChangeRequestEntity();
         BeanUtils.copyProperties(test, test1);
         assertThat(test.hashCode() == test1.hashCode()).isTrue();
     }
@@ -83,7 +83,7 @@ public class ServiceChangeDetailsEntityTest {
     void testToString() {
         String result =
                 String.format(
-                        "ServiceChangeDetailsEntity(id=%s, "
+                        "ServiceChangeRequestEntity(id=%s, "
                                 + "serviceOrderEntity=%s, "
                                 + "serviceDeploymentEntity=%s, "
                                 + "resourceName=%s, "
@@ -91,7 +91,8 @@ public class ServiceChangeDetailsEntityTest {
                                 + "resultMessage=%s, "
                                 + "properties=%s, "
                                 + "status=%s, "
-                                + "tasks=%s)",
+                                + "tasks=%s, "
+                                + "originalRequestProperties=null)",
                         id,
                         serviceOrderEntity,
                         serviceDeploymentEntity,
