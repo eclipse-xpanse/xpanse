@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.cache.consts.CacheConstants;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
+import org.eclipse.xpanse.modules.models.system.StackStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
@@ -48,21 +49,21 @@ class AdminServicesApiTest extends ApisTestCommon {
     @Resource private PluginManager pluginManager;
 
     @Test
-    @WithJwt(file = "jwt_all_roles.json")
-    void testHealthCheck() throws Exception {
+    @WithJwt(file = "jwt_admin.json")
+    void testStackStatus() throws Exception {
         // SetUp
         // Run the test
         final MockHttpServletResponse response =
-                mockMvc.perform(get("/xpanse/health").accept(MediaType.APPLICATION_JSON))
+                mockMvc.perform(get("/xpanse/stack/health").accept(MediaType.APPLICATION_JSON))
                         .andReturn()
                         .getResponse();
 
         // Verify the results
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        SystemStatus systemStatus =
-                objectMapper.readValue(response.getContentAsString(), SystemStatus.class);
-        assertEquals(HealthStatus.OK, systemStatus.getHealthStatus());
-        List<BackendSystemStatus> backendSystemStatuses = systemStatus.getBackendSystemStatuses();
+        StackStatus stackStatus =
+                objectMapper.readValue(response.getContentAsString(), StackStatus.class);
+        assertEquals(HealthStatus.OK, stackStatus.getHealthStatus());
+        List<BackendSystemStatus> backendSystemStatuses = stackStatus.getBackendSystemStatuses();
         assertEquals(BackendSystemType.values().length, backendSystemStatuses.size());
 
         assertTrue(
@@ -104,7 +105,7 @@ class AdminServicesApiTest extends ApisTestCommon {
     }
 
     @Test
-    @WithJwt(file = "jwt_user.json")
+    @WithJwt(file = "jwt_all_roles.json")
     void testHealthCheckWithRoleNotAdmin() throws Exception {
         // Run the test
         final MockHttpServletResponse response =
@@ -114,17 +115,9 @@ class AdminServicesApiTest extends ApisTestCommon {
 
         // Verify the results
         assertEquals(response.getStatus(), HttpStatus.OK.value());
-        SystemStatus systemStatus =
+        SystemStatus stackStatus =
                 objectMapper.readValue(response.getContentAsString(), SystemStatus.class);
-        assertEquals(HealthStatus.OK, systemStatus.getHealthStatus());
-        List<BackendSystemStatus> backendSystemStatuses = systemStatus.getBackendSystemStatuses();
-        assertEquals(BackendSystemType.values().length, backendSystemStatuses.size());
-        assertTrue(
-                backendSystemStatuses.stream()
-                        .allMatch(
-                                status ->
-                                        status.getDetails() == null
-                                                && status.getEndpoint() == null));
+        assertEquals(stackStatus.getHealthStatus(), HealthStatus.OK);
     }
 
     @Test

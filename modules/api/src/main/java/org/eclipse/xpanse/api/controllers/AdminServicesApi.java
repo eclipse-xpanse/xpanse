@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMa
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
+import org.eclipse.xpanse.modules.models.system.StackStatus;
 import org.eclipse.xpanse.modules.models.system.SystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
@@ -83,6 +84,27 @@ public class AdminServicesApi {
      */
     @Tag(name = "Admin", description = "APIs for administrating Xpanse")
     @Operation(description = "Check health of API service and backend systems.")
+    @GetMapping(value = "/stack/health", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({ROLE_ADMIN})
+    @AuditApiRequest(enabled = false)
+    public StackStatus stackHealthStatus() {
+        StackStatus stackStatus = new StackStatus();
+        stackStatus.setHealthStatus(HealthStatus.OK);
+        List<BackendSystemStatus> backendSystemStatuses = getBackendSystemStatuses();
+        if (!CollectionUtils.isEmpty(backendSystemStatuses)) {
+            stackStatus.setBackendSystemStatuses(backendSystemStatuses);
+        }
+        return stackStatus;
+    }
+
+    /**
+     * Method to find out the health status of the system.
+     *
+     * @return Returns the health status of the system.
+     */
+    @Tag(name = "Admin", description = "APIs for administrating Xpanse")
+    @Operation(description = "Check only health status of API service and backend systems.")
     @GetMapping(value = "/health", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_ADMIN, ROLE_CSP, ROLE_ISV, ROLE_USER})
@@ -90,10 +112,6 @@ public class AdminServicesApi {
     public SystemStatus healthCheck() {
         SystemStatus systemStatus = new SystemStatus();
         systemStatus.setHealthStatus(HealthStatus.OK);
-        List<BackendSystemStatus> backendSystemStatuses = getBackendSystemStatuses();
-        if (!CollectionUtils.isEmpty(backendSystemStatuses)) {
-            systemStatus.setBackendSystemStatuses(backendSystemStatuses);
-        }
         return systemStatus;
     }
 
@@ -120,9 +138,7 @@ public class AdminServicesApi {
      * @return list of system status.
      */
     private List<BackendSystemStatus> getBackendSystemStatuses() {
-        List<BackendSystemStatus> systemStatuses = checkHealthOfAllBackendSystems();
-        systemStatuses.forEach(this::processShownFields);
-        return systemStatuses;
+        return checkHealthOfAllBackendSystems();
     }
 
     private List<BackendSystemStatus> checkHealthOfAllBackendSystems() {
@@ -187,13 +203,5 @@ public class AdminServicesApi {
             }
         }
         return backendSystemStatuses;
-    }
-
-    private void processShownFields(BackendSystemStatus backendSystemStatus) {
-        boolean userHasRoleAdmin = userServiceHelper.currentUserHasRole(ROLE_ADMIN);
-        if (!userHasRoleAdmin) {
-            backendSystemStatus.setEndpoint(null);
-            backendSystemStatus.setDetails(null);
-        }
     }
 }
