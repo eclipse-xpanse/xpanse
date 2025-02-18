@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.controllers.AdminServicesApi;
 import org.eclipse.xpanse.modules.cache.consts.CacheConstants;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
-import org.eclipse.xpanse.modules.models.system.SystemStatus;
+import org.eclipse.xpanse.modules.models.system.StackStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.DatabaseType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
@@ -48,10 +48,10 @@ class AdminHealthCheckWithMysqlDbTest extends AbstractMysqlIntegrationTest {
     void testHealthCheck() {
         // SetUp
         // Run the test
-        SystemStatus systemStatus = adminServicesApi.healthCheck();
-        assertNotNull(systemStatus);
-        assertEquals(systemStatus.getHealthStatus(), HealthStatus.OK);
-        List<BackendSystemStatus> backendSystemStatuses = systemStatus.getBackendSystemStatuses();
+        StackStatus stackStatus = adminServicesApi.stackHealthStatus();
+        assertNotNull(stackStatus);
+        assertEquals(stackStatus.getHealthStatus(), HealthStatus.OK);
+        List<BackendSystemStatus> backendSystemStatuses = stackStatus.getBackendSystemStatuses();
         assertEquals(4, backendSystemStatuses.size());
 
         assertTrue(backendSystemStatuses.stream().allMatch(status -> status.getEndpoint() != null));
