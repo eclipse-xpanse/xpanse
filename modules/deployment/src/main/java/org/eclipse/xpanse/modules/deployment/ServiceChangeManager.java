@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.deployment;
 
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
-import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -21,22 +20,22 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsEntity;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsQueryModel;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsStorage;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestQueryModel;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
-import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
-import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
+import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
-import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.models.servicechange.AnsibleHostInfo;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeRequest;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeResult;
 import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
-import org.eclipse.xpanse.modules.models.servicechange.exceptions.ServiceChangeDetailsEntityNotFoundException;
+import org.eclipse.xpanse.modules.models.servicechange.exceptions.ServiceChangeRequestEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.hibernate.exception.LockTimeoutException;
@@ -56,8 +55,8 @@ public class ServiceChangeManager {
     private static final String IP = "ip";
     private static final String HOSTS = "hosts";
 
-    @Resource private ServiceChangeDetailsStorage serviceChangeDetailsStorage;
-    @Resource private ServiceOrderStorage serviceOrderStorage;
+    @Resource private ServiceChangeRequestStorage serviceChangeRequestStorage;
+    @Resource private ServiceOrderManager serviceOrderManager;
     @Resource private ServiceConfigurationManager serviceConfigurationManager;
     @Resource private ServiceActionManager serviceActionManager;
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
@@ -67,8 +66,8 @@ public class ServiceChangeManager {
     public ResponseEntity<ServiceChangeRequest> getPendingServiceChangeRequest(
             UUID serviceId, String resourceName) {
         try {
-            ServiceChangeDetailsEntity oldestRequest =
-                    getOldestServiceChangeDetails(serviceId, resourceName);
+            ServiceChangeRequestEntity oldestRequest =
+                    getOldestPendingServiceChangeRequest(serviceId, resourceName);
             if (Objects.isNull(oldestRequest)) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
             }
@@ -79,8 +78,8 @@ public class ServiceChangeManager {
                         serviceId, oldestRequest.getChangeHandler(), resourceName, deployResources);
             }
             updateServiceOrderState(oldestRequest);
-            ServiceChangeDetailsEntity request =
-                    updateServiceChangeDetails(oldestRequest, resourceName);
+            ServiceChangeRequestEntity request =
+                    updateServiceChangeRequestState(oldestRequest, resourceName);
             if (Objects.isNull(request)) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
             }
@@ -92,17 +91,17 @@ public class ServiceChangeManager {
         }
     }
 
-    private ServiceChangeDetailsEntity getOldestServiceChangeDetails(
+    private ServiceChangeRequestEntity getOldestPendingServiceChangeRequest(
             UUID serviceId, String resourceName) {
-        ServiceChangeDetailsQueryModel model =
-                new ServiceChangeDetailsQueryModel(
+        ServiceChangeRequestQueryModel model =
+                new ServiceChangeRequestQueryModel(
                         null, serviceId, null, null, ServiceChangeStatus.PENDING);
-        List<ServiceChangeDetailsEntity> requests =
-                serviceChangeDetailsStorage.listServiceChangeDetails(model);
+        List<ServiceChangeRequestEntity> requests =
+                serviceChangeRequestStorage.getServiceChangeRequestEntities(model);
         if (CollectionUtils.isEmpty(requests)) {
             return null;
         }
-        Optional<ServiceChangeDetailsEntity> oldestRequestOptional =
+        Optional<ServiceChangeRequestEntity> oldestRequestOptional =
                 requests.stream()
                         .filter(
                                 request ->
@@ -120,32 +119,25 @@ public class ServiceChangeManager {
         return oldestRequestOptional.orElse(null);
     }
 
-    private ServiceChangeDetailsEntity updateServiceChangeDetails(
-            ServiceChangeDetailsEntity request, String resourceName) {
+    private ServiceChangeRequestEntity updateServiceChangeRequestState(
+            ServiceChangeRequestEntity request, String resourceName) {
         if (Objects.isNull(request.getResourceName())) {
             request.setResourceName(resourceName);
         }
         request.setStatus(ServiceChangeStatus.PROCESSING);
-        return serviceChangeDetailsStorage.storeAndFlush(request);
+        return serviceChangeRequestStorage.storeAndFlush(request);
     }
 
-    private void updateServiceOrderState(ServiceChangeDetailsEntity oldestRequest) {
+    private void updateServiceOrderState(ServiceChangeRequestEntity oldestRequest) {
         ServiceOrderEntity serviceOrderEntity = oldestRequest.getServiceOrderEntity();
-        if (Objects.isNull(serviceOrderEntity)) {
-            String errorMsg =
-                    String.format(
-                            "Service order with service change details id %s not found.",
-                            oldestRequest.getId());
-            log.error(errorMsg);
-            throw new ServiceOrderNotFound(errorMsg);
-        }
-        serviceOrderEntity.setCompletedTime(OffsetDateTime.now());
-        serviceOrderEntity.setTaskStatus(TaskStatus.IN_PROGRESS);
-        serviceOrderStorage.storeAndFlush(serviceOrderEntity);
+        log.debug(
+                "updating service order state for service order entity {} status to IN_PROGRESS",
+                serviceOrderEntity.getOrderId());
+        serviceOrderManager.startOrderProgress(serviceOrderEntity);
     }
 
     private ServiceChangeRequest getServiceChangeRequest(
-            ServiceChangeDetailsEntity request, List<DeployResource> deployResources) {
+            ServiceChangeRequestEntity request, List<DeployResource> deployResources) {
         ServiceChangeRequest serviceChangeRequest = new ServiceChangeRequest();
         serviceChangeRequest.setChangeId(request.getId());
         if (request.getServiceOrderEntity().getTaskType() == ServiceOrderType.CONFIG_CHANGE) {
@@ -177,7 +169,7 @@ public class ServiceChangeManager {
      * @param result result of the service change request.
      */
     public void updateServiceChangeResult(UUID changeId, ServiceChangeResult result) {
-        ServiceChangeDetailsEntity request = serviceChangeDetailsStorage.findById(changeId);
+        ServiceChangeRequestEntity request = serviceChangeRequestStorage.findById(changeId);
         if (Objects.isNull(request)
                 || !ServiceChangeStatus.PROCESSING.equals(request.getStatus())) {
             String errorMsg =
@@ -185,7 +177,7 @@ public class ServiceChangeManager {
                             "Service change details with id %s , status %s not found",
                             changeId, ServiceChangeStatus.PROCESSING);
             log.error(errorMsg);
-            throw new ServiceChangeDetailsEntityNotFoundException(errorMsg);
+            throw new ServiceChangeRequestEntityNotFoundException(errorMsg);
         }
         if (result.getIsSuccessful()) {
             request.setStatus(ServiceChangeStatus.SUCCESSFUL);
@@ -194,20 +186,20 @@ public class ServiceChangeManager {
             request.setResultMessage(result.getError());
         }
         request.setTasks(result.getTasks());
-        serviceChangeDetailsStorage.storeAndFlush(request);
+        serviceChangeRequestStorage.storeAndFlush(request);
         updateServiceChangeResult(request);
     }
 
-    private void updateServiceChangeResult(ServiceChangeDetailsEntity request) {
-        ServiceChangeDetailsQueryModel model =
-                new ServiceChangeDetailsQueryModel(
+    private void updateServiceChangeResult(ServiceChangeRequestEntity request) {
+        ServiceChangeRequestQueryModel model =
+                new ServiceChangeRequestQueryModel(
                         request.getServiceOrderEntity().getOrderId(),
                         request.getServiceDeploymentEntity().getId(),
                         null,
                         null,
                         null);
-        List<ServiceChangeDetailsEntity> requests =
-                serviceChangeDetailsStorage.listServiceChangeDetails(model);
+        List<ServiceChangeRequestEntity> requests =
+                serviceChangeRequestStorage.getServiceChangeRequestEntities(model);
 
         if (CollectionUtils.isEmpty(requests)) {
             String errorMsg =
@@ -216,7 +208,7 @@ public class ServiceChangeManager {
                                     + "id %s not found, ",
                             request.getServiceDeploymentEntity().getId());
             log.error(errorMsg);
-            throw new ServiceChangeDetailsEntityNotFoundException(errorMsg);
+            throw new ServiceChangeRequestEntityNotFoundException(errorMsg);
         }
         boolean isNeedUpdateServiceConfigurationChange =
                 requests.stream()
@@ -235,19 +227,34 @@ public class ServiceChangeManager {
                                                 request.getStatus()
                                                         == ServiceChangeStatus.SUCCESSFUL);
                 if (isAllSuccessful) {
-                    updateServiceOrderByResult(entity, TaskStatus.SUCCESSFUL);
-                    serviceConfigurationManager.updateServiceConfiguration(request);
+                    updateServiceOrderByResult(entity, TaskStatus.SUCCESSFUL, null);
+                    // update configuration only if the job all requests are successful.
+                    if (request.getServiceOrderEntity().getTaskType()
+                            == ServiceOrderType.CONFIG_CHANGE) {
+                        serviceConfigurationManager.updateServiceConfigurationInDatabase(
+                                request, request.getOriginalRequestProperties());
+                    }
                 } else {
-                    updateServiceOrderByResult(entity, TaskStatus.FAILED);
+                    updateServiceOrderByResult(
+                            entity, TaskStatus.FAILED, request.getResultMessage());
                 }
             }
         }
     }
 
-    private void updateServiceOrderByResult(ServiceOrderEntity entity, TaskStatus status) {
-        entity.setTaskStatus(status);
-        entity.setCompletedTime(OffsetDateTime.now());
-        serviceOrderStorage.storeAndFlush(entity);
+    private void updateServiceOrderByResult(
+            ServiceOrderEntity entity, TaskStatus status, String resultMessage) {
+        log.debug(
+                "updating service order result for the service change order {} with status {}",
+                entity.getOrderId(),
+                status.toValue());
+        serviceOrderManager.completeOrderProgress(
+                entity.getOrderId(),
+                status,
+                Objects.nonNull(resultMessage)
+                        ? ErrorResponse.errorResponse(
+                                ErrorType.SERVICE_CHANGE_FAILED, List.of(resultMessage))
+                        : null);
     }
 
     private void validateChangeHandler(
@@ -318,6 +325,6 @@ public class ServiceChangeManager {
                             resourceEntity ->
                                     resourceEntity.getResourceKind().equals(resourceKind));
         }
-        return EntityTransUtils.transToDeployResources(resourceEntities.toList());
+        return EntityTranslationUtils.transToDeployResources(resourceEntities.toList());
     }
 }

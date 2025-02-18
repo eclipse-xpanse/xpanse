@@ -33,11 +33,11 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
-/** ServiceChangeDetailsEntity for persistence. */
-@Table(name = "SERVICE_CHANGE_DETAILS")
+/** ServiceChangeRequestEntity for persistence. */
+@Table(name = "SERVICE_CHANGE_REQUEST")
 @Entity
 @Data
-public class ServiceChangeDetailsEntity implements Serializable {
+public class ServiceChangeRequestEntity implements Serializable {
 
     @Serial private static final long serialVersionUID = 8759112725757851274L;
 
@@ -76,4 +76,9 @@ public class ServiceChangeDetailsEntity implements Serializable {
     @Type(value = JsonType.class)
     @Convert(converter = ObjectJsonConverter.class)
     private List<AnsibleTaskResult> tasks;
+
+    @Column(name = "ORIGINAL_REQUEST_PROPERTIES", columnDefinition = "json")
+    @Type(value = JsonType.class)
+    @Convert(converter = ObjectJsonConverter.class)
+    private Map<String, Object> originalRequestProperties;
 }

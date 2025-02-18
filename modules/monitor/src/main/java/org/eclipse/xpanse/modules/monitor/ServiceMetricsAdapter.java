@@ -15,7 +15,7 @@ import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
-import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
@@ -69,7 +69,8 @@ public class ServiceMetricsAdapter {
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
         Region region = serviceEntity.getDeployRequest().getRegion();
-        List<DeployResource> vmResources = EntityTransUtils.transToDeployResources(vmEntities);
+        List<DeployResource> vmResources =
+                EntityTranslationUtils.transToDeployResources(vmEntities);
         ServiceMetricsRequest serviceMetricRequest =
                 getServiceMetricRequest(
                         serviceId,

@@ -19,8 +19,8 @@ import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsEntity;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsStorage;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
@@ -49,7 +49,7 @@ public class GetCspInfoFromRequest {
     @Resource private TaskService taskService;
     @Resource private ServiceOrderStorage serviceOrderStorage;
     @Resource private ServiceTemplateRequestHistoryStorage serviceTemplateHistoryStorage;
-    @Resource private ServiceChangeDetailsStorage serviceChangeDetailsStorage;
+    @Resource private ServiceChangeRequestStorage serviceChangeRequestStorage;
 
     /**
      * Get Csp with the URL of Ocl.
@@ -223,11 +223,11 @@ public class GetCspInfoFromRequest {
      */
     public Csp getCspFromServiceChangeRequestId(UUID changeId) {
         try {
-            ServiceChangeDetailsEntity serviceChangeDetails =
-                    serviceChangeDetailsStorage.findById(changeId);
-            if (Objects.nonNull(serviceChangeDetails)
-                    && Objects.nonNull(serviceChangeDetails.getServiceDeploymentEntity())) {
-                return serviceChangeDetails.getServiceDeploymentEntity().getCsp();
+            ServiceChangeRequestEntity serviceChangeRequestEntity =
+                    serviceChangeRequestStorage.findById(changeId);
+            if (Objects.nonNull(serviceChangeRequestEntity)
+                    && Objects.nonNull(serviceChangeRequestEntity.getServiceDeploymentEntity())) {
+                return serviceChangeRequestEntity.getServiceDeploymentEntity().getCsp();
             }
         } catch (Exception e) {
             log.error("Get csp with service change request id:{} failed.", changeId, e);

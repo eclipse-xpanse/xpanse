@@ -9,6 +9,8 @@ package org.eclipse.xpanse.modules.deployment;
 import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ADMIN;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -22,7 +24,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
-import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceOrderStatusChangePolling;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
@@ -48,6 +50,7 @@ public class ServiceOrderManager {
     @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource private UserServiceHelper userServiceHelper;
     @Resource private ServiceOrderStatusChangePolling serviceOrderStatusChangePolling;
+    @Resource private ObjectMapper objectMapper;
 
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
@@ -71,6 +74,43 @@ public class ServiceOrderManager {
         orderTask.setTaskStatus(TaskStatus.CREATED);
         orderTask.setRequestBody(getRequestBody(task));
         return serviceOrderStorage.storeAndFlush(orderTask);
+    }
+
+    /**
+     * Creates and stores any generic request in SERVICE_ORDER table.
+     *
+     * @param orderId OrderId to be created.
+     * @param serviceDeploymentEntity serviceDeploymentEntity to which the order is related to.
+     * @param serviceOrderType type of the order.
+     * @param originalRequestBody The request body received from the customer. Will be serialized
+     *     into JSON and stored.
+     * @return serviceOrderEntity created.
+     */
+    public ServiceOrderEntity createAndStoreGenericServiceOrderEntity(
+            UUID orderId,
+            ServiceDeploymentEntity serviceDeploymentEntity,
+            ServiceOrderType serviceOrderType,
+            Object originalRequestBody) {
+        try {
+            ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
+            serviceOrderEntity.setOrderId(orderId);
+            if (Objects.nonNull(serviceDeploymentEntity.getServiceOrders())) {
+                serviceDeploymentEntity.getServiceOrders().add(serviceOrderEntity);
+            } else {
+                serviceDeploymentEntity.setServiceOrders(List.of(serviceOrderEntity));
+            }
+            serviceOrderEntity.setServiceDeploymentEntity(serviceDeploymentEntity);
+            serviceOrderEntity.setTaskType(serviceOrderType);
+            serviceOrderEntity.setUserId(userServiceHelper.getCurrentUserId());
+            serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
+            serviceOrderEntity.setStartedTime(OffsetDateTime.now());
+            serviceOrderEntity.setRequestBody(
+                    objectMapper.readValue(
+                            objectMapper.writeValueAsString(originalRequestBody), Map.class));
+            return serviceOrderStorage.storeAndFlush(serviceOrderEntity);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -165,7 +205,9 @@ public class ServiceOrderManager {
             query.setUserId(userServiceHelper.getCurrentUserId());
         }
         List<ServiceOrderEntity> orderEntities = serviceOrderStorage.queryEntities(query);
-        return orderEntities.stream().map(EntityTransUtils::transToServiceOrderDetails).toList();
+        return orderEntities.stream()
+                .map(EntityTranslationUtils::transToServiceOrderDetails)
+                .toList();
     }
 
     /**
@@ -216,7 +258,7 @@ public class ServiceOrderManager {
     public ServiceOrderDetails getOrderDetailsByOrderId(UUID orderId) {
         ServiceOrderEntity orderEntity =
                 getServiceOrderEntity(orderId, UserOperation.VIEW_ORDER_DETAILS_OF_SERVICE);
-        return EntityTransUtils.transToServiceOrderDetails(orderEntity);
+        return EntityTranslationUtils.transToServiceOrderDetails(orderEntity);
     }
 
     /**

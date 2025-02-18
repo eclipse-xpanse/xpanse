@@ -26,7 +26,7 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryStorage;
-import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
@@ -687,7 +687,7 @@ public class ServiceTemplateManage {
                 .sorted(
                         Comparator.comparing(ServiceTemplateRequestHistoryEntity::getCreateTime)
                                 .reversed())
-                .map(EntityTransUtils::convertToServiceTemplateHistoryVo)
+                .map(EntityTranslationUtils::convertToServiceTemplateHistoryVo)
                 .toList();
     }
 
@@ -702,7 +702,7 @@ public class ServiceTemplateManage {
         List<ServiceTemplateRequestHistoryEntity> reviewPendingRequests =
                 templateRequestStorage.listServiceTemplateRequestHistoryByQueryModel(queryModel);
         return reviewPendingRequests.stream()
-                .map(EntityTransUtils::convertToServiceTemplateRequestVo)
+                .map(EntityTranslationUtils::convertToServiceTemplateRequestVo)
                 .toList();
     }
 

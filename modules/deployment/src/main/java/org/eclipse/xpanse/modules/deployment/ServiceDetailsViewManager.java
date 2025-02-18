@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
-import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
@@ -78,7 +78,7 @@ public class ServiceDetailsViewManager {
         }
         serviceResultReFetchManager.reFetchDeploymentStateForMissingOrdersFromDeployers(
                 serviceDeploymentEntity);
-        return EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
+        return EntityTranslationUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
     }
 
     /**
@@ -176,7 +176,7 @@ public class ServiceDetailsViewManager {
         serviceResultReFetchManager.reFetchDeploymentStateForMissingOrdersFromDeployers(
                 serviceDeploymentEntity);
         DeployedServiceDetails details =
-                EntityTransUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
+                EntityTranslationUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
         setServiceConfigurationDetailsForDeployedService(details);
         return details;
     }
@@ -211,7 +211,7 @@ public class ServiceDetailsViewManager {
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
         VendorHostedDeployedServiceDetails details =
-                EntityTransUtils.transToVendorHostedServiceDetails(serviceDeploymentEntity);
+                EntityTranslationUtils.transToVendorHostedServiceDetails(serviceDeploymentEntity);
         setServiceConfigurationDetailsForDeployedService(details);
         return details;
     }
@@ -277,7 +277,8 @@ public class ServiceDetailsViewManager {
                 .map(
                         serviceDeployment -> {
                             DeployedService deployedService =
-                                    EntityTransUtils.convertToDeployedService(serviceDeployment);
+                                    EntityTranslationUtils.convertToDeployedService(
+                                            serviceDeployment);
                             if (Objects.nonNull(deployedService)) {
                                 setServiceConfigurationDetailsForDeployedService(deployedService);
                             }

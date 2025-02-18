@@ -18,12 +18,20 @@ public class DeployResource {
 
     @NotNull
     @NotBlank
-    @Schema(description = "The type of the group which configuration the deployed resource.")
+    @Schema(
+            description =
+                    "The type of the resource as defined by the deployer used to deploy the"
+                            + " service. Example, in case of terraform this will be the type of the"
+                            + " resource defined by the terraform provider.")
     private String groupType;
 
     @NotNull
     @NotBlank
-    @Schema(description = "The name of the group which configuration the deployed resource.")
+    @Schema(
+            description =
+                    "The group to which the resource belongs to. A service can have multiple types"
+                        + " of resources. This defines the type of resource. The name of resource"
+                        + " group is controlled in the service template.")
     private String groupName;
 
     @NotNull

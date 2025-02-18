@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsEntity;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
@@ -24,8 +24,8 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
-import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeDetails;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeRequestDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
@@ -35,9 +35,9 @@ import org.springframework.util.CollectionUtils;
 
 /** Transform DB entity object and model object. */
 @Slf4j
-public class EntityTransUtils {
+public class EntityTranslationUtils {
 
-    private EntityTransUtils() {
+    private EntityTranslationUtils() {
         // block constructor.
     }
 
@@ -157,9 +157,9 @@ public class EntityTransUtils {
      * @return Collection of ServiceChangeOrderDetails.
      */
     public static List<ServiceChangeOrderDetails> transToServiceChangeOrderDetails(
-            List<ServiceChangeDetailsEntity> requests) {
+            List<ServiceChangeRequestEntity> requests) {
 
-        Map<UUID, List<ServiceChangeDetailsEntity>> orderDetailsMap =
+        Map<UUID, List<ServiceChangeRequestEntity>> orderDetailsMap =
                 requests.stream()
                         .collect(
                                 Collectors.groupingBy(
@@ -170,12 +170,13 @@ public class EntityTransUtils {
                     ServiceChangeOrderDetails orderDetails = new ServiceChangeOrderDetails();
                     orderDetails.setOrderId(orderId);
                     ServiceOrderEntity orderEntity = requestList.getFirst().getServiceOrderEntity();
-                    orderDetails.setServiceChangeRequest(orderEntity.getRequestBody());
+                    orderDetails.setServiceChangeRequestProperties(orderEntity.getRequestBody());
                     orderDetails.setOrderStatus(orderEntity.getTaskStatus());
-                    List<ServiceChangeDetails> detailsList = new ArrayList<>();
+                    List<ServiceChangeRequestDetails> detailsList = new ArrayList<>();
                     requestList.forEach(
                             request -> {
-                                ServiceChangeDetails details = new ServiceChangeDetails();
+                                ServiceChangeRequestDetails details =
+                                        new ServiceChangeRequestDetails();
                                 details.setChangeId(request.getId());
                                 details.setResourceName(request.getResourceName());
                                 details.setChangeHandler(request.getChangeHandler());
@@ -184,7 +185,7 @@ public class EntityTransUtils {
                                 details.setStatus(request.getStatus());
                                 detailsList.add(details);
                             });
-                    orderDetails.setChangeRequests(detailsList);
+                    orderDetails.setServiceChangeRequests(detailsList);
                     orderDetailsList.add(orderDetails);
                 });
         return orderDetailsList;

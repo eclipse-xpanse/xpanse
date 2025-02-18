@@ -14,7 +14,7 @@ import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus
 
 /** service change request details. */
 @Data
-public class ServiceChangeDetails {
+public class ServiceChangeRequestDetails {
 
     @NotNull
     @Schema(description = "ID of the change request created as part of the change order.")
@@ -38,7 +38,7 @@ public class ServiceChangeDetails {
     private String resultMessage;
 
     @NotNull
-    @Schema(description = "service change requested in the change request.")
+    @Schema(description = "parameters sent to the agent.")
     private Map<String, Object> properties;
 
     @NotNull

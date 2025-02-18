@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
-import org.eclipse.xpanse.modules.deployment.ServiceChangeDetailsManager;
+import org.eclipse.xpanse.modules.deployment.ServiceChangeRequestsManager;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,9 +37,9 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
-public class ServiceChangeDetailsApi {
+public class ServiceChangeRequestDetailsApi {
 
-    @Resource private ServiceChangeDetailsManager serviceChangeDetailsManager;
+    @Resource private ServiceChangeRequestsManager serviceChangeRequestsManager;
 
     /** List all service change request. */
     @Tag(name = "Service Change Details", description = "APIs for Service Change Details.")
@@ -65,7 +65,7 @@ public class ServiceChangeDetailsApi {
             @Parameter(name = "status", description = "Status of the service configuration")
                     @RequestParam(name = "status", required = false)
                     ServiceChangeStatus status) {
-        return serviceChangeDetailsManager.getAllChangeRequests(
+        return serviceChangeRequestsManager.getAllChangeRequests(
                 orderId, serviceId, resourceName, configManager, status);
     }
 }

@@ -28,7 +28,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
-import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
+import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceDeploymentStatusChangePolling;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -227,7 +227,7 @@ public class DeployService {
                             resourceEntity ->
                                     resourceEntity.getResourceKind().equals(resourceKind));
         }
-        return EntityTransUtils.transToDeployResources(resourceEntities.toList());
+        return EntityTranslationUtils.transToDeployResources(resourceEntities.toList());
     }
 
     /**

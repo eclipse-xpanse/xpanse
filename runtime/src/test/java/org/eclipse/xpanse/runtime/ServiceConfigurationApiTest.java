@@ -95,13 +95,13 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         ServiceOrder order = changeServiceConfiguration(serviceId);
         if (Objects.nonNull(order) && waitServiceOrderIsCompleted(order.getOrderId())) {
             List<ServiceChangeOrderDetails> requests =
-                    listServiceChangeDetails(order.getOrderId(), order.getServiceId());
+                    getServiceChangeOrderDetails(order.getOrderId(), order.getServiceId());
             assertFalse(requests.isEmpty());
             assertEquals(1, requests.size());
             requests.forEach(request -> assertEquals(request.getOrderId(), order.getOrderId()));
             requests.forEach(
                     request ->
-                            request.getChangeRequests()
+                            request.getServiceChangeRequests()
                                     .forEach(
                                             requestDetails ->
                                                     assertEquals(
@@ -109,7 +109,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
                                                             requestDetails.getStatus())));
             requests.forEach(
                     request ->
-                            request.getChangeRequests()
+                            request.getServiceChangeRequests()
                                     .forEach(
                                             requestDetails -> {
                                                 if (ZOOKEEPER.equals(
@@ -226,7 +226,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         }
     }
 
-    List<ServiceChangeOrderDetails> listServiceChangeDetails(UUID orderId, UUID serviceId)
+    List<ServiceChangeOrderDetails> getServiceChangeOrderDetails(UUID orderId, UUID serviceId)
             throws Exception {
 
         final MockHttpServletResponse listResponse =

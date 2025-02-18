@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.deployment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,11 +18,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsEntity;
-import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeDetailsStorage;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
-import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -48,13 +47,11 @@ public class ServiceActionManager {
 
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
-    @Resource private ServiceChangeDetailsStorage serviceChangeDetailsStorage;
-
     @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     @Resource private DeployService deployService;
 
-    @Resource private ServiceChangeDetailsManager serviceChangeDetailsManager;
+    @Resource private ServiceChangeRequestsManager serviceChangeRequestsManager;
 
     @Resource
     private ServiceConfigurationVariablesJsonSchemaValidator
@@ -81,14 +78,12 @@ public class ServiceActionManager {
                 throw new ServiceTemplateNotRegistered(errMsg);
             }
             validateServiceActions(serviceTemplateEntity, request.getActionParameters());
-            UUID orderId = CustomRequestIdGenerator.generateOrderId();
-            addServiceChangeDetailsForServiceActions(
-                    orderId,
-                    serviceId,
-                    serviceDeploymentEntity,
-                    serviceTemplateEntity.getOcl(),
-                    request.getActionParameters(),
-                    request.getActionName());
+            UUID orderId =
+                    addServiceChangeRequestsForServiceAction(
+                            serviceId,
+                            serviceDeploymentEntity,
+                            serviceTemplateEntity.getOcl(),
+                            request);
             return new ServiceOrder(orderId, serviceId);
         } catch (ServiceConfigurationInvalidException e) {
             String errorMsg =
@@ -121,55 +116,60 @@ public class ServiceActionManager {
                 actionParameters, updateActionParameters, jsonObjectSchema);
     }
 
-    private void addServiceChangeDetailsForServiceActions(
-            UUID orderId,
+    private UUID addServiceChangeRequestsForServiceAction(
             UUID serviceId,
             ServiceDeploymentEntity serviceDeployment,
             Ocl ocl,
-            Map<String, Object> updateRequestMap,
-            String actionName) {
-
+            ServiceActionRequest serviceActionRequest) {
         Map<String, List<DeployResource>> deployResourceMap =
                 deployService
                         .listResourcesOfDeployedService(serviceId, DeployResourceKind.VM)
                         .stream()
                         .collect(Collectors.groupingBy(DeployResource::getGroupName));
 
+        // get scripts specific for the action name requested.
         List<ServiceChangeScript> actionManageScripts =
                 ocl.getServiceActions().stream()
-                        .filter(serviceAction -> actionName.equals(serviceAction.getName()))
+                        .filter(
+                                serviceAction ->
+                                        serviceActionRequest
+                                                .getActionName()
+                                                .equals(serviceAction.getName()))
                         .flatMap(action -> action.getActionManageScripts().stream())
                         .toList();
 
-        List<ServiceChangeParameter> actionParameters =
-                ocl.getServiceActions().stream()
-                        .filter(serviceAction -> actionName.equals(serviceAction.getName()))
-                        .flatMap(action -> action.getActionParameters().stream())
-                        .toList();
-
-        serviceChangeDetailsManager.createAndQueueAllServiceChangeRequests(
-                orderId,
+        return serviceChangeRequestsManager.createServiceOrderAndQueueServiceChangeRequests(
                 serviceDeployment,
-                updateRequestMap,
+                serviceActionRequest,
+                serviceActionRequest.getActionParameters(),
+                // send the final request parameters by adding the missing ones with default values
+                // from the service template.
+                mergeRequestWithDefaultValuesForMissingParameters(
+                        ocl,
+                        serviceActionRequest.getActionParameters(),
+                        serviceActionRequest.getActionName()),
                 deployResourceMap,
                 actionManageScripts,
-                actionParameters,
                 ServiceOrderType.SERVICE_ACTION);
     }
 
-    /** Returns the specific service action management script from service template. */
+    /**
+     * Returns the specific service action management script from service template. This is called
+     * when the agent requests for pending requests
+     */
     public Optional<ServiceChangeScript> getServiceActionManageScript(
-            ServiceChangeDetailsEntity serviceChangeDetailsEntity) {
+            ServiceChangeRequestEntity serviceChangeRequestEntity) {
         try {
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
-                            serviceChangeDetailsEntity
+                            serviceChangeRequestEntity
                                     .getServiceDeploymentEntity()
                                     .getServiceTemplateId());
+            // get action name from the original request stored in the service order table.
             ServiceActionRequest serviceActionRequest =
                     objectMapper.readValue(
                             objectMapper.writeValueAsString(
-                                    serviceChangeDetailsEntity
+                                    serviceChangeRequestEntity
                                             .getServiceOrderEntity()
                                             .getRequestBody()),
                             ServiceActionRequest.class);
@@ -189,12 +189,39 @@ public class ServiceActionManager {
                                                     serviceChangeScript
                                                             .getChangeHandler()
                                                             .equals(
-                                                                    serviceChangeDetailsEntity
+                                                                    serviceChangeRequestEntity
                                                                             .getChangeHandler()))
                                     .findFirst());
         } catch (JsonProcessingException e) {
             log.error(e.getMessage(), e);
-            throw new ServiceConfigurationInvalidException(List.of("Wrong"));
+            throw new ServiceConfigurationInvalidException(
+                    List.of("Cannot process service action request body."));
         }
+    }
+
+    /**
+     * update request parameters with missing parameters. The user can send only some parameters. We
+     * fill the rest with default values provided in the service template.
+     */
+    private Map<String, Object> mergeRequestWithDefaultValuesForMissingParameters(
+            Ocl ocl, Map<String, Object> updateRequestMap, String actionName) {
+        Map<String, Object> updatedActionParametersRequest = new HashMap<>(updateRequestMap);
+        ocl.getServiceActions().stream()
+                .filter(serviceAction -> serviceAction.getName().equals(actionName))
+                .findFirst()
+                .ifPresent(
+                        serviceAction ->
+                                serviceAction
+                                        .getActionParameters()
+                                        .forEach(
+                                                serviceChangeParameter -> {
+                                                    if (!(updateRequestMap.containsKey(
+                                                            serviceChangeParameter.getName()))) {
+                                                        updatedActionParametersRequest.put(
+                                                                serviceChangeParameter.getName(),
+                                                                serviceChangeParameter.getValue());
+                                                    }
+                                                }));
+        return updatedActionParametersRequest;
     }
 }
