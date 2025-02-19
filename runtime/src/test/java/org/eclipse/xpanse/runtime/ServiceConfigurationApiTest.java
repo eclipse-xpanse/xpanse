@@ -11,7 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -27,10 +30,13 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.deployment.PolicyValidator;
+import org.eclipse.xpanse.modules.deployment.ServiceChangeRequestsManager;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
+import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeRequestDetails;
 import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -53,6 +59,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
 @AutoConfigureMockMvc
 class ServiceConfigurationApiTest extends ApisTestCommon {
+
+    @MockitoBean private ServiceChangeRequestsManager serviceChangeRequestsManager;
 
     public static final String KAFKA_CFG_MESSAGE_MAX_BYTES = "kafka_cfg_message_max_bytes";
     public static final Integer KAFKA_CFG_MESSAGE_MAX_BYTES_VALUE = 2048;
@@ -228,18 +236,52 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
 
     List<ServiceChangeOrderDetails> getServiceChangeOrderDetails(UUID orderId, UUID serviceId)
             throws Exception {
+        ServiceChangeRequestDetails serviceChangeRequestDetails = new ServiceChangeRequestDetails();
+        serviceChangeRequestDetails.setChangeHandler("exampleHandler");
+        serviceChangeRequestDetails.setStatus(ServiceChangeStatus.SUCCESSFUL);
+        serviceChangeRequestDetails.setProperties(new HashMap<>());
+
+        ServiceChangeOrderDetails serviceChangeOrderDetails = new ServiceChangeOrderDetails();
+        serviceChangeOrderDetails.setOrderId(orderId);
+        serviceChangeOrderDetails.setOrderStatus(TaskStatus.IN_PROGRESS);
+        serviceChangeOrderDetails.setServiceChangeRequestProperties(new HashMap<>());
+        serviceChangeOrderDetails.setServiceChangeRequests(List.of(serviceChangeRequestDetails));
+
+        List<ServiceChangeOrderDetails> expectedDetails = new ArrayList<>();
+        expectedDetails.add(serviceChangeOrderDetails);
+
+        when(serviceChangeRequestsManager.getAllChangeRequests(
+                        eq(orderId.toString()),
+                        eq(serviceId.toString()),
+                        anyString(),
+                        anyString(),
+                        any()))
+                .thenReturn(expectedDetails);
 
         final MockHttpServletResponse listResponse =
                 mockMvc.perform(
-                                get("/xpanse/services/config/requests")
+                                get("/xpanse/services/change/requests")
                                         .param("orderId", orderId.toString())
                                         .param("serviceId", serviceId.toString())
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .accept(MediaType.APPLICATION_JSON))
                         .andReturn()
                         .getResponse();
+
         assertEquals(HttpStatus.OK.value(), listResponse.getStatus());
         assertNotNull(listResponse.getHeader(HEADER_TRACKING_ID));
+
+        String content = listResponse.getContentAsString();
+        List<ServiceChangeOrderDetails> responseDetails =
+                objectMapper.readValue(
+                        content, new TypeReference<List<ServiceChangeOrderDetails>>() {});
+
+        assertEquals(1, responseDetails.size());
+        ServiceChangeOrderDetails detail = responseDetails.get(0);
+        assertEquals(orderId, detail.getOrderId());
+        assertEquals(TaskStatus.IN_PROGRESS, detail.getOrderStatus());
+        assertEquals(1, detail.getServiceChangeRequests().size());
+
         return objectMapper.readValue(
                 listResponse.getContentAsString(),
                 new TypeReference<List<ServiceChangeOrderDetails>>() {});
