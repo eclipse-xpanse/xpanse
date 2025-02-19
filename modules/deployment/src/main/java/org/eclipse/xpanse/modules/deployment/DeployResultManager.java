@@ -207,7 +207,7 @@ public class DeployResultManager {
         if (Objects.nonNull(serviceTemplateEntity)
                 && Objects.nonNull(
                         serviceTemplateEntity.getOcl().getServiceConfigurationManage())) {
-            updateServiceConfiguration(deploymentState, serviceDeployment);
+            updateServiceConfiguration(deploymentState, serviceDeploymentToUpdate);
         }
 
         if (CollectionUtils.isEmpty(deployResult.getDeploymentGeneratedFiles())) {
