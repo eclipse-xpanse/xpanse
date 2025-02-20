@@ -85,7 +85,6 @@ class DeployEnvironmentsTest {
         serviceRequestProperties.put("example", null);
 
         deployRequest = new DeployRequest();
-        deployRequest.setUserId(userId);
         deployRequest.setFlavor("flavor");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
         deployRequest.setServiceHostingType(ServiceHostingType.SELF);
@@ -138,6 +137,7 @@ class DeployEnvironmentsTest {
         ocl.setCloudServiceProvider(cloudServiceProvider);
 
         task = new DeployTask();
+        task.setUserId(userId);
         task.setDeployRequest(deployRequest);
         task.setOcl(ocl);
         task.setServiceId(serviceId);
@@ -233,8 +233,7 @@ class DeployEnvironmentsTest {
         AbstractCredentialInfo abstractCredentialInfo =
                 new CredentialVariables(
                         csp, siteName, credentialType, "AK_SK", "description", userId, variables);
-        when(mockCredentialCenter.getCredential(
-                        csp, siteName, credentialType, deployRequest.getUserId()))
+        when(mockCredentialCenter.getCredential(csp, siteName, credentialType, userId))
                 .thenReturn(abstractCredentialInfo);
         when(pluginManager.getOrchestratorPlugin(any())).thenReturn(mockOrchestratorPlugin);
         when(pluginManager.getOrchestratorPlugin(Csp.HUAWEI_CLOUD).getEnvVarKeysMappingMap())

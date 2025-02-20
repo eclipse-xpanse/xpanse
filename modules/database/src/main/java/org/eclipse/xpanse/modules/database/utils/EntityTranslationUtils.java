@@ -71,10 +71,6 @@ public class EntityTranslationUtils {
             DeployedService deployedService = new DeployedService();
             BeanUtils.copyProperties(serviceEntity, deployedService);
             deployedService.setServiceId(serviceEntity.getId());
-            deployedService.setServiceHostingType(
-                    serviceEntity.getDeployRequest().getServiceHostingType());
-            deployedService.setRegion(serviceEntity.getDeployRequest().getRegion());
-            deployedService.setBillingMode(serviceEntity.getDeployRequest().getBillingMode());
             return deployedService;
         }
         return null;
@@ -89,9 +85,6 @@ public class EntityTranslationUtils {
     public static DeployedServiceDetails transToDeployedServiceDetails(
             ServiceDeploymentEntity entity) {
         DeployedServiceDetails details = new DeployedServiceDetails();
-        details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
-        details.setBillingMode(entity.getDeployRequest().getBillingMode());
-        details.setRegion(entity.getDeployRequest().getRegion());
         BeanUtils.copyProperties(entity, details);
         details.setServiceId(entity.getId());
         if (!CollectionUtils.isEmpty(entity.getDeployResources())) {
@@ -112,11 +105,8 @@ public class EntityTranslationUtils {
     public static VendorHostedDeployedServiceDetails transToVendorHostedServiceDetails(
             ServiceDeploymentEntity entity) {
         VendorHostedDeployedServiceDetails details = new VendorHostedDeployedServiceDetails();
-        details.setServiceHostingType(entity.getDeployRequest().getServiceHostingType());
         BeanUtils.copyProperties(entity, details);
         details.setServiceId(entity.getId());
-        details.setBillingMode(entity.getDeployRequest().getBillingMode());
-        details.setRegion(entity.getDeployRequest().getRegion());
         if (!CollectionUtils.isEmpty(entity.getOutputProperties())) {
             details.setDeployedServiceProperties(entity.getOutputProperties());
         }

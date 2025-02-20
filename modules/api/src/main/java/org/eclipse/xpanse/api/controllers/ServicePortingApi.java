@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
@@ -100,21 +101,18 @@ public class ServicePortingApi {
                             servicePortingRequest.getOriginalServiceId());
             throw new ServiceLockedException(errorMsg);
         }
-        servicePortingRequest.setUserId(userId);
         DeployTask servicePortingTask = getServicePortingTask(servicePortingRequest);
+        servicePortingTask.setUserId(userId);
         ServiceOrderEntity servicePortingOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(
-                        servicePortingTask, deployServiceEntity);
-        Map<String, Object> variable =
-                getServicePortingProcessVariable(servicePortingRequest, servicePortingOrderEntity);
+                        servicePortingTask, deployServiceEntity, Handler.WORKFLOW);
+        Map<String, Object> variables = getServicePortingProcessVariable(servicePortingTask);
         ProcessInstance instance =
-                workflowUtils.startProcess(ServicePortingConstants.PROCESS_KEY, variable);
+                workflowUtils.startProcessWithVariables(
+                        ServicePortingConstants.PROCESS_KEY, variables);
         servicePortingOrderEntity.setWorkflowId(instance.getProcessInstanceId());
-        ServiceOrderEntity updatedOrderEntity =
-                serviceOrderManager.startOrderProgress(servicePortingOrderEntity);
-        return new ServiceOrder(
-                updatedOrderEntity.getOrderId(),
-                (UUID) variable.get(ServicePortingConstants.NEW_SERVICE_ID));
+        serviceOrderManager.startOrderProgress(servicePortingOrderEntity);
+        return new ServiceOrder(servicePortingTask.getOrderId(), servicePortingTask.getServiceId());
     }
 
     private void validateData(ServicePortingRequest servicePortingRequest) {
@@ -159,26 +157,23 @@ public class ServicePortingApi {
         DeployTask servicePortingTask = new DeployTask();
         servicePortingTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         servicePortingTask.setTaskType(ServiceOrderType.PORT);
-        servicePortingTask.setServiceId(servicePortingRequest.getOriginalServiceId());
+        servicePortingTask.setServiceId(UUID.randomUUID());
         servicePortingTask.setOriginalServiceId(servicePortingRequest.getOriginalServiceId());
-        servicePortingTask.setUserId(servicePortingRequest.getUserId());
         servicePortingTask.setRequest(servicePortingRequest);
         return servicePortingTask;
     }
 
-    private Map<String, Object> getServicePortingProcessVariable(
-            ServicePortingRequest servicePortingRequest,
-            ServiceOrderEntity servicePortingOrderEntity) {
+    private Map<String, Object> getServicePortingProcessVariable(DeployTask servicePortingTask) {
         Map<String, Object> variable = new HashMap<>();
         variable.put(
-                ServicePortingConstants.SERVICE_PORTING_ORDER_ID,
-                servicePortingOrderEntity.getOrderId());
+                ServicePortingConstants.SERVICE_PORTING_ORDER_ID, servicePortingTask.getOrderId());
         variable.put(
                 ServicePortingConstants.ORIGINAL_SERVICE_ID,
-                servicePortingRequest.getOriginalServiceId());
-        variable.put(ServicePortingConstants.NEW_SERVICE_ID, UUID.randomUUID());
-        variable.put(ServicePortingConstants.SERVICE_PORTING_REQUEST, servicePortingRequest);
-        variable.put(ServicePortingConstants.USER_ID, servicePortingRequest.getUserId());
+                servicePortingTask.getOriginalServiceId());
+        variable.put(ServicePortingConstants.NEW_SERVICE_ID, servicePortingTask.getServiceId());
+        variable.put(
+                ServicePortingConstants.SERVICE_PORTING_REQUEST, servicePortingTask.getRequest());
+        variable.put(ServicePortingConstants.USER_ID, servicePortingTask.getUserId());
         variable.put(ServicePortingConstants.DEPLOY_RETRY_NUM, 0);
         variable.put(ServicePortingConstants.DESTROY_RETRY_NUM, 0);
         return variable;

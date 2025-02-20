@@ -111,8 +111,6 @@ class TofuMakerDeploymentTest {
         ocl.getDeployment().getDeployerTool().setKind(DeployerKind.OPEN_TOFU);
 
         DeployRequest deployRequest = new DeployRequest();
-        deployRequest.setServiceId(serviceId);
-        deployRequest.setUserId("userId");
         deployRequest.setServiceName(ocl.getName());
         deployRequest.setVersion(ocl.getServiceVersion());
         deployRequest.setFlavor(ocl.getFlavors().getServiceFlavors().getFirst().getName());

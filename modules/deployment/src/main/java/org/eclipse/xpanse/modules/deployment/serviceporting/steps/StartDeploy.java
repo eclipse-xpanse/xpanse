@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.workflow.WorkFlowDeployRequest;
 import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +49,7 @@ public class StartDeploy implements Serializable, JavaDelegate {
                 (ServicePortingRequest)
                         variables.get(ServicePortingConstants.SERVICE_PORTING_REQUEST);
         DeployRequest deployRequest = new DeployRequest();
-        UUID newServiceId = (UUID) variables.get(ServicePortingConstants.NEW_SERVICE_ID);
         BeanUtils.copyProperties(servicePortingRequest, deployRequest);
-        deployRequest.setServiceId(newServiceId);
         int retryTimes = (int) variables.get(ServicePortingConstants.DEPLOY_RETRY_NUM);
         log.info(
                 "Start deploy task in service porting workflow with id:{}. Request:{}. Retry"
@@ -59,11 +58,18 @@ public class StartDeploy implements Serializable, JavaDelegate {
                 deployRequest,
                 retryTimes);
         UUID originalServiceId = (UUID) variables.get(ServicePortingConstants.ORIGINAL_SERVICE_ID);
+        UUID newServiceId = (UUID) variables.get(ServicePortingConstants.NEW_SERVICE_ID);
+        String userId = (String) variables.get(ServicePortingConstants.USER_ID);
         UUID servicePortingOrderId =
                 (UUID) variables.get(ServicePortingConstants.SERVICE_PORTING_ORDER_ID);
-        ServiceOrder serviceOrder =
-                deployService.deployServiceByWorkflow(
-                        originalServiceId, processInstanceId, servicePortingOrderId, deployRequest);
+        WorkFlowDeployRequest workFlowDeployRequest = new WorkFlowDeployRequest();
+        workFlowDeployRequest.setOriginalServiceId(originalServiceId);
+        workFlowDeployRequest.setNewServiceId(newServiceId);
+        workFlowDeployRequest.setParentOrderId(servicePortingOrderId);
+        workFlowDeployRequest.setWorkflowId(processInstanceId);
+        workFlowDeployRequest.setUserId(userId);
+        workFlowDeployRequest.setDeployRequest(deployRequest);
+        ServiceOrder serviceOrder = deployService.deployServiceByWorkflow(workFlowDeployRequest);
         log.info("Started new deploy task with order: {} successfully.", serviceOrder.toString());
     }
 }

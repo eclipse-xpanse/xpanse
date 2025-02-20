@@ -17,8 +17,8 @@ import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
-import org.eclipse.xpanse.modules.deployment.DeployServiceEntityConverter;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
+import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityConverter;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
@@ -63,7 +63,7 @@ import org.springframework.web.context.WebApplicationContext;
             ServiceLockConfigService.class,
             ServiceOrderManager.class,
             CspPluginValidator.class,
-            DeployServiceEntityConverter.class,
+            ServiceDeploymentEntityConverter.class,
             PluginManager.class
         })
 @WebMvcTest
@@ -80,7 +80,7 @@ class DeploymentExceptionHandlerTest {
     @MockitoBean private OrchestratorPlugin orchestratorPlugin;
     @MockitoBean private ServiceOrderManager serviceOrderManager;
     @MockitoBean private ServiceOrderStorage serviceOrderStorage;
-    @MockitoBean private DeployServiceEntityConverter deployServiceEntityConverter;
+    @MockitoBean private ServiceDeploymentEntityConverter serviceDeploymentEntityConverter;
 
     @BeforeEach
     public void setup() {

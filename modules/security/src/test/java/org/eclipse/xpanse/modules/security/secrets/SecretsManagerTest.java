@@ -1,7 +1,6 @@
 package org.eclipse.xpanse.modules.security.secrets;
 
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -114,46 +113,5 @@ class SecretsManagerTest {
                                 "AES",
                                 "ISO10126Padding"),
                 "in correct initial vector value will throw exception");
-    }
-
-    @Test
-    void testDecryptBackToOriginalTypeBoolean() {
-        // SetUp
-        boolean bool = true;
-        // Run the test
-        final Object decodedBoolResult =
-                secretsManagerTest.decodeBackToOriginalType(
-                        DeployVariableDataType.BOOLEAN,
-                        secretsManagerTest.encrypt(String.valueOf(bool)));
-        // Verify the results
-        Assertions.assertInstanceOf(Boolean.class, decodedBoolResult);
-        Assertions.assertEquals(bool, decodedBoolResult);
-    }
-
-    @Test
-    void testDecryptBackToOriginalTypeString() {
-        // SetUp
-        String string = "hello";
-        // Run the test
-        final Object decodedResult =
-                secretsManagerTest.decodeBackToOriginalType(
-                        DeployVariableDataType.STRING, secretsManagerTest.encrypt(string));
-        // Verify the results
-        Assertions.assertInstanceOf(String.class, decodedResult);
-        Assertions.assertEquals(string, decodedResult);
-    }
-
-    @Test
-    void testDecryptBackToOriginalTypeNumber() {
-        // SetUp
-        int number = 111;
-        // Run the test
-        final Object decodedResult =
-                secretsManagerTest.decodeBackToOriginalType(
-                        DeployVariableDataType.NUMBER,
-                        secretsManagerTest.encrypt(String.valueOf(number)));
-        // Verify the results
-        Assertions.assertInstanceOf(Integer.class, decodedResult);
-        Assertions.assertEquals(number, (Integer) decodedResult);
     }
 }
