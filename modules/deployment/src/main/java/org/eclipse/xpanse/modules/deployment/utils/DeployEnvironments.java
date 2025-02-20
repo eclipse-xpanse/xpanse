@@ -272,7 +272,7 @@ public class DeployEnvironments {
         Csp csp = task.getDeployRequest().getCsp();
         String userId =
                 serviceHostingType == ServiceHostingType.SELF
-                        ? task.getDeployRequest().getUserId()
+                        ? task.getUserId()
                         : task.getServiceVendor();
         Map<String, String> variables = new HashMap<>();
         AbstractCredentialInfo abstractCredentialInfo =

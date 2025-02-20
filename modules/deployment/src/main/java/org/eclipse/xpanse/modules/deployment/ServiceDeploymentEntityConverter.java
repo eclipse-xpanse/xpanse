@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigura
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
@@ -33,7 +34,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Component
-public class DeployServiceEntityConverter {
+public class ServiceDeploymentEntityConverter {
 
     @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
@@ -52,7 +53,7 @@ public class DeployServiceEntityConverter {
         deployTask.setTaskType(orderType);
         deployTask.setServiceId(serviceDeploymentEntity.getId());
         deployTask.setUserId(serviceDeploymentEntity.getUserId());
-        deployTask.setDeployRequest(serviceDeploymentEntity.getDeployRequest());
+        deployTask.setDeployRequest(getDeployRequestByStoredService(serviceDeploymentEntity));
         deployTask.setServiceVendor(serviceDeploymentEntity.getServiceVendor());
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(
@@ -68,6 +69,34 @@ public class DeployServiceEntityConverter {
         deployTask.setOcl(serviceTemplateEntity.getOcl());
         deployTask.setServiceTemplateId(serviceTemplateEntity.getId());
         return deployTask;
+    }
+
+    /**
+     * Method to get deployRequest from service deployment.
+     *
+     * @param serviceDeploymentEntity serviceDeploymentEntity
+     * @return DeployRequest
+     */
+    public DeployRequest getDeployRequestByStoredService(
+            ServiceDeploymentEntity serviceDeploymentEntity) {
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setCustomerServiceName(serviceDeploymentEntity.getCustomerServiceName());
+        deployRequest.setCategory(serviceDeploymentEntity.getCategory());
+        deployRequest.setServiceName(serviceDeploymentEntity.getName());
+        deployRequest.setVersion(serviceDeploymentEntity.getVersion());
+        deployRequest.setCsp(serviceDeploymentEntity.getCsp());
+        deployRequest.setServiceHostingType(serviceDeploymentEntity.getServiceHostingType());
+        deployRequest.setRegion(serviceDeploymentEntity.getRegion());
+        deployRequest.setFlavor(serviceDeploymentEntity.getFlavor());
+        deployRequest.setAvailabilityZones(serviceDeploymentEntity.getAvailabilityZones());
+        deployRequest.setBillingMode(serviceDeploymentEntity.getBillingMode());
+        deployRequest.setEulaAccepted(serviceDeploymentEntity.getIsEulaAccepted());
+        if (!CollectionUtils.isEmpty(serviceDeploymentEntity.getInputProperties())) {
+            Map<String, Object> serviceRequestProperties =
+                    new HashMap<>(serviceDeploymentEntity.getInputProperties());
+            deployRequest.setServiceRequestProperties(serviceRequestProperties);
+        }
+        return deployRequest;
     }
 
     /**

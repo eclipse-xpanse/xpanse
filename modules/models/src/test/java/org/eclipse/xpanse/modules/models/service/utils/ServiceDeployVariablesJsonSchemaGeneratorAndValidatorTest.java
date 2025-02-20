@@ -155,7 +155,7 @@ class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
 
     @Test
     void throwExceptionWhenValueSchemaIsInvalid() {
-        variables.get(0).getValueSchema().put("enums", List.of(1, 2, 3));
+        variables.getFirst().getValueSchema().put("enums", List.of(1, 2, 3));
         assertThrows(
                 InvalidValueSchemaException.class,
                 () -> {

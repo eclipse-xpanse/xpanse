@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.workflow.WorkFlowDeployRequest;
 import org.eclipse.xpanse.modules.models.workflow.recreate.exceptions.ServiceRecreateFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -86,11 +87,16 @@ public class StartRecreateDeploy implements Serializable, JavaDelegate {
             UUID recreateOrderId,
             Map<String, Object> variables) {
         runtimeService.updateBusinessKey(processInstanceId, originalServiceId.toString());
+        WorkFlowDeployRequest workFlowDeployRequest = new WorkFlowDeployRequest();
+        workFlowDeployRequest.setOriginalServiceId(originalServiceId);
+        workFlowDeployRequest.setNewServiceId(originalServiceId);
+        workFlowDeployRequest.setParentOrderId(recreateOrderId);
+        workFlowDeployRequest.setWorkflowId(processInstanceId);
         String userId = (String) variables.get(RecreateConstants.USER_ID);
+        workFlowDeployRequest.setUserId(userId);
         DeployRequest deployRequest =
                 (DeployRequest) variables.get(RecreateConstants.RECREATE_REQUEST);
-        deployRequest.setUserId(userId);
-        deployService.deployServiceByWorkflow(
-                originalServiceId, processInstanceId, recreateOrderId, deployRequest);
+        workFlowDeployRequest.setDeployRequest(deployRequest);
+        deployService.deployServiceByWorkflow(workFlowDeployRequest);
     }
 }

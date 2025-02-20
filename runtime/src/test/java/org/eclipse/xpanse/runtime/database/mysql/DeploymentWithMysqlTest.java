@@ -31,7 +31,6 @@ import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.deployment.DeployRequestBase;
 import org.eclipse.xpanse.modules.models.service.deployment.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
@@ -139,9 +138,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     }
 
     ServiceOrder deployService(ServiceTemplateDetailVo serviceTemplate) {
-        DeployRequest deployRequest = new DeployRequest();
-        DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
-        BeanUtils.copyProperties(deployRequestBase, deployRequest);
+        DeployRequest deployRequest = getDeployRequest(serviceTemplate);
         deployRequest.setBillingMode(BillingMode.FIXED);
         ServiceOrder serviceOrder = serviceDeployerApi.deploy(deployRequest);
         Assertions.assertNotNull(serviceOrder.getOrderId());
@@ -175,21 +172,21 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         return false;
     }
 
-    DeployRequestBase getDeployRequestBase(ServiceTemplateDetailVo serviceTemplate) {
-        DeployRequestBase deployRequestBase = new DeployRequestBase();
-        deployRequestBase.setServiceName(serviceTemplate.getName());
-        deployRequestBase.setVersion(serviceTemplate.getVersion());
-        deployRequestBase.setCsp(serviceTemplate.getCsp());
-        deployRequestBase.setCategory(serviceTemplate.getCategory());
-        deployRequestBase.setFlavor(
+    DeployRequest getDeployRequest(ServiceTemplateDetailVo serviceTemplate) {
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.setServiceName(serviceTemplate.getName());
+        deployRequest.setVersion(serviceTemplate.getVersion());
+        deployRequest.setCsp(serviceTemplate.getCsp());
+        deployRequest.setCategory(serviceTemplate.getCategory());
+        deployRequest.setFlavor(
                 serviceTemplate.getFlavors().getServiceFlavors().getFirst().getName());
-        deployRequestBase.setRegion(serviceTemplate.getRegions().getFirst());
-        deployRequestBase.setServiceHostingType(serviceTemplate.getServiceHostingType());
-        deployRequestBase.setBillingMode(serviceTemplate.getBilling().getBillingModes().getFirst());
+        deployRequest.setRegion(serviceTemplate.getRegions().getFirst());
+        deployRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
+        deployRequest.setBillingMode(serviceTemplate.getBilling().getBillingModes().getFirst());
 
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
-        deployRequestBase.setServiceRequestProperties(serviceRequestProperties);
+        deployRequest.setServiceRequestProperties(serviceRequestProperties);
 
         List<AvailabilityZoneConfig> availabilityZoneConfigs =
                 serviceTemplate.getDeployment().getServiceAvailabilityConfig();
@@ -199,8 +196,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
                         availabilityZones.put(
                                 availabilityZoneConfig.getVarName(),
                                 availabilityZoneConfig.getDisplayName()));
-        deployRequestBase.setAvailabilityZones(availabilityZones);
-        return deployRequestBase;
+        deployRequest.setAvailabilityZones(availabilityZones);
+        return deployRequest;
     }
 
     ServiceTemplateRequestInfo registerServiceTemplate() throws Exception {
@@ -214,8 +211,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     ServiceOrder portService(UUID serviceId, ServiceTemplateDetailVo serviceTemplate) {
         ServicePortingRequest servicePortingRequest = new ServicePortingRequest();
         servicePortingRequest.setOriginalServiceId(serviceId);
-        DeployRequestBase deployRequestBase = getDeployRequestBase(serviceTemplate);
-        BeanUtils.copyProperties(deployRequestBase, servicePortingRequest);
+        DeployRequest deployRequest = getDeployRequest(serviceTemplate);
+        BeanUtils.copyProperties(deployRequest, servicePortingRequest);
         return servicePortingApi.port(servicePortingRequest);
     }
 

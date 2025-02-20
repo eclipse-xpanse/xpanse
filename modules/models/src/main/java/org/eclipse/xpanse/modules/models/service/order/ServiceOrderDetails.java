@@ -65,7 +65,6 @@ public class ServiceOrderDetails {
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime completedTime;
 
-    @NotNull
     @Schema(description = "The requests of the service order.")
     private Map<String, Object> requestBody;
 

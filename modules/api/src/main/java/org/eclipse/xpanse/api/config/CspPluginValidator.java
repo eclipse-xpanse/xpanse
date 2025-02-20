@@ -58,10 +58,10 @@ public class CspPluginValidator {
         for (Object arg : args) {
             if (arg instanceof Ocl ocl) {
                 validatePluginForCspIsActive(ocl.getCloudServiceProvider().getName());
-            } else if (arg instanceof DeployRequest deployRequest) {
-                validatePluginForCspIsActive(deployRequest.getCsp());
             } else if (arg instanceof ServicePortingRequest servicePortingRequest) {
                 validatePluginForCspIsActive(servicePortingRequest.getCsp());
+            } else if (arg instanceof DeployRequest deployRequest) {
+                validatePluginForCspIsActive(deployRequest.getCsp());
             } else if (arg instanceof CreateCredential createCredential) {
                 validatePluginForCspIsActive(createCredential.getCsp());
             } else if (arg instanceof UserPolicyCreateRequest userPolicyCreateRequest) {

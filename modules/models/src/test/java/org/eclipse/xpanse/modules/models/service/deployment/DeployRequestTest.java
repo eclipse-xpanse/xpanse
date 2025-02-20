@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.UUID;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -24,8 +23,6 @@ import org.springframework.beans.BeanUtils;
 /** Test of CreateRequest. */
 class DeployRequestTest {
 
-    private final UUID id = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
-    private final String userId = "userId";
     private final boolean IS_ACCEPT_EULA = true;
     private final Category category = Category.COMPUTE;
     private final String serviceName = "service";
@@ -45,8 +42,6 @@ class DeployRequestTest {
     @BeforeEach
     void setUp() {
         request = new DeployRequest();
-        request.setServiceId(id);
-        request.setUserId(userId);
         request.setCategory(category);
         request.setServiceName(serviceName);
         request.setCustomerServiceName(customerServiceName);
@@ -65,8 +60,6 @@ class DeployRequestTest {
 
     @Test
     void testGetters() {
-        assertEquals(id, request.getServiceId());
-        assertEquals(userId, request.getUserId());
         assertEquals(category, request.getCategory());
         assertEquals(serviceName, request.getServiceName());
         assertEquals(customerServiceName, request.getCustomerServiceName());
@@ -106,10 +99,7 @@ class DeployRequestTest {
     @Test
     void testToString() {
         String expectedToString =
-                "DeployRequest(super=DeployRequestBase("
-                        + "userId="
-                        + userId
-                        + ", category="
+                "DeployRequest(category="
                         + category
                         + ", serviceName="
                         + serviceName
@@ -133,8 +123,6 @@ class DeployRequestTest {
                         + IS_ACCEPT_EULA
                         + ", billingMode="
                         + billingMode
-                        + "), serviceId="
-                        + id
                         + ")";
         assertEquals(expectedToString, request.toString());
     }

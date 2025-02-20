@@ -53,7 +53,6 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.eclipse.xpanse.modules.models.monitor.enums.MetricType;
 import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
-import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
@@ -334,8 +333,6 @@ class OpenstackTestlabOrchestratorPluginTest {
         when(this.mockCredentialCenter.getCredential(any(), any(), any(), any()))
                 .thenReturn(getCredentialDefinition());
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
-        DeployRequest deployRequest = new DeployRequest();
-        serviceDeploymentEntity.setDeployRequest(deployRequest);
         serviceDeploymentEntity.setServiceTemplateId(UUID.randomUUID());
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         Ocl ocl = new Ocl();

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,9 +30,11 @@ class ServiceOrderEntityTest {
     private final String userId = "userId";
     private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
+    private final Handler handler = Handler.INTERNAL;
     @Mock private Map<String, Object> mockRequestBody;
     @Mock private Map<String, Object> mockResultProperties;
     @Mock private ServiceDeploymentEntity mockServiceDeploymentEntity;
+
     private ServiceOrderEntity test;
 
     @BeforeEach
@@ -50,6 +53,7 @@ class ServiceOrderEntityTest {
         test.setErrorResponse(errorResponse);
         test.setRequestBody(mockRequestBody);
         test.setResultProperties(mockResultProperties);
+        test.setHandler(handler);
     }
 
     @Test
@@ -67,6 +71,7 @@ class ServiceOrderEntityTest {
         assertThat(test.getStartedTime()).isEqualTo(startedTime);
         assertThat(test.getRequestBody()).isEqualTo(mockRequestBody);
         assertThat(test.getResultProperties()).isEqualTo(mockResultProperties);
+        assertThat(test.getHandler()).isEqualTo(handler);
     }
 
     @Test
@@ -113,6 +118,8 @@ class ServiceOrderEntityTest {
                         + mockRequestBody
                         + ", resultProperties="
                         + mockResultProperties
+                        + ", handler="
+                        + handler
                         + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

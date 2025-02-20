@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.DeployResultManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.springframework.stereotype.Component;
 
 /** Bean for managing deployer terraform callback functions. */
@@ -30,7 +31,7 @@ public class TerraformDeploymentResultCallbackManager {
     public void orderCallback(UUID orderId, TerraformResult result) {
         DeployResult deployResult = getDeployResult(result);
         deployResult.setOrderId(orderId);
-        deployResultManager.updateServiceWithDeployResult(deployResult);
+        deployResultManager.updateServiceWithDeployResult(deployResult, Handler.TERRA_BOOT);
     }
 
     private DeployResult getDeployResult(TerraformResult result) {

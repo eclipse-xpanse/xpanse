@@ -85,14 +85,14 @@ public class ProcessRecreateDeploymentResult implements Serializable, JavaDelega
                         deployRetryNum);
                 if (deployRetryNum >= 1) {
                     String userId = (String) variables.get(RecreateConstants.USER_ID);
+                    String resultMessage = (String) variables.get(RecreateConstants.RESULT_MESSAGE);
                     runtimeService.setVariable(
                             processInstanceId, RecreateConstants.ASSIGNEE, userId);
                     serviceOrderManager.completeOrderProgress(
                             recreateOrderId,
                             TaskStatus.FAILED,
                             ErrorResponse.errorResponse(
-                                    ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
-                                    List.of(serviceDeploymentEntity.getResultMessage())));
+                                    ErrorType.DEPLOYMENT_FAILED_EXCEPTION, List.of(resultMessage)));
                 }
             }
         } catch (Exception e) {

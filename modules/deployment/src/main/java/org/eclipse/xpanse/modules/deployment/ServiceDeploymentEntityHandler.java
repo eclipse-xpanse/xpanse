@@ -16,7 +16,7 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNo
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.springframework.stereotype.Component;
 
-/** Bean for grouping common methods for handling ServiceDeploymentEntity entities. */
+/** Bean for grouping common methods for handling ServiceDeploymentEntity. */
 @Slf4j
 @Component
 public class ServiceDeploymentEntityHandler {

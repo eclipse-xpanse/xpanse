@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
@@ -37,6 +39,9 @@ class DeployedServiceTest {
     private final String flavor = "basic";
     private final BillingMode billingMode = BillingMode.FIXED;
     private final Region region = new Region();
+    private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
+    private final Map<String, String> availabilityZones = new HashMap<>();
+    private final Map<String, String> inputProperties = new HashMap<>();
     private final UUID serviceTemplateId = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f4");
     private final ServiceDeploymentState serviceDeploymentState =
             ServiceDeploymentState.DEPLOY_SUCCESS;
@@ -60,15 +65,17 @@ class DeployedServiceTest {
         deployedService.setCustomerServiceName(customerServiceName);
         deployedService.setVersion(version);
         deployedService.setCsp(csp);
+        deployedService.setServiceHostingType(serviceHostingType);
+        deployedService.setRegion(region);
+        deployedService.setAvailabilityZones(availabilityZones);
         deployedService.setFlavor(flavor);
         deployedService.setBillingMode(billingMode);
-        deployedService.setRegion(region);
+        deployedService.setInputProperties(inputProperties);
         deployedService.setServiceTemplateId(serviceTemplateId);
         deployedService.setServiceDeploymentState(serviceDeploymentState);
         deployedService.setServiceState(SERVICE_STATE);
         deployedService.setCreateTime(createTime);
         deployedService.setLastModifiedTime(lastModifiedTime);
-        deployedService.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         deployedService.setLastStartedAt(LAST_STARTED_AT);
         deployedService.setLastStoppedAt(LAST_STOPPED_AT);
         deployedService.setLockConfig(LOCK_CONFIG);
@@ -84,9 +91,11 @@ class DeployedServiceTest {
         assertEquals(customerServiceName, deployedService.getCustomerServiceName());
         assertEquals(version, deployedService.getVersion());
         assertEquals(csp, deployedService.getCsp());
+        assertEquals(serviceHostingType, deployedService.getServiceHostingType());
+        assertEquals(region, deployedService.getRegion());
         assertEquals(flavor, deployedService.getFlavor());
         assertEquals(billingMode, deployedService.getBillingMode());
-        assertEquals(region, deployedService.getRegion());
+        assertEquals(inputProperties, deployedService.getInputProperties());
         assertEquals(serviceTemplateId, deployedService.getServiceTemplateId());
         assertEquals(serviceDeploymentState, deployedService.getServiceDeploymentState());
         assertEquals(createTime, deployedService.getCreateTime());
@@ -94,7 +103,6 @@ class DeployedServiceTest {
         assertEquals(LAST_STARTED_AT, deployedService.getLastStartedAt());
         assertEquals(LAST_STOPPED_AT, deployedService.getLastStoppedAt());
         assertEquals(SERVICE_STATE, deployedService.getServiceState());
-        assertEquals(ServiceHostingType.SERVICE_VENDOR, deployedService.getServiceHostingType());
         assertEquals(LOCK_CONFIG, deployedService.getLockConfig());
         assertEquals(serviceConfigurationDetails, deployedService.getServiceConfigurationDetails());
     }
@@ -131,17 +139,23 @@ class DeployedServiceTest {
                         + version
                         + ", csp="
                         + csp
-                        + ", flavor="
-                        + flavor
-                        + ", billingMode="
-                        + billingMode
+                        + ", serviceHostingType="
+                        + serviceHostingType
                         + ", region=Region(name="
                         + region.getName()
                         + ", site="
                         + region.getSite()
                         + ", area="
                         + region.getArea()
-                        + "), serviceTemplateId="
+                        + "), availabilityZones="
+                        + availabilityZones
+                        + ", flavor="
+                        + flavor
+                        + ", billingMode="
+                        + billingMode
+                        + ", inputProperties="
+                        + inputProperties
+                        + ", serviceTemplateId="
                         + serviceTemplateId
                         + ", userId="
                         + userId
@@ -149,8 +163,6 @@ class DeployedServiceTest {
                         + serviceDeploymentState
                         + ", serviceState="
                         + SERVICE_STATE
-                        + ", serviceHostingType="
-                        + ServiceHostingType.SERVICE_VENDOR
                         + ", createTime="
                         + createTime
                         + ", lastModifiedTime="
