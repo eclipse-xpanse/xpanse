@@ -50,7 +50,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev"})
+@SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-local,test,dev"})
 @AutoConfigureMockMvc
 class CspServiceTemplateApiTest extends ApisTestCommon {
 
@@ -202,7 +202,7 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
 
         pendingServiceTemplateRequests1 = listPendingServiceTemplateRequests(serviceTemplateId);
         assertThat(pendingServiceTemplateRequests1).isEmpty();
-        // After update is approved,  should be updated
+        // After update is approved, should be updated
         serviceTemplate = getRegistrationDetailsByServiceTemplateId(serviceTemplateId);
         assertEquals(descriptionToUpdate, updateRequest.getOcl().getDescription());
         assertEquals(descriptionToUpdate, serviceTemplate.getDescription());
@@ -215,7 +215,8 @@ class CspServiceTemplateApiTest extends ApisTestCommon {
                         unregisterResponse.getContentAsString(), ServiceTemplateRequestInfo.class);
 
         assertNotNull(unregisterRequestInfo);
-        // List pending service template requests is empty. Because of the unregister request is
+        // List pending service template requests is empty. Because of the unregister
+        // request is
         // always approved.
         List<ServiceTemplateRequestToReview> pendingServiceTemplateRequests2 =
                 listPendingServiceTemplateRequests(serviceTemplateId);

@@ -5,6 +5,8 @@
 
 package org.eclipse.xpanse.runtime.cache.redis;
 
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -16,6 +18,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("dev")
+@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AbstractRedisIntegrationTest {
 
@@ -28,5 +31,7 @@ public abstract class AbstractRedisIntegrationTest {
         redis.start();
         System.setProperty("spring.data.redis.host", redis.getHost());
         System.setProperty("spring.data.redis.port", redis.getMappedPort(6379).toString());
+
+        log.info("Using Zitadel URL: {}", System.getProperty("AUTHORIZATION_SERVER_ENDPOINT"));
     }
 }
