@@ -8,8 +8,8 @@ services:
     depends_on:
       db:
         condition: 'service_healthy'
-    ports:
-      - '8088:8080'
+    expose:
+      - "8080"
 
   db:
     restart: 'always'

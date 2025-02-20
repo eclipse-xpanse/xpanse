@@ -147,7 +147,7 @@ public class ApisTestCommon {
     @BeforeAll
     static void setupZitadel() {
         ZitadelTestContainer.setup();
-        System.out.println("Using Zitadel URL: " + System.getProperty("zitadel.url"));
+        log.info("Using Zitadel URL: {}", System.getProperty("AUTHORIZATION_SERVER_ENDPOINT"));
     }
 
     protected void mockSdkClientsForHuaweiCloud() {
