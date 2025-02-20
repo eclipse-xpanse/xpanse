@@ -32,7 +32,6 @@ public abstract class AbstractRedisIntegrationTest {
         System.setProperty("spring.data.redis.host", redis.getHost());
         System.setProperty("spring.data.redis.port", redis.getMappedPort(6379).toString());
 
-        ZitadelTestContainer.setup();
         log.info("Using Zitadel URL: {}", System.getProperty("AUTHORIZATION_SERVER_ENDPOINT"));
     }
 }

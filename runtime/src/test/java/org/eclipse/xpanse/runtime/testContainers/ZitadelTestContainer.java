@@ -39,9 +39,6 @@ public class ZitadelTestContainer {
         }
     }
 
-    @BeforeAll
-    public static void setup() {}
-
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
         registry.add(

@@ -102,7 +102,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 /** Test base class. */
 @Slf4j
-public class ApisTestCommon {
+public class ApisTestCommon extends ZitadelTestContainer {
 
     protected static final ObjectMapper objectMapper = new ObjectMapper();
     protected final OclLoader oclLoader = new OclLoader();
@@ -139,15 +139,11 @@ public class ApisTestCommon {
 
     @BeforeAll
     static void setEnvVar() {
+        log.info("Using Zitadel URL: {}", System.getProperty("AUTHORIZATION_SERVER_ENDPOINT"));
         System.setProperty(OPENSTACK_TESTLAB_AUTH_URL, "http://127.0.0.1/identity/v3");
         System.setProperty(PLUS_SERVER_AUTH_URL, "http://127.0.0.1/identity/v3");
         System.setProperty(REGIO_CLOUD_AUTH_URL, "http://127.0.0.1/identity/v3");
-    }
 
-    @BeforeAll
-    static void setupZitadel() {
-        ZitadelTestContainer.setup();
-        log.info("Using Zitadel URL: {}", System.getProperty("AUTHORIZATION_SERVER_ENDPOINT"));
     }
 
     protected void mockSdkClientsForHuaweiCloud() {

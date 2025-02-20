@@ -27,8 +27,6 @@ public abstract class AbstractMysqlIntegrationTest {
     static {
         mysqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:latest"));
         mysqlContainer.start();
-
-        ZitadelTestContainer.setup();
         System.out.println("Using Zitadel URL: " + System.getProperty("zitadel.url"));
     }
 
