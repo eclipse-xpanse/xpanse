@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.runtime.database.mysql;
 
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,6 +27,9 @@ public abstract class AbstractMysqlIntegrationTest {
     static {
         mysqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:latest"));
         mysqlContainer.start();
+
+        ZitadelTestContainer.setup();
+        System.out.println("Using Zitadel URL: " + System.getProperty("zitadel.url"));
     }
 
     @DynamicPropertySource

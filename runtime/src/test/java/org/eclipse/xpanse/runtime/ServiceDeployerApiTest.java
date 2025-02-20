@@ -94,7 +94,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev",
+            "spring.profiles.active=oauth,zitadel,zitadel-local,test,dev",
         })
 @AutoConfigureMockMvc
 class ServiceDeployerApiTest extends ApisTestCommon {
