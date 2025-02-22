@@ -1,0 +1,16 @@
+name: xpanse-project-move-to-planned
+
+on:
+  issues:
+    types: [assigned]
+
+jobs:
+  automate-project-columns:
+    runs-on: ubuntu-latest
+    if: github.repository == 'eclipse-xpanse/xpanse'
+    steps:
+      - uses: alex-page/github-project-automation-plus@v0.9.0
+        with:
+          project: eclipse-xpanse
+          column: 'Planned'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
