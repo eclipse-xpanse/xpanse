@@ -92,6 +92,18 @@ jobs:
           current-version: ${{ env.CURRENT_VERSION }}
           version-fragment: ${{ env.VERSION_FRAGMENT }}
 
+      - name: Check for release liquibase change log files
+        id: check_liquibase_change_log_files
+        uses: andstor/file-existence-action@v3
+        with:
+          files: >
+            modules/database/src/main/resources/liquibase/full/mysql/xpanse-${{steps.new_version.outputs.next-version}}-full.mysql.xml,
+            modules/database/src/main/resources/liquibase/full/mysql/xpanse-${{steps.new_version.outputs.next-version}}-full.h2.xml,
+            modules/database/src/main/resources/liquibase/upgrades/mysql/xpanse-${{ env.CURRENT_VERSION }}-to-${{steps.new_version.outputs.next-version}}-upgrade.mysql.xml,
+            modules/database/src/main/resources/liquibase/upgrades/mysql/xpanse-${{ env.CURRENT_VERSION }}-to-${{steps.new_version.outputs.next-version}}-upgrade.h2.xml
+          fail: true
+          ignore_case: 'false'
+
       - name: Update POMs to version to be released
         run: mvn versions:set -DnewVersion=${{ steps.new_version.outputs.next-version }} -DgenerateBackupPoms=false
 
