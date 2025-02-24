@@ -68,7 +68,7 @@ public class ServiceMetricsAdapter {
 
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
-        Region region = serviceEntity.getDeployRequest().getRegion();
+        Region region = serviceEntity.getRegion();
         List<DeployResource> vmResources =
                 EntityTranslationUtils.transToDeployResources(vmEntities);
         ServiceMetricsRequest serviceMetricRequest =
@@ -113,7 +113,7 @@ public class ServiceMetricsAdapter {
 
         OrchestratorPlugin orchestratorPlugin =
                 pluginManager.getOrchestratorPlugin(serviceEntity.getCsp());
-        Region region = serviceEntity.getDeployRequest().getRegion();
+        Region region = serviceEntity.getRegion();
         ResourceMetricsRequest resourceMetricRequest =
                 getResourceMetricRequest(
                         resourceEntity.getServiceDeploymentEntity().getId(),

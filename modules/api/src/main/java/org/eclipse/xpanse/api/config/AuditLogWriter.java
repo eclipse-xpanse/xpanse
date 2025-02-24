@@ -113,8 +113,8 @@ public class AuditLogWriter {
         for (Object arg : args) {
             return switch (arg) {
                 case Ocl ocl -> ocl.getCloudServiceProvider().getName();
-                case DeployRequest deployRequest -> deployRequest.getCsp();
                 case ServicePortingRequest servicePortingRequest -> servicePortingRequest.getCsp();
+                case DeployRequest deployRequest -> deployRequest.getCsp();
                 case CreateCredential createCredential -> createCredential.getCsp();
                 case UserPolicyCreateRequest userPolicyCreateRequest ->
                         userPolicyCreateRequest.getCsp();

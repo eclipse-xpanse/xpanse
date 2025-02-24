@@ -62,7 +62,7 @@ public class PolicyValidator {
 
     private List<UserPolicy> getUserPolicies(DeployTask deployTask) {
         if (Objects.nonNull(deployTask.getDeployRequest())) {
-            String userId = deployTask.getDeployRequest().getUserId();
+            String userId = deployTask.getUserId();
             Csp csp = deployTask.getDeployRequest().getCsp();
             UserPolicyQueryRequest queryRequest = new UserPolicyQueryRequest();
             queryRequest.setUserId(userId);

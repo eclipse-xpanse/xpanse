@@ -312,7 +312,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         Region region = new Region();
         region.setName("cn-southwest-2");
         region.setSite(site);
-        service.getDeployRequest().setRegion(region);
+        service.setRegion(region);
         service = serviceDeploymentStorage.storeAndFlush(service);
         when(huaweiCloudClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         addCredentialForHuaweiCloud();
@@ -480,7 +480,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         region.setName("eu-west-0");
         region.setSite("default");
         service.setCsp(Csp.FLEXIBLE_ENGINE);
-        service.getDeployRequest().setRegion(region);
+        service.setRegion(region);
         service = serviceDeploymentStorage.storeAndFlush(service);
         when(flexibleEngineClient.getEcsClient(any(), any())).thenReturn(mockEcsClient);
         addCredentialForFlexibleEngine();
@@ -493,7 +493,7 @@ class ServiceStateManageApiTest extends ApisTestCommon {
         region.setName("RegionOne");
         region.setSite("default");
         addCredentialForOpenstack(Csp.OPENSTACK_TESTLAB);
-        service.getDeployRequest().setRegion(region);
+        service.setRegion(region);
         service = serviceDeploymentStorage.storeAndFlush(service);
         testServiceStateManageApisWithOpenstackSdk(service);
         deleteCredential(
