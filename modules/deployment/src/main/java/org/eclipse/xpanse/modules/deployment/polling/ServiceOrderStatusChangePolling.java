@@ -17,7 +17,7 @@ import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,8 +28,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Component
 public class ServiceOrderStatusChangePolling {
 
-    private static final List<TaskStatus> FINAL_TASK_STATUS =
-            Arrays.asList(TaskStatus.FAILED, TaskStatus.SUCCESSFUL);
+    private static final List<OrderStatus> FINAL_TASK_STATUS =
+            Arrays.asList(OrderStatus.FAILED, OrderStatus.SUCCESSFUL);
 
     @Value("${service.order.status.long.polling.interval.in.seconds:5}")
     private int pollingInterval;
@@ -45,19 +45,19 @@ public class ServiceOrderStatusChangePolling {
      * @param deferredResult deferredResult object from the original HTTP thread to which the result
      *     object must be set.
      * @param orderId id of the service order.
-     * @param previousKnownTaskStatus previously known task status of the service order to the
+     * @param previousKnownOrderStatus previously known task status of the service order to the
      *     client. the poller will wait as long as there is a change to this.
      */
-    public void fetchServiceOrderTaskStatusWithPolling(
+    public void fetchServiceOrderStatusWithPolling(
             DeferredResult<ServiceOrderStatusUpdate> deferredResult,
             UUID orderId,
-            TaskStatus previousKnownTaskStatus) {
+            OrderStatus previousKnownOrderStatus) {
         log.info("Start polling for service order status with order id: {}", orderId);
         AtomicReference<ServiceOrderStatusUpdate> ref =
                 new AtomicReference<>(
                         new ServiceOrderStatusUpdate(
-                                previousKnownTaskStatus,
-                                FINAL_TASK_STATUS.contains(previousKnownTaskStatus),
+                                previousKnownOrderStatus,
+                                FINAL_TASK_STATUS.contains(previousKnownOrderStatus),
                                 null));
         try {
             Awaitility.await()
@@ -68,16 +68,16 @@ public class ServiceOrderStatusChangePolling {
                             () -> {
                                 ServiceOrderEntity serviceOrderEntity =
                                         orderStorage.getEntityById(orderId);
-                                TaskStatus taskStatus = serviceOrderEntity.getTaskStatus();
-                                boolean isOrderCompleted = FINAL_TASK_STATUS.contains(taskStatus);
+                                OrderStatus orderStatus = serviceOrderEntity.getOrderStatus();
+                                boolean isOrderCompleted = FINAL_TASK_STATUS.contains(orderStatus);
                                 ref.set(
                                         new ServiceOrderStatusUpdate(
-                                                taskStatus,
+                                                orderStatus,
                                                 isOrderCompleted,
                                                 serviceOrderEntity.getErrorResponse()));
                                 boolean statusIsChanged =
-                                        Objects.nonNull(previousKnownTaskStatus)
-                                                && taskStatus != previousKnownTaskStatus;
+                                        Objects.nonNull(previousKnownOrderStatus)
+                                                && orderStatus != previousKnownOrderStatus;
                                 return isOrderCompleted || statusIsChanged;
                             });
         } catch (ConditionTimeoutException conditionTimeoutException) {

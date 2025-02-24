@@ -33,7 +33,7 @@ import org.eclipse.xpanse.modules.deployment.PolicyValidator;
 import org.eclipse.xpanse.modules.deployment.ServiceChangeRequestsManager;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeRequestDetails;
@@ -243,7 +243,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
 
         ServiceChangeOrderDetails serviceChangeOrderDetails = new ServiceChangeOrderDetails();
         serviceChangeOrderDetails.setOrderId(orderId);
-        serviceChangeOrderDetails.setOrderStatus(TaskStatus.IN_PROGRESS);
+        serviceChangeOrderDetails.setOrderStatus(OrderStatus.IN_PROGRESS);
         serviceChangeOrderDetails.setServiceChangeRequestProperties(new HashMap<>());
         serviceChangeOrderDetails.setServiceChangeRequests(List.of(serviceChangeRequestDetails));
 
@@ -279,7 +279,7 @@ class ServiceConfigurationApiTest extends ApisTestCommon {
         assertEquals(1, responseDetails.size());
         ServiceChangeOrderDetails detail = responseDetails.get(0);
         assertEquals(orderId, detail.getOrderId());
-        assertEquals(TaskStatus.IN_PROGRESS, detail.getOrderStatus());
+        assertEquals(OrderStatus.IN_PROGRESS, detail.getOrderStatus());
         assertEquals(1, detail.getServiceChangeRequests().size());
 
         return objectMapper.readValue(

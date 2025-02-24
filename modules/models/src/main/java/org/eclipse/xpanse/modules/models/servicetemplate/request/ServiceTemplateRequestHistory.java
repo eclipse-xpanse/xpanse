@@ -39,7 +39,7 @@ public class ServiceTemplateRequestHistory extends ServiceTemplateRequestInfo {
     @Schema(description = "Create time of the service template request.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
-    private OffsetDateTime createTime;
+    private OffsetDateTime createdTime;
 
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")

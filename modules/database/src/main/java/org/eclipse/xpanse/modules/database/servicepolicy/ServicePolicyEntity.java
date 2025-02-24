@@ -19,7 +19,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
+import org.eclipse.xpanse.modules.database.common.CreatedModifiedTime;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -31,7 +31,7 @@ import org.hibernate.annotations.OnDeleteAction;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"SERVICE_TEMPLATE_ID", "POLICY"})})
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class ServicePolicyEntity extends CreateModifiedTime {
+public class ServicePolicyEntity extends CreatedModifiedTime {
 
     /** The id of the entity. */
     @Id

@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
 /** Enumeration class for service order status. */
-public enum TaskStatus {
+public enum OrderStatus {
     CREATED("created"),
     IN_PROGRESS("in-progress"),
     SUCCESSFUL("successful"),
@@ -20,23 +20,23 @@ public enum TaskStatus {
 
     private final String value;
 
-    TaskStatus(String value) {
+    OrderStatus(String value) {
         this.value = value;
     }
 
-    /** For WorkFlowTaskStatus deserialize. */
+    /** For OrderStatus deserialize. */
     @JsonCreator
-    public static TaskStatus getByValue(String value) {
-        for (TaskStatus entry : values()) {
+    public static OrderStatus getByValue(String value) {
+        for (OrderStatus entry : values()) {
             if (StringUtils.equalsIgnoreCase(entry.value, value)) {
                 return entry;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("WorkFlowTaskStatus value %s is not supported.", value));
+                String.format("OrderStatus value %s is not supported.", value));
     }
 
-    /** For WorkFlowTaskStatus serialize. */
+    /** For OrderStatus serialize. */
     @JsonValue
     public String toValue() {
         return this.value;

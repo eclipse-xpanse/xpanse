@@ -138,7 +138,8 @@ class ServicePolicyManageApiTest extends ApisTestCommon {
         // Verify the results
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
         Assertions.assertNotNull(servicePolicy.getServicePolicyId());
-        Assertions.assertEquals(servicePolicy.getCreateTime(), servicePolicy.getLastModifiedTime());
+        Assertions.assertEquals(
+                servicePolicy.getCreatedTime(), servicePolicy.getLastModifiedTime());
         Assertions.assertEquals(servicePolicy.getPolicy(), createRequest.getPolicy());
         Assertions.assertTrue(servicePolicy.getEnabled());
 

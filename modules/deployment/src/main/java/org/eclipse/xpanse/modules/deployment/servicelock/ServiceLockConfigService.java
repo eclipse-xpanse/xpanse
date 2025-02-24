@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -72,7 +72,7 @@ public class ServiceLockConfigService {
         deployedService.setLockConfig(lockConfig);
         serviceDeploymentEntityHandler.storeAndFlush(deployedService);
         serviceOrder.setCompletedTime(OffsetDateTime.now());
-        serviceOrder.setTaskStatus(TaskStatus.SUCCESSFUL);
+        serviceOrder.setOrderStatus(OrderStatus.SUCCESSFUL);
         serviceOrderStorage.storeAndFlush(serviceOrder);
         return new ServiceOrder(serviceOrder.getOrderId(), deployedService.getId());
     }

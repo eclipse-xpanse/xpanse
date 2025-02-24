@@ -21,8 +21,8 @@ import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -90,7 +90,7 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
                     String resultMessage = (String) variables.get(RecreateConstants.RESULT_MESSAGE);
                     serviceOrderManager.completeOrderProgress(
                             recreateOrderId,
-                            TaskStatus.FAILED,
+                            OrderStatus.FAILED,
                             ErrorResponse.errorResponse(
                                     ErrorType.DESTROY_FAILED_EXCEPTION, List.of(resultMessage)));
                 }
@@ -104,7 +104,7 @@ public class ProcessRecreateDestroyResult implements Serializable, JavaDelegate 
                     processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS, false);
             serviceOrderManager.completeOrderProgress(
                     recreateOrderId,
-                    TaskStatus.FAILED,
+                    OrderStatus.FAILED,
                     ErrorResponse.errorResponse(
                             ErrorType.DESTROY_FAILED_EXCEPTION, List.of(e.getMessage())));
         }

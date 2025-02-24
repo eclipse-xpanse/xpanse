@@ -18,8 +18,8 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerResultRefetchManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootResultRefetchManager;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -58,8 +58,8 @@ public class ServiceResultReFetchManager {
                             .filter(
                                     serviceOrder ->
                                             serviceOrder.getTaskType() == ServiceOrderType.DEPLOY
-                                                    && serviceOrder.getTaskStatus()
-                                                            == TaskStatus.IN_PROGRESS)
+                                                    && serviceOrder.getOrderStatus()
+                                                            == OrderStatus.IN_PROGRESS)
                             .findFirst()
                             .orElseThrow(
                                     () ->
@@ -77,8 +77,8 @@ public class ServiceResultReFetchManager {
                             .filter(
                                     serviceOrder ->
                                             serviceOrder.getTaskType() == ServiceOrderType.DESTROY
-                                                    && serviceOrder.getTaskStatus()
-                                                            == TaskStatus.IN_PROGRESS)
+                                                    && serviceOrder.getOrderStatus()
+                                                            == OrderStatus.IN_PROGRESS)
                             .findFirst()
                             .orElseThrow(
                                     () ->
@@ -96,8 +96,8 @@ public class ServiceResultReFetchManager {
                             .filter(
                                     serviceOrder ->
                                             serviceOrder.getTaskType() == ServiceOrderType.MODIFY
-                                                    && serviceOrder.getTaskStatus()
-                                                            == TaskStatus.IN_PROGRESS)
+                                                    && serviceOrder.getOrderStatus()
+                                                            == OrderStatus.IN_PROGRESS)
                             .findFirst()
                             .orElseThrow(
                                     () ->

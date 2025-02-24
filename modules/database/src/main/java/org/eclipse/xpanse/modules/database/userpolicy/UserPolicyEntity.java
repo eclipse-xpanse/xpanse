@@ -18,7 +18,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
+import org.eclipse.xpanse.modules.database.common.CreatedModifiedTime;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 
 /** Represents the USER_POLICY table in the database. */
@@ -28,7 +28,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"USERID", "POLICY", "CSP"})})
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class UserPolicyEntity extends CreateModifiedTime {
+public class UserPolicyEntity extends CreatedModifiedTime {
 
     /** The id of the entity. */
     @Id

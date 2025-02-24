@@ -20,7 +20,7 @@ import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class StartDestroy implements Serializable, JavaDelegate {
                     processInstanceId, ServicePortingConstants.IS_DEPLOY_SUCCESS, false);
             serviceOrderManager.completeOrderProgress(
                     destroyTask.getParentOrderId(),
-                    TaskStatus.FAILED,
+                    OrderStatus.FAILED,
                     ErrorResponse.errorResponse(
                             ErrorType.DESTROY_FAILED_EXCEPTION, List.of(e.getMessage())));
         }

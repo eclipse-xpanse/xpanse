@@ -30,6 +30,8 @@ public class ModifyRequest implements Serializable {
     private String flavor;
 
     /** The property of the Service. */
-    @Schema(description = "The properties for the requested service")
+    @Schema(
+            description = "The properties for the requested service",
+            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> serviceRequestProperties;
 }

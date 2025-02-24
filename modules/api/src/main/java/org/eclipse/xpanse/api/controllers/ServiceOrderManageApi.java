@@ -19,7 +19,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -52,7 +52,7 @@ public class ServiceOrderManageApi {
      *
      * @param serviceId id of the service.
      * @param taskType task type of the service order.
-     * @param taskStatus task status of the order.
+     * @param orderStatus task status of the order.
      * @return service orders.
      */
     @Tag(name = "ServiceOrders", description = "APIs to manage orders of services")
@@ -67,10 +67,10 @@ public class ServiceOrderManageApi {
             @Parameter(name = "taskType", description = "Task type of the service order.")
                     @RequestParam(name = "taskType", required = false)
                     ServiceOrderType taskType,
-            @Parameter(name = "taskStatus", description = "Task status of the service order")
-                    @RequestParam(name = "taskStatus", required = false)
-                    TaskStatus taskStatus) {
-        return serviceOrderManager.listServiceOrders(serviceId, taskType, taskStatus);
+            @Parameter(name = "orderStatus", description = "Task status of the service order")
+                    @RequestParam(name = "orderStatus", required = false)
+                    OrderStatus orderStatus) {
+        return serviceOrderManager.listServiceOrders(serviceId, taskType, orderStatus);
     }
 
     /**
@@ -151,9 +151,9 @@ public class ServiceOrderManageApi {
                                             + " the service will wait for a configured period time"
                                             + " until to see if there is a change to the last known"
                                             + " state.")
-                    @RequestParam(name = "lastKnownServiceOrderTaskStatus", required = false)
-                    TaskStatus lastKnownServiceOrderTaskStatus) {
+                    @RequestParam(name = "lastKnownServiceOrderStatus", required = false)
+                    OrderStatus lastKnownServiceOrderStatus) {
         return serviceOrderManager.getLatestServiceOrderStatus(
-                orderId, lastKnownServiceOrderTaskStatus);
+                orderId, lastKnownServiceOrderStatus);
     }
 }

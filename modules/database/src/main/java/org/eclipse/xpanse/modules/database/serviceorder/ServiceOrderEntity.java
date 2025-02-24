@@ -28,7 +28,7 @@ import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -70,8 +70,8 @@ public class ServiceOrderEntity implements Serializable {
     private String userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "TASK_STATUS", nullable = false)
-    private TaskStatus taskStatus;
+    @Column(name = "ORDER_STATUS", nullable = false)
+    private OrderStatus orderStatus;
 
     @Column(name = "ERROR", columnDefinition = "json")
     @Type(value = JsonType.class)

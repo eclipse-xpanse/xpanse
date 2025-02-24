@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 
 /** Define view object for details of the service order. */
@@ -37,7 +37,7 @@ public class ServiceOrderDetails {
 
     @NotNull
     @Schema(description = "The task status of the service order.")
-    private TaskStatus taskStatus;
+    private OrderStatus orderStatus;
 
     @Schema(description = "The id of the original service.")
     private UUID originalServiceId;
@@ -65,9 +65,13 @@ public class ServiceOrderDetails {
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     private OffsetDateTime completedTime;
 
-    @Schema(description = "The requests of the service order.")
+    @Schema(
+            description = "The requests of the service order.",
+            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> requestBody;
 
-    @Schema(description = "The result properties of the service order.")
+    @Schema(
+            description = "The result properties of the service order.",
+            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> resultProperties;
 }

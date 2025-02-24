@@ -38,7 +38,9 @@ public class ServiceChangeRequestDetails {
     private String resultMessage;
 
     @NotNull
-    @Schema(description = "parameters sent to the agent.")
+    @Schema(
+            description = "parameters sent to the agent.",
+            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> properties;
 
     @NotNull

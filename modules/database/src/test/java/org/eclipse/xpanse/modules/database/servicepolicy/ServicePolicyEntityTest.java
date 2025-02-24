@@ -44,11 +44,11 @@ class ServicePolicyEntityTest {
     }
 
     @Test
-    void testCreateTimeGetterAndSetter() {
-        final OffsetDateTime createTime =
+    void testCreatedTimeGetterAndSetter() {
+        final OffsetDateTime createdTime =
                 OffsetDateTime.of(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
-        test.setCreateTime(createTime);
-        assertThat(test.getCreateTime()).isEqualTo(createTime);
+        test.setCreatedTime(createdTime);
+        assertThat(test.getCreatedTime()).isEqualTo(createdTime);
     }
 
     @Test

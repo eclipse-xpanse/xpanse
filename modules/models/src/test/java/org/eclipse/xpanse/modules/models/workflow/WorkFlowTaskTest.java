@@ -17,12 +17,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class WorkFlowTaskTest {
 
-    @Mock private OffsetDateTime mockCreateTime;
+    @Mock private OffsetDateTime mockCreatedTime;
 
     @Test
     void testProcessInstanceIdGetterAndSetter() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         final String processInstanceId = "processInstanceId";
         workFlowTaskUnderTest.setProcessInstanceId(processInstanceId);
         assertThat(workFlowTaskUnderTest.getProcessInstanceId()).isEqualTo(processInstanceId);
@@ -31,7 +31,7 @@ class WorkFlowTaskTest {
     @Test
     void testProcessInstanceNameGetterAndSetter() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         final String processInstanceName = "processInstanceName";
         workFlowTaskUnderTest.setProcessInstanceName(processInstanceName);
         assertThat(workFlowTaskUnderTest.getProcessInstanceName()).isEqualTo(processInstanceName);
@@ -40,7 +40,7 @@ class WorkFlowTaskTest {
     @Test
     void testProcessDefinitionIdGetterAndSetter() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         final String processDefinitionId = "processDefinitionId";
         workFlowTaskUnderTest.setProcessDefinitionId(processDefinitionId);
         assertThat(workFlowTaskUnderTest.getProcessDefinitionId()).isEqualTo(processDefinitionId);
@@ -49,7 +49,7 @@ class WorkFlowTaskTest {
     @Test
     void testProcessDefinitionNameGetterAndSetter() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         final String processDefinitionName = "processDefinitionName";
         workFlowTaskUnderTest.setProcessDefinitionName(processDefinitionName);
         assertThat(workFlowTaskUnderTest.getProcessDefinitionName())
@@ -59,7 +59,7 @@ class WorkFlowTaskTest {
     @Test
     void testExecutionIdGetterAndSetter() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         final String executionId = "executionId";
         workFlowTaskUnderTest.setExecutionId(executionId);
         assertThat(workFlowTaskUnderTest.getExecutionId()).isEqualTo(executionId);
@@ -68,7 +68,7 @@ class WorkFlowTaskTest {
     @Test
     void testTaskIdGetterAndSetter() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         final String taskId = "taskId";
         workFlowTaskUnderTest.setTaskId(taskId);
         assertThat(workFlowTaskUnderTest.getTaskId()).isEqualTo(taskId);
@@ -77,7 +77,7 @@ class WorkFlowTaskTest {
     @Test
     void testTaskNameGetterAndSetter() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         final String taskName = "taskName";
         workFlowTaskUnderTest.setTaskName(taskName);
         assertThat(workFlowTaskUnderTest.getTaskName()).isEqualTo(taskName);
@@ -86,41 +86,34 @@ class WorkFlowTaskTest {
     @Test
     void testBusinessKeyGetterAndSetter() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         final String businessKey = "businessKey";
         workFlowTaskUnderTest.setBusinessKey(businessKey);
         assertThat(workFlowTaskUnderTest.getBusinessKey()).isEqualTo(businessKey);
     }
 
     @Test
-    void testGetCreateTime() {
+    void testGetCreatedTime() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        mockCreateTime = OffsetDateTime.now();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
-        assertThat(workFlowTaskUnderTest.getCreateTime()).isEqualTo(mockCreateTime);
-    }
-
-    @Test
-    void testEquals() {
-        final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
-        assertThat(workFlowTaskUnderTest.equals("o")).isFalse();
+        mockCreatedTime = OffsetDateTime.now();
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
+        assertThat(workFlowTaskUnderTest.getCreatedTime()).isEqualTo(mockCreatedTime);
     }
 
     @Test
     void testCanEqual() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         assertThat(workFlowTaskUnderTest.canEqual("other")).isFalse();
     }
 
     @Test
     void testHashCode() {
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
 
         final WorkFlowTask workFlowTaskUnderTest2 = new WorkFlowTask();
-        workFlowTaskUnderTest2.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest2.setCreatedTime(mockCreatedTime);
         assertThat(workFlowTaskUnderTest.hashCode()).isEqualTo(workFlowTaskUnderTest2.hashCode());
     }
 
@@ -129,11 +122,11 @@ class WorkFlowTaskTest {
         String result =
                 "WorkFlowTask(processInstanceId=null, processInstanceName=null,"
                         + " processDefinitionId=null, processDefinitionName=null, executionId=null,"
-                        + " taskId=null, taskName=null, businessKey=null, status=null, "
-                        + "createTime=mockCreateTime)";
+                        + " taskId=null, taskName=null, businessKey=null, taskStatus=null, "
+                        + "createdTime=mockCreatedTime)";
 
         final WorkFlowTask workFlowTaskUnderTest = new WorkFlowTask();
-        workFlowTaskUnderTest.setCreateTime(mockCreateTime);
+        workFlowTaskUnderTest.setCreatedTime(mockCreatedTime);
         assertThat(workFlowTaskUnderTest.toString()).isEqualTo(result);
     }
 }

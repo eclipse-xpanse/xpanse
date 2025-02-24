@@ -55,7 +55,7 @@ public class ServicePolicy {
     @Schema(description = "Time of the policy created.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
-    private OffsetDateTime createTime;
+    private OffsetDateTime createdTime;
 
     @NotNull
     @Schema(description = "Time of the policy updated.")

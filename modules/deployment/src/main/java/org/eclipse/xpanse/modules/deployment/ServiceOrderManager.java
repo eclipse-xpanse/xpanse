@@ -33,7 +33,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -76,7 +76,7 @@ public class ServiceOrderManager {
         orderTask.setServiceDeploymentEntity(serviceDeploymentEntity);
         orderTask.setOriginalServiceId(task.getOriginalServiceId());
         orderTask.setWorkflowId(task.getWorkflowId());
-        orderTask.setTaskStatus(TaskStatus.CREATED);
+        orderTask.setOrderStatus(OrderStatus.CREATED);
         orderTask.setStartedTime(OffsetDateTime.now());
         orderTask.setRequestBody(getRequestBody(task.getRequest()));
         orderTask.setHandler(handler);
@@ -116,7 +116,7 @@ public class ServiceOrderManager {
         serviceOrderEntity.setServiceDeploymentEntity(serviceDeploymentEntity);
         serviceOrderEntity.setTaskType(serviceOrderType);
         serviceOrderEntity.setUserId(userServiceHelper.getCurrentUserId());
-        serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
+        serviceOrderEntity.setOrderStatus(OrderStatus.CREATED);
         serviceOrderEntity.setStartedTime(OffsetDateTime.now());
         serviceOrderEntity.setRequestBody(getRequestBody(originalRequest));
         return serviceOrderStorage.storeAndFlush(serviceOrderEntity);
@@ -129,7 +129,7 @@ public class ServiceOrderManager {
      * @return service order entity.
      */
     public ServiceOrderEntity startOrderProgress(ServiceOrderEntity serviceOrder) {
-        serviceOrder.setTaskStatus(TaskStatus.IN_PROGRESS);
+        serviceOrder.setOrderStatus(OrderStatus.IN_PROGRESS);
         serviceOrder.setStartedTime(OffsetDateTime.now());
         return serviceOrderStorage.storeAndFlush(serviceOrder);
     }
@@ -138,10 +138,10 @@ public class ServiceOrderManager {
      * Complete order progress.
      *
      * @param orderId service order id.
-     * @param taskStatus task status.
+     * @param orderStatus task status.
      */
     public void completeOrderProgress(
-            UUID orderId, TaskStatus taskStatus, ErrorResponse errorResponse) {
+            UUID orderId, OrderStatus orderStatus, ErrorResponse errorResponse) {
         ServiceOrderEntity serviceOrder = serviceOrderStorage.getEntityById(orderId);
         if (Objects.isNull(serviceOrder)) {
             String errMsg =
@@ -152,7 +152,7 @@ public class ServiceOrderManager {
             log.error(errMsg);
             throw new ServiceOrderNotFound(errMsg);
         }
-        serviceOrder.setTaskStatus(taskStatus);
+        serviceOrder.setOrderStatus(orderStatus);
         serviceOrder.setCompletedTime(OffsetDateTime.now());
         if (Objects.nonNull(errorResponse)) {
             serviceOrder.setErrorResponse(errorResponse);
@@ -169,9 +169,9 @@ public class ServiceOrderManager {
     public void completeOrderProgressWithDeployResult(
             ServiceOrderEntity serviceOrder, DeployResult deployResult) {
         if (deployResult.getIsTaskSuccessful()) {
-            serviceOrder.setTaskStatus(TaskStatus.SUCCESSFUL);
+            serviceOrder.setOrderStatus(OrderStatus.SUCCESSFUL);
         } else {
-            serviceOrder.setTaskStatus(TaskStatus.FAILED);
+            serviceOrder.setOrderStatus(OrderStatus.FAILED);
             ErrorResponse errorResponse =
                     ErrorResponse.errorResponse(
                             ErrorType.DEPLOYMENT_FAILED_EXCEPTION,
@@ -199,17 +199,17 @@ public class ServiceOrderManager {
      * List the service orders.
      *
      * @param serviceId service id.
-     * @param taskStatus order status.
+     * @param orderStatus order status.
      * @return list of service orders.
      */
     public List<ServiceOrderDetails> listServiceOrders(
-            UUID serviceId, ServiceOrderType taskType, TaskStatus taskStatus) {
+            UUID serviceId, ServiceOrderType taskType, OrderStatus orderStatus) {
         validateDeployService(serviceId, UserOperation.VIEW_ORDERS_OF_SERVICE);
         ServiceOrderEntity query = new ServiceOrderEntity();
         query.setServiceDeploymentEntity(
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId));
         query.setTaskType(taskType);
-        query.setTaskStatus(taskStatus);
+        query.setOrderStatus(orderStatus);
         if (!userServiceHelper.currentUserHasRole(ROLE_ADMIN)) {
             query.setUserId(userServiceHelper.getCurrentUserId());
         }
@@ -223,17 +223,17 @@ public class ServiceOrderManager {
      * Get the task status update of the service order.
      *
      * @param orderId if of the service order.
-     * @param lastKnownTaskStatus last known task status of the service order.
+     * @param lastKnownOrderStatus last known task status of the service order.
      * @return updated service order status.
      */
     public DeferredResult<ServiceOrderStatusUpdate> getLatestServiceOrderStatus(
-            UUID orderId, TaskStatus lastKnownTaskStatus) {
+            UUID orderId, OrderStatus lastKnownOrderStatus) {
         DeferredResult<ServiceOrderStatusUpdate> stateDeferredResult = new DeferredResult<>();
         taskExecutor.execute(
                 () -> {
                     try {
-                        this.serviceOrderStatusChangePolling.fetchServiceOrderTaskStatusWithPolling(
-                                stateDeferredResult, orderId, lastKnownTaskStatus);
+                        this.serviceOrderStatusChangePolling.fetchServiceOrderStatusWithPolling(
+                                stateDeferredResult, orderId, lastKnownOrderStatus);
                     } catch (Exception exception) {
                         stateDeferredResult.setErrorResult(exception);
                     }

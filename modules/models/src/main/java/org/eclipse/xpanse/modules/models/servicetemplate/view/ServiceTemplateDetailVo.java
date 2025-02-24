@@ -104,10 +104,10 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
     private ServiceHostingType serviceHostingType;
 
     @NotNull
-    @Schema(description = "createTime of the registered service.")
+    @Schema(description = "createdTime of the registered service.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
-    private OffsetDateTime createTime;
+    private OffsetDateTime createdTime;
 
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")

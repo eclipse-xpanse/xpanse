@@ -13,7 +13,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -63,7 +63,7 @@ class ServiceRecreateApiTest extends ApisTestCommon {
         assertThat(waitServiceOrderIsCompleted(servicePortingOrder.getOrderId())).isTrue();
         ServiceOrderEntity orderEntity =
                 serviceOrderStorage.getEntityById(servicePortingOrder.getOrderId());
-        assertThat(orderEntity.getTaskStatus()).isEqualTo(TaskStatus.SUCCESSFUL);
+        assertThat(orderEntity.getOrderStatus()).isEqualTo(OrderStatus.SUCCESSFUL);
 
         ServiceOrderEntity query = new ServiceOrderEntity();
         query.setWorkflowId(orderEntity.getWorkflowId());

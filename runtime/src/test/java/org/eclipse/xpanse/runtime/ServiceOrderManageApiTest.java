@@ -27,7 +27,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
@@ -88,7 +88,7 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         assertNotNull(orderId);
         assertNotNull(serviceId);
         ServiceOrderStatusUpdate statusUpdatedResult =
-                getLatestServiceOrderStatus(orderId, TaskStatus.CREATED);
+                getLatestServiceOrderStatus(orderId, OrderStatus.CREATED);
         assertThat(statusUpdatedResult).isNotNull();
         assertThat(statusUpdatedResult.getIsOrderCompleted()).isFalse();
 
@@ -104,12 +104,12 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
                         orderDetailsResponse.getContentAsString(), ServiceOrderDetails.class);
 
         assertThat(orderDetails.getOrderId()).isEqualTo(orderId);
-        assertThat(orderDetails.getTaskStatus()).isEqualTo(TaskStatus.SUCCESSFUL);
+        assertThat(orderDetails.getOrderStatus()).isEqualTo(OrderStatus.SUCCESSFUL);
         assertThat(orderDetails.getTaskType()).isEqualTo(ServiceOrderType.DEPLOY);
         assertThat(orderDetails.getServiceId()).isEqualTo(serviceId);
 
         MockHttpServletResponse serviceOrdersResponse =
-                listServiceOrders(serviceId, ServiceOrderType.DEPLOY, TaskStatus.SUCCESSFUL);
+                listServiceOrders(serviceId, ServiceOrderType.DEPLOY, OrderStatus.SUCCESSFUL);
 
         assertThat(serviceOrdersResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         List<ServiceOrderDetails> serviceOrders =
@@ -132,7 +132,7 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
         assertThat(getOrderDetailsResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
         MockHttpServletResponse listServiceOrdersResponse =
-                listServiceOrders(serviceId, ServiceOrderType.DEPLOY, TaskStatus.SUCCESSFUL);
+                listServiceOrders(serviceId, ServiceOrderType.DEPLOY, OrderStatus.SUCCESSFUL);
 
         assertThat(listServiceOrdersResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
@@ -241,15 +241,15 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
     }
 
     MockHttpServletResponse listServiceOrders(
-            UUID serviceId, ServiceOrderType taskType, TaskStatus taskStatus) throws Exception {
+            UUID serviceId, ServiceOrderType taskType, OrderStatus orderStatus) throws Exception {
         MockHttpServletRequestBuilder listRequestBuilder =
                 get("/xpanse/services/{serviceId}/orders", serviceId)
                         .accept(MediaType.APPLICATION_JSON);
         if (taskType != null) {
             listRequestBuilder.param("taskType", taskType.toValue());
         }
-        if (taskStatus != null) {
-            listRequestBuilder.param("taskStatus", taskStatus.toValue());
+        if (orderStatus != null) {
+            listRequestBuilder.param("orderStatus", orderStatus.toValue());
         }
         return mockMvc.perform(listRequestBuilder).andReturn().getResponse();
     }

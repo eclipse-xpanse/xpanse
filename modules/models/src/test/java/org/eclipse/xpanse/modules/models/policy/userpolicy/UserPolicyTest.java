@@ -48,11 +48,11 @@ class UserPolicyTest {
     }
 
     @Test
-    void testCreateTimeGetterAndSetter() {
-        final OffsetDateTime createTime =
+    void testCreatedTimeGetterAndSetter() {
+        final OffsetDateTime createdTime =
                 OffsetDateTime.of(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
-        test.setCreateTime(createTime);
-        assertThat(test.getCreateTime()).isEqualTo(createTime);
+        test.setCreatedTime(createdTime);
+        assertThat(test.getCreatedTime()).isEqualTo(createdTime);
     }
 
     @Test
@@ -89,7 +89,7 @@ class UserPolicyTest {
     void testToString() {
         String result =
                 String.format(
-                        "UserPolicy(userPolicyId=%s, policy=%s, csp=%s, enabled=%s, createTime=%s,"
+                        "UserPolicy(userPolicyId=%s, policy=%s, csp=%s, enabled=%s, createdTime=%s,"
                                 + " lastModifiedTime=%s)",
                         id, policy, mockCsp, enabled, null, null);
         assertThat(test.toString()).isEqualTo(result);

@@ -58,7 +58,8 @@ public class DeployVariable implements Serializable {
                     "valueSchema of the variable. The key be any keyword that is part of the JSON"
                             + " schema definition which can be found here"
                             + " https://json-schema.org/draft/2020-12/meta/validation."
-                            + " Only the type field is taken from dataType parameter directly. ")
+                            + " Only the type field is taken from dataType parameter directly.",
+            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> valueSchema;
 
     @Schema(description = "Sensitive scope of variable storage")

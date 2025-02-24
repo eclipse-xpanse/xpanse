@@ -21,8 +21,8 @@ import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +65,7 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
                 runtimeService.setVariable(
                         processInstanceId, ServicePortingConstants.IS_DESTROY_SUCCESS, true);
                 serviceOrderManager.completeOrderProgress(
-                        servicePortingOrderId, TaskStatus.SUCCESSFUL, null);
+                        servicePortingOrderId, OrderStatus.SUCCESSFUL, null);
             } else {
                 int destroyRetryNum = getDestroyRetryNum(variables);
                 runtimeService.setVariable(
@@ -87,7 +87,7 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
                             (String) variables.get(ServicePortingConstants.RESULT_MESSAGE);
                     serviceOrderManager.completeOrderProgress(
                             servicePortingOrderId,
-                            TaskStatus.FAILED,
+                            OrderStatus.FAILED,
                             ErrorResponse.errorResponse(
                                     ErrorType.DESTROY_FAILED_EXCEPTION, List.of(resultMessage)));
                 }
@@ -101,7 +101,7 @@ public class ProcessDestroyResult implements Serializable, JavaDelegate {
                     processInstanceId, ServicePortingConstants.IS_DESTROY_SUCCESS, false);
             serviceOrderManager.completeOrderProgress(
                     servicePortingOrderId,
-                    TaskStatus.FAILED,
+                    OrderStatus.FAILED,
                     ErrorResponse.errorResponse(
                             ErrorType.DESTROY_FAILED_EXCEPTION, List.of(e.getMessage())));
         }

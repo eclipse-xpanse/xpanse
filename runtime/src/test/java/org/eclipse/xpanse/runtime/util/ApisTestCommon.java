@@ -57,7 +57,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.DeploymentStatusUpdate;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -270,9 +270,9 @@ public class ApisTestCommon {
     }
 
     protected ServiceOrderStatusUpdate getLatestServiceOrderStatus(
-            UUID orderId, TaskStatus taskStatus) throws InterruptedException {
+            UUID orderId, OrderStatus orderStatus) throws InterruptedException {
         DeferredResult<ServiceOrderStatusUpdate> deferredResult =
-                serviceOrderManager.getLatestServiceOrderStatus(orderId, taskStatus);
+                serviceOrderManager.getLatestServiceOrderStatus(orderId, orderStatus);
         while (Objects.isNull(deferredResult.getResult())) {
             Thread.sleep(1000);
         }

@@ -685,7 +685,7 @@ public class ServiceTemplateManage {
         }
         return historyList.stream()
                 .sorted(
-                        Comparator.comparing(ServiceTemplateRequestHistoryEntity::getCreateTime)
+                        Comparator.comparing(ServiceTemplateRequestHistoryEntity::getCreatedTime)
                                 .reversed())
                 .map(EntityTranslationUtils::convertToServiceTemplateHistoryVo)
                 .toList();

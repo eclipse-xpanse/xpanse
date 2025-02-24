@@ -46,7 +46,7 @@ class DeployedServiceTest {
     private final ServiceDeploymentState serviceDeploymentState =
             ServiceDeploymentState.DEPLOY_SUCCESS;
     private final ServiceState SERVICE_STATE = ServiceState.NOT_RUNNING;
-    private final OffsetDateTime createTime = OffsetDateTime.now();
+    private final OffsetDateTime createdTime = OffsetDateTime.now();
     private final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private final OffsetDateTime LAST_STARTED_AT = OffsetDateTime.now();
     private final OffsetDateTime LAST_STOPPED_AT = OffsetDateTime.now();
@@ -74,7 +74,7 @@ class DeployedServiceTest {
         deployedService.setServiceTemplateId(serviceTemplateId);
         deployedService.setServiceDeploymentState(serviceDeploymentState);
         deployedService.setServiceState(SERVICE_STATE);
-        deployedService.setCreateTime(createTime);
+        deployedService.setCreatedTime(createdTime);
         deployedService.setLastModifiedTime(lastModifiedTime);
         deployedService.setLastStartedAt(LAST_STARTED_AT);
         deployedService.setLastStoppedAt(LAST_STOPPED_AT);
@@ -98,7 +98,7 @@ class DeployedServiceTest {
         assertEquals(inputProperties, deployedService.getInputProperties());
         assertEquals(serviceTemplateId, deployedService.getServiceTemplateId());
         assertEquals(serviceDeploymentState, deployedService.getServiceDeploymentState());
-        assertEquals(createTime, deployedService.getCreateTime());
+        assertEquals(createdTime, deployedService.getCreatedTime());
         assertEquals(lastModifiedTime, deployedService.getLastModifiedTime());
         assertEquals(LAST_STARTED_AT, deployedService.getLastStartedAt());
         assertEquals(LAST_STOPPED_AT, deployedService.getLastStoppedAt());
@@ -163,8 +163,8 @@ class DeployedServiceTest {
                         + serviceDeploymentState
                         + ", serviceState="
                         + SERVICE_STATE
-                        + ", createTime="
-                        + createTime
+                        + ", createdTime="
+                        + createdTime
                         + ", lastModifiedTime="
                         + lastModifiedTime
                         + ", lastStartedAt="

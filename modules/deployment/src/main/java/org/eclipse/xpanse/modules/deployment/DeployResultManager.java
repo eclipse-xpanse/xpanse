@@ -37,8 +37,8 @@ import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deployment.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
@@ -485,7 +485,7 @@ public class DeployResultManager {
             ErrorType errorType,
             HttpClientErrorException e) {
         serviceEntity.setServiceDeploymentState(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
-        serviceOrder.setTaskStatus(TaskStatus.FAILED);
+        serviceOrder.setOrderStatus(OrderStatus.FAILED);
         serviceOrder.setErrorResponse(
                 ErrorResponse.errorResponse(errorType, List.of(e.getMessage())));
         serviceDeploymentStorage.storeAndFlush(serviceEntity);

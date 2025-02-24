@@ -82,7 +82,7 @@ public class DatabaseServiceTemplateRequestHistoryStorage
                     }
                     assert query != null;
                     query.distinct(true);
-                    query.orderBy(criteriaBuilder.asc(root.get("createTime")));
+                    query.orderBy(criteriaBuilder.asc(root.get("createdTime")));
                     return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
                 };
 

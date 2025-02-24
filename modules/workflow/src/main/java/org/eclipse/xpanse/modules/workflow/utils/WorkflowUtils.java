@@ -152,7 +152,7 @@ public class WorkflowUtils {
         workFlowTask.setExecutionId(task.getExecutionId());
         workFlowTask.setTaskId(task.getId());
         workFlowTask.setTaskName(task.getName());
-        workFlowTask.setCreateTime(
+        workFlowTask.setCreatedTime(
                 OffsetDateTime.ofInstant(task.getCreateTime().toInstant(), ZoneOffset.UTC));
         return workFlowTask;
     }
@@ -205,12 +205,12 @@ public class WorkflowUtils {
     }
 
     private WorkFlowTask setTodoTaskStatus(WorkFlowTask workFlowTask) {
-        workFlowTask.setStatus(WorkFlowTaskStatus.FAILED);
+        workFlowTask.setTaskStatus(WorkFlowTaskStatus.FAILED);
         return workFlowTask;
     }
 
     private WorkFlowTask setDoneTaskStatus(WorkFlowTask workFlowTask) {
-        workFlowTask.setStatus(WorkFlowTaskStatus.DONE);
+        workFlowTask.setTaskStatus(WorkFlowTaskStatus.DONE);
         return workFlowTask;
     }
 }

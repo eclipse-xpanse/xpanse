@@ -16,7 +16,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,10 +62,10 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
                         predicateList.add(
                                 criteriaBuilder.equal(root.get("taskType"), entity.getTaskType()));
                     }
-                    if (Objects.nonNull(entity.getTaskStatus())) {
+                    if (Objects.nonNull(entity.getOrderStatus())) {
                         predicateList.add(
                                 criteriaBuilder.equal(
-                                        root.get("taskStatus"), entity.getTaskStatus()));
+                                        root.get("orderStatus"), entity.getOrderStatus()));
                     }
                     if (Objects.nonNull(entity.getParentOrderId())) {
                         predicateList.add(
@@ -120,8 +120,8 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
     }
 
     private void checkEntityData(ServiceOrderEntity entity) {
-        TaskStatus taskStatus = entity.getTaskStatus();
-        if (taskStatus == TaskStatus.CREATED || taskStatus == TaskStatus.IN_PROGRESS) {
+        OrderStatus orderStatus = entity.getOrderStatus();
+        if (orderStatus == OrderStatus.CREATED || orderStatus == OrderStatus.IN_PROGRESS) {
             return;
         }
         if (Objects.isNull(entity.getCompletedTime())) {
@@ -130,7 +130,7 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
             log.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }
-        if (taskStatus == TaskStatus.FAILED) {
+        if (orderStatus == OrderStatus.FAILED) {
             if (Objects.isNull(entity.getErrorResponse())) {
                 String errorMsg =
                         "The error response could not be null when the order task is failed.";

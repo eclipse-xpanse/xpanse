@@ -32,8 +32,8 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.ModifyRequest;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
@@ -233,7 +233,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         if (waitServiceOrderIsCompleted(serviceOrder.getOrderId())) {
             ServiceOrderDetails serviceOrderDetails =
                     serviceOrderManageApi.getOrderDetailsByOrderId(serviceOrder.getOrderId());
-            assertEquals(serviceOrderDetails.getTaskStatus(), TaskStatus.SUCCESSFUL);
+            assertEquals(serviceOrderDetails.getOrderStatus(), OrderStatus.SUCCESSFUL);
             assertEquals(serviceOrderDetails.getTaskType(), ServiceOrderType.MODIFY);
         }
     }
@@ -245,7 +245,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         if (waitServiceOrderIsCompleted(serviceOrder.getOrderId())) {
             ServiceOrderDetails serviceOrderDetails =
                     serviceOrderManageApi.getOrderDetailsByOrderId(serviceOrder.getOrderId());
-            assertEquals(serviceOrderDetails.getTaskStatus(), TaskStatus.SUCCESSFUL);
+            assertEquals(serviceOrderDetails.getOrderStatus(), OrderStatus.SUCCESSFUL);
             assertEquals(serviceOrderDetails.getTaskType(), ServiceOrderType.DESTROY);
         }
     }

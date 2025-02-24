@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class ServiceOrderEntityTest {
     private final UUID uuid = UUID.fromString("4caabd86-1967-4351-aedc-b18cbab3ab61");
     private final ErrorResponse errorResponse = new ErrorResponse();
     private final String userId = "userId";
-    private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
+    private final OrderStatus orderStatus = OrderStatus.SUCCESSFUL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
     private final Handler handler = Handler.INTERNAL;
     @Mock private Map<String, Object> mockRequestBody;
@@ -49,7 +49,7 @@ class ServiceOrderEntityTest {
         test.setUserId(userId);
         test.setStartedTime(startedTime);
         test.setCompletedTime(completedTime);
-        test.setTaskStatus(taskStatus);
+        test.setOrderStatus(orderStatus);
         test.setErrorResponse(errorResponse);
         test.setRequestBody(mockRequestBody);
         test.setResultProperties(mockResultProperties);
@@ -65,7 +65,7 @@ class ServiceOrderEntityTest {
         assertThat(test.getWorkflowId()).isEqualTo(uuid.toString());
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
-        assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
+        assertThat(test.getOrderStatus()).isEqualTo(orderStatus);
         assertThat(test.getErrorResponse()).isEqualTo(errorResponse);
         assertThat(test.getCompletedTime()).isEqualTo(completedTime);
         assertThat(test.getStartedTime()).isEqualTo(startedTime);
@@ -106,8 +106,8 @@ class ServiceOrderEntityTest {
                         + taskType
                         + ", userId="
                         + userId
-                        + ", taskStatus="
-                        + taskStatus
+                        + ", orderStatus="
+                        + orderStatus
                         + ", errorResponse="
                         + errorResponse
                         + ", startedTime="
