@@ -55,6 +55,8 @@ public class ServiceTemplateEntityConverter {
             serviceTemplateDetailVo.setEula(serviceTemplateEntity.getOcl().getEula());
             serviceTemplateDetailVo.setServiceConfigurationManage(
                     serviceTemplateEntity.getOcl().getServiceConfigurationManage());
+            serviceTemplateDetailVo.setServiceActions(
+                    serviceTemplateEntity.getOcl().getServiceActions());
             return serviceTemplateDetailVo;
         }
         return null;
