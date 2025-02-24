@@ -8,11 +8,9 @@ jobs:
   automate-project-columns:
     runs-on: ubuntu-latest
     if: github.repository == 'eclipse-xpanse/xpanse'
-    permissions:
-      repository-projects: write
     steps:
       - uses: alex-page/github-project-automation-plus@v0.9.0
         with:
           project: eclipse-xpanse
           column: 'Backlog'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.BOT_GITHUB_TOKEN }}
