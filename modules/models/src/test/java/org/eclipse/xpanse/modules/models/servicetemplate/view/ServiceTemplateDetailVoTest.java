@@ -21,9 +21,11 @@ import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ConfigurationManagerTool;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +60,7 @@ class ServiceTemplateDetailVoTest {
     private FlavorsWithPrice flavors;
     private Billing billing;
     private ServiceTemplateDetailVo serviceTemplateDetailVo;
+    private List<ServiceAction> serviceActions;
 
     @BeforeEach
     void setUp() {
@@ -77,6 +80,11 @@ class ServiceTemplateDetailVoTest {
 
         billing = new Billing();
         billing.setBillingModes(Arrays.asList(BillingMode.values()));
+
+        ServiceAction serviceAction = new ServiceAction();
+        serviceAction.setName("backup");
+        serviceAction.setType(ConfigurationManagerTool.ANSIBLE);
+        serviceActions = List.of(serviceAction);
 
         serviceTemplateDetailVo = new ServiceTemplateDetailVo();
         serviceTemplateDetailVo.setServiceTemplateId(uuid);
@@ -102,6 +110,7 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
         serviceTemplateDetailVo.setEula(eula);
         serviceTemplateDetailVo.setServiceConfigurationManage(serviceConfigurationManage);
+        serviceTemplateDetailVo.setServiceActions(serviceActions);
     }
 
     @Test
@@ -196,6 +205,8 @@ class ServiceTemplateDetailVoTest {
                         + eula
                         + ", serviceConfigurationManage="
                         + serviceConfigurationManage
+                        + ", serviceActions="
+                        + serviceActions
                         + ")";
 
         assertEquals(expectedToString, serviceTemplateDetailVo.toString());
