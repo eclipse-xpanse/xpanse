@@ -22,7 +22,8 @@ import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
-import org.eclipse.xpanse.modules.models.workflow.recreate.exceptions.ServiceRecreateFailedException;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,34 +54,43 @@ public class StartRecreateDestroy implements Serializable, JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) {
         String processInstanceId = execution.getProcessInstanceId();
-
-        Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
-        UUID serviceId = (UUID) variables.get(RecreateConstants.SERVICE_ID);
-        UUID recreateOrderId = (UUID) variables.get(RecreateConstants.RECREATE_ORDER_ID);
-        int retryDestroyTimes = (int) variables.get(RecreateConstants.DESTROY_RETRY_NUM);
+        DeployTask destroyTask = getDestroyTaskForRecreate(processInstanceId);
+        int retryTimes = (int) execution.getVariable(RecreateConstants.DEPLOY_RETRY_NUM);
         log.info(
-                "Recreate workflow of instance id : {} start destroy old service with id:{}. "
-                        + "Retry times:{}",
+                "Start destroy task in service recreate workflow with id:{}. Task:{}. Retry"
+                        + " times:{}",
                 processInstanceId,
-                serviceId,
-                retryDestroyTimes);
+                destroyTask,
+                retryTimes);
         try {
-
-            deployService.destroyServiceByWorkflow(serviceId, processInstanceId, recreateOrderId);
-        } catch (ServiceRecreateFailedException e) {
+            ServiceOrder serviceOrder = deployService.destroyServiceByWorkflow(destroyTask);
+            log.info("Started destroy task with order: {} successfully.", serviceOrder);
+        } catch (Exception e) {
             log.error(
-                    "Recreate workflow of instance id : {} start destroy old service with id: {},"
-                            + " error: {}",
+                    "Started destroy task in service recreate workflow with id:{} failed.",
                     processInstanceId,
-                    serviceId,
-                    e.getMessage());
+                    e);
             runtimeService.setVariable(
                     processInstanceId, RecreateConstants.IS_DESTROY_SUCCESS, false);
             serviceOrderManager.completeOrderProgress(
-                    recreateOrderId,
+                    destroyTask.getParentOrderId(),
                     TaskStatus.FAILED,
                     ErrorResponse.errorResponse(
                             ErrorType.DESTROY_FAILED_EXCEPTION, List.of(e.getMessage())));
         }
+    }
+
+    private DeployTask getDestroyTaskForRecreate(String processInstanceId) {
+        DeployTask destroyTask = new DeployTask();
+        destroyTask.setWorkflowId(processInstanceId);
+        Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
+        UUID serviceId = (UUID) variables.get(RecreateConstants.SERVICE_ID);
+        destroyTask.setOriginalServiceId(serviceId);
+        destroyTask.setServiceId(serviceId);
+        UUID recreateOrderId = (UUID) variables.get(RecreateConstants.RECREATE_ORDER_ID);
+        destroyTask.setParentOrderId(recreateOrderId);
+        String userId = (String) variables.get(RecreateConstants.USER_ID);
+        destroyTask.setUserId(userId);
+        return destroyTask;
     }
 }

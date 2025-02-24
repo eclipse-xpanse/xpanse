@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -81,7 +82,7 @@ public class ServiceRecreateApi {
     public ServiceOrder recreateService(@Valid @PathVariable("serviceId") UUID serviceId) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 this.serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
-        String userId = getUserId();
+        String userId = userServiceHelper.getCurrentUserId();
         if (!StringUtils.equals(userId, serviceDeploymentEntity.getUserId())) {
             String errorMsg =
                     String.format(
@@ -131,21 +132,15 @@ public class ServiceRecreateApi {
         DeployTask recreateTask = getRecreateTask(serviceDeploymentEntity);
         ServiceOrderEntity recreateOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(
-                        recreateTask, serviceDeploymentEntity);
+                        recreateTask, serviceDeploymentEntity, Handler.WORKFLOW);
 
         // prepare recreate process variables
-        Map<String, Object> variable =
-                getRecreateProcessVariable(serviceDeploymentEntity, recreateOrderEntity);
+        Map<String, Object> variables = getRecreateProcessVariables(recreateTask);
         ProcessInstance instance =
-                workflowUtils.startProcess(RecreateConstants.PROCESS_KEY, variable);
-
+                workflowUtils.startProcessWithVariables(RecreateConstants.PROCESS_KEY, variables);
         recreateOrderEntity.setWorkflowId(instance.getProcessInstanceId());
-        ServiceOrderEntity updatedRecreateOrderEntity =
-                serviceOrderManager.startOrderProgress(recreateOrderEntity);
-
-        return new ServiceOrder(
-                updatedRecreateOrderEntity.getOrderId(),
-                updatedRecreateOrderEntity.getOriginalServiceId());
+        serviceOrderManager.startOrderProgress(recreateOrderEntity);
+        return new ServiceOrder(recreateTask.getOrderId(), recreateTask.getServiceId());
     }
 
     private DeployTask getRecreateTask(ServiceDeploymentEntity serviceDeploymentEntity) {
@@ -154,22 +149,16 @@ public class ServiceRecreateApi {
         recreateTask.setTaskType(ServiceOrderType.RECREATE);
         recreateTask.setServiceId(serviceDeploymentEntity.getId());
         recreateTask.setOriginalServiceId(serviceDeploymentEntity.getId());
-        recreateTask.setUserId(getUserId());
-        recreateTask.setDeployRequest(serviceDeploymentEntity.getDeployRequest());
+        recreateTask.setUserId(serviceDeploymentEntity.getUserId());
         return recreateTask;
     }
 
-    private String getUserId() {
-        return this.userServiceHelper.getCurrentUserId();
-    }
-
-    private Map<String, Object> getRecreateProcessVariable(
-            ServiceDeploymentEntity deployedService, ServiceOrderEntity recreateOrderEntity) {
+    private Map<String, Object> getRecreateProcessVariables(DeployTask recreateTask) {
         Map<String, Object> variable = new HashMap<>();
-        variable.put(RecreateConstants.SERVICE_ID, deployedService.getId());
-        variable.put(RecreateConstants.RECREATE_ORDER_ID, recreateOrderEntity.getOrderId());
-        variable.put(RecreateConstants.RECREATE_REQUEST, deployedService.getDeployRequest());
-        variable.put(RecreateConstants.USER_ID, recreateOrderEntity.getUserId());
+        variable.put(RecreateConstants.SERVICE_ID, recreateTask.getServiceId());
+        variable.put(RecreateConstants.RECREATE_ORDER_ID, recreateTask.getOrderId());
+        variable.put(RecreateConstants.RECREATE_REQUEST, recreateTask.getDeployRequest());
+        variable.put(RecreateConstants.USER_ID, recreateTask.getUserId());
         variable.put(RecreateConstants.DEPLOY_RETRY_NUM, 0);
         variable.put(RecreateConstants.DESTROY_RETRY_NUM, 0);
         return variable;

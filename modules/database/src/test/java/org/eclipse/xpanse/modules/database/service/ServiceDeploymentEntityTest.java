@@ -18,12 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
+import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
-import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.servicetemplate.Region;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
@@ -42,15 +44,19 @@ class ServiceDeploymentEntityTest {
     private final String SERVICE_VENDOR = "defaultUserId";
     private final Csp CSP = Csp.HUAWEI_CLOUD;
     private final String FLAVOR = "1-zookeeper-with-3-worker-nodes-normal";
+    private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
+    private final Region REGION = new Region();
+    private final BillingMode BILLING_MODE = BillingMode.FIXED;
+    private final Map<String, String> availabilityZones = new HashMap<>();
+    private final Boolean IS_EULA_ACCEPTED = true;
+    private final Map<String, String> INPUT_PROPERTIES = new HashMap<>();
     private final ServiceDeploymentState SERVICE_STATE = ServiceDeploymentState.DEPLOYING;
     private final ServiceState SERVICE_RUN_STATE = ServiceState.NOT_RUNNING;
     private final UUID SERVICE_TEMPLATE_ID =
             UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f3d");
-    private final DeployRequest CREATE_REQUEST = new DeployRequest();
     private final List<ServiceResourceEntity> DEPLOY_RESOURCE_LIST = new ArrayList<>();
     private final Map<String, String> OUTPUT_PROPERTIES = new HashMap<>();
     private final Map<String, String> DEPLOYMENT_GENERATED_FILES = new HashMap<>();
-    private final String RESULT_MESSAGE = "RESULT_MESSAGE";
     private ServiceDeploymentEntity test;
 
     @BeforeEach
@@ -64,15 +70,19 @@ class ServiceDeploymentEntityTest {
         test.setVersion(VERSION);
         test.setServiceVendor(SERVICE_VENDOR);
         test.setCsp(CSP);
+        test.setServiceHostingType(serviceHostingType);
+        test.setRegion(REGION);
+        test.setAvailabilityZones(availabilityZones);
         test.setFlavor(FLAVOR);
+        test.setBillingMode(BILLING_MODE);
+        test.setIsEulaAccepted(IS_EULA_ACCEPTED);
+        test.setInputProperties(INPUT_PROPERTIES);
         test.setServiceDeploymentState(SERVICE_STATE);
         test.setServiceState(SERVICE_RUN_STATE);
         test.setServiceTemplateId(SERVICE_TEMPLATE_ID);
-        test.setDeployRequest(CREATE_REQUEST);
         test.setDeployResources(DEPLOY_RESOURCE_LIST);
         test.setOutputProperties(OUTPUT_PROPERTIES);
         test.setDeploymentGeneratedFiles(DEPLOYMENT_GENERATED_FILES);
-        test.setResultMessage(RESULT_MESSAGE);
         test.setLastStartedAt(LAST_STARTED_AT);
         test.setLastStoppedAt(LAST_STOPPED_AT);
         test.setLockConfig(LOCK_CONFIG);
@@ -88,15 +98,19 @@ class ServiceDeploymentEntityTest {
         assertEquals(VERSION, test.getVersion());
         assertEquals(SERVICE_VENDOR, test.getServiceVendor());
         assertEquals(CSP, test.getCsp());
+        assertEquals(serviceHostingType, test.getServiceHostingType());
+        assertEquals(REGION, test.getRegion());
+        assertEquals(availabilityZones, test.getAvailabilityZones());
         assertEquals(FLAVOR, test.getFlavor());
+        assertEquals(BILLING_MODE, test.getBillingMode());
+        assertEquals(INPUT_PROPERTIES, test.getInputProperties());
+        assertEquals(IS_EULA_ACCEPTED, test.getIsEulaAccepted());
         assertEquals(SERVICE_STATE, test.getServiceDeploymentState());
         assertEquals(SERVICE_RUN_STATE, test.getServiceState());
         assertEquals(SERVICE_TEMPLATE_ID, test.getServiceTemplateId());
-        assertEquals(CREATE_REQUEST, test.getDeployRequest());
         assertEquals(DEPLOY_RESOURCE_LIST, test.getDeployResources());
         assertEquals(OUTPUT_PROPERTIES, test.getOutputProperties());
         assertEquals(DEPLOYMENT_GENERATED_FILES, test.getDeploymentGeneratedFiles());
-        assertEquals(RESULT_MESSAGE, test.getResultMessage());
         assertEquals(LAST_STARTED_AT, test.getLastStartedAt());
         assertEquals(LAST_STOPPED_AT, test.getLastStoppedAt());
         assertEquals(LOCK_CONFIG, test.getLockConfig());
@@ -113,26 +127,34 @@ class ServiceDeploymentEntityTest {
                         + CATEGORY
                         + ", name="
                         + NAME
-                        + ", customerServiceName="
-                        + CUSTOMER_SERVICE_NAME
                         + ", version="
                         + VERSION
+                        + ", customerServiceName="
+                        + CUSTOMER_SERVICE_NAME
                         + ", serviceVendor="
                         + SERVICE_VENDOR
                         + ", csp="
                         + CSP
+                        + ", serviceHostingType="
+                        + serviceHostingType
+                        + ", region="
+                        + REGION
+                        + ", availabilityZones="
+                        + availabilityZones
                         + ", flavor="
                         + FLAVOR
+                        + ", billingMode="
+                        + BILLING_MODE
+                        + ", inputProperties="
+                        + INPUT_PROPERTIES
+                        + ", isEulaAccepted="
+                        + IS_EULA_ACCEPTED
                         + ", serviceDeploymentState="
                         + SERVICE_STATE
-                        + ", resultMessage="
-                        + RESULT_MESSAGE
                         + ", serviceState="
                         + SERVICE_RUN_STATE
                         + ", serviceTemplateId="
                         + SERVICE_TEMPLATE_ID
-                        + ", deployRequest="
-                        + CREATE_REQUEST
                         + ", outputProperties="
                         + OUTPUT_PROPERTIES
                         + ", deploymentGeneratedFiles="

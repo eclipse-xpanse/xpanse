@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.models.service.deployment;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,9 +16,6 @@ import lombok.Data;
 public class ModifyRequest implements Serializable {
 
     @Serial private static final long serialVersionUID = 8759112725757850274L;
-
-    /** The id of the user who ordered the Service. */
-    @Hidden private String userId;
 
     /** Customer provided name for the service. */
     @Schema(

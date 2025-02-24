@@ -18,7 +18,6 @@ import org.springframework.beans.BeanUtils;
 class ServicePortingRequestTest {
 
     private final UUID id = UUID.fromString("ed6248d4-2bcd-4e94-84b0-29e014c05137");
-    private final String userId = "userId";
     private final Category category = Category.COMPUTE;
     private final String serviceName = "service";
     private final String customerServiceName = "customerService";
@@ -39,7 +38,6 @@ class ServicePortingRequestTest {
     void setUp() {
         request = new ServicePortingRequest();
         request.setOriginalServiceId(id);
-        request.setUserId(userId);
         request.setCategory(category);
         request.setServiceName(serviceName);
         request.setCustomerServiceName(customerServiceName);
@@ -59,7 +57,6 @@ class ServicePortingRequestTest {
     @Test
     void testGetterAndSetter() {
         assertEquals(id, request.getOriginalServiceId());
-        assertEquals(userId, request.getUserId());
         assertEquals(category, request.getCategory());
         assertEquals(serviceName, request.getServiceName());
         assertEquals(customerServiceName, request.getCustomerServiceName());
@@ -99,10 +96,7 @@ class ServicePortingRequestTest {
     @Test
     void testToString() {
         String expectedToString =
-                "ServicePortingRequest(super=DeployRequestBase("
-                        + "userId="
-                        + userId
-                        + ", category="
+                "ServicePortingRequest(super=DeployRequest(category="
                         + category
                         + ", serviceName="
                         + serviceName

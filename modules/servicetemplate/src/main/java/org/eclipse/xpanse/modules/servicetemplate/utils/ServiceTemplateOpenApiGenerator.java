@@ -192,7 +192,7 @@ public class ServiceTemplateOpenApiGenerator {
                 }
                 exec.waitFor();
                 if (exec.exitValue() != 0) {
-                    log.error("Create service openApi html file failed." + stdErrOut);
+                    log.error("Create service openApi html file failed. {}", stdErrOut);
                 }
                 // Modify the file name to serviceId.html
                 File tempHtmlFile = new File(openApiDir, "index.html");

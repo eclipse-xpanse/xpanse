@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidSe
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -81,7 +82,7 @@ public class ServiceStateManager {
         deployTask.setServiceId(service.getId());
         deployTask.setTaskType(taskType);
         deployTask.setUserId(getUserId());
-        return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service);
+        return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service, Handler.PLUGIN);
     }
 
     private void asyncStartService(
@@ -290,7 +291,7 @@ public class ServiceStateManager {
     }
 
     private void validateDeployServiceEntity(ServiceDeploymentEntity service) {
-        if (service.getDeployRequest().getServiceHostingType() == ServiceHostingType.SELF) {
+        if (service.getServiceHostingType() == ServiceHostingType.SELF) {
             boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(service.getUserId());
             if (!currentUserIsOwner) {
                 String errorMsg =
@@ -334,11 +335,11 @@ public class ServiceStateManager {
             throw new ServiceNotDeployedException(errorMsg);
         }
         serviceStateManageRequest.setServiceResourceEntityList(vmResources);
-        ServiceHostingType serviceHostingType = service.getDeployRequest().getServiceHostingType();
+        ServiceHostingType serviceHostingType = service.getServiceHostingType();
         if (serviceHostingType == ServiceHostingType.SELF) {
             serviceStateManageRequest.setUserId(service.getUserId());
         }
-        serviceStateManageRequest.setRegion(service.getDeployRequest().getRegion());
+        serviceStateManageRequest.setRegion(service.getRegion());
         return serviceStateManageRequest;
     }
 

@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
+import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
@@ -48,6 +49,7 @@ public class ServiceDetailsViewManager {
     @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource private ServiceTemplateStorage serviceTemplateStorage;
     @Resource private ServiceResultReFetchManager serviceResultReFetchManager;
+    @Resource private SensitiveDataHandler sensitiveDataHandler;
 
     /**
      * Get deploy service detail by id.
@@ -58,8 +60,7 @@ public class ServiceDetailsViewManager {
     public DeployedServiceDetails getServiceDetailsByIdForIsv(UUID id) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(id);
-        ServiceHostingType serviceHostingType =
-                serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
+        ServiceHostingType serviceHostingType = serviceDeploymentEntity.getServiceHostingType();
         if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
             String errorMsg = String.format("the details of Service with id %s no accessible", id);
             log.error(errorMsg);
@@ -97,6 +98,17 @@ public class ServiceDetailsViewManager {
             String serviceName,
             String serviceVersion,
             ServiceDeploymentState state) {
+        List<ServiceDeploymentEntity> serviceDeploymentEntities =
+                queryServiceDeploymentEntities(category, csp, serviceName, serviceVersion, state);
+        return setServiceConfigurationForDeployedServiceList(serviceDeploymentEntities);
+    }
+
+    private List<ServiceDeploymentEntity> queryServiceDeploymentEntities(
+            Category category,
+            Csp csp,
+            String serviceName,
+            String serviceVersion,
+            ServiceDeploymentState state) {
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
         String currentUserId = userServiceHelper.getCurrentUserId();
@@ -108,7 +120,7 @@ public class ServiceDetailsViewManager {
                         serviceResultReFetchManager
                                 .reFetchDeploymentStateForMissingOrdersFromDeployers(
                                         serviceDeployment));
-        return setServiceConfigurationForDeployedServiceList(serviceDeploymentEntities);
+        return serviceDeploymentEntities;
     }
 
     /**
@@ -127,18 +139,16 @@ public class ServiceDetailsViewManager {
             String serviceVersion,
             ServiceDeploymentState serviceState) {
         List<DeployedService> servicesDetails = new ArrayList<>();
-        List<DeployedService> services =
-                listDeployedServices(category, csp, serviceName, serviceVersion, serviceState);
+        List<ServiceDeploymentEntity> services =
+                queryServiceDeploymentEntities(
+                        category, csp, serviceName, serviceVersion, serviceState);
         if (!CollectionUtils.isEmpty(services)) {
-            for (DeployedService deployService : services) {
-                if (deployService.getServiceHostingType() == ServiceHostingType.SERVICE_VENDOR) {
-                    servicesDetails.add(
-                            getVendorHostedServiceDetailsByIdForEndUser(
-                                    deployService.getServiceId()));
+            for (ServiceDeploymentEntity serviceDeployment : services) {
+                if (serviceDeployment.getServiceHostingType()
+                        == ServiceHostingType.SERVICE_VENDOR) {
+                    servicesDetails.add(getVendorHostedServiceDetails(serviceDeployment));
                 } else {
-                    servicesDetails.add(
-                            getSelfHostedServiceDetailsByIdForEndUser(
-                                    deployService.getServiceId()));
+                    servicesDetails.add(getSelfHostedServiceDetails(serviceDeployment));
                 }
             }
         }
@@ -164,8 +174,7 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new AccessDeniedException(errorMsg);
         }
-        ServiceHostingType serviceHostingType =
-                serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
+        ServiceHostingType serviceHostingType = serviceDeploymentEntity.getServiceHostingType();
         if (ServiceHostingType.SELF != serviceHostingType) {
             String errorMsg =
                     String.format(
@@ -175,9 +184,18 @@ public class ServiceDetailsViewManager {
         }
         serviceResultReFetchManager.reFetchDeploymentStateForMissingOrdersFromDeployers(
                 serviceDeploymentEntity);
+        return getSelfHostedServiceDetails(serviceDeploymentEntity);
+    }
+
+    private DeployedServiceDetails getSelfHostedServiceDetails(
+            ServiceDeploymentEntity serviceDeploymentEntity) {
         DeployedServiceDetails details =
                 EntityTranslationUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
-        setServiceConfigurationDetailsForDeployedService(details);
+        ServiceTemplateEntity serviceTemplate =
+                serviceTemplateStorage.getServiceTemplateById(
+                        serviceDeploymentEntity.getServiceTemplateId());
+        setServiceConfigurationDetailsForDeployedService(details, serviceTemplate);
+        maskSensitiveFieldsInInputProperties(details, serviceTemplate);
         return details;
     }
 
@@ -200,8 +218,7 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new AccessDeniedException(errorMsg);
         }
-        ServiceHostingType serviceHostingType =
-                serviceDeploymentEntity.getDeployRequest().getServiceHostingType();
+        ServiceHostingType serviceHostingType = serviceDeploymentEntity.getServiceHostingType();
         if (ServiceHostingType.SERVICE_VENDOR != serviceHostingType) {
             String errorMsg =
                     String.format(
@@ -210,9 +227,18 @@ public class ServiceDetailsViewManager {
             log.error(errorMsg);
             throw new ServiceDetailsNotAccessible(errorMsg);
         }
+        return getVendorHostedServiceDetails(serviceDeploymentEntity);
+    }
+
+    private VendorHostedDeployedServiceDetails getVendorHostedServiceDetails(
+            ServiceDeploymentEntity serviceDeploymentEntity) {
         VendorHostedDeployedServiceDetails details =
                 EntityTranslationUtils.transToVendorHostedServiceDetails(serviceDeploymentEntity);
-        setServiceConfigurationDetailsForDeployedService(details);
+        ServiceTemplateEntity serviceTemplate =
+                serviceTemplateStorage.getServiceTemplateById(
+                        serviceDeploymentEntity.getServiceTemplateId());
+        setServiceConfigurationDetailsForDeployedService(details, serviceTemplate);
+        maskSensitiveFieldsInInputProperties(details, serviceTemplate);
         return details;
     }
 
@@ -280,17 +306,22 @@ public class ServiceDetailsViewManager {
                                     EntityTranslationUtils.convertToDeployedService(
                                             serviceDeployment);
                             if (Objects.nonNull(deployedService)) {
-                                setServiceConfigurationDetailsForDeployedService(deployedService);
+                                ServiceTemplateEntity serviceTemplate =
+                                        serviceTemplateStorage.getServiceTemplateById(
+                                                deployedService.getServiceTemplateId());
+                                setServiceConfigurationDetailsForDeployedService(
+                                        deployedService, serviceTemplate);
+                                maskSensitiveFieldsInInputProperties(
+                                        deployedService, serviceTemplate);
                             }
                             return deployedService;
                         })
                 .toList();
     }
 
-    private void setServiceConfigurationDetailsForDeployedService(DeployedService deployedService) {
-        ServiceTemplateEntity serviceTemplate =
-                serviceTemplateStorage.getServiceTemplateById(
-                        deployedService.getServiceTemplateId());
+    private void setServiceConfigurationDetailsForDeployedService(
+            DeployedService deployedService, ServiceTemplateEntity serviceTemplate) {
+
         if (Objects.nonNull(serviceTemplate)
                 && Objects.nonNull(serviceTemplate.getOcl().getServiceConfigurationManage())) {
             List<ServiceChangeParameter> configurationParameters =
@@ -308,6 +339,19 @@ public class ServiceDetailsViewManager {
                             configuration,
                             serviceTemplate.getLastModifiedTime());
             deployedService.setServiceConfigurationDetails(details);
+        }
+    }
+
+    private void maskSensitiveFieldsInInputProperties(
+            DeployedService deployedService, ServiceTemplateEntity serviceTemplate) {
+
+        List<DeployVariable> variables = serviceTemplate.getOcl().getDeployment().getVariables();
+        if (!CollectionUtils.isEmpty(variables)
+                && !CollectionUtils.isEmpty(deployedService.getInputProperties())) {
+            Map<String, String> inputPropertiesWithSensitiveFields =
+                    sensitiveDataHandler.getServiceRequestPropertiesWithSensitiveFields(
+                            deployedService.getInputProperties(), variables);
+            deployedService.setInputProperties(inputPropertiesWithSensitiveFields);
         }
     }
 

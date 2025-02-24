@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceOrderStatusChangePolling;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
@@ -31,6 +32,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
@@ -46,11 +48,14 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Slf4j
 @Component
 public class ServiceOrderManager {
+
     @Resource private ServiceOrderStorage serviceOrderStorage;
     @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
+    @Resource private ServiceTemplateStorage serviceTemplateStorage;
     @Resource private UserServiceHelper userServiceHelper;
     @Resource private ServiceOrderStatusChangePolling serviceOrderStatusChangePolling;
     @Resource private ObjectMapper objectMapper;
+    @Resource private SensitiveDataHandler sensitiveDataHandler;
 
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
@@ -62,7 +67,7 @@ public class ServiceOrderManager {
      * @param serviceDeploymentEntity service deployment entity
      */
     public ServiceOrderEntity storeNewServiceOrderEntity(
-            DeployTask task, ServiceDeploymentEntity serviceDeploymentEntity) {
+            DeployTask task, ServiceDeploymentEntity serviceDeploymentEntity, Handler handler) {
         ServiceOrderEntity orderTask = new ServiceOrderEntity();
         orderTask.setOrderId(task.getOrderId());
         orderTask.setParentOrderId(task.getParentOrderId());
@@ -72,8 +77,18 @@ public class ServiceOrderManager {
         orderTask.setOriginalServiceId(task.getOriginalServiceId());
         orderTask.setWorkflowId(task.getWorkflowId());
         orderTask.setTaskStatus(TaskStatus.CREATED);
-        orderTask.setRequestBody(getRequestBody(task));
+        orderTask.setStartedTime(OffsetDateTime.now());
+        orderTask.setRequestBody(getRequestBody(task.getRequest()));
+        orderTask.setHandler(handler);
         return serviceOrderStorage.storeAndFlush(orderTask);
+    }
+
+    private Map<String, Object> getRequestBody(Object request) {
+        try {
+            return objectMapper.readValue(objectMapper.writeValueAsString(request), Map.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -82,35 +97,29 @@ public class ServiceOrderManager {
      * @param orderId OrderId to be created.
      * @param serviceDeploymentEntity serviceDeploymentEntity to which the order is related to.
      * @param serviceOrderType type of the order.
-     * @param originalRequestBody The request body received from the customer. Will be serialized
-     *     into JSON and stored.
+     * @param originalRequest The request body received from the customer. Will be serialized into
+     *     JSON and stored.
      * @return serviceOrderEntity created.
      */
     public ServiceOrderEntity createAndStoreGenericServiceOrderEntity(
             UUID orderId,
             ServiceDeploymentEntity serviceDeploymentEntity,
             ServiceOrderType serviceOrderType,
-            Object originalRequestBody) {
-        try {
-            ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
-            serviceOrderEntity.setOrderId(orderId);
-            if (Objects.nonNull(serviceDeploymentEntity.getServiceOrders())) {
-                serviceDeploymentEntity.getServiceOrders().add(serviceOrderEntity);
-            } else {
-                serviceDeploymentEntity.setServiceOrders(List.of(serviceOrderEntity));
-            }
-            serviceOrderEntity.setServiceDeploymentEntity(serviceDeploymentEntity);
-            serviceOrderEntity.setTaskType(serviceOrderType);
-            serviceOrderEntity.setUserId(userServiceHelper.getCurrentUserId());
-            serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
-            serviceOrderEntity.setStartedTime(OffsetDateTime.now());
-            serviceOrderEntity.setRequestBody(
-                    objectMapper.readValue(
-                            objectMapper.writeValueAsString(originalRequestBody), Map.class));
-            return serviceOrderStorage.storeAndFlush(serviceOrderEntity);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            Object originalRequest) {
+        ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
+        serviceOrderEntity.setOrderId(orderId);
+        if (Objects.nonNull(serviceDeploymentEntity.getServiceOrders())) {
+            serviceDeploymentEntity.getServiceOrders().add(serviceOrderEntity);
+        } else {
+            serviceDeploymentEntity.setServiceOrders(List.of(serviceOrderEntity));
         }
+        serviceOrderEntity.setServiceDeploymentEntity(serviceDeploymentEntity);
+        serviceOrderEntity.setTaskType(serviceOrderType);
+        serviceOrderEntity.setUserId(userServiceHelper.getCurrentUserId());
+        serviceOrderEntity.setTaskStatus(TaskStatus.CREATED);
+        serviceOrderEntity.setStartedTime(OffsetDateTime.now());
+        serviceOrderEntity.setRequestBody(getRequestBody(originalRequest));
+        return serviceOrderStorage.storeAndFlush(serviceOrderEntity);
     }
 
     /**
@@ -154,11 +163,11 @@ public class ServiceOrderManager {
     /**
      * Complete order progress.
      *
-     * @param orderId id of service order.
+     * @param serviceOrder service order entity.
      * @param deployResult deploy result of this order.
      */
-    public void completeOrderProgressWithDeployResult(UUID orderId, DeployResult deployResult) {
-        ServiceOrderEntity serviceOrder = serviceOrderStorage.getEntityById(orderId);
+    public void completeOrderProgressWithDeployResult(
+            ServiceOrderEntity serviceOrder, DeployResult deployResult) {
         if (deployResult.getIsTaskSuccessful()) {
             serviceOrder.setTaskStatus(TaskStatus.SUCCESSFUL);
         } else {
@@ -284,6 +293,17 @@ public class ServiceOrderManager {
     }
 
     /**
+     * Method to get request from service order by order id.
+     *
+     * @param orderId orderId
+     * @return request
+     */
+    public Map<String, Object> getRequestByStoredOrder(UUID orderId) {
+        ServiceOrderEntity serviceOrder = serviceOrderStorage.getEntityById(orderId);
+        return serviceOrder.getRequestBody();
+    }
+
+    /**
      * Get the service order entity with the order id.
      *
      * @param orderId order id.
@@ -311,22 +331,6 @@ public class ServiceOrderManager {
             log.error(errorMsg);
             throw new AccessDeniedException(errorMsg);
         }
-    }
-
-    private Map<String, Object> getRequestBody(DeployTask task) {
-        Map<String, Object> orderRequests = new HashMap<>();
-        if (Objects.isNull(task.getRequest())) {
-            task.setRequest(task.getTaskType());
-        }
-        orderRequests.put("Order Request", task.getRequest());
-        if (Objects.nonNull(task.getDeployRequest())
-                && task.getTaskType() != ServiceOrderType.DEPLOY) {
-            orderRequests.put("Deployment Request", task.getDeployRequest());
-        }
-        if (Objects.nonNull(task.getOcl()) && Objects.nonNull(task.getOcl().getServiceActions())) {
-            orderRequests.put("Service Actions", task.getOcl().getServiceActions());
-        }
-        return orderRequests;
     }
 
     private Map<String, Object> getResultProperties(DeployResult deployResult) {

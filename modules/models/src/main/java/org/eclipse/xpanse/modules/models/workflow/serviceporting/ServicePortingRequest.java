@@ -12,13 +12,13 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.eclipse.xpanse.modules.models.service.deployment.DeployRequestBase;
+import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 
 /** ServicePortingRequest model. */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
-public class ServicePortingRequest extends DeployRequestBase {
+public class ServicePortingRequest extends DeployRequest {
 
     @Serial private static final long serialVersionUID = 204243455244611956L;
 

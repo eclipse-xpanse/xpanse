@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
@@ -32,64 +33,29 @@ public class DeployedService {
     @Schema(description = "The ID of the service")
     private UUID serviceId;
 
-    /** The category of the Service. */
     @NotNull
     @Schema(description = "The catalog of the service")
     private Category category;
 
-    /** The name of the Service. */
     @NotNull
     @NotBlank
     @Schema(description = "The name of the service")
     private String name;
 
-    /** Customer provided name for the service. */
     @Schema(
             description =
                     "Customer's name for the service. Used only for customer's reference."
                             + "If not provided, this value will be auto-generated")
     private String customerServiceName;
 
-    /** The version of the Service. */
     @NotNull
     @NotBlank
     @Schema(description = "The version of the service")
     private String version;
 
-    /** The csp of the Service. */
     @NotNull
     @Schema(description = "The provider of the service")
     private Csp csp;
-
-    /** The flavor of the Service. */
-    @Schema(description = "The flavor of the service")
-    private String flavor;
-
-    /** The billing mode of the Service. */
-    @NotNull
-    @Schema(description = "The billing mode of the managed service.")
-    private BillingMode billingMode;
-
-    /** The region of the Service. */
-    @NotNull
-    @Schema(description = "The region of the service.")
-    private Region region;
-
-    /** The id of the Service Template. */
-    @Schema(description = "The id of the Service Template")
-    private UUID serviceTemplateId;
-
-    @Schema(description = "The id of the user who deployed the service.")
-    private String userId;
-
-    /** The state of the Service. */
-    @NotNull
-    @Schema(description = "The deployment state of the service")
-    private ServiceDeploymentState serviceDeploymentState;
-
-    @NotNull
-    @Schema(description = "The run state of the service")
-    private ServiceState serviceState = ServiceState.NOT_RUNNING;
 
     @NotNull
     @Schema(
@@ -97,6 +63,40 @@ public class DeployedService {
                     "Defines which cloud service account is used "
                             + "for deploying cloud resources.")
     private ServiceHostingType serviceHostingType;
+
+    @NotNull
+    @Schema(description = "The region of the service.")
+    private Region region;
+
+    @Schema(description = "The availability zones of the service")
+    private Map<String, String> availabilityZones;
+
+    @NotNull
+    @NotBlank
+    @Schema(description = "The flavor of the service")
+    private String flavor;
+
+    @NotNull
+    @Schema(description = "The billing mode of the managed service.")
+    private BillingMode billingMode;
+
+    @Schema(description = "The input properties to deploy the service.")
+    private Map<String, String> inputProperties;
+
+    @NotNull
+    @Schema(description = "The id of the Service Template")
+    private UUID serviceTemplateId;
+
+    @Schema(description = "The id of the user who deployed the service.")
+    private String userId;
+
+    @NotNull
+    @Schema(description = "The deployment state of the service")
+    private ServiceDeploymentState serviceDeploymentState;
+
+    @NotNull
+    @Schema(description = "The run state of the service")
+    private ServiceState serviceState = ServiceState.NOT_RUNNING;
 
     @NotNull
     @Schema(description = "Time of register service.")

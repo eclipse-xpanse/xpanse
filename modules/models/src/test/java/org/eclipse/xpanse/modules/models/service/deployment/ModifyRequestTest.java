@@ -23,7 +23,6 @@ class ModifyRequestTest {
     @BeforeEach
     void setUp() {
         test = new ModifyRequest();
-        test.setUserId(userId);
         test.setCustomerServiceName(customerServiceName);
         test.setFlavor(flavor);
         test.setServiceRequestProperties(mockServiceRequestProperties);
@@ -31,7 +30,6 @@ class ModifyRequestTest {
 
     @Test
     void testGetters() {
-        assertThat(test.getUserId()).isEqualTo(userId);
         assertThat(test.getFlavor()).isEqualTo(flavor);
         assertThat(test.getCustomerServiceName()).isEqualTo(customerServiceName);
         assertThat(test.getServiceRequestProperties()).isEqualTo(mockServiceRequestProperties);
@@ -58,9 +56,7 @@ class ModifyRequestTest {
     @Test
     void testToString() {
         String result =
-                "ModifyRequest(userId="
-                        + userId
-                        + ", customerServiceName="
+                "ModifyRequest(customerServiceName="
                         + customerServiceName
                         + ", flavor="
                         + flavor

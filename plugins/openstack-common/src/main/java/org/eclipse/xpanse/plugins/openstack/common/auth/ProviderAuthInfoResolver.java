@@ -8,6 +8,7 @@ package org.eclipse.xpanse.plugins.openstack.common.auth;
 import jakarta.annotation.Resource;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -146,11 +147,13 @@ public class ProviderAuthInfoResolver {
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceTemplateStorage.getServiceTemplateById(
                             serviceDeploymentEntity.getServiceTemplateId());
+            Map<String, Object> inputProperties = new HashMap<>();
+            if (Objects.nonNull(serviceDeploymentEntity.getInputProperties())) {
+                inputProperties.putAll(serviceDeploymentEntity.getInputProperties());
+            }
             Map<String, Object> serviceRequestVariables =
                     this.deployEnvironments.getAllDeploymentVariablesForService(
-                            serviceDeploymentEntity
-                                    .getDeployRequest()
-                                    .getServiceRequestProperties(),
+                            inputProperties,
                             serviceTemplateEntity.getOcl().getDeployment().getVariables(),
                             serviceDeploymentEntity.getFlavor(),
                             serviceTemplateEntity.getOcl());
