@@ -13,18 +13,18 @@ import java.time.OffsetDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class CreateModifiedTimeTest {
+class CreatedModifiedTimeTest {
 
-    private static final OffsetDateTime createTime = OffsetDateTime.now();
+    private static final OffsetDateTime createdTime = OffsetDateTime.now();
 
     private static final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
 
-    private CreateModifiedTime test;
+    private CreatedModifiedTime test;
 
     @BeforeEach
     void setUp() {
-        test = new CreateModifiedTime();
-        test.setCreateTime(createTime);
+        test = new CreatedModifiedTime();
+        test.setCreatedTime(createdTime);
         test.setLastModifiedTime(lastModifiedTime);
     }
 
@@ -37,8 +37,8 @@ class CreateModifiedTimeTest {
         assertNotEquals(test, o);
         assertNotEquals(test.hashCode(), o.hashCode());
 
-        CreateModifiedTime test1 = new CreateModifiedTime();
-        CreateModifiedTime test2 = new CreateModifiedTime();
+        CreatedModifiedTime test1 = new CreatedModifiedTime();
+        CreatedModifiedTime test2 = new CreatedModifiedTime();
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertEquals(test1, test2);
@@ -46,7 +46,7 @@ class CreateModifiedTimeTest {
         assertNotEquals(test.hashCode(), test2.hashCode());
         assertEquals(test1.hashCode(), test2.hashCode());
 
-        test1.setCreateTime(createTime);
+        test1.setCreatedTime(createdTime);
         assertNotEquals(test, test1);
         assertNotEquals(test, test2);
         assertNotEquals(test1, test2);
@@ -64,8 +64,8 @@ class CreateModifiedTimeTest {
     @Test
     void testToString() {
         String expectedToString =
-                "CreateModifiedTime(createTime="
-                        + createTime
+                "CreatedModifiedTime(createdTime="
+                        + createdTime
                         + ", "
                         + "lastModifiedTime="
                         + lastModifiedTime

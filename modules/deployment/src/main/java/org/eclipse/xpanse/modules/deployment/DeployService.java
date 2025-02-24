@@ -376,7 +376,7 @@ public class DeployService {
     private ServiceDeploymentEntity storeNewDeployServiceEntity(DeployTask deployTask) {
         ServiceDeploymentEntity entity = new ServiceDeploymentEntity();
         entity.setId(deployTask.getServiceId());
-        entity.setCreateTime(OffsetDateTime.now());
+        entity.setCreatedTime(OffsetDateTime.now());
         entity.setVersion(StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
         entity.setName(StringUtils.lowerCase(deployTask.getDeployRequest().getServiceName()));
         entity.setCsp(deployTask.getDeployRequest().getCsp());

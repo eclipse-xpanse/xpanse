@@ -107,7 +107,7 @@ class UserPolicyManageApiTest extends ApisTestCommon {
         Assertions.assertEquals(response.getStatus(), HttpStatus.OK.value());
         Assertions.assertNotNull(userPolicy.getUserPolicyId());
         Assertions.assertEquals(userPolicy.getCsp(), createRequest.getCsp());
-        Assertions.assertEquals(userPolicy.getCreateTime(), userPolicy.getLastModifiedTime());
+        Assertions.assertEquals(userPolicy.getCreatedTime(), userPolicy.getLastModifiedTime());
         Assertions.assertEquals(userPolicy.getPolicy(), createRequest.getPolicy());
         Assertions.assertTrue(userPolicy.getEnabled());
 

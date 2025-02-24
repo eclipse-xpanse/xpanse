@@ -22,6 +22,8 @@ public class ServiceActionRequest {
 
     @NotNull
     @Size(min = 1)
-    @Schema(description = "The service actions parameter to be modified")
+    @Schema(
+            description = "The service actions parameter to be modified",
+            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> actionParameters;
 }

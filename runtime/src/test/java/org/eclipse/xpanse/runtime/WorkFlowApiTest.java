@@ -51,12 +51,12 @@ class WorkFlowApiTest extends ApisTestCommon {
         task.setProcessDefinitionId(processDefinitionKey);
         task.setProcessDefinitionName(processDefinitionKey);
         String taskId = UUID.randomUUID().toString();
-        task.setStatus(status);
+        task.setTaskStatus(status);
         task.setTaskId(taskId);
         task.setExecutionId(taskId);
         task.setTaskName("ExportData");
         task.setBusinessKey(processInstanceId);
-        task.setCreateTime(OffsetDateTime.now());
+        task.setCreatedTime(OffsetDateTime.now());
         return task;
     }
 

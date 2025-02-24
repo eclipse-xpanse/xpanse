@@ -106,7 +106,7 @@ public class DatabaseServiceDeploymentStorage implements ServiceDeploymentStorag
                     query.where(criteriaBuilder.and(predicateList.toArray(new Predicate[0])))
                             .getRestriction();
 
-                    query.orderBy(criteriaBuilder.desc(root.get("createTime")));
+                    query.orderBy(criteriaBuilder.desc(root.get("createdTime")));
 
                     return query.getRestriction();
                 };

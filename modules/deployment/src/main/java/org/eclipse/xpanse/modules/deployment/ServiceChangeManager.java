@@ -29,7 +29,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicechange.AnsibleHostInfo;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeRequest;
@@ -227,7 +227,7 @@ public class ServiceChangeManager {
                                                 request.getStatus()
                                                         == ServiceChangeStatus.SUCCESSFUL);
                 if (isAllSuccessful) {
-                    updateServiceOrderByResult(entity, TaskStatus.SUCCESSFUL, null);
+                    updateServiceOrderByResult(entity, OrderStatus.SUCCESSFUL, null);
                     // update configuration only if the job all requests are successful.
                     if (request.getServiceOrderEntity().getTaskType()
                             == ServiceOrderType.CONFIG_CHANGE) {
@@ -236,14 +236,14 @@ public class ServiceChangeManager {
                     }
                 } else {
                     updateServiceOrderByResult(
-                            entity, TaskStatus.FAILED, request.getResultMessage());
+                            entity, OrderStatus.FAILED, request.getResultMessage());
                 }
             }
         }
     }
 
     private void updateServiceOrderByResult(
-            ServiceOrderEntity entity, TaskStatus status, String resultMessage) {
+            ServiceOrderEntity entity, OrderStatus status, String resultMessage) {
         log.debug(
                 "updating service order result for the service change order {} with status {}",
                 entity.getOrderId(),

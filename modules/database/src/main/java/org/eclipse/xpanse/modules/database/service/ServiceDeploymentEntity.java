@@ -29,7 +29,7 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
+import org.eclipse.xpanse.modules.database.common.CreatedModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
@@ -52,7 +52,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ServiceDeploymentEntity extends CreateModifiedTime {
+public class ServiceDeploymentEntity extends CreatedModifiedTime {
 
     @Id private UUID id;
 

@@ -51,11 +51,11 @@ public class WorkFlowTask {
 
     @NotNull
     @Schema(description = "The status of the Task")
-    private WorkFlowTaskStatus status;
+    private WorkFlowTaskStatus taskStatus;
 
     @NotNull
     @Schema(description = "The create time of the task")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
-    private OffsetDateTime createTime;
+    private OffsetDateTime createdTime;
 }

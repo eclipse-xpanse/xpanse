@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
@@ -111,7 +111,7 @@ public class ServiceChangeRequestsManager {
             // if no requests were created, then the order is completed as failed.
             serviceOrderManager.completeOrderProgress(
                     orderId,
-                    TaskStatus.FAILED,
+                    OrderStatus.FAILED,
                     ErrorResponse.errorResponse(
                             ErrorType.SERVICE_CHANGE_FAILED,
                             List.of(

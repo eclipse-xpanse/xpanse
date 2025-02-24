@@ -27,8 +27,8 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLo
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
@@ -102,16 +102,16 @@ public class ServiceStateManager {
                             ErrorType.ASYNC_START_SERVICE_ERROR, List.of(e.getMessage())));
         }
         if (result) {
-            serviceOrderTaskEntity.setTaskStatus(TaskStatus.SUCCESSFUL);
+            serviceOrderTaskEntity.setOrderStatus(OrderStatus.SUCCESSFUL);
             service.setLastStartedAt(OffsetDateTime.now());
             service.setServiceState(ServiceState.RUNNING);
         } else {
-            serviceOrderTaskEntity.setTaskStatus(TaskStatus.FAILED);
+            serviceOrderTaskEntity.setOrderStatus(OrderStatus.FAILED);
             service.setServiceState(ServiceState.STOPPED);
         }
         serviceOrderManager.completeOrderProgress(
                 serviceOrderTaskEntity.getOrderId(),
-                serviceOrderTaskEntity.getTaskStatus(),
+                serviceOrderTaskEntity.getOrderStatus(),
                 serviceOrderTaskEntity.getErrorResponse());
         serviceHandler.storeAndFlush(service);
     }
@@ -141,7 +141,7 @@ public class ServiceStateManager {
             OrchestratorPlugin plugin,
             ServiceStateManageRequest request,
             ServiceDeploymentEntity service) {
-        serviceOrderTaskEntity.setTaskStatus(TaskStatus.IN_PROGRESS);
+        serviceOrderTaskEntity.setOrderStatus(OrderStatus.IN_PROGRESS);
         serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.STOPPING);
         serviceHandler.storeAndFlush(service);
@@ -154,16 +154,16 @@ public class ServiceStateManager {
                             ErrorType.ASYNC_STOP_SERVICE_ERROR, List.of(e.getMessage())));
         }
         if (result) {
-            serviceOrderTaskEntity.setTaskStatus(TaskStatus.SUCCESSFUL);
+            serviceOrderTaskEntity.setOrderStatus(OrderStatus.SUCCESSFUL);
             service.setLastStoppedAt(OffsetDateTime.now());
             service.setServiceState(ServiceState.STOPPED);
         } else {
-            serviceOrderTaskEntity.setTaskStatus(TaskStatus.FAILED);
+            serviceOrderTaskEntity.setOrderStatus(OrderStatus.FAILED);
             service.setServiceState(ServiceState.RUNNING);
         }
         serviceOrderManager.completeOrderProgress(
                 serviceOrderTaskEntity.getOrderId(),
-                serviceOrderTaskEntity.getTaskStatus(),
+                serviceOrderTaskEntity.getOrderStatus(),
                 serviceOrderTaskEntity.getErrorResponse());
         serviceHandler.storeAndFlush(service);
     }
@@ -205,16 +205,16 @@ public class ServiceStateManager {
                             ErrorType.ASYNC_RESTART_SERVICE_ERROR, List.of(e.getMessage())));
         }
         if (result) {
-            serviceOrderTaskEntity.setTaskStatus(TaskStatus.SUCCESSFUL);
+            serviceOrderTaskEntity.setOrderStatus(OrderStatus.SUCCESSFUL);
             service.setLastStartedAt(OffsetDateTime.now());
             service.setServiceState(ServiceState.RUNNING);
         } else {
-            serviceOrderTaskEntity.setTaskStatus(TaskStatus.FAILED);
+            serviceOrderTaskEntity.setOrderStatus(OrderStatus.FAILED);
             service.setServiceState(ServiceState.RUNNING);
         }
         serviceOrderManager.completeOrderProgress(
                 serviceOrderTaskEntity.getOrderId(),
-                serviceOrderTaskEntity.getTaskStatus(),
+                serviceOrderTaskEntity.getOrderStatus(),
                 serviceOrderTaskEntity.getErrorResponse());
         serviceHandler.storeAndFlush(service);
     }

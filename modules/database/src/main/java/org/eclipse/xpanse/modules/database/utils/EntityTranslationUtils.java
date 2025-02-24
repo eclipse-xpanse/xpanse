@@ -167,7 +167,7 @@ public class EntityTranslationUtils {
                     orderDetails.setOrderId(orderId);
                     ServiceOrderEntity orderEntity = requestList.getFirst().getServiceOrderEntity();
                     orderDetails.setServiceChangeRequestProperties(orderEntity.getRequestBody());
-                    orderDetails.setOrderStatus(orderEntity.getTaskStatus());
+                    orderDetails.setOrderStatus(orderEntity.getOrderStatus());
                     List<ServiceChangeRequestDetails> detailsList = new ArrayList<>();
                     requestList.forEach(
                             request -> {

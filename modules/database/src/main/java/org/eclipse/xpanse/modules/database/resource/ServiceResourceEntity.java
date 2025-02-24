@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
+import org.eclipse.xpanse.modules.database.common.CreatedModifiedTime;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.hibernate.annotations.OnDelete;
@@ -35,7 +35,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "SERVICE_RESOURCE")
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class ServiceResourceEntity extends CreateModifiedTime {
+public class ServiceResourceEntity extends CreatedModifiedTime {
 
     /** The id of the entity. */
     @Id

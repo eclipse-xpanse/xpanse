@@ -102,7 +102,7 @@ public class DeployedService {
     @Schema(description = "Time of register service.")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss XXX")
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
-    private OffsetDateTime createTime;
+    private OffsetDateTime createdTime;
 
     @NotNull
     @Schema(description = "Time of update service.")

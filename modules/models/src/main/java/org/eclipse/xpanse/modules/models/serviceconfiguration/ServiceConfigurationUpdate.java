@@ -18,6 +18,8 @@ public class ServiceConfigurationUpdate {
 
     @NotNull
     @Size(min = 1)
-    @Schema(description = "The service configuration to be modified")
+    @Schema(
+            description = "The service configuration to be modified",
+            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> configuration;
 }

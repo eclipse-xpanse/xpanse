@@ -46,7 +46,7 @@ class ServiceTemplateDetailVoTest {
     private final String serviceVendor = "serviceVendor";
     private final String icon = "icon";
     private final Deployment deployment = new Deployment();
-    private final OffsetDateTime createTime = OffsetDateTime.now();
+    private final OffsetDateTime createdTime = OffsetDateTime.now();
     private final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private final ServiceTemplateRegistrationState serviceTemplateRegistrationState =
@@ -100,7 +100,7 @@ class ServiceTemplateDetailVoTest {
         serviceTemplateDetailVo.setVariables(variables);
         serviceTemplateDetailVo.setFlavors(flavors);
         serviceTemplateDetailVo.setBilling(billing);
-        serviceTemplateDetailVo.setCreateTime(createTime);
+        serviceTemplateDetailVo.setCreatedTime(createdTime);
         serviceTemplateDetailVo.setLastModifiedTime(lastModifiedTime);
         serviceTemplateDetailVo.setServiceTemplateRegistrationState(
                 serviceTemplateRegistrationState);
@@ -127,7 +127,7 @@ class ServiceTemplateDetailVoTest {
         assertEquals(variables, serviceTemplateDetailVo.getVariables());
         assertEquals(flavors, serviceTemplateDetailVo.getFlavors());
         assertEquals(billing, serviceTemplateDetailVo.getBilling());
-        assertEquals(createTime, serviceTemplateDetailVo.getCreateTime());
+        assertEquals(createdTime, serviceTemplateDetailVo.getCreatedTime());
         assertEquals(lastModifiedTime, serviceTemplateDetailVo.getLastModifiedTime());
         assertEquals(
                 serviceTemplateRegistrationState,
@@ -189,8 +189,8 @@ class ServiceTemplateDetailVoTest {
                         + billing
                         + ", serviceHostingType="
                         + serviceHostingType
-                        + ", createTime="
-                        + createTime
+                        + ", createdTime="
+                        + createdTime
                         + ", lastModifiedTime="
                         + lastModifiedTime
                         + ", serviceTemplateRegistrationState="

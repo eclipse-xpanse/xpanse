@@ -15,15 +15,15 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-/** Represents the createTime and modifiedTime the database. */
+/** Represents the createdTime and modifiedTime of the entry in the database. */
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class CreateModifiedTime {
+public class CreatedModifiedTime {
 
     @CreatedDate
-    @Column(name = "CREATE_TIME")
-    private OffsetDateTime createTime;
+    @Column(name = "CREATED_TIME")
+    private OffsetDateTime createdTime;
 
     @LastModifiedDate
     @Column(name = "LAST_MODIFIED_TIME")

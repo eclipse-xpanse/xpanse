@@ -21,7 +21,7 @@ import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortin
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -74,7 +74,7 @@ public class StartDeploy implements Serializable, JavaDelegate {
                     processInstanceId, ServicePortingConstants.IS_DEPLOY_SUCCESS, false);
             serviceOrderManager.completeOrderProgress(
                     deployTask.getParentOrderId(),
-                    TaskStatus.FAILED,
+                    OrderStatus.FAILED,
                     ErrorResponse.errorResponse(
                             ErrorType.DEPLOYMENT_FAILED_EXCEPTION, List.of(e.getMessage())));
         }

@@ -21,7 +21,7 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.eclipse.xpanse.modules.database.common.CreateModifiedTime;
+import org.eclipse.xpanse.modules.database.common.CreatedModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -36,7 +36,7 @@ import org.hibernate.annotations.Type;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ServiceTemplateRequestHistoryEntity extends CreateModifiedTime {
+public class ServiceTemplateRequestHistoryEntity extends CreatedModifiedTime {
 
     @Id
     @Column(name = "REQUEST_ID", nullable = false)

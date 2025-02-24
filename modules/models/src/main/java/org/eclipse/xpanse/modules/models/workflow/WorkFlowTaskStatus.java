@@ -15,17 +15,17 @@ public enum WorkFlowTaskStatus {
     DONE("done"),
     FAILED("failed");
 
-    private final String status;
+    private final String workfowStatus;
 
-    WorkFlowTaskStatus(String status) {
-        this.status = status;
+    WorkFlowTaskStatus(String workfowStatus) {
+        this.workfowStatus = workfowStatus;
     }
 
     /** For Category deserialize. */
     @JsonCreator
     public static WorkFlowTaskStatus getByValue(String status) {
         for (WorkFlowTaskStatus workflowTaskStatus : values()) {
-            if (StringUtils.equalsIgnoreCase(workflowTaskStatus.status, status)) {
+            if (StringUtils.equalsIgnoreCase(workflowTaskStatus.workfowStatus, status)) {
                 return workflowTaskStatus;
             }
         }
@@ -36,6 +36,6 @@ public enum WorkFlowTaskStatus {
     /** For Category serialize. */
     @JsonValue
     public String toValue() {
-        return this.status;
+        return this.workfowStatus;
     }
 }

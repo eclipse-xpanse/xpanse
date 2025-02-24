@@ -3,7 +3,7 @@ package org.eclipse.xpanse.modules.models.service.order;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +14,7 @@ import org.springframework.beans.BeanUtils;
 class ServiceOrderStatusUpdateTest {
 
     private final Boolean isOrderCompleted = false;
-    private final TaskStatus taskStatus = TaskStatus.CREATED;
+    private final OrderStatus orderStatus = OrderStatus.CREATED;
 
     private final ErrorResponse error = new ErrorResponse();
 
@@ -22,12 +22,12 @@ class ServiceOrderStatusUpdateTest {
 
     @BeforeEach
     void setUp() {
-        test = new ServiceOrderStatusUpdate(taskStatus, isOrderCompleted, error);
+        test = new ServiceOrderStatusUpdate(orderStatus, isOrderCompleted, error);
     }
 
     @Test
     void testGetters() {
-        assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
+        assertThat(test.getOrderStatus()).isEqualTo(orderStatus);
         assertThat(test.getIsOrderCompleted()).isEqualTo(isOrderCompleted);
         assertThat(test.getError()).isEqualTo(error);
     }
@@ -38,7 +38,7 @@ class ServiceOrderStatusUpdateTest {
         assertThat(test.equals(o)).isFalse();
         assertThat(test.hashCode()).isNotEqualTo(o.hashCode());
 
-        ServiceOrderStatusUpdate test1 = new ServiceOrderStatusUpdate(taskStatus, false, null);
+        ServiceOrderStatusUpdate test1 = new ServiceOrderStatusUpdate(orderStatus, false, null);
         assertThat(test.equals(test1)).isFalse();
         assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
 
@@ -50,8 +50,8 @@ class ServiceOrderStatusUpdateTest {
     @Test
     void testToString() {
         String expected =
-                "ServiceOrderStatusUpdate(taskStatus="
-                        + taskStatus
+                "ServiceOrderStatusUpdate(orderStatus="
+                        + orderStatus
                         + ", "
                         + "isOrderCompleted="
                         + isOrderCompleted

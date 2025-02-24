@@ -21,8 +21,8 @@ import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -66,7 +66,7 @@ public class ProcessRecreateDeploymentResult implements Serializable, JavaDelega
                     && serviceDeploymentEntity.getServiceDeploymentState()
                             == ServiceDeploymentState.DEPLOY_SUCCESS) {
                 serviceOrderManager.completeOrderProgress(
-                        recreateOrderId, TaskStatus.SUCCESSFUL, null);
+                        recreateOrderId, OrderStatus.SUCCESSFUL, null);
                 runtimeService.setVariable(
                         processInstanceId, RecreateConstants.IS_DEPLOY_SUCCESS, true);
                 log.info(
@@ -90,7 +90,7 @@ public class ProcessRecreateDeploymentResult implements Serializable, JavaDelega
                             processInstanceId, RecreateConstants.ASSIGNEE, userId);
                     serviceOrderManager.completeOrderProgress(
                             recreateOrderId,
-                            TaskStatus.FAILED,
+                            OrderStatus.FAILED,
                             ErrorResponse.errorResponse(
                                     ErrorType.DEPLOYMENT_FAILED_EXCEPTION, List.of(resultMessage)));
                 }
@@ -104,7 +104,7 @@ public class ProcessRecreateDeploymentResult implements Serializable, JavaDelega
                     processInstanceId, RecreateConstants.IS_DEPLOY_SUCCESS, false);
             serviceOrderManager.completeOrderProgress(
                     recreateOrderId,
-                    TaskStatus.FAILED,
+                    OrderStatus.FAILED,
                     ErrorResponse.errorResponse(
                             ErrorType.DEPLOYMENT_FAILED_EXCEPTION, List.of(e.getMessage())));
         }

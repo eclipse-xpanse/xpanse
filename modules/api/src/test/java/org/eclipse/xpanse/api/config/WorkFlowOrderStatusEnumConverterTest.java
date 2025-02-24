@@ -8,7 +8,7 @@ import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class WorkFlowTaskStatusEnumConverterTest {
+class WorkFlowOrderStatusEnumConverterTest {
 
     private WorkFlowTaskStatusEnumConverter workFlowTaskStatusEnumConverter;
 

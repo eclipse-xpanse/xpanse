@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 
 /** service change request order details. */
 @Data
@@ -23,10 +23,12 @@ public class ServiceChangeOrderDetails {
 
     @NotNull
     @Schema(description = "Order status of service update request.")
-    private TaskStatus orderStatus;
+    private OrderStatus orderStatus;
 
     @NotNull
-    @Schema(description = "service change request properties.")
+    @Schema(
+            description = "service change request properties.",
+            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> serviceChangeRequestProperties;
 
     @NotNull

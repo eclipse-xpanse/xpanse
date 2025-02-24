@@ -45,7 +45,7 @@ class ServicePolicyManagerTest {
     private final UUID policyId = UUID.randomUUID();
     private final UUID serviceTemplateId = UUID.randomUUID();
     private final String serviceVendor = "userServiceVendor";
-    private final OffsetDateTime createTime =
+    private final OffsetDateTime createdTime =
             OffsetDateTime.of(LocalDateTime.of(2023, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
 
     @Mock private PolicyManager mockPolicyManager;
@@ -131,7 +131,7 @@ class ServicePolicyManagerTest {
         expectedResult.setPolicy(newPolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
-        expectedResult.setCreateTime(createTime);
+        expectedResult.setCreatedTime(createdTime);
 
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
@@ -153,7 +153,7 @@ class ServicePolicyManagerTest {
         newServicePolicy.setId(newPolicyId);
         newServicePolicy.setPolicy(newPolicy);
         newServicePolicy.setEnabled(false);
-        newServicePolicy.setCreateTime(createTime);
+        newServicePolicy.setCreatedTime(createdTime);
         newServicePolicy.setServiceTemplate(serviceTemplateEntity);
 
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(newServicePolicy);
@@ -184,7 +184,7 @@ class ServicePolicyManagerTest {
         expectedResult.setFlavorNameList(flavorNameList);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
-        expectedResult.setCreateTime(createTime);
+        expectedResult.setCreatedTime(createdTime);
 
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
@@ -218,7 +218,7 @@ class ServicePolicyManagerTest {
         newServicePolicy.setFlavorNames(StringUtils.join(flavorNameList, ","));
         newServicePolicy.setPolicy(newPolicy);
         newServicePolicy.setEnabled(false);
-        newServicePolicy.setCreateTime(createTime);
+        newServicePolicy.setCreatedTime(createdTime);
         newServicePolicy.setServiceTemplate(serviceTemplateEntity);
 
         when(mockServicePolicyStorage.storeAndFlush(any())).thenReturn(newServicePolicy);
@@ -345,7 +345,7 @@ class ServicePolicyManagerTest {
         expectedResult.setPolicy(newPolicy);
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
-        expectedResult.setCreateTime(createTime);
+        expectedResult.setCreatedTime(createdTime);
 
         // Configure DatabaseServiceTemplateStorage.getServiceTemplateById(...).
         final ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
@@ -649,12 +649,12 @@ class ServicePolicyManagerTest {
         expectedResult.setPolicy("policy");
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
-        expectedResult.setCreateTime(createTime);
+        expectedResult.setCreatedTime(createdTime);
         // Configure DatabaseServicePolicyStorage.findPolicyById(...).
         final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
         servicePolicyEntity.setId(policyId);
         servicePolicyEntity.setPolicy("policy");
-        servicePolicyEntity.setCreateTime(createTime);
+        servicePolicyEntity.setCreatedTime(createdTime);
         servicePolicyEntity.setEnabled(false);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setId(serviceTemplateId);
@@ -680,12 +680,12 @@ class ServicePolicyManagerTest {
         expectedResult.setPolicy("policy");
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
-        expectedResult.setCreateTime(createTime);
+        expectedResult.setCreatedTime(createdTime);
         // Configure DatabaseServicePolicyStorage.findPolicyById(...).
         final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
         servicePolicyEntity.setId(policyId);
         servicePolicyEntity.setPolicy("policy");
-        servicePolicyEntity.setCreateTime(createTime);
+        servicePolicyEntity.setCreatedTime(createdTime);
         servicePolicyEntity.setEnabled(false);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setId(serviceTemplateId);
@@ -742,12 +742,12 @@ class ServicePolicyManagerTest {
         expectedResult.setPolicy("policy");
         expectedResult.setServiceTemplateId(serviceTemplateId);
         expectedResult.setEnabled(false);
-        expectedResult.setCreateTime(createTime);
+        expectedResult.setCreatedTime(createdTime);
         // Configure DatabaseServicePolicyStorage.findPolicyById(...).
         final ServicePolicyEntity servicePolicyEntity = new ServicePolicyEntity();
         servicePolicyEntity.setId(policyId);
         servicePolicyEntity.setPolicy("policy");
-        servicePolicyEntity.setCreateTime(createTime);
+        servicePolicyEntity.setCreatedTime(createdTime);
         servicePolicyEntity.setEnabled(false);
         final ServiceTemplateEntity serviceTemplate = new ServiceTemplateEntity();
         serviceTemplate.setId(serviceTemplateId);

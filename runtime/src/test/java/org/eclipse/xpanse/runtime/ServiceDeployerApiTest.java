@@ -51,8 +51,8 @@ import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.deployment.ModifyRequest;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
@@ -876,7 +876,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         ServiceOrderEntity serviceOrderEntity =
                 serviceOrderStorage.getEntityById(serviceOrder.getOrderId());
         assertEquals(ServiceOrderType.LOCK_CHANGE, serviceOrderEntity.getTaskType());
-        assertEquals(TaskStatus.SUCCESSFUL, serviceOrderEntity.getTaskStatus());
+        assertEquals(OrderStatus.SUCCESSFUL, serviceOrderEntity.getOrderStatus());
     }
 
     void testDestroy(UUID serviceId) throws Exception {

@@ -27,7 +27,7 @@ import org.springframework.beans.BeanUtils;
 class ServiceConfigurationEntityTest {
 
     final UUID id = UUID.randomUUID();
-    final OffsetDateTime createTime = OffsetDateTime.now();
+    final OffsetDateTime createdTime = OffsetDateTime.now();
 
     private ServiceConfigurationEntity test;
 
@@ -39,31 +39,31 @@ class ServiceConfigurationEntityTest {
         test.setId(id);
         test.setServiceDeploymentEntity(serviceDeploymentEntity);
         test.setConfiguration(getConfiguration());
-        test.setCreatedTime(createTime);
+        test.setCreatedTime(createdTime);
     }
 
     @Test
     void testGetters() {
         assertThat(test.getId()).isEqualTo(id);
         assertThat(test.getConfiguration()).isEqualTo(getConfiguration());
-        assertThat(test.getCreatedTime()).isEqualTo(createTime);
+        assertThat(test.getCreatedTime()).isEqualTo(createdTime);
         assertThat(test.getServiceDeploymentEntity()).isEqualTo(serviceDeploymentEntity);
     }
 
     @Test
-    void testCreateTimeGetterAndSetter() {
-        final OffsetDateTime createTime =
+    void testCreatedTimeGetterAndSetter() {
+        final OffsetDateTime createdTime =
                 OffsetDateTime.of(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
-        test.setCreatedTime(createTime);
-        assertThat(test.getCreatedTime()).isEqualTo(createTime);
+        test.setCreatedTime(createdTime);
+        assertThat(test.getCreatedTime()).isEqualTo(createdTime);
     }
 
     @Test
     void testUpdatedTimeGetterAndSetter() {
-        final OffsetDateTime createTime =
+        final OffsetDateTime createdTime =
                 OffsetDateTime.of(LocalDateTime.of(2020, 1, 1, 0, 0, 0, 0), ZoneOffset.UTC);
-        test.setUpdatedTime(createTime);
-        assertThat(test.getUpdatedTime()).isEqualTo(createTime);
+        test.setUpdatedTime(createdTime);
+        assertThat(test.getUpdatedTime()).isEqualTo(createdTime);
     }
 
     @Test
@@ -101,7 +101,7 @@ class ServiceConfigurationEntityTest {
                 String.format(
                         "ServiceConfigurationEntity(id=%s, serviceDeploymentEntity=%s,"
                                 + " configuration=%s, createdTime=%s, updatedTime=%s)",
-                        id, serviceDeploymentEntity, getConfiguration(), createTime, null);
+                        id, serviceDeploymentEntity, getConfiguration(), createdTime, null);
 
         assertThat(test.toString()).isEqualTo(result);
     }

@@ -8,7 +8,7 @@ import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
-import org.eclipse.xpanse.modules.models.service.enums.TaskStatus;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class ServiceOrderDetailsTest {
     private final String workflowId = "workflowId";
     private final ErrorResponse errorResponse = new ErrorResponse();
     private final String userId = "userId";
-    private final TaskStatus taskStatus = TaskStatus.SUCCESSFUL;
+    private final OrderStatus orderStatus = OrderStatus.SUCCESSFUL;
     private final ServiceOrderType taskType = ServiceOrderType.DEPLOY;
     @Mock private Map<String, Object> mockRequestBody;
     @Mock private Map<String, Object> mockResultProperties;
@@ -50,7 +50,7 @@ class ServiceOrderDetailsTest {
         test.setStartedTime(startedTime);
         test.setCompletedTime(completedTime);
         test.setErrorResponse(errorResponse);
-        test.setTaskStatus(taskStatus);
+        test.setOrderStatus(orderStatus);
         test.setRequestBody(mockRequestBody);
         test.setResultProperties(mockResultProperties);
     }
@@ -64,7 +64,7 @@ class ServiceOrderDetailsTest {
         assertThat(test.getWorkflowId()).isEqualTo(workflowId);
         assertThat(test.getTaskType()).isEqualTo(taskType);
         assertThat(test.getUserId()).isEqualTo(userId);
-        assertThat(test.getTaskStatus()).isEqualTo(taskStatus);
+        assertThat(test.getOrderStatus()).isEqualTo(orderStatus);
         assertThat(test.getErrorResponse()).isEqualTo(errorResponse);
         assertThat(test.getCompletedTime()).isEqualTo(completedTime);
         assertThat(test.getStartedTime()).isEqualTo(startedTime);
@@ -96,8 +96,8 @@ class ServiceOrderDetailsTest {
                         + serviceId
                         + ", taskType="
                         + taskType
-                        + ", taskStatus="
-                        + taskStatus
+                        + ", orderStatus="
+                        + orderStatus
                         + ", originalServiceId="
                         + originalServiceId
                         + ", parentOrderId="

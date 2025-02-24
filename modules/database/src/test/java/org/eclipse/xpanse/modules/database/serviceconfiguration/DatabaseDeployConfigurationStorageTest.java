@@ -27,7 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DatabaseDeployConfigurationStorageTest {
 
     private static final UUID id = UUID.fromString("9803512b-16b7-4eef-8aba-5e2495aa6fd2");
-    private static final OffsetDateTime createTime = OffsetDateTime.now();
+    private static final OffsetDateTime createdTime = OffsetDateTime.now();
 
     @Mock private ServiceConfigurationRepository serviceConfigurationRepository;
 
@@ -39,12 +39,12 @@ class DatabaseDeployConfigurationStorageTest {
         final ServiceConfigurationEntity serviceConfigurationEntity =
                 new ServiceConfigurationEntity();
         serviceConfigurationEntity.setConfiguration(getConfiguration());
-        serviceConfigurationEntity.setCreatedTime(createTime);
+        serviceConfigurationEntity.setCreatedTime(createdTime);
         databaseServiceConfigurationStorageTest.storeAndFlush(serviceConfigurationEntity);
 
         final ServiceConfigurationEntity entity = new ServiceConfigurationEntity();
         entity.setConfiguration(getConfiguration());
-        entity.setCreatedTime(createTime);
+        entity.setCreatedTime(createdTime);
         verify(serviceConfigurationRepository).saveAndFlush(entity);
     }
 
@@ -52,11 +52,11 @@ class DatabaseDeployConfigurationStorageTest {
     void testFindServiceConfigurationById() {
         final ServiceConfigurationEntity expectedResult = new ServiceConfigurationEntity();
         expectedResult.setConfiguration(getConfiguration());
-        expectedResult.setCreatedTime(createTime);
+        expectedResult.setCreatedTime(createdTime);
         final ServiceConfigurationEntity serviceConfigurationEntity1 =
                 new ServiceConfigurationEntity();
         serviceConfigurationEntity1.setConfiguration(getConfiguration());
-        serviceConfigurationEntity1.setCreatedTime(createTime);
+        serviceConfigurationEntity1.setCreatedTime(createdTime);
         final Optional<ServiceConfigurationEntity> entity =
                 Optional.of(serviceConfigurationEntity1);
         when(serviceConfigurationRepository.findById(id)).thenReturn(entity);
