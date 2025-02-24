@@ -13,4 +13,4 @@ jobs:
         with:
           project: eclipse-xpanse
           column: 'Backlog'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.BOT_GITHUB_TOKEN }}

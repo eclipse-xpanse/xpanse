@@ -13,4 +13,4 @@ jobs:
         with:
           project: eclipse-xpanse
           column: 'Planned'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.BOT_GITHUB_TOKEN }}
