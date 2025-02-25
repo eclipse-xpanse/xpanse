@@ -56,6 +56,10 @@ Details can be found on the project website [here](https://eclipse.dev/xpanse/do
 
 Details can be found on the project website [here](https://eclipse.dev/xpanse/docs/database).
 
+## Cache
+
+Details can be found on the project website [here](https://eclipse.dev/xpanse/docs/caching).
+
 ## Generate terra-boot client code
 
 1. Run the terra-boot project with spring-profile `oauth` and `dev` with methods mentioned here.
@@ -88,7 +92,7 @@ mvn clean generate-sources -DskipTofuMakerClientGeneration=false
 
 ## Generate policy-man client code
 
-1. Run the policy-man project and access “http://localhost:8090/swagger/doc.json” to get the openapi json.
+1. Run the policy-man project and access http://localhost:8090/swagger/doc.json to get the openapi json.
 2. Copy all the JSON content of the openapi json and replace all the content in the JSON file
 [policy-man-openapi.json](modules/policy/src/main/resources/policy-man-openapi.json)
 3. Run the below maven command to generate the REST API client and data models for policy-man. The command must be
