@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.database.serviceconfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -31,6 +32,8 @@ public class ServiceChangeRequestEntityTest {
     final Map<String, Object> properties = Map.of("k1", "v1", "k2", "v2");
     final ServiceChangeStatus status = ServiceChangeStatus.PENDING;
     final List<AnsibleTaskResult> tasks = List.of();
+    final OffsetDateTime createdTime = OffsetDateTime.now();
+    final OffsetDateTime lastModifiedTime = OffsetDateTime.now();
     @Mock private ServiceDeploymentEntity serviceDeploymentEntity;
     @Mock private ServiceOrderEntity serviceOrderEntity;
 
@@ -48,6 +51,8 @@ public class ServiceChangeRequestEntityTest {
         test.setStatus(status);
         test.setProperties(properties);
         test.setTasks(tasks);
+        test.setCreatedTime(createdTime);
+        test.setLastModifiedTime(lastModifiedTime);
     }
 
     @Test
@@ -61,6 +66,8 @@ public class ServiceChangeRequestEntityTest {
         assertThat(test.getStatus()).isEqualTo(status);
         assertThat(test.getProperties()).isEqualTo(properties);
         assertThat(test.getTasks()).isEqualTo(tasks);
+        assertThat(test.getCreatedTime()).isEqualTo(createdTime);
+        assertThat(test.getLastModifiedTime()).isEqualTo(lastModifiedTime);
     }
 
     @Test

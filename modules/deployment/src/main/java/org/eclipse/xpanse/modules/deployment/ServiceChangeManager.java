@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.deployment;
 
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
+import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -125,6 +126,7 @@ public class ServiceChangeManager {
             request.setResourceName(resourceName);
         }
         request.setStatus(ServiceChangeStatus.PROCESSING);
+        request.setLastModifiedTime(OffsetDateTime.now());
         return serviceChangeRequestStorage.storeAndFlush(request);
     }
 
