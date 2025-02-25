@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.deployment;
 
 import jakarta.annotation.Resource;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -163,6 +164,7 @@ public class ServiceChangeRequestsManager {
         request.setProperties(properties);
         request.setOriginalRequestProperties(originalPropertiesReceived);
         request.setStatus(ServiceChangeStatus.PENDING);
+        request.setCreatedTime(OffsetDateTime.now());
         return request;
     }
 }

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
+import org.eclipse.xpanse.modules.database.common.CreatedModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
@@ -37,7 +38,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "SERVICE_CHANGE_REQUEST")
 @Entity
 @Data
-public class ServiceChangeRequestEntity implements Serializable {
+public class ServiceChangeRequestEntity extends CreatedModifiedTime implements Serializable {
 
     @Serial private static final long serialVersionUID = 8759112725757851274L;
 
