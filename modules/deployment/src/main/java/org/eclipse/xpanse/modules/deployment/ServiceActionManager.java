@@ -19,15 +19,18 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.serviceaction.ServiceActionRequest;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceActionChangeOrderAlreadyExistsException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
@@ -77,6 +80,7 @@ public class ServiceActionManager {
                 log.error(errMsg);
                 throw new ServiceTemplateNotRegistered(errMsg);
             }
+            validateAllActionChangeOrdersCompleted(serviceDeploymentEntity);
             validateServiceActions(serviceTemplateEntity, request.getActionParameters());
             UUID orderId =
                     addServiceChangeRequestsForServiceAction(
@@ -90,6 +94,38 @@ public class ServiceActionManager {
                     String.format("Change service configuration error, %s", e.getErrorReasons());
             log.error(errorMsg);
             throw e;
+        }
+    }
+
+    private void validateAllActionChangeOrdersCompleted(
+            ServiceDeploymentEntity serviceDeploymentEntity) {
+        List<ServiceOrderEntity> serviceOrders = serviceDeploymentEntity.getServiceOrders();
+        if (CollectionUtils.isEmpty(serviceOrders)) {
+            return;
+        }
+        List<ServiceOrderEntity> serviceActionOrders =
+                serviceOrders.stream()
+                        .filter(
+                                serviceOrder ->
+                                        serviceOrder.getTaskType()
+                                                == ServiceOrderType.SERVICE_ACTION)
+                        .toList();
+        if (!CollectionUtils.isEmpty(serviceActionOrders)) {
+            List<UUID> pendingOrderIds =
+                    serviceActionOrders.stream()
+                            .filter(
+                                    order ->
+                                            order.getOrderStatus() != OrderStatus.SUCCESSFUL
+                                                    && order.getOrderStatus() != OrderStatus.FAILED)
+                            .map(ServiceOrderEntity::getOrderId)
+                            .toList();
+
+            if (!CollectionUtils.isEmpty(pendingOrderIds)) {
+                throw new ServiceActionChangeOrderAlreadyExistsException(
+                        String.format(
+                                "There is already a pending action change order. Order ID - %s",
+                                pendingOrderIds.getFirst().toString()));
+            }
         }
     }
 
