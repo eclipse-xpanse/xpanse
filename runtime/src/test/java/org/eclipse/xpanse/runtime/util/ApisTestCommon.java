@@ -72,6 +72,7 @@ import org.eclipse.xpanse.plugins.flexibleengine.monitor.constant.FlexibleEngine
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants;
+import org.eclipse.xpanse.runtime.testContainers.ZitadelTestContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.MockedStatic;
@@ -101,7 +102,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 /** Test base class. */
 @Slf4j
-public class ApisTestCommon {
+public class ApisTestCommon extends ZitadelTestContainer {
 
     protected static final ObjectMapper objectMapper = new ObjectMapper();
     protected final OclLoader oclLoader = new OclLoader();

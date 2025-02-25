@@ -76,7 +76,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
         properties = {
-            "spring.profiles.active=oauth,zitadel,zitadel-testbed,test,dev",
+            "spring.profiles.active=oauth,zitadel,zitadel-local,test,dev",
             "huaweicloud.auto.approve.service.template.enabled=false"
         })
 @AutoConfigureMockMvc
@@ -544,7 +544,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 objectMapper.readValue(
                         registerWell.getContentAsString(), ServiceTemplateRequestInfo.class);
 
-        // Setup service template with service vendor 'test' to test access denied exception
+        // Setup service template with service vendor 'test' to test access denied
+        // exception
         UUID serviceTemplateId = serviceTemplateRequestInfo.getServiceTemplateId();
         ServiceTemplateEntity serviceTemplateEntity =
                 serviceTemplateStorage.getServiceTemplateById(serviceTemplateId);
