@@ -22,18 +22,21 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationStorage;
+import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigChangeOrderAlreadyExistsException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationNotFoundException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
@@ -45,6 +48,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 /** Bean to manage service configuration. */
 @Slf4j
@@ -116,6 +120,7 @@ public class ServiceConfigurationManager {
                 log.error(errMsg);
                 throw new ServiceTemplateNotRegistered(errMsg);
             }
+            validateAllConfigChangeOrdersCompleted(serviceDeploymentEntity);
             validateRequestParameters(serviceTemplateEntity, configurationUpdate);
             UUID orderId =
                     createServiceChangeRequestsInDatabase(
@@ -130,6 +135,38 @@ public class ServiceConfigurationManager {
                     String.format("Change service configuration error, %s", e.getErrorReasons());
             log.error(errorMsg);
             throw e;
+        }
+    }
+
+    private void validateAllConfigChangeOrdersCompleted(
+            ServiceDeploymentEntity serviceDeploymentEntity) {
+        List<ServiceOrderEntity> serviceOrders = serviceDeploymentEntity.getServiceOrders();
+        if (CollectionUtils.isEmpty(serviceOrders)) {
+            return;
+        }
+        List<ServiceOrderEntity> configChangeOrders =
+                serviceOrders.stream()
+                        .filter(
+                                serviceOrder ->
+                                        serviceOrder.getTaskType()
+                                                == ServiceOrderType.CONFIG_CHANGE)
+                        .toList();
+        if (!CollectionUtils.isEmpty(configChangeOrders)) {
+            List<UUID> pendingOrderIds =
+                    configChangeOrders.stream()
+                            .filter(
+                                    order ->
+                                            order.getOrderStatus() != OrderStatus.SUCCESSFUL
+                                                    && order.getOrderStatus() != OrderStatus.FAILED)
+                            .map(ServiceOrderEntity::getOrderId)
+                            .toList();
+
+            if (!CollectionUtils.isEmpty(pendingOrderIds)) {
+                throw new ServiceConfigChangeOrderAlreadyExistsException(
+                        String.format(
+                                "There is already a pending config change order. Order ID - %s",
+                                pendingOrderIds.getFirst().toString()));
+            }
         }
     }
 
