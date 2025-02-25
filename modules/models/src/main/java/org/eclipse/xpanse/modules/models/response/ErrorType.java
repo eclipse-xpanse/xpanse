@@ -81,7 +81,8 @@ public enum ErrorType {
     DEPLOYMENT_FAILED_EXCEPTION("Deployment Failed Exception"),
     DESTROY_FAILED_EXCEPTION("Destroy Failed Exception"),
     INVALID_SERVICE_ACTION("Service Action Invalid"),
-    SERVICE_CHANGE_FAILED("Service Change Request Failed");
+    SERVICE_CHANGE_FAILED("Service Change Request Failed"),
+    SERVICE_CONFIG_CHANGE_ORDER_ALREADY_EXISTS("Service Configuration Change Order Already Exists");
 
     private final String value;
 

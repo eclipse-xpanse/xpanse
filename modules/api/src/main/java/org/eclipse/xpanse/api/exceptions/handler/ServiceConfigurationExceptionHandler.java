@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicechange.exceptions.ServiceChangeRequestEntityNotFoundException;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigChangeOrderAlreadyExistsException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationNotFoundException;
 import org.springframework.core.Ordered;
@@ -56,6 +57,17 @@ public class ServiceConfigurationExceptionHandler {
             ServiceConfigurationNotFoundException ex) {
         return getErrorResponse(
                 ErrorType.SERVICE_CONFIGURATION_NOT_FOUND,
+                Collections.singletonList(ex.getMessage()));
+    }
+
+    /** Exception handler for ServiceConfigChangeOrderAlreadyExistsException. */
+    @ExceptionHandler({ServiceConfigChangeOrderAlreadyExistsException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleServiceConfigChangeOrderAlreadyExistsException(
+            ServiceConfigChangeOrderAlreadyExistsException ex) {
+        return getErrorResponse(
+                ErrorType.SERVICE_CONFIG_CHANGE_ORDER_ALREADY_EXISTS,
                 Collections.singletonList(ex.getMessage()));
     }
 }
