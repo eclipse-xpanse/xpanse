@@ -41,7 +41,6 @@ import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
-import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
@@ -182,20 +181,7 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         deployRequest.setRegion(serviceTemplate.getRegions().getFirst());
         deployRequest.setServiceHostingType(serviceTemplate.getServiceHostingType());
         deployRequest.setBillingMode(serviceTemplate.getBilling().getBillingModes().getFirst());
-
-        Map<String, Object> serviceRequestProperties = new HashMap<>();
-        serviceRequestProperties.put("admin_passwd", "111111111@Qq");
-        deployRequest.setServiceRequestProperties(serviceRequestProperties);
-
-        List<AvailabilityZoneConfig> availabilityZoneConfigs =
-                serviceTemplate.getDeployment().getServiceAvailabilityConfig();
-        Map<String, String> availabilityZones = new HashMap<>();
-        availabilityZoneConfigs.forEach(
-                availabilityZoneConfig ->
-                        availabilityZones.put(
-                                availabilityZoneConfig.getVarName(),
-                                availabilityZoneConfig.getDisplayName()));
-        deployRequest.setAvailabilityZones(availabilityZones);
+        // null serviceRequestProperties and availabilityZones
         return deployRequest;
     }
 

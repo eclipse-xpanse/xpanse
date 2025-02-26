@@ -226,37 +226,40 @@ public class DeployEnvironments {
             List<DeployVariable> deployVariables,
             boolean isDeployRequest) {
         Map<String, Object> variables = new HashMap<>();
-        for (DeployVariable variable : deployVariables) {
-            if (variable.getKind() == DeployVariableKind.VARIABLE) {
-                if (serviceRequestProperties.containsKey(variable.getName())
-                        && serviceRequestProperties.get(variable.getName()) != null) {
+        if (!CollectionUtils.isEmpty(serviceRequestProperties)
+                && !CollectionUtils.isEmpty(deployVariables)) {
+            for (DeployVariable variable : deployVariables) {
+                if (variable.getKind() == DeployVariableKind.VARIABLE) {
+                    if (serviceRequestProperties.containsKey(variable.getName())
+                            && serviceRequestProperties.get(variable.getName()) != null) {
+                        variables.put(
+                                variable.getName(),
+                                (variable.getSensitiveScope() != SensitiveScope.NONE
+                                                && isDeployRequest)
+                                        ? secretsManager.decodeBackToOriginalType(
+                                                variable.getDataType(),
+                                                serviceRequestProperties
+                                                        .get(variable.getName())
+                                                        .toString())
+                                        : serviceRequestProperties.get(variable.getName()));
+                    } else {
+                        variables.put(variable.getName(), System.getenv(variable.getName()));
+                    }
+                }
+
+                if (variable.getKind() == DeployVariableKind.ENV_VARIABLE) {
+                    variables.put(variable.getName(), System.getenv(variable.getName()));
+                }
+
+                if (variable.getKind() == DeployVariableKind.FIX_VARIABLE) {
                     variables.put(
                             variable.getName(),
                             (variable.getSensitiveScope() != SensitiveScope.NONE && isDeployRequest)
-                                    ? secretsManager.decodeBackToOriginalType(
-                                            variable.getDataType(),
-                                            serviceRequestProperties
-                                                    .get(variable.getName())
-                                                    .toString())
-                                    : serviceRequestProperties.get(variable.getName()));
-                } else {
-                    variables.put(variable.getName(), System.getenv(variable.getName()));
+                                    ? secretsManager.decrypt(variable.getValue())
+                                    : variable.getValue());
                 }
             }
-
-            if (variable.getKind() == DeployVariableKind.ENV_VARIABLE) {
-                variables.put(variable.getName(), System.getenv(variable.getName()));
-            }
-
-            if (variable.getKind() == DeployVariableKind.FIX_VARIABLE) {
-                variables.put(
-                        variable.getName(),
-                        (variable.getSensitiveScope() != SensitiveScope.NONE && isDeployRequest)
-                                ? secretsManager.decrypt(variable.getValue())
-                                : variable.getValue());
-            }
         }
-
         return variables;
     }
 
