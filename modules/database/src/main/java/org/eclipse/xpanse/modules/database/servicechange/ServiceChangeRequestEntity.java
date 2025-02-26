@@ -59,7 +59,7 @@ public class ServiceChangeRequestEntity extends CreatedModifiedTime implements S
 
     private String resourceName;
 
-    @Column(nullable = false)
+    @Column(name = "CHANGE_HANDLER", nullable = false)
     private String changeHandler;
 
     private String resultMessage;

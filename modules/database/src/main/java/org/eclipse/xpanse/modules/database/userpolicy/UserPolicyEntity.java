@@ -25,7 +25,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 @Data
 @Table(
         name = "USER_POLICY",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"USERID", "POLICY", "CSP"})})
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"USER_ID", "POLICY", "CSP"})})
 @Entity
 @EqualsAndHashCode(callSuper = true)
 public class UserPolicyEntity extends CreatedModifiedTime {
@@ -50,6 +50,6 @@ public class UserPolicyEntity extends CreatedModifiedTime {
     private Csp csp;
 
     /** Is the policy enabled. */
-    @Column(columnDefinition = "boolean default true", nullable = false)
+    @Column(name = "ENABLED", columnDefinition = "boolean default true", nullable = false)
     private Boolean enabled;
 }
