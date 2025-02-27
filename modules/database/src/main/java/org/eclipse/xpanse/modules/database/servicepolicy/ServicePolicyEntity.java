@@ -54,6 +54,6 @@ public class ServicePolicyEntity extends CreatedModifiedTime {
     private String flavorNames;
 
     /** Is the policy enabled. */
-    @Column(columnDefinition = "boolean default true")
+    @Column(name = "ENABLED", nullable = false, columnDefinition = "boolean default true")
     private Boolean enabled;
 }

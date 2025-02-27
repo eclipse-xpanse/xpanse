@@ -88,6 +88,7 @@
         <jackson.datatype.jsr310.version>2.18.2</jackson.datatype.jsr310.version>
         <spotless.version>2.44.3</spotless.version>
         <liquibase.version>4.31.1</liquibase.version>
+        <org.reflections.version>0.10.2</org.reflections.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
