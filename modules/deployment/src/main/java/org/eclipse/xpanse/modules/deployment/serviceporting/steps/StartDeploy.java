@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.beans.BeanUtils;
@@ -64,6 +65,10 @@ public class StartDeploy implements Serializable, JavaDelegate {
                 retryTimes);
         try {
             ServiceOrder serviceOrder = deployService.deployServiceByWorkflow(deployTask);
+            runtimeService.setVariable(
+                    processInstanceId,
+                    ServicePortingConstants.NEW_SERVICE_ID,
+                    serviceOrder.getServiceId());
             log.info("Started deploy task with order: {} successfully.", serviceOrder);
         } catch (Exception e) {
             log.error(
@@ -86,8 +91,6 @@ public class StartDeploy implements Serializable, JavaDelegate {
         deployTask.setWorkflowId(processInstanceId);
         UUID originalServiceId = (UUID) variables.get(ServicePortingConstants.ORIGINAL_SERVICE_ID);
         deployTask.setOriginalServiceId(originalServiceId);
-        UUID newServiceId = (UUID) variables.get(ServicePortingConstants.NEW_SERVICE_ID);
-        deployTask.setServiceId(newServiceId);
         UUID servicePortingOrderId =
                 (UUID) variables.get(ServicePortingConstants.SERVICE_PORTING_ORDER_ID);
         deployTask.setParentOrderId(servicePortingOrderId);
@@ -100,6 +103,7 @@ public class StartDeploy implements Serializable, JavaDelegate {
         BeanUtils.copyProperties(servicePortingRequest, deployRequest);
         deployTask.setDeployRequest(deployRequest);
         deployTask.setRequest(servicePortingRequest);
+        deployTask.setTaskType(ServiceOrderType.PORT);
         return deployTask;
     }
 }
