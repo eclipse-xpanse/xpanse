@@ -298,7 +298,6 @@ public class ServiceTemplateManage {
 
     private ServiceTemplateEntity createServiceTemplateEntity(Ocl ocl) {
         ServiceTemplateEntity newServiceTemplate = new ServiceTemplateEntity();
-        newServiceTemplate.setId(UUID.randomUUID());
         newServiceTemplate.setCategory(ocl.getCategory());
         newServiceTemplate.setCsp(ocl.getCloudServiceProvider().getName());
         newServiceTemplate.setName(StringUtils.lowerCase(ocl.getName()));
@@ -330,7 +329,6 @@ public class ServiceTemplateManage {
             ServiceTemplateEntity serviceTemplate) {
         ServiceTemplateRequestHistoryEntity serviceTemplateHistory =
                 new ServiceTemplateRequestHistoryEntity();
-        serviceTemplateHistory.setRequestId(UUID.randomUUID());
         serviceTemplateHistory.setServiceTemplate(serviceTemplate);
         serviceTemplateHistory.setOcl(serviceTemplate.getOcl());
         serviceTemplateHistory.setRequestType(requestType);

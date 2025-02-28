@@ -145,6 +145,11 @@ public class WorkflowUtils {
         }
     }
 
+    /** Get processInstance Variables by instanceId. */
+    public Map<String, Object> getVariablesByProcessInstanceId(String processInstanceId) {
+        return runtimeService.getVariables(processInstanceId);
+    }
+
     private WorkFlowTask getWorkFlow(TaskInfo task) {
         WorkFlowTask workFlowTask = new WorkFlowTask();
         workFlowTask.setProcessInstanceId(task.getProcessInstanceId());

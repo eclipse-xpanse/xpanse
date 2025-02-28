@@ -110,10 +110,8 @@ public class DeployService {
      * @return ServiceOrder.
      */
     public ServiceOrder createOrderToDeployNewService(DeployRequest deployRequest) {
-        UUID newServiceId = UUID.randomUUID();
-        MDC.put(SERVICE_ID, newServiceId.toString());
         String userId = userServiceHelper.getCurrentUserId();
-        DeployTask deployTask = createNewDeployTask(newServiceId, userId, deployRequest);
+        DeployTask deployTask = createNewDeployTask(userId, deployRequest);
         deployService(deployTask);
         return new ServiceOrder(deployTask.getOrderId(), deployTask.getServiceId());
     }
@@ -265,8 +263,7 @@ public class DeployService {
      * @param deployRequest deploy request.
      * @return new deploy task.
      */
-    private DeployTask createNewDeployTask(
-            UUID serviceId, String userId, DeployRequest deployRequest) {
+    private DeployTask createNewDeployTask(String userId, DeployRequest deployRequest) {
         // Find service templates and fill Ocl.
         ServiceTemplateQueryModel queryModel =
                 ServiceTemplateQueryModel.builder()
@@ -320,7 +317,6 @@ public class DeployService {
         }
         DeployTask deployTask = new DeployTask();
         deployTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
-        deployTask.setServiceId(serviceId);
         deployTask.setUserId(userId);
         deployTask.setDeployRequest(deployRequest);
         deployTask.setRequest(deployRequest);
@@ -375,7 +371,6 @@ public class DeployService {
 
     private ServiceDeploymentEntity storeNewDeployServiceEntity(DeployTask deployTask) {
         ServiceDeploymentEntity entity = new ServiceDeploymentEntity();
-        entity.setId(deployTask.getServiceId());
         entity.setCreatedTime(OffsetDateTime.now());
         entity.setVersion(StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
         entity.setName(StringUtils.lowerCase(deployTask.getDeployRequest().getServiceName()));
@@ -423,6 +418,10 @@ public class DeployService {
         DeployerKind kind = deployTask.getOcl().getDeployment().getDeployerTool().getKind();
         Deployer deployer = deployerKindManager.getDeployment(kind);
         ServiceDeploymentEntity serviceEntity = storeNewDeployServiceEntity(deployTask);
+        if (Objects.nonNull(serviceEntity.getId())) {
+            MDC.put(SERVICE_ID, serviceEntity.getId().toString());
+            deployTask.setServiceId(serviceEntity.getId());
+        }
         Handler handler = getHandler(activeProfiles, kind);
         ServiceOrderEntity serviceOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(deployTask, serviceEntity, handler);
@@ -674,12 +673,11 @@ public class DeployService {
      * @return serviceOrder
      */
     public ServiceOrder deployServiceByWorkflow(DeployTask workFlowDeployTask) {
-        UUID newServiceId = workFlowDeployTask.getServiceId();
-        MDC.put(SERVICE_ID, newServiceId.toString());
-        // check if the new service is already deployed.
-        ServiceDeploymentEntity deployServiceEntity =
-                serviceDeploymentStorage.findServiceDeploymentById(newServiceId);
-        if (Objects.nonNull(deployServiceEntity)) {
+        if (workFlowDeployTask.getTaskType() == ServiceOrderType.RECREATE) {
+            ServiceDeploymentEntity deployServiceEntity =
+                    serviceDeploymentStorage.findServiceDeploymentById(
+                            workFlowDeployTask.getServiceId());
+            MDC.put(SERVICE_ID, workFlowDeployTask.getServiceId().toString());
             // retry to deploy the service.
             DeployTask retryTask = getRedeployTask(deployServiceEntity);
             retryTask.setOriginalServiceId(workFlowDeployTask.getOriginalServiceId());
@@ -687,16 +685,16 @@ public class DeployService {
             retryTask.setWorkflowId(workFlowDeployTask.getWorkflowId());
             redeployService(retryTask, deployServiceEntity);
             return new ServiceOrder(retryTask.getOrderId(), retryTask.getServiceId());
-        } else {
+        }
+        if (workFlowDeployTask.getTaskType() == ServiceOrderType.PORT) {
             DeployTask deployTask =
                     createNewDeployTask(
-                            newServiceId,
-                            workFlowDeployTask.getUserId(),
-                            workFlowDeployTask.getDeployRequest());
+                            workFlowDeployTask.getUserId(), workFlowDeployTask.getDeployRequest());
             deployTask.setOriginalServiceId(workFlowDeployTask.getOriginalServiceId());
             deployTask.setParentOrderId(workFlowDeployTask.getParentOrderId());
             deployTask.setWorkflowId(workFlowDeployTask.getWorkflowId());
             deployService(deployTask);
+            return new ServiceOrder(workFlowDeployTask.getOrderId(), deployTask.getServiceId());
         }
         return new ServiceOrder(workFlowDeployTask.getOrderId(), workFlowDeployTask.getServiceId());
     }
