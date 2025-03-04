@@ -10,8 +10,9 @@ import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
@@ -38,13 +39,15 @@ class UserOrderableServiceVoTest {
     @Mock private Category mockCategory;
     @Mock private Csp mockCsp;
     @Mock private List<Region> mockRegions;
-    @Mock private List<DeployVariable> mockVariables;
+    @Mock private List<InputVariable> mockInputVariables;
+    @Mock private List<OutputVariable> mockOutputVariables;
     @Mock private EndUserFlavors mockFlavors;
     @Mock private Billing mockBilling;
     @Mock private ServiceHostingType mockServiceHostingType;
     @Mock private ServiceProviderContactDetails mockServiceProviderContactDetails;
-    @Mock private List<AvailabilityZoneConfig> mockserviceAvailabilityConfig;
-    private List<ServiceAction> serviceActions = List.of();
+    @Mock private List<AvailabilityZoneConfig> mockServiceAvailabilityConfig;
+    @Mock private List<ServiceAction> mockServiceActions;
+
     private UserOrderableServiceVo test;
 
     @BeforeEach
@@ -59,15 +62,16 @@ class UserOrderableServiceVoTest {
         test.setCategory(mockCategory);
         test.setCsp(mockCsp);
         test.setRegions(mockRegions);
-        test.setVariables(mockVariables);
+        test.setInputVariables(mockInputVariables);
+        test.setOutputVariables(mockOutputVariables);
         test.setFlavors(mockFlavors);
         test.setBilling(mockBilling);
         test.setServiceHostingType(mockServiceHostingType);
         test.setServiceProviderContactDetails(mockServiceProviderContactDetails);
-        test.setServiceAvailabilityConfig(mockserviceAvailabilityConfig);
+        test.setServiceAvailabilityConfig(mockServiceAvailabilityConfig);
         test.setEula(eula);
         test.setConfigurationParameters(configurationParameters);
-        test.setServiceActions(serviceActions);
+        test.setServiceActions(mockServiceActions);
     }
 
     @Test
@@ -81,22 +85,24 @@ class UserOrderableServiceVoTest {
         assertThat(test.getIcon()).isEqualTo(icon);
         assertThat(test.getRegions()).isEqualTo(mockRegions);
         assertThat(test.getCsp()).isEqualTo(mockCsp);
-        assertThat(test.getVariables()).isEqualTo(mockVariables);
+        assertThat(test.getInputVariables()).isEqualTo(mockInputVariables);
+        assertThat(test.getOutputVariables()).isEqualTo(mockOutputVariables);
         assertThat(test.getFlavors()).isEqualTo(mockFlavors);
         assertThat(test.getBilling()).isEqualTo(mockBilling);
         assertThat(test.getServiceHostingType()).isEqualTo(mockServiceHostingType);
         assertThat(test.getServiceProviderContactDetails())
                 .isEqualTo(mockServiceProviderContactDetails);
-        assertThat(test.getServiceAvailabilityConfig()).isEqualTo(mockserviceAvailabilityConfig);
+        assertThat(test.getServiceAvailabilityConfig()).isEqualTo(mockServiceAvailabilityConfig);
         assertThat(test.getEula()).isEqualTo(eula);
         assertThat(test.getConfigurationParameters()).isEqualTo(configurationParameters);
-        assertThat(test.getServiceActions()).isEqualTo(serviceActions);
+        assertThat(test.getServiceActions()).isEqualTo(mockServiceActions);
     }
 
     @Test
     public void testEqualsAndHashCode() {
-        assertNotEquals(test, new Object());
-        assertNotEquals(test.hashCode(), new Object().hashCode());
+        Object obj = new Object();
+        assertThat(test).isNotEqualTo(obj);
+        assertThat(test.hashCode()).isNotEqualTo(obj.hashCode());
         UserOrderableServiceVo test1 = new UserOrderableServiceVo();
         assertNotEquals(test, test1);
         assertNotEquals(test.hashCode(), test1.hashCode());
@@ -128,8 +134,10 @@ class UserOrderableServiceVoTest {
                         + description
                         + ", icon="
                         + icon
-                        + ", variables="
-                        + mockVariables
+                        + ", inputVariables="
+                        + mockInputVariables
+                        + ", outputVariables="
+                        + mockOutputVariables
                         + ", flavors="
                         + mockFlavors
                         + ", billing="
@@ -139,13 +147,13 @@ class UserOrderableServiceVoTest {
                         + ", serviceProviderContactDetails="
                         + mockServiceProviderContactDetails
                         + ", serviceAvailabilityConfig="
-                        + mockserviceAvailabilityConfig
+                        + mockServiceAvailabilityConfig
                         + ", eula="
                         + eula
                         + ", configurationParameters="
                         + configurationParameters
                         + ", serviceActions="
-                        + serviceActions
+                        + mockServiceActions
                         + ")";
         assertEquals(expectedToString, test.toString());
     }

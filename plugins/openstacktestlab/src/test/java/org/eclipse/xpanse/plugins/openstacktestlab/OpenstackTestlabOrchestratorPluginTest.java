@@ -56,8 +56,8 @@ import org.eclipse.xpanse.modules.models.monitor.enums.MonitorResourceType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -337,8 +337,8 @@ class OpenstackTestlabOrchestratorPluginTest {
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         Ocl ocl = new Ocl();
         Deployment deployment = new Deployment();
-        List<DeployVariable> variables = new ArrayList<>();
-        deployment.setVariables(variables);
+        List<InputVariable> inputVariables = new ArrayList<>();
+        deployment.setInputVariables(inputVariables);
         ocl.setDeployment(deployment);
         serviceTemplateEntity.setOcl(ocl);
         when(this.mockServiceDeploymentStorage.findServiceDeploymentById(any()))

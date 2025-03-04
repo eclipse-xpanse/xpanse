@@ -17,7 +17,7 @@ import org.eclipse.xpanse.modules.database.servicepolicy.ServicePolicyEntity;
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceInputVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
@@ -57,11 +57,11 @@ class ServiceTemplateEntityTest {
         ocl =
                 oclLoader.getOcl(
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator =
-                new ServiceDeployVariablesJsonSchemaGenerator();
+        ServiceInputVariablesJsonSchemaGenerator serviceInputVariablesJsonSchemaGenerator =
+                new ServiceInputVariablesJsonSchemaGenerator();
         jsonObjectSchema =
-                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
-                        ocl.getDeployment().getVariables());
+                serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
+                        ocl.getDeployment().getInputVariables());
         category = ocl.getCategory();
         csp = ocl.getCloudServiceProvider().getName();
         name = ocl.getName();

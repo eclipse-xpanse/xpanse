@@ -54,9 +54,9 @@ import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
-import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaValidator;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceInputVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -84,10 +84,7 @@ public class DeployService {
     @Resource private PluginManager pluginManager;
     @Resource private ServiceTemplateStorage serviceTemplateStorage;
     @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-
-    @Resource
-    private ServiceDeployVariablesJsonSchemaValidator serviceDeployVariablesJsonSchemaValidator;
-
+    @Resource private ServiceInputVariablesJsonSchemaValidator inputVariablesJsonSchemaValidator;
     @Resource private PolicyValidator policyValidator;
     @Resource private SensitiveDataHandler sensitiveDataHandler;
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
@@ -309,8 +306,10 @@ public class DeployService {
         }
         // Check context validation
         validateDeployRequestWithServiceTemplate(availableServiceTemplate, deployRequest);
-        sensitiveDataHandler.encodeDeployVariable(
-                availableServiceTemplate, deployRequest.getServiceRequestProperties());
+        List<InputVariable> definedInputVariables =
+                availableServiceTemplate.getOcl().getDeployment().getInputVariables();
+        sensitiveDataHandler.encodeInputVariables(
+                definedInputVariables, deployRequest.getServiceRequestProperties());
 
         AvailabilityZonesRequestValidator.validateAvailabilityZones(
                 deployRequest.getAvailabilityZones(),
@@ -336,11 +335,11 @@ public class DeployService {
         // Check context validation
         if (Objects.nonNull(existingServiceTemplate.getOcl().getDeployment())
                 && Objects.nonNull(deployRequest.getServiceRequestProperties())) {
-            List<DeployVariable> deployVariables =
-                    existingServiceTemplate.getOcl().getDeployment().getVariables();
+            List<InputVariable> inputVariables =
+                    existingServiceTemplate.getOcl().getDeployment().getInputVariables();
 
-            serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(
-                    deployVariables,
+            inputVariablesJsonSchemaValidator.validateInputVariables(
+                    inputVariables,
                     deployRequest.getServiceRequestProperties(),
                     existingServiceTemplate.getJsonObjectSchema());
         }
@@ -538,8 +537,10 @@ public class DeployService {
             newDeployRequest.setServiceRequestProperties(serviceRequestProperties);
         }
         validateDeployRequestWithServiceTemplate(existingServiceTemplate, newDeployRequest);
-        sensitiveDataHandler.encodeDeployVariable(
-                existingServiceTemplate, newDeployRequest.getServiceRequestProperties());
+        List<InputVariable> definedInputVariables =
+                existingServiceTemplate.getOcl().getDeployment().getInputVariables();
+        sensitiveDataHandler.encodeInputVariables(
+                definedInputVariables, newDeployRequest.getServiceRequestProperties());
         modifyTask.setDeployRequest(newDeployRequest);
         modifyTask.setRequest(modifyRequest);
         return modifyTask;

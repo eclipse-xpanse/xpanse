@@ -21,30 +21,31 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.VariableValidationFailedException;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/** The class is used to validate deployment variables. */
+/** The class is used to validate input variables of deployment. */
 @Slf4j
 @Component
-public class ServiceDeployVariablesJsonSchemaValidator {
+public class ServiceInputVariablesJsonSchemaValidator {
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
     /**
-     * Check validation of deploy property map by list of deployVariables in registered service.
+     * Check validation of requested input properties map by list of inputVariables in registered
+     * service.
      *
-     * @param deployVariables list of deployVariables in registered service
-     * @param deployProperty deploy property map
+     * @param inputVariables list of inputVariables in registered service
+     * @param inputProperties input properties map
      */
-    public void validateDeployVariables(
-            List<DeployVariable> deployVariables,
-            Map<String, Object> deployProperty,
+    public void validateInputVariables(
+            List<InputVariable> inputVariables,
+            Map<String, Object> inputProperties,
             JsonObjectSchema jsonObjectSchema) {
 
-        if (CollectionUtils.isEmpty(deployVariables) || Objects.isNull(jsonObjectSchema)) {
+        if (CollectionUtils.isEmpty(inputVariables) || Objects.isNull(jsonObjectSchema)) {
             return;
         }
         try {
@@ -53,7 +54,7 @@ public class ServiceDeployVariablesJsonSchemaValidator {
             JsonSchemaFactory factory =
                     JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012);
             JsonSchema schema = factory.getSchema(jsonObjectSchemaString);
-            String propertyJson = jsonMapper.writeValueAsString(deployProperty);
+            String propertyJson = jsonMapper.writeValueAsString(inputProperties);
             JsonNode jsonNode = jsonMapper.readTree(propertyJson);
             Set<ValidationMessage> validate = schema.validate(jsonNode);
 

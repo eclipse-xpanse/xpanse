@@ -32,14 +32,14 @@ import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -66,10 +66,10 @@ class DeployEnvironmentsTest {
     private DeployTask task;
     private DeployRequest deployRequest;
     private FlavorsWithPrice flavors;
-    private DeployVariable deployVariable1;
-    private DeployVariable deployVariable2;
-    private DeployVariable deployVariable3;
-    private DeployVariable deployVariable4;
+    private InputVariable inputVariable1;
+    private InputVariable inputVariable2;
+    private InputVariable inputVariable3;
+    private InputVariable inputVariable4;
     @Mock private SecretsManager secretsManager;
     @Mock private CredentialCenter mockCredentialCenter;
     @Mock private PluginManager pluginManager;
@@ -97,28 +97,28 @@ class DeployEnvironmentsTest {
         deployRequest.setRegion(region);
 
         Deployment deployment = new Deployment();
-        deployVariable1 = new DeployVariable();
-        deployVariable1.setName("name");
-        deployVariable1.setKind(DeployVariableKind.ENV);
-        deployVariable1.setValue("value");
+        inputVariable1 = new InputVariable();
+        inputVariable1.setName("name");
+        inputVariable1.setKind(VariableKind.ENV);
+        inputVariable1.setValue("value");
 
-        deployVariable2 = new DeployVariable();
-        deployVariable2.setName("key1");
-        deployVariable2.setKind(DeployVariableKind.ENV_ENV);
-        deployVariable2.setValue("value1");
+        inputVariable2 = new InputVariable();
+        inputVariable2.setName("key1");
+        inputVariable2.setKind(VariableKind.ENV_ENV);
+        inputVariable2.setValue("value1");
 
-        deployVariable3 = new DeployVariable();
-        deployVariable3.setName("key2");
-        deployVariable3.setKind(DeployVariableKind.FIX_ENV);
-        deployVariable3.setValue("value2");
+        inputVariable3 = new InputVariable();
+        inputVariable3.setName("key2");
+        inputVariable3.setKind(VariableKind.FIX_ENV);
+        inputVariable3.setValue("value2");
 
-        deployVariable4 = new DeployVariable();
-        deployVariable4.setName("example");
-        deployVariable4.setKind(DeployVariableKind.ENV);
-        deployVariable4.setValue("example_value");
+        inputVariable4 = new InputVariable();
+        inputVariable4.setName("example");
+        inputVariable4.setKind(VariableKind.ENV);
+        inputVariable4.setValue("example_value");
 
-        deployment.setVariables(
-                List.of(deployVariable1, deployVariable2, deployVariable3, deployVariable4));
+        deployment.setInputVariables(
+                List.of(inputVariable1, inputVariable2, inputVariable3, inputVariable4));
         deployment.setCredentialType(CredentialType.VARIABLES);
 
         flavors = new FlavorsWithPrice();
@@ -196,10 +196,10 @@ class DeployEnvironmentsTest {
 
     @Test
     void testGetVariables() {
-        deployVariable1.setKind(DeployVariableKind.VARIABLE);
-        deployVariable4.setKind(DeployVariableKind.VARIABLE);
-        deployVariable2.setKind(DeployVariableKind.ENV_VARIABLE);
-        deployVariable3.setKind(DeployVariableKind.FIX_VARIABLE);
+        inputVariable1.setKind(VariableKind.VARIABLE);
+        inputVariable4.setKind(VariableKind.VARIABLE);
+        inputVariable2.setKind(VariableKind.ENV_VARIABLE);
+        inputVariable3.setKind(VariableKind.FIX_VARIABLE);
 
         Map<String, String> expectedResult = new HashMap<>();
         expectedResult.put("example", null);
@@ -218,10 +218,10 @@ class DeployEnvironmentsTest {
 
     @Test
     void testGetCredentialVariablesWithHostingType_SELF() {
-        deployVariable1.setKind(DeployVariableKind.VARIABLE);
-        deployVariable4.setKind(DeployVariableKind.VARIABLE);
-        deployVariable2.setKind(DeployVariableKind.ENV_VARIABLE);
-        deployVariable3.setKind(DeployVariableKind.FIX_VARIABLE);
+        inputVariable1.setKind(VariableKind.VARIABLE);
+        inputVariable4.setKind(VariableKind.VARIABLE);
+        inputVariable2.setKind(VariableKind.ENV_VARIABLE);
+        inputVariable3.setKind(VariableKind.FIX_VARIABLE);
 
         Csp csp = Csp.HUAWEI_CLOUD;
         List<CredentialVariable> variables = new ArrayList<>();
@@ -251,10 +251,10 @@ class DeployEnvironmentsTest {
 
     @Test
     void testGetCredentialVariablesWithHostingType_SERVICE_VENDOR() {
-        deployVariable1.setKind(DeployVariableKind.VARIABLE);
-        deployVariable4.setKind(DeployVariableKind.VARIABLE);
-        deployVariable2.setKind(DeployVariableKind.ENV_VARIABLE);
-        deployVariable3.setKind(DeployVariableKind.FIX_VARIABLE);
+        inputVariable1.setKind(VariableKind.VARIABLE);
+        inputVariable4.setKind(VariableKind.VARIABLE);
+        inputVariable2.setKind(VariableKind.ENV_VARIABLE);
+        inputVariable3.setKind(VariableKind.FIX_VARIABLE);
         deployRequest.setServiceHostingType(ServiceHostingType.SERVICE_VENDOR);
         Csp csp = Csp.HUAWEI_CLOUD;
         List<CredentialVariable> variables = new ArrayList<>();

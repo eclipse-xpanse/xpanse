@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
@@ -43,8 +43,8 @@ public class ServiceConfigurationVariablesJsonSchemaGenerator {
         JsonObjectSchema jsonObjectSchema = new JsonObjectSchema();
         Map<String, Map<String, Object>> serviceConfigurationJsonSchemaProperties = new HashMap<>();
         for (ServiceChangeParameter configurationParameter : serviceConfigurationParameters) {
-            if (configurationParameter.getKind() == DeployVariableKind.VARIABLE
-                    || configurationParameter.getKind() == DeployVariableKind.ENV) {
+            if (configurationParameter.getKind() == VariableKind.VARIABLE
+                    || configurationParameter.getKind() == VariableKind.ENV) {
                 Map<String, Object> validationProperties = new HashMap<>();
 
                 if (!CollectionUtils.isEmpty(configurationParameter.getValueSchema())) {
@@ -85,15 +85,15 @@ public class ServiceConfigurationVariablesJsonSchemaGenerator {
         jsonObjectSchema
                 .getProperties()
                 .forEach(
-                        (deployVariable, variableValueSchema) ->
+                        (inputVariable, variableValueSchema) ->
                                 variableValueSchema.forEach(
                                         (schemaDefKey, schemaDefValue) -> {
                                             if (!allowedKeys.contains(schemaDefKey)) {
                                                 invalidKeys.add(
                                                         String.format(
-                                                                "Value schema key %s in deploy"
+                                                                "Value schema key %s in input"
                                                                         + " variable %s is invalid",
-                                                                schemaDefKey, deployVariable));
+                                                                schemaDefKey, inputVariable));
                                             }
                                         }));
         if (!invalidKeys.isEmpty()) {

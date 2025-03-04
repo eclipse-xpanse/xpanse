@@ -39,8 +39,10 @@ public class ServiceTemplateEntityConverter {
             serviceTemplateDetailVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
             serviceTemplateDetailVo.setFlavors(serviceTemplateEntity.getOcl().getFlavors());
             serviceTemplateDetailVo.setDeployment(serviceTemplateEntity.getOcl().getDeployment());
-            serviceTemplateDetailVo.setVariables(
-                    serviceTemplateEntity.getOcl().getDeployment().getVariables());
+            serviceTemplateDetailVo.setInputVariables(
+                    serviceTemplateEntity.getOcl().getDeployment().getInputVariables());
+            serviceTemplateDetailVo.setOutputVariables(
+                    serviceTemplateEntity.getOcl().getDeployment().getOutputVariables());
             serviceTemplateDetailVo.setRegions(
                     serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
             serviceTemplateDetailVo.add(
@@ -78,12 +80,12 @@ public class ServiceTemplateEntityConverter {
             userOrderableServiceVo.setIcon(serviceTemplateEntity.getOcl().getIcon());
             userOrderableServiceVo.setDescription(serviceTemplateEntity.getOcl().getDescription());
             userOrderableServiceVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
-
             setFlavorsWithoutPricing(
                     userOrderableServiceVo, serviceTemplateEntity.getOcl().getFlavors());
-
-            userOrderableServiceVo.setVariables(
-                    serviceTemplateEntity.getOcl().getDeployment().getVariables());
+            userOrderableServiceVo.setInputVariables(
+                    serviceTemplateEntity.getOcl().getDeployment().getInputVariables());
+            userOrderableServiceVo.setOutputVariables(
+                    serviceTemplateEntity.getOcl().getDeployment().getOutputVariables());
             userOrderableServiceVo.setRegions(
                     serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
             userOrderableServiceVo.add(
