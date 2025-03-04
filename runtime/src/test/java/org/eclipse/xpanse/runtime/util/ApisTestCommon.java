@@ -524,7 +524,7 @@ public class ApisTestCommon extends ZitadelTestContainer {
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         serviceTemplate
                 .getDeployment()
-                .getVariables()
+                .getInputVariables()
                 .forEach(
                         variable ->
                                 serviceRequestProperties.put(

@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
 class DeploymentScriptValidationResultTest {
     String detail = "detail";
     String deployerVersionUsed = "1.6.0";
-    DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
+    InputValidateDiagnostics diagnostics = new InputValidateDiagnostics();
     private DeploymentScriptValidationResult test;
 
     @BeforeEach
@@ -52,7 +52,7 @@ class DeploymentScriptValidationResultTest {
                 "DeploymentScriptValidationResult(valid=true"
                         + ", deployerVersionUsed="
                         + deployerVersionUsed
-                        + ", diagnostics=[DeployValidateDiagnostics(detail=detail)])";
+                        + ", diagnostics=[InputValidateDiagnostics(detail=detail)])";
         assertEquals(test.toString(), exceptedString);
     }
 }

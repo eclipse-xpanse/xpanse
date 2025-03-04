@@ -43,8 +43,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.InputValidateDiagnostics;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -133,7 +133,7 @@ class OpenTofuLocalDeploymentTest {
         deployRequest.setServiceHostingType(ocl.getServiceHostingType());
         Map<String, Object> serviceRequestProperties = new HashMap<>();
         ocl.getDeployment()
-                .getVariables()
+                .getInputVariables()
                 .forEach(
                         variable ->
                                 serviceRequestProperties.put(
@@ -347,7 +347,7 @@ class OpenTofuLocalDeploymentTest {
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(false);
-        DeployValidateDiagnostics diagnostics = new DeployValidateDiagnostics();
+        InputValidateDiagnostics diagnostics = new InputValidateDiagnostics();
         diagnostics.setDetail(
                 "A managed resource \"random_id_2\" \"new\" has not been declared in the root "
                         + "module.");

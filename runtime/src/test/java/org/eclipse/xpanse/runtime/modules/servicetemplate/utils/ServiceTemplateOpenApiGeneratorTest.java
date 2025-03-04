@@ -13,14 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceInputVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
-import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;
+import org.eclipse.xpanse.modules.servicetemplate.utils.InputVariablesSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -121,12 +121,13 @@ class ServiceTemplateOpenApiGeneratorTest {
         Ocl ocl = oclLoader.getOcl(url);
         AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
                 ocl.getDeployment().getServiceAvailabilityConfig());
-        DeployVariableSchemaValidator.validateDeployVariable(ocl.getDeployment().getVariables());
-        ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator =
-                new ServiceDeployVariablesJsonSchemaGenerator();
+        InputVariablesSchemaValidator.validateInputVariables(
+                ocl.getDeployment().getInputVariables());
+        ServiceInputVariablesJsonSchemaGenerator serviceInputVariablesJsonSchemaGenerator =
+                new ServiceInputVariablesJsonSchemaGenerator();
         JsonObjectSchema jsonObjectSchema =
-                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
-                        ocl.getDeployment().getVariables());
+                serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
+                        ocl.getDeployment().getInputVariables());
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceId);
         serviceTemplateEntity.setName(ocl.getName());

@@ -10,31 +10,31 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/** Deploy variable data types. */
-public enum DeployVariableDataType {
+/** Variable data types. */
+public enum VariableDataType {
     STRING("string"),
     NUMBER("number"),
     BOOLEAN("boolean");
 
     private final String type;
 
-    DeployVariableDataType(String type) {
+    VariableDataType(String type) {
         this.type = type;
     }
 
-    /** For DeployVariableKind serialize. */
+    /** For VariableKind serialize. */
     @JsonCreator
-    public DeployVariableDataType getByValue(String type) {
-        for (DeployVariableDataType deployVariableType : values()) {
-            if (StringUtils.equalsIgnoreCase(deployVariableType.type, type)) {
-                return deployVariableType;
+    public VariableDataType getByValue(String type) {
+        for (VariableDataType variableDataType : values()) {
+            if (StringUtils.equalsIgnoreCase(variableDataType.type, type)) {
+                return variableDataType;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("DeployVariableDataType value %s is not supported.", type));
+                String.format("VariableDataType value %s is not supported.", type));
     }
 
-    /** For DeployVariableKind deserialize. */
+    /** For VariableKind deserialize. */
     @JsonValue
     public String toValue() {
         return this.type;

@@ -16,5 +16,5 @@ public class DeploymentScriptValidationResult {
 
     private boolean valid;
     private String deployerVersionUsed;
-    private List<DeployValidateDiagnostics> diagnostics;
+    private List<InputValidateDiagnostics> diagnostics;
 }

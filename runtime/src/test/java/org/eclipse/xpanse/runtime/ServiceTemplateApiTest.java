@@ -43,14 +43,14 @@ import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableDataType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
@@ -696,8 +696,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         AvailabilityZoneConfig duplicateAvailabilityZoneConfig =
                 ocl.getDeployment().getServiceAvailabilityConfig().getFirst();
         ocl.getDeployment().getServiceAvailabilityConfig().add(duplicateAvailabilityZoneConfig);
-        DeployVariable duplicateDeployVariable = ocl.getDeployment().getVariables().getFirst();
-        ocl.getDeployment().getVariables().add(duplicateDeployVariable);
+        InputVariable duplicateInputVariable = ocl.getDeployment().getInputVariables().getFirst();
+        ocl.getDeployment().getInputVariables().add(duplicateInputVariable);
         ServiceFlavorWithPrice duplicateFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
         ocl.getFlavors().getServiceFlavors().add(duplicateFlavor);
         String duplicateEmail = ocl.getServiceProviderContactDetails().getEmails().getFirst();
@@ -789,16 +789,16 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
         ocl.getDeployment().setServiceAvailabilityConfig(null);
-        DeployVariable deployVariable = ocl.getDeployment().getVariables().getLast();
-        DeployVariable deployVariableWithRepeatName = new DeployVariable();
-        BeanUtils.copyProperties(deployVariable, deployVariableWithRepeatName);
-        deployVariableWithRepeatName.setValue("newValue");
-        ocl.getDeployment().getVariables().add(deployVariableWithRepeatName);
+        InputVariable inputVariable = ocl.getDeployment().getInputVariables().getLast();
+        InputVariable inputVariableWithRepeatName = new InputVariable();
+        BeanUtils.copyProperties(inputVariable, inputVariableWithRepeatName);
+        inputVariableWithRepeatName.setValue("newValue");
+        ocl.getDeployment().getInputVariables().add(inputVariableWithRepeatName);
 
         String errorMessage =
                 String.format(
                         "The deploy variable configuration list with duplicated variable name %s",
-                        deployVariableWithRepeatName.getName());
+                        inputVariableWithRepeatName.getName());
         ErrorResponse expectedResponse =
                 ErrorResponse.errorResponse(
                         ErrorType.VARIABLE_SCHEMA_DEFINITION_INVALID,
@@ -844,9 +844,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl3 =
                 oclLoader.getOcl(
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        DeployVariable errorVariable = new DeployVariable();
-        errorVariable.setKind(DeployVariableKind.VARIABLE);
-        errorVariable.setDataType(DeployVariableDataType.STRING);
+        InputVariable errorVariable = new InputVariable();
+        errorVariable.setKind(VariableKind.VARIABLE);
+        errorVariable.setDataType(VariableDataType.STRING);
         errorVariable.setMandatory(true);
         errorVariable.setName("errorVarName");
         errorVariable.setDescription("description");
@@ -858,11 +858,11 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         modificationImpact.setIsDataLost(true);
         modificationImpact.setIsServiceInterrupted(true);
         errorVariable.setModificationImpact(modificationImpact);
-        ocl3.getDeployment().setVariables(List.of(errorVariable));
+        ocl3.getDeployment().setInputVariables(List.of(errorVariable));
 
         String errorMessage3 =
                 String.format(
-                        "Value schema key %s in deploy variable %s is invalid",
+                        "Value schema key %s in input variable %s is invalid",
                         errorSchemaKey, errorVariable.getName());
         ErrorResponse expectedResponse3 =
                 ErrorResponse.errorResponse(

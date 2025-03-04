@@ -767,7 +767,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         .getOcl(
                                 URI.create("file:src/test/resources/ocl_terraform_test.yml")
                                         .toURL());
-        ocl.getDeployment().getVariables().getLast().setMandatory(true);
+        ocl.getDeployment().getInputVariables().getLast().setMandatory(true);
         AvailabilityZoneConfig zoneConfig = new AvailabilityZoneConfig();
         zoneConfig.setDisplayName("Primary AZ");
         zoneConfig.setVarName("primary_az");
@@ -787,7 +787,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         String refuseMsg1 =
                 String.format(
                         "Variable validation failed:" + " [required property '%s' not found]",
-                        ocl.getDeployment().getVariables().getLast().getName());
+                        ocl.getDeployment().getInputVariables().getLast().getName());
 
         final MockHttpServletResponse deployResponse1 = deployService(deployRequest1);
         // Verify the results

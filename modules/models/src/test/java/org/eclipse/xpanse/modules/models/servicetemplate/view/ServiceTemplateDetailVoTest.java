@@ -6,26 +6,23 @@
 
 package org.eclipse.xpanse.modules.models.servicetemplate.view;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.models.billing.Billing;
-import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
-import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.ConfigurationManagerTool;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,109 +50,84 @@ class ServiceTemplateDetailVoTest {
             ServiceTemplateRegistrationState.APPROVED;
     private final Boolean isAvailableInCatalog = true;
     private final Boolean isReviewInProgress = false;
-    private final ServiceChangeManage serviceConfigurationManage = new ServiceChangeManage();
+    @Mock private ServiceChangeManage serviceConfigurationManage;
     @Mock private ServiceProviderContactDetails serviceProviderContactDetails;
-    private List<Region> regions;
-    private List<DeployVariable> variables;
-    private FlavorsWithPrice flavors;
-    private Billing billing;
-    private ServiceTemplateDetailVo serviceTemplateDetailVo;
-    private List<ServiceAction> serviceActions;
+    @Mock private List<Region> regions;
+    @Mock private List<InputVariable> inputVariables;
+    @Mock private List<OutputVariable> outputVariables;
+    @Mock private FlavorsWithPrice flavors;
+    @Mock private Billing billing;
+    @Mock private List<ServiceAction> serviceActions;
+
+    private ServiceTemplateDetailVo test;
 
     @BeforeEach
     void setUp() {
-        Region region = new Region();
-        region.setName("cn-north-1");
-        region.setArea("Asia");
-        regions = List.of(region);
-
-        DeployVariable deployVariable = new DeployVariable();
-        deployVariable.setName("HuaweiCloud AK");
-        variables = List.of(deployVariable);
-
-        flavors = new FlavorsWithPrice();
-        ServiceFlavorWithPrice flavor = new ServiceFlavorWithPrice();
-        flavor.setName("flavor");
-        flavors.setServiceFlavors(List.of(flavor));
-
-        billing = new Billing();
-        billing.setBillingModes(Arrays.asList(BillingMode.values()));
-
-        ServiceAction serviceAction = new ServiceAction();
-        serviceAction.setName("backup");
-        serviceAction.setType(ConfigurationManagerTool.ANSIBLE);
-        serviceActions = List.of(serviceAction);
-
-        serviceTemplateDetailVo = new ServiceTemplateDetailVo();
-        serviceTemplateDetailVo.setServiceTemplateId(uuid);
-        serviceTemplateDetailVo.setCategory(category);
-        serviceTemplateDetailVo.setName(name);
-        serviceTemplateDetailVo.setVersion(version);
-        serviceTemplateDetailVo.setCsp(csp);
-        serviceTemplateDetailVo.setRegions(regions);
-        serviceTemplateDetailVo.setDescription(description);
-        serviceTemplateDetailVo.setServiceVendor(serviceVendor);
-        serviceTemplateDetailVo.setIcon(icon);
-        serviceTemplateDetailVo.setDeployment(deployment);
-        serviceTemplateDetailVo.setVariables(variables);
-        serviceTemplateDetailVo.setFlavors(flavors);
-        serviceTemplateDetailVo.setBilling(billing);
-        serviceTemplateDetailVo.setCreatedTime(createdTime);
-        serviceTemplateDetailVo.setLastModifiedTime(lastModifiedTime);
-        serviceTemplateDetailVo.setServiceTemplateRegistrationState(
-                serviceTemplateRegistrationState);
-        serviceTemplateDetailVo.setIsAvailableInCatalog(isAvailableInCatalog);
-        serviceTemplateDetailVo.setIsReviewInProgress(isReviewInProgress);
-        serviceTemplateDetailVo.setServiceHostingType(serviceHostingType);
-        serviceTemplateDetailVo.setServiceProviderContactDetails(serviceProviderContactDetails);
-        serviceTemplateDetailVo.setEula(eula);
-        serviceTemplateDetailVo.setServiceConfigurationManage(serviceConfigurationManage);
-        serviceTemplateDetailVo.setServiceActions(serviceActions);
+        test = new ServiceTemplateDetailVo();
+        test.setServiceTemplateId(uuid);
+        test.setCategory(category);
+        test.setName(name);
+        test.setVersion(version);
+        test.setCsp(csp);
+        test.setRegions(regions);
+        test.setDescription(description);
+        test.setServiceVendor(serviceVendor);
+        test.setIcon(icon);
+        test.setDeployment(deployment);
+        test.setInputVariables(inputVariables);
+        test.setOutputVariables(outputVariables);
+        test.setFlavors(flavors);
+        test.setBilling(billing);
+        test.setCreatedTime(createdTime);
+        test.setLastModifiedTime(lastModifiedTime);
+        test.setServiceTemplateRegistrationState(serviceTemplateRegistrationState);
+        test.setIsAvailableInCatalog(isAvailableInCatalog);
+        test.setIsReviewInProgress(isReviewInProgress);
+        test.setServiceHostingType(serviceHostingType);
+        test.setServiceProviderContactDetails(serviceProviderContactDetails);
+        test.setEula(eula);
+        test.setServiceConfigurationManage(serviceConfigurationManage);
+        test.setServiceActions(serviceActions);
     }
 
     @Test
     void testGetterAndSetter() {
-        assertEquals(uuid, serviceTemplateDetailVo.getServiceTemplateId());
-        assertEquals(category, serviceTemplateDetailVo.getCategory());
-        assertEquals(name, serviceTemplateDetailVo.getName());
-        assertEquals(version, serviceTemplateDetailVo.getVersion());
-        assertEquals(csp, serviceTemplateDetailVo.getCsp());
-        assertEquals(regions, serviceTemplateDetailVo.getRegions());
-        assertEquals(description, serviceTemplateDetailVo.getDescription());
-        assertEquals(serviceVendor, serviceTemplateDetailVo.getServiceVendor());
-        assertEquals(icon, serviceTemplateDetailVo.getIcon());
-        assertEquals(variables, serviceTemplateDetailVo.getVariables());
-        assertEquals(flavors, serviceTemplateDetailVo.getFlavors());
-        assertEquals(billing, serviceTemplateDetailVo.getBilling());
-        assertEquals(createdTime, serviceTemplateDetailVo.getCreatedTime());
-        assertEquals(lastModifiedTime, serviceTemplateDetailVo.getLastModifiedTime());
-        assertEquals(
-                serviceTemplateRegistrationState,
-                serviceTemplateDetailVo.getServiceTemplateRegistrationState());
-        assertEquals(isAvailableInCatalog, serviceTemplateDetailVo.getIsAvailableInCatalog());
-        assertEquals(isReviewInProgress, serviceTemplateDetailVo.getIsReviewInProgress());
-        assertEquals(serviceHostingType, serviceTemplateDetailVo.getServiceHostingType());
-        assertEquals(
-                serviceProviderContactDetails,
-                serviceTemplateDetailVo.getServiceProviderContactDetails());
-        assertEquals(eula, serviceTemplateDetailVo.getEula());
-        assertEquals(
-                serviceConfigurationManage,
-                serviceTemplateDetailVo.getServiceConfigurationManage());
+        assertEquals(uuid, test.getServiceTemplateId());
+        assertEquals(category, test.getCategory());
+        assertEquals(name, test.getName());
+        assertEquals(version, test.getVersion());
+        assertEquals(csp, test.getCsp());
+        assertEquals(regions, test.getRegions());
+        assertEquals(description, test.getDescription());
+        assertEquals(serviceVendor, test.getServiceVendor());
+        assertEquals(icon, test.getIcon());
+        assertEquals(inputVariables, test.getInputVariables());
+        assertEquals(outputVariables, test.getOutputVariables());
+        assertEquals(flavors, test.getFlavors());
+        assertEquals(billing, test.getBilling());
+        assertEquals(createdTime, test.getCreatedTime());
+        assertEquals(lastModifiedTime, test.getLastModifiedTime());
+        assertEquals(serviceTemplateRegistrationState, test.getServiceTemplateRegistrationState());
+        assertEquals(isAvailableInCatalog, test.getIsAvailableInCatalog());
+        assertEquals(isReviewInProgress, test.getIsReviewInProgress());
+        assertEquals(serviceHostingType, test.getServiceHostingType());
+        assertEquals(serviceProviderContactDetails, test.getServiceProviderContactDetails());
+        assertEquals(eula, test.getEula());
+        assertEquals(serviceConfigurationManage, test.getServiceConfigurationManage());
     }
 
     @Test
     public void testEqualsAndHashCode() {
-        assertNotEquals(serviceTemplateDetailVo, new Object());
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), new Object().hashCode());
-        ServiceTemplateDetailVo test = new ServiceTemplateDetailVo();
-        assertNotEquals(serviceTemplateDetailVo, test);
-        assertNotEquals(serviceTemplateDetailVo.hashCode(), test.hashCode());
+        Object obj = new Object();
+        assertThat(test).isNotEqualTo(obj);
+        assertThat(test.hashCode()).isNotEqualTo(obj.hashCode());
+        ServiceTemplateDetailVo test1 = new ServiceTemplateDetailVo();
+        assertThat(test).isNotEqualTo(test1);
+        assertThat(test.hashCode()).isNotEqualTo(test1.hashCode());
         ServiceTemplateDetailVo test2 = new ServiceTemplateDetailVo();
-        BeanUtils.copyProperties(serviceTemplateDetailVo, test2);
-        test2.setEula(eula);
-        assertEquals(serviceTemplateDetailVo, test2);
-        assertEquals(serviceTemplateDetailVo.hashCode(), test2.hashCode());
+        BeanUtils.copyProperties(test, test2);
+        assertThat(test).isEqualTo(test2);
+        assertThat(test.hashCode()).isEqualTo(test2.hashCode());
     }
 
     @Test
@@ -181,8 +153,10 @@ class ServiceTemplateDetailVoTest {
                         + icon
                         + ", deployment="
                         + deployment
-                        + ", variables="
-                        + variables
+                        + ", inputVariables="
+                        + inputVariables
+                        + ", outputVariables="
+                        + outputVariables
                         + ", flavors="
                         + flavors
                         + ", billing="
@@ -209,6 +183,6 @@ class ServiceTemplateDetailVoTest {
                         + serviceActions
                         + ")";
 
-        assertEquals(expectedToString, serviceTemplateDetailVo.toString());
+        assertEquals(expectedToString, test.toString());
     }
 }
