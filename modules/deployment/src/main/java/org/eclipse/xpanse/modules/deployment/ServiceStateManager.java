@@ -78,11 +78,12 @@ public class ServiceStateManager {
     private ServiceOrderEntity createNewManagementTask(
             ServiceOrderType taskType, ServiceDeploymentEntity service) {
         DeployTask deployTask = new DeployTask();
-        deployTask.setOrderId(UUID.randomUUID());
         deployTask.setServiceId(service.getId());
         deployTask.setTaskType(taskType);
         deployTask.setUserId(getUserId());
-        return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service, Handler.PLUGIN);
+        ServiceOrderEntity serviceOrder =
+                serviceOrderManager.storeNewServiceOrderEntity(deployTask, service, Handler.PLUGIN);
+        return serviceOrder;
     }
 
     private void asyncStartService(

@@ -28,7 +28,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
-import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
@@ -133,7 +132,6 @@ public class ServiceRecreateApi {
         ServiceOrderEntity recreateOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(
                         recreateTask, serviceDeploymentEntity, Handler.WORKFLOW);
-
         // prepare recreate process variables
         Map<String, Object> variables = getRecreateProcessVariables(recreateTask);
         ProcessInstance instance =
@@ -145,7 +143,6 @@ public class ServiceRecreateApi {
 
     private DeployTask getRecreateTask(ServiceDeploymentEntity serviceDeploymentEntity) {
         DeployTask recreateTask = new DeployTask();
-        recreateTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         recreateTask.setTaskType(ServiceOrderType.RECREATE);
         recreateTask.setServiceId(serviceDeploymentEntity.getId());
         recreateTask.setOriginalServiceId(serviceDeploymentEntity.getId());
