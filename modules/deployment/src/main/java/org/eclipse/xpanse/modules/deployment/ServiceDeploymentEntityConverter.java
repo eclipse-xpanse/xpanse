@@ -17,7 +17,6 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
-import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
@@ -49,7 +48,6 @@ public class ServiceDeploymentEntityConverter {
             ServiceOrderType orderType, ServiceDeploymentEntity serviceDeploymentEntity) {
         // Set Ocl and CreateRequest
         DeployTask deployTask = new DeployTask();
-        deployTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         deployTask.setTaskType(orderType);
         deployTask.setServiceId(serviceDeploymentEntity.getId());
         deployTask.setUserId(serviceDeploymentEntity.getUserId());

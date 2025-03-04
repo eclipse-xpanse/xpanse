@@ -27,6 +27,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceOrderStatusChangePolling;
+import org.eclipse.xpanse.modules.deployment.utils.MdcUtils;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
@@ -69,7 +70,6 @@ public class ServiceOrderManager {
     public ServiceOrderEntity storeNewServiceOrderEntity(
             DeployTask task, ServiceDeploymentEntity serviceDeploymentEntity, Handler handler) {
         ServiceOrderEntity orderTask = new ServiceOrderEntity();
-        orderTask.setOrderId(task.getOrderId());
         orderTask.setParentOrderId(task.getParentOrderId());
         orderTask.setTaskType(task.getTaskType());
         orderTask.setUserId(task.getUserId());
@@ -80,7 +80,12 @@ public class ServiceOrderManager {
         orderTask.setStartedTime(OffsetDateTime.now());
         orderTask.setRequestBody(getRequestBody(task.getRequest()));
         orderTask.setHandler(handler);
-        return serviceOrderStorage.storeAndFlush(orderTask);
+        orderTask = serviceOrderStorage.storeAndFlush(orderTask);
+        MdcUtils.putServiceIdAndOrderId(
+                serviceDeploymentEntity.getId().toString(), orderTask.getOrderId().toString());
+        task.setOrderId(orderTask.getOrderId());
+        task.setServiceId(serviceDeploymentEntity.getId());
+        return orderTask;
     }
 
     private Map<String, Object> getRequestBody(Object request) {
@@ -94,7 +99,6 @@ public class ServiceOrderManager {
     /**
      * Creates and stores any generic request in SERVICE_ORDER table.
      *
-     * @param orderId OrderId to be created.
      * @param serviceDeploymentEntity serviceDeploymentEntity to which the order is related to.
      * @param serviceOrderType type of the order.
      * @param originalRequest The request body received from the customer. Will be serialized into
@@ -102,12 +106,10 @@ public class ServiceOrderManager {
      * @return serviceOrderEntity created.
      */
     public ServiceOrderEntity createAndStoreGenericServiceOrderEntity(
-            UUID orderId,
             ServiceDeploymentEntity serviceDeploymentEntity,
             ServiceOrderType serviceOrderType,
             Object originalRequest) {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
-        serviceOrderEntity.setOrderId(orderId);
         if (Objects.nonNull(serviceDeploymentEntity.getServiceOrders())) {
             serviceDeploymentEntity.getServiceOrders().add(serviceOrderEntity);
         } else {

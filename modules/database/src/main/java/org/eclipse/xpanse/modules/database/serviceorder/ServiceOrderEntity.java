@@ -14,6 +14,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -45,6 +47,7 @@ public class ServiceOrderEntity implements Serializable {
     @Serial private static final long serialVersionUID = 8759112775257851274L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ORDER_ID", nullable = false)
     private UUID orderId;
 

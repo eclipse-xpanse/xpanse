@@ -60,7 +60,6 @@ public class ServiceLockConfigService {
         }
         ServiceOrderType taskType = ServiceOrderType.LOCK_CHANGE;
         DeployTask lockChangeTask = new DeployTask();
-        lockChangeTask.setOrderId(UUID.randomUUID());
         lockChangeTask.setTaskType(taskType);
         lockChangeTask.setServiceId(serviceId);
         lockChangeTask.setUserId(deployedService.getUserId());
