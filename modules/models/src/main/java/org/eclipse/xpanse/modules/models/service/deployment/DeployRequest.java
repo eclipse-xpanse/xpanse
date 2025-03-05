@@ -75,7 +75,9 @@ public class DeployRequest implements Serializable {
     private ServiceHostingType serviceHostingType;
 
     /** The property of the Service. */
-    @Schema(description = "The properties for the requested service")
+    @Schema(
+            description = "The properties for the requested service",
+            additionalProperties = Schema.AdditionalPropertiesValue.TRUE)
     private Map<String, Object> serviceRequestProperties;
 
     @Schema(description = "The availability zones to deploy the service instance.")
