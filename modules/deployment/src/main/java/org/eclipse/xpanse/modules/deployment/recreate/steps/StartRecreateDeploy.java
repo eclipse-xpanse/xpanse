@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -91,6 +92,7 @@ public class StartRecreateDeploy implements Serializable, JavaDelegate {
         deployTask.setParentOrderId(recreateOrderId);
         String userId = (String) variables.get(RecreateConstants.USER_ID);
         deployTask.setUserId(userId);
+        deployTask.setTaskType(ServiceOrderType.RECREATE);
         return deployTask;
     }
 }

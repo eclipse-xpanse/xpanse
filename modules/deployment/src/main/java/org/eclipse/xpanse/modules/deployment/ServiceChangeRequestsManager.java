@@ -20,7 +20,6 @@ import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestQue
 import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
-import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
@@ -67,10 +66,9 @@ public class ServiceChangeRequestsManager {
             Map<String, List<DeployResource>> deployResourceMap,
             List<ServiceChangeScript> serviceChangeScripts,
             ServiceOrderType serviceOrderType) {
-        UUID orderId = CustomRequestIdGenerator.generateOrderId();
         ServiceOrderEntity serviceOrderEntity =
                 serviceOrderManager.createAndStoreGenericServiceOrderEntity(
-                        orderId, serviceDeploymentEntity, serviceOrderType, originalRequestObject);
+                        serviceDeploymentEntity, serviceOrderType, originalRequestObject);
         List<ServiceChangeRequestEntity> requests = new ArrayList<>();
         deployResourceMap.forEach(
                 (groupName, deployResourceList) ->
@@ -111,7 +109,7 @@ public class ServiceChangeRequestsManager {
         } else {
             // if no requests were created, then the order is completed as failed.
             serviceOrderManager.completeOrderProgress(
-                    orderId,
+                    serviceOrderEntity.getOrderId(),
                     OrderStatus.FAILED,
                     ErrorResponse.errorResponse(
                             ErrorType.SERVICE_CHANGE_FAILED,
@@ -119,7 +117,7 @@ public class ServiceChangeRequestsManager {
                                     "No change requests created for the requested change"
                                             + " properties.")));
         }
-        return orderId;
+        return serviceOrderEntity.getOrderId();
     }
 
     /** Query service change details update request by queryModel. */

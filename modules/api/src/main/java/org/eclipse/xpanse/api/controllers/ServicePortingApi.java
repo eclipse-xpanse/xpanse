@@ -30,7 +30,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorag
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
-import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
@@ -112,7 +111,12 @@ public class ServicePortingApi {
                         ServicePortingConstants.PROCESS_KEY, variables);
         servicePortingOrderEntity.setWorkflowId(instance.getProcessInstanceId());
         serviceOrderManager.startOrderProgress(servicePortingOrderEntity);
-        return new ServiceOrder(servicePortingTask.getOrderId(), servicePortingTask.getServiceId());
+        UUID serviceId =
+                (UUID)
+                        workflowUtils
+                                .getVariablesByProcessInstanceId(instance.getProcessInstanceId())
+                                .get(ServicePortingConstants.NEW_SERVICE_ID);
+        return new ServiceOrder(servicePortingTask.getOrderId(), serviceId);
     }
 
     private void validateData(ServicePortingRequest servicePortingRequest) {
@@ -155,9 +159,7 @@ public class ServicePortingApi {
 
     private DeployTask getServicePortingTask(ServicePortingRequest servicePortingRequest) {
         DeployTask servicePortingTask = new DeployTask();
-        servicePortingTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
         servicePortingTask.setTaskType(ServiceOrderType.PORT);
-        servicePortingTask.setServiceId(UUID.randomUUID());
         servicePortingTask.setOriginalServiceId(servicePortingRequest.getOriginalServiceId());
         servicePortingTask.setRequest(servicePortingRequest);
         return servicePortingTask;
@@ -170,7 +172,6 @@ public class ServicePortingApi {
         variables.put(
                 ServicePortingConstants.ORIGINAL_SERVICE_ID,
                 servicePortingTask.getOriginalServiceId());
-        variables.put(ServicePortingConstants.NEW_SERVICE_ID, servicePortingTask.getServiceId());
         variables.put(
                 ServicePortingConstants.SERVICE_PORTING_REQUEST, servicePortingTask.getRequest());
         variables.put(ServicePortingConstants.USER_ID, servicePortingTask.getUserId());

@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.modules.deployment;
 
 import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
-import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
 
 import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
@@ -33,7 +32,6 @@ import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateQueryM
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceDeploymentStatusChangePolling;
-import org.eclipse.xpanse.modules.logging.CustomRequestIdGenerator;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
@@ -66,7 +64,6 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -110,10 +107,8 @@ public class DeployService {
      * @return ServiceOrder.
      */
     public ServiceOrder createOrderToDeployNewService(DeployRequest deployRequest) {
-        UUID newServiceId = UUID.randomUUID();
-        MDC.put(SERVICE_ID, newServiceId.toString());
         String userId = userServiceHelper.getCurrentUserId();
-        DeployTask deployTask = createNewDeployTask(newServiceId, userId, deployRequest);
+        DeployTask deployTask = createNewDeployTask(userId, deployRequest);
         deployService(deployTask);
         return new ServiceOrder(deployTask.getOrderId(), deployTask.getServiceId());
     }
@@ -125,7 +120,6 @@ public class DeployService {
      * @return ServiceOrder.
      */
     public ServiceOrder createOrderToRedeployFailedService(UUID serviceId) {
-        MDC.put(SERVICE_ID, serviceId.toString());
         ServiceDeploymentEntity serviceDeploymentEntity =
                 getServiceOwnedByCurrentUser(serviceId, UserOperation.REDEPLOY_SERVICE);
         DeployTask redeployTask = getRedeployTask(serviceDeploymentEntity);
@@ -146,7 +140,6 @@ public class DeployService {
      */
     public ServiceOrder createOrderToModifyDeployedService(
             UUID serviceId, ModifyRequest modifyRequest) {
-        MDC.put(SERVICE_ID, serviceId.toString());
         ServiceDeploymentEntity serviceDeploymentEntity =
                 getServiceOwnedByCurrentUser(serviceId, UserOperation.MODIFY_SERVICE);
         DeployTask modifyTask = getModifyTask(modifyRequest, serviceDeploymentEntity);
@@ -165,7 +158,6 @@ public class DeployService {
      * @return ServiceOrder.
      */
     public ServiceOrder createOrderToDestroyDeployedService(UUID serviceId) {
-        MDC.put(SERVICE_ID, serviceId.toString());
         ServiceDeploymentEntity serviceDeploymentEntity =
                 getServiceOwnedByCurrentUser(serviceId, UserOperation.DESTROY_SERVICE);
         DeployTask destroyTask = getDestroyTask(serviceDeploymentEntity);
@@ -184,7 +176,7 @@ public class DeployService {
      * @return ServiceOrder.
      */
     public ServiceOrder createOrderToPurgeDestroyedService(UUID serviceId) {
-        MDC.put(SERVICE_ID, serviceId.toString());
+
         ServiceDeploymentEntity serviceDeploymentEntity =
                 getServiceOwnedByCurrentUser(serviceId, UserOperation.PURGE_SERVICE);
         DeployTask purgeTask = getPurgeTask(serviceDeploymentEntity);
@@ -265,8 +257,7 @@ public class DeployService {
      * @param deployRequest deploy request.
      * @return new deploy task.
      */
-    private DeployTask createNewDeployTask(
-            UUID serviceId, String userId, DeployRequest deployRequest) {
+    private DeployTask createNewDeployTask(String userId, DeployRequest deployRequest) {
         // Find service templates and fill Ocl.
         ServiceTemplateQueryModel queryModel =
                 ServiceTemplateQueryModel.builder()
@@ -319,8 +310,6 @@ public class DeployService {
             deployRequest.setCustomerServiceName(generateCustomerServiceName(deployRequest));
         }
         DeployTask deployTask = new DeployTask();
-        deployTask.setOrderId(CustomRequestIdGenerator.generateOrderId());
-        deployTask.setServiceId(serviceId);
         deployTask.setUserId(userId);
         deployTask.setDeployRequest(deployRequest);
         deployTask.setRequest(deployRequest);
@@ -375,7 +364,6 @@ public class DeployService {
 
     private ServiceDeploymentEntity storeNewDeployServiceEntity(DeployTask deployTask) {
         ServiceDeploymentEntity entity = new ServiceDeploymentEntity();
-        entity.setId(deployTask.getServiceId());
         entity.setCreatedTime(OffsetDateTime.now());
         entity.setVersion(StringUtils.lowerCase(deployTask.getDeployRequest().getVersion()));
         entity.setName(StringUtils.lowerCase(deployTask.getDeployRequest().getServiceName()));
@@ -571,7 +559,6 @@ public class DeployService {
     public void modifyService(DeployTask modifyTask, ServiceDeploymentEntity serviceDeployment) {
         RuntimeException exception = null;
         DeployResult modifyResult;
-        MDC.put(SERVICE_ID, modifyTask.getServiceId().toString());
         DeployerKind kind = modifyTask.getOcl().getDeployment().getDeployerTool().getKind();
         Deployer deployer = deployerKindManager.getDeployment(kind);
         Handler handler = getHandler(activeProfiles, kind);
@@ -603,7 +590,6 @@ public class DeployService {
             DeployTask destroyTask, ServiceDeploymentEntity serviceDeploymentEntity) {
         DeployResult destroyResult;
         RuntimeException exception = null;
-        MDC.put(SERVICE_ID, destroyTask.getServiceId().toString());
         DeployerKind kind = destroyTask.getOcl().getDeployment().getDeployerTool().getKind();
         Deployer deployer = deployerKindManager.getDeployment(kind);
         Handler handler = getHandler(activeProfiles, kind);
@@ -636,7 +622,6 @@ public class DeployService {
     private void purgeService(DeployTask purgeTask, ServiceDeploymentEntity serviceDeployment) {
         RuntimeException exception = null;
         DeployResult purgeResult;
-        MDC.put(SERVICE_ID, purgeTask.getServiceId().toString());
         DeployerKind kind = purgeTask.getOcl().getDeployment().getDeployerTool().getKind();
         Deployer deployer = deployerKindManager.getDeployment(kind);
         Handler handler = getHandler(activeProfiles, kind);
@@ -674,12 +659,10 @@ public class DeployService {
      * @return serviceOrder
      */
     public ServiceOrder deployServiceByWorkflow(DeployTask workFlowDeployTask) {
-        UUID newServiceId = workFlowDeployTask.getServiceId();
-        MDC.put(SERVICE_ID, newServiceId.toString());
-        // check if the new service is already deployed.
-        ServiceDeploymentEntity deployServiceEntity =
-                serviceDeploymentStorage.findServiceDeploymentById(newServiceId);
-        if (Objects.nonNull(deployServiceEntity)) {
+        if (workFlowDeployTask.getTaskType() == ServiceOrderType.RECREATE) {
+            ServiceDeploymentEntity deployServiceEntity =
+                    serviceDeploymentStorage.findServiceDeploymentById(
+                            workFlowDeployTask.getServiceId());
             // retry to deploy the service.
             DeployTask retryTask = getRedeployTask(deployServiceEntity);
             retryTask.setOriginalServiceId(workFlowDeployTask.getOriginalServiceId());
@@ -690,15 +673,13 @@ public class DeployService {
         } else {
             DeployTask deployTask =
                     createNewDeployTask(
-                            newServiceId,
-                            workFlowDeployTask.getUserId(),
-                            workFlowDeployTask.getDeployRequest());
+                            workFlowDeployTask.getUserId(), workFlowDeployTask.getDeployRequest());
             deployTask.setOriginalServiceId(workFlowDeployTask.getOriginalServiceId());
             deployTask.setParentOrderId(workFlowDeployTask.getParentOrderId());
             deployTask.setWorkflowId(workFlowDeployTask.getWorkflowId());
             deployService(deployTask);
+            return new ServiceOrder(workFlowDeployTask.getOrderId(), deployTask.getServiceId());
         }
-        return new ServiceOrder(workFlowDeployTask.getOrderId(), workFlowDeployTask.getServiceId());
     }
 
     /**
@@ -709,7 +690,6 @@ public class DeployService {
      */
     public ServiceOrder destroyServiceByWorkflow(DeployTask workFlowDestroyTask) {
         UUID originalServiceId = workFlowDestroyTask.getOriginalServiceId();
-        MDC.put(SERVICE_ID, originalServiceId.toString());
         ServiceDeploymentEntity deployServiceEntity =
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(originalServiceId);
         DeployTask destroyTask =
@@ -778,7 +758,6 @@ public class DeployService {
      * @return deploy task.
      */
     public DeployTask getRedeployTask(ServiceDeploymentEntity serviceDeploymentEntity) {
-        MDC.put(SERVICE_ID, serviceDeploymentEntity.getId().toString());
         // Get state of service.
         ServiceDeploymentState state = serviceDeploymentEntity.getServiceDeploymentState();
         // Retry's deploy service trigger when service deployment state is DEPLOYMENT_FAILED
