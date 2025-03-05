@@ -40,7 +40,8 @@ import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
@@ -238,6 +239,10 @@ public class DeployResultManager {
                 serviceDeploymentToUpdate.setOutputProperties(Collections.emptyMap());
             }
         } else {
+            List<OutputVariable> outputVariables =
+                    serviceTemplateEntity.getOcl().getDeployment().getOutputVariables();
+            sensitiveDataHandler.encodeOutputVariables(
+                    outputVariables, deployResult.getOutputProperties());
             serviceDeploymentToUpdate.setOutputProperties(deployResult.getOutputProperties());
         }
 
@@ -391,14 +396,13 @@ public class DeployResultManager {
         ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
         BeanUtils.copyProperties(storedOrderEntity, entityToUpdate);
         entityToUpdate.setCompletedTime(OffsetDateTime.now());
-
-        List<DeployVariable> deployVariables =
-                serviceTemplate.getOcl().getDeployment().getVariables();
-        if (!CollectionUtils.isEmpty(deployVariables)
+        List<InputVariable> inputVariables =
+                serviceTemplate.getOcl().getDeployment().getInputVariables();
+        if (!CollectionUtils.isEmpty(inputVariables)
                 && !CollectionUtils.isEmpty(entityToUpdate.getRequestBody())) {
             Map<String, Object> requestBodyWithSensitiveFields =
                     sensitiveDataHandler.getOrderRequestBodyWithSensitiveFields(
-                            storedOrderEntity.getRequestBody(), deployVariables);
+                            storedOrderEntity.getRequestBody(), inputVariables);
             entityToUpdate.setRequestBody(requestBodyWithSensitiveFields);
         }
         serviceOrderManager.completeOrderProgressWithDeployResult(entityToUpdate, deployResult);

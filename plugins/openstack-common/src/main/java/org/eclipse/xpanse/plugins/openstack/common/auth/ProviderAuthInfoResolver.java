@@ -154,7 +154,7 @@ public class ProviderAuthInfoResolver {
             Map<String, Object> serviceRequestVariables =
                     this.deployEnvironments.getAllDeploymentVariablesForService(
                             inputProperties,
-                            serviceTemplateEntity.getOcl().getDeployment().getVariables(),
+                            serviceTemplateEntity.getOcl().getDeployment().getInputVariables(),
                             serviceDeploymentEntity.getFlavor(),
                             serviceTemplateEntity.getOcl());
             defaultAuthUrl =
@@ -186,7 +186,7 @@ public class ProviderAuthInfoResolver {
                 Objects.isNull(RetrySynchronizationManager.getContext())
                         ? 0
                         : RetrySynchronizationManager.getContext().getRetryCount();
-        log.error(ex.getMessage() + System.lineSeparator() + "Retry count:" + retryCount);
+        log.error("Handler auth exception {}. Retry count: {} ", ex.getMessage(), retryCount);
         if (ex instanceof ClientAuthenticationFailedException) {
             throw new ClientAuthenticationFailedException(ex.getMessage());
         }

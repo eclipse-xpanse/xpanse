@@ -253,12 +253,12 @@ deployment:
   # - env_env: Value to this variable is read by runtime (it can read from other sources, e.g., OS env variables) and injected as a environment variable to the deployer. End user cannot see or change this variable.
   # - env_variable: Value to this variable is read by runtime (it can read from other sources, e.g., OS env variables) and injected as a regular variable to the deployer. End user cannot see or change this variable.
   # The parameters will be used to generate the API of the managed service.
-  variables:
+  inputVariables:
     - name: admin_passwd
       description: The admin password of the service instance. If the value is empty, will create a random password.
       kind: variable
       dataType: string
-      mandatory: false
+      sensitiveScope: always
       valueSchema:
         minLength: 8
         maxLength: 16
@@ -296,6 +296,11 @@ deployment:
       modificationImpact:
         isDataLost: true
         isServiceInterrupted: true
+  outputVariables:
+    - name: admin_passwd
+      description: The admin password of the service instance.
+      dataType: string
+      sensitiveScope: always
   scriptFiles:
     # variables file name and content
     variables.tf: |

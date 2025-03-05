@@ -20,12 +20,12 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.secrets.SecretsManager;
@@ -81,22 +81,22 @@ public class DeployEnvironments {
         return getEnv(
                 task.getOcl().getCloudServiceProvider().getName(),
                 task.getDeployRequest().getServiceRequestProperties(),
-                task.getOcl().getDeployment().getVariables());
+                task.getOcl().getDeployment().getInputVariables());
     }
 
     /**
-     * Build environment variables for serviceRequestProperties and deployVariables.
+     * Build environment variables for serviceRequestProperties and inputVariables.
      *
      * @param serviceRequestProperties variables passed by end user during ordering.
-     * @param deployVariables deploy variables defined in the service template.
+     * @param inputVariables deploy variables defined in the service template.
      */
     private Map<String, String> getEnv(
             Csp csp,
             Map<String, Object> serviceRequestProperties,
-            List<DeployVariable> deployVariables) {
+            List<InputVariable> inputVariables) {
         Map<String, String> variables = new HashMap<>();
-        for (DeployVariable variable : deployVariables) {
-            if (variable.getKind() == DeployVariableKind.ENV) {
+        for (InputVariable variable : inputVariables) {
+            if (variable.getKind() == VariableKind.ENV) {
                 if (serviceRequestProperties.containsKey(variable.getName())
                         && serviceRequestProperties.get(variable.getName()) != null) {
                     variables.put(
@@ -114,11 +114,11 @@ public class DeployEnvironments {
                 }
             }
 
-            if (variable.getKind() == DeployVariableKind.ENV_ENV) {
+            if (variable.getKind() == VariableKind.ENV_ENV) {
                 variables.put(variable.getName(), System.getenv(variable.getName()));
             }
 
-            if (variable.getKind() == DeployVariableKind.FIX_ENV) {
+            if (variable.getKind() == VariableKind.FIX_ENV) {
                 variables.put(
                         variable.getName(),
                         !SensitiveScope.NONE
@@ -207,7 +207,7 @@ public class DeployEnvironments {
         Map<String, Object> variables =
                 getVariables(
                         task.getDeployRequest().getServiceRequestProperties(),
-                        task.getOcl().getDeployment().getVariables(),
+                        task.getOcl().getDeployment().getInputVariables(),
                         isDeployRequest);
         variables.put(VAR_REGION, task.getDeployRequest().getRegion().getName());
         return variables;
@@ -217,19 +217,19 @@ public class DeployEnvironments {
      * Get deployment variables.
      *
      * @param serviceRequestProperties variables provided by the end user.
-     * @param deployVariables variables configured in the service template.
+     * @param inputVariables variables configured in the service template.
      * @param isDeployRequest defines if the variables are required for deploying the service. False
      *     if it is for any other use cases.
      */
     private Map<String, Object> getVariables(
             Map<String, Object> serviceRequestProperties,
-            List<DeployVariable> deployVariables,
+            List<InputVariable> inputVariables,
             boolean isDeployRequest) {
         Map<String, Object> variables = new HashMap<>();
         if (!CollectionUtils.isEmpty(serviceRequestProperties)
-                && !CollectionUtils.isEmpty(deployVariables)) {
-            for (DeployVariable variable : deployVariables) {
-                if (variable.getKind() == DeployVariableKind.VARIABLE) {
+                && !CollectionUtils.isEmpty(inputVariables)) {
+            for (InputVariable variable : inputVariables) {
+                if (variable.getKind() == VariableKind.VARIABLE) {
                     if (serviceRequestProperties.containsKey(variable.getName())
                             && serviceRequestProperties.get(variable.getName()) != null) {
                         variables.put(
@@ -247,11 +247,11 @@ public class DeployEnvironments {
                     }
                 }
 
-                if (variable.getKind() == DeployVariableKind.ENV_VARIABLE) {
+                if (variable.getKind() == VariableKind.ENV_VARIABLE) {
                     variables.put(variable.getName(), System.getenv(variable.getName()));
                 }
 
-                if (variable.getKind() == DeployVariableKind.FIX_VARIABLE) {
+                if (variable.getKind() == VariableKind.FIX_VARIABLE) {
                     variables.put(
                             variable.getName(),
                             (variable.getSensitiveScope() != SensitiveScope.NONE && isDeployRequest)
@@ -310,19 +310,19 @@ public class DeployEnvironments {
      * Get all variables that are considered for a service.
      *
      * @param serviceRequestProperties variables provided by the end user.
-     * @param deployVariables variables configured in the service template.
+     * @param inputVariables variables configured in the service template.
      * @param requestedFlavor Flavor of the service ordered.
      * @param ocl OCL of the requested service template.
      */
     public Map<String, Object> getAllDeploymentVariablesForService(
             Map<String, Object> serviceRequestProperties,
-            List<DeployVariable> deployVariables,
+            List<InputVariable> inputVariables,
             String requestedFlavor,
             Ocl ocl) {
         Csp csp = ocl.getCloudServiceProvider().getName();
         Map<String, Object> allVariables = new HashMap<>();
-        allVariables.putAll(getVariables(serviceRequestProperties, deployVariables, false));
-        allVariables.putAll(getEnv(csp, serviceRequestProperties, deployVariables));
+        allVariables.putAll(getVariables(serviceRequestProperties, inputVariables, false));
+        allVariables.putAll(getEnv(csp, serviceRequestProperties, inputVariables));
         allVariables.putAll(getFlavorVariables(ocl, requestedFlavor));
         return allVariables;
     }
@@ -350,16 +350,16 @@ public class DeployEnvironments {
     public Map<String, Object> getFixedVariablesFromTemplate(
             ServiceTemplateEntity serviceTemplateEntity) {
         Map<String, Object> fixedVariables = new HashMap<>();
-        for (DeployVariable variable :
-                serviceTemplateEntity.getOcl().getDeployment().getVariables()) {
-            if (variable.getKind() == DeployVariableKind.FIX_VARIABLE) {
+        for (InputVariable variable :
+                serviceTemplateEntity.getOcl().getDeployment().getInputVariables()) {
+            if (variable.getKind() == VariableKind.FIX_VARIABLE) {
                 fixedVariables.put(
                         variable.getName(),
                         (variable.getSensitiveScope() != SensitiveScope.NONE)
                                 ? secretsManager.decrypt(variable.getValue())
                                 : variable.getValue());
             }
-            if (variable.getKind() == DeployVariableKind.FIX_ENV) {
+            if (variable.getKind() == VariableKind.FIX_ENV) {
                 fixedVariables.put(
                         variable.getName(),
                         (variable.getSensitiveScope() != SensitiveScope.NONE)

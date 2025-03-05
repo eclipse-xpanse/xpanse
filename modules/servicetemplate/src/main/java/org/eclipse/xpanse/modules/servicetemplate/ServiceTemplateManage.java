@@ -30,7 +30,7 @@ import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
-import org.eclipse.xpanse.modules.models.service.utils.ServiceDeployVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.service.utils.ServiceInputVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewServiceTemplateRequest;
@@ -52,13 +52,13 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.Serv
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
-import org.eclipse.xpanse.modules.orchestrator.deployment.DeployValidateDiagnostics;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
+import org.eclipse.xpanse.modules.orchestrator.deployment.InputValidateDiagnostics;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.eclipse.xpanse.modules.servicetemplate.price.BillingConfigValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
-import org.eclipse.xpanse.modules.servicetemplate.utils.DeployVariableSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
+import org.eclipse.xpanse.modules.servicetemplate.utils.InputVariablesSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceActionTemplateValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceConfigurationParameterValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
@@ -82,7 +82,7 @@ public class ServiceTemplateManage {
     @Resource private UserServiceHelper userServiceHelper;
 
     @Resource
-    private ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator;
+    private ServiceInputVariablesJsonSchemaGenerator serviceInputVariablesJsonSchemaGenerator;
 
     @Resource private DeployerKindManager deployerKindManager;
     @Resource private BillingConfigValidator billingConfigValidator;
@@ -446,10 +446,10 @@ public class ServiceTemplateManage {
             Deployment deployment, ServiceTemplateEntity serviceTemplate) {
         AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
                 deployment.getServiceAvailabilityConfig());
-        DeployVariableSchemaValidator.validateDeployVariable(deployment.getVariables());
+        InputVariablesSchemaValidator.validateInputVariables(deployment.getInputVariables());
         JsonObjectSchema jsonObjectSchema =
-                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
-                        deployment.getVariables());
+                serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
+                        deployment.getInputVariables());
         serviceTemplate.setJsonObjectSchema(jsonObjectSchema);
         validateTerraformScript(deployment);
     }
@@ -803,7 +803,7 @@ public class ServiceTemplateManage {
             if (!tfValidationResult.isValid()) {
                 throw new TerraformScriptFormatInvalidException(
                         tfValidationResult.getDiagnostics().stream()
-                                .map(DeployValidateDiagnostics::getDetail)
+                                .map(InputValidateDiagnostics::getDetail)
                                 .collect(Collectors.toList()));
             }
         }
@@ -814,7 +814,7 @@ public class ServiceTemplateManage {
             if (!tfValidationResult.isValid()) {
                 throw new OpenTofuScriptFormatInvalidException(
                         tfValidationResult.getDiagnostics().stream()
-                                .map(DeployValidateDiagnostics::getDetail)
+                                .map(InputValidateDiagnostics::getDetail)
                                 .collect(Collectors.toList()));
             }
         }

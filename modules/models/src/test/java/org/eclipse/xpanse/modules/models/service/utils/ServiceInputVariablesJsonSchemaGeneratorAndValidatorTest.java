@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.VariableValidationFailedException;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
@@ -30,16 +30,16 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {
-            ServiceDeployVariablesJsonSchemaGenerator.class,
-            ServiceDeployVariablesJsonSchemaValidator.class
+            ServiceInputVariablesJsonSchemaGenerator.class,
+            ServiceInputVariablesJsonSchemaValidator.class
         })
-class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
+class ServiceInputVariablesJsonSchemaGeneratorAndValidatorTest {
 
-    @Autowired ServiceDeployVariablesJsonSchemaGenerator serviceDeployVariablesJsonSchemaGenerator;
+    @Autowired ServiceInputVariablesJsonSchemaGenerator serviceInputVariablesJsonSchemaGenerator;
 
-    @Autowired ServiceDeployVariablesJsonSchemaValidator serviceDeployVariablesJsonSchemaValidator;
+    @Autowired ServiceInputVariablesJsonSchemaValidator serviceInputVariablesJsonSchemaValidator;
 
-    private List<DeployVariable> variables;
+    private List<InputVariable> inputVariables;
 
     @BeforeEach
     void setup() throws Exception {
@@ -47,28 +47,30 @@ class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
         Ocl ocl =
                 oclLoader.getOcl(
                         new File("src/test/resources/ocl_terraform_test.yml").toURI().toURL());
-        variables = ocl.getDeployment().getVariables();
+        inputVariables = ocl.getDeployment().getInputVariables();
     }
 
     @Test
     void validateSuccess_test() {
         JsonObjectSchema jsonObjectSchema =
-                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
+                serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
+                        inputVariables);
 
         Map<String, Object> deployProperty = new HashMap<>();
         deployProperty.put("admin_passwd", "123456@Qq");
 
         assertDoesNotThrow(
                 () -> {
-                    serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(
-                            variables, deployProperty, jsonObjectSchema);
+                    serviceInputVariablesJsonSchemaValidator.validateInputVariables(
+                            inputVariables, deployProperty, jsonObjectSchema);
                 });
     }
 
     @Test
     void validateWithValueSchema_test() {
         JsonObjectSchema jsonObjectSchema =
-                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
+                serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
+                        inputVariables);
 
         Map<String, Object> validateMinLengthPro = new HashMap<>();
         validateMinLengthPro.put("admin_passwd", "123456");
@@ -82,31 +84,32 @@ class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
         assertThrows(
                 VariableValidationFailedException.class,
                 () -> {
-                    serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(
-                            variables, validateMinLengthPro, jsonObjectSchema);
+                    serviceInputVariablesJsonSchemaValidator.validateInputVariables(
+                            inputVariables, validateMinLengthPro, jsonObjectSchema);
                 });
         assertThrows(
                 VariableValidationFailedException.class,
                 () -> {
-                    serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(
-                            variables, validateMaxLengthPro, jsonObjectSchema);
+                    serviceInputVariablesJsonSchemaValidator.validateInputVariables(
+                            inputVariables, validateMaxLengthPro, jsonObjectSchema);
                 });
         assertThrows(
                 VariableValidationFailedException.class,
                 () -> {
-                    serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(
-                            variables, validatePatternPro, jsonObjectSchema);
+                    serviceInputVariablesJsonSchemaValidator.validateInputVariables(
+                            inputVariables, validatePatternPro, jsonObjectSchema);
                 });
     }
 
     @Test
     void validateWithRequiredSuccess_test() {
-        for (DeployVariable variable : variables) {
+        for (InputVariable variable : inputVariables) {
             variable.setMandatory(true);
         }
 
         JsonObjectSchema jsonObjectSchema =
-                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
+                serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
+                        inputVariables);
 
         Map<String, Object> validateRequiredPro = new HashMap<>();
         validateRequiredPro.put("admin_passwd", "123456@Qq");
@@ -116,19 +119,20 @@ class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
 
         assertDoesNotThrow(
                 () -> {
-                    serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(
-                            variables, validateRequiredPro, jsonObjectSchema);
+                    serviceInputVariablesJsonSchemaValidator.validateInputVariables(
+                            inputVariables, validateRequiredPro, jsonObjectSchema);
                 });
     }
 
     @Test
     void validateWithRequiredFail_test() {
-        for (DeployVariable variable : variables) {
+        for (InputVariable variable : inputVariables) {
             variable.setMandatory(true);
         }
 
         JsonObjectSchema jsonObjectSchema =
-                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
+                serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
+                        inputVariables);
 
         Map<String, Object> validateRequiredPro = new HashMap<>();
         validateRequiredPro.put("admin_passwd", "123456@Qq");
@@ -136,18 +140,19 @@ class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
         assertThrows(
                 VariableValidationFailedException.class,
                 () -> {
-                    serviceDeployVariablesJsonSchemaValidator.validateDeployVariables(
-                            variables, validateRequiredPro, jsonObjectSchema);
+                    serviceInputVariablesJsonSchemaValidator.validateInputVariables(
+                            inputVariables, validateRequiredPro, jsonObjectSchema);
                 });
     }
 
     @Test
     void validateWithDataType_test() {
         JsonObjectSchema jsonObjectSchema =
-                serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(variables);
+                serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
+                        inputVariables);
 
         Map<String, Map<String, Object>> properties = jsonObjectSchema.getProperties();
-        for (DeployVariable variable : variables) {
+        for (InputVariable variable : inputVariables) {
             Map<String, Object> stringObjectMap = properties.get(variable.getName());
             assertEquals(variable.getDataType().toValue(), stringObjectMap.get("type"));
         }
@@ -155,12 +160,12 @@ class ServiceDeployVariablesJsonSchemaGeneratorAndValidatorTest {
 
     @Test
     void throwExceptionWhenValueSchemaIsInvalid() {
-        variables.getFirst().getValueSchema().put("enums", List.of(1, 2, 3));
+        inputVariables.getFirst().getValueSchema().put("enums", List.of(1, 2, 3));
         assertThrows(
                 InvalidValueSchemaException.class,
                 () -> {
-                    serviceDeployVariablesJsonSchemaGenerator.buildDeployVariableJsonSchema(
-                            variables);
+                    serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
+                            inputVariables);
                 });
     }
 }

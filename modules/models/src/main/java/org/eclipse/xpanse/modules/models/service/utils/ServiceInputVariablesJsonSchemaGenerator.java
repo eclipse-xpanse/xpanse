@@ -14,36 +14,36 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-/** The Class is used to generate a JSONSchema for service variables. */
+/** The Class is used to generate a JSONSchema for service input variables. */
 @Slf4j
 @Component
-public class ServiceDeployVariablesJsonSchemaGenerator {
+public class ServiceInputVariablesJsonSchemaGenerator {
 
     private static final String VARIABLE_TYPE_KEY = "type";
     private static final String VARIABLE_DESCRIPTION_KEY = "description";
     private static final String VARIABLE_EXAMPLE_KEY = "examples";
 
     /**
-     * Generate JsonSchema objects to describe validation rules and metadata information for a set
-     * of deployment variables.
+     * Generate JsonSchema objects to describe validation rules and metadata information for
+     * deployment input variables.
      *
-     * @param deployVariables list of deployVariables in registered service
+     * @param inputVariables list of InputVariable in registered service
      * @return JsonObjectSchema
      */
-    public JsonObjectSchema buildDeployVariableJsonSchema(List<DeployVariable> deployVariables) {
+    public JsonObjectSchema buildJsonSchemaOfInputVariables(List<InputVariable> inputVariables) {
         JsonObjectSchema jsonObjectSchema = new JsonObjectSchema();
-        Map<String, Map<String, Object>> deployVariableJsonSchemaProperties = new HashMap<>();
+        Map<String, Map<String, Object>> inputVariableJsonSchemaProperties = new HashMap<>();
         List<String> requiredList = new ArrayList<>();
-        for (DeployVariable variable : deployVariables) {
-            if (variable.getKind() == DeployVariableKind.VARIABLE
-                    || variable.getKind() == DeployVariableKind.ENV) {
+        for (InputVariable variable : inputVariables) {
+            if (variable.getKind() == VariableKind.VARIABLE
+                    || variable.getKind() == VariableKind.ENV) {
                 Map<String, Object> validationProperties = new HashMap<>();
 
                 if (Boolean.TRUE.equals(variable.getMandatory())) {
@@ -67,13 +67,12 @@ public class ServiceDeployVariablesJsonSchemaGenerator {
                 }
 
                 if (!validationProperties.isEmpty()) {
-                    deployVariableJsonSchemaProperties.put(
-                            variable.getName(), validationProperties);
+                    inputVariableJsonSchemaProperties.put(variable.getName(), validationProperties);
                 }
             }
         }
         jsonObjectSchema.setRequired(requiredList);
-        jsonObjectSchema.setProperties(deployVariableJsonSchemaProperties);
+        jsonObjectSchema.setProperties(inputVariableJsonSchemaProperties);
         validateSchemaDefinition(jsonObjectSchema);
         return jsonObjectSchema;
     }
@@ -84,15 +83,15 @@ public class ServiceDeployVariablesJsonSchemaGenerator {
         jsonObjectSchema
                 .getProperties()
                 .forEach(
-                        (deployVariable, variableValueSchema) ->
+                        (inputVariable, variableValueSchema) ->
                                 variableValueSchema.forEach(
                                         (schemaDefKey, schemaDefValue) -> {
                                             if (!allowedKeys.contains(schemaDefKey)) {
                                                 invalidKeys.add(
                                                         String.format(
-                                                                "Value schema key %s in deploy"
+                                                                "Value schema key %s in input"
                                                                         + " variable %s is invalid",
-                                                                schemaDefKey, deployVariable));
+                                                                schemaDefKey, inputVariable));
                                             }
                                         }));
         if (!invalidKeys.isEmpty()) {
