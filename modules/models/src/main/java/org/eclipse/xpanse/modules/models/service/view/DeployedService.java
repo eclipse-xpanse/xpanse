@@ -83,6 +83,9 @@ public class DeployedService {
     @Schema(description = "The input properties to deploy the service.")
     private Map<String, String> inputProperties;
 
+    @Schema(description = "The properties of the deployed service.")
+    private Map<String, String> deployedServiceProperties;
+
     @NotNull
     @Schema(description = "The id of the Service Template")
     private UUID serviceTemplateId;

@@ -6,14 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class DeployValidateDiagnosticsTest {
+class InputValidateDiagnosticsTest {
 
     String detail = "detail";
-    private DeployValidateDiagnostics test;
+    private InputValidateDiagnostics test;
 
     @BeforeEach
     void setUp() {
-        test = new DeployValidateDiagnostics();
+        test = new InputValidateDiagnostics();
         test.setDetail(detail);
     }
 
@@ -31,12 +31,12 @@ class DeployValidateDiagnosticsTest {
         assertNotEquals(test, object);
         assertNotEquals(test.hashCode(), object.hashCode());
 
-        DeployValidateDiagnostics test1 = new DeployValidateDiagnostics();
+        InputValidateDiagnostics test1 = new InputValidateDiagnostics();
         assertNotEquals(test, test1);
         assertNotEquals(test.hashCode(), test1.hashCode());
 
-        DeployValidateDiagnostics test2 = new DeployValidateDiagnostics();
-        DeployValidateDiagnostics test3 = new DeployValidateDiagnostics();
+        InputValidateDiagnostics test2 = new InputValidateDiagnostics();
+        InputValidateDiagnostics test3 = new InputValidateDiagnostics();
         test2.setDetail(detail);
         test3.setDetail(detail + "1");
         assertNotEquals(test, test1);
@@ -51,7 +51,7 @@ class DeployValidateDiagnosticsTest {
     @Test
     void testToString() {
         assertNotEquals(test.toString(), null);
-        String exceptedString = "DeployValidateDiagnostics(detail=detail)";
+        String exceptedString = "InputValidateDiagnostics(detail=detail)";
         assertEquals(test.toString(), exceptedString);
     }
 }

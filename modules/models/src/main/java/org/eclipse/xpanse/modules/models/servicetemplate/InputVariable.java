@@ -12,13 +12,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableDataType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 
 /** Defines for the deploy variable. */
 @Data
-public class DeployVariable implements Serializable {
+public class InputVariable implements Serializable {
 
     @Serial private static final long serialVersionUID = 4180720936204332115L;
 
@@ -29,11 +29,11 @@ public class DeployVariable implements Serializable {
 
     @NotNull
     @Schema(description = "The kind of the deploy variable")
-    private DeployVariableKind kind;
+    private VariableKind kind;
 
     @NotNull
     @Schema(description = "The type of the deploy variable")
-    private DeployVariableDataType dataType;
+    private VariableDataType dataType;
 
     @Schema(description = "The example value of the deploy variable")
     private String example;

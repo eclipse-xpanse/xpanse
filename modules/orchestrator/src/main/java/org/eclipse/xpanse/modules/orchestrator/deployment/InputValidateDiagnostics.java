@@ -11,7 +11,7 @@ import lombok.Data;
 /** This data class holds the diagnostics details returned by the Terraform validator. */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DeployValidateDiagnostics {
+public class InputValidateDiagnostics {
 
     private String detail;
 }

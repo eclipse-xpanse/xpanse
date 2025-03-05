@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 
 /** Test of Deployment. */
@@ -22,23 +23,14 @@ class DeploymentTest {
     private final CredentialType credentialType = CredentialType.API_KEY;
     private DeployerTool deployerTool;
     private ScriptsRepo scriptsRepo;
-    private List<DeployVariable> variables;
-    private List<AvailabilityZoneConfig> availabilityZoneConfig;
+    @Mock private List<InputVariable> inputVariables;
+    @Mock private List<OutputVariable> outputVariables;
+    @Mock private List<AvailabilityZoneConfig> availabilityZoneConfig;
+
     private Deployment test;
 
     @BeforeEach
     void setUp() {
-        DeployVariable deployVariable = new DeployVariable();
-        deployVariable.setName("HW_AK");
-        variables = List.of(deployVariable);
-
-        AvailabilityZoneConfig availabilityZoneConfig = new AvailabilityZoneConfig();
-        availabilityZoneConfig.setDisplayName("displayName");
-        availabilityZoneConfig.setVarName("varName");
-        availabilityZoneConfig.setMandatory(true);
-        availabilityZoneConfig.setDescription("description");
-        this.availabilityZoneConfig = List.of(availabilityZoneConfig);
-
         scriptsRepo = new ScriptsRepo();
         scriptsRepo.setRepoUrl("repoUrl");
         scriptsRepo.setBranch("branch");
@@ -51,7 +43,8 @@ class DeploymentTest {
         test = new Deployment();
         test.setScriptFiles(scriptFiles);
         test.setDeployerTool(deployerTool);
-        test.setVariables(variables);
+        test.setInputVariables(inputVariables);
+        test.setOutputVariables(outputVariables);
         test.setCredentialType(credentialType);
         test.setServiceAvailabilityConfig(this.availabilityZoneConfig);
         test.setScriptsRepo(scriptsRepo);
@@ -61,7 +54,7 @@ class DeploymentTest {
     void testGetters() {
         assertEquals(deployerTool, test.getDeployerTool());
         assertEquals(scriptFiles, test.getScriptFiles());
-        assertEquals(variables, test.getVariables());
+        assertEquals(inputVariables, test.getInputVariables());
         assertEquals(credentialType, test.getCredentialType());
         assertEquals(availabilityZoneConfig, test.getServiceAvailabilityConfig());
         assertEquals(scriptsRepo, test.getScriptsRepo());
@@ -92,8 +85,10 @@ class DeploymentTest {
         String expectedString =
                 "Deployment(deployerTool="
                         + deployerTool
-                        + ", variables="
-                        + variables
+                        + ", inputVariables="
+                        + inputVariables
+                        + ", outputVariables="
+                        + outputVariables
                         + ", credentialType="
                         + credentialType
                         + ", serviceAvailabilityConfig="

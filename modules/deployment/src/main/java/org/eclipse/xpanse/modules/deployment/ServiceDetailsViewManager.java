@@ -31,7 +31,8 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
@@ -195,7 +196,7 @@ public class ServiceDetailsViewManager {
                 serviceTemplateStorage.getServiceTemplateById(
                         serviceDeploymentEntity.getServiceTemplateId());
         setServiceConfigurationDetailsForDeployedService(details, serviceTemplate);
-        maskSensitiveFieldsInInputProperties(details, serviceTemplate);
+        handleSensitiveDataInDetails(details, serviceTemplate);
         return details;
     }
 
@@ -238,7 +239,7 @@ public class ServiceDetailsViewManager {
                 serviceTemplateStorage.getServiceTemplateById(
                         serviceDeploymentEntity.getServiceTemplateId());
         setServiceConfigurationDetailsForDeployedService(details, serviceTemplate);
-        maskSensitiveFieldsInInputProperties(details, serviceTemplate);
+        handleSensitiveDataInDetails(details, serviceTemplate);
         return details;
     }
 
@@ -311,8 +312,7 @@ public class ServiceDetailsViewManager {
                                                 deployedService.getServiceTemplateId());
                                 setServiceConfigurationDetailsForDeployedService(
                                         deployedService, serviceTemplate);
-                                maskSensitiveFieldsInInputProperties(
-                                        deployedService, serviceTemplate);
+                                handleSensitiveDataInDetails(deployedService, serviceTemplate);
                             }
                             return deployedService;
                         })
@@ -342,17 +342,20 @@ public class ServiceDetailsViewManager {
         }
     }
 
-    private void maskSensitiveFieldsInInputProperties(
+    private void handleSensitiveDataInDetails(
             DeployedService deployedService, ServiceTemplateEntity serviceTemplate) {
-
-        List<DeployVariable> variables = serviceTemplate.getOcl().getDeployment().getVariables();
-        if (!CollectionUtils.isEmpty(variables)
-                && !CollectionUtils.isEmpty(deployedService.getInputProperties())) {
-            Map<String, String> inputPropertiesWithSensitiveFields =
-                    sensitiveDataHandler.getServiceRequestPropertiesWithSensitiveFields(
-                            deployedService.getInputProperties(), variables);
-            deployedService.setInputProperties(inputPropertiesWithSensitiveFields);
-        }
+        // Handle sensitive data in input properties
+        List<InputVariable> inputVariables =
+                serviceTemplate.getOcl().getDeployment().getInputVariables();
+        sensitiveDataHandler.handleSensitiveDataInInputProperties(
+                inputVariables, deployedService.getInputProperties());
+        // Handle sensitive data in output properties
+        List<OutputVariable> outputVariables =
+                serviceTemplate.getOcl().getDeployment().getOutputVariables();
+        sensitiveDataHandler.handleSensitiveDataInOutputVariables(
+                deployedService.getServiceId(),
+                outputVariables,
+                deployedService.getDeployedServiceProperties());
     }
 
     /**
@@ -366,11 +369,10 @@ public class ServiceDetailsViewManager {
             OffsetDateTime updateTime) {
         Map<String, Object> configurationParameterMap = new HashMap<>();
         parameters.forEach(
-                configurationParameter -> {
-                    configurationParameterMap.put(
-                            configurationParameter.getName(),
-                            configurationParameter.getInitialValue());
-                });
+                configurationParameter ->
+                        configurationParameterMap.put(
+                                configurationParameter.getName(),
+                                configurationParameter.getInitialValue()));
         if (!CollectionUtils.isEmpty(configuration)) {
             configurationParameterMap.forEach(
                     (k, v) -> {

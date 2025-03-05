@@ -15,55 +15,55 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
-import org.eclipse.xpanse.modules.models.servicetemplate.DeployVariable;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.MandatoryValueMissingForFixedVariablesException;
 
-/** Defines method to validate the deploy variable configuration list of deployment. */
+/** Defines method to validate the input variable configuration list of deployment. */
 @Slf4j
-public class DeployVariableSchemaValidator {
+public class InputVariablesSchemaValidator {
 
     /**
      * Validate the deploy variable configuration list of deployment.
      *
-     * @param deployVariables deployVariables.
+     * @param inputVariables inputVariables.
      */
-    public static void validateDeployVariable(List<DeployVariable> deployVariables) {
-        if (Objects.isNull(deployVariables)) {
+    public static void validateInputVariables(List<InputVariable> inputVariables) {
+        if (Objects.isNull(inputVariables)) {
             return;
         }
-        if (deployVariables.isEmpty()) {
+        if (inputVariables.isEmpty()) {
             String errorMessage = "The deploy variable configuration list could not be empty.";
             throw new InvalidValueSchemaException(List.of(errorMessage));
         }
         Set<String> varNameSet = new HashSet<>();
-        List<DeployVariable> missingExampleValueVariables = new ArrayList<>();
+        List<InputVariable> missingExampleValueVariables = new ArrayList<>();
 
-        for (DeployVariable deployVariable : deployVariables) {
-            if (deployVariable.getKind() == DeployVariableKind.FIX_ENV
-                    || deployVariable.getKind() == DeployVariableKind.FIX_VARIABLE) {
-                if (StringUtils.isEmpty(deployVariable.getValue())) {
-                    missingExampleValueVariables.add(deployVariable);
+        for (InputVariable inputVariable : inputVariables) {
+            if (inputVariable.getKind() == VariableKind.FIX_ENV
+                    || inputVariable.getKind() == VariableKind.FIX_VARIABLE) {
+                if (StringUtils.isEmpty(inputVariable.getValue())) {
+                    missingExampleValueVariables.add(inputVariable);
                 }
             }
-            if (varNameSet.contains(deployVariable.getName())) {
+            if (varNameSet.contains(inputVariable.getName())) {
                 String errorMessage =
                         String.format(
                                 "The deploy variable configuration list with duplicated variable"
                                         + " name %s",
-                                deployVariable.getName());
+                                inputVariable.getName());
                 throw new InvalidValueSchemaException(List.of(errorMessage));
             } else {
-                varNameSet.add(deployVariable.getName());
+                varNameSet.add(inputVariable.getName());
             }
         }
         if (!missingExampleValueVariables.isEmpty()) {
             StringBuilder errorMessageBuilder =
                     new StringBuilder("The deploy variable " + "configuration for ")
-                            .append(DeployVariableKind.FIX_ENV.toValue())
+                            .append(VariableKind.FIX_ENV.toValue())
                             .append(" or ")
-                            .append(DeployVariableKind.FIX_VARIABLE.toValue())
+                            .append(VariableKind.FIX_VARIABLE.toValue())
                             .append(" kind has an empty default value. Details: ");
 
             missingExampleValueVariables.forEach(
@@ -79,22 +79,22 @@ public class DeployVariableSchemaValidator {
             throw new MandatoryValueMissingForFixedVariablesException(errorMessage);
         }
 
-        if (!hasAutoFillAndParentKind(deployVariables)) {
+        if (!hasAutoFillAndParentKind(inputVariables)) {
             log.error("variable schema definition invalid");
             throw new InvalidValueSchemaException(
                     List.of(ErrorType.VARIABLE_SCHEMA_DEFINITION_INVALID.toValue()));
         }
     }
 
-    private static boolean hasAutoFillAndParentKind(List<DeployVariable> deployVariables) {
-        for (DeployVariable deployVariable : deployVariables) {
-            if (Objects.nonNull(deployVariable.getAutoFill())) {
+    private static boolean hasAutoFillAndParentKind(List<InputVariable> inputVariables) {
+        for (InputVariable inputVariable : inputVariables) {
+            if (Objects.nonNull(inputVariable.getAutoFill())) {
                 DeployResourceKind currentResourceKind =
-                        deployVariable.getAutoFill().getDeployResourceKind();
+                        inputVariable.getAutoFill().getDeployResourceKind();
                 DeployResourceKind parentKind = currentResourceKind.getParent();
                 if (Objects.nonNull(parentKind)) {
-                    for (DeployVariable otherVariable : deployVariables) {
-                        if (otherVariable != deployVariable
+                    for (InputVariable otherVariable : inputVariables) {
+                        if (otherVariable != inputVariable
                                 && Objects.nonNull(otherVariable.getAutoFill())
                                 && otherVariable.getAutoFill().getDeployResourceKind()
                                         == parentKind) {

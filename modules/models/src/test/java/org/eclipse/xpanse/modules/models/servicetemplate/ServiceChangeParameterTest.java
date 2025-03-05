@@ -10,18 +10,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.Map;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableDataType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/** Test of DeployVariable. */
+/** Test of ServiceChangeParameter. */
 class ServiceChangeParameterTest {
 
     private static final String name = "service_configuration_parameter_name";
-    private static final DeployVariableKind kind = DeployVariableKind.VARIABLE;
-    private static final DeployVariableDataType dataType = DeployVariableDataType.STRING;
+    private static final VariableKind kind = VariableKind.VARIABLE;
+    private static final VariableDataType dataType = VariableDataType.STRING;
     private static final String example = "example";
     private static final String description = "description";
     private static final String value = "value";

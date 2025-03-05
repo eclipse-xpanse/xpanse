@@ -42,6 +42,7 @@ class DeployedServiceTest {
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     private final Map<String, String> availabilityZones = new HashMap<>();
     private final Map<String, String> inputProperties = new HashMap<>();
+    private final Map<String, String> deployedServiceProperties = new HashMap<>();
     private final UUID serviceTemplateId = UUID.fromString("20424910-5f64-4984-84f0-6013c63c64f4");
     private final ServiceDeploymentState serviceDeploymentState =
             ServiceDeploymentState.DEPLOY_SUCCESS;
@@ -53,74 +54,77 @@ class DeployedServiceTest {
     private final ServiceLockConfig LOCK_CONFIG = new ServiceLockConfig();
     private final ServiceConfigurationDetails serviceConfigurationDetails =
             new ServiceConfigurationDetails();
-    private DeployedService deployedService;
+
+    private DeployedService test;
 
     @BeforeEach
     void setUp() {
-        deployedService = new DeployedService();
-        deployedService.setServiceId(uuid);
-        deployedService.setUserId(userId);
-        deployedService.setCategory(category);
-        deployedService.setName(name);
-        deployedService.setCustomerServiceName(customerServiceName);
-        deployedService.setVersion(version);
-        deployedService.setCsp(csp);
-        deployedService.setServiceHostingType(serviceHostingType);
-        deployedService.setRegion(region);
-        deployedService.setAvailabilityZones(availabilityZones);
-        deployedService.setFlavor(flavor);
-        deployedService.setBillingMode(billingMode);
-        deployedService.setInputProperties(inputProperties);
-        deployedService.setServiceTemplateId(serviceTemplateId);
-        deployedService.setServiceDeploymentState(serviceDeploymentState);
-        deployedService.setServiceState(SERVICE_STATE);
-        deployedService.setCreatedTime(createdTime);
-        deployedService.setLastModifiedTime(lastModifiedTime);
-        deployedService.setLastStartedAt(LAST_STARTED_AT);
-        deployedService.setLastStoppedAt(LAST_STOPPED_AT);
-        deployedService.setLockConfig(LOCK_CONFIG);
-        deployedService.setServiceConfigurationDetails(serviceConfigurationDetails);
+        test = new DeployedService();
+        test.setServiceId(uuid);
+        test.setUserId(userId);
+        test.setCategory(category);
+        test.setName(name);
+        test.setCustomerServiceName(customerServiceName);
+        test.setVersion(version);
+        test.setCsp(csp);
+        test.setServiceHostingType(serviceHostingType);
+        test.setRegion(region);
+        test.setAvailabilityZones(availabilityZones);
+        test.setFlavor(flavor);
+        test.setBillingMode(billingMode);
+        test.setInputProperties(inputProperties);
+        test.setDeployedServiceProperties(deployedServiceProperties);
+        test.setServiceTemplateId(serviceTemplateId);
+        test.setServiceDeploymentState(serviceDeploymentState);
+        test.setServiceState(SERVICE_STATE);
+        test.setCreatedTime(createdTime);
+        test.setLastModifiedTime(lastModifiedTime);
+        test.setLastStartedAt(LAST_STARTED_AT);
+        test.setLastStoppedAt(LAST_STOPPED_AT);
+        test.setLockConfig(LOCK_CONFIG);
+        test.setServiceConfigurationDetails(serviceConfigurationDetails);
     }
 
     @Test
     void testGetterAndSetter() {
-        assertEquals(uuid, deployedService.getServiceId());
-        assertEquals(userId, deployedService.getUserId());
-        assertEquals(category, deployedService.getCategory());
-        assertEquals(name, deployedService.getName());
-        assertEquals(customerServiceName, deployedService.getCustomerServiceName());
-        assertEquals(version, deployedService.getVersion());
-        assertEquals(csp, deployedService.getCsp());
-        assertEquals(serviceHostingType, deployedService.getServiceHostingType());
-        assertEquals(region, deployedService.getRegion());
-        assertEquals(flavor, deployedService.getFlavor());
-        assertEquals(billingMode, deployedService.getBillingMode());
-        assertEquals(inputProperties, deployedService.getInputProperties());
-        assertEquals(serviceTemplateId, deployedService.getServiceTemplateId());
-        assertEquals(serviceDeploymentState, deployedService.getServiceDeploymentState());
-        assertEquals(createdTime, deployedService.getCreatedTime());
-        assertEquals(lastModifiedTime, deployedService.getLastModifiedTime());
-        assertEquals(LAST_STARTED_AT, deployedService.getLastStartedAt());
-        assertEquals(LAST_STOPPED_AT, deployedService.getLastStoppedAt());
-        assertEquals(SERVICE_STATE, deployedService.getServiceState());
-        assertEquals(LOCK_CONFIG, deployedService.getLockConfig());
-        assertEquals(serviceConfigurationDetails, deployedService.getServiceConfigurationDetails());
+        assertEquals(uuid, test.getServiceId());
+        assertEquals(userId, test.getUserId());
+        assertEquals(category, test.getCategory());
+        assertEquals(name, test.getName());
+        assertEquals(customerServiceName, test.getCustomerServiceName());
+        assertEquals(version, test.getVersion());
+        assertEquals(csp, test.getCsp());
+        assertEquals(serviceHostingType, test.getServiceHostingType());
+        assertEquals(region, test.getRegion());
+        assertEquals(flavor, test.getFlavor());
+        assertEquals(billingMode, test.getBillingMode());
+        assertEquals(inputProperties, test.getInputProperties());
+        assertEquals(deployedServiceProperties, test.getDeployedServiceProperties());
+        assertEquals(serviceTemplateId, test.getServiceTemplateId());
+        assertEquals(serviceDeploymentState, test.getServiceDeploymentState());
+        assertEquals(createdTime, test.getCreatedTime());
+        assertEquals(lastModifiedTime, test.getLastModifiedTime());
+        assertEquals(LAST_STARTED_AT, test.getLastStartedAt());
+        assertEquals(LAST_STOPPED_AT, test.getLastStoppedAt());
+        assertEquals(SERVICE_STATE, test.getServiceState());
+        assertEquals(LOCK_CONFIG, test.getLockConfig());
+        assertEquals(serviceConfigurationDetails, test.getServiceConfigurationDetails());
     }
 
     @Test
     public void testEqualsAndHashCode() {
 
         Object obj = new Object();
-        assertNotEquals(deployedService, obj);
-        assertNotEquals(deployedService.hashCode(), obj.hashCode());
+        assertNotEquals(test, obj);
+        assertNotEquals(test.hashCode(), obj.hashCode());
 
-        DeployedService deployedService1 = new DeployedService();
-        assertNotEquals(deployedService, deployedService1);
-        assertNotEquals(deployedService.hashCode(), deployedService1.hashCode());
+        DeployedService test1 = new DeployedService();
+        assertNotEquals(test, test1);
+        assertNotEquals(test.hashCode(), test1.hashCode());
 
-        BeanUtils.copyProperties(deployedService, deployedService1);
-        assertEquals(deployedService, deployedService1);
-        assertEquals(deployedService.hashCode(), deployedService1.hashCode());
+        BeanUtils.copyProperties(test, test1);
+        assertEquals(test, test1);
+        assertEquals(test.hashCode(), test1.hashCode());
     }
 
     @Test
@@ -155,6 +159,8 @@ class DeployedServiceTest {
                         + billingMode
                         + ", inputProperties="
                         + inputProperties
+                        + ", deployedServiceProperties="
+                        + deployedServiceProperties
                         + ", serviceTemplateId="
                         + serviceTemplateId
                         + ", userId="
@@ -176,6 +182,6 @@ class DeployedServiceTest {
                         + ", serviceConfigurationDetails="
                         + serviceConfigurationDetails
                         + ")";
-        assertEquals(expectedString, deployedService.toString());
+        assertEquals(expectedString, test.toString());
     }
 }

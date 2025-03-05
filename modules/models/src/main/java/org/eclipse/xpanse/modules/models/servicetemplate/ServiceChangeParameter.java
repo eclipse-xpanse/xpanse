@@ -12,9 +12,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 import lombok.Data;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableDataType;
-import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployVariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableDataType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 
 /** Defines for the service config parameter. */
 @Data
@@ -29,11 +29,11 @@ public class ServiceChangeParameter implements Serializable {
 
     @NotNull
     @Schema(description = "The kind of the service config parameter")
-    private DeployVariableKind kind;
+    private VariableKind kind;
 
     @NotNull
     @Schema(description = "The type of the service config parameter")
-    private DeployVariableDataType dataType;
+    private VariableDataType dataType;
 
     @Schema(description = "The example value of the service config parameter")
     private String example;

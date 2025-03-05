@@ -41,7 +41,7 @@ End user cannot see or change this variable.
 (it can read from other sources, e.g., OS env variables)\s
 and injected as a regular variable to the deployer.\s
 End user cannot see or change this variable.""")
-public enum DeployVariableKind {
+public enum VariableKind {
     FIX_ENV("fix_env"),
     FIX_VARIABLE("fix_variable"),
     ENV("env"),
@@ -51,23 +51,23 @@ public enum DeployVariableKind {
 
     private final String type;
 
-    DeployVariableKind(String type) {
+    VariableKind(String type) {
         this.type = type;
     }
 
-    /** For DeployVariableKind serialize. */
+    /** For VariableKind serialize. */
     @JsonCreator
-    public DeployVariableKind getByValue(String type) {
-        for (DeployVariableKind deployVariableKind : values()) {
-            if (deployVariableKind.type.equals(StringUtils.lowerCase(type))) {
-                return deployVariableKind;
+    public VariableKind getByValue(String type) {
+        for (VariableKind variableKind : values()) {
+            if (variableKind.type.equals(StringUtils.lowerCase(type))) {
+                return variableKind;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("DeployVariableKind value %s is not supported.", type));
+                String.format("VariableKind value %s is not supported.", type));
     }
 
-    /** For DeployVariableKind deserialize. */
+    /** For VariableKind deserialize. */
     @JsonValue
     public String toValue() {
         return this.type;
