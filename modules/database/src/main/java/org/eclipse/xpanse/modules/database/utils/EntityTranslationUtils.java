@@ -71,7 +71,10 @@ public class EntityTranslationUtils {
         if (Objects.nonNull(serviceEntity)) {
             DeployedService deployedService = new DeployedService();
             BeanUtils.copyProperties(serviceEntity, deployedService);
-            deployedService.setServiceId(serviceEntity.getId());
+            setServiceIdAndServiceTemplateId(
+                    deployedService,
+                    serviceEntity.getId(),
+                    serviceEntity.getServiceTemplateEntity().getId());
             return deployedService;
         }
         return null;
@@ -87,7 +90,8 @@ public class EntityTranslationUtils {
             ServiceDeploymentEntity entity) {
         DeployedServiceDetails details = new DeployedServiceDetails();
         BeanUtils.copyProperties(entity, details);
-        details.setServiceId(entity.getId());
+        setServiceIdAndServiceTemplateId(
+                details, entity.getId(), entity.getServiceTemplateEntity().getId());
         if (!CollectionUtils.isEmpty(entity.getInputProperties())) {
             Map<String, String> inputProperties = new HashMap<>(entity.getInputProperties());
             details.setInputProperties(inputProperties);
@@ -112,7 +116,8 @@ public class EntityTranslationUtils {
             ServiceDeploymentEntity entity) {
         VendorHostedDeployedServiceDetails details = new VendorHostedDeployedServiceDetails();
         BeanUtils.copyProperties(entity, details);
-        details.setServiceId(entity.getId());
+        setServiceIdAndServiceTemplateId(
+                details, entity.getId(), entity.getServiceTemplateEntity().getId());
         if (!CollectionUtils.isEmpty(entity.getOutputProperties())) {
             details.setDeployedServiceProperties(entity.getOutputProperties());
         }
@@ -221,5 +226,11 @@ public class EntityTranslationUtils {
         requestVo.setRequestSubmittedForReview(
                 requestEntity.getRequestStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
         return requestVo;
+    }
+
+    private static void setServiceIdAndServiceTemplateId(
+            DeployedService deployedService, UUID serviceId, UUID serviceTemplateId) {
+        deployedService.setServiceId(serviceId);
+        deployedService.setServiceTemplateId(serviceTemplateId);
     }
 }

@@ -110,13 +110,9 @@ public class ServiceConfigurationManager {
                     serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
             checkPermission(serviceDeploymentEntity, UserOperation.CHANGE_SERVICE_CONFIGURATION);
             ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            serviceDeploymentEntity.getServiceTemplateId());
+                    serviceDeploymentEntity.getServiceTemplateEntity();
             if (Objects.isNull(serviceTemplateEntity)) {
-                String errMsg =
-                        String.format(
-                                "Service template with id %s not found.",
-                                serviceDeploymentEntity.getServiceTemplateId());
+                String errMsg = String.format("Service template not found.");
                 log.error(errMsg);
                 throw new ServiceTemplateNotRegistered(errMsg);
             }
@@ -249,13 +245,9 @@ public class ServiceConfigurationManager {
      */
     public Optional<ServiceChangeScript> getConfigManageScript(ServiceChangeRequestEntity request) {
         ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateStorage.getServiceTemplateById(
-                        request.getServiceDeploymentEntity().getServiceTemplateId());
+                request.getServiceDeploymentEntity().getServiceTemplateEntity();
         if (Objects.isNull(serviceTemplateEntity)) {
-            String errMsg =
-                    String.format(
-                            "Service template with id %s not found.",
-                            request.getServiceDeploymentEntity().getServiceTemplateId());
+            String errMsg = String.format("Service template not found.");
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }
@@ -284,8 +276,7 @@ public class ServiceConfigurationManager {
         ServiceConfigurationEntity serviceConfigurationEntity =
                 request.getServiceDeploymentEntity().getServiceConfiguration();
         ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateStorage.getServiceTemplateById(
-                        request.getServiceDeploymentEntity().getServiceTemplateId());
+                request.getServiceDeploymentEntity().getServiceTemplateEntity();
         // merge current stored configuration with missing parameters from its service template.#
         Map<String, Object> currentConfigurationMergedWithMissingParametersFromTemplate =
                 mergeCurrentConfigurations(

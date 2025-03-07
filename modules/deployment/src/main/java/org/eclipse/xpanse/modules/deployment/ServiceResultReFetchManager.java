@@ -114,9 +114,7 @@ public class ServiceResultReFetchManager {
     private void refetchDeploymentStateForMissingOrdersFromDeployers(
             ServiceDeploymentEntity serviceDeployment, ServiceOrderEntity serviceOrder) {
         if (Objects.nonNull(serviceOrder)) {
-            ServiceTemplateEntity serviceTemplate =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            serviceDeployment.getServiceTemplateId());
+            ServiceTemplateEntity serviceTemplate = serviceDeployment.getServiceTemplateEntity();
             DeployerKind deployerKind =
                     serviceTemplate.getOcl().getDeployment().getDeployerTool().getKind();
             if (Duration.between(serviceOrder.getStartedTime(), OffsetDateTime.now()).getSeconds()

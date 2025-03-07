@@ -16,10 +16,12 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -36,6 +38,7 @@ import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -139,9 +142,10 @@ public class ServiceDeploymentEntity extends CreatedModifiedTime {
     @Column(name = "SERVICE_STATE")
     private ServiceState serviceState = ServiceState.NOT_RUNNING;
 
-    /** The id of the Service Template. */
-    @Column(name = "SERVICE_TEMPLATE_ID", nullable = false)
-    private UUID serviceTemplateId;
+    /** The Service Template. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SERVICE_TEMPLATE_ID", nullable = false)
+    private ServiceTemplateEntity serviceTemplateEntity;
 
     @OneToMany(
             mappedBy = "serviceDeploymentEntity",

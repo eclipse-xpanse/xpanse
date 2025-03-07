@@ -50,7 +50,6 @@ class ServicePortingApiTest extends ApisTestCommon {
         addCredentialForHuaweiCloud();
         testServicePortingApisWell(serviceTemplate);
         testServicePortingApisThrowsException(serviceTemplate);
-        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testServicePortingApisWell(ServiceTemplateDetailVo serviceTemplate) throws Exception {

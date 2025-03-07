@@ -103,15 +103,9 @@ public class DeployResultManager {
         }
         UUID orderId = deployResult.getOrderId();
         ServiceOrderEntity storedServiceOrder = serviceOrderStorage.getEntityById(orderId);
-        ServiceDeploymentEntity storedServiceDeployment =
-                storedServiceOrder.getServiceDeploymentEntity();
-        ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateStorage.getServiceTemplateById(
-                        storedServiceDeployment.getServiceTemplateId());
         ServiceOrderType taskType = storedServiceOrder.getTaskType();
         ServiceDeploymentEntity updatedServiceDeployment =
-                updateServiceDeploymentWithDeployResult(
-                        deployResult, storedServiceDeployment, serviceTemplateEntity, taskType);
+                updateServiceDeploymentWithDeployResult(deployResult, storedServiceOrder, taskType);
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         // When the task failed and task type is deploy or retry, just update the task status and
         // error message. If the tfState is not null, start a new rollback order task and wait
@@ -130,8 +124,7 @@ public class DeployResultManager {
                 return;
             }
         }
-        updateServiceOrderEntityWithDeployResult(
-                deployResult, storedServiceOrder, serviceTemplateEntity);
+        updateServiceOrderEntityWithDeployResult(deployResult, storedServiceOrder);
     }
 
     /** Perform rollback when deployment fails and destroy the created resources. */
@@ -174,15 +167,16 @@ public class DeployResultManager {
 
     private ServiceDeploymentEntity updateServiceDeploymentWithDeployResult(
             DeployResult deployResult,
-            ServiceDeploymentEntity serviceDeployment,
-            ServiceTemplateEntity serviceTemplateEntity,
+            ServiceOrderEntity serviceOrderEntity,
             ServiceOrderType taskType) {
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                serviceOrderEntity.getServiceDeploymentEntity();
         log.info(
                 "Updating service deployment with id:{} by deploy result {}.",
-                serviceDeployment.getId(),
+                serviceDeploymentEntity.getId(),
                 deployResult);
         ServiceDeploymentEntity serviceDeploymentToUpdate = new ServiceDeploymentEntity();
-        BeanUtils.copyProperties(serviceDeployment, serviceDeploymentToUpdate);
+        BeanUtils.copyProperties(serviceDeploymentEntity, serviceDeploymentToUpdate);
         handleDeploymentResult(deployResult, serviceDeploymentToUpdate);
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         ServiceDeploymentState deploymentState =
@@ -220,9 +214,14 @@ public class DeployResultManager {
                 log.error("Failed to convert request to ModifyRequest.");
             }
         }
-        if (Objects.nonNull(serviceTemplateEntity)
+        if (Objects.nonNull(serviceDeploymentEntity)
+                && Objects.nonNull(serviceDeploymentEntity.getServiceTemplateEntity())
+                && Objects.nonNull(serviceDeploymentEntity.getServiceTemplateEntity().getOcl())
                 && Objects.nonNull(
-                        serviceTemplateEntity.getOcl().getServiceConfigurationManage())) {
+                        serviceDeploymentEntity
+                                .getServiceTemplateEntity()
+                                .getOcl()
+                                .getServiceConfigurationManage())) {
             updateServiceConfiguration(deploymentState, serviceDeploymentToUpdate);
         }
         if (CollectionUtils.isEmpty(deployResult.getDeploymentGeneratedFiles())) {
@@ -239,10 +238,18 @@ public class DeployResultManager {
                 serviceDeploymentToUpdate.setOutputProperties(Collections.emptyMap());
             }
         } else {
-            List<OutputVariable> outputVariables =
-                    serviceTemplateEntity.getOcl().getDeployment().getOutputVariables();
-            sensitiveDataHandler.encodeOutputVariables(
-                    outputVariables, deployResult.getOutputProperties());
+            if (Objects.nonNull(
+                    serviceOrderEntity.getServiceDeploymentEntity().getServiceTemplateEntity())) {
+                List<OutputVariable> outputVariables =
+                        serviceOrderEntity
+                                .getServiceDeploymentEntity()
+                                .getServiceTemplateEntity()
+                                .getOcl()
+                                .getDeployment()
+                                .getOutputVariables();
+                sensitiveDataHandler.encodeOutputVariables(
+                        outputVariables, deployResult.getOutputProperties());
+            }
             serviceDeploymentToUpdate.setOutputProperties(deployResult.getOutputProperties());
         }
 
@@ -284,8 +291,7 @@ public class DeployResultManager {
                     .getDeploymentGeneratedFiles()
                     .put(TF_STATE_FILE_NAME, deployResult.getTfStateContent());
             ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            serviceDeploymentEntity.getServiceTemplateId());
+                    serviceDeploymentEntity.getServiceTemplateEntity();
             DeployerKind deployerKind =
                     serviceTemplateEntity.getOcl().getDeployment().getDeployerTool().getKind();
             try {
@@ -378,9 +384,7 @@ public class DeployResultManager {
      * @param deployResult Deployment Result.
      */
     private void updateServiceOrderEntityWithDeployResult(
-            DeployResult deployResult,
-            ServiceOrderEntity storedOrderEntity,
-            ServiceTemplateEntity serviceTemplate) {
+            DeployResult deployResult, ServiceOrderEntity storedOrderEntity) {
         log.info(
                 "Updating service order with id:{} by deploy result:{}.",
                 storedOrderEntity.getOrderId(),
@@ -396,15 +400,29 @@ public class DeployResultManager {
         ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
         BeanUtils.copyProperties(storedOrderEntity, entityToUpdate);
         entityToUpdate.setCompletedTime(OffsetDateTime.now());
-        List<InputVariable> inputVariables =
-                serviceTemplate.getOcl().getDeployment().getInputVariables();
-        if (!CollectionUtils.isEmpty(inputVariables)
-                && !CollectionUtils.isEmpty(entityToUpdate.getRequestBody())) {
-            Map<String, Object> requestBodyWithSensitiveFields =
-                    sensitiveDataHandler.getOrderRequestBodyWithSensitiveFields(
-                            storedOrderEntity.getRequestBody(), inputVariables);
-            entityToUpdate.setRequestBody(requestBodyWithSensitiveFields);
+        if (Objects.nonNull(
+                        storedOrderEntity.getServiceDeploymentEntity().getServiceTemplateEntity())
+                && Objects.nonNull(
+                        storedOrderEntity
+                                .getServiceDeploymentEntity()
+                                .getServiceTemplateEntity()
+                                .getOcl())) {
+            List<InputVariable> inputVariables =
+                    storedOrderEntity
+                            .getServiceDeploymentEntity()
+                            .getServiceTemplateEntity()
+                            .getOcl()
+                            .getDeployment()
+                            .getInputVariables();
+            if (!CollectionUtils.isEmpty(inputVariables)
+                    && !CollectionUtils.isEmpty(entityToUpdate.getRequestBody())) {
+                Map<String, Object> requestBodyWithSensitiveFields =
+                        sensitiveDataHandler.getOrderRequestBodyWithSensitiveFields(
+                                storedOrderEntity.getRequestBody(), inputVariables);
+                entityToUpdate.setRequestBody(requestBodyWithSensitiveFields);
+            }
         }
+
         serviceOrderManager.completeOrderProgressWithDeployResult(entityToUpdate, deployResult);
     }
 

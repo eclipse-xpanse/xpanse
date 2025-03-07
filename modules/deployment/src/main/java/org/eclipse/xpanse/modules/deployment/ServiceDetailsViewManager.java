@@ -192,9 +192,7 @@ public class ServiceDetailsViewManager {
             ServiceDeploymentEntity serviceDeploymentEntity) {
         DeployedServiceDetails details =
                 EntityTranslationUtils.transToDeployedServiceDetails(serviceDeploymentEntity);
-        ServiceTemplateEntity serviceTemplate =
-                serviceTemplateStorage.getServiceTemplateById(
-                        serviceDeploymentEntity.getServiceTemplateId());
+        ServiceTemplateEntity serviceTemplate = serviceDeploymentEntity.getServiceTemplateEntity();
         setServiceConfigurationDetailsForDeployedService(details, serviceTemplate);
         handleSensitiveDataInDetails(details, serviceTemplate);
         return details;
@@ -235,9 +233,7 @@ public class ServiceDetailsViewManager {
             ServiceDeploymentEntity serviceDeploymentEntity) {
         VendorHostedDeployedServiceDetails details =
                 EntityTranslationUtils.transToVendorHostedServiceDetails(serviceDeploymentEntity);
-        ServiceTemplateEntity serviceTemplate =
-                serviceTemplateStorage.getServiceTemplateById(
-                        serviceDeploymentEntity.getServiceTemplateId());
+        ServiceTemplateEntity serviceTemplate = serviceDeploymentEntity.getServiceTemplateEntity();
         setServiceConfigurationDetailsForDeployedService(details, serviceTemplate);
         handleSensitiveDataInDetails(details, serviceTemplate);
         return details;
@@ -308,8 +304,7 @@ public class ServiceDetailsViewManager {
                                             serviceDeployment);
                             if (Objects.nonNull(deployedService)) {
                                 ServiceTemplateEntity serviceTemplate =
-                                        serviceTemplateStorage.getServiceTemplateById(
-                                                deployedService.getServiceTemplateId());
+                                        serviceDeployment.getServiceTemplateEntity();
                                 setServiceConfigurationDetailsForDeployedService(
                                         deployedService, serviceTemplate);
                                 handleSensitiveDataInDetails(deployedService, serviceTemplate);
@@ -321,7 +316,6 @@ public class ServiceDetailsViewManager {
 
     private void setServiceConfigurationDetailsForDeployedService(
             DeployedService deployedService, ServiceTemplateEntity serviceTemplate) {
-
         if (Objects.nonNull(serviceTemplate)
                 && Objects.nonNull(serviceTemplate.getOcl().getServiceConfigurationManage())) {
             List<ServiceChangeParameter> configurationParameters =

@@ -389,7 +389,9 @@ public class DeployService {
         entity.setDeployResources(new ArrayList<>());
         entity.setServiceVendor(deployTask.getServiceVendor());
         entity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
-        entity.setServiceTemplateId(deployTask.getServiceTemplateId());
+        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
+        serviceTemplateEntity.setId(deployTask.getServiceTemplateId());
+        entity.setServiceTemplateEntity(serviceTemplateEntity);
         ServiceLockConfig defaultLockConfig = new ServiceLockConfig();
         defaultLockConfig.setDestroyLocked(false);
         defaultLockConfig.setModifyLocked(false);
@@ -495,8 +497,7 @@ public class DeployService {
                             serviceDeploymentEntity.getServiceDeploymentState()));
         }
         ServiceTemplateEntity existingServiceTemplate =
-                serviceTemplateStorage.getServiceTemplateById(
-                        serviceDeploymentEntity.getServiceTemplateId());
+                serviceDeploymentEntity.getServiceTemplateEntity();
         if (!existingServiceTemplate.getIsAvailableInCatalog()) {
             String errorMsg =
                     String.format(
@@ -808,8 +809,7 @@ public class DeployService {
     public ServiceTemplateEntity getOrderableServiceDetailsByServiceId(UUID serviceId) {
         ServiceDeploymentEntity deployedService =
                 serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
-        return serviceTemplateStorage.getServiceTemplateById(
-                deployedService.getServiceTemplateId());
+        return deployedService.getServiceTemplateEntity();
     }
 
     private Handler getHandler(String activeProfile, DeployerKind kind) {

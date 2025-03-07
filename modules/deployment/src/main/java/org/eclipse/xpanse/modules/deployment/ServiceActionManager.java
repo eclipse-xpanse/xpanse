@@ -70,13 +70,9 @@ public class ServiceActionManager {
             ServiceDeploymentEntity serviceDeploymentEntity =
                     serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
             ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            serviceDeploymentEntity.getServiceTemplateId());
+                    serviceDeploymentEntity.getServiceTemplateEntity();
             if (Objects.isNull(serviceTemplateEntity)) {
-                String errMsg =
-                        String.format(
-                                "Service template with id %s not found.",
-                                serviceDeploymentEntity.getServiceTemplateId());
+                String errMsg = String.format("Service template not found.");
                 log.error(errMsg);
                 throw new ServiceTemplateNotRegistered(errMsg);
             }
@@ -197,10 +193,9 @@ public class ServiceActionManager {
             ServiceChangeRequestEntity serviceChangeRequestEntity) {
         try {
             ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            serviceChangeRequestEntity
-                                    .getServiceDeploymentEntity()
-                                    .getServiceTemplateId());
+                    serviceChangeRequestEntity
+                            .getServiceDeploymentEntity()
+                            .getServiceTemplateEntity();
             // get action name from the original request stored in the service order table.
             ServiceActionRequest serviceActionRequest =
                     objectMapper.readValue(

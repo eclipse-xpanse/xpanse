@@ -333,7 +333,6 @@ class OpenstackTestlabOrchestratorPluginTest {
         when(this.mockCredentialCenter.getCredential(any(), any(), any(), any()))
                 .thenReturn(getCredentialDefinition());
         ServiceDeploymentEntity serviceDeploymentEntity = new ServiceDeploymentEntity();
-        serviceDeploymentEntity.setServiceTemplateId(UUID.randomUUID());
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         Ocl ocl = new Ocl();
         Deployment deployment = new Deployment();
@@ -341,6 +340,7 @@ class OpenstackTestlabOrchestratorPluginTest {
         deployment.setInputVariables(inputVariables);
         ocl.setDeployment(deployment);
         serviceTemplateEntity.setOcl(ocl);
+        serviceDeploymentEntity.setServiceTemplateEntity(serviceTemplateEntity);
         when(this.mockServiceDeploymentStorage.findServiceDeploymentById(any()))
                 .thenReturn(serviceDeploymentEntity);
         when(this.mockServiceTemplateStorage.getServiceTemplateById(any()))
