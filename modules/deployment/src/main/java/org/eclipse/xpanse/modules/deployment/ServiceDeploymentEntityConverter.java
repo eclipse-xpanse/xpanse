@@ -54,8 +54,7 @@ public class ServiceDeploymentEntityConverter {
         deployTask.setDeployRequest(getDeployRequestByStoredService(serviceDeploymentEntity));
         deployTask.setServiceVendor(serviceDeploymentEntity.getServiceVendor());
         ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateStorage.getServiceTemplateById(
-                        serviceDeploymentEntity.getServiceTemplateId());
+                serviceDeploymentEntity.getServiceTemplateEntity();
         if (!serviceTemplateEntity.getIsAvailableInCatalog()) {
             String errorMsg =
                     String.format(

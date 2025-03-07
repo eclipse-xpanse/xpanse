@@ -56,7 +56,7 @@ public class DatabaseServiceDeploymentStorage implements ServiceDeploymentStorag
                     if (Objects.nonNull(serviceQuery.getServiceTemplateId())) {
                         predicateList.add(
                                 criteriaBuilder.equal(
-                                        root.get("serviceTemplateId"),
+                                        root.get("serviceTemplateEntity").get("id"),
                                         serviceQuery.getServiceTemplateId()));
                     }
                     if (Objects.nonNull(serviceQuery.getCategory())) {

@@ -47,7 +47,6 @@ class ServiceRecreateApiTest extends ApisTestCommon {
         addCredentialForHuaweiCloud();
         testServiceRecreateApisWell(serviceTemplate);
         testServiceRecreateApisThrowsException(serviceTemplate);
-        deleteServiceTemplate(serviceTemplate.getServiceTemplateId());
     }
 
     void testServiceRecreateApisWell(ServiceTemplateDetailVo serviceTemplate) throws Exception {

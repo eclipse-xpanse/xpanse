@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
+import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -52,8 +53,7 @@ class ServiceDeploymentEntityTest {
     private final Map<String, String> INPUT_PROPERTIES = new HashMap<>();
     private final ServiceDeploymentState SERVICE_STATE = ServiceDeploymentState.DEPLOYING;
     private final ServiceState SERVICE_RUN_STATE = ServiceState.NOT_RUNNING;
-    private final UUID SERVICE_TEMPLATE_ID =
-            UUID.fromString("eef27308-92d6-4c7a-866b-a58966b94f3d");
+    private final ServiceTemplateEntity SERVICE_TEMPLATE_ENTITY = new ServiceTemplateEntity();
     private final List<ServiceResourceEntity> DEPLOY_RESOURCE_LIST = new ArrayList<>();
     private final Map<String, String> OUTPUT_PROPERTIES = new HashMap<>();
     private final Map<String, String> DEPLOYMENT_GENERATED_FILES = new HashMap<>();
@@ -79,7 +79,7 @@ class ServiceDeploymentEntityTest {
         test.setInputProperties(INPUT_PROPERTIES);
         test.setServiceDeploymentState(SERVICE_STATE);
         test.setServiceState(SERVICE_RUN_STATE);
-        test.setServiceTemplateId(SERVICE_TEMPLATE_ID);
+        test.setServiceTemplateEntity(SERVICE_TEMPLATE_ENTITY);
         test.setDeployResources(DEPLOY_RESOURCE_LIST);
         test.setOutputProperties(OUTPUT_PROPERTIES);
         test.setDeploymentGeneratedFiles(DEPLOYMENT_GENERATED_FILES);
@@ -107,7 +107,7 @@ class ServiceDeploymentEntityTest {
         assertEquals(IS_EULA_ACCEPTED, test.getIsEulaAccepted());
         assertEquals(SERVICE_STATE, test.getServiceDeploymentState());
         assertEquals(SERVICE_RUN_STATE, test.getServiceState());
-        assertEquals(SERVICE_TEMPLATE_ID, test.getServiceTemplateId());
+        assertEquals(SERVICE_TEMPLATE_ENTITY, test.getServiceTemplateEntity());
         assertEquals(DEPLOY_RESOURCE_LIST, test.getDeployResources());
         assertEquals(OUTPUT_PROPERTIES, test.getOutputProperties());
         assertEquals(DEPLOYMENT_GENERATED_FILES, test.getDeploymentGeneratedFiles());
@@ -153,8 +153,8 @@ class ServiceDeploymentEntityTest {
                         + SERVICE_STATE
                         + ", serviceState="
                         + SERVICE_RUN_STATE
-                        + ", serviceTemplateId="
-                        + SERVICE_TEMPLATE_ID
+                        + ", serviceTemplateEntity="
+                        + SERVICE_TEMPLATE_ENTITY
                         + ", outputProperties="
                         + OUTPUT_PROPERTIES
                         + ", deploymentGeneratedFiles="

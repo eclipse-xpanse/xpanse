@@ -145,8 +145,7 @@ public class ProviderAuthInfoResolver {
             ServiceDeploymentEntity serviceDeploymentEntity =
                     serviceDeploymentStorage.findServiceDeploymentById(serviceId);
             ServiceTemplateEntity serviceTemplateEntity =
-                    serviceTemplateStorage.getServiceTemplateById(
-                            serviceDeploymentEntity.getServiceTemplateId());
+                    serviceDeploymentEntity.getServiceTemplateEntity();
             Map<String, Object> inputProperties = new HashMap<>();
             if (Objects.nonNull(serviceDeploymentEntity.getInputProperties())) {
                 inputProperties.putAll(serviceDeploymentEntity.getInputProperties());

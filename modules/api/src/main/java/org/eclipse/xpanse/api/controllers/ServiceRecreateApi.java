@@ -117,8 +117,7 @@ public class ServiceRecreateApi {
                             serviceDeploymentEntity.getServiceDeploymentState()));
         }
         ServiceTemplateEntity existingServiceTemplate =
-                serviceTemplateStorage.getServiceTemplateById(
-                        serviceDeploymentEntity.getServiceTemplateId());
+                serviceDeploymentEntity.getServiceTemplateEntity();
         if (!existingServiceTemplate.getIsAvailableInCatalog()) {
             String errorMsg =
                     String.format(
