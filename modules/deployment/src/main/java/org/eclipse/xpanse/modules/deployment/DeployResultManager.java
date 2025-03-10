@@ -49,7 +49,6 @@ import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.HttpClientErrorException;
 
 /** Bean to handle deployment result. */
 @Component
@@ -503,11 +502,11 @@ public class DeployResultManager {
             ServiceDeploymentEntity serviceEntity,
             ServiceOrderEntity serviceOrder,
             ErrorType errorType,
-            HttpClientErrorException e) {
+            String errorMessage) {
         serviceEntity.setServiceDeploymentState(ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
         serviceOrder.setOrderStatus(OrderStatus.FAILED);
         serviceOrder.setErrorResponse(
-                ErrorResponse.errorResponse(errorType, List.of(e.getMessage())));
+                ErrorResponse.errorResponse(errorType, List.of(errorMessage)));
         serviceDeploymentStorage.storeAndFlush(serviceEntity);
         serviceOrderStorage.storeAndFlush(serviceOrder);
     }

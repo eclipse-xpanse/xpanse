@@ -116,11 +116,8 @@ public class ServiceDetailsViewManager {
         query.setUserId(currentUserId);
         List<ServiceDeploymentEntity> serviceDeploymentEntities =
                 serviceDeploymentStorage.listServices(query);
-        serviceDeploymentEntities.forEach(
-                serviceDeployment ->
-                        serviceResultReFetchManager
-                                .reFetchDeploymentStateForMissingOrdersFromDeployers(
-                                        serviceDeployment));
+        serviceResultReFetchManager.batchReFetchDeploymentStateForMissingOrdersFromDeployers(
+                serviceDeploymentEntities);
         return serviceDeploymentEntities;
     }
 
@@ -260,11 +257,8 @@ public class ServiceDetailsViewManager {
         String isv = userServiceHelper.getIsvManagedByCurrentUser();
         query.setServiceVendor(isv);
         List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
-        deployServices.forEach(
-                serviceDeployment ->
-                        serviceResultReFetchManager
-                                .reFetchDeploymentStateForMissingOrdersFromDeployers(
-                                        serviceDeployment));
+        serviceResultReFetchManager.batchReFetchDeploymentStateForMissingOrdersFromDeployers(
+                deployServices);
         return setServiceConfigurationForDeployedServiceList(deployServices);
     }
 
@@ -286,11 +280,8 @@ public class ServiceDetailsViewManager {
         ServiceQueryModel query =
                 getServiceQueryModel(category, csp, serviceName, serviceVersion, state);
         List<ServiceDeploymentEntity> deployServices = serviceDeploymentStorage.listServices(query);
-        deployServices.forEach(
-                serviceDeployment ->
-                        serviceResultReFetchManager
-                                .reFetchDeploymentStateForMissingOrdersFromDeployers(
-                                        serviceDeployment));
+        serviceResultReFetchManager.batchReFetchDeploymentStateForMissingOrdersFromDeployers(
+                deployServices);
         return setServiceConfigurationForDeployedServiceList(deployServices);
     }
 

@@ -48,8 +48,8 @@ import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplat
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.ServiceResultReFetchManager;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerResultRefetchManager;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootResultRefetchManager;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerResultReFetchManager;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootResultReFetchManager;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -123,8 +123,8 @@ public class ApisTestCommon extends ZitadelTestContainer {
     @MockitoBean protected BssClient mockBssClient;
     @MockitoBean protected BssintlClient mockBssintlClient;
     protected MockedStatic<OSFactory> mockOsFactory;
-    @Resource private TerraBootResultRefetchManager terraBootResultRefetchManager;
-    @Resource private TofuMakerResultRefetchManager tofuMakerResultRefetchManager;
+    @Resource private TerraBootResultReFetchManager terraBootResultRefetchManager;
+    @Resource private TofuMakerResultReFetchManager tofuMakerResultRefetchManager;
     @Resource private ServiceResultReFetchManager serviceResultReFetchManager;
 
     @BeforeAll
