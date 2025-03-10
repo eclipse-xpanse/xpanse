@@ -1,11 +1,13 @@
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.BaseApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.ReFetchResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -36,25 +38,106 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
     }
 
     /**
-     * Method to retrieve stored openTofu result in case tofu-maker receives a failure while sending
-     * the openTofu result via callback.
-     *
-     * <p><b>400</b> - Bad Request
-     *
-     * <p><b>502</b> - Bad Gateway
-     *
-     * <p><b>422</b> - Unprocessable Entity
-     *
-     * <p><b>503</b> - Service Unavailable
+     * Method to batch retrieve stored openTofu results from tofu-maker.
      *
      * <p><b>200</b> - OK
      *
-     * @param requestId id of the request (required)
-     * @return OpenTofuResult
+     * <p><b>400</b> - Bad Request
+     *
+     * <p><b>422</b> - Unprocessable Entity
+     *
+     * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>503</b> - Service Unavailable
+     *
+     * @param UUID (required)
+     * @return List&lt;ReFetchResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult getStoredTaskResultByRequestId(String requestId)
+    public List<ReFetchResult> getBatchTaskResults(List<UUID> UUID) throws RestClientException {
+        return getBatchTaskResultsWithHttpInfo(UUID).getBody();
+    }
+
+    /**
+     * Method to batch retrieve stored openTofu results from tofu-maker.
+     *
+     * <p><b>200</b> - OK
+     *
+     * <p><b>400</b> - Bad Request
+     *
+     * <p><b>422</b> - Unprocessable Entity
+     *
+     * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>503</b> - Service Unavailable
+     *
+     * @param UUID (required)
+     * @return ResponseEntity&lt;List&lt;ReFetchResult&gt;&gt;
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ResponseEntity<List<ReFetchResult>> getBatchTaskResultsWithHttpInfo(List<UUID> UUID)
             throws RestClientException {
+        Object localVarPostBody = UUID;
+
+        // verify the required parameter 'UUID' is set
+        if (UUID == null) {
+            throw new HttpClientErrorException(
+                    HttpStatus.BAD_REQUEST,
+                    "Missing the required parameter 'UUID' when calling getBatchTaskResults");
+        }
+
+        final MultiValueMap<String, String> localVarQueryParams =
+                new LinkedMultiValueMap<String, String>();
+        final HttpHeaders localVarHeaderParams = new HttpHeaders();
+        final MultiValueMap<String, String> localVarCookieParams =
+                new LinkedMultiValueMap<String, String>();
+        final MultiValueMap<String, Object> localVarFormParams =
+                new LinkedMultiValueMap<String, Object>();
+
+        final String[] localVarAccepts = {"*/*"};
+        final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String[] localVarContentTypes = {"application/json"};
+        final MediaType localVarContentType =
+                apiClient.selectHeaderContentType(localVarContentTypes);
+
+        String[] localVarAuthNames = new String[] {"OAuth2Flow"};
+
+        ParameterizedTypeReference<List<ReFetchResult>> localReturnType =
+                new ParameterizedTypeReference<List<ReFetchResult>>() {};
+        return apiClient.invokeAPI(
+                "/tofu-maker/task/results/batch",
+                HttpMethod.POST,
+                Collections.<String, Object>emptyMap(),
+                localVarQueryParams,
+                localVarPostBody,
+                localVarHeaderParams,
+                localVarCookieParams,
+                localVarFormParams,
+                localVarAccept,
+                localVarContentType,
+                localVarAuthNames,
+                localReturnType);
+    }
+
+    /**
+     * Method to retrieve stored openTofu result in case tofu-maker receives a failure while sending
+     * the openTofu result via callback.
+     *
+     * <p><b>200</b> - OK
+     *
+     * <p><b>400</b> - Bad Request
+     *
+     * <p><b>422</b> - Unprocessable Entity
+     *
+     * <p><b>502</b> - Bad Gateway
+     *
+     * <p><b>503</b> - Service Unavailable
+     *
+     * @param requestId id of the request (required)
+     * @return ReFetchResult
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public ReFetchResult getStoredTaskResultByRequestId(UUID requestId) throws RestClientException {
         return getStoredTaskResultByRequestIdWithHttpInfo(requestId).getBody();
     }
 
@@ -62,22 +145,22 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
      * Method to retrieve stored openTofu result in case tofu-maker receives a failure while sending
      * the openTofu result via callback.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
+     * <p><b>502</b> - Bad Gateway
+     *
      * <p><b>503</b> - Service Unavailable
      *
-     * <p><b>200</b> - OK
-     *
      * @param requestId id of the request (required)
-     * @return ResponseEntity&lt;OpenTofuResult&gt;
+     * @return ResponseEntity&lt;ReFetchResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<OpenTofuResult> getStoredTaskResultByRequestIdWithHttpInfo(
-            String requestId) throws RestClientException {
+    public ResponseEntity<ReFetchResult> getStoredTaskResultByRequestIdWithHttpInfo(UUID requestId)
+            throws RestClientException {
         Object localVarPostBody = null;
 
         // verify the required parameter 'requestId' is set
@@ -100,7 +183,7 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {};
         final MediaType localVarContentType =
@@ -108,8 +191,8 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuResult> localReturnType =
-                new ParameterizedTypeReference<OpenTofuResult>() {};
+        ParameterizedTypeReference<ReFetchResult> localReturnType =
+                new ParameterizedTypeReference<ReFetchResult>() {};
         return apiClient.invokeAPI(
                 "/tofu-maker/task/result/{requestId}",
                 HttpMethod.GET,
@@ -141,7 +224,7 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {};
         final MediaType localVarContentType =

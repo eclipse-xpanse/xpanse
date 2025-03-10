@@ -48,15 +48,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * async deploy resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuAsyncDeployFromScriptsRequest (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -70,15 +70,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * async deploy resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuAsyncDeployFromScriptsRequest (required)
      * @return ResponseEntity&lt;Void&gt;
@@ -133,15 +133,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Async destroy the OpenTofu modules
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuAsyncDestroyFromScriptsRequest (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -155,15 +155,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Async destroy the OpenTofu modules
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuAsyncDestroyFromScriptsRequest (required)
      * @return ResponseEntity&lt;Void&gt;
@@ -218,15 +218,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * async modify resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuAsyncModifyFromScriptsRequest (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -240,15 +240,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * async modify resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuAsyncModifyFromScriptsRequest (required)
      * @return ResponseEntity&lt;Void&gt;
@@ -303,15 +303,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Deploy resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuDeployWithScriptsRequest (required)
      * @return OpenTofuResult
@@ -326,15 +326,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Deploy resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuDeployWithScriptsRequest (required)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
@@ -361,7 +361,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
@@ -389,15 +389,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Destroy resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuDestroyWithScriptsRequest (required)
      * @return OpenTofuResult
@@ -412,15 +412,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Destroy resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuDestroyWithScriptsRequest (required)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
@@ -447,7 +447,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
@@ -475,15 +475,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Modify resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuModifyWithScriptsRequest (required)
      * @return OpenTofuResult
@@ -498,15 +498,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Modify resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuModifyWithScriptsRequest (required)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
@@ -533,7 +533,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
@@ -561,15 +561,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Get OpenTofu Plan as JSON string from the list of script files provided
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuPlanWithScriptsRequest (required)
      * @return OpenTofuPlan
@@ -584,15 +584,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Get OpenTofu Plan as JSON string from the list of script files provided
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuPlanWithScriptsRequest (required)
      * @return ResponseEntity&lt;OpenTofuPlan&gt;
@@ -619,7 +619,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
@@ -647,15 +647,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Deploy resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuDeployWithScriptsRequest (required)
      * @return OpenTofuValidationResult
@@ -670,15 +670,15 @@ public class OpenTofuFromScriptsApi extends BaseApi {
     /**
      * Deploy resources via OpenTofu
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param openTofuDeployWithScriptsRequest (required)
      * @return ResponseEntity&lt;OpenTofuValidationResult&gt;
@@ -705,7 +705,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
@@ -746,7 +746,7 @@ public class OpenTofuFromScriptsApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =

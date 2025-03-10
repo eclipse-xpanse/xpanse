@@ -47,15 +47,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * async deploy resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncDeployFromDirectoryRequest (required)
@@ -72,15 +72,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * async deploy resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncDeployFromDirectoryRequest (required)
@@ -149,15 +149,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * async destroy resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncDestroyFromDirectoryRequest (required)
@@ -174,15 +174,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * async destroy resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncDestroyFromDirectoryRequest (required)
@@ -251,15 +251,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * async modify resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncModifyFromDirectoryRequest (required)
@@ -276,15 +276,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * async modify resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>202</b> - Accepted
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>202</b> - Accepted
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuAsyncModifyFromDirectoryRequest (required)
@@ -353,15 +353,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Deploy resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuDeployFromDirectoryRequest (required)
@@ -379,15 +379,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Deploy resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuDeployFromDirectoryRequest (required)
@@ -428,7 +428,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
@@ -456,15 +456,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Destroy the resources from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuDestroyFromDirectoryRequest (required)
@@ -483,15 +483,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Destroy the resources from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuDestroyFromDirectoryRequest (required)
@@ -532,7 +532,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
@@ -560,15 +560,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Modify resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuModifyFromDirectoryRequest (required)
@@ -586,15 +586,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Modify resources via OpenTofu from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuModifyFromDirectoryRequest (required)
@@ -635,7 +635,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
@@ -663,15 +663,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Get OpenTofu Plan as JSON string from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuPlanFromDirectoryRequest (required)
@@ -688,15 +688,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Get OpenTofu Plan as JSON string from the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param openTofuPlanFromDirectoryRequest (required)
@@ -736,7 +736,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
@@ -764,15 +764,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Validate the OpenTofu modules in the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param opentofuVersion version of OpenTofu to execute the module files. (required)
@@ -787,15 +787,15 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
     /**
      * Validate the OpenTofu modules in the given directory.
      *
-     * <p><b>400</b> - Bad Request
+     * <p><b>200</b> - OK
      *
-     * <p><b>502</b> - Bad Gateway
+     * <p><b>400</b> - Bad Request
      *
      * <p><b>422</b> - Unprocessable Entity
      *
-     * <p><b>503</b> - Service Unavailable
+     * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>200</b> - OK
+     * <p><b>503</b> - Service Unavailable
      *
      * @param moduleDirectory directory name where the OpenTofu module files exist. (required)
      * @param opentofuVersion version of OpenTofu to execute the module files. (required)
@@ -835,7 +835,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {};
         final MediaType localVarContentType =
@@ -876,7 +876,7 @@ public class OpenTofuFromDirectoryApi extends BaseApi {
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
 
-        final String[] localVarAccepts = {"*/*", "application/json"};
+        final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
         final String[] localVarContentTypes = {};
         final MediaType localVarContentType =

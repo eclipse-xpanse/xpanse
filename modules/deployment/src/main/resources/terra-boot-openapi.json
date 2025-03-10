@@ -3,7 +3,7 @@
   "info": {
     "title": "Terra-Boot API",
     "description": "RESTful Services to interact with terraform CLI",
-    "version": "1.0.19-SNAPSHOT"
+    "version": "1.0.21-SNAPSHOT"
   },
   "servers": [
     {
@@ -20,6 +20,10 @@
   ],
   "tags": [
     {
+      "name": "RetrieveTerraformResult",
+      "description": "APIs to manually fetching task results from terra-boot."
+    },
+    {
       "name": "TerraformFromScripts",
       "description": "APIs for running Terraform commands on the scripts sent via request body."
     },
@@ -32,33 +36,57 @@
       "description": "APIs for running Terraform commands inside a provided directory."
     },
     {
-      "name": "RetrieveTerraformResult",
-      "description": "APIs for manage the task form terra-boot."
-    },
-    {
       "name": "TerraformFromGitRepo",
       "description": "APIs for running Terraform commands using Terraform scripts from a GIT Repo."
     }
   ],
   "paths": {
-    "/terra-boot/scripts/validate": {
+    "/terra-boot/task/results/batch": {
       "post": {
         "tags": [
-          "TerraformFromScripts"
+          "RetrieveTerraformResult"
         ],
-        "description": "Deploy resources via Terraform",
-        "operationId": "validateWithScripts",
+        "description": "Method to batch retrieve stored terraform result from terra-boot.",
+        "operationId": "getBatchTaskResults",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDeployWithScriptsRequest"
+                "type": "array",
+                "description": "List of request IDs",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
               }
             }
           },
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReFetchResult"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -79,8 +107,69 @@
               }
             }
           },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/terra-boot/scripts/validate": {
+      "post": {
+        "tags": [
+          "TerraformFromScripts"
+        ],
+        "description": "Deploy resources via Terraform",
+        "operationId": "validateWithScripts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformDeployWithScriptsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformValidationResult"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -95,16 +184,6 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
                 }
               }
             }
@@ -130,6 +209,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -150,32 +249,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformPlan"
                 }
               }
             }
@@ -201,6 +280,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -221,32 +320,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -272,6 +351,19 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -292,16 +384,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -311,9 +393,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -336,6 +415,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -356,32 +455,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -407,6 +486,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -427,32 +526,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -478,6 +557,19 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -498,16 +590,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -517,9 +599,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -542,6 +621,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -562,32 +661,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
                 }
               }
             }
@@ -613,6 +692,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -633,32 +732,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformPlan"
                 }
               }
             }
@@ -684,6 +763,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -704,32 +803,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -755,6 +834,19 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -775,16 +867,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -794,9 +876,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -819,6 +898,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -839,32 +938,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -890,6 +969,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -910,32 +1009,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -961,6 +1040,19 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -981,16 +1073,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1000,9 +1082,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1045,6 +1124,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1065,32 +1164,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformPlan"
                 }
               }
             }
@@ -1127,6 +1206,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1147,32 +1246,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -1209,6 +1288,19 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1229,16 +1321,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1248,9 +1330,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1284,6 +1363,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1304,32 +1403,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -1366,6 +1445,19 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1386,16 +1478,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1405,9 +1487,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1426,11 +1505,32 @@
             "description": "id of the request",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReFetchResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1451,32 +1551,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -1492,6 +1572,26 @@
         "description": "Check health of Terra Boot API service",
         "operationId": "healthCheck",
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraBootSystemStatus"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1512,32 +1612,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraBootSystemStatus"
                 }
               }
             }
@@ -1569,11 +1649,31 @@
             "required": true,
             "schema": {
               "type": "string",
-              "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+              "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
             }
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1594,32 +1694,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
                 }
               }
             }
@@ -1645,6 +1725,19 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1665,16 +1758,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1684,9 +1767,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1709,6 +1789,19 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1729,16 +1822,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1748,9 +1831,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1784,6 +1864,26 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1804,32 +1904,12 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformResult"
                 }
               }
             }
@@ -1866,6 +1946,19 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "422": {
             "description": "Unprocessable Entity",
             "content": {
@@ -1886,16 +1979,6 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1905,9 +1988,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1952,6 +2032,74 @@
           "success"
         ]
       },
+      "ReFetchResult": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Id of the request order."
+          },
+          "state": {
+            "type": "string",
+            "description": "State of the re-fetching result of order.",
+            "enum": [
+              "OK",
+              "OrderInProgress",
+              "ResultNotFound",
+              "ResultParseFailed"
+            ]
+          },
+          "terraformResult": {
+            "$ref": "#/components/schemas/TerraformResult",
+            "description": "Result of the service order executed by terraform."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Error message of the re-fetching result of order."
+          }
+        },
+        "required": [
+          "requestId",
+          "state"
+        ]
+      },
+      "TerraformResult": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Id of the request"
+          },
+          "commandStdOutput": {
+            "type": "string",
+            "description": "stdout of the command returned as string."
+          },
+          "commandStdError": {
+            "type": "string",
+            "description": "stderr of the command returned as string."
+          },
+          "terraformState": {
+            "type": "string",
+            "description": ".tfstate file contents returned as string."
+          },
+          "generatedFileContentMap": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Data of all other files generated by the terraform execution.The map key contains the file name and value is the file contents as string."
+          },
+          "terraformVersionUsed": {
+            "type": "string",
+            "description": "The version of the Terraform binary used to execute scripts."
+          },
+          "commandSuccessful": {
+            "type": "boolean"
+          }
+        }
+      },
       "TerraformDeployWithScriptsRequest": {
         "type": "object",
         "properties": {
@@ -1963,7 +2111,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2041,7 +2189,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "variables": {
             "type": "object",
@@ -2098,7 +2246,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2143,42 +2291,6 @@
           "variables"
         ]
       },
-      "TerraformResult": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "commandStdOutput": {
-            "type": "string",
-            "description": "stdout of the command returned as string."
-          },
-          "commandStdError": {
-            "type": "string",
-            "description": "stderr of the command returned as string."
-          },
-          "terraformState": {
-            "type": "string",
-            "description": ".tfstate file contents returned as string."
-          },
-          "generatedFileContentMap": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Data of all other files generated by the terraform execution.The map key contains the file name and value is the file contents as string."
-          },
-          "terraformVersionUsed": {
-            "type": "string",
-            "description": "The version of the Terraform binary used to execute scripts."
-          },
-          "commandSuccessful": {
-            "type": "boolean"
-          }
-        }
-      },
       "TerraformAsyncModifyFromScriptsRequest": {
         "type": "object",
         "properties": {
@@ -2190,7 +2302,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2273,7 +2385,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "variables": {
             "type": "object",
@@ -2319,7 +2431,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2370,7 +2482,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2434,7 +2546,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "variables": {
             "type": "object",
@@ -2471,7 +2583,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2518,7 +2630,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2570,7 +2682,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "variables": {
             "type": "object",
@@ -2612,7 +2724,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2660,7 +2772,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "variables": {
             "type": "object",
@@ -2693,7 +2805,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2731,7 +2843,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2774,7 +2886,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2812,7 +2924,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
@@ -2871,7 +2983,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "variables": {
             "type": "object",
@@ -2922,7 +3034,7 @@
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|\u003E=|\u003C=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "variables": {
             "type": "object",

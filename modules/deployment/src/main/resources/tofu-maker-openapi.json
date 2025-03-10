@@ -28,49 +28,57 @@
       "description": "Admin services for managing the application."
     },
     {
+      "name": "RetrieveOpenTofuResult",
+      "description": "APIs to manually fetching task results from tofu-maker."
+    },
+    {
       "name": "OpenTofuFromScripts",
       "description": "APIs for running OpenTofu commands on the scripts sent via request body."
     },
     {
       "name": "OpenTofuFromDirectory",
       "description": "APIs for running OpenTofu commands inside a provided directory."
-    },
-    {
-      "name": "RetrieveOpenTofuResult",
-      "description": "APIs for manage the task form tofu-maker."
     }
   ],
   "paths": {
-    "/tofu-maker/scripts/validate": {
+    "/tofu-maker/task/results/batch": {
       "post": {
         "tags": [
-          "OpenTofuFromScripts"
+          "RetrieveOpenTofuResult"
         ],
-        "description": "Deploy resources via OpenTofu",
-        "operationId": "validateWithScripts",
+        "description": "Method to batch retrieve stored openTofu results from tofu-maker.",
+        "operationId": "getBatchTaskResults",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuDeployWithScriptsRequest"
+                "type": "array",
+                "description": "List of request IDs",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
               }
             }
           },
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReFetchResult"
+                  }
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -89,6 +97,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -98,13 +116,74 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/tofu-maker/scripts/validate": {
+      "post": {
+        "tags": [
+          "OpenTofuFromScripts"
+        ],
+        "description": "Deploy resources via OpenTofu",
+        "operationId": "validateWithScripts",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuDeployWithScriptsRequest"
+              }
+            }
           },
+          "required": true
+        },
+        "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OpenTofuValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -130,18 +209,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuPlan"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -160,8 +239,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -170,12 +249,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuPlan"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -201,18 +280,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -231,8 +310,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -241,12 +320,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -272,18 +351,11 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -302,6 +374,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -311,9 +393,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -336,18 +415,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -366,8 +445,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -376,12 +455,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -407,18 +486,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -437,8 +516,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -447,12 +526,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -478,18 +557,11 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -508,6 +580,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -517,9 +599,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -542,18 +621,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuValidationResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -572,8 +651,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -582,12 +661,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuValidationResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -613,18 +692,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuPlan"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -643,8 +722,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -653,12 +732,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuPlan"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -684,18 +763,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -714,8 +793,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -724,12 +803,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -755,18 +834,11 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -785,6 +857,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -794,9 +876,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -819,18 +898,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -849,8 +928,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -859,12 +938,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -890,18 +969,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -920,8 +999,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -930,12 +1009,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -961,18 +1040,11 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -991,6 +1063,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1000,9 +1082,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1036,18 +1115,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuPlan"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1066,8 +1145,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1076,12 +1155,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuPlan"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1118,18 +1197,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1148,8 +1227,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1158,12 +1237,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1200,18 +1279,11 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1230,6 +1302,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1239,9 +1321,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1275,18 +1354,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1305,8 +1384,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1315,12 +1394,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1357,18 +1436,11 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1387,6 +1459,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1396,9 +1478,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1417,23 +1496,24 @@
             "description": "id of the request",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/ReFetchResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1452,8 +1532,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1462,12 +1542,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1483,18 +1563,18 @@
         "description": "Check health of OpenTofu Maker API service",
         "operationId": "healthCheck",
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuMakerSystemStatus"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1513,8 +1593,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1523,12 +1603,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuMakerSystemStatus"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1565,18 +1645,18 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuValidationResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1595,8 +1675,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1605,12 +1685,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuValidationResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1636,18 +1716,11 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1666,6 +1739,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1675,9 +1758,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1700,18 +1780,11 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1730,6 +1803,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1739,9 +1822,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1775,18 +1855,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "Bad Request",
+          "200": {
+            "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Response"
+                  "$ref": "#/components/schemas/OpenTofuResult"
                 }
               }
             }
           },
-          "502": {
-            "description": "Bad Gateway",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "*/*": {
                 "schema": {
@@ -1805,8 +1885,8 @@
               }
             }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1815,12 +1895,12 @@
               }
             }
           },
-          "200": {
-            "description": "OK",
+          "503": {
+            "description": "Service Unavailable",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuResult"
+                  "$ref": "#/components/schemas/Response"
                 }
               }
             }
@@ -1857,18 +1937,11 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted"
+          },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1887,6 +1960,16 @@
               }
             }
           },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Service Unavailable",
             "content": {
@@ -1896,9 +1979,6 @@
                 }
               }
             }
-          },
-          "202": {
-            "description": "Accepted"
           }
         }
       }
@@ -1941,6 +2021,74 @@
           "details",
           "resultType",
           "success"
+        ]
+      },
+      "OpenTofuResult": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Id of the request."
+          },
+          "commandStdOutput": {
+            "type": "string",
+            "description": "stdout of the command returned as string."
+          },
+          "commandStdError": {
+            "type": "string",
+            "description": "stderr of the command returned as string."
+          },
+          "terraformState": {
+            "type": "string",
+            "description": ".tfstate file contents returned as string."
+          },
+          "generatedFileContentMap": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Data of all other files generated by the openTofu execution.The map key contains the file name and value is the file contents as string."
+          },
+          "openTofuVersionUsed": {
+            "type": "string",
+            "description": "The version of the OpenTofu binary used to execute scripts."
+          },
+          "commandSuccessful": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ReFetchResult": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Id of the request order."
+          },
+          "state": {
+            "type": "string",
+            "description": "State of the re-fetching result of order.",
+            "enum": [
+              "OK",
+              "OrderInProgress",
+              "ResultNotFound",
+              "ResultParseFailed"
+            ]
+          },
+          "openTofuResult": {
+            "$ref": "#/components/schemas/OpenTofuResult",
+            "description": "Result of the service order executed by open tofu."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Error message of the re-fetching result of order."
+          }
+        },
+        "required": [
+          "requestId",
+          "state"
         ]
       },
       "OpenTofuDeployWithScriptsRequest": {
@@ -2128,42 +2276,6 @@
           "tfState",
           "variables"
         ]
-      },
-      "OpenTofuResult": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "commandStdOutput": {
-            "type": "string",
-            "description": "stdout of the command returned as string."
-          },
-          "commandStdError": {
-            "type": "string",
-            "description": "stderr of the command returned as string."
-          },
-          "terraformState": {
-            "type": "string",
-            "description": ".tfstate file contents returned as string."
-          },
-          "generatedFileContentMap": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Data of all other files generated by the openTofu execution.The map key contains the file name and value is the file contents as string."
-          },
-          "openTofuVersionUsed": {
-            "type": "string",
-            "description": "The version of the OpenTofu binary used to execute scripts."
-          },
-          "commandSuccessful": {
-            "type": "boolean"
-          }
-        }
       },
       "OpenTofuAsyncModifyFromScriptsRequest": {
         "type": "object",
