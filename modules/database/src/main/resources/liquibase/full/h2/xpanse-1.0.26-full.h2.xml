@@ -1,0 +1,393 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ SPDX-FileCopyrightText: Huawei Inc.
+  ~
+  -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="swaroop.ar" id="1741667199958-1">
+        <createTable tableName="SERVICE_CHANGE_REQUEST">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_C"/>
+            </column>
+            <column name="CREATED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="LAST_MODIFIED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="CHANGE_HANDLER" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORIGINAL_REQUEST_PROPERTIES" type="JSON(1000000000)"/>
+            <column name="PROPERTIES" type="JSON(1000000000)"/>
+            <column name="RESOURCENAME" type="VARCHAR(255)"/>
+            <column name="RESULTMESSAGE" type="VARCHAR(255)"/>
+            <column name="STATUS" type="ENUM('PENDING', 'PROCESSING', 'SUCCESSFUL', 'ERROR')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TASK_RESULT" type="JSON(1000000000)"/>
+            <column name="SERVICE_ID" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORDER_ID" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-2">
+        <createTable tableName="SERVICE_CONFIGURATION">
+            <column name="SERVICE_ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_A"/>
+            </column>
+            <column name="CONFIGURATION" type="JSON(1000000000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="UPDATED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-3">
+        <createTable tableName="SERVICE_DEPLOYMENT">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_A2"/>
+            </column>
+            <column name="CREATED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="LAST_MODIFIED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="AVAILABILITY_ZONES" type="JSON(1000000000)"/>
+            <column name="BILLING_MODE" type="ENUM('FIXED', 'PAY_PER_USE')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CATEGORY" type="ENUM('AI', 'COMPUTE', 'CONTAINER', 'STORAGE', 'NETWORK', 'DATABASE', 'MEDIA_SERVICE', 'SECURITY', 'MIDDLEWARE', 'OTHERS')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CSP" type="ENUM('HUAWEI_CLOUD', 'FLEXIBLE_ENGINE', 'OPENSTACK_TESTLAB', 'PLUS_SERVER', 'REGIO_CLOUD', 'ALIBABA_CLOUD', 'AWS', 'AZURE', 'GCP')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CUSTOMER_SERVICE_NAME" type="VARCHAR(255)"/>
+            <column name="FLAVOR" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="IS_EULA_ACCEPTED" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LAST_STARTED_AT" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="LAST_STOPPED_AT" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="LOCK_CONFIG" type="JSON(1000000000)"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="REGION" type="JSON(1000000000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_DEPLOYMENT_STATE" type="ENUM('DEPLOYING', 'DEPLOY_SUCCESS', 'DEPLOY_FAILED', 'DESTROYING', 'DESTROY_SUCCESS', 'DESTROY_FAILED', 'MANUAL_CLEANUP_REQUIRED', 'ROLLBACK_FAILED', 'MODIFYING', 'MODIFICATION_FAILED', 'MODIFICATION_SUCCESSFUL')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_HOSTING_TYPE" type="ENUM('SELF', 'SERVICE_VENDOR')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_STATE" type="ENUM('NOT_RUNNING', 'RUNNING', 'STARTING', 'STOPPING', 'STOPPED', 'RESTARTING')"/>
+            <column name="SERVICE_VENDOR" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="USER_ID" type="VARCHAR(255)"/>
+            <column name="VERSION" type="VARCHAR(255)"/>
+            <column name="SERVICE_TEMPLATE_ID" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-4">
+        <createTable tableName="SERVICE_DEPLOYMENT_GENERATED_FILES">
+            <column name="SERVICE_ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_2"/>
+            </column>
+            <column name="P_VALUE" type="CHARACTER LARGE OBJECT"/>
+            <column name="P_KEY" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_2"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-5">
+        <createTable tableName="SERVICE_DEPLOYMENT_INPUT">
+            <column name="SERVICE_ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_9"/>
+            </column>
+            <column name="P_VALUE" type="VARCHAR(255)"/>
+            <column name="P_KEY" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_9"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-6">
+        <createTable tableName="SERVICE_DEPLOYMENT_OUTPUT">
+            <column name="SERVICE_ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_8"/>
+            </column>
+            <column name="P_VALUE" type="CHARACTER LARGE OBJECT"/>
+            <column name="P_KEY" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_8"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-7">
+        <createTable tableName="SERVICE_ORDER">
+            <column name="ORDER_ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_89"/>
+            </column>
+            <column name="COMPLETED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="ERROR" type="JSON(1000000000)"/>
+            <column name="HANDLER" type="ENUM('TERRAFORM_LOCAL', 'TERRA_BOOT', 'OPEN_TOFU_LOCAL', 'TOFU_MAKER', 'INTERNAL', 'WORKFLOW', 'AGENT', 'PLUGIN')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORDER_STATUS" type="ENUM('CREATED', 'IN_PROGRESS', 'SUCCESSFUL', 'FAILED')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORIGINAL_SERVICE_ID" type="UUID"/>
+            <column name="PARENT_ORDER_ID" type="UUID"/>
+            <column name="REQUEST_BODY" type="JSON(1000000000)"/>
+            <column name="RESULT_PROPERTIES" type="JSON(1000000000)"/>
+            <column name="STARTED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="TASK_TYPE" type="ENUM('DEPLOY', 'RETRY', 'ROLLBACK', 'MODIFY', 'DESTROY', 'PORT', 'RECREATE', 'LOCK_CHANGE', 'CONFIG_CHANGE', 'SERVICE_ACTION', 'PURGE', 'SERVICE_START', 'SERVICE_STOP', 'SERVICE_RESTART')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="USER_ID" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="WORKFLOW_ID" type="VARCHAR(255)"/>
+            <column name="SERVICE_ID" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-8">
+        <createTable tableName="SERVICE_POLICY">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_A4"/>
+            </column>
+            <column name="CREATED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="LAST_MODIFIED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column defaultValueBoolean="true" name="ENABLED" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="FLAVOR_NAMES" type="VARCHAR(255)"/>
+            <column name="POLICY" type="CHARACTER LARGE OBJECT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_TEMPLATE_ID" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-9">
+        <createTable tableName="SERVICE_RESOURCE">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_F"/>
+            </column>
+            <column name="CREATED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="LAST_MODIFIED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="GROUP_NAME" type="VARCHAR(255)"/>
+            <column name="GROUP_TYPE" type="VARCHAR(255)"/>
+            <column name="RESOURCE_ID" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="RESOURCE_KIND" type="ENUM('VM', 'CONTAINER', 'PUBLIC_IP', 'VPC', 'VOLUME', 'UNKNOWN', 'SECURITY_GROUP', 'SECURITY_GROUP_RULE', 'KEYPAIR', 'SUBNET')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="RESOURCE_NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_ID" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-10">
+        <createTable tableName="SERVICE_RESOURCE_PROPERTY">
+            <column name="RESOURCE_ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_3"/>
+            </column>
+            <column name="P_VALUE" type="CHARACTER LARGE OBJECT"/>
+            <column name="P_KEY" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_3"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-11">
+        <createTable tableName="SERVICE_TEMPLATE">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_B"/>
+            </column>
+            <column name="CREATED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="LAST_MODIFIED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="CATEGORY" type="ENUM('AI', 'COMPUTE', 'CONTAINER', 'STORAGE', 'NETWORK', 'DATABASE', 'MEDIA_SERVICE', 'SECURITY', 'MIDDLEWARE', 'OTHERS')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CSP" type="ENUM('HUAWEI_CLOUD', 'FLEXIBLE_ENGINE', 'OPENSTACK_TESTLAB', 'PLUS_SERVER', 'REGIO_CLOUD', 'ALIBABA_CLOUD', 'AWS', 'AZURE', 'GCP')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="IS_AVAILABLE_IN_CATALOG" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="IS_REVIEW_IN_PROGRESS" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_VARIABLES_JSON_SCHEMA" type="JSON(1000000000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="OCL" type="JSON(1000000000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_HOSTING_TYPE" type="ENUM('SELF', 'SERVICE_VENDOR')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_PROVIDER_CONTACT_DETAILS" type="JSON(1000000000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_TEMPLATE_REGISTRATION_STATE" type="ENUM('IN_REVIEW', 'APPROVED', 'CANCELLED', 'REJECTED')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_VENDOR" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="VERSION" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-12">
+        <createTable tableName="SERVICE_TEMPLATE_REQUEST_HISTORY">
+            <column name="REQUEST_ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_B9"/>
+            </column>
+            <column name="CREATED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="LAST_MODIFIED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="BLOCK_TEMPLATE_UNTIL_REVIEWED" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERVICE_TEMPLATE_REQUEST" type="JSON(1000000000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATUS" type="ENUM('IN_REVIEW', 'ACCEPTED', 'REJECTED', 'CANCELLED')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="REQUEST_TYPE" type="ENUM('REGISTER', 'UPDATE', 'UNPUBLISH', 'REPUBLISH')">
+                <constraints nullable="false"/>
+            </column>
+            <column name="REVIEW_COMMENT" type="CHARACTER LARGE OBJECT"/>
+            <column name="SERVICE_TEMPLATE_ID" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-13">
+        <createTable tableName="USER_POLICY">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="CONSTRAINT_E"/>
+            </column>
+            <column name="CREATED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="LAST_MODIFIED_TIME" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="CSP" type="ENUM('HUAWEI_CLOUD', 'FLEXIBLE_ENGINE', 'OPENSTACK_TESTLAB', 'PLUS_SERVER', 'REGIO_CLOUD', 'ALIBABA_CLOUD', 'AWS', 'AZURE', 'GCP')">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="true" name="ENABLED" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="POLICY" type="CHARACTER LARGE OBJECT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="USER_ID" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-14">
+        <addUniqueConstraint columnNames="NAME, VERSION, CSP, CATEGORY, SERVICE_HOSTING_TYPE" constraintName="UK_NAME_VERSION_CSP_CATEGORY_SERVICE_HOSTING_TYPE" tableName="SERVICE_TEMPLATE"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-15">
+        <createIndex associatedWith="" indexName="FK_SERVICE_DEPLOYMENT_SERVICE_CHANGE_REQUEST_INDEX_E" tableName="SERVICE_CHANGE_REQUEST">
+            <column name="SERVICE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-16">
+        <createIndex associatedWith="" indexName="FK_SERVICE_DEPLOYMENT_SERVICE_DEPLOYMENT_GENERATED_FILES_INDEX_2" tableName="SERVICE_DEPLOYMENT_GENERATED_FILES">
+            <column name="SERVICE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-17">
+        <createIndex associatedWith="" indexName="FK_SERVICE_DEPLOYMENT_SERVICE_DEPLOYMENT_INPUT_INDEX_9" tableName="SERVICE_DEPLOYMENT_INPUT">
+            <column name="SERVICE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-18">
+        <createIndex associatedWith="" indexName="FK_SERVICE_DEPLOYMENT_SERVICE_DEPLOYMENT_OUTPUT_INDEX_8" tableName="SERVICE_DEPLOYMENT_OUTPUT">
+            <column name="SERVICE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-19">
+        <createIndex associatedWith="" indexName="FK_SERVICE_DEPLOYMENT_SERVICE_ORDER_INDEX_3" tableName="SERVICE_ORDER">
+            <column name="SERVICE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-20">
+        <createIndex associatedWith="" indexName="FK_SERVICE_DEPLOYMENT_SERVICE_RESOURCE_INDEX_C" tableName="SERVICE_RESOURCE">
+            <column name="SERVICE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-21">
+        <createIndex associatedWith="" indexName="FK_SERVICE_ORDER_SERVICE_CHANGE_REQUEST_INDEX_E" tableName="SERVICE_CHANGE_REQUEST">
+            <column name="ORDER_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-22">
+        <createIndex associatedWith="" indexName="FK_SERVICE_RESOURCE_SERVICE_RESOURCE_PROPERTY_INDEX_3" tableName="SERVICE_RESOURCE_PROPERTY">
+            <column name="RESOURCE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-23">
+        <createIndex associatedWith="" indexName="FK_SERVICE_TEMPLATE_SERVICE_DEPLOYMENT_INDEX_E" tableName="SERVICE_DEPLOYMENT">
+            <column name="SERVICE_TEMPLATE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-24">
+        <createIndex associatedWith="" indexName="FK_SERVICE_TEMPLATE_SERVICE_POLICY_INDEX_A" tableName="SERVICE_POLICY">
+            <column name="SERVICE_TEMPLATE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-25">
+        <createIndex associatedWith="" indexName="FK_SERVICE_TEMPLATE_SERVICE_TEMPLATE_REQUEST_HISTORY_INDEX_8" tableName="SERVICE_TEMPLATE_REQUEST_HISTORY">
+            <column name="SERVICE_TEMPLATE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-26">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_CHANGE_REQUEST" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_CHANGE_REQUEST" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-27">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_CONFIGURATION" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_CONFIGURATION" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-28">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_DEPLOYMENT_GENERATED_FILES" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_DEPLOYMENT_GENERATED_FILES" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-29">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_DEPLOYMENT_INPUT" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_DEPLOYMENT_INPUT" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-30">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_DEPLOYMENT_OUTPUT" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_DEPLOYMENT_OUTPUT" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-31">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_ORDER" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_ORDER" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-32">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_RESOURCE" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_RESOURCE" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-33">
+        <addForeignKeyConstraint baseColumnNames="ORDER_ID" baseTableName="SERVICE_CHANGE_REQUEST" constraintName="FK_SERVICE_ORDER_SERVICE_CHANGE_REQUEST" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ORDER_ID" referencedTableName="SERVICE_ORDER" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-34">
+        <addForeignKeyConstraint baseColumnNames="RESOURCE_ID" baseTableName="SERVICE_RESOURCE_PROPERTY" constraintName="FK_SERVICE_RESOURCE_SERVICE_RESOURCE_PROPERTY" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_RESOURCE" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-35">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_TEMPLATE_ID" baseTableName="SERVICE_DEPLOYMENT" constraintName="FK_SERVICE_TEMPLATE_SERVICE_DEPLOYMENT" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_TEMPLATE" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-36">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_TEMPLATE_ID" baseTableName="SERVICE_POLICY" constraintName="FK_SERVICE_TEMPLATE_SERVICE_POLICY" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_TEMPLATE" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667199958-37">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_TEMPLATE_ID" baseTableName="SERVICE_TEMPLATE_REQUEST_HISTORY" constraintName="FK_SERVICE_TEMPLATE_SERVICE_TEMPLATE_REQUEST_HISTORY" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_TEMPLATE" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
