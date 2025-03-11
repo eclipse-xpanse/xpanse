@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>modules</artifactId>
-        <version>1.0.26</version>
+        <version>1.0.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
