@@ -23,7 +23,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableCaching
 @EnableRetry
 @EnableAsync(proxyTargetClass = true)
-@EnableJpaRepositories(basePackages = "org.eclipse.xpanse")
+@EnableJpaRepositories(
+        basePackages = "org.eclipse.xpanse",
+        entityManagerFactoryRef = "entityManagerFactory",
+        transactionManagerRef = "transactionManager")
 @EntityScan(basePackages = "org.eclipse.xpanse")
 @ComponentScan(basePackages = "org.eclipse.xpanse")
 @EnableJpaAuditing(dateTimeProviderRef = "auditDateTimeProviderConfig")
