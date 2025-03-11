@@ -33,8 +33,15 @@ public abstract class AbstractMysqlIntegrationTest extends ZitadelTestContainer 
 
     @DynamicPropertySource
     static void props(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.jdbcUrl", mysqlContainer::getJdbcUrl);
         registry.add("spring.datasource.username", mysqlContainer::getUsername);
         registry.add("spring.datasource.password", mysqlContainer::getPassword);
+    }
+
+    @DynamicPropertySource
+    static void activitiProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.activiti.datasource.jdbcUrl", mysqlContainer::getJdbcUrl);
+        registry.add("spring.activiti.datasource.username", mysqlContainer::getUsername);
+        registry.add("spring.activiti.datasource.password", mysqlContainer::getPassword);
     }
 }

@@ -25,22 +25,20 @@ import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionManager;
 
 /** Activiti configuration class. */
 @Configuration
 public class ActivitiConfig {
-
-    private final DataSource dataSource;
-
-    private final TransactionManager transactionManager;
 
     private final ApplicationContext applicationContext;
 
@@ -49,13 +47,19 @@ public class ActivitiConfig {
 
     /** constructor for ActivitiConfig bean. */
     @Autowired
-    public ActivitiConfig(
-            DataSource dataSource,
-            TransactionManager transactionManager,
-            ApplicationContext applicationContext) {
-        this.dataSource = dataSource;
-        this.transactionManager = transactionManager;
+    public ActivitiConfig(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+    }
+
+    @Bean(name = "activitiDataSource")
+    @ConfigurationProperties(prefix = "spring.activiti.datasource")
+    public DataSource activitiDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean(name = "activitiTransactionManager")
+    public PlatformTransactionManager activitiTransactionManager() {
+        return new DataSourceTransactionManager(activitiDataSource());
     }
 
     /** Create ProcessEngineConfiguration object into SpringIoc. */
@@ -64,9 +68,8 @@ public class ActivitiConfig {
         SpringProcessEngineConfiguration springProcessEngineConfiguration =
                 new SpringProcessEngineConfiguration();
         springProcessEngineConfiguration.setIdGenerator(strongUuidGenerator());
-        springProcessEngineConfiguration.setDataSource(dataSource);
-        springProcessEngineConfiguration.setTransactionManager(
-                (PlatformTransactionManager) transactionManager);
+        springProcessEngineConfiguration.setDataSource(activitiDataSource());
+        springProcessEngineConfiguration.setTransactionManager(activitiTransactionManager());
         springProcessEngineConfiguration.setDatabaseSchemaUpdate("true");
         springProcessEngineConfiguration.setDeploymentMode("single-resource");
         Resource[] resources =
