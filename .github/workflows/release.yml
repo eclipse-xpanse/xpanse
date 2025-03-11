@@ -98,9 +98,9 @@ jobs:
         with:
           files: >
             modules/database/src/main/resources/liquibase/full/mysql/xpanse-${{steps.new_version.outputs.next-version}}-full.mysql.xml,
-            modules/database/src/main/resources/liquibase/full/mysql/xpanse-${{steps.new_version.outputs.next-version}}-full.h2.xml,
+            modules/database/src/main/resources/liquibase/full/h2/xpanse-${{steps.new_version.outputs.next-version}}-full.h2.xml,
             modules/database/src/main/resources/liquibase/upgrades/mysql/xpanse-${{ env.CURRENT_VERSION }}-to-${{steps.new_version.outputs.next-version}}-upgrade.mysql.xml,
-            modules/database/src/main/resources/liquibase/upgrades/mysql/xpanse-${{ env.CURRENT_VERSION }}-to-${{steps.new_version.outputs.next-version}}-upgrade.h2.xml
+            modules/database/src/main/resources/liquibase/upgrades/h2/xpanse-${{ env.CURRENT_VERSION }}-to-${{steps.new_version.outputs.next-version}}-upgrade.h2.xml
           fail: true
           ignore_case: 'false'
 

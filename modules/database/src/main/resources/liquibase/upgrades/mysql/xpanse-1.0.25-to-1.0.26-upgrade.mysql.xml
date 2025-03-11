@@ -1,0 +1,212 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ SPDX-FileCopyrightText: Huawei Inc.
+  ~
+  -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="swaroop.ar" id="1741667557051-28">
+        <dropForeignKeyConstraint baseTableName="SERVICE_CHANGE_DETAILS" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_CHANGE_DETAILS"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-29">
+        <dropForeignKeyConstraint baseTableName="SERVICE_CHANGE_DETAILS" constraintName="FK_SERVICE_ORDER_SERVICE_CHANGE_DETAILS"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-2">
+        <createTable tableName="SERVICE_CHANGE_REQUEST">
+            <column name="ID" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="CREATED_TIME" type="datetime(6)"/>
+            <column name="LAST_MODIFIED_TIME" type="datetime(6)"/>
+            <column name="CHANGE_HANDLER" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORIGINAL_REQUEST_PROPERTIES" type="JSON"/>
+            <column name="PROPERTIES" type="JSON"/>
+            <column name="RESOURCENAME" type="VARCHAR(255)"/>
+            <column name="RESULTMESSAGE" type="VARCHAR(255)"/>
+            <column name="STATUS" type="ENUM('PENDING', 'PROCESSING', 'SUCCESSFUL', 'ERROR')"/>
+            <column name="TASK_RESULT" type="JSON"/>
+            <column name="SERVICE_ID" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORDER_ID" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-3">
+        <createTable tableName="SERVICE_DEPLOYMENT_INPUT">
+            <column name="SERVICE_ID" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="P_VALUE" type="VARCHAR(255)"/>
+            <column name="P_KEY" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-4">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="CREATED_TIME" type="datetime(6)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-5">
+        <addColumn tableName="SERVICE_POLICY">
+            <column name="CREATED_TIME" type="datetime(6)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-6">
+        <addColumn tableName="SERVICE_RESOURCE">
+            <column name="CREATED_TIME" type="datetime(6)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-7">
+        <addColumn tableName="SERVICE_TEMPLATE">
+            <column name="CREATED_TIME" type="datetime(6)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-8">
+        <addColumn tableName="SERVICE_TEMPLATE_REQUEST_HISTORY">
+            <column name="CREATED_TIME" type="datetime(6)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-9">
+        <addColumn tableName="USER_POLICY">
+            <column name="CREATED_TIME" type="datetime(6)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-10">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="AVAILABILITY_ZONES" type="JSON"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-11">
+        <addColumn tableName="SERVICE_ORDER">
+            <column name="HANDLER" type="ENUM('TERRAFORM_LOCAL', 'TERRA_BOOT', 'OPEN_TOFU_LOCAL', 'TOFU_MAKER', 'INTERNAL', 'WORKFLOW', 'AGENT', 'PLUGIN')"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-12">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="BILLING_MODE" type="ENUM('FIXED', 'PAY_PER_USE')"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-13">
+        <addColumn tableName="SERVICE_ORDER">
+            <column name="ORDER_STATUS" type="ENUM('CREATED', 'IN_PROGRESS', 'SUCCESSFUL', 'FAILED')"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-14">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="CUSTOMER_SERVICE_NAME" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-15">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="IS_EULA_ACCEPTED" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-16">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="LOCK_CONFIG" type="JSON"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-17">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="REGION" type="JSON">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-18">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="SERVICE_HOSTING_TYPE" type="ENUM('SELF', 'SERVICE_VENDOR')"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-19">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="SERVICE_VENDOR" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-20">
+        <addColumn tableName="SERVICE_DEPLOYMENT">
+            <column name="USER_ID" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-21">
+        <createIndex associatedWith="" indexName="FK_SERVICE_DEPLOYMENT_SERVICE_CHANGE_REQUEST" tableName="SERVICE_CHANGE_REQUEST">
+            <column name="SERVICE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-22">
+        <createIndex associatedWith="" indexName="FK_SERVICE_ORDER_SERVICE_CHANGE_REQUEST" tableName="SERVICE_CHANGE_REQUEST">
+            <column name="ORDER_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-23">
+        <createIndex associatedWith="" indexName="FK_SERVICE_TEMPLATE_SERVICE_DEPLOYMENT" tableName="SERVICE_DEPLOYMENT">
+            <column name="SERVICE_TEMPLATE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-24">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_CHANGE_REQUEST" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_CHANGE_REQUEST" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-25">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_DEPLOYMENT_INPUT" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_DEPLOYMENT_INPUT" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-26">
+        <addForeignKeyConstraint baseColumnNames="ORDER_ID" baseTableName="SERVICE_CHANGE_REQUEST" constraintName="FK_SERVICE_ORDER_SERVICE_CHANGE_REQUEST" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="RESTRICT" referencedColumnNames="ORDER_ID" referencedTableName="SERVICE_ORDER" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-27">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_TEMPLATE_ID" baseTableName="SERVICE_DEPLOYMENT" constraintName="FK_SERVICE_TEMPLATE_SERVICE_DEPLOYMENT" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_TEMPLATE" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-30">
+        <dropTable tableName="SERVICE_CHANGE_DETAILS"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-31">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-32">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_POLICY"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-33">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_RESOURCE"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-34">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_TEMPLATE"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-35">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_TEMPLATE_REQUEST_HISTORY"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-36">
+        <dropColumn columnName="CREATE_TIME" tableName="USER_POLICY"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-37">
+        <dropColumn columnName="CUSTOMERSERVICENAME" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-38">
+        <dropColumn columnName="DEPLOYREQUEST" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-39">
+        <dropColumn columnName="LOCKCONFIG" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-40">
+        <dropColumn columnName="RESULT_MESSAGE" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-41">
+        <dropColumn columnName="SERVICEVENDOR" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-42">
+        <dropColumn columnName="TASK_STATUS" tableName="SERVICE_ORDER"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-43">
+        <dropColumn columnName="USERID" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop.ar" id="1741667557051-1">
+        <addNotNullConstraint columnDataType="boolean" columnName="ENABLED" tableName="SERVICE_POLICY" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
