@@ -37,6 +37,7 @@ class OclTest {
     @Mock private ServiceProviderContactDetails serviceProviderContactDetails;
     @Mock private ServiceChangeManage serviceConfigurationManage;
     @Mock private List<ServiceAction> serviceActions;
+    @Mock private List<ServiceObject> serviceObjects;
 
     private Ocl ocl;
 
@@ -59,6 +60,7 @@ class OclTest {
         ocl.setServiceProviderContactDetails(serviceProviderContactDetails);
         ocl.setServiceConfigurationManage(serviceConfigurationManage);
         ocl.setServiceActions(serviceActions);
+        ocl.setServiceObjects(serviceObjects);
     }
 
     @Test
@@ -79,6 +81,7 @@ class OclTest {
         assertEquals(eula, ocl.getEula());
         assertEquals(serviceConfigurationManage, ocl.getServiceConfigurationManage());
         assertEquals(serviceActions, ocl.getServiceActions());
+        assertEquals(serviceObjects, ocl.getServiceObjects());
     }
 
     @Test
@@ -134,6 +137,9 @@ class OclTest {
                         + ", "
                         + "serviceActions="
                         + serviceActions
+                        + ", "
+                        + "serviceObjects="
+                        + serviceObjects
                         + ")";
         assertEquals(expectedString, ocl.toString());
     }
