@@ -111,4 +111,7 @@ public class Ocl implements Serializable {
 
     @Schema(description = "manage service action.")
     private List<ServiceAction> serviceActions;
+
+    @Schema(description = "manage service object.")
+    private List<ServiceObject> serviceObjects;
 }

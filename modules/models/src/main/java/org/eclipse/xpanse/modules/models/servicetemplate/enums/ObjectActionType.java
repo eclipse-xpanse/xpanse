@@ -10,32 +10,31 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/** Variable data types. */
-public enum VariableDataType {
-    STRING("string"),
-    NUMBER("number"),
-    BOOLEAN("boolean"),
-    ARRAY("array");
+/** Defines the tool of service object manage. */
+public enum ObjectActionType {
+    CREATE("create"),
+    UPDATE("update"),
+    DELETE("delete");
 
     private final String type;
 
-    VariableDataType(String type) {
+    ObjectActionType(String type) {
         this.type = type;
     }
 
-    /** For VariableKind serialize. */
+    /** For ObjectActionType serialize. */
     @JsonCreator
-    public VariableDataType getByValue(String type) {
-        for (VariableDataType variableDataType : values()) {
-            if (StringUtils.equalsIgnoreCase(variableDataType.type, type)) {
-                return variableDataType;
+    public static ObjectActionType getByValue(String type) {
+        for (ObjectActionType kind : values()) {
+            if (kind.toValue().equals(StringUtils.lowerCase(type))) {
+                return kind;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("VariableDataType value %s is not supported.", type));
+                String.format("ObjectActionType value %s is not supported.", type));
     }
 
-    /** For VariableKind deserialize. */
+    /** For ObjectActionType deserialize. */
     @JsonValue
     public String toValue() {
         return this.type;
