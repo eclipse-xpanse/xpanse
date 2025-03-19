@@ -1,19 +1,14 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.ApiClient;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.BaseApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDeployFromDirectoryRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDestroyFromDirectoryRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncModifyFromDirectoryRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformDeployFromDirectoryRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformDestroyFromDirectoryRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformModifyFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncRequestWithScriptsDirectory;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformPlan;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformPlanFromDirectoryRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformRequestWithScriptsDirectory;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,18 +51,13 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncDeployFromDirectoryRequest (required)
+     * @param terraformAsyncRequestWithScriptsDirectory (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDeployFromDirectory(
-            String moduleDirectory,
-            TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest)
+            TerraformAsyncRequestWithScriptsDirectory terraformAsyncRequestWithScriptsDirectory)
             throws RestClientException {
-        asyncDeployFromDirectoryWithHttpInfo(
-                moduleDirectory, terraformAsyncDeployFromDirectoryRequest);
+        asyncDeployFromDirectoryWithHttpInfo(terraformAsyncRequestWithScriptsDirectory);
     }
 
     /**
@@ -81,38 +71,22 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncDeployFromDirectoryRequest (required)
+     * @param terraformAsyncRequestWithScriptsDirectory (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDeployFromDirectoryWithHttpInfo(
-            String moduleDirectory,
-            TerraformAsyncDeployFromDirectoryRequest terraformAsyncDeployFromDirectoryRequest)
+            TerraformAsyncRequestWithScriptsDirectory terraformAsyncRequestWithScriptsDirectory)
             throws RestClientException {
-        Object localVarPostBody = terraformAsyncDeployFromDirectoryRequest;
+        Object localVarPostBody = terraformAsyncRequestWithScriptsDirectory;
 
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
+        // verify the required parameter 'terraformAsyncRequestWithScriptsDirectory' is set
+        if (terraformAsyncRequestWithScriptsDirectory == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'moduleDirectory' when calling"
-                            + " asyncDeployFromDirectory");
+                    "Missing the required parameter 'terraformAsyncRequestWithScriptsDirectory'"
+                            + " when calling asyncDeployFromDirectory");
         }
-
-        // verify the required parameter 'terraformAsyncDeployFromDirectoryRequest' is set
-        if (terraformAsyncDeployFromDirectoryRequest == null) {
-            throw new HttpClientErrorException(
-                    HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformAsyncDeployFromDirectoryRequest' when"
-                            + " calling asyncDeployFromDirectory");
-        }
-
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
 
         final MultiValueMap<String, String> localVarQueryParams =
                 new LinkedMultiValueMap<String, String>();
@@ -133,9 +107,9 @@ public class TerraformFromDirectoryApi extends BaseApi {
         ParameterizedTypeReference<Void> localReturnType =
                 new ParameterizedTypeReference<Void>() {};
         return apiClient.invokeAPI(
-                "/terra-boot/directory/deploy/async/{module_directory}",
+                "/terra-boot/directory/deploy/async",
                 HttpMethod.POST,
-                uriVariables,
+                Collections.<String, Object>emptyMap(),
                 localVarQueryParams,
                 localVarPostBody,
                 localVarHeaderParams,
@@ -158,18 +132,13 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncDestroyFromDirectoryRequest (required)
+     * @param terraformAsyncRequestWithScriptsDirectory (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDestroyFromDirectory(
-            String moduleDirectory,
-            TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest)
+            TerraformAsyncRequestWithScriptsDirectory terraformAsyncRequestWithScriptsDirectory)
             throws RestClientException {
-        asyncDestroyFromDirectoryWithHttpInfo(
-                moduleDirectory, terraformAsyncDestroyFromDirectoryRequest);
+        asyncDestroyFromDirectoryWithHttpInfo(terraformAsyncRequestWithScriptsDirectory);
     }
 
     /**
@@ -183,38 +152,22 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncDestroyFromDirectoryRequest (required)
+     * @param terraformAsyncRequestWithScriptsDirectory (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDestroyFromDirectoryWithHttpInfo(
-            String moduleDirectory,
-            TerraformAsyncDestroyFromDirectoryRequest terraformAsyncDestroyFromDirectoryRequest)
+            TerraformAsyncRequestWithScriptsDirectory terraformAsyncRequestWithScriptsDirectory)
             throws RestClientException {
-        Object localVarPostBody = terraformAsyncDestroyFromDirectoryRequest;
+        Object localVarPostBody = terraformAsyncRequestWithScriptsDirectory;
 
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
+        // verify the required parameter 'terraformAsyncRequestWithScriptsDirectory' is set
+        if (terraformAsyncRequestWithScriptsDirectory == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'moduleDirectory' when calling"
-                            + " asyncDestroyFromDirectory");
-        }
-
-        // verify the required parameter 'terraformAsyncDestroyFromDirectoryRequest' is set
-        if (terraformAsyncDestroyFromDirectoryRequest == null) {
-            throw new HttpClientErrorException(
-                    HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformAsyncDestroyFromDirectoryRequest'"
+                    "Missing the required parameter 'terraformAsyncRequestWithScriptsDirectory'"
                             + " when calling asyncDestroyFromDirectory");
         }
-
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
 
         final MultiValueMap<String, String> localVarQueryParams =
                 new LinkedMultiValueMap<String, String>();
@@ -235,9 +188,9 @@ public class TerraformFromDirectoryApi extends BaseApi {
         ParameterizedTypeReference<Void> localReturnType =
                 new ParameterizedTypeReference<Void>() {};
         return apiClient.invokeAPI(
-                "/terra-boot/directory/destroy/async/{module_directory}",
+                "/terra-boot/directory/destroy/async",
                 HttpMethod.DELETE,
-                uriVariables,
+                Collections.<String, Object>emptyMap(),
                 localVarQueryParams,
                 localVarPostBody,
                 localVarHeaderParams,
@@ -260,18 +213,13 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncModifyFromDirectoryRequest (required)
+     * @param terraformAsyncRequestWithScriptsDirectory (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncModifyFromDirectory(
-            String moduleDirectory,
-            TerraformAsyncModifyFromDirectoryRequest terraformAsyncModifyFromDirectoryRequest)
+            TerraformAsyncRequestWithScriptsDirectory terraformAsyncRequestWithScriptsDirectory)
             throws RestClientException {
-        asyncModifyFromDirectoryWithHttpInfo(
-                moduleDirectory, terraformAsyncModifyFromDirectoryRequest);
+        asyncModifyFromDirectoryWithHttpInfo(terraformAsyncRequestWithScriptsDirectory);
     }
 
     /**
@@ -285,38 +233,22 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformAsyncModifyFromDirectoryRequest (required)
+     * @param terraformAsyncRequestWithScriptsDirectory (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncModifyFromDirectoryWithHttpInfo(
-            String moduleDirectory,
-            TerraformAsyncModifyFromDirectoryRequest terraformAsyncModifyFromDirectoryRequest)
+            TerraformAsyncRequestWithScriptsDirectory terraformAsyncRequestWithScriptsDirectory)
             throws RestClientException {
-        Object localVarPostBody = terraformAsyncModifyFromDirectoryRequest;
+        Object localVarPostBody = terraformAsyncRequestWithScriptsDirectory;
 
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
+        // verify the required parameter 'terraformAsyncRequestWithScriptsDirectory' is set
+        if (terraformAsyncRequestWithScriptsDirectory == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'moduleDirectory' when calling"
-                            + " asyncModifyFromDirectory");
+                    "Missing the required parameter 'terraformAsyncRequestWithScriptsDirectory'"
+                            + " when calling asyncModifyFromDirectory");
         }
-
-        // verify the required parameter 'terraformAsyncModifyFromDirectoryRequest' is set
-        if (terraformAsyncModifyFromDirectoryRequest == null) {
-            throw new HttpClientErrorException(
-                    HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformAsyncModifyFromDirectoryRequest' when"
-                            + " calling asyncModifyFromDirectory");
-        }
-
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
 
         final MultiValueMap<String, String> localVarQueryParams =
                 new LinkedMultiValueMap<String, String>();
@@ -337,9 +269,9 @@ public class TerraformFromDirectoryApi extends BaseApi {
         ParameterizedTypeReference<Void> localReturnType =
                 new ParameterizedTypeReference<Void>() {};
         return apiClient.invokeAPI(
-                "/terra-boot/directory/modify/async/{module_directory}",
+                "/terra-boot/directory/modify/async",
                 HttpMethod.POST,
-                uriVariables,
+                Collections.<String, Object>emptyMap(),
                 localVarQueryParams,
                 localVarPostBody,
                 localVarHeaderParams,
@@ -362,19 +294,14 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformDeployFromDirectoryRequest (required)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformResult deployFromDirectory(
-            String moduleDirectory,
-            TerraformDeployFromDirectoryRequest terraformDeployFromDirectoryRequest)
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
             throws RestClientException {
-        return deployFromDirectoryWithHttpInfo(moduleDirectory, terraformDeployFromDirectoryRequest)
-                .getBody();
+        return deployFromDirectoryWithHttpInfo(terraformRequestWithScriptsDirectory).getBody();
     }
 
     /**
@@ -388,38 +315,22 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformDeployFromDirectoryRequest (required)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformResult> deployFromDirectoryWithHttpInfo(
-            String moduleDirectory,
-            TerraformDeployFromDirectoryRequest terraformDeployFromDirectoryRequest)
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
             throws RestClientException {
-        Object localVarPostBody = terraformDeployFromDirectoryRequest;
+        Object localVarPostBody = terraformRequestWithScriptsDirectory;
 
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
+        // verify the required parameter 'terraformRequestWithScriptsDirectory' is set
+        if (terraformRequestWithScriptsDirectory == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'moduleDirectory' when calling"
-                            + " deployFromDirectory");
-        }
-
-        // verify the required parameter 'terraformDeployFromDirectoryRequest' is set
-        if (terraformDeployFromDirectoryRequest == null) {
-            throw new HttpClientErrorException(
-                    HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformDeployFromDirectoryRequest' when"
+                    "Missing the required parameter 'terraformRequestWithScriptsDirectory' when"
                             + " calling deployFromDirectory");
         }
-
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
 
         final MultiValueMap<String, String> localVarQueryParams =
                 new LinkedMultiValueMap<String, String>();
@@ -440,9 +351,9 @@ public class TerraformFromDirectoryApi extends BaseApi {
         ParameterizedTypeReference<TerraformResult> localReturnType =
                 new ParameterizedTypeReference<TerraformResult>() {};
         return apiClient.invokeAPI(
-                "/terra-boot/directory/deploy/{module_directory}",
+                "/terra-boot/directory/deploy",
                 HttpMethod.POST,
-                uriVariables,
+                Collections.<String, Object>emptyMap(),
                 localVarQueryParams,
                 localVarPostBody,
                 localVarHeaderParams,
@@ -465,20 +376,14 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformDestroyFromDirectoryRequest (required)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformResult destroyFromDirectory(
-            String moduleDirectory,
-            TerraformDestroyFromDirectoryRequest terraformDestroyFromDirectoryRequest)
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
             throws RestClientException {
-        return destroyFromDirectoryWithHttpInfo(
-                        moduleDirectory, terraformDestroyFromDirectoryRequest)
-                .getBody();
+        return destroyFromDirectoryWithHttpInfo(terraformRequestWithScriptsDirectory).getBody();
     }
 
     /**
@@ -492,38 +397,22 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformDestroyFromDirectoryRequest (required)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformResult> destroyFromDirectoryWithHttpInfo(
-            String moduleDirectory,
-            TerraformDestroyFromDirectoryRequest terraformDestroyFromDirectoryRequest)
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
             throws RestClientException {
-        Object localVarPostBody = terraformDestroyFromDirectoryRequest;
+        Object localVarPostBody = terraformRequestWithScriptsDirectory;
 
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
+        // verify the required parameter 'terraformRequestWithScriptsDirectory' is set
+        if (terraformRequestWithScriptsDirectory == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'moduleDirectory' when calling"
-                            + " destroyFromDirectory");
-        }
-
-        // verify the required parameter 'terraformDestroyFromDirectoryRequest' is set
-        if (terraformDestroyFromDirectoryRequest == null) {
-            throw new HttpClientErrorException(
-                    HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformDestroyFromDirectoryRequest' when"
+                    "Missing the required parameter 'terraformRequestWithScriptsDirectory' when"
                             + " calling destroyFromDirectory");
         }
-
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
 
         final MultiValueMap<String, String> localVarQueryParams =
                 new LinkedMultiValueMap<String, String>();
@@ -544,9 +433,9 @@ public class TerraformFromDirectoryApi extends BaseApi {
         ParameterizedTypeReference<TerraformResult> localReturnType =
                 new ParameterizedTypeReference<TerraformResult>() {};
         return apiClient.invokeAPI(
-                "/terra-boot/directory/destroy/{module_directory}",
+                "/terra-boot/directory/destroy",
                 HttpMethod.DELETE,
-                uriVariables,
+                Collections.<String, Object>emptyMap(),
                 localVarQueryParams,
                 localVarPostBody,
                 localVarHeaderParams,
@@ -569,19 +458,14 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformModifyFromDirectoryRequest (required)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformResult modifyFromDirectory(
-            String moduleDirectory,
-            TerraformModifyFromDirectoryRequest terraformModifyFromDirectoryRequest)
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
             throws RestClientException {
-        return modifyFromDirectoryWithHttpInfo(moduleDirectory, terraformModifyFromDirectoryRequest)
-                .getBody();
+        return modifyFromDirectoryWithHttpInfo(terraformRequestWithScriptsDirectory).getBody();
     }
 
     /**
@@ -595,38 +479,22 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformModifyFromDirectoryRequest (required)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformResult> modifyFromDirectoryWithHttpInfo(
-            String moduleDirectory,
-            TerraformModifyFromDirectoryRequest terraformModifyFromDirectoryRequest)
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
             throws RestClientException {
-        Object localVarPostBody = terraformModifyFromDirectoryRequest;
+        Object localVarPostBody = terraformRequestWithScriptsDirectory;
 
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
+        // verify the required parameter 'terraformRequestWithScriptsDirectory' is set
+        if (terraformRequestWithScriptsDirectory == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'moduleDirectory' when calling"
-                            + " modifyFromDirectory");
-        }
-
-        // verify the required parameter 'terraformModifyFromDirectoryRequest' is set
-        if (terraformModifyFromDirectoryRequest == null) {
-            throw new HttpClientErrorException(
-                    HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformModifyFromDirectoryRequest' when"
+                    "Missing the required parameter 'terraformRequestWithScriptsDirectory' when"
                             + " calling modifyFromDirectory");
         }
-
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
 
         final MultiValueMap<String, String> localVarQueryParams =
                 new LinkedMultiValueMap<String, String>();
@@ -647,9 +515,9 @@ public class TerraformFromDirectoryApi extends BaseApi {
         ParameterizedTypeReference<TerraformResult> localReturnType =
                 new ParameterizedTypeReference<TerraformResult>() {};
         return apiClient.invokeAPI(
-                "/terra-boot/directory/modify/{module_directory}",
+                "/terra-boot/directory/modify",
                 HttpMethod.POST,
-                uriVariables,
+                Collections.<String, Object>emptyMap(),
                 localVarQueryParams,
                 localVarPostBody,
                 localVarHeaderParams,
@@ -672,22 +540,14 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformPlanFromDirectoryRequest (required)
-     * @param xCustomRequestId (optional)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return TerraformPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformPlan plan(
-            String moduleDirectory,
-            TerraformPlanFromDirectoryRequest terraformPlanFromDirectoryRequest,
-            UUID xCustomRequestId)
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
             throws RestClientException {
-        return planWithHttpInfo(
-                        moduleDirectory, terraformPlanFromDirectoryRequest, xCustomRequestId)
-                .getBody();
+        return planWithHttpInfo(terraformRequestWithScriptsDirectory).getBody();
     }
 
     /**
@@ -701,39 +561,22 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformPlanFromDirectoryRequest (required)
-     * @param xCustomRequestId (optional)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return ResponseEntity&lt;TerraformPlan&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformPlan> planWithHttpInfo(
-            String moduleDirectory,
-            TerraformPlanFromDirectoryRequest terraformPlanFromDirectoryRequest,
-            UUID xCustomRequestId)
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
             throws RestClientException {
-        Object localVarPostBody = terraformPlanFromDirectoryRequest;
+        Object localVarPostBody = terraformRequestWithScriptsDirectory;
 
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
+        // verify the required parameter 'terraformRequestWithScriptsDirectory' is set
+        if (terraformRequestWithScriptsDirectory == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'moduleDirectory' when calling plan");
-        }
-
-        // verify the required parameter 'terraformPlanFromDirectoryRequest' is set
-        if (terraformPlanFromDirectoryRequest == null) {
-            throw new HttpClientErrorException(
-                    HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformPlanFromDirectoryRequest' when"
+                    "Missing the required parameter 'terraformRequestWithScriptsDirectory' when"
                             + " calling plan");
         }
-
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
 
         final MultiValueMap<String, String> localVarQueryParams =
                 new LinkedMultiValueMap<String, String>();
@@ -742,10 +585,6 @@ public class TerraformFromDirectoryApi extends BaseApi {
                 new LinkedMultiValueMap<String, String>();
         final MultiValueMap<String, Object> localVarFormParams =
                 new LinkedMultiValueMap<String, Object>();
-
-        if (xCustomRequestId != null)
-            localVarHeaderParams.add(
-                    "X-Custom-RequestId", apiClient.parameterToString(xCustomRequestId));
 
         final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
@@ -758,9 +597,9 @@ public class TerraformFromDirectoryApi extends BaseApi {
         ParameterizedTypeReference<TerraformPlan> localReturnType =
                 new ParameterizedTypeReference<TerraformPlan>() {};
         return apiClient.invokeAPI(
-                "/terra-boot/directory/plan/{module_directory}",
+                "/terra-boot/directory/plan",
                 HttpMethod.POST,
-                uriVariables,
+                Collections.<String, Object>emptyMap(),
                 localVarQueryParams,
                 localVarPostBody,
                 localVarHeaderParams,
@@ -783,16 +622,14 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformVersion version of Terraform to execute the module files. (required)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return TerraformValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformValidationResult validateFromDirectory(
-            String moduleDirectory, String terraformVersion) throws RestClientException {
-        return validateFromDirectoryWithHttpInfo(moduleDirectory, terraformVersion).getBody();
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
+            throws RestClientException {
+        return validateFromDirectoryWithHttpInfo(terraformRequestWithScriptsDirectory).getBody();
     }
 
     /**
@@ -806,37 +643,22 @@ public class TerraformFromDirectoryApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param moduleDirectory directory name where the Terraform module files exist. (required)
-     * @param terraformVersion version of Terraform to execute the module files. (required)
+     * @param terraformRequestWithScriptsDirectory (required)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformValidationResult> validateFromDirectoryWithHttpInfo(
-            String moduleDirectory, String terraformVersion) throws RestClientException {
-        Object localVarPostBody = null;
+            TerraformRequestWithScriptsDirectory terraformRequestWithScriptsDirectory)
+            throws RestClientException {
+        Object localVarPostBody = terraformRequestWithScriptsDirectory;
 
-        // verify the required parameter 'moduleDirectory' is set
-        if (moduleDirectory == null) {
+        // verify the required parameter 'terraformRequestWithScriptsDirectory' is set
+        if (terraformRequestWithScriptsDirectory == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'moduleDirectory' when calling"
-                            + " validateFromDirectory");
+                    "Missing the required parameter 'terraformRequestWithScriptsDirectory' when"
+                            + " calling validateFromDirectory");
         }
-
-        // verify the required parameter 'terraformVersion' is set
-        if (terraformVersion == null) {
-            throw new HttpClientErrorException(
-                    HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformVersion' when calling"
-                            + " validateFromDirectory");
-        }
-
-        // create path and map variables
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
-        uriVariables.put("module_directory", moduleDirectory);
-        uriVariables.put("terraform_version", terraformVersion);
 
         final MultiValueMap<String, String> localVarQueryParams =
                 new LinkedMultiValueMap<String, String>();
@@ -848,7 +670,7 @@ public class TerraformFromDirectoryApi extends BaseApi {
 
         final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        final String[] localVarContentTypes = {};
+        final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
                 apiClient.selectHeaderContentType(localVarContentTypes);
 
@@ -857,9 +679,9 @@ public class TerraformFromDirectoryApi extends BaseApi {
         ParameterizedTypeReference<TerraformValidationResult> localReturnType =
                 new ParameterizedTypeReference<TerraformValidationResult>() {};
         return apiClient.invokeAPI(
-                "/terra-boot/directory/validate/{module_directory}/{terraform_version}",
-                HttpMethod.GET,
-                uriVariables,
+                "/terra-boot/directory/validate",
+                HttpMethod.POST,
+                Collections.<String, Object>emptyMap(),
                 localVarQueryParams,
                 localVarPostBody,
                 localVarHeaderParams,
@@ -889,7 +711,7 @@ public class TerraformFromDirectoryApi extends BaseApi {
 
         final String[] localVarAccepts = {"application/json", "*/*"};
         final List<MediaType> localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        final String[] localVarContentTypes = {};
+        final String[] localVarContentTypes = {"application/json"};
         final MediaType localVarContentType =
                 apiClient.selectHeaderContentType(localVarContentTypes);
 

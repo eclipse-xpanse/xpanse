@@ -48,8 +48,6 @@ public class RetrieveTerraformResultApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
      * @param UUID (required)
      * @return List&lt;ReFetchResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -68,8 +66,6 @@ public class RetrieveTerraformResultApi extends BaseApi {
      * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>502</b> - Bad Gateway
-     *
-     * <p><b>503</b> - Service Unavailable
      *
      * @param UUID (required)
      * @return ResponseEntity&lt;List&lt;ReFetchResult&gt;&gt;
@@ -131,8 +127,6 @@ public class RetrieveTerraformResultApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
      * @param requestId id of the request (required)
      * @return ReFetchResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
@@ -152,8 +146,6 @@ public class RetrieveTerraformResultApi extends BaseApi {
      * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>502</b> - Bad Gateway
-     *
-     * <p><b>503</b> - Service Unavailable
      *
      * @param requestId id of the request (required)
      * @return ResponseEntity&lt;ReFetchResult&gt;

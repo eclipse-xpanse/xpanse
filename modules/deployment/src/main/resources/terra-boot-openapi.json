@@ -3,7 +3,7 @@
   "info": {
     "title": "Terra-Boot API",
     "description": "RESTful Services to interact with terraform CLI",
-    "version": "1.0.21-SNAPSHOT"
+    "version": "1.0.22-SNAPSHOT"
   },
   "servers": [
     {
@@ -106,16 +106,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -131,7 +121,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDeployWithScriptsRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScripts"
               }
             }
           },
@@ -170,16 +160,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -202,7 +182,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformPlanWithScriptsRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScripts"
               }
             }
           },
@@ -248,16 +228,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -273,7 +243,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformModifyWithScriptsRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScripts"
               }
             }
           },
@@ -312,16 +282,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -344,7 +304,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncModifyFromScriptsRequest"
+                "$ref": "#/components/schemas/TerraformAsyncRequestWithScripts"
               }
             }
           },
@@ -376,16 +336,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -408,7 +358,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDestroyWithScriptsRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScripts"
               }
             }
           },
@@ -447,16 +397,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -479,7 +419,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDeployWithScriptsRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScripts"
               }
             }
           },
@@ -525,16 +465,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -550,7 +480,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncDeployFromScriptsRequest"
+                "$ref": "#/components/schemas/TerraformAsyncRequestWithScripts"
               }
             }
           },
@@ -589,16 +519,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -614,7 +534,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDeployFromGitRepoRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsGitRepo"
               }
             }
           },
@@ -660,16 +580,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -685,7 +595,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformPlanFromGitRepoRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsGitRepo"
               }
             }
           },
@@ -724,16 +634,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -756,7 +656,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformModifyFromGitRepoRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsGitRepo"
               }
             }
           },
@@ -795,16 +695,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -827,7 +717,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncModifyFromGitRepoRequest"
+                "$ref": "#/components/schemas/TerraformAsyncRequestWithScriptsGitRepo"
               }
             }
           },
@@ -859,16 +749,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -891,7 +771,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDestroyFromGitRepoRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsGitRepo"
               }
             }
           },
@@ -930,16 +810,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -962,7 +832,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDeployFromGitRepoRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsGitRepo"
               }
             }
           },
@@ -1008,16 +878,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -1033,7 +893,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncDeployFromGitRepoRequest"
+                "$ref": "#/components/schemas/TerraformAsyncRequestWithScriptsGitRepo"
               }
             }
           },
@@ -1072,9 +932,60 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/terra-boot/directory/validate": {
+      "post": {
+        "tags": [
+          "TerraformFromDirectory"
+        ],
+        "description": "Validate the Terraform modules in the given directory.",
+        "operationId": "validateFromDirectory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsDirectory"
+              }
+            }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerraformValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1086,38 +997,18 @@
         }
       }
     },
-    "/terra-boot/directory/plan/{module_directory}": {
+    "/terra-boot/directory/plan": {
       "post": {
         "tags": [
           "TerraformFromDirectory"
         ],
         "description": "Get Terraform Plan as JSON string from the given directory.",
         "operationId": "plan",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Custom-RequestId",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformPlanFromDirectoryRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsDirectory"
               }
             }
           },
@@ -1163,43 +1054,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/terra-boot/directory/modify/{module_directory}": {
+    "/terra-boot/directory/modify": {
       "post": {
         "tags": [
           "TerraformFromDirectory"
         ],
         "description": "Modify resources via Terraform from the given directory.",
         "operationId": "modifyFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformModifyFromDirectoryRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsDirectory"
               }
             }
           },
@@ -1245,43 +1115,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/terra-boot/directory/modify/async/{module_directory}": {
+    "/terra-boot/directory/modify/async": {
       "post": {
         "tags": [
           "TerraformFromDirectory"
         ],
         "description": "async modify resources via Terraform from the given directory.",
         "operationId": "asyncModifyFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncModifyFromDirectoryRequest"
+                "$ref": "#/components/schemas/TerraformAsyncRequestWithScriptsDirectory"
               }
             }
           },
@@ -1320,43 +1169,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/terra-boot/directory/deploy/{module_directory}": {
+    "/terra-boot/directory/deploy": {
       "post": {
         "tags": [
           "TerraformFromDirectory"
         ],
         "description": "Deploy resources via Terraform from the given directory.",
         "operationId": "deployFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDeployFromDirectoryRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsDirectory"
               }
             }
           },
@@ -1402,43 +1230,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/terra-boot/directory/deploy/async/{module_directory}": {
+    "/terra-boot/directory/deploy/async": {
       "post": {
         "tags": [
           "TerraformFromDirectory"
         ],
         "description": "async deploy resources via Terraform from the given directory.",
         "operationId": "asyncDeployFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncDeployFromDirectoryRequest"
+                "$ref": "#/components/schemas/TerraformAsyncRequestWithScriptsDirectory"
               }
             }
           },
@@ -1470,16 +1277,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1550,16 +1347,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -1611,98 +1398,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/terra-boot/directory/validate/{module_directory}/{terraform_version}": {
-      "get": {
-        "tags": [
-          "TerraformFromDirectory"
-        ],
-        "description": "Validate the Terraform modules in the given directory.",
-        "operationId": "validateFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "terraform_version",
-            "in": "path",
-            "description": "version of Terraform to execute the module files.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TerraformValidationResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -1718,7 +1413,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncDestroyFromScriptsRequest"
+                "$ref": "#/components/schemas/TerraformAsyncRequestWithScripts"
               }
             }
           },
@@ -1750,16 +1445,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1782,7 +1467,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncDestroyFromGitRepoRequest"
+                "$ref": "#/components/schemas/TerraformAsyncRequestWithScriptsGitRepo"
               }
             }
           },
@@ -1821,43 +1506,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/terra-boot/directory/destroy/{module_directory}": {
+    "/terra-boot/directory/destroy": {
       "delete": {
         "tags": [
           "TerraformFromDirectory"
         ],
         "description": "Destroy the resources from the given directory.",
         "operationId": "destroyFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformDestroyFromDirectoryRequest"
+                "$ref": "#/components/schemas/TerraformRequestWithScriptsDirectory"
               }
             }
           },
@@ -1903,43 +1567,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/terra-boot/directory/destroy/async/{module_directory}": {
+    "/terra-boot/directory/destroy/async": {
       "delete": {
         "tags": [
           "TerraformFromDirectory"
         ],
         "description": "async destroy resources via Terraform from the given directory.",
         "operationId": "asyncDestroyFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the Terraform module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TerraformAsyncDestroyFromDirectoryRequest"
+                "$ref": "#/components/schemas/TerraformAsyncRequestWithScriptsDirectory"
               }
             }
           },
@@ -1978,16 +1621,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -2008,9 +1641,11 @@
               "Unsupported Enum Value",
               "Service Unavailable",
               "Unauthorized",
+              "Invalid Terraform Request",
               "Invalid Git Repo Details",
               "Invalid Terraform Tool",
               "Invalid Terraform Scripts",
+              "Send Amqp Message Failed",
               "Result Already Returned or RequestId Invalid"
             ]
           },
@@ -2098,15 +1733,30 @@
           "commandSuccessful": {
             "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "requestId"
+        ]
       },
-      "TerraformDeployWithScriptsRequest": {
+      "TerraformRequestWithScripts": {
         "type": "object",
+        "description": "Terraform request with scripts files",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
-            "description": "Id of the request"
+            "description": "Id of the request."
+          },
+          "requestType": {
+            "type": "string",
+            "description": "Type of the terraform request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
           },
           "terraformVersion": {
             "type": "string",
@@ -2131,6 +1781,10 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           },
+          "tfState": {
+            "type": "string",
+            "description": "Terraform state as a string."
+          },
           "scriptFiles": {
             "type": "object",
             "additionalProperties": {
@@ -2141,6 +1795,8 @@
         },
         "required": [
           "isPlanOnly",
+          "requestId",
+          "requestType",
           "scriptFiles",
           "terraformVersion",
           "variables"
@@ -2158,6 +1814,11 @@
       "TerraformValidationResult": {
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The request ID of the Terraform scripts validation."
+          },
           "valid": {
             "type": "boolean",
             "description": "Defines if the Terraform scripts is valid."
@@ -2175,21 +1836,64 @@
           }
         },
         "required": [
+          "requestId",
           "valid"
         ]
       },
-      "TerraformPlanWithScriptsRequest": {
+      "TerraformPlan": {
         "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the Terraform plan request"
+          },
+          "plan": {
+            "type": "string",
+            "description": "Terraform plan as a JSON string"
+          },
+          "terraformVersionUsed": {
+            "type": "string",
+            "description": "The version of the Terraform binary used to execute scripts."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "The error message of executing terraform plan command."
+          }
+        },
+        "required": [
+          "plan",
+          "requestId"
+        ]
+      },
+      "TerraformAsyncRequestWithScripts": {
+        "type": "object",
+        "description": "Terraform async request with scripts files",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
             "description": "Id of the request."
           },
+          "requestType": {
+            "type": "string",
+            "description": "Type of the terraform request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
+          },
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
             "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+          },
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
           "variables": {
             "type": "object",
@@ -2205,138 +1909,16 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for generating terraform plan."
-          }
-        },
-        "required": [
-          "scriptFiles",
-          "terraformVersion",
-          "variables"
-        ]
-      },
-      "TerraformPlan": {
-        "type": "object",
-        "properties": {
-          "plan": {
-            "type": "string",
-            "description": "Terraform plan as a JSON string"
-          },
-          "terraformVersionUsed": {
-            "type": "string",
-            "description": "The version of the Terraform binary used to execute scripts."
-          }
-        },
-        "required": [
-          "plan"
-        ]
-      },
-      "TerraformModifyWithScriptsRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "taskId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for modify request."
-          },
           "tfState": {
             "type": "string",
-            "description": "The .tfState file content after deployment"
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "scriptFiles",
-          "terraformVersion",
-          "tfState",
-          "variables"
-        ]
-      },
-      "TerraformAsyncModifyFromScriptsRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "taskId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
+            "description": "Terraform state as a string."
           },
           "scriptFiles": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Map stores file name and content of all script files for modify request."
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
+            "description": "Map stores file name and content of all script files for deploy request."
           },
           "webhookConfig": {
             "$ref": "#/components/schemas/WebhookConfig",
@@ -2345,9 +1927,10 @@
         },
         "required": [
           "isPlanOnly",
+          "requestId",
+          "requestType",
           "scriptFiles",
           "terraformVersion",
-          "tfState",
           "variables",
           "webhookConfig"
         ]
@@ -2374,25 +1957,41 @@
           "url"
         ]
       },
-      "TerraformDestroyWithScriptsRequest": {
+      "TerraformRequestWithScriptsGitRepo": {
         "type": "object",
+        "description": "Terraform async request with scripts git repo",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
-            "description": "Id of the request"
+            "description": "Id of the request."
+          },
+          "requestType": {
+            "type": "string",
+            "description": "Type of the terraform request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
           },
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
             "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
+          },
           "variables": {
             "type": "object",
             "additionalProperties": {
               "type": "object"
             },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
           },
           "envVariables": {
             "type": "object",
@@ -2400,121 +1999,26 @@
               "type": "string"
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for destroy request."
           },
           "tfState": {
             "type": "string",
-            "description": "The .tfState file content after deployment"
-          }
-        },
-        "required": [
-          "scriptFiles",
-          "terraformVersion",
-          "tfState",
-          "variables"
-        ]
-      },
-      "TerraformAsyncDeployFromScriptsRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for deploy request."
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "scriptFiles",
-          "terraformVersion",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "TerraformDeployFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            "description": "Terraform state as a string."
           },
           "gitRepoDetails": {
-            "$ref": "#/components/schemas/TerraformScriptGitRepoDetails",
+            "$ref": "#/components/schemas/TerraformScriptsGitRepoDetails",
             "description": "GIT Repo details from where the scripts can be fetched."
           }
         },
         "required": [
           "gitRepoDetails",
           "isPlanOnly",
+          "requestId",
+          "requestType",
           "terraformVersion",
           "variables"
         ]
       },
-      "TerraformScriptGitRepoDetails": {
+      "TerraformScriptsGitRepoDetails": {
         "type": "object",
         "properties": {
           "repoUrl": {
@@ -2535,191 +2039,25 @@
           "repoUrl"
         ]
       },
-      "TerraformPlanFromGitRepoRequest": {
+      "TerraformAsyncRequestWithScriptsGitRepo": {
         "type": "object",
+        "description": "Terraform request with scripts git repo",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
             "description": "Id of the request."
           },
-          "terraformVersion": {
+          "requestType": {
             "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/TerraformScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
-          }
-        },
-        "required": [
-          "terraformVersion",
-          "variables"
-        ]
-      },
-      "TerraformModifyFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/TerraformScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "terraformVersion",
-          "tfState",
-          "variables"
-        ]
-      },
-      "TerraformAsyncModifyFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/TerraformScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "terraformVersion",
-          "tfState",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "TerraformDestroyFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/TerraformScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          }
-        },
-        "required": [
-          "terraformVersion",
-          "tfState",
-          "variables"
-        ]
-      },
-      "TerraformAsyncDeployFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
+            "description": "Type of the terraform request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
           },
           "terraformVersion": {
             "type": "string",
@@ -2744,8 +2082,12 @@
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
           },
+          "tfState": {
+            "type": "string",
+            "description": "Terraform state as a string."
+          },
           "gitRepoDetails": {
-            "$ref": "#/components/schemas/TerraformScriptGitRepoDetails",
+            "$ref": "#/components/schemas/TerraformScriptsGitRepoDetails",
             "description": "GIT Repo details from where the scripts can be fetched."
           },
           "webhookConfig": {
@@ -2756,23 +2098,41 @@
         "required": [
           "gitRepoDetails",
           "isPlanOnly",
+          "requestId",
+          "requestType",
           "terraformVersion",
           "variables",
           "webhookConfig"
         ]
       },
-      "TerraformPlanFromDirectoryRequest": {
+      "TerraformRequestWithScriptsDirectory": {
         "type": "object",
+        "description": "Terraform request with directory where scripts files exist",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
             "description": "Id of the request."
           },
+          "requestType": {
+            "type": "string",
+            "description": "Type of the terraform request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
+          },
           "terraformVersion": {
             "type": "string",
             "description": "The required version of terraform which will execute the scripts.",
             "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
+          },
+          "isPlanOnly": {
+            "type": "boolean",
+            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
           },
           "variables": {
             "type": "object",
@@ -2787,58 +2147,44 @@
               "type": "string"
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          }
-        },
-        "required": [
-          "terraformVersion",
-          "variables"
-        ]
-      },
-      "TerraformModifyFromDirectoryRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
+          },
+          "tfState": {
             "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
+            "description": "Terraform state as a string."
           },
-          "terraformVersion": {
+          "scriptsDirectory": {
             "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+            "description": "Directory where the Terraform scripts files exist."
           }
         },
         "required": [
           "isPlanOnly",
+          "requestId",
+          "requestType",
+          "scriptsDirectory",
           "terraformVersion",
           "variables"
         ]
       },
-      "TerraformAsyncModifyFromDirectoryRequest": {
+      "TerraformAsyncRequestWithScriptsDirectory": {
         "type": "object",
+        "description": "Terraform async request with directory where scripts files exist",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
-            "description": "Id of the request"
+            "description": "Id of the request."
+          },
+          "requestType": {
+            "type": "string",
+            "description": "Type of the terraform request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
           },
           "terraformVersion": {
             "type": "string",
@@ -2854,7 +2200,7 @@
             "additionalProperties": {
               "type": "object"
             },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
+            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
           },
           "envVariables": {
             "type": "object",
@@ -2862,6 +2208,14 @@
               "type": "string"
             },
             "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
+          },
+          "tfState": {
+            "type": "string",
+            "description": "Terraform state as a string."
+          },
+          "scriptsDirectory": {
+            "type": "string",
+            "description": "Directory where the Terraform scripts files exist."
           },
           "webhookConfig": {
             "$ref": "#/components/schemas/WebhookConfig",
@@ -2870,87 +2224,9 @@
         },
         "required": [
           "isPlanOnly",
-          "terraformVersion",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "TerraformDeployFromDirectoryRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "terraformVersion",
-          "variables"
-        ]
-      },
-      "TerraformAsyncDeployFromDirectoryRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the terraform or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "isPlanOnly",
+          "requestId",
+          "requestType",
+          "scriptsDirectory",
           "terraformVersion",
           "variables",
           "webhookConfig"
@@ -2959,186 +2235,37 @@
       "TerraBootSystemStatus": {
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the request."
+          },
           "healthStatus": {
             "type": "string",
-            "description": "The health status of terra-boot api service.",
+            "description": "The health status of terra-boot service.",
             "enum": [
               "OK",
               "NOK"
             ]
+          },
+          "serviceType": {
+            "type": "string",
+            "description": "The service type of terra-boot."
+          },
+          "serviceUrl": {
+            "type": "string",
+            "description": "The url of terra-boot service."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "The error message of terra-boot service."
           }
         },
         "required": [
-          "healthStatus"
-        ]
-      },
-      "TerraformAsyncDestroyFromScriptsRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for destroy request."
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "scriptFiles",
-          "terraformVersion",
-          "tfState",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "TerraformAsyncDestroyFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/TerraformScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "terraformVersion",
-          "tfState",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "TerraformDestroyFromDirectoryRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          }
-        },
-        "required": [
-          "terraformVersion",
-          "variables"
-        ]
-      },
-      "TerraformAsyncDestroyFromDirectoryRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request"
-          },
-          "terraformVersion": {
-            "type": "string",
-            "description": "The required version of terraform which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the Terraform request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to terraform process."
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "terraformVersion",
-          "variables",
-          "webhookConfig"
+          "healthStatus",
+          "requestId",
+          "serviceType",
+          "serviceUrl"
         ]
       }
     },
