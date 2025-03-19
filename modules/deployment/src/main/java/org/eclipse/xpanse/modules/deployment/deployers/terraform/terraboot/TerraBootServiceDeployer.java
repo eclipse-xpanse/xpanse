@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.TerraformFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.TerraformFromScriptsApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDeployFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDeployFromScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncRequestWithScripts;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.context.annotation.Profile;
@@ -40,7 +40,7 @@ public class TerraBootServiceDeployer {
     /** method to perform service deployment using scripts provided in OCL. */
     public DeployResult deployFromScripts(DeployTask deployTask) {
         DeployResult result = new DeployResult();
-        TerraformAsyncDeployFromScriptsRequest request = getDeployFromScriptsRequest(deployTask);
+        TerraformAsyncRequestWithScripts request = getDeployFromScriptsRequest(deployTask);
         try {
             terraformFromScriptsApi.asyncDeployWithScripts(request);
             result.setOrderId(deployTask.getOrderId());
@@ -53,7 +53,7 @@ public class TerraBootServiceDeployer {
     /** method to perform service deployment using scripts form GIT repo. */
     public DeployResult deployFromGitRepo(DeployTask deployTask) {
         DeployResult result = new DeployResult();
-        TerraformAsyncDeployFromGitRepoRequest request = getDeployFromGitRepoRequest(deployTask);
+        TerraformAsyncRequestWithScriptsGitRepo request = getDeployFromGitRepoRequest(deployTask);
         try {
             terraformFromGitRepoApi.asyncDeployFromGitRepo(request);
             result.setOrderId(deployTask.getOrderId());
@@ -63,10 +63,10 @@ public class TerraBootServiceDeployer {
         }
     }
 
-    private TerraformAsyncDeployFromScriptsRequest getDeployFromScriptsRequest(DeployTask task) {
-        TerraformAsyncDeployFromScriptsRequest request =
-                new TerraformAsyncDeployFromScriptsRequest();
+    private TerraformAsyncRequestWithScripts getDeployFromScriptsRequest(DeployTask task) {
+        TerraformAsyncRequestWithScripts request = new TerraformAsyncRequestWithScripts();
         request.setRequestId(task.getOrderId());
+        request.setRequestType(TerraformAsyncRequestWithScripts.RequestTypeEnum.DEPLOY);
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
@@ -76,17 +76,18 @@ public class TerraBootServiceDeployer {
         return request;
     }
 
-    private TerraformAsyncDeployFromGitRepoRequest getDeployFromGitRepoRequest(DeployTask task) {
-        TerraformAsyncDeployFromGitRepoRequest request =
-                new TerraformAsyncDeployFromGitRepoRequest();
+    private TerraformAsyncRequestWithScriptsGitRepo getDeployFromGitRepoRequest(DeployTask task) {
+        TerraformAsyncRequestWithScriptsGitRepo request =
+                new TerraformAsyncRequestWithScriptsGitRepo();
         request.setRequestId(task.getOrderId());
+        request.setRequestType(TerraformAsyncRequestWithScriptsGitRepo.RequestTypeEnum.DEPLOY);
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setVariables(terraBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraBootHelper.getEnvironmentVariables(task));
         request.setWebhookConfig(terraBootHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
-                terraBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
+                terraBootHelper.convertTerraformScriptsGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }

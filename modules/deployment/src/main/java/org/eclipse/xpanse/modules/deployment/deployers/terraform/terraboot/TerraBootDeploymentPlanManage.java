@@ -8,8 +8,8 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.TerraformFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.TerraformFromScriptsApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformPlan;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformPlanFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformPlanWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformRequestWithScripts;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,7 @@ public class TerraBootDeploymentPlanManage {
 
     /** Method to get terraform plan from scripts provided in OCL. */
     public TerraformPlan getTerraformPlanFromScripts(DeployTask deployTask) {
-        return terraformFromScriptsApi.planWithScripts(getPlanWithScriptsRequest(deployTask));
+        return terraformFromScriptsApi.planWithScripts(getPlanWithScripts(deployTask));
     }
 
     /** Method to get terraform plan from scripts provided in GIT repo. */
@@ -43,9 +43,10 @@ public class TerraBootDeploymentPlanManage {
         return terraformFromGitRepoApi.planFromGitRepo(getPlanFromGitRepoRequest(deployTask));
     }
 
-    private TerraformPlanWithScriptsRequest getPlanWithScriptsRequest(DeployTask task) {
-        TerraformPlanWithScriptsRequest request = new TerraformPlanWithScriptsRequest();
+    private TerraformRequestWithScripts getPlanWithScripts(DeployTask task) {
+        TerraformRequestWithScripts request = new TerraformRequestWithScripts();
         request.setRequestId(task.getOrderId());
+        request.setRequestType(TerraformRequestWithScripts.RequestTypeEnum.PLAN);
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
         request.setVariables(terraBootHelper.getInputVariables(task, true));
@@ -53,14 +54,15 @@ public class TerraBootDeploymentPlanManage {
         return request;
     }
 
-    private TerraformPlanFromGitRepoRequest getPlanFromGitRepoRequest(DeployTask task) {
-        TerraformPlanFromGitRepoRequest request = new TerraformPlanFromGitRepoRequest();
+    private TerraformRequestWithScriptsGitRepo getPlanFromGitRepoRequest(DeployTask task) {
+        TerraformRequestWithScriptsGitRepo request = new TerraformRequestWithScriptsGitRepo();
         request.setRequestId(task.getOrderId());
+        request.setRequestType(TerraformRequestWithScriptsGitRepo.RequestTypeEnum.PLAN);
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setVariables(terraBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraBootHelper.getEnvironmentVariables(task));
         request.setGitRepoDetails(
-                terraBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
+                terraBootHelper.convertTerraformScriptsGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }
