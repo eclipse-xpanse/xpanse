@@ -16,8 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.TerraformFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.TerraformFromScriptsApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformDeployFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformDeployWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformRequestWithScripts;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformValidationResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
@@ -94,24 +94,25 @@ public class TerraBootScriptValidator {
         return deploymentScriptValidationResult;
     }
 
-    private TerraformDeployWithScriptsRequest getValidateScriptsInOclRequest(
-            Deployment deployment) {
-        TerraformDeployWithScriptsRequest request = new TerraformDeployWithScriptsRequest();
+    private TerraformRequestWithScripts getValidateScriptsInOclRequest(Deployment deployment) {
+        TerraformRequestWithScripts request = new TerraformRequestWithScripts();
         request.setRequestId(getRequestId());
+        request.setRequestType(TerraformRequestWithScripts.RequestTypeEnum.VALIDATE);
         request.setTerraformVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setScriptFiles(deployment.getScriptFiles());
         return request;
     }
 
-    private TerraformDeployFromGitRepoRequest getValidateScriptsInGitRepoRequest(
+    private TerraformRequestWithScriptsGitRepo getValidateScriptsInGitRepoRequest(
             Deployment deployment) {
-        TerraformDeployFromGitRepoRequest request = new TerraformDeployFromGitRepoRequest();
+        TerraformRequestWithScriptsGitRepo request = new TerraformRequestWithScriptsGitRepo();
         request.setRequestId(getRequestId());
+        request.setRequestType(TerraformRequestWithScriptsGitRepo.RequestTypeEnum.VALIDATE);
         request.setTerraformVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
-                terraBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
+                terraBootHelper.convertTerraformScriptsGitRepoDetailsFromDeployFromGitRepo(
                         deployment.getScriptsRepo()));
         return request;
     }

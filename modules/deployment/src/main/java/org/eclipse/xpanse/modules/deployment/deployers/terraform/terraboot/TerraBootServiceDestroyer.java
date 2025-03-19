@@ -11,8 +11,8 @@ import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.TerraformFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.TerraformFromScriptsApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDestroyFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDestroyFromScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncRequestWithScripts;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -49,7 +49,7 @@ public class TerraBootServiceDestroyer {
                 deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
-        TerraformAsyncDestroyFromScriptsRequest request =
+        TerraformAsyncRequestWithScripts request =
                 getDestroyFromScriptsRequest(deployTask, resourceState);
         try {
             terraformFromScriptsApi.asyncDestroyWithScripts(request);
@@ -66,7 +66,7 @@ public class TerraBootServiceDestroyer {
                 deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
-        TerraformAsyncDestroyFromGitRepoRequest request =
+        TerraformAsyncRequestWithScriptsGitRepo request =
                 getDestroyFromGitRepoRequest(deployTask, resourceState);
         try {
             terraformFromGitRepoApi.asyncDestroyFromGitRepo(request);
@@ -77,11 +77,11 @@ public class TerraBootServiceDestroyer {
         }
     }
 
-    private TerraformAsyncDestroyFromScriptsRequest getDestroyFromScriptsRequest(
+    private TerraformAsyncRequestWithScripts getDestroyFromScriptsRequest(
             DeployTask task, String stateFile) throws TerraBootRequestFailedException {
-        TerraformAsyncDestroyFromScriptsRequest request =
-                new TerraformAsyncDestroyFromScriptsRequest();
+        TerraformAsyncRequestWithScripts request = new TerraformAsyncRequestWithScripts();
         request.setRequestId(task.getOrderId());
+        request.setRequestType(TerraformAsyncRequestWithScripts.RequestTypeEnum.DESTROY);
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
         request.setTfState(stateFile);
@@ -91,18 +91,19 @@ public class TerraBootServiceDestroyer {
         return request;
     }
 
-    private TerraformAsyncDestroyFromGitRepoRequest getDestroyFromGitRepoRequest(
+    private TerraformAsyncRequestWithScriptsGitRepo getDestroyFromGitRepoRequest(
             DeployTask task, String stateFile) throws TerraBootRequestFailedException {
-        TerraformAsyncDestroyFromGitRepoRequest request =
-                new TerraformAsyncDestroyFromGitRepoRequest();
+        TerraformAsyncRequestWithScriptsGitRepo request =
+                new TerraformAsyncRequestWithScriptsGitRepo();
         request.setRequestId(task.getOrderId());
+        request.setRequestType(TerraformAsyncRequestWithScriptsGitRepo.RequestTypeEnum.DESTROY);
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setTfState(stateFile);
         request.setVariables(terraBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraBootHelper.getEnvironmentVariables(task));
         request.setWebhookConfig(terraBootHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
-                terraBootHelper.convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
+                terraBootHelper.convertTerraformScriptsGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }
