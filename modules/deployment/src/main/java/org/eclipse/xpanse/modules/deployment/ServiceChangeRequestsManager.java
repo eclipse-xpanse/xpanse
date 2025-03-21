@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
@@ -65,10 +66,11 @@ public class ServiceChangeRequestsManager {
             Map<String, Object> finalPropertiesToBeUsed,
             Map<String, List<DeployResource>> deployResourceMap,
             List<ServiceChangeScript> serviceChangeScripts,
-            ServiceOrderType serviceOrderType) {
+            ServiceOrderType serviceOrderType,
+            Handler handler) {
         ServiceOrderEntity serviceOrderEntity =
                 serviceOrderManager.createAndStoreGenericServiceOrderEntity(
-                        serviceDeploymentEntity, serviceOrderType, originalRequestObject);
+                        serviceDeploymentEntity, serviceOrderType, originalRequestObject, handler);
         List<ServiceChangeRequestEntity> requests = new ArrayList<>();
         deployResourceMap.forEach(
                 (groupName, deployResourceList) ->

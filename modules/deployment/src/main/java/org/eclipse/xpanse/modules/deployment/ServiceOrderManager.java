@@ -108,7 +108,8 @@ public class ServiceOrderManager {
     public ServiceOrderEntity createAndStoreGenericServiceOrderEntity(
             ServiceDeploymentEntity serviceDeploymentEntity,
             ServiceOrderType serviceOrderType,
-            Object originalRequest) {
+            Object originalRequest,
+            Handler handler) {
         ServiceOrderEntity serviceOrderEntity = new ServiceOrderEntity();
         if (Objects.nonNull(serviceDeploymentEntity.getServiceOrders())) {
             serviceDeploymentEntity.getServiceOrders().add(serviceOrderEntity);
@@ -121,6 +122,7 @@ public class ServiceOrderManager {
         serviceOrderEntity.setOrderStatus(OrderStatus.CREATED);
         serviceOrderEntity.setStartedTime(OffsetDateTime.now());
         serviceOrderEntity.setRequestBody(getRequestBody(originalRequest));
+        serviceOrderEntity.setHandler(handler);
         return serviceOrderStorage.storeAndFlush(serviceOrderEntity);
     }
 

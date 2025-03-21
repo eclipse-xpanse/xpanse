@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Implementation of the sStorage. */
+/** Implementation of the ServiceChangeRequestStorage. */
 @Component
 @Transactional
 public class DatabaseServiceChangeRequestStorage implements ServiceChangeRequestStorage {

@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
+import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
@@ -212,7 +213,8 @@ public class ServiceConfigurationManager {
                 newMergedConfiguration,
                 deployResourceMap,
                 configManageScripts,
-                ServiceOrderType.CONFIG_CHANGE);
+                ServiceOrderType.CONFIG_CHANGE,
+                Handler.AGENT);
     }
 
     private void validateRequestParameters(
