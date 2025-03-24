@@ -8,6 +8,7 @@ import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.serviceobject.ServiceObjectEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
@@ -34,6 +35,7 @@ class ServiceOrderEntityTest {
     @Mock private Map<String, Object> mockRequestBody;
     @Mock private Map<String, Object> mockResultProperties;
     @Mock private ServiceDeploymentEntity mockServiceDeploymentEntity;
+    @Mock private ServiceObjectEntity serviceObjectEntity;
 
     private ServiceOrderEntity test;
 
@@ -44,6 +46,7 @@ class ServiceOrderEntityTest {
         test.setParentOrderId(uuid);
         test.setWorkflowId(uuid.toString());
         test.setServiceDeploymentEntity(mockServiceDeploymentEntity);
+        test.setServiceObjectEntity(serviceObjectEntity);
         test.setOriginalServiceId(uuid);
         test.setTaskType(taskType);
         test.setUserId(userId);
@@ -61,6 +64,7 @@ class ServiceOrderEntityTest {
         assertThat(test.getOrderId()).isEqualTo(uuid);
         assertThat(test.getParentOrderId()).isEqualTo(uuid);
         assertThat(test.getServiceDeploymentEntity()).isEqualTo(mockServiceDeploymentEntity);
+        assertThat(test.getServiceObjectEntity()).isEqualTo(serviceObjectEntity);
         assertThat(test.getOriginalServiceId()).isEqualTo(uuid);
         assertThat(test.getWorkflowId()).isEqualTo(uuid.toString());
         assertThat(test.getTaskType()).isEqualTo(taskType);
@@ -96,6 +100,8 @@ class ServiceOrderEntityTest {
                         + uuid
                         + ", serviceDeploymentEntity="
                         + mockServiceDeploymentEntity
+                        + ", serviceObjectEntity="
+                        + serviceObjectEntity
                         + ", parentOrderId="
                         + uuid
                         + ", workflowId="
