@@ -6,14 +6,9 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.BaseApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDeployFromScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDestroyFromScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncModifyFromScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDeployWithScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDestroyWithScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuModifyWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncRequestWithScripts;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlan;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlanWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuRequestWithScripts;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +51,13 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncDeployFromScriptsRequest (required)
+     * @param openTofuAsyncRequestWithScripts (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDeployWithScripts(
-            OpenTofuAsyncDeployFromScriptsRequest openTofuAsyncDeployFromScriptsRequest)
+            OpenTofuAsyncRequestWithScripts openTofuAsyncRequestWithScripts)
             throws RestClientException {
-        asyncDeployWithScriptsWithHttpInfo(openTofuAsyncDeployFromScriptsRequest);
+        asyncDeployWithScriptsWithHttpInfo(openTofuAsyncRequestWithScripts);
     }
 
     /**
@@ -78,23 +71,21 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncDeployFromScriptsRequest (required)
+     * @param openTofuAsyncRequestWithScripts (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDeployWithScriptsWithHttpInfo(
-            OpenTofuAsyncDeployFromScriptsRequest openTofuAsyncDeployFromScriptsRequest)
+            OpenTofuAsyncRequestWithScripts openTofuAsyncRequestWithScripts)
             throws RestClientException {
-        Object localVarPostBody = openTofuAsyncDeployFromScriptsRequest;
+        Object localVarPostBody = openTofuAsyncRequestWithScripts;
 
-        // verify the required parameter 'openTofuAsyncDeployFromScriptsRequest' is set
-        if (openTofuAsyncDeployFromScriptsRequest == null) {
+        // verify the required parameter 'openTofuAsyncRequestWithScripts' is set
+        if (openTofuAsyncRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDeployFromScriptsRequest' when"
-                            + " calling asyncDeployWithScripts");
+                    "Missing the required parameter 'openTofuAsyncRequestWithScripts' when calling"
+                            + " asyncDeployWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -141,15 +132,13 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncDestroyFromScriptsRequest (required)
+     * @param openTofuAsyncRequestWithScripts (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDestroyWithScripts(
-            OpenTofuAsyncDestroyFromScriptsRequest openTofuAsyncDestroyFromScriptsRequest)
+            OpenTofuAsyncRequestWithScripts openTofuAsyncRequestWithScripts)
             throws RestClientException {
-        asyncDestroyWithScriptsWithHttpInfo(openTofuAsyncDestroyFromScriptsRequest);
+        asyncDestroyWithScriptsWithHttpInfo(openTofuAsyncRequestWithScripts);
     }
 
     /**
@@ -163,23 +152,21 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncDestroyFromScriptsRequest (required)
+     * @param openTofuAsyncRequestWithScripts (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDestroyWithScriptsWithHttpInfo(
-            OpenTofuAsyncDestroyFromScriptsRequest openTofuAsyncDestroyFromScriptsRequest)
+            OpenTofuAsyncRequestWithScripts openTofuAsyncRequestWithScripts)
             throws RestClientException {
-        Object localVarPostBody = openTofuAsyncDestroyFromScriptsRequest;
+        Object localVarPostBody = openTofuAsyncRequestWithScripts;
 
-        // verify the required parameter 'openTofuAsyncDestroyFromScriptsRequest' is set
-        if (openTofuAsyncDestroyFromScriptsRequest == null) {
+        // verify the required parameter 'openTofuAsyncRequestWithScripts' is set
+        if (openTofuAsyncRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDestroyFromScriptsRequest' when"
-                            + " calling asyncDestroyWithScripts");
+                    "Missing the required parameter 'openTofuAsyncRequestWithScripts' when calling"
+                            + " asyncDestroyWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -226,15 +213,13 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncModifyFromScriptsRequest (required)
+     * @param openTofuAsyncRequestWithScripts (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncModifyWithScripts(
-            OpenTofuAsyncModifyFromScriptsRequest openTofuAsyncModifyFromScriptsRequest)
+            OpenTofuAsyncRequestWithScripts openTofuAsyncRequestWithScripts)
             throws RestClientException {
-        asyncModifyWithScriptsWithHttpInfo(openTofuAsyncModifyFromScriptsRequest);
+        asyncModifyWithScriptsWithHttpInfo(openTofuAsyncRequestWithScripts);
     }
 
     /**
@@ -248,23 +233,21 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncModifyFromScriptsRequest (required)
+     * @param openTofuAsyncRequestWithScripts (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncModifyWithScriptsWithHttpInfo(
-            OpenTofuAsyncModifyFromScriptsRequest openTofuAsyncModifyFromScriptsRequest)
+            OpenTofuAsyncRequestWithScripts openTofuAsyncRequestWithScripts)
             throws RestClientException {
-        Object localVarPostBody = openTofuAsyncModifyFromScriptsRequest;
+        Object localVarPostBody = openTofuAsyncRequestWithScripts;
 
-        // verify the required parameter 'openTofuAsyncModifyFromScriptsRequest' is set
-        if (openTofuAsyncModifyFromScriptsRequest == null) {
+        // verify the required parameter 'openTofuAsyncRequestWithScripts' is set
+        if (openTofuAsyncRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncModifyFromScriptsRequest' when"
-                            + " calling asyncModifyWithScripts");
+                    "Missing the required parameter 'openTofuAsyncRequestWithScripts' when calling"
+                            + " asyncModifyWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -311,16 +294,13 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDeployWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult deployWithScripts(
-            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest)
+    public OpenTofuResult deployWithScripts(OpenTofuRequestWithScripts openTofuRequestWithScripts)
             throws RestClientException {
-        return deployWithScriptsWithHttpInfo(openTofuDeployWithScriptsRequest).getBody();
+        return deployWithScriptsWithHttpInfo(openTofuRequestWithScripts).getBody();
     }
 
     /**
@@ -334,22 +314,19 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDeployWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> deployWithScriptsWithHttpInfo(
-            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = openTofuDeployWithScriptsRequest;
+            OpenTofuRequestWithScripts openTofuRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = openTofuRequestWithScripts;
 
-        // verify the required parameter 'openTofuDeployWithScriptsRequest' is set
-        if (openTofuDeployWithScriptsRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScripts' is set
+        if (openTofuRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDeployWithScriptsRequest' when calling"
+                    "Missing the required parameter 'openTofuRequestWithScripts' when calling"
                             + " deployWithScripts");
         }
 
@@ -397,16 +374,13 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDestroyWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult destroyWithScripts(
-            OpenTofuDestroyWithScriptsRequest openTofuDestroyWithScriptsRequest)
+    public OpenTofuResult destroyWithScripts(OpenTofuRequestWithScripts openTofuRequestWithScripts)
             throws RestClientException {
-        return destroyWithScriptsWithHttpInfo(openTofuDestroyWithScriptsRequest).getBody();
+        return destroyWithScriptsWithHttpInfo(openTofuRequestWithScripts).getBody();
     }
 
     /**
@@ -420,23 +394,20 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDestroyWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> destroyWithScriptsWithHttpInfo(
-            OpenTofuDestroyWithScriptsRequest openTofuDestroyWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = openTofuDestroyWithScriptsRequest;
+            OpenTofuRequestWithScripts openTofuRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = openTofuRequestWithScripts;
 
-        // verify the required parameter 'openTofuDestroyWithScriptsRequest' is set
-        if (openTofuDestroyWithScriptsRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScripts' is set
+        if (openTofuRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDestroyWithScriptsRequest' when"
-                            + " calling destroyWithScripts");
+                    "Missing the required parameter 'openTofuRequestWithScripts' when calling"
+                            + " destroyWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -483,16 +454,13 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuModifyWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuResult modifyWithScripts(
-            OpenTofuModifyWithScriptsRequest openTofuModifyWithScriptsRequest)
+    public OpenTofuResult modifyWithScripts(OpenTofuRequestWithScripts openTofuRequestWithScripts)
             throws RestClientException {
-        return modifyWithScriptsWithHttpInfo(openTofuModifyWithScriptsRequest).getBody();
+        return modifyWithScriptsWithHttpInfo(openTofuRequestWithScripts).getBody();
     }
 
     /**
@@ -506,22 +474,19 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuModifyWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> modifyWithScriptsWithHttpInfo(
-            OpenTofuModifyWithScriptsRequest openTofuModifyWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = openTofuModifyWithScriptsRequest;
+            OpenTofuRequestWithScripts openTofuRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = openTofuRequestWithScripts;
 
-        // verify the required parameter 'openTofuModifyWithScriptsRequest' is set
-        if (openTofuModifyWithScriptsRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScripts' is set
+        if (openTofuRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuModifyWithScriptsRequest' when calling"
+                    "Missing the required parameter 'openTofuRequestWithScripts' when calling"
                             + " modifyWithScripts");
         }
 
@@ -569,16 +534,13 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuPlanWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return OpenTofuPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuPlan planWithScripts(
-            OpenTofuPlanWithScriptsRequest openTofuPlanWithScriptsRequest)
+    public OpenTofuPlan planWithScripts(OpenTofuRequestWithScripts openTofuRequestWithScripts)
             throws RestClientException {
-        return planWithScriptsWithHttpInfo(openTofuPlanWithScriptsRequest).getBody();
+        return planWithScriptsWithHttpInfo(openTofuRequestWithScripts).getBody();
     }
 
     /**
@@ -592,22 +554,19 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuPlanWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return ResponseEntity&lt;OpenTofuPlan&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuPlan> planWithScriptsWithHttpInfo(
-            OpenTofuPlanWithScriptsRequest openTofuPlanWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = openTofuPlanWithScriptsRequest;
+            OpenTofuRequestWithScripts openTofuRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = openTofuRequestWithScripts;
 
-        // verify the required parameter 'openTofuPlanWithScriptsRequest' is set
-        if (openTofuPlanWithScriptsRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScripts' is set
+        if (openTofuRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuPlanWithScriptsRequest' when calling"
+                    "Missing the required parameter 'openTofuRequestWithScripts' when calling"
                             + " planWithScripts");
         }
 
@@ -655,16 +614,13 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDeployWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return OpenTofuValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public OpenTofuValidationResult validateWithScripts(
-            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest)
-            throws RestClientException {
-        return validateWithScriptsWithHttpInfo(openTofuDeployWithScriptsRequest).getBody();
+            OpenTofuRequestWithScripts openTofuRequestWithScripts) throws RestClientException {
+        return validateWithScriptsWithHttpInfo(openTofuRequestWithScripts).getBody();
     }
 
     /**
@@ -678,22 +634,19 @@ public class OpenTofuFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDeployWithScriptsRequest (required)
+     * @param openTofuRequestWithScripts (required)
      * @return ResponseEntity&lt;OpenTofuValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuValidationResult> validateWithScriptsWithHttpInfo(
-            OpenTofuDeployWithScriptsRequest openTofuDeployWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = openTofuDeployWithScriptsRequest;
+            OpenTofuRequestWithScripts openTofuRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = openTofuRequestWithScripts;
 
-        // verify the required parameter 'openTofuDeployWithScriptsRequest' is set
-        if (openTofuDeployWithScriptsRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScripts' is set
+        if (openTofuRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDeployWithScriptsRequest' when calling"
+                    "Missing the required parameter 'openTofuRequestWithScripts' when calling"
                             + " validateWithScripts");
         }
 

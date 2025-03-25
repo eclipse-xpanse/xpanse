@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDeployFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDeployFromScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncRequestWithScripts;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.springframework.context.annotation.Profile;
@@ -40,7 +40,7 @@ public class TofuMakerServiceDeployer {
     /** method to perform service deployment using scripts provided in OCL. */
     public DeployResult deployFromScripts(DeployTask deployTask) {
         DeployResult result = new DeployResult();
-        OpenTofuAsyncDeployFromScriptsRequest request = getDeployFromScriptsRequest(deployTask);
+        OpenTofuAsyncRequestWithScripts request = getDeployFromScriptsRequest(deployTask);
         try {
             openTofuFromScriptsApi.asyncDeployWithScripts(request);
             result.setOrderId(deployTask.getOrderId());
@@ -53,7 +53,7 @@ public class TofuMakerServiceDeployer {
     /** method to perform service deployment using scripts form GIT repo. */
     public DeployResult deployFromGitRepo(DeployTask deployTask) {
         DeployResult result = new DeployResult();
-        OpenTofuAsyncDeployFromGitRepoRequest request = getDeployFromGitRepoRequest(deployTask);
+        OpenTofuAsyncRequestWithScriptsGitRepo request = getDeployFromGitRepoRequest(deployTask);
         try {
             openTofuFromGitRepoApi.asyncDeployFromGitRepo(request);
             result.setOrderId(deployTask.getOrderId());
@@ -63,8 +63,9 @@ public class TofuMakerServiceDeployer {
         }
     }
 
-    private OpenTofuAsyncDeployFromScriptsRequest getDeployFromScriptsRequest(DeployTask task) {
-        OpenTofuAsyncDeployFromScriptsRequest request = new OpenTofuAsyncDeployFromScriptsRequest();
+    private OpenTofuAsyncRequestWithScripts getDeployFromScriptsRequest(DeployTask task) {
+        OpenTofuAsyncRequestWithScripts request = new OpenTofuAsyncRequestWithScripts();
+        request.setRequestType(OpenTofuAsyncRequestWithScripts.RequestTypeEnum.DEPLOY);
         request.setRequestId(task.getOrderId());
         request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
@@ -75,8 +76,10 @@ public class TofuMakerServiceDeployer {
         return request;
     }
 
-    private OpenTofuAsyncDeployFromGitRepoRequest getDeployFromGitRepoRequest(DeployTask task) {
-        OpenTofuAsyncDeployFromGitRepoRequest request = new OpenTofuAsyncDeployFromGitRepoRequest();
+    private OpenTofuAsyncRequestWithScriptsGitRepo getDeployFromGitRepoRequest(DeployTask task) {
+        OpenTofuAsyncRequestWithScriptsGitRepo request =
+                new OpenTofuAsyncRequestWithScriptsGitRepo();
+        request.setRequestType(OpenTofuAsyncRequestWithScriptsGitRepo.RequestTypeEnum.DEPLOY);
         request.setRequestId(task.getOrderId());
         request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
@@ -84,7 +87,7 @@ public class TofuMakerServiceDeployer {
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
         request.setWebhookConfig(tofuMakerHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
-                tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
+                tofuMakerHelper.convertOpenTofuScriptsGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }

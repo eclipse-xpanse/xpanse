@@ -6,14 +6,9 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.BaseApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDeployFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDestroyFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncModifyFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDeployFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDestroyFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuModifyFromGitRepoRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlan;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuPlanFromGitRepoRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +51,13 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncDeployFromGitRepoRequest (required)
+     * @param openTofuAsyncRequestWithScriptsGitRepo (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDeployFromGitRepo(
-            OpenTofuAsyncDeployFromGitRepoRequest openTofuAsyncDeployFromGitRepoRequest)
+            OpenTofuAsyncRequestWithScriptsGitRepo openTofuAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        asyncDeployFromGitRepoWithHttpInfo(openTofuAsyncDeployFromGitRepoRequest);
+        asyncDeployFromGitRepoWithHttpInfo(openTofuAsyncRequestWithScriptsGitRepo);
     }
 
     /**
@@ -78,22 +71,20 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncDeployFromGitRepoRequest (required)
+     * @param openTofuAsyncRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDeployFromGitRepoWithHttpInfo(
-            OpenTofuAsyncDeployFromGitRepoRequest openTofuAsyncDeployFromGitRepoRequest)
+            OpenTofuAsyncRequestWithScriptsGitRepo openTofuAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = openTofuAsyncDeployFromGitRepoRequest;
+        Object localVarPostBody = openTofuAsyncRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'openTofuAsyncDeployFromGitRepoRequest' is set
-        if (openTofuAsyncDeployFromGitRepoRequest == null) {
+        // verify the required parameter 'openTofuAsyncRequestWithScriptsGitRepo' is set
+        if (openTofuAsyncRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDeployFromGitRepoRequest' when"
+                    "Missing the required parameter 'openTofuAsyncRequestWithScriptsGitRepo' when"
                             + " calling asyncDeployFromGitRepo");
         }
 
@@ -141,15 +132,13 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncDestroyFromGitRepoRequest (required)
+     * @param openTofuAsyncRequestWithScriptsGitRepo (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDestroyFromGitRepo(
-            OpenTofuAsyncDestroyFromGitRepoRequest openTofuAsyncDestroyFromGitRepoRequest)
+            OpenTofuAsyncRequestWithScriptsGitRepo openTofuAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        asyncDestroyFromGitRepoWithHttpInfo(openTofuAsyncDestroyFromGitRepoRequest);
+        asyncDestroyFromGitRepoWithHttpInfo(openTofuAsyncRequestWithScriptsGitRepo);
     }
 
     /**
@@ -163,22 +152,20 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncDestroyFromGitRepoRequest (required)
+     * @param openTofuAsyncRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDestroyFromGitRepoWithHttpInfo(
-            OpenTofuAsyncDestroyFromGitRepoRequest openTofuAsyncDestroyFromGitRepoRequest)
+            OpenTofuAsyncRequestWithScriptsGitRepo openTofuAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = openTofuAsyncDestroyFromGitRepoRequest;
+        Object localVarPostBody = openTofuAsyncRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'openTofuAsyncDestroyFromGitRepoRequest' is set
-        if (openTofuAsyncDestroyFromGitRepoRequest == null) {
+        // verify the required parameter 'openTofuAsyncRequestWithScriptsGitRepo' is set
+        if (openTofuAsyncRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncDestroyFromGitRepoRequest' when"
+                    "Missing the required parameter 'openTofuAsyncRequestWithScriptsGitRepo' when"
                             + " calling asyncDestroyFromGitRepo");
         }
 
@@ -216,7 +203,7 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
     }
 
     /**
-     * async modify resources via OpenTofu
+     * async deploy resources via OpenTofu
      *
      * <p><b>202</b> - Accepted
      *
@@ -226,19 +213,17 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncModifyFromGitRepoRequest (required)
+     * @param openTofuAsyncRequestWithScriptsGitRepo (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncModifyFromGitRepo(
-            OpenTofuAsyncModifyFromGitRepoRequest openTofuAsyncModifyFromGitRepoRequest)
+            OpenTofuAsyncRequestWithScriptsGitRepo openTofuAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        asyncModifyFromGitRepoWithHttpInfo(openTofuAsyncModifyFromGitRepoRequest);
+        asyncModifyFromGitRepoWithHttpInfo(openTofuAsyncRequestWithScriptsGitRepo);
     }
 
     /**
-     * async modify resources via OpenTofu
+     * async deploy resources via OpenTofu
      *
      * <p><b>202</b> - Accepted
      *
@@ -248,22 +233,20 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuAsyncModifyFromGitRepoRequest (required)
+     * @param openTofuAsyncRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncModifyFromGitRepoWithHttpInfo(
-            OpenTofuAsyncModifyFromGitRepoRequest openTofuAsyncModifyFromGitRepoRequest)
+            OpenTofuAsyncRequestWithScriptsGitRepo openTofuAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = openTofuAsyncModifyFromGitRepoRequest;
+        Object localVarPostBody = openTofuAsyncRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'openTofuAsyncModifyFromGitRepoRequest' is set
-        if (openTofuAsyncModifyFromGitRepoRequest == null) {
+        // verify the required parameter 'openTofuAsyncRequestWithScriptsGitRepo' is set
+        if (openTofuAsyncRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuAsyncModifyFromGitRepoRequest' when"
+                    "Missing the required parameter 'openTofuAsyncRequestWithScriptsGitRepo' when"
                             + " calling asyncModifyFromGitRepo");
         }
 
@@ -311,16 +294,14 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDeployFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public OpenTofuResult deployFromGitRepo(
-            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        return deployFromGitRepoWithHttpInfo(openTofuDeployFromGitRepoRequest).getBody();
+        return deployFromGitRepoWithHttpInfo(openTofuRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -334,23 +315,21 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDeployFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> deployFromGitRepoWithHttpInfo(
-            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = openTofuDeployFromGitRepoRequest;
+        Object localVarPostBody = openTofuRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'openTofuDeployFromGitRepoRequest' is set
-        if (openTofuDeployFromGitRepoRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScriptsGitRepo' is set
+        if (openTofuRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDeployFromGitRepoRequest' when calling"
-                            + " deployFromGitRepo");
+                    "Missing the required parameter 'openTofuRequestWithScriptsGitRepo' when"
+                            + " calling deployFromGitRepo");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -397,16 +376,14 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDestroyFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public OpenTofuResult destroyFromGitRepo(
-            OpenTofuDestroyFromGitRepoRequest openTofuDestroyFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        return destroyFromGitRepoWithHttpInfo(openTofuDestroyFromGitRepoRequest).getBody();
+        return destroyFromGitRepoWithHttpInfo(openTofuRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -420,22 +397,20 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDestroyFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> destroyFromGitRepoWithHttpInfo(
-            OpenTofuDestroyFromGitRepoRequest openTofuDestroyFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = openTofuDestroyFromGitRepoRequest;
+        Object localVarPostBody = openTofuRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'openTofuDestroyFromGitRepoRequest' is set
-        if (openTofuDestroyFromGitRepoRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScriptsGitRepo' is set
+        if (openTofuRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDestroyFromGitRepoRequest' when"
+                    "Missing the required parameter 'openTofuRequestWithScriptsGitRepo' when"
                             + " calling destroyFromGitRepo");
         }
 
@@ -483,16 +458,14 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuModifyFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return OpenTofuResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public OpenTofuResult modifyFromGitRepo(
-            OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        return modifyFromGitRepoWithHttpInfo(openTofuModifyFromGitRepoRequest).getBody();
+        return modifyFromGitRepoWithHttpInfo(openTofuRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -506,23 +479,21 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuModifyFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;OpenTofuResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuResult> modifyFromGitRepoWithHttpInfo(
-            OpenTofuModifyFromGitRepoRequest openTofuModifyFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = openTofuModifyFromGitRepoRequest;
+        Object localVarPostBody = openTofuRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'openTofuModifyFromGitRepoRequest' is set
-        if (openTofuModifyFromGitRepoRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScriptsGitRepo' is set
+        if (openTofuRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuModifyFromGitRepoRequest' when calling"
-                            + " modifyFromGitRepo");
+                    "Missing the required parameter 'openTofuRequestWithScriptsGitRepo' when"
+                            + " calling modifyFromGitRepo");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -569,16 +540,14 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuPlanFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return OpenTofuPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public OpenTofuPlan planFromGitRepo(
-            OpenTofuPlanFromGitRepoRequest openTofuPlanFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        return planFromGitRepoWithHttpInfo(openTofuPlanFromGitRepoRequest).getBody();
+        return planFromGitRepoWithHttpInfo(openTofuRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -592,23 +561,21 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuPlanFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;OpenTofuPlan&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuPlan> planFromGitRepoWithHttpInfo(
-            OpenTofuPlanFromGitRepoRequest openTofuPlanFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = openTofuPlanFromGitRepoRequest;
+        Object localVarPostBody = openTofuRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'openTofuPlanFromGitRepoRequest' is set
-        if (openTofuPlanFromGitRepoRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScriptsGitRepo' is set
+        if (openTofuRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuPlanFromGitRepoRequest' when calling"
-                            + " planFromGitRepo");
+                    "Missing the required parameter 'openTofuRequestWithScriptsGitRepo' when"
+                            + " calling planFromGitRepo");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -655,16 +622,14 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDeployFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return OpenTofuValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public OpenTofuValidationResult validateScriptsFromGitRepo(
-            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        return validateScriptsFromGitRepoWithHttpInfo(openTofuDeployFromGitRepoRequest).getBody();
+        return validateScriptsFromGitRepoWithHttpInfo(openTofuRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -678,23 +643,21 @@ public class OpenTofuFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param openTofuDeployFromGitRepoRequest (required)
+     * @param openTofuRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;OpenTofuValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<OpenTofuValidationResult> validateScriptsFromGitRepoWithHttpInfo(
-            OpenTofuDeployFromGitRepoRequest openTofuDeployFromGitRepoRequest)
+            OpenTofuRequestWithScriptsGitRepo openTofuRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = openTofuDeployFromGitRepoRequest;
+        Object localVarPostBody = openTofuRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'openTofuDeployFromGitRepoRequest' is set
-        if (openTofuDeployFromGitRepoRequest == null) {
+        // verify the required parameter 'openTofuRequestWithScriptsGitRepo' is set
+        if (openTofuRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'openTofuDeployFromGitRepoRequest' when calling"
-                            + " validateScriptsFromGitRepo");
+                    "Missing the required parameter 'openTofuRequestWithScriptsGitRepo' when"
+                            + " calling validateScriptsFromGitRepo");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =

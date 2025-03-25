@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.AdminApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuMakerSystemStatus;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.TofuMakerSystemStatus;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
@@ -27,15 +27,13 @@ class TofuMakerManagerTest {
 
     @Mock private AdminApi mockOpenTofuApi;
 
-    @Mock private TofuMakerHelper tofuMakerHelper;
-
     @InjectMocks private TofuMakerManager tofuMakerManagerUnderTest;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(
                 tofuMakerManagerUnderTest, "springProfilesActive", "tofu-maker");
-        ReflectionTestUtils.setField(tofuMakerManagerUnderTest, "openTofuMakerBaseUrl", "endpoint");
+        ReflectionTestUtils.setField(tofuMakerManagerUnderTest, "tofuMakerBaseUrl", "endpoint");
     }
 
     @Test
@@ -48,9 +46,9 @@ class TofuMakerManagerTest {
         expectedResult.setEndpoint("endpoint");
 
         // Configure OpenTofuApi.healthCheck(...).
-        final OpenTofuMakerSystemStatus openTofuMakerSystemStatus = new OpenTofuMakerSystemStatus();
-        openTofuMakerSystemStatus.setHealthStatus(OpenTofuMakerSystemStatus.HealthStatusEnum.OK);
-        when(mockOpenTofuApi.healthCheck()).thenReturn(openTofuMakerSystemStatus);
+        final TofuMakerSystemStatus tofuMakerSystemStatus = new TofuMakerSystemStatus();
+        tofuMakerSystemStatus.setHealthStatus(TofuMakerSystemStatus.HealthStatusEnum.OK);
+        when(mockOpenTofuApi.healthCheck()).thenReturn(tofuMakerSystemStatus);
 
         // Run the test
         final BackendSystemStatus result = tofuMakerManagerUnderTest.getOpenTofuMakerStatus();
@@ -87,9 +85,9 @@ class TofuMakerManagerTest {
         expectedResult.setEndpoint("endpoint");
 
         // Configure OpenTofuApi.healthCheck(...).
-        final OpenTofuMakerSystemStatus openTofuMakerSystemStatus = new OpenTofuMakerSystemStatus();
-        openTofuMakerSystemStatus.setHealthStatus(OpenTofuMakerSystemStatus.HealthStatusEnum.NOK);
-        when(mockOpenTofuApi.healthCheck()).thenReturn(openTofuMakerSystemStatus);
+        final TofuMakerSystemStatus tofuMakerSystemStatus = new TofuMakerSystemStatus();
+        tofuMakerSystemStatus.setHealthStatus(TofuMakerSystemStatus.HealthStatusEnum.NOK);
+        when(mockOpenTofuApi.healthCheck()).thenReturn(tofuMakerSystemStatus);
 
         // Run the test
         final BackendSystemStatus result = tofuMakerManagerUnderTest.getOpenTofuMakerStatus();

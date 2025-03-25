@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.AdminApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuMakerSystemStatus;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.TofuMakerSystemStatus;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
@@ -33,9 +33,7 @@ public class TofuMakerManager {
     private String springProfilesActive;
 
     @Value("${tofu-maker.endpoint:http://localhost:9090}")
-    private String openTofuMakerBaseUrl;
-
-    @Resource private TofuMakerHelper tofuMakerHelper;
+    private String tofuMakerBaseUrl;
 
     /**
      * Get system status of TofuMaker.
@@ -45,23 +43,21 @@ public class TofuMakerManager {
     public BackendSystemStatus getOpenTofuMakerStatus() {
         List<String> configSplitList = Arrays.asList(springProfilesActive.split(","));
         if (configSplitList.contains(TOFU_MAKER_PROFILE_NAME)) {
-            BackendSystemStatus openTofuMakerStatus = new BackendSystemStatus();
-            openTofuMakerStatus.setBackendSystemType(BackendSystemType.TOFU_MAKER);
-            openTofuMakerStatus.setName(BackendSystemType.TOFU_MAKER.toValue());
-            openTofuMakerStatus.setEndpoint(openTofuMakerBaseUrl);
+            BackendSystemStatus tofuMakerStatus = new BackendSystemStatus();
+            tofuMakerStatus.setBackendSystemType(BackendSystemType.TOFU_MAKER);
+            tofuMakerStatus.setName(BackendSystemType.TOFU_MAKER.toValue());
+            tofuMakerStatus.setEndpoint(tofuMakerBaseUrl);
 
             try {
-                OpenTofuMakerSystemStatus openTofuMakerSystemStatus =
-                        openTofuAdminApi.healthCheck();
-                openTofuMakerStatus.setHealthStatus(
-                        HealthStatus.valueOf(
-                                openTofuMakerSystemStatus.getHealthStatus().getValue()));
+                TofuMakerSystemStatus tofuMakerSystemStatus = openTofuAdminApi.healthCheck();
+                tofuMakerStatus.setHealthStatus(
+                        HealthStatus.valueOf(tofuMakerSystemStatus.getHealthStatus().getValue()));
             } catch (RestClientException e) {
                 log.error("Get status of tofu-maker error:{}", e.getMessage());
-                openTofuMakerStatus.setHealthStatus(HealthStatus.NOK);
-                openTofuMakerStatus.setDetails(e.getMessage());
+                tofuMakerStatus.setHealthStatus(HealthStatus.NOK);
+                tofuMakerStatus.setDetails(e.getMessage());
             }
-            return openTofuMakerStatus;
+            return tofuMakerStatus;
         }
         return null;
     }

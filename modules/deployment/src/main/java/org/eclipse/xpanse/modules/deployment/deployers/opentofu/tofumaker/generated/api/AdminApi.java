@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.BaseApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuMakerSystemStatus;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.TofuMakerSystemStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +35,7 @@ public class AdminApi extends BaseApi {
     }
 
     /**
-     * Check health of OpenTofu Maker API service
+     * Check health of Tofu Maker API service
      *
      * <p><b>200</b> - OK
      *
@@ -45,17 +45,15 @@ public class AdminApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @return OpenTofuMakerSystemStatus
+     * @return TofuMakerSystemStatus
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public OpenTofuMakerSystemStatus healthCheck() throws RestClientException {
+    public TofuMakerSystemStatus healthCheck() throws RestClientException {
         return healthCheckWithHttpInfo().getBody();
     }
 
     /**
-     * Check health of OpenTofu Maker API service
+     * Check health of Tofu Maker API service
      *
      * <p><b>200</b> - OK
      *
@@ -65,12 +63,10 @@ public class AdminApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @return ResponseEntity&lt;OpenTofuMakerSystemStatus&gt;
+     * @return ResponseEntity&lt;TofuMakerSystemStatus&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ResponseEntity<OpenTofuMakerSystemStatus> healthCheckWithHttpInfo()
+    public ResponseEntity<TofuMakerSystemStatus> healthCheckWithHttpInfo()
             throws RestClientException {
         Object localVarPostBody = null;
 
@@ -90,8 +86,8 @@ public class AdminApi extends BaseApi {
 
         String[] localVarAuthNames = new String[] {"OAuth2Flow"};
 
-        ParameterizedTypeReference<OpenTofuMakerSystemStatus> localReturnType =
-                new ParameterizedTypeReference<OpenTofuMakerSystemStatus>() {};
+        ParameterizedTypeReference<TofuMakerSystemStatus> localReturnType =
+                new ParameterizedTypeReference<TofuMakerSystemStatus>() {};
         return apiClient.invokeAPI(
                 "/tofu-maker/health",
                 HttpMethod.GET,

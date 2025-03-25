@@ -38,7 +38,7 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
     }
 
     /**
-     * Method to batch retrieve stored openTofu results from tofu-maker.
+     * Method to batch retrieve stored opentofu result from tofu-maker.
      *
      * <p><b>200</b> - OK
      *
@@ -47,8 +47,6 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
      * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>502</b> - Bad Gateway
-     *
-     * <p><b>503</b> - Service Unavailable
      *
      * @param UUID (required)
      * @return List&lt;ReFetchResult&gt;
@@ -59,7 +57,7 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
     }
 
     /**
-     * Method to batch retrieve stored openTofu results from tofu-maker.
+     * Method to batch retrieve stored opentofu result from tofu-maker.
      *
      * <p><b>200</b> - OK
      *
@@ -68,8 +66,6 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
      * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>502</b> - Bad Gateway
-     *
-     * <p><b>503</b> - Service Unavailable
      *
      * @param UUID (required)
      * @return ResponseEntity&lt;List&lt;ReFetchResult&gt;&gt;
@@ -120,8 +116,8 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
     }
 
     /**
-     * Method to retrieve stored openTofu result in case tofu-maker receives a failure while sending
-     * the openTofu result via callback.
+     * Method to retrieve stored opentofu result in case tofu-maker receives a failure while sending
+     * the opentofu result via callback.
      *
      * <p><b>200</b> - OK
      *
@@ -130,8 +126,6 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
      * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>502</b> - Bad Gateway
-     *
-     * <p><b>503</b> - Service Unavailable
      *
      * @param requestId id of the request (required)
      * @return ReFetchResult
@@ -142,8 +136,8 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
     }
 
     /**
-     * Method to retrieve stored openTofu result in case tofu-maker receives a failure while sending
-     * the openTofu result via callback.
+     * Method to retrieve stored opentofu result in case tofu-maker receives a failure while sending
+     * the opentofu result via callback.
      *
      * <p><b>200</b> - OK
      *
@@ -152,8 +146,6 @@ public class RetrieveOpenTofuResultApi extends BaseApi {
      * <p><b>422</b> - Unprocessable Entity
      *
      * <p><b>502</b> - Bad Gateway
-     *
-     * <p><b>503</b> - Service Unavailable
      *
      * @param requestId id of the request (required)
      * @return ResponseEntity&lt;ReFetchResult&gt;
