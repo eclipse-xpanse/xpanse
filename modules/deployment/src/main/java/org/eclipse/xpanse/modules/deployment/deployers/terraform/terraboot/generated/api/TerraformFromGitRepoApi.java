@@ -6,14 +6,9 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.ApiClient;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.BaseApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDeployFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDestroyFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncModifyFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformDeployFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformDestroyFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformModifyFromGitRepoRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformPlan;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformPlanFromGitRepoRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +51,13 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncDeployFromGitRepoRequest (required)
+     * @param terraformAsyncRequestWithScriptsGitRepo (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDeployFromGitRepo(
-            TerraformAsyncDeployFromGitRepoRequest terraformAsyncDeployFromGitRepoRequest)
+            TerraformAsyncRequestWithScriptsGitRepo terraformAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        asyncDeployFromGitRepoWithHttpInfo(terraformAsyncDeployFromGitRepoRequest);
+        asyncDeployFromGitRepoWithHttpInfo(terraformAsyncRequestWithScriptsGitRepo);
     }
 
     /**
@@ -78,22 +71,20 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncDeployFromGitRepoRequest (required)
+     * @param terraformAsyncRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDeployFromGitRepoWithHttpInfo(
-            TerraformAsyncDeployFromGitRepoRequest terraformAsyncDeployFromGitRepoRequest)
+            TerraformAsyncRequestWithScriptsGitRepo terraformAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = terraformAsyncDeployFromGitRepoRequest;
+        Object localVarPostBody = terraformAsyncRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'terraformAsyncDeployFromGitRepoRequest' is set
-        if (terraformAsyncDeployFromGitRepoRequest == null) {
+        // verify the required parameter 'terraformAsyncRequestWithScriptsGitRepo' is set
+        if (terraformAsyncRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformAsyncDeployFromGitRepoRequest' when"
+                    "Missing the required parameter 'terraformAsyncRequestWithScriptsGitRepo' when"
                             + " calling asyncDeployFromGitRepo");
         }
 
@@ -141,15 +132,13 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncDestroyFromGitRepoRequest (required)
+     * @param terraformAsyncRequestWithScriptsGitRepo (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDestroyFromGitRepo(
-            TerraformAsyncDestroyFromGitRepoRequest terraformAsyncDestroyFromGitRepoRequest)
+            TerraformAsyncRequestWithScriptsGitRepo terraformAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        asyncDestroyFromGitRepoWithHttpInfo(terraformAsyncDestroyFromGitRepoRequest);
+        asyncDestroyFromGitRepoWithHttpInfo(terraformAsyncRequestWithScriptsGitRepo);
     }
 
     /**
@@ -163,22 +152,20 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncDestroyFromGitRepoRequest (required)
+     * @param terraformAsyncRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDestroyFromGitRepoWithHttpInfo(
-            TerraformAsyncDestroyFromGitRepoRequest terraformAsyncDestroyFromGitRepoRequest)
+            TerraformAsyncRequestWithScriptsGitRepo terraformAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = terraformAsyncDestroyFromGitRepoRequest;
+        Object localVarPostBody = terraformAsyncRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'terraformAsyncDestroyFromGitRepoRequest' is set
-        if (terraformAsyncDestroyFromGitRepoRequest == null) {
+        // verify the required parameter 'terraformAsyncRequestWithScriptsGitRepo' is set
+        if (terraformAsyncRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformAsyncDestroyFromGitRepoRequest' when"
+                    "Missing the required parameter 'terraformAsyncRequestWithScriptsGitRepo' when"
                             + " calling asyncDestroyFromGitRepo");
         }
 
@@ -226,15 +213,13 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncModifyFromGitRepoRequest (required)
+     * @param terraformAsyncRequestWithScriptsGitRepo (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncModifyFromGitRepo(
-            TerraformAsyncModifyFromGitRepoRequest terraformAsyncModifyFromGitRepoRequest)
+            TerraformAsyncRequestWithScriptsGitRepo terraformAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        asyncModifyFromGitRepoWithHttpInfo(terraformAsyncModifyFromGitRepoRequest);
+        asyncModifyFromGitRepoWithHttpInfo(terraformAsyncRequestWithScriptsGitRepo);
     }
 
     /**
@@ -248,22 +233,20 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncModifyFromGitRepoRequest (required)
+     * @param terraformAsyncRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncModifyFromGitRepoWithHttpInfo(
-            TerraformAsyncModifyFromGitRepoRequest terraformAsyncModifyFromGitRepoRequest)
+            TerraformAsyncRequestWithScriptsGitRepo terraformAsyncRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = terraformAsyncModifyFromGitRepoRequest;
+        Object localVarPostBody = terraformAsyncRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'terraformAsyncModifyFromGitRepoRequest' is set
-        if (terraformAsyncModifyFromGitRepoRequest == null) {
+        // verify the required parameter 'terraformAsyncRequestWithScriptsGitRepo' is set
+        if (terraformAsyncRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformAsyncModifyFromGitRepoRequest' when"
+                    "Missing the required parameter 'terraformAsyncRequestWithScriptsGitRepo' when"
                             + " calling asyncModifyFromGitRepo");
         }
 
@@ -311,16 +294,14 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDeployFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformResult deployFromGitRepo(
-            TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        return deployFromGitRepoWithHttpInfo(terraformDeployFromGitRepoRequest).getBody();
+        return deployFromGitRepoWithHttpInfo(terraformRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -334,22 +315,20 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDeployFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformResult> deployFromGitRepoWithHttpInfo(
-            TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = terraformDeployFromGitRepoRequest;
+        Object localVarPostBody = terraformRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'terraformDeployFromGitRepoRequest' is set
-        if (terraformDeployFromGitRepoRequest == null) {
+        // verify the required parameter 'terraformRequestWithScriptsGitRepo' is set
+        if (terraformRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformDeployFromGitRepoRequest' when"
+                    "Missing the required parameter 'terraformRequestWithScriptsGitRepo' when"
                             + " calling deployFromGitRepo");
         }
 
@@ -397,16 +376,14 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDestroyFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformResult destroyFromGitRepo(
-            TerraformDestroyFromGitRepoRequest terraformDestroyFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        return destroyFromGitRepoWithHttpInfo(terraformDestroyFromGitRepoRequest).getBody();
+        return destroyFromGitRepoWithHttpInfo(terraformRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -420,22 +397,20 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDestroyFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformResult> destroyFromGitRepoWithHttpInfo(
-            TerraformDestroyFromGitRepoRequest terraformDestroyFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = terraformDestroyFromGitRepoRequest;
+        Object localVarPostBody = terraformRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'terraformDestroyFromGitRepoRequest' is set
-        if (terraformDestroyFromGitRepoRequest == null) {
+        // verify the required parameter 'terraformRequestWithScriptsGitRepo' is set
+        if (terraformRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformDestroyFromGitRepoRequest' when"
+                    "Missing the required parameter 'terraformRequestWithScriptsGitRepo' when"
                             + " calling destroyFromGitRepo");
         }
 
@@ -483,16 +458,14 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformModifyFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformResult modifyFromGitRepo(
-            TerraformModifyFromGitRepoRequest terraformModifyFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        return modifyFromGitRepoWithHttpInfo(terraformModifyFromGitRepoRequest).getBody();
+        return modifyFromGitRepoWithHttpInfo(terraformRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -506,22 +479,20 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformModifyFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformResult> modifyFromGitRepoWithHttpInfo(
-            TerraformModifyFromGitRepoRequest terraformModifyFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = terraformModifyFromGitRepoRequest;
+        Object localVarPostBody = terraformRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'terraformModifyFromGitRepoRequest' is set
-        if (terraformModifyFromGitRepoRequest == null) {
+        // verify the required parameter 'terraformRequestWithScriptsGitRepo' is set
+        if (terraformRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformModifyFromGitRepoRequest' when"
+                    "Missing the required parameter 'terraformRequestWithScriptsGitRepo' when"
                             + " calling modifyFromGitRepo");
         }
 
@@ -569,16 +540,14 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformPlanFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return TerraformPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformPlan planFromGitRepo(
-            TerraformPlanFromGitRepoRequest terraformPlanFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        return planFromGitRepoWithHttpInfo(terraformPlanFromGitRepoRequest).getBody();
+        return planFromGitRepoWithHttpInfo(terraformRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -592,23 +561,21 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformPlanFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;TerraformPlan&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformPlan> planFromGitRepoWithHttpInfo(
-            TerraformPlanFromGitRepoRequest terraformPlanFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = terraformPlanFromGitRepoRequest;
+        Object localVarPostBody = terraformRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'terraformPlanFromGitRepoRequest' is set
-        if (terraformPlanFromGitRepoRequest == null) {
+        // verify the required parameter 'terraformRequestWithScriptsGitRepo' is set
+        if (terraformRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformPlanFromGitRepoRequest' when calling"
-                            + " planFromGitRepo");
+                    "Missing the required parameter 'terraformRequestWithScriptsGitRepo' when"
+                            + " calling planFromGitRepo");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -655,16 +622,14 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDeployFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return TerraformValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformValidationResult validateScriptsFromGitRepo(
-            TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        return validateScriptsFromGitRepoWithHttpInfo(terraformDeployFromGitRepoRequest).getBody();
+        return validateScriptsFromGitRepoWithHttpInfo(terraformRequestWithScriptsGitRepo).getBody();
     }
 
     /**
@@ -678,22 +643,20 @@ public class TerraformFromGitRepoApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDeployFromGitRepoRequest (required)
+     * @param terraformRequestWithScriptsGitRepo (required)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformValidationResult> validateScriptsFromGitRepoWithHttpInfo(
-            TerraformDeployFromGitRepoRequest terraformDeployFromGitRepoRequest)
+            TerraformRequestWithScriptsGitRepo terraformRequestWithScriptsGitRepo)
             throws RestClientException {
-        Object localVarPostBody = terraformDeployFromGitRepoRequest;
+        Object localVarPostBody = terraformRequestWithScriptsGitRepo;
 
-        // verify the required parameter 'terraformDeployFromGitRepoRequest' is set
-        if (terraformDeployFromGitRepoRequest == null) {
+        // verify the required parameter 'terraformRequestWithScriptsGitRepo' is set
+        if (terraformRequestWithScriptsGitRepo == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformDeployFromGitRepoRequest' when"
+                    "Missing the required parameter 'terraformRequestWithScriptsGitRepo' when"
                             + " calling validateScriptsFromGitRepo");
         }
 

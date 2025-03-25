@@ -6,14 +6,9 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.ApiClient;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.BaseApi;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDeployFromScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncDestroyFromScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncModifyFromScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformDeployWithScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformDestroyWithScriptsRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformModifyWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformAsyncRequestWithScripts;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformPlan;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformPlanWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformRequestWithScripts;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +51,13 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncDeployFromScriptsRequest (required)
+     * @param terraformAsyncRequestWithScripts (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDeployWithScripts(
-            TerraformAsyncDeployFromScriptsRequest terraformAsyncDeployFromScriptsRequest)
+            TerraformAsyncRequestWithScripts terraformAsyncRequestWithScripts)
             throws RestClientException {
-        asyncDeployWithScriptsWithHttpInfo(terraformAsyncDeployFromScriptsRequest);
+        asyncDeployWithScriptsWithHttpInfo(terraformAsyncRequestWithScripts);
     }
 
     /**
@@ -78,23 +71,21 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncDeployFromScriptsRequest (required)
+     * @param terraformAsyncRequestWithScripts (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDeployWithScriptsWithHttpInfo(
-            TerraformAsyncDeployFromScriptsRequest terraformAsyncDeployFromScriptsRequest)
+            TerraformAsyncRequestWithScripts terraformAsyncRequestWithScripts)
             throws RestClientException {
-        Object localVarPostBody = terraformAsyncDeployFromScriptsRequest;
+        Object localVarPostBody = terraformAsyncRequestWithScripts;
 
-        // verify the required parameter 'terraformAsyncDeployFromScriptsRequest' is set
-        if (terraformAsyncDeployFromScriptsRequest == null) {
+        // verify the required parameter 'terraformAsyncRequestWithScripts' is set
+        if (terraformAsyncRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformAsyncDeployFromScriptsRequest' when"
-                            + " calling asyncDeployWithScripts");
+                    "Missing the required parameter 'terraformAsyncRequestWithScripts' when calling"
+                            + " asyncDeployWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -141,15 +132,13 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncDestroyFromScriptsRequest (required)
+     * @param terraformAsyncRequestWithScripts (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncDestroyWithScripts(
-            TerraformAsyncDestroyFromScriptsRequest terraformAsyncDestroyFromScriptsRequest)
+            TerraformAsyncRequestWithScripts terraformAsyncRequestWithScripts)
             throws RestClientException {
-        asyncDestroyWithScriptsWithHttpInfo(terraformAsyncDestroyFromScriptsRequest);
+        asyncDestroyWithScriptsWithHttpInfo(terraformAsyncRequestWithScripts);
     }
 
     /**
@@ -163,23 +152,21 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncDestroyFromScriptsRequest (required)
+     * @param terraformAsyncRequestWithScripts (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncDestroyWithScriptsWithHttpInfo(
-            TerraformAsyncDestroyFromScriptsRequest terraformAsyncDestroyFromScriptsRequest)
+            TerraformAsyncRequestWithScripts terraformAsyncRequestWithScripts)
             throws RestClientException {
-        Object localVarPostBody = terraformAsyncDestroyFromScriptsRequest;
+        Object localVarPostBody = terraformAsyncRequestWithScripts;
 
-        // verify the required parameter 'terraformAsyncDestroyFromScriptsRequest' is set
-        if (terraformAsyncDestroyFromScriptsRequest == null) {
+        // verify the required parameter 'terraformAsyncRequestWithScripts' is set
+        if (terraformAsyncRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformAsyncDestroyFromScriptsRequest' when"
-                            + " calling asyncDestroyWithScripts");
+                    "Missing the required parameter 'terraformAsyncRequestWithScripts' when calling"
+                            + " asyncDestroyWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -226,15 +213,13 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncModifyFromScriptsRequest (required)
+     * @param terraformAsyncRequestWithScripts (required)
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public void asyncModifyWithScripts(
-            TerraformAsyncModifyFromScriptsRequest terraformAsyncModifyFromScriptsRequest)
+            TerraformAsyncRequestWithScripts terraformAsyncRequestWithScripts)
             throws RestClientException {
-        asyncModifyWithScriptsWithHttpInfo(terraformAsyncModifyFromScriptsRequest);
+        asyncModifyWithScriptsWithHttpInfo(terraformAsyncRequestWithScripts);
     }
 
     /**
@@ -248,23 +233,21 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformAsyncModifyFromScriptsRequest (required)
+     * @param terraformAsyncRequestWithScripts (required)
      * @return ResponseEntity&lt;Void&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<Void> asyncModifyWithScriptsWithHttpInfo(
-            TerraformAsyncModifyFromScriptsRequest terraformAsyncModifyFromScriptsRequest)
+            TerraformAsyncRequestWithScripts terraformAsyncRequestWithScripts)
             throws RestClientException {
-        Object localVarPostBody = terraformAsyncModifyFromScriptsRequest;
+        Object localVarPostBody = terraformAsyncRequestWithScripts;
 
-        // verify the required parameter 'terraformAsyncModifyFromScriptsRequest' is set
-        if (terraformAsyncModifyFromScriptsRequest == null) {
+        // verify the required parameter 'terraformAsyncRequestWithScripts' is set
+        if (terraformAsyncRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformAsyncModifyFromScriptsRequest' when"
-                            + " calling asyncModifyWithScripts");
+                    "Missing the required parameter 'terraformAsyncRequestWithScripts' when calling"
+                            + " asyncModifyWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -311,16 +294,13 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDeployWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformResult deployWithScripts(
-            TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest)
-            throws RestClientException {
-        return deployWithScriptsWithHttpInfo(terraformDeployWithScriptsRequest).getBody();
+            TerraformRequestWithScripts terraformRequestWithScripts) throws RestClientException {
+        return deployWithScriptsWithHttpInfo(terraformRequestWithScripts).getBody();
     }
 
     /**
@@ -334,23 +314,20 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDeployWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformResult> deployWithScriptsWithHttpInfo(
-            TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = terraformDeployWithScriptsRequest;
+            TerraformRequestWithScripts terraformRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = terraformRequestWithScripts;
 
-        // verify the required parameter 'terraformDeployWithScriptsRequest' is set
-        if (terraformDeployWithScriptsRequest == null) {
+        // verify the required parameter 'terraformRequestWithScripts' is set
+        if (terraformRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformDeployWithScriptsRequest' when"
-                            + " calling deployWithScripts");
+                    "Missing the required parameter 'terraformRequestWithScripts' when calling"
+                            + " deployWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -397,16 +374,13 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDestroyWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformResult destroyWithScripts(
-            TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest)
-            throws RestClientException {
-        return destroyWithScriptsWithHttpInfo(terraformDestroyWithScriptsRequest).getBody();
+            TerraformRequestWithScripts terraformRequestWithScripts) throws RestClientException {
+        return destroyWithScriptsWithHttpInfo(terraformRequestWithScripts).getBody();
     }
 
     /**
@@ -420,23 +394,20 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDestroyWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformResult> destroyWithScriptsWithHttpInfo(
-            TerraformDestroyWithScriptsRequest terraformDestroyWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = terraformDestroyWithScriptsRequest;
+            TerraformRequestWithScripts terraformRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = terraformRequestWithScripts;
 
-        // verify the required parameter 'terraformDestroyWithScriptsRequest' is set
-        if (terraformDestroyWithScriptsRequest == null) {
+        // verify the required parameter 'terraformRequestWithScripts' is set
+        if (terraformRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformDestroyWithScriptsRequest' when"
-                            + " calling destroyWithScripts");
+                    "Missing the required parameter 'terraformRequestWithScripts' when calling"
+                            + " destroyWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -483,16 +454,13 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformModifyWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return TerraformResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformResult modifyWithScripts(
-            TerraformModifyWithScriptsRequest terraformModifyWithScriptsRequest)
-            throws RestClientException {
-        return modifyWithScriptsWithHttpInfo(terraformModifyWithScriptsRequest).getBody();
+            TerraformRequestWithScripts terraformRequestWithScripts) throws RestClientException {
+        return modifyWithScriptsWithHttpInfo(terraformRequestWithScripts).getBody();
     }
 
     /**
@@ -506,23 +474,20 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformModifyWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return ResponseEntity&lt;TerraformResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformResult> modifyWithScriptsWithHttpInfo(
-            TerraformModifyWithScriptsRequest terraformModifyWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = terraformModifyWithScriptsRequest;
+            TerraformRequestWithScripts terraformRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = terraformRequestWithScripts;
 
-        // verify the required parameter 'terraformModifyWithScriptsRequest' is set
-        if (terraformModifyWithScriptsRequest == null) {
+        // verify the required parameter 'terraformRequestWithScripts' is set
+        if (terraformRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformModifyWithScriptsRequest' when"
-                            + " calling modifyWithScripts");
+                    "Missing the required parameter 'terraformRequestWithScripts' when calling"
+                            + " modifyWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =
@@ -569,16 +534,13 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformPlanWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return TerraformPlan
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public TerraformPlan planWithScripts(
-            TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest)
+    public TerraformPlan planWithScripts(TerraformRequestWithScripts terraformRequestWithScripts)
             throws RestClientException {
-        return planWithScriptsWithHttpInfo(terraformPlanWithScriptsRequest).getBody();
+        return planWithScriptsWithHttpInfo(terraformRequestWithScripts).getBody();
     }
 
     /**
@@ -592,22 +554,19 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformPlanWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return ResponseEntity&lt;TerraformPlan&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformPlan> planWithScriptsWithHttpInfo(
-            TerraformPlanWithScriptsRequest terraformPlanWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = terraformPlanWithScriptsRequest;
+            TerraformRequestWithScripts terraformRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = terraformRequestWithScripts;
 
-        // verify the required parameter 'terraformPlanWithScriptsRequest' is set
-        if (terraformPlanWithScriptsRequest == null) {
+        // verify the required parameter 'terraformRequestWithScripts' is set
+        if (terraformRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformPlanWithScriptsRequest' when calling"
+                    "Missing the required parameter 'terraformRequestWithScripts' when calling"
                             + " planWithScripts");
         }
 
@@ -655,16 +614,13 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDeployWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return TerraformValidationResult
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public TerraformValidationResult validateWithScripts(
-            TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest)
-            throws RestClientException {
-        return validateWithScriptsWithHttpInfo(terraformDeployWithScriptsRequest).getBody();
+            TerraformRequestWithScripts terraformRequestWithScripts) throws RestClientException {
+        return validateWithScriptsWithHttpInfo(terraformRequestWithScripts).getBody();
     }
 
     /**
@@ -678,23 +634,20 @@ public class TerraformFromScriptsApi extends BaseApi {
      *
      * <p><b>502</b> - Bad Gateway
      *
-     * <p><b>503</b> - Service Unavailable
-     *
-     * @param terraformDeployWithScriptsRequest (required)
+     * @param terraformRequestWithScripts (required)
      * @return ResponseEntity&lt;TerraformValidationResult&gt;
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
     public ResponseEntity<TerraformValidationResult> validateWithScriptsWithHttpInfo(
-            TerraformDeployWithScriptsRequest terraformDeployWithScriptsRequest)
-            throws RestClientException {
-        Object localVarPostBody = terraformDeployWithScriptsRequest;
+            TerraformRequestWithScripts terraformRequestWithScripts) throws RestClientException {
+        Object localVarPostBody = terraformRequestWithScripts;
 
-        // verify the required parameter 'terraformDeployWithScriptsRequest' is set
-        if (terraformDeployWithScriptsRequest == null) {
+        // verify the required parameter 'terraformRequestWithScripts' is set
+        if (terraformRequestWithScripts == null) {
             throw new HttpClientErrorException(
                     HttpStatus.BAD_REQUEST,
-                    "Missing the required parameter 'terraformDeployWithScriptsRequest' when"
-                            + " calling validateWithScripts");
+                    "Missing the required parameter 'terraformRequestWithScripts' when calling"
+                            + " validateWithScripts");
         }
 
         final MultiValueMap<String, String> localVarQueryParams =

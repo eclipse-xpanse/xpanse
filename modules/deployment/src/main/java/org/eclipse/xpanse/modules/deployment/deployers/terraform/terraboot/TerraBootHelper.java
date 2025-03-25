@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraBootRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.config.TerraBootConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformScriptGitRepoDetails;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformScriptsGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
@@ -41,11 +41,11 @@ public class TerraBootHelper {
         this.deployEnvironments = deployEnvironments;
     }
 
-    /** Converts OCL DeployFromGitRepo type to terra-boot TerraformScriptGitRepoDetails type. */
-    public TerraformScriptGitRepoDetails convertTerraformScriptGitRepoDetailsFromDeployFromGitRepo(
-            ScriptsRepo scriptsRepo) {
-        TerraformScriptGitRepoDetails terraformScriptGitRepoDetails =
-                new TerraformScriptGitRepoDetails();
+    /** Converts OCL DeployFromGitRepo type to terra-boot TerraformScriptsGitRepoDetails type. */
+    public TerraformScriptsGitRepoDetails
+            convertTerraformScriptsGitRepoDetailsFromDeployFromGitRepo(ScriptsRepo scriptsRepo) {
+        TerraformScriptsGitRepoDetails terraformScriptGitRepoDetails =
+                new TerraformScriptsGitRepoDetails();
         terraformScriptGitRepoDetails.setRepoUrl(scriptsRepo.getRepoUrl());
         terraformScriptGitRepoDetails.setBranch(scriptsRepo.getBranch());
         terraformScriptGitRepoDetails.setScriptPath(scriptsRepo.getScriptsPath());

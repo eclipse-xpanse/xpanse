@@ -35,8 +35,6 @@ public class TerraBootManager {
     @Value("${terra-boot.endpoint:http://localhost:9090}")
     private String terraBootBaseUrl;
 
-    @Resource private TerraBootHelper terraBootHelper;
-
     /**
      * Get system status of TerraBoot.
      *
