@@ -33,7 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 class AdminHealthCheckWithRedisCacheTest extends AbstractRedisIntegrationTest {
 
-    @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
+    @Value("${spring.datasource.jdbcUrl}")
     private String dataSourceUrl;
 
     @Value("${spring.data.redis.host}")

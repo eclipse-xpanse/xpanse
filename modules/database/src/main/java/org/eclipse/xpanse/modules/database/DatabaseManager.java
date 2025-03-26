@@ -19,7 +19,7 @@ public class DatabaseManager {
     @Value("${spring.datasource.name:h2}")
     private String dataSourceName;
 
-    @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
+    @Value("${spring.datasource.jdbcUrl:jdbc:h2:file:./xpanse}")
     private String dataSourceUrl;
 
     /**

@@ -43,7 +43,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @AutoConfigureMockMvc
 class AdminServicesApiTest extends ApisTestCommon {
 
-    @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
+    @Value("${spring.datasource.jdbcUrl}")
     private String dataSourceUrl;
 
     @Resource private PluginManager pluginManager;
