@@ -37,7 +37,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 class AdminHealthCheckWithMysqlDbTest extends AbstractMysqlIntegrationTest {
 
-    @Value("${spring.datasource.url:jdbc:h2:file:./testdb}")
+    @Value("${spring.datasource.jdbcUrl}")
     private String dataSourceUrl;
 
     @Resource private AdminServicesApi adminServicesApi;
