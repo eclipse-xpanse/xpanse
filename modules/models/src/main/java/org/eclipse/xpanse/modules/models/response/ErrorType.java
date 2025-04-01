@@ -26,6 +26,7 @@ public enum ErrorType {
     DEPLOYER_NOT_FOUND("Deployer Not Found"),
     CREDENTIAL_DEFINITIONS_NOT_AVAILABLE("No Credential Definition Available"),
     SERVICE_STATE_INVALID("Invalid Service State"),
+    SERVICE_DEPLOYMENT_STATE_INVALID("Invalid Service Deployment State"),
     RESOURCE_TYPE_INVALID_FOR_MONITORING("Resource Invalid For Monitoring"),
     UNHANDLED_EXCEPTION("Unhandled Exception"),
     ICON_PROCESSING_FAILED("Icon Processing Failed"),

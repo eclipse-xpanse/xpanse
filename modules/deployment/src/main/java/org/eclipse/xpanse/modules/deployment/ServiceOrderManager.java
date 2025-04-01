@@ -24,7 +24,6 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceOrderStatusChangePolling;
 import org.eclipse.xpanse.modules.deployment.utils.MdcUtils;
@@ -50,13 +49,11 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Component
 public class ServiceOrderManager {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Resource private ServiceOrderStorage serviceOrderStorage;
     @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
     @Resource private UserServiceHelper userServiceHelper;
     @Resource private ServiceOrderStatusChangePolling serviceOrderStatusChangePolling;
-    @Resource private ObjectMapper objectMapper;
-    @Resource private SensitiveDataHandler sensitiveDataHandler;
 
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;

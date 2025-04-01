@@ -20,7 +20,6 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
 import org.eclipse.xpanse.modules.database.service.ServiceQueryModel;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -48,7 +47,6 @@ public class ServiceDetailsViewManager {
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @Resource private UserServiceHelper userServiceHelper;
     @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
     @Resource private ServiceResultReFetchManager serviceResultReFetchManager;
     @Resource private SensitiveDataHandler sensitiveDataHandler;
 

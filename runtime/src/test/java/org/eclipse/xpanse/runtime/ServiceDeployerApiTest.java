@@ -445,7 +445,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         }
         testDeployApiFailedWithVariableInvalidException();
         testApisThrowsServiceDeploymentNotFoundException();
-        testApisThrowsInvalidServiceStateException(serviceId);
+        testApisThrowsInvalidServiceDeploymentStateException(serviceId);
         testApisThrowsServiceLockedException(serviceId);
         testApisThrowsAccessDeniedException(serviceId);
 
@@ -484,7 +484,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         assertEquals(
                 ErrorType.SERVICE_FLAVOR_DOWNGRADE_NOT_ALLOWED, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     void testApisThrowsServiceLockedException(UUID serviceId) throws Exception {
@@ -552,7 +552,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         modifyResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
 
         // Run the test
         final MockHttpServletResponse redeployResponse = redeployService(serviceId);
@@ -562,7 +561,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         redeployResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
 
         // Run the test
         final MockHttpServletResponse destroyResponse = destroyService(serviceId);
@@ -573,7 +571,6 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         destroyResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
 
         // Run the test
         final MockHttpServletResponse purgeResponse = purgeService(serviceId);
@@ -583,15 +580,14 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         purgeResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.SERVICE_DEPLOYMENT_NOT_FOUND, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
     }
 
-    void testApisThrowsInvalidServiceStateException(UUID serviceId) throws Exception {
+    void testApisThrowsInvalidServiceDeploymentStateException(UUID serviceId) throws Exception {
 
         // SetUp modify
         String errorMsg =
                 setInvalidStateAndGetExceptedErrorMsg(
-                        serviceId, ServiceDeploymentState.DESTROYING, "modify");
+                        serviceId, ServiceDeploymentState.DESTROYING, ServiceOrderType.MODIFY);
         ModifyRequest modifyRequest = new ModifyRequest();
         modifyRequest.setFlavor("flavor-error");
 
@@ -601,61 +597,67 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         OrderFailedErrorResponse orderFailedResponse =
                 objectMapper.readValue(
                         modifyResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(ErrorType.SERVICE_STATE_INVALID, orderFailedResponse.getErrorType());
+        assertEquals(
+                ErrorType.SERVICE_DEPLOYMENT_STATE_INVALID, orderFailedResponse.getErrorType());
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
 
         // SetUp redeploy
         errorMsg =
                 setInvalidStateAndGetExceptedErrorMsg(
-                        serviceId, ServiceDeploymentState.DEPLOY_SUCCESS, "redeploy");
+                        serviceId, ServiceDeploymentState.DEPLOY_SUCCESS, ServiceOrderType.RETRY);
         // Run the test
         final MockHttpServletResponse redeployResponse = redeployService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), redeployResponse.getStatus());
         orderFailedResponse =
                 objectMapper.readValue(
                         redeployResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(ErrorType.SERVICE_STATE_INVALID, orderFailedResponse.getErrorType());
+        assertEquals(
+                ErrorType.SERVICE_DEPLOYMENT_STATE_INVALID, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp destroy
         errorMsg =
                 setInvalidStateAndGetExceptedErrorMsg(
-                        serviceId, ServiceDeploymentState.DEPLOYING, "destroy");
+                        serviceId, ServiceDeploymentState.DEPLOYING, ServiceOrderType.DESTROY);
         // Run the test
         final MockHttpServletResponse destroyResponse = destroyService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), destroyResponse.getStatus());
         orderFailedResponse =
                 objectMapper.readValue(
                         destroyResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(ErrorType.SERVICE_STATE_INVALID, orderFailedResponse.getErrorType());
+        assertEquals(
+                ErrorType.SERVICE_DEPLOYMENT_STATE_INVALID, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp purge
         errorMsg =
                 setInvalidStateAndGetExceptedErrorMsg(
-                        serviceId, ServiceDeploymentState.DEPLOYING, "purge");
+                        serviceId, ServiceDeploymentState.DEPLOYING, ServiceOrderType.PURGE);
         // Run the test
         final MockHttpServletResponse purgeResponse = purgeService(serviceId);
         assertEquals(HttpStatus.BAD_REQUEST.value(), purgeResponse.getStatus());
         orderFailedResponse =
                 objectMapper.readValue(
                         purgeResponse.getContentAsString(), OrderFailedErrorResponse.class);
-        assertEquals(ErrorType.SERVICE_STATE_INVALID, orderFailedResponse.getErrorType());
+        assertEquals(
+                ErrorType.SERVICE_DEPLOYMENT_STATE_INVALID, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     String setInvalidStateAndGetExceptedErrorMsg(
-            UUID serviceId, ServiceDeploymentState state, String action) {
+            UUID serviceId, ServiceDeploymentState state, ServiceOrderType serviceOrderType) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId);
         serviceDeploymentEntity.setServiceDeploymentState(state);
         serviceDeploymentStorage.storeAndFlush(serviceDeploymentEntity);
         return String.format(
-                "Service %s with the state %s is not allowed to %s.", serviceId, state, action);
+                "Request with type %s to the service %s with the deployment state %s is"
+                        + " not allowed.",
+                serviceOrderType.toValue(), serviceDeploymentEntity.getId(), state.toValue());
     }
 
     void testApisThrowsAccessDeniedException(UUID serviceId) throws Exception {
@@ -712,7 +714,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         modifyResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.ACCESS_DENIED, orderFailedResponse.getErrorType());
         assertEquals(List.of(errorMsg3), orderFailedResponse.getDetails());
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp redeploy
         String errorMsg4 =
@@ -727,7 +729,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         redeployResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.ACCESS_DENIED, orderFailedResponse.getErrorType());
         assertEquals(List.of(errorMsg4), orderFailedResponse.getDetails());
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp destroy
         String errorMsg5 =
@@ -742,7 +744,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         destroyResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.ACCESS_DENIED, orderFailedResponse.getErrorType());
         assertEquals(List.of(errorMsg5), orderFailedResponse.getDetails());
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         // SetUp purge
         String errorMsg6 =
@@ -757,7 +759,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         purgeResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.ACCESS_DENIED, orderFailedResponse.getErrorType());
         assertEquals(List.of(errorMsg6), orderFailedResponse.getDetails());
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     void testDeployApiFailedWithVariableInvalidException() throws Exception {
@@ -904,7 +906,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         destroyResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.SERVICE_LOCKED, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     void testModifyThrowsServiceLockedException(UUID serviceId) throws Exception {
@@ -920,7 +922,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         modifyResponse.getContentAsString(), OrderFailedErrorResponse.class);
         assertEquals(ErrorType.SERVICE_LOCKED, orderFailedResponse.getErrorType());
         assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
-        assertEquals(orderFailedResponse.getServiceId(), null);
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
     }
 
     void testPurge(UUID serviceId) throws Exception {

@@ -28,6 +28,7 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.DeployerN
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidDeploymentVariableException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceDeploymentStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceFlavorDowngradeNotAllowed;
@@ -144,6 +145,18 @@ class DeploymentExceptionHandlerTest {
                 .perform(get("/xpanse/services"))
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.errorType").value("Invalid Service State"))
+                .andExpect(jsonPath("$.details[0]").value("test error"));
+    }
+
+    @Test
+    void testInvalidServiceDeploymentStateException() throws Exception {
+        when(serviceDetailsViewManager.listDeployedServices(any(), any(), any(), any(), any()))
+                .thenThrow(new InvalidServiceDeploymentStateException("test error"));
+
+        this.mockMvc
+                .perform(get("/xpanse/services"))
+                .andExpect(status().is(400))
+                .andExpect(jsonPath("$.errorType").value("Invalid Service Deployment State"))
                 .andExpect(jsonPath("$.details[0]").value("test error"));
     }
 

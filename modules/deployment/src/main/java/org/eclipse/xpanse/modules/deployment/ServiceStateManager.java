@@ -28,7 +28,6 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNo
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
@@ -47,7 +46,7 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class ServiceStateManager {
 
-    @Resource private ServiceDeploymentEntityHandler serviceHandler;
+    @Resource private ServiceDeploymentEntityHandler serviceDeploymentHandler;
     @Resource private PluginManager pluginManager;
     @Resource private UserServiceHelper userServiceHelper;
     @Resource private ServiceOrderManager serviceOrderManager;
@@ -81,9 +80,7 @@ public class ServiceStateManager {
         deployTask.setServiceId(service.getId());
         deployTask.setTaskType(taskType);
         deployTask.setUserId(getUserId());
-        ServiceOrderEntity serviceOrder =
-                serviceOrderManager.storeNewServiceOrderEntity(deployTask, service, Handler.PLUGIN);
-        return serviceOrder;
+        return serviceOrderManager.storeNewServiceOrderEntity(deployTask, service, Handler.PLUGIN);
     }
 
     private void asyncStartService(
@@ -93,7 +90,7 @@ public class ServiceStateManager {
             ServiceDeploymentEntity service) {
         serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.STARTING);
-        serviceHandler.storeAndFlush(service);
+        serviceDeploymentHandler.storeAndFlush(service);
         boolean result = false;
         try {
             result = plugin.startService(request);
@@ -114,7 +111,7 @@ public class ServiceStateManager {
                 serviceOrderTaskEntity.getOrderId(),
                 serviceOrderTaskEntity.getOrderStatus(),
                 serviceOrderTaskEntity.getErrorResponse());
-        serviceHandler.storeAndFlush(service);
+        serviceDeploymentHandler.storeAndFlush(service);
     }
 
     /**
@@ -145,7 +142,7 @@ public class ServiceStateManager {
         serviceOrderTaskEntity.setOrderStatus(OrderStatus.IN_PROGRESS);
         serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.STOPPING);
-        serviceHandler.storeAndFlush(service);
+        serviceDeploymentHandler.storeAndFlush(service);
         boolean result = false;
         try {
             result = plugin.stopService(request);
@@ -166,7 +163,7 @@ public class ServiceStateManager {
                 serviceOrderTaskEntity.getOrderId(),
                 serviceOrderTaskEntity.getOrderStatus(),
                 serviceOrderTaskEntity.getErrorResponse());
-        serviceHandler.storeAndFlush(service);
+        serviceDeploymentHandler.storeAndFlush(service);
     }
 
     /**
@@ -196,7 +193,7 @@ public class ServiceStateManager {
             ServiceDeploymentEntity service) {
         serviceOrderTaskEntity = serviceOrderManager.startOrderProgress(serviceOrderTaskEntity);
         service.setServiceState(ServiceState.RESTARTING);
-        serviceHandler.storeAndFlush(service);
+        serviceDeploymentHandler.storeAndFlush(service);
         boolean result = false;
         try {
             result = plugin.restartService(request);
@@ -217,13 +214,27 @@ public class ServiceStateManager {
                 serviceOrderTaskEntity.getOrderId(),
                 serviceOrderTaskEntity.getOrderStatus(),
                 serviceOrderTaskEntity.getErrorResponse());
-        serviceHandler.storeAndFlush(service);
+        serviceDeploymentHandler.storeAndFlush(service);
     }
 
     private ServiceDeploymentEntity getDeployedServiceAndValidateState(
             UUID serviceId, ServiceOrderType taskType) {
-        ServiceDeploymentEntity service = serviceHandler.getServiceDeploymentEntity(serviceId);
-        validateDeployServiceEntity(service);
+        ServiceDeploymentEntity service =
+                serviceDeploymentHandler.getServiceDeploymentEntity(serviceId);
+        if (service.getServiceHostingType() == ServiceHostingType.SELF) {
+            boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(service.getUserId());
+            if (!currentUserIsOwner) {
+                String errorMsg =
+                        String.format(
+                                "No permission to %s owned by other users.",
+                                UserOperation.CHANGE_SERVICE_STATE.toValue());
+                log.error(errorMsg);
+                throw new AccessDeniedException(errorMsg);
+            }
+        }
+        serviceDeploymentHandler.validateServiceDeploymentStateForOrderType(service, taskType);
+
+        // check if there is a running management task
         if (service.getServiceState() == ServiceState.STARTING
                 || service.getServiceState() == ServiceState.STOPPING
                 || service.getServiceState() == ServiceState.RESTARTING) {
@@ -233,6 +244,7 @@ public class ServiceStateManager {
                                     + " later.",
                             serviceId));
         }
+        // validate powers state for service start/stop/restart
         if (taskType == ServiceOrderType.SERVICE_START) {
             validateStartActionForService(service);
         } else if (taskType == ServiceOrderType.SERVICE_STOP) {
@@ -286,33 +298,6 @@ public class ServiceStateManager {
                     String.format(
                             "Service %s with state %s is not supported to restart.",
                             service.getId(), service.getServiceState().toValue());
-            log.error(errorMsg);
-            throw new InvalidServiceStateException(errorMsg);
-        }
-    }
-
-    private void validateDeployServiceEntity(ServiceDeploymentEntity service) {
-        if (service.getServiceHostingType() == ServiceHostingType.SELF) {
-            boolean currentUserIsOwner = userServiceHelper.currentUserIsOwner(service.getUserId());
-            if (!currentUserIsOwner) {
-                String errorMsg =
-                        String.format(
-                                "No permission to %s owned by other users.",
-                                UserOperation.CHANGE_SERVICE_STATE.toValue());
-                log.error(errorMsg);
-                throw new AccessDeniedException(errorMsg);
-            }
-        }
-        ServiceDeploymentState serviceDeploymentState = service.getServiceDeploymentState();
-        if (!(serviceDeploymentState == ServiceDeploymentState.DEPLOY_SUCCESS
-                || serviceDeploymentState == ServiceDeploymentState.DESTROY_FAILED
-                || serviceDeploymentState == ServiceDeploymentState.MODIFICATION_SUCCESSFUL
-                || serviceDeploymentState == ServiceDeploymentState.MODIFICATION_FAILED)) {
-            String errorMsg =
-                    String.format(
-                            "Service %s with deployment state %s is not supported"
-                                    + " to manage power state.",
-                            service.getId(), serviceDeploymentState.toValue());
             log.error(errorMsg);
             throw new InvalidServiceStateException(errorMsg);
         }

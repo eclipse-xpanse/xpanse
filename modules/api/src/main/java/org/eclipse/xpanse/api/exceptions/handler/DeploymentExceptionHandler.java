@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.EulaNotAc
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FileLockedException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidDeploymentVariableException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceDeploymentStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceDetailsNotAccessible;
@@ -89,6 +90,17 @@ public class DeploymentExceptionHandler {
     public ErrorResponse handleInvalidServiceStateException(InvalidServiceStateException ex) {
         return getErrorResponse(
                 ErrorType.SERVICE_STATE_INVALID, Collections.singletonList(ex.getMessage()));
+    }
+
+    /** Exception handler for InvalidServiceDeploymentStateException. */
+    @ExceptionHandler({InvalidServiceDeploymentStateException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleInvalidServiceDeploymentStateException(
+            InvalidServiceDeploymentStateException ex) {
+        return getErrorResponse(
+                ErrorType.SERVICE_DEPLOYMENT_STATE_INVALID,
+                Collections.singletonList(ex.getMessage()));
     }
 
     /** Exception handler for ServiceNotDeployedException. */

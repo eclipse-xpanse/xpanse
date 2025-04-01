@@ -12,7 +12,6 @@ import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,7 +20,6 @@ import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
@@ -37,7 +35,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
-import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -50,8 +47,6 @@ public class ServiceActionManager {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     @Resource private DeployService deployService;
 
@@ -70,13 +65,10 @@ public class ServiceActionManager {
         try {
             ServiceDeploymentEntity serviceDeploymentEntity =
                     serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
+            serviceDeploymentEntityHandler.validateServiceDeploymentStateForOrderType(
+                    serviceDeploymentEntity, ServiceOrderType.SERVICE_ACTION);
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceDeploymentEntity.getServiceTemplateEntity();
-            if (Objects.isNull(serviceTemplateEntity)) {
-                String errMsg = String.format("Service template not found.");
-                log.error(errMsg);
-                throw new ServiceTemplateNotRegistered(errMsg);
-            }
             validateAllActionChangeOrdersCompleted(serviceDeploymentEntity);
             validateServiceActions(serviceTemplateEntity, request.getActionParameters());
             UUID orderId =
