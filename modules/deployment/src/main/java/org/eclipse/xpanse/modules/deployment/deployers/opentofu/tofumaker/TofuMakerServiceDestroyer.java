@@ -11,8 +11,8 @@ import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDestroyFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncDestroyFromScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncRequestWithScripts;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuAsyncRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -49,7 +49,7 @@ public class TofuMakerServiceDestroyer {
                 deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
-        OpenTofuAsyncDestroyFromScriptsRequest request =
+        OpenTofuAsyncRequestWithScripts request =
                 getDestroyFromScriptsRequest(deployTask, resourceState);
         try {
             openTofuFromScriptsApi.asyncDestroyWithScripts(request);
@@ -66,7 +66,7 @@ public class TofuMakerServiceDestroyer {
                 deploymentEntityHandler.getServiceDeploymentEntity(deployTask.getServiceId());
         String resourceState = TfResourceTransUtils.getStoredStateContent(serviceDeploymentEntity);
         DeployResult result = new DeployResult();
-        OpenTofuAsyncDestroyFromGitRepoRequest request =
+        OpenTofuAsyncRequestWithScriptsGitRepo request =
                 getDestroyFromGitRepoRequest(deployTask, resourceState);
         try {
             openTofuFromGitRepoApi.asyncDestroyFromGitRepo(request);
@@ -77,10 +77,10 @@ public class TofuMakerServiceDestroyer {
         }
     }
 
-    private OpenTofuAsyncDestroyFromScriptsRequest getDestroyFromScriptsRequest(
+    private OpenTofuAsyncRequestWithScripts getDestroyFromScriptsRequest(
             DeployTask task, String stateFile) throws OpenTofuMakerRequestFailedException {
-        OpenTofuAsyncDestroyFromScriptsRequest request =
-                new OpenTofuAsyncDestroyFromScriptsRequest();
+        OpenTofuAsyncRequestWithScripts request = new OpenTofuAsyncRequestWithScripts();
+        request.setRequestType(OpenTofuAsyncRequestWithScripts.RequestTypeEnum.DESTROY);
         request.setRequestId(task.getOrderId());
         request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
@@ -91,10 +91,11 @@ public class TofuMakerServiceDestroyer {
         return request;
     }
 
-    private OpenTofuAsyncDestroyFromGitRepoRequest getDestroyFromGitRepoRequest(
+    private OpenTofuAsyncRequestWithScriptsGitRepo getDestroyFromGitRepoRequest(
             DeployTask task, String stateFile) throws OpenTofuMakerRequestFailedException {
-        OpenTofuAsyncDestroyFromGitRepoRequest request =
-                new OpenTofuAsyncDestroyFromGitRepoRequest();
+        OpenTofuAsyncRequestWithScriptsGitRepo request =
+                new OpenTofuAsyncRequestWithScriptsGitRepo();
+        request.setRequestType(OpenTofuAsyncRequestWithScriptsGitRepo.RequestTypeEnum.DESTROY);
         request.setRequestId(task.getOrderId());
         request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setTfState(stateFile);
@@ -102,7 +103,7 @@ public class TofuMakerServiceDestroyer {
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
         request.setWebhookConfig(tofuMakerHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
-                tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
+                tofuMakerHelper.convertOpenTofuScriptsGitRepoDetailsFromDeployFromGitRepo(
                         task.getOcl().getDeployment().getScriptsRepo()));
         return request;
     }

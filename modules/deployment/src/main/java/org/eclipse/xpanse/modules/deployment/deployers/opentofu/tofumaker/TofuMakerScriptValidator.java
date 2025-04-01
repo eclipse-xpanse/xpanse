@@ -16,8 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDeployFromGitRepoRequest;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuDeployWithScriptsRequest;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuRequestWithScripts;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuRequestWithScriptsGitRepo;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuValidationResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
@@ -92,8 +92,9 @@ public class TofuMakerScriptValidator {
         return deployValidationResult;
     }
 
-    private OpenTofuDeployWithScriptsRequest getValidateScriptsInOclRequest(Deployment deployment) {
-        OpenTofuDeployWithScriptsRequest request = new OpenTofuDeployWithScriptsRequest();
+    private OpenTofuRequestWithScripts getValidateScriptsInOclRequest(Deployment deployment) {
+        OpenTofuRequestWithScripts request = new OpenTofuRequestWithScripts();
+        request.setRequestType(OpenTofuRequestWithScripts.RequestTypeEnum.VALIDATE);
         request.setRequestId(getRequestId());
         request.setOpenTofuVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
@@ -101,14 +102,15 @@ public class TofuMakerScriptValidator {
         return request;
     }
 
-    private OpenTofuDeployFromGitRepoRequest getValidateScriptsInGitRepoRequest(
+    private OpenTofuRequestWithScriptsGitRepo getValidateScriptsInGitRepoRequest(
             Deployment deployment) {
-        OpenTofuDeployFromGitRepoRequest request = new OpenTofuDeployFromGitRepoRequest();
+        OpenTofuRequestWithScriptsGitRepo request = new OpenTofuRequestWithScriptsGitRepo();
+        request.setRequestType(OpenTofuRequestWithScriptsGitRepo.RequestTypeEnum.VALIDATE);
         request.setRequestId(getRequestId());
         request.setOpenTofuVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
-                tofuMakerHelper.convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
+                tofuMakerHelper.convertOpenTofuScriptsGitRepoDetailsFromDeployFromGitRepo(
                         deployment.getScriptsRepo()));
         return request;
     }
