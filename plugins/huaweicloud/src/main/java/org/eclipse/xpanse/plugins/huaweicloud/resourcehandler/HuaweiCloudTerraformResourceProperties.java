@@ -23,6 +23,7 @@ public enum HuaweiCloudTerraformResourceProperties {
     HUAWEI_CLOUD_KEYPAIR_PROPERTIES("huaweicloud_kps_keypair", new HuaweiKeyPairProperties()),
     HUAWEI_CLOUD_SECURITY_GROUP_PROPERTIES(
             "huaweicloud_networking_secgroup", new HuaweiSecurityGroupProperties()),
+    HUAWEI_CLOUD_RDS_PROPERTIES("huaweicloud_rds_instance", new HuaweiRdsProperties()),
     HUAWEI_CLOUD_SECURITY_GROUP_RULE_PROPERTIES(
             "huaweicloud_networking_secgroup_rule", new HuaweiSecurityGroupRuleProperties());
 
@@ -78,6 +79,26 @@ public enum HuaweiCloudTerraformResourceProperties {
             map.put("image_id", "image_id");
             map.put("image_name", "image_name");
             map.put("region", "region");
+            return map;
+        }
+    }
+
+    /** Huawei cloud rds properties. */
+    static class HuaweiRdsProperties extends DeployResourceProperties {
+
+        @Override
+        public DeployResourceKind getResourceKind() {
+            return DeployResourceKind.RDS;
+        }
+
+        @Override
+        public Map<String, String> getResourceProperties() {
+            Map<String, String> map = new HashMap<>();
+            map.put("ip", "fixed_ip");
+            map.put("name", "name");
+            map.put("nodes", "nodes");
+            map.put("region", "region");
+            map.put("db", "db");
             return map;
         }
     }

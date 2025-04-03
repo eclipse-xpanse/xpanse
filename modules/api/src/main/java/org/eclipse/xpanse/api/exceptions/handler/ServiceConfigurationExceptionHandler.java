@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.servicechange.exceptions.ServiceChangeRequestEntityNotFoundException;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceActionChangeOrderAlreadyExistsException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigChangeOrderAlreadyExistsException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationNotFoundException;
@@ -69,17 +68,6 @@ public class ServiceConfigurationExceptionHandler {
             ServiceConfigChangeOrderAlreadyExistsException ex) {
         return getErrorResponse(
                 ErrorType.SERVICE_CONFIG_CHANGE_ORDER_ALREADY_EXISTS,
-                Collections.singletonList(ex.getMessage()));
-    }
-
-    /** Exception handler for ServiceActionChangeOrderAlreadyExistsException. */
-    @ExceptionHandler({ServiceActionChangeOrderAlreadyExistsException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ErrorResponse handleServiceActionChangeOrderAlreadyExistsException(
-            ServiceActionChangeOrderAlreadyExistsException ex) {
-        return getErrorResponse(
-                ErrorType.SERVICE_ACTION_CHANGE_ORDER_ALREADY_EXISTS,
                 Collections.singletonList(ex.getMessage()));
     }
 }

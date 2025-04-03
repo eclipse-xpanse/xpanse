@@ -25,7 +25,10 @@ public enum ServiceOrderType {
     PURGE("purge"),
     SERVICE_START("serviceStart"),
     SERVICE_STOP("serviceStop"),
-    SERVICE_RESTART("serviceRestart");
+    SERVICE_RESTART("serviceRestart"),
+    OBJECT_CREATE("objectCreate"),
+    OBJECT_MODIFY("objectModify"),
+    OBJECT_DELETE("objectDelete");
 
     private final String type;
 

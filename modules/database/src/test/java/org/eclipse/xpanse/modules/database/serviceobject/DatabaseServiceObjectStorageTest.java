@@ -7,7 +7,7 @@
 package org.eclipse.xpanse.modules.database.serviceobject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.models.serviceobject.exceptions.ServiceObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,9 +63,6 @@ class DatabaseServiceObjectStorageTest {
 
     @Test
     void getEntityByIdShouldReturnNullWhenNotExists() {
-        when(repository.findById(objectId)).thenReturn(Optional.empty());
-        ServiceObjectEntity result = storage.getEntityById(objectId);
-        verify(repository, times(1)).findById(objectId);
-        assertNull(result);
+        assertThrows(ServiceObjectNotFoundException.class, () -> storage.getEntityById(objectId));
     }
 }

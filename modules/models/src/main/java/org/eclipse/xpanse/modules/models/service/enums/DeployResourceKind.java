@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 /** The kind of the Resources. */
 public enum DeployResourceKind {
     VM("vm", null),
+    RDS("rds", null),
     CONTAINER("container", null),
     PUBLIC_IP("publicIP", null),
     VPC("vpc", null),

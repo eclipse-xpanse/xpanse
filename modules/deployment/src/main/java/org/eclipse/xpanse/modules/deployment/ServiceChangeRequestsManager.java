@@ -86,6 +86,10 @@ public class ServiceChangeRequestsManager {
                                                                 finalPropertiesToBeUsed,
                                                                 originalRequestProperties,
                                                                 serviceOrderEntity);
+                                                request.setResourceName(
+                                                        deployResourceList
+                                                                .getFirst()
+                                                                .getResourceName());
                                                 requests.add(request);
                                             } else {
                                                 deployResourceList.forEach(

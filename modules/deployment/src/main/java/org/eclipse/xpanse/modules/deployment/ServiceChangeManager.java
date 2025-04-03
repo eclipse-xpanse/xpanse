@@ -38,6 +38,7 @@ import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeResult;
 import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
 import org.eclipse.xpanse.modules.models.servicechange.exceptions.ServiceChangeRequestEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
+import org.eclipse.xpanse.modules.models.servicetemplate.AnsibleScriptConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.hibernate.exception.LockTimeoutException;
 import org.springframework.http.HttpStatus;
@@ -60,6 +61,7 @@ public class ServiceChangeManager {
     @Resource private ServiceOrderManager serviceOrderManager;
     @Resource private ServiceConfigurationManager serviceConfigurationManager;
     @Resource private ServiceActionManager serviceActionManager;
+    @Resource private ServiceObjectManager serviceObjectManager;
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
     /** returns the oldest pending request for a specific resource of the service. */
@@ -142,26 +144,38 @@ public class ServiceChangeManager {
             ServiceChangeRequestEntity request, List<DeployResource> deployResources) {
         ServiceChangeRequest serviceChangeRequest = new ServiceChangeRequest();
         serviceChangeRequest.setChangeId(request.getId());
-        if (request.getServiceOrderEntity().getTaskType() == ServiceOrderType.CONFIG_CHANGE) {
-            Optional<ServiceChangeScript> configManageScriptOptional =
-                    this.serviceConfigurationManager.getConfigManageScript(request);
-            configManageScriptOptional.ifPresent(
-                    serviceChangeScript ->
-                            serviceChangeRequest.setAnsibleScriptConfig(
-                                    serviceChangeScript.getAnsibleScriptConfig()));
-        } else if (request.getServiceOrderEntity().getTaskType()
-                == ServiceOrderType.SERVICE_ACTION) {
-            Optional<ServiceChangeScript> changeManageScriptOptional =
-                    this.serviceActionManager.getServiceActionManageScript(request);
-            changeManageScriptOptional.ifPresent(
-                    serviceChangeScript ->
-                            serviceChangeRequest.setAnsibleScriptConfig(
-                                    serviceChangeScript.getAnsibleScriptConfig()));
-        }
-
+        serviceChangeRequest.setAnsibleScriptConfig(getAnsibleScriptConfig(request));
         serviceChangeRequest.setServiceChangeParameters(request.getProperties());
         serviceChangeRequest.setAnsibleInventory(getAnsibleInventory(deployResources));
         return serviceChangeRequest;
+    }
+
+    private AnsibleScriptConfig getAnsibleScriptConfig(ServiceChangeRequestEntity request) {
+        ServiceOrderType serviceOrderType = request.getServiceOrderEntity().getTaskType();
+        return switch (serviceOrderType) {
+            case CONFIG_CHANGE -> {
+                Optional<ServiceChangeScript> configManageScriptOptional =
+                        this.serviceConfigurationManager.getConfigManageScript(request);
+                yield configManageScriptOptional
+                        .map(ServiceChangeScript::getAnsibleScriptConfig)
+                        .orElse(null);
+            }
+            case SERVICE_ACTION -> {
+                Optional<ServiceChangeScript> changeManageScriptOptional =
+                        this.serviceActionManager.getServiceActionManageScript(request);
+                yield changeManageScriptOptional
+                        .map(ServiceChangeScript::getAnsibleScriptConfig)
+                        .orElse(null);
+            }
+            case OBJECT_CREATE, OBJECT_MODIFY, OBJECT_DELETE -> {
+                Optional<ServiceChangeScript> serviceObjectScriptOptional =
+                        this.serviceObjectManager.getServiceObjectManageScript(request);
+                yield serviceObjectScriptOptional
+                        .map(ServiceChangeScript::getAnsibleScriptConfig)
+                        .orElse(null);
+            }
+            default -> null;
+        };
     }
 
     /**
@@ -235,6 +249,15 @@ public class ServiceChangeManager {
                             == ServiceOrderType.CONFIG_CHANGE) {
                         serviceConfigurationManager.updateServiceConfigurationInDatabase(
                                 request, request.getOriginalRequestProperties());
+                    }
+                    // update object only if the job all requests are successful.
+                    if (request.getServiceOrderEntity().getTaskType()
+                                    == ServiceOrderType.OBJECT_CREATE
+                            || request.getServiceOrderEntity().getTaskType()
+                                    == ServiceOrderType.OBJECT_MODIFY
+                            || request.getServiceOrderEntity().getTaskType()
+                                    == ServiceOrderType.OBJECT_DELETE) {
+                        serviceObjectManager.updateServiceObjectInDatabase(request, entity);
                     }
                 } else {
                     updateServiceOrderByResult(

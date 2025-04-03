@@ -10,7 +10,8 @@ import static org.eclipse.xpanse.api.exceptions.handler.CommonExceptionHandler.g
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceActionTemplateInvalidException;
+import org.eclipse.xpanse.modules.models.serviceaction.exceptions.ServiceActionTemplateInvalidException;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,5 +30,14 @@ public class ServiceActionExceptionHandler {
     public ErrorResponse handleServiceActionInvalidException(
             ServiceActionTemplateInvalidException ex) {
         return getErrorResponse(ErrorType.INVALID_SERVICE_ACTION, ex.getErrorReasons());
+    }
+
+    /** Exception handler for ServiceConfigurationNotValidException. */
+    @ExceptionHandler({ServiceConfigurationInvalidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleServiceConfigurationInvalidException(
+            ServiceConfigurationInvalidException ex) {
+        return getErrorResponse(ErrorType.INVALID_SERVICE_CONFIGURATION, ex.getErrorReasons());
     }
 }

@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
-import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceActionTemplateInvalidException;
+import org.eclipse.xpanse.modules.models.serviceaction.exceptions.ServiceActionTemplateInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;

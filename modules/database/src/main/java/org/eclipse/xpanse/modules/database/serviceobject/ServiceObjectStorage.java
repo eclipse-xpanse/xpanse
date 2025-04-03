@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.database.serviceobject;
 
+import java.util.Set;
 import java.util.UUID;
 
 /** Interface for persist of ServiceObjectEntity. */
@@ -16,4 +17,6 @@ public interface ServiceObjectStorage {
     void delete(ServiceObjectEntity entity);
 
     ServiceObjectEntity getEntityById(UUID objectId);
+
+    Set<UUID> getObjectIdsByDependentObjectId(UUID dependentObjectId);
 }
