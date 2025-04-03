@@ -372,7 +372,7 @@ public class DeployService {
         entity.setUserId(deployTask.getUserId());
         entity.setServiceHostingType(deployTask.getDeployRequest().getServiceHostingType());
         entity.setRegion(deployTask.getDeployRequest().getRegion());
-        if (!CollectionUtils.isEmpty(deployTask.getDeployRequest().getServiceRequestProperties())) {
+        if (!CollectionUtils.isEmpty(deployTask.getDeployRequest().getAvailabilityZones())) {
             entity.setAvailabilityZones(deployTask.getDeployRequest().getAvailabilityZones());
         }
         entity.setFlavor(deployTask.getDeployRequest().getFlavor());
