@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.config.TofuMakerConfig;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuScriptGitRepoDetails;
+import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuScriptsGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
@@ -42,10 +42,10 @@ public class TofuMakerHelper {
     }
 
     /** Converts OCL DeployFromGitRepo type to tofu-maker OpenTofuScriptGitRepoDetails type. */
-    public OpenTofuScriptGitRepoDetails convertOpenTofuScriptGitRepoDetailsFromDeployFromGitRepo(
+    public OpenTofuScriptsGitRepoDetails convertOpenTofuScriptsGitRepoDetailsFromDeployFromGitRepo(
             ScriptsRepo scriptsRepo) {
-        OpenTofuScriptGitRepoDetails openTofuScriptGitRepoDetails =
-                new OpenTofuScriptGitRepoDetails();
+        OpenTofuScriptsGitRepoDetails openTofuScriptGitRepoDetails =
+                new OpenTofuScriptsGitRepoDetails();
         openTofuScriptGitRepoDetails.setRepoUrl(scriptsRepo.getRepoUrl());
         openTofuScriptGitRepoDetails.setBranch(scriptsRepo.getBranch());
         openTofuScriptGitRepoDetails.setScriptPath(scriptsRepo.getScriptsPath());

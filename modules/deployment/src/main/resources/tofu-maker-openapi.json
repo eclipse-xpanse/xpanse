@@ -3,7 +3,7 @@
   "info": {
     "title": "Tofu-Maker API",
     "description": "RESTful Services to interact with opentofu CLI",
-    "version": "1.0.13-SNAPSHOT"
+    "version": "1.0.14-SNAPSHOT"
   },
   "servers": [
     {
@@ -46,7 +46,7 @@
         "tags": [
           "RetrieveOpenTofuResult"
         ],
-        "description": "Method to batch retrieve stored openTofu results from tofu-maker.",
+        "description": "Method to batch retrieve stored opentofu result from tofu-maker.",
         "operationId": "getBatchTaskResults",
         "requestBody": {
           "content": {
@@ -106,16 +106,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -131,7 +121,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuDeployWithScriptsRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScripts"
               }
             }
           },
@@ -170,16 +160,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -202,7 +182,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuPlanWithScriptsRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScripts"
               }
             }
           },
@@ -248,16 +228,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -273,7 +243,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuModifyWithScriptsRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScripts"
               }
             }
           },
@@ -312,16 +282,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -344,7 +304,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuAsyncModifyFromScriptsRequest"
+                "$ref": "#/components/schemas/OpenTofuAsyncRequestWithScripts"
               }
             }
           },
@@ -376,16 +336,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -408,7 +358,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuDestroyWithScriptsRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScripts"
               }
             }
           },
@@ -447,16 +397,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -479,7 +419,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuDeployWithScriptsRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScripts"
               }
             }
           },
@@ -525,16 +465,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -550,7 +480,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuAsyncDeployFromScriptsRequest"
+                "$ref": "#/components/schemas/OpenTofuAsyncRequestWithScripts"
               }
             }
           },
@@ -589,16 +519,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -614,7 +534,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuDeployFromGitRepoRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsGitRepo"
               }
             }
           },
@@ -660,16 +580,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -685,7 +595,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuPlanFromGitRepoRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsGitRepo"
               }
             }
           },
@@ -724,16 +634,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -756,7 +656,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuModifyFromGitRepoRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsGitRepo"
               }
             }
           },
@@ -802,16 +702,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -821,13 +711,13 @@
         "tags": [
           "OpenTofuFromGitRepo"
         ],
-        "description": "async modify resources via OpenTofu",
+        "description": "async deploy resources via OpenTofu",
         "operationId": "asyncModifyFromGitRepo",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuAsyncModifyFromGitRepoRequest"
+                "$ref": "#/components/schemas/OpenTofuAsyncRequestWithScriptsGitRepo"
               }
             }
           },
@@ -859,16 +749,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -891,7 +771,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuDestroyFromGitRepoRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsGitRepo"
               }
             }
           },
@@ -930,16 +810,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -962,7 +832,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuDeployFromGitRepoRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsGitRepo"
               }
             }
           },
@@ -1008,16 +878,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -1033,7 +893,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuAsyncDeployFromGitRepoRequest"
+                "$ref": "#/components/schemas/OpenTofuAsyncRequestWithScriptsGitRepo"
               }
             }
           },
@@ -1072,9 +932,60 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/tofu-maker/directory/validate": {
+      "post": {
+        "tags": [
+          "OpenTofuFromDirectory"
+        ],
+        "description": "Validate the OpenTofu modules in the given directory.",
+        "operationId": "validateFromDirectory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsDirectory"
+              }
+            }
           },
-          "503": {
-            "description": "Service Unavailable",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenTofuValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
             "content": {
               "*/*": {
                 "schema": {
@@ -1086,29 +997,18 @@
         }
       }
     },
-    "/tofu-maker/directory/plan/{module_directory}": {
+    "/tofu-maker/directory/plan": {
       "post": {
         "tags": [
           "OpenTofuFromDirectory"
         ],
         "description": "Get OpenTofu Plan as JSON string from the given directory.",
         "operationId": "plan",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the OpenTofu module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuPlanFromDirectoryRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsDirectory"
               }
             }
           },
@@ -1154,43 +1054,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/tofu-maker/directory/modify/{module_directory}": {
+    "/tofu-maker/directory/modify": {
       "post": {
         "tags": [
           "OpenTofuFromDirectory"
         ],
         "description": "Modify resources via OpenTofu from the given directory.",
         "operationId": "modifyFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the OpenTofu module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuModifyFromDirectoryRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsDirectory"
               }
             }
           },
@@ -1236,43 +1115,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/tofu-maker/directory/modify/async/{module_directory}": {
+    "/tofu-maker/directory/modify/async": {
       "post": {
         "tags": [
           "OpenTofuFromDirectory"
         ],
         "description": "async modify resources via OpenTofu from the given directory.",
         "operationId": "asyncModifyFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the OpenTofu module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuAsyncModifyFromDirectoryRequest"
+                "$ref": "#/components/schemas/OpenTofuAsyncRequestWithScriptsDirectory"
               }
             }
           },
@@ -1311,43 +1169,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/tofu-maker/directory/deploy/{module_directory}": {
+    "/tofu-maker/directory/deploy": {
       "post": {
         "tags": [
           "OpenTofuFromDirectory"
         ],
         "description": "Deploy resources via OpenTofu from the given directory.",
         "operationId": "deployFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the OpenTofu module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuDeployFromDirectoryRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsDirectory"
               }
             }
           },
@@ -1393,43 +1230,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/tofu-maker/directory/deploy/async/{module_directory}": {
+    "/tofu-maker/directory/deploy/async": {
       "post": {
         "tags": [
           "OpenTofuFromDirectory"
         ],
         "description": "async deploy resources via OpenTofu from the given directory.",
         "operationId": "asyncDeployFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the OpenTofu module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuAsyncDeployFromDirectoryRequest"
+                "$ref": "#/components/schemas/OpenTofuAsyncRequestWithScriptsDirectory"
               }
             }
           },
@@ -1461,16 +1277,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1487,7 +1293,7 @@
         "tags": [
           "RetrieveOpenTofuResult"
         ],
-        "description": "Method to retrieve stored openTofu result in case tofu-maker receives a failure while sending the openTofu result via callback.",
+        "description": "Method to retrieve stored opentofu result in case tofu-maker receives a failure while sending the opentofu result via callback.",
         "operationId": "getStoredTaskResultByRequestId",
         "parameters": [
           {
@@ -1541,16 +1347,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -1560,7 +1356,7 @@
         "tags": [
           "Admin"
         ],
-        "description": "Check health of OpenTofu Maker API service",
+        "description": "Check health of Tofu Maker API service",
         "operationId": "healthCheck",
         "responses": {
           "200": {
@@ -1568,7 +1364,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OpenTofuMakerSystemStatus"
+                  "$ref": "#/components/schemas/TofuMakerSystemStatus"
                 }
               }
             }
@@ -1595,98 +1391,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/tofu-maker/directory/validate/{module_directory}/{opentofu_version}": {
-      "get": {
-        "tags": [
-          "OpenTofuFromDirectory"
-        ],
-        "description": "Validate the OpenTofu modules in the given directory.",
-        "operationId": "validateFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the OpenTofu module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "opentofu_version",
-            "in": "path",
-            "description": "version of OpenTofu to execute the module files.",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OpenTofuValidationResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Unprocessable Entity",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1709,7 +1413,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuAsyncDestroyFromScriptsRequest"
+                "$ref": "#/components/schemas/OpenTofuAsyncRequestWithScripts"
               }
             }
           },
@@ -1741,16 +1445,6 @@
           },
           "502": {
             "description": "Bad Gateway",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable",
             "content": {
               "*/*": {
                 "schema": {
@@ -1773,7 +1467,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuAsyncDestroyFromGitRepoRequest"
+                "$ref": "#/components/schemas/OpenTofuAsyncRequestWithScriptsGitRepo"
               }
             }
           },
@@ -1812,43 +1506,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/tofu-maker/directory/destroy/{module_directory}": {
+    "/tofu-maker/directory/destroy": {
       "delete": {
         "tags": [
           "OpenTofuFromDirectory"
         ],
         "description": "Destroy the resources from the given directory.",
         "operationId": "destroyFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the OpenTofu module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuDestroyFromDirectoryRequest"
+                "$ref": "#/components/schemas/OpenTofuRequestWithScriptsDirectory"
               }
             }
           },
@@ -1894,43 +1567,22 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/tofu-maker/directory/destroy/async/{module_directory}": {
+    "/tofu-maker/directory/destroy/async": {
       "delete": {
         "tags": [
           "OpenTofuFromDirectory"
         ],
         "description": "async destroy resources via OpenTofu from the given directory.",
         "operationId": "asyncDestroyFromDirectory",
-        "parameters": [
-          {
-            "name": "module_directory",
-            "in": "path",
-            "description": "directory name where the OpenTofu module files exist.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OpenTofuAsyncDestroyFromDirectoryRequest"
+                "$ref": "#/components/schemas/OpenTofuAsyncRequestWithScriptsDirectory"
               }
             }
           },
@@ -1969,16 +1621,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "Service Unavailable",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Response"
-                }
-              }
-            }
           }
         }
       }
@@ -2002,6 +1644,8 @@
               "Invalid Git Repo Details",
               "Invalid OpenTofu Tool",
               "Invalid OpenTofu Scripts",
+              "Invalid OpenTofu Request",
+              "Send Amqp Message Failed",
               "Result Already Returned or RequestId Invalid"
             ]
           },
@@ -2057,7 +1701,10 @@
           "commandSuccessful": {
             "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "requestId"
+        ]
       },
       "ReFetchResult": {
         "type": "object",
@@ -2091,22 +1738,34 @@
           "state"
         ]
       },
-      "OpenTofuDeployWithScriptsRequest": {
+      "OpenTofuRequestWithScripts": {
         "type": "object",
+        "description": "OpenTofu request with scripts files",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
             "description": "Id of the request."
           },
+          "requestType": {
+            "type": "string",
+            "description": "Type of the openTofu request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
+          },
           "openTofuVersion": {
             "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
+            "description": "The required version of openTofu which will execute the scripts.",
             "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+            "description": "Flag to control if the deployment must only generate the openTofu or it must also apply the changes."
           },
           "variables": {
             "type": "object",
@@ -2120,7 +1779,11 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            "description": "Key-value pairs of variables that must be injected as environment variables to openTofu process."
+          },
+          "tfState": {
+            "type": "string",
+            "description": "OpenTofu state as a string."
           },
           "scriptFiles": {
             "type": "object",
@@ -2133,6 +1796,8 @@
         "required": [
           "isPlanOnly",
           "openTofuVersion",
+          "requestId",
+          "requestType",
           "scriptFiles",
           "variables"
         ]
@@ -2149,6 +1814,11 @@
       "OpenTofuValidationResult": {
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the request."
+          },
           "valid": {
             "type": "boolean",
             "description": "Defines if the scripts is valid."
@@ -2166,53 +1836,18 @@
           }
         },
         "required": [
+          "requestId",
           "valid"
-        ]
-      },
-      "OpenTofuPlanWithScriptsRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
-          },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for generating terraform plan."
-          }
-        },
-        "required": [
-          "openTofuVersion",
-          "scriptFiles",
-          "variables"
         ]
       },
       "OpenTofuPlan": {
         "type": "object",
         "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the request"
+          },
           "plan": {
             "type": "string",
             "description": "OpenTofu plan as a JSON string"
@@ -2220,203 +1855,45 @@
           "openTofuVersionUsed": {
             "type": "string",
             "description": "The version of the OpenTofu binary used to execute scripts."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "The error message of executing tofu plan command."
           }
         },
         "required": [
-          "plan"
+          "plan",
+          "requestId"
         ]
       },
-      "OpenTofuModifyWithScriptsRequest": {
+      "OpenTofuAsyncRequestWithScripts": {
         "type": "object",
+        "description": "OpenTofu async request with scripts files",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
             "description": "Id of the request."
           },
-          "openTofuVersion": {
+          "requestType": {
             "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for modify request"
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "openTofuVersion",
-          "scriptFiles",
-          "tfState",
-          "variables"
-        ]
-      },
-      "OpenTofuAsyncModifyFromScriptsRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for modify request"
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "openTofuVersion",
-          "scriptFiles",
-          "tfState",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "WebhookConfig": {
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string",
-            "description": "Callback address after deployment/destroy is completed."
-          },
-          "authType": {
-            "type": "string",
-            "description": "The authentication type when calling back.",
+            "description": "Type of the openTofu request.",
             "enum": [
-              "none",
-              "oauth",
-              "hmac"
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
             ]
-          }
-        },
-        "required": [
-          "authType",
-          "url"
-        ]
-      },
-      "OpenTofuDestroyWithScriptsRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
           },
           "openTofuVersion": {
             "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for destroy request"
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          }
-        },
-        "required": [
-          "openTofuVersion",
-          "scriptFiles",
-          "tfState",
-          "variables"
-        ]
-      },
-      "OpenTofuAsyncDeployFromScriptsRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
+            "description": "The required version of openTofu which will execute the scripts.",
             "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+            "description": "Flag to control if the deployment must only generate the openTofu or it must also apply the changes."
           },
           "variables": {
             "type": "object",
@@ -2430,7 +1907,11 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            "description": "Key-value pairs of variables that must be injected as environment variables to openTofu process."
+          },
+          "tfState": {
+            "type": "string",
+            "description": "OpenTofu state as a string."
           },
           "scriptFiles": {
             "type": "object",
@@ -2447,27 +1928,63 @@
         "required": [
           "isPlanOnly",
           "openTofuVersion",
+          "requestId",
+          "requestType",
           "scriptFiles",
           "variables",
           "webhookConfig"
         ]
       },
-      "OpenTofuDeployFromGitRepoRequest": {
+      "WebhookConfig": {
         "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Callback address after deployment/destroy is completed."
+          },
+          "authType": {
+            "type": "string",
+            "description": "The permission type when calling back.",
+            "enum": [
+              "none",
+              "oauth",
+              "hmac"
+            ]
+          }
+        },
+        "required": [
+          "authType",
+          "url"
+        ]
+      },
+      "OpenTofuRequestWithScriptsGitRepo": {
+        "type": "object",
+        "description": "OpenTofu request with scripts git repo",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
             "description": "Id of the request."
           },
+          "requestType": {
+            "type": "string",
+            "description": "Type of the openTofu request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
+          },
           "openTofuVersion": {
             "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
+            "description": "The required version of openTofu which will execute the scripts.",
             "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+            "description": "Flag to control if the deployment must only generate the openTofu or it must also apply the changes."
           },
           "variables": {
             "type": "object",
@@ -2481,10 +1998,14 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            "description": "Key-value pairs of variables that must be injected as environment variables to openTofu process."
+          },
+          "tfState": {
+            "type": "string",
+            "description": "OpenTofu state as a string."
           },
           "gitRepoDetails": {
-            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails",
+            "$ref": "#/components/schemas/OpenTofuScriptsGitRepoDetails",
             "description": "GIT Repo details from where the scripts can be fetched."
           }
         },
@@ -2492,10 +2013,12 @@
           "gitRepoDetails",
           "isPlanOnly",
           "openTofuVersion",
+          "requestId",
+          "requestType",
           "variables"
         ]
       },
-      "OpenTofuScriptGitRepoDetails": {
+      "OpenTofuScriptsGitRepoDetails": {
         "type": "object",
         "properties": {
           "repoUrl": {
@@ -2516,59 +2039,34 @@
           "repoUrl"
         ]
       },
-      "OpenTofuPlanFromGitRepoRequest": {
+      "OpenTofuAsyncRequestWithScriptsGitRepo": {
         "type": "object",
+        "description": "OpenTofu async request with scripts git repo",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
             "description": "Id of the request."
           },
-          "openTofuVersion": {
+          "requestType": {
             "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
-          }
-        },
-        "required": [
-          "openTofuVersion",
-          "variables"
-        ]
-      },
-      "OpenTofuModifyFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
+            "description": "Type of the openTofu request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
           },
           "openTofuVersion": {
             "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
+            "description": "The required version of openTofu which will execute the scripts.",
             "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+            "description": "Flag to control if the deployment must only generate the openTofu or it must also apply the changes."
           },
           "variables": {
             "type": "object",
@@ -2582,151 +2080,14 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
+            "description": "Key-value pairs of variables that must be injected as environment variables to openTofu process."
           },
           "tfState": {
             "type": "string",
-            "description": "The .tfState file content after deployment"
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "openTofuVersion",
-          "tfState",
-          "variables"
-        ]
-      },
-      "OpenTofuAsyncModifyFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            "description": "OpenTofu state as a string."
           },
           "gitRepoDetails": {
-            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "openTofuVersion",
-          "tfState",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "OpenTofuDestroyFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          }
-        },
-        "required": [
-          "openTofuVersion",
-          "tfState",
-          "variables"
-        ]
-      },
-      "OpenTofuAsyncDeployFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails",
+            "$ref": "#/components/schemas/OpenTofuScriptsGitRepoDetails",
             "description": "GIT Repo details from where the scripts can be fetched."
           },
           "webhookConfig": {
@@ -2738,59 +2099,40 @@
           "gitRepoDetails",
           "isPlanOnly",
           "openTofuVersion",
+          "requestId",
+          "requestType",
           "variables",
           "webhookConfig"
         ]
       },
-      "OpenTofuPlanFromDirectoryRequest": {
+      "OpenTofuRequestWithScriptsDirectory": {
         "type": "object",
+        "description": "OpenTofu request with directory where scripts files exist",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
             "description": "Id of the request."
           },
-          "openTofuVersion": {
+          "requestType": {
             "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to open tofu process."
-          }
-        },
-        "required": [
-          "openTofuVersion",
-          "variables"
-        ]
-      },
-      "OpenTofuModifyFromDirectoryRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
+            "description": "Type of the openTofu request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
           },
           "openTofuVersion": {
             "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
+            "description": "The required version of openTofu which will execute the scripts.",
             "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+            "description": "Flag to control if the deployment must only generate the openTofu or it must also apply the changes."
           },
           "variables": {
             "type": "object",
@@ -2804,31 +2146,54 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            "description": "Key-value pairs of variables that must be injected as environment variables to openTofu process."
+          },
+          "tfState": {
+            "type": "string",
+            "description": "OpenTofu state as a string."
+          },
+          "scriptsDirectory": {
+            "type": "string",
+            "description": "Directory where the OpenTofu scripts files exist."
           }
         },
         "required": [
           "isPlanOnly",
           "openTofuVersion",
+          "requestId",
+          "requestType",
+          "scriptsDirectory",
           "variables"
         ]
       },
-      "OpenTofuAsyncModifyFromDirectoryRequest": {
+      "OpenTofuAsyncRequestWithScriptsDirectory": {
         "type": "object",
+        "description": "OpenTofu async request with directory where scripts files exist",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
             "description": "Id of the request."
           },
+          "requestType": {
+            "type": "string",
+            "description": "Type of the openTofu request.",
+            "enum": [
+              "validate",
+              "plan",
+              "deploy",
+              "modify",
+              "destroy"
+            ]
+          },
           "openTofuVersion": {
             "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
+            "description": "The required version of openTofu which will execute the scripts.",
             "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
           },
           "isPlanOnly": {
             "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
+            "description": "Flag to control if the deployment must only generate the openTofu or it must also apply the changes."
           },
           "variables": {
             "type": "object",
@@ -2842,7 +2207,15 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
+            "description": "Key-value pairs of variables that must be injected as environment variables to openTofu process."
+          },
+          "tfState": {
+            "type": "string",
+            "description": "OpenTofu state as a string."
+          },
+          "scriptsDirectory": {
+            "type": "string",
+            "description": "Directory where the OpenTofu scripts files exist."
           },
           "webhookConfig": {
             "$ref": "#/components/schemas/WebhookConfig",
@@ -2852,94 +2225,21 @@
         "required": [
           "isPlanOnly",
           "openTofuVersion",
+          "requestId",
+          "requestType",
+          "scriptsDirectory",
           "variables",
           "webhookConfig"
         ]
       },
-      "OpenTofuDeployFromDirectoryRequest": {
+      "TofuMakerSystemStatus": {
         "type": "object",
         "properties": {
           "requestId": {
             "type": "string",
             "format": "uuid",
-            "description": "Id of the request."
+            "description": "ID of the request."
           },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "openTofuVersion",
-          "variables"
-        ]
-      },
-      "OpenTofuAsyncDeployFromDirectoryRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "isPlanOnly": {
-            "type": "boolean",
-            "description": "Flag to control if the deployment must only generate the OpenTofu or it must also apply the changes."
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "isPlanOnly",
-          "openTofuVersion",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "OpenTofuMakerSystemStatus": {
-        "type": "object",
-        "properties": {
           "healthStatus": {
             "type": "string",
             "description": "The health status of api service.",
@@ -2947,179 +2247,25 @@
               "OK",
               "NOK"
             ]
+          },
+          "serviceType": {
+            "type": "string",
+            "description": "The service type of tofu-maker."
+          },
+          "serviceUrl": {
+            "type": "string",
+            "description": "The url of tofu-maker service."
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "The error message of tofu-maker service."
           }
         },
         "required": [
-          "healthStatus"
-        ]
-      },
-      "OpenTofuAsyncDestroyFromScriptsRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "scriptFiles": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Map stores file name and content of all script files for destroy request"
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "openTofuVersion",
-          "scriptFiles",
-          "tfState",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "OpenTofuAsyncDestroyFromGitRepoRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "gitRepoDetails": {
-            "$ref": "#/components/schemas/OpenTofuScriptGitRepoDetails",
-            "description": "GIT Repo details from where the scripts can be fetched."
-          },
-          "tfState": {
-            "type": "string",
-            "description": "The .tfState file content after deployment"
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "openTofuVersion",
-          "tfState",
-          "variables",
-          "webhookConfig"
-        ]
-      },
-      "OpenTofuDestroyFromDirectoryRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          }
-        },
-        "required": [
-          "openTofuVersion",
-          "variables"
-        ]
-      },
-      "OpenTofuAsyncDestroyFromDirectoryRequest": {
-        "type": "object",
-        "properties": {
-          "requestId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Id of the request."
-          },
-          "openTofuVersion": {
-            "type": "string",
-            "description": "The required version of the OpenTofu which will execute the scripts.",
-            "pattern": "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-          },
-          "variables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object"
-            },
-            "description": "Key-value pairs of regular variables that must be used to execute the OpenTofu request."
-          },
-          "envVariables": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Key-value pairs of variables that must be injected as environment variables to OpenTofu process."
-          },
-          "webhookConfig": {
-            "$ref": "#/components/schemas/WebhookConfig",
-            "description": "Configuration information of webhook."
-          }
-        },
-        "required": [
-          "openTofuVersion",
-          "variables",
-          "webhookConfig"
+          "healthStatus",
+          "requestId",
+          "serviceType",
+          "serviceUrl"
         ]
       }
     },
