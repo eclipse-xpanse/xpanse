@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.HEADER_TRACKING_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +28,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.OrderFailedErrorResponse;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
@@ -174,30 +176,40 @@ class ServiceOrderManageApiTest extends ApisTestCommon {
                 String.format(
                         "No permission to %s owned by other users.",
                         UserOperation.VIEW_ORDERS_OF_SERVICE.toValue());
-        ErrorResponse expectedErrorResponse =
-                ErrorResponse.errorResponse(
-                        ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg));
-        String result = objectMapper.writeValueAsString(expectedErrorResponse);
-
         MockHttpServletResponse listOrdersResponse = listServiceOrders(serviceId, null, null);
         assertEquals(HttpStatus.FORBIDDEN.value(), listOrdersResponse.getStatus());
-        assertEquals(result, listOrdersResponse.getContentAsString());
+        assertNotNull(listOrdersResponse.getHeader(HEADER_TRACKING_ID));
+        OrderFailedErrorResponse orderFailedResponse =
+                objectMapper.readValue(
+                        listOrdersResponse.getContentAsString(), OrderFailedErrorResponse.class);
+        assertEquals(ErrorType.ACCESS_DENIED, orderFailedResponse.getErrorType());
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         errorMsg =
                 String.format(
                         "No permission to %s owned by other users.",
                         UserOperation.DELETE_ORDERS_OF_SERVICE.toValue());
-        expectedErrorResponse =
-                ErrorResponse.errorResponse(
-                        ErrorType.ACCESS_DENIED, Collections.singletonList(errorMsg));
-        result = objectMapper.writeValueAsString(expectedErrorResponse);
+
         MockHttpServletResponse deleteOrdersResponse = deleteOrdersByServiceId(serviceId);
         assertEquals(HttpStatus.FORBIDDEN.value(), deleteOrdersResponse.getStatus());
-        assertEquals(result, deleteOrdersResponse.getContentAsString());
+        assertNotNull(deleteOrdersResponse.getHeader(HEADER_TRACKING_ID));
+        orderFailedResponse =
+                objectMapper.readValue(
+                        deleteOrdersResponse.getContentAsString(), OrderFailedErrorResponse.class);
+        assertEquals(ErrorType.ACCESS_DENIED, orderFailedResponse.getErrorType());
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         MockHttpServletResponse deleteOrderResponse = deleteOrderByOrderId(orderId);
         assertEquals(HttpStatus.FORBIDDEN.value(), deleteOrderResponse.getStatus());
-        assertEquals(result, deleteOrderResponse.getContentAsString());
+        assertNotNull(deleteOrderResponse.getHeader(HEADER_TRACKING_ID));
+        orderFailedResponse =
+                objectMapper.readValue(
+                        deleteOrderResponse.getContentAsString(), OrderFailedErrorResponse.class);
+        assertEquals(ErrorType.ACCESS_DENIED, orderFailedResponse.getErrorType());
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
 
         deleteServiceDeployment(serviceId);
     }

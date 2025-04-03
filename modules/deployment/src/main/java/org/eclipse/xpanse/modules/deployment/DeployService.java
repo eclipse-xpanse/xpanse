@@ -43,7 +43,6 @@ import org.eclipse.xpanse.modules.models.service.deployment.ModifyRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.BillingModeNotSupported;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.EulaNotAccepted;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
-import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceFlavorDowngradeNotAllowed;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceModifyParamsNotFoundException;
@@ -119,7 +118,7 @@ public class DeployService {
     public ServiceOrder createOrderToRedeployFailedService(UUID serviceId) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 getServiceOwnedByCurrentUser(serviceId, UserOperation.REDEPLOY_SERVICE);
-        DeployTask redeployTask = getRedeployTask(serviceDeploymentEntity);
+        DeployTask redeployTask = getRedeployTask(serviceDeploymentEntity, ServiceOrderType.RETRY);
         redeployService(redeployTask, serviceDeploymentEntity);
         log.info(
                 "Order task {} to redeploy failed service {} started.",
@@ -481,21 +480,8 @@ public class DeployService {
             throw new ServiceModifyParamsNotFoundException("No params found for modify services.");
         }
 
-        if (!serviceDeploymentEntity
-                        .getServiceDeploymentState()
-                        .equals(ServiceDeploymentState.DEPLOY_SUCCESS)
-                && !serviceDeploymentEntity
-                        .getServiceDeploymentState()
-                        .equals(ServiceDeploymentState.MODIFICATION_FAILED)
-                && !serviceDeploymentEntity
-                        .getServiceDeploymentState()
-                        .equals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL)) {
-            throw new InvalidServiceStateException(
-                    String.format(
-                            "Service %s with the state %s is not allowed to modify.",
-                            serviceDeploymentEntity.getId(),
-                            serviceDeploymentEntity.getServiceDeploymentState()));
-        }
+        this.serviceDeploymentEntityHandler.validateServiceDeploymentStateForOrderType(
+                serviceDeploymentEntity, ServiceOrderType.MODIFY);
         ServiceTemplateEntity existingServiceTemplate =
                 serviceDeploymentEntity.getServiceTemplateEntity();
         if (!existingServiceTemplate.getIsAvailableInCatalog()) {
@@ -665,8 +651,8 @@ public class DeployService {
             ServiceDeploymentEntity deployServiceEntity =
                     serviceDeploymentStorage.findServiceDeploymentById(
                             workFlowDeployTask.getServiceId());
-            // retry to deploy the service.
-            DeployTask retryTask = getRedeployTask(deployServiceEntity);
+            // recreate the service destroy_success.
+            DeployTask retryTask = getRedeployTask(deployServiceEntity, ServiceOrderType.RECREATE);
             retryTask.setOriginalServiceId(workFlowDeployTask.getOriginalServiceId());
             retryTask.setParentOrderId(workFlowDeployTask.getParentOrderId());
             retryTask.setWorkflowId(workFlowDeployTask.getWorkflowId());
@@ -717,15 +703,9 @@ public class DeployService {
             throw new ServiceLockedException(errorMsg);
         }
         // Get state of service.
-        ServiceDeploymentState state = serviceDeploymentEntity.getServiceDeploymentState();
-        if (state.equals(ServiceDeploymentState.DEPLOYING)
-                || state.equals(ServiceDeploymentState.DESTROYING)
-                || state.equals(ServiceDeploymentState.MODIFYING)) {
-            throw new InvalidServiceStateException(
-                    String.format(
-                            "Service %s with the state %s is not allowed to destroy.",
-                            serviceDeploymentEntity.getId(), state));
-        }
+        this.serviceDeploymentEntityHandler.validateServiceDeploymentStateForOrderType(
+                serviceDeploymentEntity, ServiceOrderType.DESTROY);
+
         return serviceDeploymentEntityConverter.getDeployTaskByStoredService(
                 ServiceOrderType.DESTROY, serviceDeploymentEntity);
     }
@@ -738,17 +718,8 @@ public class DeployService {
      */
     private DeployTask getPurgeTask(ServiceDeploymentEntity serviceDeploymentEntity) {
         // Get state of service.
-        ServiceDeploymentState state = serviceDeploymentEntity.getServiceDeploymentState();
-        if (!(state == ServiceDeploymentState.DEPLOY_FAILED
-                || state == ServiceDeploymentState.DESTROY_SUCCESS
-                || state == ServiceDeploymentState.DESTROY_FAILED
-                || state == ServiceDeploymentState.ROLLBACK_FAILED
-                || state == ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED)) {
-            throw new InvalidServiceStateException(
-                    String.format(
-                            "Service %s with the state %s is not allowed to purge.",
-                            serviceDeploymentEntity.getId(), state));
-        }
+        this.serviceDeploymentEntityHandler.validateServiceDeploymentStateForOrderType(
+                serviceDeploymentEntity, ServiceOrderType.PURGE);
         return serviceDeploymentEntityConverter.getDeployTaskByStoredService(
                 ServiceOrderType.PURGE, serviceDeploymentEntity);
     }
@@ -759,20 +730,10 @@ public class DeployService {
      * @param serviceDeploymentEntity deploy service entity.
      * @return deploy task.
      */
-    public DeployTask getRedeployTask(ServiceDeploymentEntity serviceDeploymentEntity) {
-        // Get state of service.
-        ServiceDeploymentState state = serviceDeploymentEntity.getServiceDeploymentState();
-        // Retry's deploy service trigger when service deployment state is DEPLOYMENT_FAILED
-        // Recreate's deploy service trigger when service deployment state is DESTROY_SUCCESS
-        if (!(state == ServiceDeploymentState.DEPLOY_FAILED
-                || state == ServiceDeploymentState.DESTROY_FAILED
-                || state == ServiceDeploymentState.DESTROY_SUCCESS
-                || state == ServiceDeploymentState.ROLLBACK_FAILED)) {
-            throw new InvalidServiceStateException(
-                    String.format(
-                            "Service %s with the state %s is not allowed to redeploy.",
-                            serviceDeploymentEntity.getId(), state));
-        }
+    public DeployTask getRedeployTask(
+            ServiceDeploymentEntity serviceDeploymentEntity, ServiceOrderType serviceOrderType) {
+        this.serviceDeploymentEntityHandler.validateServiceDeploymentStateForOrderType(
+                serviceDeploymentEntity, serviceOrderType);
         return serviceDeploymentEntityConverter.getDeployTaskByStoredService(
                 ServiceOrderType.RETRY, serviceDeploymentEntity);
     }

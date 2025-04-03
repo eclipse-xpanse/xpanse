@@ -27,7 +27,6 @@ import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigura
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
@@ -58,7 +57,6 @@ public class DeployResultManager {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource private ServiceOrderStorage serviceOrderStorage;
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
     @Resource private ResourceHandlerManager resourceHandlerManager;
     @Resource private WorkflowUtils workflowUtils;
     @Resource private SensitiveDataHandler sensitiveDataHandler;

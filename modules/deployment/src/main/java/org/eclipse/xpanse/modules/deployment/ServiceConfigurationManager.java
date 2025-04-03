@@ -24,7 +24,6 @@ import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigura
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
@@ -59,8 +58,6 @@ public class ServiceConfigurationManager {
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
 
     @Resource private ServiceConfigurationStorage serviceConfigurationStorage;
-
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     @Resource private DeployService deployService;
 
@@ -110,13 +107,10 @@ public class ServiceConfigurationManager {
             ServiceDeploymentEntity serviceDeploymentEntity =
                     serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
             checkPermission(serviceDeploymentEntity, UserOperation.CHANGE_SERVICE_CONFIGURATION);
+            serviceDeploymentEntityHandler.validateServiceDeploymentStateForOrderType(
+                    serviceDeploymentEntity, ServiceOrderType.CONFIG_CHANGE);
             ServiceTemplateEntity serviceTemplateEntity =
                     serviceDeploymentEntity.getServiceTemplateEntity();
-            if (Objects.isNull(serviceTemplateEntity)) {
-                String errMsg = String.format("Service template not found.");
-                log.error(errMsg);
-                throw new ServiceTemplateNotRegistered(errMsg);
-            }
             validateAllConfigChangeOrdersCompleted(serviceDeploymentEntity);
             validateRequestParameters(serviceTemplateEntity, configurationUpdate);
             UUID orderId =

@@ -5,6 +5,9 @@
 
 package org.eclipse.xpanse.api.config;
 
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.ORDER_ID;
+import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.annotation.Resource;
@@ -33,6 +36,7 @@ import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyEntity;
 import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyStorage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -98,6 +102,7 @@ public class GetCspInfoFromRequest {
             ServiceDeploymentEntity deployService =
                     deployServiceStorage.findServiceDeploymentById(serviceId);
             if (Objects.nonNull(deployService)) {
+                MDC.put(SERVICE_ID, serviceId.toString());
                 return deployService.getCsp();
             }
         } catch (Exception e) {
@@ -187,6 +192,8 @@ public class GetCspInfoFromRequest {
                 ServiceDeploymentEntity deployService =
                         deployServiceStorage.findServiceDeploymentById(
                                 order.getServiceDeploymentEntity().getId());
+                MDC.put(SERVICE_ID, deployService.getId().toString());
+                MDC.put(ORDER_ID, orderId.toString());
                 return deployService.getCsp();
             }
         } catch (Exception e) {

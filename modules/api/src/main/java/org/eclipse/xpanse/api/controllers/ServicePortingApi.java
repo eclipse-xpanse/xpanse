@@ -100,6 +100,8 @@ public class ServicePortingApi {
                             servicePortingRequest.getOriginalServiceId());
             throw new ServiceLockedException(errorMsg);
         }
+        this.serviceDeploymentEntityHandler.validateServiceDeploymentStateForOrderType(
+                deployServiceEntity, ServiceOrderType.PORT);
         DeployTask servicePortingTask = getServicePortingTask(servicePortingRequest);
         servicePortingTask.setUserId(userId);
         ServiceOrderEntity servicePortingOrderEntity =

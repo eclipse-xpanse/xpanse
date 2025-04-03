@@ -1,17 +1,18 @@
 package org.eclipse.xpanse.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.eclipse.xpanse.modules.models.response.OrderFailedErrorResponse;
 import org.eclipse.xpanse.modules.models.service.config.ServiceLockConfig;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -109,26 +110,24 @@ class ServiceRecreateApiTest extends ApisTestCommon {
         deployService.setLockConfig(serviceLockConfig);
         serviceDeploymentStorage.storeAndFlush(deployService);
 
-        String message = String.format("Service with id %s is locked from recreate.", serviceId);
-        ErrorResponse expectedErrorResponse =
-                ErrorResponse.errorResponse(
-                        ErrorType.SERVICE_LOCKED, Collections.singletonList(message));
-        String result = objectMapper.writeValueAsString(expectedErrorResponse);
+        String errorMsg = String.format("Service with id %s is locked from recreate.", serviceId);
         // Run the test
         final MockHttpServletResponse response = recreateService(serviceId);
 
+        OrderFailedErrorResponse orderFailedResponse =
+                objectMapper.readValue(
+                        response.getContentAsString(), OrderFailedErrorResponse.class);
+
         // Verify the results
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentAsString()).isEqualTo(result);
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(ErrorType.SERVICE_LOCKED, orderFailedResponse.getErrorType());
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
     }
 
     void testRecreateThrowsAccessDeniedException(UUID serviceId) throws Exception {
 
-        ErrorResponse expectedErrorResponse =
-                ErrorResponse.errorResponse(
-                        ErrorType.ACCESS_DENIED,
-                        Collections.singletonList(
-                                "No permission to recreate the service owned by other users."));
+        String errorMsg = "No permission to recreate the service owned by other users.";
 
         ServiceDeploymentEntity deployService =
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId);
@@ -136,10 +135,14 @@ class ServiceRecreateApiTest extends ApisTestCommon {
         serviceDeploymentStorage.storeAndFlush(deployService);
         MockHttpServletResponse response = recreateService(serviceId);
 
+        OrderFailedErrorResponse orderFailedResponse =
+                objectMapper.readValue(
+                        response.getContentAsString(), OrderFailedErrorResponse.class);
         // Verify the results
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-        assertThat(response.getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(expectedErrorResponse));
+        assertEquals(response.getStatus(), HttpStatus.FORBIDDEN.value());
+        assertEquals(ErrorType.ACCESS_DENIED, orderFailedResponse.getErrorType());
+        assertEquals(orderFailedResponse.getServiceId(), serviceId.toString());
+        assertEquals(orderFailedResponse.getDetails(), List.of(errorMsg));
     }
 
     MockHttpServletResponse recreateService(UUID serviceId) throws Exception {

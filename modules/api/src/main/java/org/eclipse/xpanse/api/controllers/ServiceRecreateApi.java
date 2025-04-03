@@ -24,15 +24,12 @@ import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.ServiceOrderManager;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
-import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidServiceStateException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
-import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
@@ -62,7 +59,6 @@ public class ServiceRecreateApi {
 
     @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @Resource private ServiceOrderManager serviceOrderManager;
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
     @Resource private UserServiceHelper userServiceHelper;
     @Resource private WorkflowUtils workflowUtils;
 
@@ -98,24 +94,6 @@ public class ServiceRecreateApi {
             throw new ServiceLockedException(errorMsg);
         }
 
-        if (!serviceDeploymentEntity
-                        .getServiceDeploymentState()
-                        .equals(ServiceDeploymentState.DEPLOY_SUCCESS)
-                && !serviceDeploymentEntity
-                        .getServiceDeploymentState()
-                        .equals(ServiceDeploymentState.DESTROY_FAILED)
-                && !serviceDeploymentEntity
-                        .getServiceDeploymentState()
-                        .equals(ServiceDeploymentState.MODIFICATION_FAILED)
-                && !serviceDeploymentEntity
-                        .getServiceDeploymentState()
-                        .equals(ServiceDeploymentState.MODIFICATION_SUCCESSFUL)) {
-            throw new InvalidServiceStateException(
-                    String.format(
-                            "Service %s with the state %s is not allowed to recreate.",
-                            serviceDeploymentEntity.getId(),
-                            serviceDeploymentEntity.getServiceDeploymentState()));
-        }
         ServiceTemplateEntity existingServiceTemplate =
                 serviceDeploymentEntity.getServiceTemplateEntity();
         if (!existingServiceTemplate.getIsAvailableInCatalog()) {
@@ -127,6 +105,8 @@ public class ServiceRecreateApi {
             throw new ServiceTemplateUnavailableException(errorMsg);
         }
         // prepare parent recreate service order entity
+        this.serviceDeploymentEntityHandler.validateServiceDeploymentStateForOrderType(
+                serviceDeploymentEntity, ServiceOrderType.RECREATE);
         DeployTask recreateTask = getRecreateTask(serviceDeploymentEntity);
         ServiceOrderEntity recreateOrderEntity =
                 serviceOrderManager.storeNewServiceOrderEntity(

@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
-import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateStorage;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
@@ -34,8 +32,6 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 @Component
 public class ServiceDeploymentEntityConverter {
-
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
 
     /**
      * Method to create a DeployTask from DeployServiceEntity.
