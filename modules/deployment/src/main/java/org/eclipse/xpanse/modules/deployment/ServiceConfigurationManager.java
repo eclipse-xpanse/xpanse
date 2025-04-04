@@ -243,7 +243,7 @@ public class ServiceConfigurationManager {
         ServiceTemplateEntity serviceTemplateEntity =
                 request.getServiceDeploymentEntity().getServiceTemplateEntity();
         if (Objects.isNull(serviceTemplateEntity)) {
-            String errMsg = String.format("Service template not found.");
+            String errMsg = "Service template not found.";
             log.error(errMsg);
             throw new ServiceTemplateNotRegistered(errMsg);
         }

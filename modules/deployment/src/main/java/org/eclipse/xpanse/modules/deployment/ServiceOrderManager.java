@@ -9,6 +9,7 @@ package org.eclipse.xpanse.modules.deployment;
 import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE_ADMIN;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
@@ -49,7 +50,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Component
 public class ServiceOrderManager {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper =
+            new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
     @Resource private ServiceOrderStorage serviceOrderStorage;
     @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
     @Resource private UserServiceHelper userServiceHelper;

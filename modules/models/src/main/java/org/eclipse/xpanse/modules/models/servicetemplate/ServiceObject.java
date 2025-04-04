@@ -26,8 +26,8 @@ public class ServiceObject implements Serializable {
     @Serial private static final long serialVersionUID = 240913796673021261L;
 
     @NotNull
-    @Schema(description = "the name of service object.")
-    private String name;
+    @Schema(description = "the type of service object.")
+    private String type;
 
     @NotNull
     @Schema(description = "the identifier of service object.")
