@@ -59,6 +59,8 @@ public class ServiceTemplateEntityConverter {
                     serviceTemplateEntity.getOcl().getServiceConfigurationManage());
             serviceTemplateDetailVo.setServiceActions(
                     serviceTemplateEntity.getOcl().getServiceActions());
+            serviceTemplateDetailVo.setServiceObjects(
+                    serviceTemplateEntity.getOcl().getServiceObjects());
             return serviceTemplateDetailVo;
         }
         return null;
@@ -100,15 +102,15 @@ public class ServiceTemplateEntityConverter {
             userOrderableServiceVo.setServiceAvailabilityConfig(
                     serviceTemplateEntity.getOcl().getDeployment().getServiceAvailabilityConfig());
             userOrderableServiceVo.setEula(serviceTemplateEntity.getOcl().getEula());
+            userOrderableServiceVo.setServiceActions(
+                    serviceTemplateEntity.getOcl().getServiceActions());
+            userOrderableServiceVo.setServiceObjects(
+                    serviceTemplateEntity.getOcl().getServiceObjects());
             ServiceChangeManage serviceConfigurationManage =
                     serviceTemplateEntity.getOcl().getServiceConfigurationManage();
             if (Objects.nonNull(serviceConfigurationManage)) {
                 userOrderableServiceVo.setConfigurationParameters(
                         serviceConfigurationManage.getConfigurationParameters());
-            }
-            if (Objects.nonNull(serviceTemplateEntity.getOcl().getServiceActions())) {
-                userOrderableServiceVo.setServiceActions(
-                        serviceTemplateEntity.getOcl().getServiceActions());
             }
             return userOrderableServiceVo;
         }

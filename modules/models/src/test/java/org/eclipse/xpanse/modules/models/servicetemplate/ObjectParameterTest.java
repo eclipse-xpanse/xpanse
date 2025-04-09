@@ -22,7 +22,7 @@ public class ObjectParameterTest {
     private final String name = "test";
     private final VariableDataType dataType = VariableDataType.STRING;
     private final String description = "description";
-    private final String example = "example";
+    private final Object example = "example";
     private final Map<String, Object> valueSchema = Map.of();
     private final SensitiveScope sensitiveScope = SensitiveScope.ALWAYS;
     private final Boolean isMandatory = Boolean.TRUE;

@@ -28,5 +28,7 @@ public interface CustomJpaRepository<T, ID> extends Repository<T, ID> {
 
     long count();
 
+    List<T> findAllById(Iterable<ID> ids);
+
     <S extends T> List<S> saveAll(Iterable<S> entities);
 }

@@ -104,6 +104,7 @@ class HuaweiCloudTerraformResourcePropertiesTest {
         Set<String> exceptedTypes =
                 Set.of(
                         "huaweicloud_compute_instance",
+                        "huaweicloud_rds_instance",
                         "huaweicloud_evs_volume",
                         "huaweicloud_vpc_subnet",
                         "huaweicloud_networking_secgroup_rule",

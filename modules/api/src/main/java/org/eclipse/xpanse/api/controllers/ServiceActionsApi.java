@@ -44,7 +44,7 @@ public class ServiceActionsApi {
 
     @Tag(name = "Service Actions", description = "APIs for Service Actions.")
     @PutMapping(value = "/services/action/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @Operation(description = "Create Service Actions.")
     @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
     public ServiceOrder createServiceAction(

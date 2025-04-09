@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.servicechange.exceptions.ServiceChangeRequestEntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -36,8 +37,8 @@ public class DatabaseServiceChangeRequestStorage implements ServiceChangeRequest
     }
 
     @Override
-    public <S extends ServiceChangeRequestEntity> List<S> saveAll(Iterable<S> entities) {
-        return repository.saveAll(entities);
+    public <S extends ServiceChangeRequestEntity> void saveAll(Iterable<S> entities) {
+        repository.saveAll(entities);
     }
 
     @Override
@@ -59,17 +60,17 @@ public class DatabaseServiceChangeRequestStorage implements ServiceChangeRequest
                                         root.get("serviceDeploymentEntity").get("id"),
                                         requestQuery.getServiceId()));
                     }
+                    if (StringUtils.isNotBlank(requestQuery.getChangeHandler())) {
+                        predicateList.add(
+                                criteriaBuilder.equal(
+                                        criteriaBuilder.lower(root.get("changeHandler")),
+                                        StringUtils.lowerCase(requestQuery.getChangeHandler())));
+                    }
                     if (StringUtils.isNotBlank(requestQuery.getResourceName())) {
                         predicateList.add(
                                 criteriaBuilder.equal(
-                                        root.get("resourceName"),
+                                        criteriaBuilder.lower(root.get("resourceName")),
                                         StringUtils.lowerCase(requestQuery.getResourceName())));
-                    }
-                    if (StringUtils.isNotBlank(requestQuery.getConfigManager())) {
-                        predicateList.add(
-                                criteriaBuilder.equal(
-                                        root.get("configManager"),
-                                        StringUtils.lowerCase(requestQuery.getConfigManager())));
                     }
                     if (Objects.nonNull(requestQuery.getStatus())) {
                         predicateList.add(
@@ -84,6 +85,13 @@ public class DatabaseServiceChangeRequestStorage implements ServiceChangeRequest
 
     @Override
     public ServiceChangeRequestEntity findById(UUID changeId) {
-        return repository.findById(changeId).orElse(null);
+        return repository
+                .findById(changeId)
+                .orElseThrow(
+                        () ->
+                                new ServiceChangeRequestEntityNotFoundException(
+                                        String.format(
+                                                "Service change request with id %s not found.",
+                                                changeId)));
     }
 }

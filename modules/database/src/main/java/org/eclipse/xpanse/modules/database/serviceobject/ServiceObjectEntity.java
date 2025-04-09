@@ -17,7 +17,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
@@ -42,14 +42,14 @@ public class ServiceObjectEntity implements Serializable {
     @Column(name = "OBJECT_ID", nullable = false)
     private UUID objectId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SERVICE_ID", nullable = false)
     private ServiceDeploymentEntity serviceDeploymentEntity;
 
-    @JoinColumn(name = "OBJECT_TYPE", nullable = false)
+    @Column(name = "OBJECT_TYPE", nullable = false)
     private String objectType;
 
-    @JoinColumn(name = "OBJECT_IDENTIFIER", nullable = false)
+    @Column(name = "OBJECT_IDENTIFIER_NAME", nullable = false)
     private String objectIdentifierName;
 
     @Column(name = "PROPERTIES", columnDefinition = "json", length = Integer.MAX_VALUE)

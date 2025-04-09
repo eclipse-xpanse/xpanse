@@ -24,6 +24,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceObject;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -121,4 +122,7 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
     @UniqueElements
     @Schema(description = "manage service action.")
     private List<ServiceAction> serviceActions;
+
+    @Schema(description = "manage service object.")
+    private List<ServiceObject> serviceObjects;
 }

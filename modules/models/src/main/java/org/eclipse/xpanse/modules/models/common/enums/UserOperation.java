@@ -54,6 +54,11 @@ public enum UserOperation {
     CHANGE_SERVICE_CONFIGURATION("change the configuration of the service"),
     CHANGE_SERVICE_LOCK_CONFIGURATION("change the lock configuration of the service"),
 
+    // Operations for service objects.
+    CREATE_SERVICE_OBJECT("create object for the service"),
+    UPDATE_SERVICE_OBJECT("update the object of the service"),
+    DELETE_SERVICE_OBJECT("delete the object of the service"),
+
     // Operations for service orders.
     VIEW_ORDER_DETAILS_OF_SERVICE("view order details of the service"),
     VIEW_ORDERS_OF_SERVICE("view orders of the service"),

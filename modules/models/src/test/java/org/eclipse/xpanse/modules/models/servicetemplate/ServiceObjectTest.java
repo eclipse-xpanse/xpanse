@@ -19,7 +19,7 @@ import org.springframework.beans.BeanUtils;
 /** Test of ServiceObject. */
 public class ServiceObjectTest {
 
-    private final String name = "uaser";
+    private final String type = "uaser";
     private final ConfigurationManagerTool handlerType = ConfigurationManagerTool.ANSIBLE;
     @Mock private ObjectIdentifier objectIdentifier;
     @Mock private List<ObjectManage> objectsManage;
@@ -29,7 +29,7 @@ public class ServiceObjectTest {
     @BeforeEach
     void setUp() {
         serviceObject = new ServiceObject();
-        serviceObject.setName(name);
+        serviceObject.setType(type);
         serviceObject.setObjectIdentifier(objectIdentifier);
         serviceObject.setHandlerType(handlerType);
         serviceObject.setObjectsManage(objectsManage);
@@ -37,7 +37,7 @@ public class ServiceObjectTest {
 
     @Test
     void testGetters() {
-        assertEquals(name, serviceObject.getName());
+        assertEquals(type, serviceObject.getType());
         assertEquals(objectIdentifier, serviceObject.getObjectIdentifier());
         assertEquals(handlerType, serviceObject.getHandlerType());
         assertEquals(objectsManage, serviceObject.getObjectsManage());
@@ -62,8 +62,8 @@ public class ServiceObjectTest {
     void testToString() {
         String expectedString =
                 "ServiceObject("
-                        + "name="
-                        + name
+                        + "type="
+                        + type
                         + ", objectIdentifier="
                         + objectIdentifier
                         + ", handlerType="

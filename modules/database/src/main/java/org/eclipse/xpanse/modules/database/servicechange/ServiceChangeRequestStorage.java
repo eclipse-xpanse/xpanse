@@ -20,7 +20,7 @@ public interface ServiceChangeRequestStorage {
     ServiceChangeRequestEntity storeAndFlush(ServiceChangeRequestEntity serviceChangeRequestEntity);
 
     /** Batch add or update service change details data to database. */
-    <S extends ServiceChangeRequestEntity> List<S> saveAll(Iterable<S> entities);
+    <S extends ServiceChangeRequestEntity> void saveAll(Iterable<S> entities);
 
     /** Method to list database entry based ServiceChangeRequestEntity. */
     List<ServiceChangeRequestEntity> getServiceChangeRequestEntities(

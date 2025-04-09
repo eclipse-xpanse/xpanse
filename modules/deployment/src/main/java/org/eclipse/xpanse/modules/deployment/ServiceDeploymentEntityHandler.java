@@ -75,7 +75,10 @@ public class ServiceDeploymentEntityHandler {
                             SERVICE_ACTION,
                             SERVICE_START,
                             SERVICE_STOP,
-                            SERVICE_RESTART ->
+                            SERVICE_RESTART,
+                            OBJECT_CREATE,
+                            OBJECT_MODIFY,
+                            OBJECT_DELETE ->
                     state == ServiceDeploymentState.DEPLOY_SUCCESS
                             || state == ServiceDeploymentState.MODIFICATION_SUCCESSFUL
                             || state == ServiceDeploymentState.MODIFICATION_FAILED;

@@ -39,7 +39,6 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
-import org.eclipse.xpanse.modules.models.service.utils.ServiceInputVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
@@ -70,10 +69,6 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
     @Resource private UserCloudCredentialsApi userCloudCredentialsApi;
     @Resource private ServiceOrderManageApi serviceOrderManageApi;
     @Resource private ServiceTemplateApi serviceTemplateApi;
-
-    @Resource
-    private ServiceInputVariablesJsonSchemaGenerator serviceInputVariablesJsonSchemaGenerator;
-
     @Resource private OclLoader oclLoader;
     @Resource private ServicePortingApi servicePortingApi;
     @Resource private ServiceTemplateStorage serviceTemplateStorage;

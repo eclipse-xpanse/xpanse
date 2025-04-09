@@ -58,25 +58,29 @@ public class HuaweiCloudTerraformResourceHandler implements DeployResourceHandle
             Set<String> supportTypes =
                     HuaweiCloudTerraformResourceProperties.getTerraformResourceTypes();
             for (TfStateResource tfStateResource : tfState.getResources()) {
-                if (!supportTypes.contains(tfStateResource.getType())) {
+                if (supportTypes.contains(tfStateResource.getType())) {
+                    DeployResourceProperties deployResourceProperties =
+                            HuaweiCloudTerraformResourceProperties.getDeployResourceProperties(
+                                    tfStateResource.getType());
+                    for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
+                        DeployResource deployResource = new DeployResource();
+                        deployResource.setGroupType(tfStateResource.getType());
+                        deployResource.setGroupName(tfStateResource.getName());
+                        deployResource.setResourceKind(deployResourceProperties.getResourceKind());
+                        TfResourceTransUtils.fillDeployResource(
+                                instance,
+                                deployResource,
+                                deployResourceProperties.getResourceProperties());
+                        deployResourceList.add(deployResource);
+                    }
                     log.info(
-                            "The resource type {} is unsupported to parse.",
+                            "Parse tf resource with type {} to deployed resource with type {}",
+                            tfStateResource.getType(),
+                            deployResourceProperties.getResourceKind());
+                } else {
+                    log.warn(
+                            "The tf resource type {} is unsupported to parse.",
                             tfStateResource.getType());
-                    continue;
-                }
-                DeployResourceProperties deployResourceProperties =
-                        HuaweiCloudTerraformResourceProperties.getDeployResourceProperties(
-                                tfStateResource.getType());
-                for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    DeployResource deployResource = new DeployResource();
-                    deployResource.setGroupType(tfStateResource.getType());
-                    deployResource.setGroupName(tfStateResource.getName());
-                    deployResource.setResourceKind(deployResourceProperties.getResourceKind());
-                    TfResourceTransUtils.fillDeployResource(
-                            instance,
-                            deployResource,
-                            deployResourceProperties.getResourceProperties());
-                    deployResourceList.add(deployResource);
                 }
             }
         }

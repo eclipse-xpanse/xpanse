@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceObject;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
@@ -58,6 +59,7 @@ class ServiceTemplateDetailVoTest {
     @Mock private FlavorsWithPrice flavors;
     @Mock private Billing billing;
     @Mock private List<ServiceAction> serviceActions;
+    @Mock private List<ServiceObject> serviceObjects;
 
     private ServiceTemplateDetailVo test;
 
@@ -88,6 +90,7 @@ class ServiceTemplateDetailVoTest {
         test.setEula(eula);
         test.setServiceConfigurationManage(serviceConfigurationManage);
         test.setServiceActions(serviceActions);
+        test.setServiceObjects(serviceObjects);
     }
 
     @Test
@@ -114,6 +117,7 @@ class ServiceTemplateDetailVoTest {
         assertEquals(serviceProviderContactDetails, test.getServiceProviderContactDetails());
         assertEquals(eula, test.getEula());
         assertEquals(serviceConfigurationManage, test.getServiceConfigurationManage());
+        assertEquals(serviceActions, test.getServiceActions());
     }
 
     @Test
@@ -181,6 +185,8 @@ class ServiceTemplateDetailVoTest {
                         + serviceConfigurationManage
                         + ", serviceActions="
                         + serviceActions
+                        + ", serviceObjects="
+                        + serviceObjects
                         + ")";
 
         assertEquals(expectedToString, test.toString());
