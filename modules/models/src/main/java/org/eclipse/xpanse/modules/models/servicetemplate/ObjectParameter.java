@@ -40,7 +40,7 @@ public class ObjectParameter implements Serializable {
     private String description;
 
     @Schema(description = "The example value of the service object  parameter")
-    private String example;
+    private Object example;
 
     @Schema(
             description =

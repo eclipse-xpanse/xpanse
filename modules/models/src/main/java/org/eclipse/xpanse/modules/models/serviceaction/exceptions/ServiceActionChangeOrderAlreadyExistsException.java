@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions;
+package org.eclipse.xpanse.modules.models.serviceaction.exceptions;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

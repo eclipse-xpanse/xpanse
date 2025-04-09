@@ -27,9 +27,11 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class SensitiveDataHandler {
 
+    /** The value of sensitive data will be masked as "******". */
+    public static final String SENSITIVE_VALUE = "******";
+
     private static final String PROPERTIES_ALREADY_VIEWED = "is_already_viewed";
     private static final String REQUEST_PROPERTIES_FIELD = "serviceRequestProperties";
-    private static final String SENSITIVE_VALUE = "******";
 
     @Resource private SecretsManager secretsManager;
 

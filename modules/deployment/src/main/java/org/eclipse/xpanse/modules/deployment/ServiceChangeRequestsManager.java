@@ -86,6 +86,10 @@ public class ServiceChangeRequestsManager {
                                                                 finalPropertiesToBeUsed,
                                                                 originalRequestProperties,
                                                                 serviceOrderEntity);
+                                                request.setResourceName(
+                                                        deployResourceList
+                                                                .getFirst()
+                                                                .getResourceName());
                                                 requests.add(request);
                                             } else {
                                                 deployResourceList.forEach(
@@ -131,12 +135,13 @@ public class ServiceChangeRequestsManager {
             ServiceChangeStatus status) {
         UUID uuidOrderId = StringUtils.isEmpty(orderId) ? null : UUID.fromString(orderId);
         ServiceChangeRequestQueryModel queryModel =
-                new ServiceChangeRequestQueryModel(
-                        uuidOrderId,
-                        UUID.fromString(serviceId),
-                        resourceName,
-                        changeHandler,
-                        status);
+                ServiceChangeRequestQueryModel.builder()
+                        .orderId(uuidOrderId)
+                        .serviceId(UUID.fromString(serviceId))
+                        .resourceName(resourceName)
+                        .changeHandler(changeHandler)
+                        .status(status)
+                        .build();
         List<ServiceChangeRequestEntity> requests =
                 serviceChangeRequestStorage.getServiceChangeRequestEntities(queryModel);
 

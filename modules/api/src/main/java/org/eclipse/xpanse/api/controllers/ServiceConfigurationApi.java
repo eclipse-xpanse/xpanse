@@ -76,7 +76,7 @@ public class ServiceConfigurationApi {
      */
     @Tag(name = "ServiceConfiguration", description = "APIs for managing service's configuration.")
     @PutMapping(value = "/services/config/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @Operation(
             description = "Update the service's configuration to the registered service template.")
     @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.eclipse.xpanse.modules.database.common.CreatedModifiedTime;
 import org.eclipse.xpanse.modules.database.common.ObjectJsonConverter;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
@@ -35,6 +36,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 /** ServiceChangeRequestEntity for persistence. */
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "SERVICE_CHANGE_REQUEST")
 @Entity
 @Data
@@ -57,11 +59,13 @@ public class ServiceChangeRequestEntity extends CreatedModifiedTime implements S
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ServiceDeploymentEntity serviceDeploymentEntity;
 
+    @Column(name = "RESOURCE_NAME", nullable = false)
     private String resourceName;
 
     @Column(name = "CHANGE_HANDLER", nullable = false)
     private String changeHandler;
 
+    @Column(name = "RESULT_MESSAGE")
     private String resultMessage;
 
     @Column(name = "PROPERTIES", columnDefinition = "json")

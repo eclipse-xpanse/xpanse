@@ -16,6 +16,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
+import org.eclipse.xpanse.modules.models.servicetemplate.ServiceObject;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceProviderContactDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +48,7 @@ class UserOrderableServiceVoTest {
     @Mock private ServiceProviderContactDetails mockServiceProviderContactDetails;
     @Mock private List<AvailabilityZoneConfig> mockServiceAvailabilityConfig;
     @Mock private List<ServiceAction> mockServiceActions;
+    @Mock private List<ServiceObject> mockServiceObjects;
 
     private UserOrderableServiceVo test;
 
@@ -72,6 +74,7 @@ class UserOrderableServiceVoTest {
         test.setEula(eula);
         test.setConfigurationParameters(configurationParameters);
         test.setServiceActions(mockServiceActions);
+        test.setServiceObjects(mockServiceObjects);
     }
 
     @Test
@@ -96,6 +99,7 @@ class UserOrderableServiceVoTest {
         assertThat(test.getEula()).isEqualTo(eula);
         assertThat(test.getConfigurationParameters()).isEqualTo(configurationParameters);
         assertThat(test.getServiceActions()).isEqualTo(mockServiceActions);
+        assertThat(test.getServiceObjects()).isEqualTo(mockServiceObjects);
     }
 
     @Test
@@ -154,6 +158,8 @@ class UserOrderableServiceVoTest {
                         + configurationParameters
                         + ", serviceActions="
                         + mockServiceActions
+                        + ", serviceObjects="
+                        + mockServiceObjects
                         + ")";
         assertEquals(expectedToString, test.toString());
     }
