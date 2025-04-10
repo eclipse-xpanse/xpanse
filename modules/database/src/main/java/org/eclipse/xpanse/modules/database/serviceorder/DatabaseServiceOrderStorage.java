@@ -14,8 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
-import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
@@ -96,17 +94,8 @@ public class DatabaseServiceOrderStorage implements ServiceOrderStorage {
     }
 
     @Override
-    public ServiceDeploymentEntity getServiceDeploymentByOrderId(UUID uuid) {
-        Optional<ServiceOrderEntity> optional = repository.findById(uuid);
-        if (optional.isEmpty()) {
-            throw new ServiceOrderNotFound(
-                    String.format("Service order with id %s not found.", uuid));
-        }
-        if (Objects.isNull(optional.get().getServiceDeploymentEntity())) {
-            throw new ServiceNotDeployedException(
-                    String.format("No service related to order with id %s.", uuid));
-        }
-        return optional.get().getServiceDeploymentEntity();
+    public List<ServiceOrderEntity> getEntitiesByIds(List<UUID> orderIds) {
+        return repository.findAllById(orderIds);
     }
 
     @Override

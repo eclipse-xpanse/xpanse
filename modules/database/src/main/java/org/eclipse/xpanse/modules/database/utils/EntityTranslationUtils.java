@@ -18,6 +18,7 @@ import org.eclipse.xpanse.modules.database.resource.ServiceResourceEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
 import org.eclipse.xpanse.modules.database.serviceconfiguration.ServiceConfigurationEntity;
+import org.eclipse.xpanse.modules.database.serviceobject.ServiceObjectEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplaterequest.ServiceTemplateRequestHistoryEntity;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
@@ -28,6 +29,7 @@ import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServic
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeRequestDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
+import org.eclipse.xpanse.modules.models.serviceobject.ServiceObjectDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestHistory;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestStatus;
@@ -226,6 +228,21 @@ public class EntityTranslationUtils {
         requestVo.setRequestSubmittedForReview(
                 requestEntity.getRequestStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
         return requestVo;
+    }
+
+    /**
+     * ServiceObjectEntity converted to ServiceObjectDetails.
+     *
+     * @param serviceObjectEntity ServiceObjectEntity.
+     * @return serviceObjectDetails
+     */
+    public static ServiceObjectDetails convertToServiceObjectDetails(
+            ServiceObjectEntity serviceObjectEntity) {
+        ServiceObjectDetails serviceObjectDetails = new ServiceObjectDetails();
+        BeanUtils.copyProperties(serviceObjectEntity, serviceObjectDetails);
+        serviceObjectDetails.setServiceId(serviceObjectEntity.getServiceDeploymentEntity().getId());
+        serviceObjectDetails.setParameters(serviceObjectEntity.getProperties());
+        return serviceObjectDetails;
     }
 
     private static void setServiceIdAndServiceTemplateId(

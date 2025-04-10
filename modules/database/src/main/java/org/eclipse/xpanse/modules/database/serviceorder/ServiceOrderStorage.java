@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.database.serviceorder;
 
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 
 /** Interface for persist of ServiceModificationAudit. */
 public interface ServiceOrderStorage {
@@ -38,6 +37,14 @@ public interface ServiceOrderStorage {
     ServiceOrderEntity getEntityById(UUID orderId);
 
     /**
+     * Method to get database entry based ServiceOrderEntity.
+     *
+     * @param orderIds orderIds of ServiceOrderEntity.
+     * @return Returns the database entry for the provided arguments.
+     */
+    List<ServiceOrderEntity> getEntitiesByIds(List<UUID> orderIds);
+
+    /**
      * Delete service order entity from database by entity.
      *
      * @param entity service order entity
@@ -50,12 +57,4 @@ public interface ServiceOrderStorage {
      * @param entities service order entities
      */
     void deleteBatch(List<ServiceOrderEntity> entities);
-
-    /**
-     * Get deploy service entity by order id.
-     *
-     * @param orderId order id
-     * @return DeployServiceEntity
-     */
-    ServiceDeploymentEntity getServiceDeploymentByOrderId(UUID orderId);
 }

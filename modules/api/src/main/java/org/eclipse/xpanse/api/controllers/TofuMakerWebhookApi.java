@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("tofu-maker")
 @CrossOrigin
 @ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
-public class OpenTofuMakerWebhookApi {
+public class TofuMakerWebhookApi {
 
     @Resource
     private OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;

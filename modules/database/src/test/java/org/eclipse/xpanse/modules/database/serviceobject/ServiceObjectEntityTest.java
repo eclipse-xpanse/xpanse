@@ -27,6 +27,7 @@ public class ServiceObjectEntityTest {
     private final String objectIdentifierName = "test";
     private final Map<String, Object> properties = Map.of();
     private final Set<UUID> dependentObjectIds = new HashSet<>();
+    private final Set<UUID> historyOrderIds = new HashSet<>();
 
     private ServiceObjectEntity test;
 
@@ -39,6 +40,7 @@ public class ServiceObjectEntityTest {
         test.setObjectIdentifierName(objectIdentifierName);
         test.setProperties(properties);
         test.setDependentObjectIds(dependentObjectIds);
+        test.setHistoryOrderIds(historyOrderIds);
     }
 
     @Test
@@ -49,6 +51,7 @@ public class ServiceObjectEntityTest {
         assertThat(test.getObjectIdentifierName()).isEqualTo(objectIdentifierName);
         assertThat(test.getProperties()).isEqualTo(properties);
         assertThat(test.getDependentObjectIds()).isEqualTo(dependentObjectIds);
+        assertThat(test.getHistoryOrderIds()).isEqualTo(historyOrderIds);
     }
 
     @Test
@@ -76,13 +79,15 @@ public class ServiceObjectEntityTest {
                                 + "objectType=%s, "
                                 + "objectIdentifierName=%s, "
                                 + "properties=%s, "
-                                + "dependentObjectIds=%s)",
+                                + "dependentObjectIds=%s, "
+                                + "historyOrderIds=%s)",
                         objectId,
                         serviceDeploymentEntity,
                         objectType,
                         objectIdentifierName,
                         properties,
-                        dependentObjectIds);
+                        dependentObjectIds,
+                        historyOrderIds);
 
         assertThat(test.toString()).isEqualTo(result);
     }
