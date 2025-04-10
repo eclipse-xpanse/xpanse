@@ -63,4 +63,11 @@ public class ServiceObjectEntity implements Serializable {
             joinColumns = @JoinColumn(name = "OBJECT_ID", nullable = false))
     @Column(name = "DEPENDENT_OBJECT_ID")
     private Set<UUID> dependentObjectIds;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "SERVICE_OBJECT_ORDER_HISTORY",
+            joinColumns = @JoinColumn(name = "OBJECT_ID", nullable = false))
+    @Column(name = "ORDER_ID")
+    private Set<UUID> historyOrderIds;
 }

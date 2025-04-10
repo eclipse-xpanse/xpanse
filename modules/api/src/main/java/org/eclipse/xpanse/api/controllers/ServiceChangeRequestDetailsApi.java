@@ -42,7 +42,7 @@ public class ServiceChangeRequestDetailsApi {
     @Resource private ServiceChangeRequestsManager serviceChangeRequestsManager;
 
     /** List all service change request. */
-    @Tag(name = "Service Change Details", description = "APIs for Service Change Details.")
+    @Tag(name = "ServiceChangeDetails", description = "APIs for Service Change Details.")
     @GetMapping(value = "/services/change/requests", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(description = "List service's change details Request.")

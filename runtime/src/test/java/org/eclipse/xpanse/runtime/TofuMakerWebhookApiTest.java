@@ -54,7 +54,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @SpringBootTest(
         properties = {"spring.profiles.active=oauth,zitadel,zitadel-local,tofu-maker,test,dev"})
 @AutoConfigureMockMvc
-public class OpenTofuMakerWebhookApiTest extends ApisTestCommon {
+public class TofuMakerWebhookApiTest extends ApisTestCommon {
 
     @MockitoBean private PolicyValidator mockPolicyValidator;
 

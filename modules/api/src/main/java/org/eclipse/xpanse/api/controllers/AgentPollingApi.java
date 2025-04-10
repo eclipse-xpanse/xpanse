@@ -48,7 +48,7 @@ public class AgentPollingApi {
      * @return ServiceChangeRequest.
      */
     @Tag(
-            name = "Agent Api",
+            name = "AgentApis",
             description = "APIs for agent to poll pending service change requests.")
     @GetMapping(
             value = "/poll/{serviceId}/{resourceName}",
@@ -84,7 +84,7 @@ public class AgentPollingApi {
      * @param result result of the service change request.
      */
     @Tag(
-            name = "Agent Api",
+            name = "AgentApis",
             description = "APIs for agent to poll pending service change requests.")
     @PutMapping(value = "/update/status/{changeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)

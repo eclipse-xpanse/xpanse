@@ -22,4 +22,6 @@ public interface ServiceObjectStorage {
     List<ServiceObjectEntity> getEntitiesByIds(List<UUID> ids);
 
     Set<UUID> getObjectIdsByDependentObjectId(UUID dependentObjectId);
+
+    List<ServiceObjectEntity> getObjectsByServiceId(UUID serviceId);
 }
