@@ -14,11 +14,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceObjectManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.serviceobject.ServiceObjectDetails;
 import org.eclipse.xpanse.modules.models.serviceobject.ServiceObjectRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -44,6 +48,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServiceObjectsApi {
 
     @Resource private ServiceObjectManager serviceObjectManager;
+
+    /**
+     * Get details of the managed service by serviceId.
+     *
+     * @return Details of the managed service.
+     */
+    @Tag(name = "ServiceObjects", description = "APIs for managing service's objects.")
+    @Operation(description = "Get all objects of the service grouped by type.")
+    @GetMapping(
+            value = "/services/objects/{serviceId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @AuditApiRequest(methodName = "getCspFromServiceId", paramTypes = UUID.class)
+    public Map<String, List<ServiceObjectDetails>> getObjectsByServiceId(
+            @Parameter(name = "serviceId", description = "Id of the service")
+                    @PathVariable("serviceId")
+                    UUID serviceId) {
+        return serviceObjectManager.getObjectsByServiceId(serviceId);
+    }
 
     @Tag(name = "ServiceObjects", description = "APIs for managing service's objects.")
     @PostMapping(

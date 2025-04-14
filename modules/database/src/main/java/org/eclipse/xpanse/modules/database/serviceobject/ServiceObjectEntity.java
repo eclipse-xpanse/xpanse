@@ -13,6 +13,7 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -63,4 +64,16 @@ public class ServiceObjectEntity implements Serializable {
             joinColumns = @JoinColumn(name = "OBJECT_ID", nullable = false))
     @Column(name = "DEPENDENT_OBJECT_ID")
     private Set<UUID> dependentObjectIds;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "SERVICE_OBJECT_ORDER_HISTORY",
+            joinColumns = @JoinColumn(name = "OBJECT_ID", nullable = false),
+            foreignKey =
+                    @ForeignKey(
+                            name = "FK_ORDER_HISTORY",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY (ORDER_ID) REFERENCES SERVICE_ORDER(ORDER_ID)"))
+    @Column(name = "ORDER_ID")
+    private Set<UUID> objectOrderIds;
 }

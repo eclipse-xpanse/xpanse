@@ -6,9 +6,14 @@
 
 package org.eclipse.xpanse.modules.database.serviceobject;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
+import org.eclipse.xpanse.modules.database.servicechange.ServiceChangeRequestEntity;
 import org.eclipse.xpanse.modules.models.serviceobject.exceptions.ServiceObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -55,5 +60,17 @@ public class DatabaseServiceObjectStorage implements ServiceObjectStorage {
     @Override
     public Set<UUID> getObjectIdsByDependentObjectId(UUID dependentObjectId) {
         return repository.findObjectIdsByDependentObjectId(dependentObjectId);
+    }
+
+    @Override
+    public List<ServiceObjectEntity> getObjectsByServiceId(UUID serviceId) {
+        return repository.findAll(
+                (root, query, cb) -> {
+                    Join<ServiceChangeRequestEntity, ServiceDeploymentEntity> deploymentJoin =
+                            root.join("serviceDeploymentEntity", JoinType.INNER);
+                    Predicate serviceIdPredicate = cb.equal(deploymentJoin.get("id"), serviceId);
+                    query.distinct(true);
+                    return cb.and(serviceIdPredicate);
+                });
     }
 }

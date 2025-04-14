@@ -9,6 +9,9 @@ package org.eclipse.xpanse.modules.deployment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,16 +30,19 @@ import org.eclipse.xpanse.modules.database.serviceobject.ServiceObjectStorage;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceObjectVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceObjectVariablesJsonSchemaValidator;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.ServiceConfigurationInvalidException;
+import org.eclipse.xpanse.modules.models.serviceobject.ServiceObjectDetails;
 import org.eclipse.xpanse.modules.models.serviceobject.ServiceObjectRequest;
 import org.eclipse.xpanse.modules.models.serviceobject.exceptions.ServiceObjectChangeOrderAlreadyExistsException;
 import org.eclipse.xpanse.modules.models.serviceobject.exceptions.ServiceObjectNotFoundException;
@@ -77,6 +83,65 @@ public class ServiceObjectManager {
     @Resource private ServiceObjectStorage serviceObjectStorage;
 
     @Resource private ServiceOrderStorage serviceOrderStorage;
+
+    /**
+     * Get service objects grouped by type with service id.
+     *
+     * @return Map of type and service objects.
+     */
+    public Map<String, List<ServiceObjectDetails>> getObjectsByServiceId(UUID serviceId) {
+        ServiceDeploymentEntity serviceDeploymentEntity =
+                serviceDeploymentEntityHandler.getServiceDeploymentEntity(serviceId);
+        checkPermission(serviceDeploymentEntity, UserOperation.VIEW_SERVICE_OBJECTS);
+        List<ServiceObjectEntity> serviceObjectEntities =
+                serviceObjectStorage.getObjectsByServiceId(serviceId);
+        if (CollectionUtils.isEmpty(serviceObjectEntities)) {
+            return Collections.emptyMap();
+        }
+        List<ServiceObjectDetails> serviceObjectDetails =
+                convertToServiceObjectDetails(serviceObjectEntities);
+        return serviceObjectDetails.stream()
+                .collect(Collectors.groupingBy(ServiceObjectDetails::getObjectType));
+    }
+
+    private List<ServiceObjectDetails> convertToServiceObjectDetails(
+            List<ServiceObjectEntity> serviceObjectEntities) {
+        List<UUID> orderIds = new ArrayList<>();
+        serviceObjectEntities.forEach(
+                serviceObjectEntity -> {
+                    orderIds.addAll(serviceObjectEntity.getObjectOrderIds());
+                });
+        List<ServiceOrderEntity> serviceOrderEntities =
+                serviceOrderStorage.getEntitiesByIds(orderIds);
+        Map<UUID, ServiceOrderEntity> serviceOrdersMap =
+                serviceOrderEntities.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        ServiceOrderEntity::getOrderId,
+                                        serviceOrder -> serviceOrder));
+        List<ServiceObjectDetails> serviceObjectDetailsList = new ArrayList<>();
+        serviceObjectEntities.forEach(
+                serviceObjectEntity -> {
+                    ServiceObjectDetails serviceObjectDetails =
+                            EntityTranslationUtils.convertToServiceObjectDetails(
+                                    serviceObjectEntity);
+                    List<ServiceOrderDetails> serviceOrderDetailsList = new ArrayList<>();
+                    serviceObjectEntity
+                            .getObjectOrderIds()
+                            .forEach(
+                                    orderId -> {
+                                        ServiceOrderDetails serviceOrderDetails =
+                                                EntityTranslationUtils.transToServiceOrderDetails(
+                                                        serviceOrdersMap.get(orderId));
+                                        serviceOrderDetailsList.add(serviceOrderDetails);
+                                    });
+                    serviceOrderDetailsList.sort(
+                            Comparator.comparing(ServiceOrderDetails::getStartedTime));
+                    serviceObjectDetails.setObjectOrderHistory(serviceOrderDetailsList);
+                    serviceObjectDetailsList.add(serviceObjectDetails);
+                });
+        return serviceObjectDetailsList;
+    }
 
     /** create service action. */
     public ServiceOrder createOrderToCreateServiceObject(
@@ -296,24 +361,23 @@ public class ServiceObjectManager {
                     serviceObjectRequest,
                     serviceOrder);
             if (ServiceOrderType.OBJECT_CREATE == serviceOrder.getTaskType()) {
-                addServiceObjectEntity(request.getServiceDeploymentEntity(), serviceObjectRequest);
+                addServiceObjectEntity(serviceOrder, serviceObjectRequest);
                 log.info(
                         "Service object created for service ID {}",
                         request.getServiceDeploymentEntity().getId());
             } else if (ServiceOrderType.OBJECT_MODIFY == serviceOrder.getTaskType()) {
-                updateServiceObjectEntity(serviceObjectRequest);
+                updateServiceObjectEntity(serviceOrder, serviceObjectRequest);
                 log.info(
                         "Updated service object {} for service ID {}",
                         serviceObjectRequest.getObjectId(),
                         request.getServiceDeploymentEntity().getId());
             } else if (ServiceOrderType.OBJECT_DELETE == serviceOrder.getTaskType()) {
-                deleteServiceObjectEntity(serviceObjectRequest.getObjectId());
+                deleteServiceObjectEntity(serviceOrder, serviceObjectRequest.getObjectId());
                 log.info(
                         "Deleted service object {} for service ID {}",
                         serviceObjectRequest.getObjectId(),
                         request.getServiceDeploymentEntity().getId());
             }
-            serviceOrderStorage.storeAndFlush(serviceOrder);
         } catch (JsonProcessingException e) {
             log.error(e.getMessage(), e);
         }
@@ -355,19 +419,21 @@ public class ServiceObjectManager {
     }
 
     private void addServiceObjectEntity(
-            ServiceDeploymentEntity serviceDeploymentEntity, ServiceObjectRequest request) {
+            ServiceOrderEntity serviceOrder, ServiceObjectRequest request) {
         ServiceObjectEntity serviceObjectEntity = new ServiceObjectEntity();
-        serviceObjectEntity.setServiceDeploymentEntity(serviceDeploymentEntity);
+        serviceObjectEntity.setServiceDeploymentEntity(serviceOrder.getServiceDeploymentEntity());
         serviceObjectEntity.setObjectType(request.getObjectType());
         serviceObjectEntity.setObjectIdentifierName(request.getObjectIdentifier());
         serviceObjectEntity.setProperties(request.getServiceObjectParameters());
         if (Objects.nonNull(request.getLinkedObjects())) {
             serviceObjectEntity.setDependentObjectIds(new HashSet<>(request.getLinkedObjects()));
         }
+        serviceObjectEntity.setObjectOrderIds(Set.of(serviceOrder.getOrderId()));
         serviceObjectStorage.storeAndFlush(serviceObjectEntity);
     }
 
-    private void updateServiceObjectEntity(ServiceObjectRequest request) {
+    private void updateServiceObjectEntity(
+            ServiceOrderEntity serviceOrder, ServiceObjectRequest request) {
         ServiceObjectEntity serviceObjectEntity =
                 serviceObjectStorage.getEntityById(request.getObjectId());
         serviceObjectEntity.setObjectType(request.getObjectType());
@@ -376,11 +442,13 @@ public class ServiceObjectManager {
         if (Objects.nonNull(request.getLinkedObjects())) {
             serviceObjectEntity.setDependentObjectIds(new HashSet<>(request.getLinkedObjects()));
         }
+        serviceObjectEntity.getObjectOrderIds().add(serviceOrder.getOrderId());
         serviceObjectStorage.storeAndFlush(serviceObjectEntity);
     }
 
-    private void deleteServiceObjectEntity(UUID objectId) {
+    private void deleteServiceObjectEntity(ServiceOrderEntity serviceOrder, UUID objectId) {
         ServiceObjectEntity serviceObjectEntity = serviceObjectStorage.getEntityById(objectId);
+        serviceObjectEntity.getObjectOrderIds().add(serviceOrder.getOrderId());
         serviceObjectStorage.delete(serviceObjectEntity);
     }
 

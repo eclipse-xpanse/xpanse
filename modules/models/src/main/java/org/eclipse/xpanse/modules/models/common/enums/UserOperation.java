@@ -58,6 +58,7 @@ public enum UserOperation {
     CREATE_SERVICE_OBJECT("create object for the service"),
     UPDATE_SERVICE_OBJECT("update the object of the service"),
     DELETE_SERVICE_OBJECT("delete the object of the service"),
+    VIEW_SERVICE_OBJECTS("view objects of the service"),
 
     // Operations for service orders.
     VIEW_ORDER_DETAILS_OF_SERVICE("view order details of the service"),
