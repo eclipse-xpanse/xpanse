@@ -168,13 +168,17 @@ class TofuMakerDeploymentTest {
 
     @Test
     void testDeploy_ThrowsRestClientException() {
-        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
+        ocl.getDeployment()
+                .getTerraformDeployment()
+                .setScriptFiles(Map.of("error_test.tf", errorScript));
 
         Mockito.doThrow(new OpenTofuMakerRequestFailedException("IO error"))
                 .when(terraformApi)
                 .asyncDeployWithScripts(any());
 
-        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
+        ocl.getDeployment()
+                .getTerraformDeployment()
+                .setScriptFiles(Map.of("invalid_test.tf", invalidScript));
         Assertions.assertThrows(
                 OpenTofuMakerRequestFailedException.class,
                 () -> this.openTofuMakerDeployment.deploy(deployTask));
@@ -247,7 +251,9 @@ class TofuMakerDeploymentTest {
 
     @Test
     void testValidateFailed() {
-        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
+        ocl.getDeployment()
+                .getTerraformDeployment()
+                .setScriptFiles(Map.of("invalid_test.tf", invalidScript));
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(false);
@@ -269,7 +275,9 @@ class TofuMakerDeploymentTest {
 
     @Test
     void testValidate_ThrowsOpenTofuExecutorException() {
-        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
+        ocl.getDeployment()
+                .getTerraformDeployment()
+                .setScriptFiles(Map.of("error_test.tf", errorScript));
         when(tofuMakerScriptValidator.validateOpenTofuScripts(any()))
                 .thenThrow(new OpenTofuMakerRequestFailedException("IO error"));
 

@@ -129,7 +129,16 @@ class ServiceCatalogApiTest extends ApisTestCommon {
             ServiceTemplateDetailVo serviceTemplateDetailVo) {
         UserOrderableServiceVo userOrderableServiceVo = new UserOrderableServiceVo();
         BeanUtils.copyProperties(serviceTemplateDetailVo, userOrderableServiceVo);
-
+        userOrderableServiceVo.setInputVariables(
+                serviceTemplateDetailVo
+                        .getDeployment()
+                        .getTerraformDeployment()
+                        .getInputVariables());
+        userOrderableServiceVo.setOutputVariables(
+                serviceTemplateDetailVo
+                        .getDeployment()
+                        .getTerraformDeployment()
+                        .getOutputVariables());
         List<ServiceFlavor> flavorBasics =
                 serviceTemplateDetailVo.getFlavors().getServiceFlavors().stream()
                         .map(
@@ -187,7 +196,7 @@ class ServiceCatalogApiTest extends ApisTestCommon {
                         response2.getContentAsString(), UserOrderableServiceVo.class);
         // Verify the results 2
         Assertions.assertEquals(HttpStatus.OK.value(), response2.getStatus());
-        Assertions.assertEquals(result2, expectedResponse2);
+        Assertions.assertEquals(expectedResponse2, result2);
     }
 
     void testGetOrderableServiceDetailsThrowsException(

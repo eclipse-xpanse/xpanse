@@ -60,11 +60,13 @@ import org.eclipse.xpanse.modules.models.service.deployment.DeploymentStatusUpda
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewServiceTemplateRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceReviewResult;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestToReview;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
@@ -522,13 +524,11 @@ public class ApisTestCommon extends ZitadelTestContainer {
         deployRequest.setBillingMode(serviceTemplate.getBilling().getBillingModes().getFirst());
 
         Map<String, Object> serviceRequestProperties = new HashMap<>();
-        serviceTemplate
-                .getDeployment()
-                .getInputVariables()
-                .forEach(
-                        variable ->
-                                serviceRequestProperties.put(
-                                        variable.getName(), variable.getExample()));
+        List<InputVariable> inputVariables =
+                DeploymentVariableHelper.getInputVariables(serviceTemplate.getDeployment());
+        inputVariables.forEach(
+                variable ->
+                        serviceRequestProperties.put(variable.getName(), variable.getExample()));
         serviceRequestProperties.put("admin_passwd", "111111111@Qq");
         deployRequest.setServiceRequestProperties(serviceRequestProperties);
 

@@ -48,7 +48,8 @@ public class TerraBootDeploymentPlanManage {
         request.setRequestId(task.getOrderId());
         request.setRequestType(TerraformRequestWithScripts.RequestTypeEnum.PLAN);
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
-        request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
+        request.setScriptFiles(
+                task.getOcl().getDeployment().getTerraformDeployment().getScriptFiles());
         request.setVariables(terraBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraBootHelper.getEnvironmentVariables(task));
         return request;
@@ -63,7 +64,7 @@ public class TerraBootDeploymentPlanManage {
         request.setEnvVariables(terraBootHelper.getEnvironmentVariables(task));
         request.setGitRepoDetails(
                 terraBootHelper.convertTerraformScriptsGitRepoDetailsFromDeployFromGitRepo(
-                        task.getOcl().getDeployment().getScriptsRepo()));
+                        task.getOcl().getDeployment().getTerraformDeployment().getScriptsRepo()));
         return request;
     }
 }

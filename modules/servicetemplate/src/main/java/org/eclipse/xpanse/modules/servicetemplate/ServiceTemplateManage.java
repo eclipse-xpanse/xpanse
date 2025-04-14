@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
 import org.eclipse.xpanse.modules.models.common.exceptions.OpenApiFileGenerationException;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceInputVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ReviewServiceTemplateRequest;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
@@ -49,6 +50,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTe
 import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTemplateRequestType;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ReviewServiceTemplateRequestNotAllowed;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.ServiceTemplateRequestNotAllowed;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -446,10 +448,11 @@ public class ServiceTemplateManage {
             Deployment deployment, ServiceTemplateEntity serviceTemplate) {
         AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
                 deployment.getServiceAvailabilityConfig());
-        InputVariablesSchemaValidator.validateInputVariables(deployment.getInputVariables());
+        List<InputVariable> inputVariables = DeploymentVariableHelper.getInputVariables(deployment);
+        InputVariablesSchemaValidator.validateInputVariables(inputVariables);
         JsonObjectSchema jsonObjectSchema =
                 serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
-                        deployment.getInputVariables());
+                        inputVariables);
         serviceTemplate.setJsonObjectSchema(jsonObjectSchema);
         validateTerraformScript(deployment);
     }

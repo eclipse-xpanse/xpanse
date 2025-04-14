@@ -11,8 +11,11 @@ import org.eclipse.xpanse.api.controllers.ServiceCatalogApi;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.servicetemplate.EndUserFlavors;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.springframework.beans.BeanUtils;
@@ -39,10 +42,6 @@ public class ServiceTemplateEntityConverter {
             serviceTemplateDetailVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
             serviceTemplateDetailVo.setFlavors(serviceTemplateEntity.getOcl().getFlavors());
             serviceTemplateDetailVo.setDeployment(serviceTemplateEntity.getOcl().getDeployment());
-            serviceTemplateDetailVo.setInputVariables(
-                    serviceTemplateEntity.getOcl().getDeployment().getInputVariables());
-            serviceTemplateDetailVo.setOutputVariables(
-                    serviceTemplateEntity.getOcl().getDeployment().getOutputVariables());
             serviceTemplateDetailVo.setRegions(
                     serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
             serviceTemplateDetailVo.add(
@@ -84,10 +83,14 @@ public class ServiceTemplateEntityConverter {
             userOrderableServiceVo.setBilling(serviceTemplateEntity.getOcl().getBilling());
             setFlavorsWithoutPricing(
                     userOrderableServiceVo, serviceTemplateEntity.getOcl().getFlavors());
-            userOrderableServiceVo.setInputVariables(
-                    serviceTemplateEntity.getOcl().getDeployment().getInputVariables());
-            userOrderableServiceVo.setOutputVariables(
-                    serviceTemplateEntity.getOcl().getDeployment().getOutputVariables());
+            List<InputVariable> inputVariables =
+                    DeploymentVariableHelper.getInputVariables(
+                            serviceTemplateEntity.getOcl().getDeployment());
+            userOrderableServiceVo.setInputVariables(inputVariables);
+            List<OutputVariable> outputVariables =
+                    DeploymentVariableHelper.getOutputVariables(
+                            serviceTemplateEntity.getOcl().getDeployment());
+            userOrderableServiceVo.setOutputVariables(outputVariables);
             userOrderableServiceVo.setRegions(
                     serviceTemplateEntity.getOcl().getCloudServiceProvider().getRegions());
             userOrderableServiceVo.add(

@@ -32,12 +32,15 @@ import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.servicetemplate.CloudServiceProvider;
+import org.eclipse.xpanse.modules.models.servicetemplate.DeployerTool;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.FlavorsWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.TerraformDeployment;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
@@ -95,8 +98,13 @@ class DeployEnvironmentsTest {
         region.setArea(areaName);
         region.setSite(siteName);
         deployRequest.setRegion(region);
-
         Deployment deployment = new Deployment();
+        DeployerTool deployerTool = new DeployerTool();
+        deployerTool.setKind(DeployerKind.TERRAFORM);
+        deployment.setDeployerTool(deployerTool);
+        TerraformDeployment terraformDeployment = new TerraformDeployment();
+        deployment.setTerraformDeployment(terraformDeployment);
+
         inputVariable1 = new InputVariable();
         inputVariable1.setName("name");
         inputVariable1.setKind(VariableKind.ENV);
@@ -117,7 +125,7 @@ class DeployEnvironmentsTest {
         inputVariable4.setKind(VariableKind.ENV);
         inputVariable4.setValue("example_value");
 
-        deployment.setInputVariables(
+        terraformDeployment.setInputVariables(
                 List.of(inputVariable1, inputVariable2, inputVariable3, inputVariable4));
         deployment.setCredentialType(CredentialType.VARIABLES);
 
@@ -135,7 +143,6 @@ class DeployEnvironmentsTest {
         ocl.setDeployment(deployment);
         ocl.setFlavors(flavors);
         ocl.setCloudServiceProvider(cloudServiceProvider);
-
         task = new DeployTask();
         task.setUserId(userId);
         task.setDeployRequest(deployRequest);

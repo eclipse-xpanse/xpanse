@@ -48,6 +48,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ModificationImpact;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.Region;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
+import org.eclipse.xpanse.modules.models.servicetemplate.TerraformDeployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
@@ -696,8 +697,9 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         AvailabilityZoneConfig duplicateAvailabilityZoneConfig =
                 ocl.getDeployment().getServiceAvailabilityConfig().getFirst();
         ocl.getDeployment().getServiceAvailabilityConfig().add(duplicateAvailabilityZoneConfig);
-        InputVariable duplicateInputVariable = ocl.getDeployment().getInputVariables().getFirst();
-        ocl.getDeployment().getInputVariables().add(duplicateInputVariable);
+        TerraformDeployment terraformDeployment = ocl.getDeployment().getTerraformDeployment();
+        InputVariable duplicateInputVariable = terraformDeployment.getInputVariables().getFirst();
+        terraformDeployment.getInputVariables().add(duplicateInputVariable);
         ServiceFlavorWithPrice duplicateFlavor = ocl.getFlavors().getServiceFlavors().getFirst();
         ocl.getFlavors().getServiceFlavors().add(duplicateFlavor);
         String duplicateEmail = ocl.getServiceProviderContactDetails().getEmails().getFirst();
@@ -768,7 +770,10 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         Ocl ocl =
                 oclLoader.getOcl(
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        ocl.getDeployment().getScriptFiles().put("error.tf", "error_script");
+        ocl.getDeployment()
+                .getTerraformDeployment()
+                .getScriptFiles()
+                .put("error.tf", "error_script");
         ErrorResponse expectedResponse =
                 ErrorResponse.errorResponse(
                         ErrorType.TERRAFORM_EXECUTION_FAILED,
@@ -789,11 +794,12 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
 
         ocl.getDeployment().setServiceAvailabilityConfig(null);
-        InputVariable inputVariable = ocl.getDeployment().getInputVariables().getLast();
+        TerraformDeployment deployment = ocl.getDeployment().getTerraformDeployment();
+        InputVariable inputVariable = deployment.getInputVariables().getLast();
         InputVariable inputVariableWithRepeatName = new InputVariable();
         BeanUtils.copyProperties(inputVariable, inputVariableWithRepeatName);
         inputVariableWithRepeatName.setValue("newValue");
-        ocl.getDeployment().getInputVariables().add(inputVariableWithRepeatName);
+        deployment.getInputVariables().add(inputVariableWithRepeatName);
 
         String errorMessage =
                 String.format(
@@ -858,7 +864,8 @@ class ServiceTemplateApiTest extends ApisTestCommon {
         modificationImpact.setIsDataLost(true);
         modificationImpact.setIsServiceInterrupted(true);
         errorVariable.setModificationImpact(modificationImpact);
-        ocl3.getDeployment().setInputVariables(List.of(errorVariable));
+        TerraformDeployment deployment3 = ocl3.getDeployment().getTerraformDeployment();
+        deployment3.setInputVariables(List.of(errorVariable));
 
         String errorMessage3 =
                 String.format(

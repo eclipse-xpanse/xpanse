@@ -98,7 +98,7 @@ public class TofuMakerScriptValidator {
         request.setRequestId(getRequestId());
         request.setOpenTofuVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
-        request.setScriptFiles(deployment.getScriptFiles());
+        request.setScriptFiles(deployment.getTerraformDeployment().getScriptFiles());
         return request;
     }
 
@@ -111,7 +111,7 @@ public class TofuMakerScriptValidator {
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
                 tofuMakerHelper.convertOpenTofuScriptsGitRepoDetailsFromDeployFromGitRepo(
-                        deployment.getScriptsRepo()));
+                        deployment.getTerraformDeployment().getScriptsRepo()));
         return request;
     }
 

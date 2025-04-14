@@ -58,6 +58,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
@@ -297,7 +298,8 @@ public class DeployService {
         // Check context validation
         validateDeployRequestWithServiceTemplate(availableServiceTemplate, deployRequest);
         List<InputVariable> definedInputVariables =
-                availableServiceTemplate.getOcl().getDeployment().getInputVariables();
+                DeploymentVariableHelper.getInputVariables(
+                        availableServiceTemplate.getOcl().getDeployment());
         sensitiveDataHandler.encodeInputVariables(
                 definedInputVariables, deployRequest.getServiceRequestProperties());
 
@@ -324,8 +326,8 @@ public class DeployService {
         if (Objects.nonNull(existingServiceTemplate.getOcl().getDeployment())
                 && Objects.nonNull(deployRequest.getServiceRequestProperties())) {
             List<InputVariable> inputVariables =
-                    existingServiceTemplate.getOcl().getDeployment().getInputVariables();
-
+                    DeploymentVariableHelper.getInputVariables(
+                            existingServiceTemplate.getOcl().getDeployment());
             inputVariablesJsonSchemaValidator.validateInputVariables(
                     inputVariables,
                     deployRequest.getServiceRequestProperties(),
@@ -388,8 +390,8 @@ public class DeployService {
         entity.setDeployResources(new ArrayList<>());
         entity.setServiceVendor(deployTask.getServiceVendor());
         entity.setServiceDeploymentState(ServiceDeploymentState.DEPLOYING);
-        ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
-        serviceTemplateEntity.setId(deployTask.getServiceTemplateId());
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateStorage.getServiceTemplateById(deployTask.getServiceTemplateId());
         entity.setServiceTemplateEntity(serviceTemplateEntity);
         ServiceLockConfig defaultLockConfig = new ServiceLockConfig();
         defaultLockConfig.setDestroyLocked(false);
@@ -513,7 +515,8 @@ public class DeployService {
         }
         validateDeployRequestWithServiceTemplate(existingServiceTemplate, newDeployRequest);
         List<InputVariable> definedInputVariables =
-                existingServiceTemplate.getOcl().getDeployment().getInputVariables();
+                DeploymentVariableHelper.getInputVariables(
+                        existingServiceTemplate.getOcl().getDeployment());
         sensitiveDataHandler.encodeInputVariables(
                 definedInputVariables, newDeployRequest.getServiceRequestProperties());
         modifyTask.setDeployRequest(newDeployRequest);
