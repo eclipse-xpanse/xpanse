@@ -42,7 +42,7 @@ public class ServiceActionsApi {
 
     @Resource private ServiceActionManager serviceActionManager;
 
-    @Tag(name = "Service Actions", description = "APIs for Service Actions.")
+    @Tag(name = "ServiceActions", description = "APIs for Service Actions.")
     @PutMapping(value = "/services/action/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Operation(description = "Create Service Actions.")
