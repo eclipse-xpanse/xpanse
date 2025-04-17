@@ -10,31 +10,30 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/** Deployer kinds. */
-public enum DeployerKind {
-    TERRAFORM("terraform"),
-    OPEN_TOFU("opentofu"),
-    HELM("helm");
+/** Defines the type of the kubernetes cluster on which the service will be deployed. */
+public enum KubernetesClusterType {
+    DEDICATED("dedicated"),
+    SHARED("shared");
 
     private final String type;
 
-    DeployerKind(String type) {
+    KubernetesClusterType(String type) {
         this.type = type;
     }
 
-    /** For DeployerType serialize. */
+    /** For KubernetesClusterType serialize. */
     @JsonCreator
-    public static DeployerKind getByValue(String type) {
-        for (DeployerKind kind : values()) {
-            if (StringUtils.equalsIgnoreCase(kind.type, type)) {
-                return kind;
+    public static KubernetesClusterType getByValue(String type) {
+        for (KubernetesClusterType tool : values()) {
+            if (StringUtils.equalsIgnoreCase(tool.type, type)) {
+                return tool;
             }
         }
         throw new UnsupportedEnumValueException(
-                String.format("DeployerKind value %s is not supported.", type));
+                String.format("KubernetesClusterType value %s is not supported.", type));
     }
 
-    /** For DeployerType deserialize. */
+    /** For KubernetesClusterType deserialize. */
     @JsonValue
     public String toValue() {
         return this.type;

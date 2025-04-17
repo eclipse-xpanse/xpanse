@@ -94,25 +94,30 @@ public class DeploymentScriptsHelper {
                     "Create workspace for task failed, File path not created: " + taskWorkspace);
         }
         List<File> files = new ArrayList<>();
-        Map<String, String> scriptsMap = deployment.getScriptFiles();
+        Map<String, String> scriptsMap = deployment.getTerraformDeployment().getScriptFiles();
         if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
-            List<File> scriptFiles = createScriptFiles(taskWorkspace, deployment.getScriptFiles());
+            List<File> scriptFiles =
+                    createScriptFiles(
+                            taskWorkspace, deployment.getTerraformDeployment().getScriptFiles());
             files.addAll(scriptFiles);
             if (StringUtils.isNotBlank(tfState)) {
                 File stateFile = createServiceStateFile(taskWorkspace, tfState);
                 files.add(stateFile);
             }
 
-        } else if (Objects.nonNull(deployment.getScriptsRepo())) {
+        } else if (Objects.nonNull(deployment.getTerraformDeployment().getScriptsRepo())) {
             List<File> scriptFiles =
                     scriptsGitRepoManage.checkoutScripts(
-                            taskWorkspace, deployment.getScriptsRepo());
+                            taskWorkspace, deployment.getTerraformDeployment().getScriptsRepo());
             files.addAll(scriptFiles);
             if (StringUtils.isNotBlank(tfState)) {
                 String scriptPath =
                         taskWorkspace
                                 + File.separator
-                                + deployment.getScriptsRepo().getScriptsPath();
+                                + deployment
+                                        .getTerraformDeployment()
+                                        .getScriptsRepo()
+                                        .getScriptsPath();
                 File stateFile = createServiceStateFile(scriptPath, tfState);
                 files.add(stateFile);
             }
@@ -203,11 +208,13 @@ public class DeploymentScriptsHelper {
      */
     @Nullable
     public String getScriptsLocationInWorkspace(String taskWorkspace, Deployment deployment) {
-        if (Objects.nonNull(deployment.getScriptsRepo())) {
+        if (Objects.nonNull(deployment.getTerraformDeployment().getScriptsRepo())) {
             log.info(
                     "Deployment scripts are from git repo. Scripts path:{}",
-                    deployment.getScriptsRepo().getScriptsPath());
-            return taskWorkspace + File.separator + deployment.getScriptsRepo().getScriptsPath();
+                    deployment.getTerraformDeployment().getScriptsRepo().getScriptsPath());
+            return taskWorkspace
+                    + File.separator
+                    + deployment.getTerraformDeployment().getScriptsRepo().getScriptsPath();
         }
         return taskWorkspace;
     }

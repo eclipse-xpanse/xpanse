@@ -50,7 +50,8 @@ class OpenTofuLocalExecutorTest {
         Ocl ocl =
                 oclLoader.getOcl(
                         URI.create("file:src/test/resources/ocl_terraform_test.yml").toURL());
-        Map<String, String> scriptsMap = ocl.getDeployment().getScriptFiles();
+        Map<String, String> scriptsMap =
+                ocl.getDeployment().getTerraformDeployment().getScriptFiles();
         for (Map.Entry<String, String> entry : scriptsMap.entrySet()) {
             String scriptPath = workspace + File.separator + entry.getKey();
             try (FileWriter scriptWriter = new FileWriter(scriptPath)) {

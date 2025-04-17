@@ -27,7 +27,7 @@ public abstract class AbstractMysqlIntegrationTest extends ZitadelTestContainer 
     private static final MySQLContainer<?> mysqlContainer;
 
     static {
-        mysqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:latest"));
+        mysqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:9.2.0"));
         mysqlContainer.start();
     }
 

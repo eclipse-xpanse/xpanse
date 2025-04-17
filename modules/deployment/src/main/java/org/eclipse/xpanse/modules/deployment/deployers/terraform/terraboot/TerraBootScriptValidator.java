@@ -100,7 +100,7 @@ public class TerraBootScriptValidator {
         request.setRequestType(TerraformRequestWithScripts.RequestTypeEnum.VALIDATE);
         request.setTerraformVersion(deployment.getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
-        request.setScriptFiles(deployment.getScriptFiles());
+        request.setScriptFiles(deployment.getTerraformDeployment().getScriptFiles());
         return request;
     }
 
@@ -113,7 +113,7 @@ public class TerraBootScriptValidator {
         request.setIsPlanOnly(false);
         request.setGitRepoDetails(
                 terraBootHelper.convertTerraformScriptsGitRepoDetailsFromDeployFromGitRepo(
-                        deployment.getScriptsRepo()));
+                        deployment.getTerraformDeployment().getScriptsRepo()));
         return request;
     }
 

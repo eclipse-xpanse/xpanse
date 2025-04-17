@@ -58,11 +58,13 @@ import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.AvailabilityZoneConfig;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavorWithPrice;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
@@ -411,6 +413,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         testDeployerWithOclAndPolicy(oclFromGit);
     }
 
+    @Test
+    @WithJwt(file = "jwt_all_roles-no-policies.json")
     void testDeployApisThrowExceptions() throws Exception {
         Ocl ocl =
                 new OclLoader()
@@ -455,7 +459,8 @@ class ServiceDeployerApiTest extends ApisTestCommon {
     void testDeployThrowPolicyEvaluationFailed(ServiceTemplateDetailVo serviceTemplate)
             throws Exception {
         mockPolicyEvaluationResult(false);
-        MockHttpServletResponse response = deployService(getDeployRequest(serviceTemplate));
+        DeployRequest deployRequest = getDeployRequest(serviceTemplate);
+        MockHttpServletResponse response = deployService(deployRequest);
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
     }
 
@@ -769,7 +774,15 @@ class ServiceDeployerApiTest extends ApisTestCommon {
                         .getOcl(
                                 URI.create("file:src/test/resources/ocl_terraform_test.yml")
                                         .toURL());
-        ocl.getDeployment().getInputVariables().getLast().setMandatory(true);
+        if (ocl.getDeployment().getTerraformDeployment() != null) {
+            ocl.getDeployment()
+                    .getTerraformDeployment()
+                    .getInputVariables()
+                    .getLast()
+                    .setMandatory(true);
+        }
+        List<InputVariable> inputVariables =
+                DeploymentVariableHelper.getInputVariables(ocl.getDeployment());
         AvailabilityZoneConfig zoneConfig = new AvailabilityZoneConfig();
         zoneConfig.setDisplayName("Primary AZ");
         zoneConfig.setVarName("primary_az");
@@ -789,7 +802,7 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         String refuseMsg1 =
                 String.format(
                         "Variable validation failed:" + " [required property '%s' not found]",
-                        ocl.getDeployment().getInputVariables().getLast().getName());
+                        inputVariables.getLast().getName());
 
         final MockHttpServletResponse deployResponse1 = deployService(deployRequest1);
         // Verify the results

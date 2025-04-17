@@ -76,8 +76,6 @@ class ServiceTemplateDetailVoTest {
         test.setServiceVendor(serviceVendor);
         test.setIcon(icon);
         test.setDeployment(deployment);
-        test.setInputVariables(inputVariables);
-        test.setOutputVariables(outputVariables);
         test.setFlavors(flavors);
         test.setBilling(billing);
         test.setCreatedTime(createdTime);
@@ -104,8 +102,6 @@ class ServiceTemplateDetailVoTest {
         assertEquals(description, test.getDescription());
         assertEquals(serviceVendor, test.getServiceVendor());
         assertEquals(icon, test.getIcon());
-        assertEquals(inputVariables, test.getInputVariables());
-        assertEquals(outputVariables, test.getOutputVariables());
         assertEquals(flavors, test.getFlavors());
         assertEquals(billing, test.getBilling());
         assertEquals(createdTime, test.getCreatedTime());
@@ -157,10 +153,6 @@ class ServiceTemplateDetailVoTest {
                         + icon
                         + ", deployment="
                         + deployment
-                        + ", inputVariables="
-                        + inputVariables
-                        + ", outputVariables="
-                        + outputVariables
                         + ", flavors="
                         + flavors
                         + ", billing="

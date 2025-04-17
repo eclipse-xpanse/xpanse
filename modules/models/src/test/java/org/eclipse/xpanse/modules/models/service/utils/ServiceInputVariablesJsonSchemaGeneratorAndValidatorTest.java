@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.VariableV
 import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ class ServiceInputVariablesJsonSchemaGeneratorAndValidatorTest {
         Ocl ocl =
                 oclLoader.getOcl(
                         new File("src/test/resources/ocl_terraform_test.yml").toURI().toURL());
-        inputVariables = ocl.getDeployment().getInputVariables();
+        inputVariables = DeploymentVariableHelper.getInputVariables(ocl.getDeployment());
     }
 
     @Test

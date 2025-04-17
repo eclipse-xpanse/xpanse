@@ -8,14 +8,17 @@ package org.eclipse.xpanse.runtime.modules.servicetemplate.utils;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceInputVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateRegistrationState;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -121,13 +124,14 @@ class ServiceTemplateOpenApiGeneratorTest {
         Ocl ocl = oclLoader.getOcl(url);
         AvailabilityZoneSchemaValidator.validateServiceAvailabilities(
                 ocl.getDeployment().getServiceAvailabilityConfig());
-        InputVariablesSchemaValidator.validateInputVariables(
-                ocl.getDeployment().getInputVariables());
+        List<InputVariable> inputVariables =
+                DeploymentVariableHelper.getInputVariables(ocl.getDeployment());
+        InputVariablesSchemaValidator.validateInputVariables(inputVariables);
         ServiceInputVariablesJsonSchemaGenerator serviceInputVariablesJsonSchemaGenerator =
                 new ServiceInputVariablesJsonSchemaGenerator();
         JsonObjectSchema jsonObjectSchema =
                 serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
-                        ocl.getDeployment().getInputVariables());
+                        inputVariables);
         ServiceTemplateEntity serviceTemplateEntity = new ServiceTemplateEntity();
         serviceTemplateEntity.setId(serviceId);
         serviceTemplateEntity.setName(ocl.getName());

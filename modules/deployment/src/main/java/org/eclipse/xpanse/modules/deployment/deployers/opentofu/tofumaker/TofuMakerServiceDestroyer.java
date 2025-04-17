@@ -83,7 +83,8 @@ public class TofuMakerServiceDestroyer {
         request.setRequestType(OpenTofuAsyncRequestWithScripts.RequestTypeEnum.DESTROY);
         request.setRequestId(task.getOrderId());
         request.setOpenTofuVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
-        request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
+        request.setScriptFiles(
+                task.getOcl().getDeployment().getTerraformDeployment().getScriptFiles());
         request.setTfState(stateFile);
         request.setVariables(tofuMakerHelper.getInputVariables(task, false));
         request.setEnvVariables(tofuMakerHelper.getEnvironmentVariables(task));
@@ -104,7 +105,7 @@ public class TofuMakerServiceDestroyer {
         request.setWebhookConfig(tofuMakerHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
                 tofuMakerHelper.convertOpenTofuScriptsGitRepoDetailsFromDeployFromGitRepo(
-                        task.getOcl().getDeployment().getScriptsRepo()));
+                        task.getOcl().getDeployment().getTerraformDeployment().getScriptsRepo()));
         return request;
     }
 

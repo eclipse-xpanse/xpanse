@@ -83,7 +83,8 @@ public class TerraBootServiceDestroyer {
         request.setRequestId(task.getOrderId());
         request.setRequestType(TerraformAsyncRequestWithScripts.RequestTypeEnum.DESTROY);
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
-        request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
+        request.setScriptFiles(
+                task.getOcl().getDeployment().getTerraformDeployment().getScriptFiles());
         request.setTfState(stateFile);
         request.setVariables(terraBootHelper.getInputVariables(task, false));
         request.setEnvVariables(terraBootHelper.getEnvironmentVariables(task));
@@ -104,7 +105,7 @@ public class TerraBootServiceDestroyer {
         request.setWebhookConfig(terraBootHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
                 terraBootHelper.convertTerraformScriptsGitRepoDetailsFromDeployFromGitRepo(
-                        task.getOcl().getDeployment().getScriptsRepo()));
+                        task.getOcl().getDeployment().getTerraformDeployment().getScriptsRepo()));
         return request;
     }
 

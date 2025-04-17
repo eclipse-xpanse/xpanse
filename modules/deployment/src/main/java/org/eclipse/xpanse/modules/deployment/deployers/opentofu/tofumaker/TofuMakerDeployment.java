@@ -47,7 +47,8 @@ public class TofuMakerDeployment implements Deployer {
 
     @Override
     public DeployResult deploy(DeployTask deployTask) {
-        Map<String, String> scriptsMap = deployTask.getOcl().getDeployment().getScriptFiles();
+        Map<String, String> scriptsMap =
+                deployTask.getOcl().getDeployment().getTerraformDeployment().getScriptFiles();
         if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             return tofuMakerServiceDeployer.deployFromScripts(deployTask);
         }
@@ -56,7 +57,8 @@ public class TofuMakerDeployment implements Deployer {
 
     @Override
     public DeployResult destroy(DeployTask deployTask) {
-        Map<String, String> scriptsMap = deployTask.getOcl().getDeployment().getScriptFiles();
+        Map<String, String> scriptsMap =
+                deployTask.getOcl().getDeployment().getTerraformDeployment().getScriptFiles();
         if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             return tofuMakerServiceDestroyer.destroyFromScripts(deployTask);
         }
@@ -65,7 +67,8 @@ public class TofuMakerDeployment implements Deployer {
 
     @Override
     public DeployResult modify(DeployTask deployTask) {
-        Map<String, String> scriptsMap = deployTask.getOcl().getDeployment().getScriptFiles();
+        Map<String, String> scriptsMap =
+                deployTask.getOcl().getDeployment().getTerraformDeployment().getScriptFiles();
         if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             return tofuMakerServiceModifier.modifyFromScripts(deployTask);
         }
@@ -82,11 +85,11 @@ public class TofuMakerDeployment implements Deployer {
     @Override
     public DeploymentScriptValidationResult validate(Deployment deployment) {
         DeploymentScriptValidationResult result = null;
-        Map<String, String> scriptsMap = deployment.getScriptFiles();
+        Map<String, String> scriptsMap = deployment.getTerraformDeployment().getScriptFiles();
         if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             result = tofuMakerScriptValidator.validateOpenTofuScripts(deployment);
         }
-        if (Objects.nonNull(deployment.getScriptsRepo())) {
+        if (Objects.nonNull(deployment.getTerraformDeployment().getScriptsRepo())) {
             result = tofuMakerScriptValidator.validateOpenTofuScriptsFromGitRepo(deployment);
         }
         return result;
@@ -94,7 +97,8 @@ public class TofuMakerDeployment implements Deployer {
 
     @Override
     public String getDeploymentPlanAsJson(DeployTask task) {
-        Map<String, String> scriptsMap = task.getOcl().getDeployment().getScriptFiles();
+        Map<String, String> scriptsMap =
+                task.getOcl().getDeployment().getTerraformDeployment().getScriptFiles();
         if (Objects.nonNull(scriptsMap) && !scriptsMap.isEmpty()) {
             return tofuMakerDeploymentPlanManage.getOpenTofuPlanFromScripts(task).getPlan();
         }

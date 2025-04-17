@@ -58,6 +58,15 @@ public class DeployerToolVersionsFetcher {
     @Value("${deployer.opentofu.default.supported.versions}")
     private String openTofuDefaultVersionsStr;
 
+    @Value("${deployer.helm.github.api.endpoint}")
+    private String helmGithubApiEndpoint;
+
+    @Value("${deployer.helm.github.repository}")
+    private String helmGithubRepository;
+
+    @Value("${deployer.helm.default.supported.versions}")
+    private String helmDefaultVersionsStr;
+
     /**
      * Fetch all available versions from the website of deployer.
      *
@@ -106,7 +115,7 @@ public class DeployerToolVersionsFetcher {
                             "Failed to fetch available versions from website for "
                                     + "deployer tool %s.",
                             deployerKind.toValue());
-            log.error(errorMsg + " Retry count: " + retryCount, e);
+            log.error("{} Retry count: {}", errorMsg, retryCount, e);
             throw new ClientApiCallFailedException(errorMsg);
         }
         log.info(
@@ -145,6 +154,7 @@ public class DeployerToolVersionsFetcher {
         return switch (deployerKind) {
             case TERRAFORM -> terraformGithubApiEndpoint;
             case OPEN_TOFU -> openTofuGithubApiEndpoint;
+            case HELM -> helmGithubApiEndpoint;
         };
     }
 
@@ -165,6 +175,7 @@ public class DeployerToolVersionsFetcher {
         return switch (deployerKind) {
             case TERRAFORM -> terraformGithubRepository;
             case OPEN_TOFU -> openTofuGithubRepository;
+            case HELM -> helmGithubRepository;
         };
     }
 
@@ -172,6 +183,7 @@ public class DeployerToolVersionsFetcher {
         return switch (deployerKind) {
             case TERRAFORM -> terraformDefaultVersionsStr;
             case OPEN_TOFU -> openTofuDefaultVersionsStr;
+            case HELM -> helmDefaultVersionsStr;
         };
     }
 

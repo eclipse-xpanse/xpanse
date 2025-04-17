@@ -26,6 +26,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceFlavor;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.secrets.SecretsManager;
@@ -81,7 +82,7 @@ public class DeployEnvironments {
         return getEnv(
                 task.getOcl().getCloudServiceProvider().getName(),
                 task.getDeployRequest().getServiceRequestProperties(),
-                task.getOcl().getDeployment().getInputVariables());
+                DeploymentVariableHelper.getInputVariables(task.getOcl().getDeployment()));
     }
 
     /**
@@ -207,7 +208,7 @@ public class DeployEnvironments {
         Map<String, Object> variables =
                 getVariables(
                         task.getDeployRequest().getServiceRequestProperties(),
-                        task.getOcl().getDeployment().getInputVariables(),
+                        DeploymentVariableHelper.getInputVariables(task.getOcl().getDeployment()),
                         isDeployRequest);
         variables.put(VAR_REGION, task.getDeployRequest().getRegion().getName());
         return variables;
@@ -350,8 +351,10 @@ public class DeployEnvironments {
     public Map<String, Object> getFixedVariablesFromTemplate(
             ServiceTemplateEntity serviceTemplateEntity) {
         Map<String, Object> fixedVariables = new HashMap<>();
-        for (InputVariable variable :
-                serviceTemplateEntity.getOcl().getDeployment().getInputVariables()) {
+        List<InputVariable> inputVariables =
+                DeploymentVariableHelper.getInputVariables(
+                        serviceTemplateEntity.getOcl().getDeployment());
+        for (InputVariable variable : inputVariables) {
             if (variable.getKind() == VariableKind.FIX_VARIABLE) {
                 fixedVariables.put(
                         variable.getName(),

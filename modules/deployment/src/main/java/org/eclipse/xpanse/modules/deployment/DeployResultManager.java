@@ -39,9 +39,11 @@ import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
@@ -211,14 +213,11 @@ public class DeployResultManager {
                 log.error("Failed to convert request to ModifyRequest.");
             }
         }
-        if (Objects.nonNull(serviceDeploymentEntity)
-                && Objects.nonNull(serviceDeploymentEntity.getServiceTemplateEntity())
-                && Objects.nonNull(serviceDeploymentEntity.getServiceTemplateEntity().getOcl())
-                && Objects.nonNull(
-                        serviceDeploymentEntity
-                                .getServiceTemplateEntity()
-                                .getOcl()
-                                .getServiceConfigurationManage())) {
+        if (Objects.nonNull(
+                serviceDeploymentEntity
+                        .getServiceTemplateEntity()
+                        .getOcl()
+                        .getServiceConfigurationManage())) {
             updateServiceConfiguration(deploymentState, serviceDeploymentToUpdate);
         }
         if (CollectionUtils.isEmpty(deployResult.getDeploymentGeneratedFiles())) {
@@ -235,15 +234,10 @@ public class DeployResultManager {
                 serviceDeploymentToUpdate.setOutputProperties(Collections.emptyMap());
             }
         } else {
-            if (Objects.nonNull(
-                    serviceOrderEntity.getServiceDeploymentEntity().getServiceTemplateEntity())) {
+            Deployment deployment = getDeploymentByServiceOrder(serviceOrderEntity);
+            if (Objects.nonNull(deployment)) {
                 List<OutputVariable> outputVariables =
-                        serviceOrderEntity
-                                .getServiceDeploymentEntity()
-                                .getServiceTemplateEntity()
-                                .getOcl()
-                                .getDeployment()
-                                .getOutputVariables();
+                        DeploymentVariableHelper.getOutputVariables(deployment);
                 sensitiveDataHandler.encodeOutputVariables(
                         outputVariables, deployResult.getOutputProperties());
             }
@@ -397,20 +391,11 @@ public class DeployResultManager {
         ServiceOrderEntity entityToUpdate = new ServiceOrderEntity();
         BeanUtils.copyProperties(storedOrderEntity, entityToUpdate);
         entityToUpdate.setCompletedTime(OffsetDateTime.now());
-        if (Objects.nonNull(
-                        storedOrderEntity.getServiceDeploymentEntity().getServiceTemplateEntity())
-                && Objects.nonNull(
-                        storedOrderEntity
-                                .getServiceDeploymentEntity()
-                                .getServiceTemplateEntity()
-                                .getOcl())) {
+
+        Deployment deployment = getDeploymentByServiceOrder(storedOrderEntity);
+        if (Objects.nonNull(deployment)) {
             List<InputVariable> inputVariables =
-                    storedOrderEntity
-                            .getServiceDeploymentEntity()
-                            .getServiceTemplateEntity()
-                            .getOcl()
-                            .getDeployment()
-                            .getInputVariables();
+                    DeploymentVariableHelper.getInputVariables(deployment);
             if (!CollectionUtils.isEmpty(inputVariables)
                     && !CollectionUtils.isEmpty(entityToUpdate.getRequestBody())) {
                 Map<String, Object> requestBodyWithSensitiveFields =
@@ -421,6 +406,19 @@ public class DeployResultManager {
         }
 
         serviceOrderManager.completeOrderProgressWithDeployResult(entityToUpdate, deployResult);
+    }
+
+    private Deployment getDeploymentByServiceOrder(ServiceOrderEntity serviceOrderEntity) {
+        try {
+            return serviceOrderEntity
+                    .getServiceDeploymentEntity()
+                    .getServiceTemplateEntity()
+                    .getOcl()
+                    .getDeployment();
+        } catch (Exception e) {
+            log.error("Failed to get deployment by service order:{}.", serviceOrderEntity);
+            return null;
+        }
     }
 
     private void completeParentServiceOrder(UUID parentOrderId, DeployResult deployResult) {

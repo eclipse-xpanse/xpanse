@@ -9,6 +9,7 @@ import jakarta.annotation.Resource;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,6 +25,8 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants;
 import org.eclipse.xpanse.plugins.openstack.common.auth.keystone.OpenstackKeystoneManager;
 import org.eclipse.xpanse.plugins.openstack.common.auth.keystone.ScsKeystoneManager;
@@ -150,10 +153,13 @@ public class ProviderAuthInfoResolver {
             if (Objects.nonNull(serviceDeploymentEntity.getInputProperties())) {
                 inputProperties.putAll(serviceDeploymentEntity.getInputProperties());
             }
+            List<InputVariable> inputVariables =
+                    DeploymentVariableHelper.getInputVariables(
+                            serviceTemplateEntity.getOcl().getDeployment());
             Map<String, Object> serviceRequestVariables =
                     this.deployEnvironments.getAllDeploymentVariablesForService(
                             inputProperties,
-                            serviceTemplateEntity.getOcl().getDeployment().getInputVariables(),
+                            inputVariables,
                             serviceDeploymentEntity.getFlavor(),
                             serviceTemplateEntity.getOcl());
             defaultAuthUrl =

@@ -171,13 +171,17 @@ class TerraBootDeploymentTest {
 
     @Test
     void testDeploy_ThrowsRestClientException() {
-        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
+        ocl.getDeployment()
+                .getTerraformDeployment()
+                .setScriptFiles(Map.of("error_test.tf", errorScript));
         deployTask.setTaskType(ServiceOrderType.DEPLOY);
         Mockito.doThrow(new TerraBootRequestFailedException("IO error"))
                 .when(terraformApi)
                 .asyncDeployWithScripts(any());
 
-        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
+        ocl.getDeployment()
+                .getTerraformDeployment()
+                .setScriptFiles(Map.of("invalid_test.tf", invalidScript));
 
         Assertions.assertThrows(
                 TerraBootRequestFailedException.class,
@@ -252,7 +256,9 @@ class TerraBootDeploymentTest {
 
     @Test
     void testValidateFailed() {
-        ocl.getDeployment().setScriptFiles(Map.of("invalid_test.tf", invalidScript));
+        ocl.getDeployment()
+                .getTerraformDeployment()
+                .setScriptFiles(Map.of("invalid_test.tf", invalidScript));
 
         DeploymentScriptValidationResult expectedResult = new DeploymentScriptValidationResult();
         expectedResult.setValid(false);
@@ -274,7 +280,9 @@ class TerraBootDeploymentTest {
 
     @Test
     void testValidate_ThrowsTerraformExecutorException() {
-        ocl.getDeployment().setScriptFiles(Map.of("error_test.tf", errorScript));
+        ocl.getDeployment()
+                .getTerraformDeployment()
+                .setScriptFiles(Map.of("error_test.tf", errorScript));
         when(terraBootScriptValidator.validateTerraformScripts(any()))
                 .thenThrow(new TerraBootRequestFailedException("IO error"));
 

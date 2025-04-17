@@ -69,7 +69,8 @@ public class TerraBootServiceDeployer {
         request.setRequestType(TerraformAsyncRequestWithScripts.RequestTypeEnum.DEPLOY);
         request.setTerraformVersion(task.getOcl().getDeployment().getDeployerTool().getVersion());
         request.setIsPlanOnly(false);
-        request.setScriptFiles(task.getOcl().getDeployment().getScriptFiles());
+        request.setScriptFiles(
+                task.getOcl().getDeployment().getTerraformDeployment().getScriptFiles());
         request.setVariables(terraBootHelper.getInputVariables(task, true));
         request.setEnvVariables(terraBootHelper.getEnvironmentVariables(task));
         request.setWebhookConfig(terraBootHelper.getWebhookConfigWithTask(task));
@@ -88,7 +89,7 @@ public class TerraBootServiceDeployer {
         request.setWebhookConfig(terraBootHelper.getWebhookConfigWithTask(task));
         request.setGitRepoDetails(
                 terraBootHelper.convertTerraformScriptsGitRepoDetailsFromDeployFromGitRepo(
-                        task.getOcl().getDeployment().getScriptsRepo()));
+                        task.getOcl().getDeployment().getTerraformDeployment().getScriptsRepo()));
         return request;
     }
 

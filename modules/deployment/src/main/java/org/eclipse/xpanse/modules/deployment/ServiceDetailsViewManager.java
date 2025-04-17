@@ -34,6 +34,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
+import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -329,12 +330,14 @@ public class ServiceDetailsViewManager {
             DeployedService deployedService, ServiceTemplateEntity serviceTemplate) {
         // Handle sensitive data in input properties
         List<InputVariable> inputVariables =
-                serviceTemplate.getOcl().getDeployment().getInputVariables();
+                DeploymentVariableHelper.getInputVariables(
+                        serviceTemplate.getOcl().getDeployment());
         sensitiveDataHandler.handleSensitiveDataInInputProperties(
                 inputVariables, deployedService.getInputProperties());
         // Handle sensitive data in output properties
         List<OutputVariable> outputVariables =
-                serviceTemplate.getOcl().getDeployment().getOutputVariables();
+                DeploymentVariableHelper.getOutputVariables(
+                        serviceTemplate.getOcl().getDeployment());
         sensitiveDataHandler.handleSensitiveDataInOutputVariables(
                 deployedService.getServiceId(),
                 outputVariables,

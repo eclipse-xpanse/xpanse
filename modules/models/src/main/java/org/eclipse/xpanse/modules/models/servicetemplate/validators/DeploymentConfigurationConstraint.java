@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = DeploymentValidator.class)
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DeploymentScriptsConstraint {
+public @interface DeploymentConfigurationConstraint {
     /**
      * Message returned when constraint validation fails.
      *
