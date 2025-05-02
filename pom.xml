@@ -89,6 +89,9 @@
         <spotless.version>2.44.4</spotless.version>
         <liquibase.version>4.31.1</liquibase.version>
         <org.reflections.version>0.10.2</org.reflections.version>
+        <docker.java.version>3.5.0</docker.java.version>
+        <pebble.version>3.2.4</pebble.version>
+        <apache.commons.compress.version>1.27.1</apache.commons.compress.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
@@ -191,6 +194,13 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>1.0.0-M8</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>

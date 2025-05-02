@@ -83,9 +83,7 @@ public class ServiceTemplateApi {
     @Transactional
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     public ServiceTemplateRequestInfo register(@Valid @RequestBody Ocl ocl) {
-        ServiceTemplateRequestHistoryEntity registerRequest =
-                serviceTemplateManage.registerServiceTemplate(ocl);
-        return getServiceTemplateRequestInfo(registerRequest);
+        return createServiceTemplate(ocl);
     }
 
     /**
@@ -144,9 +142,7 @@ public class ServiceTemplateApi {
                     String oclLocation)
             throws Exception {
         Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
-        ServiceTemplateRequestHistoryEntity registerRequest =
-                serviceTemplateManage.registerServiceTemplate(ocl);
-        return getServiceTemplateRequestInfo(registerRequest);
+        return createServiceTemplate(ocl);
     }
 
     /**
@@ -426,5 +422,12 @@ public class ServiceTemplateApi {
                 requestHistoryEntity.getServiceTemplate().getId(),
                 requestHistoryEntity.getRequestId(),
                 requestHistoryEntity.getRequestStatus() == ServiceTemplateRequestStatus.IN_REVIEW);
+    }
+
+    /** wrapper method to be called from multiple places. */
+    public ServiceTemplateRequestInfo createServiceTemplate(Ocl ocl) {
+        ServiceTemplateRequestHistoryEntity registerRequest =
+                serviceTemplateManage.registerServiceTemplate(ocl);
+        return getServiceTemplateRequestInfo(registerRequest);
     }
 }
