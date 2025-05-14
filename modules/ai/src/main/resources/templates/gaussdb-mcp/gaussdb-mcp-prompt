@@ -1,0 +1,61 @@
+Generate only the implementation code for the following files. Include only the file contents that would be checked into GIT, with no explanation or markdown or comments or assumptions.
+INSTRUCTIONS:
+1. Generate ONLY executable code.
+2. NO explanations
+3. No comments
+4. No assumptions.
+5. No any explanation after each file.
+7. No information on how to use the file to be added. It must be completely avoided.
+
+Output each file's content must start with a ## followed by the file name. After this the markdown code block for the file must start.
+OUTPUT_FORMAT: CODE_ONLY
+
+
+Write a Python script for a JSON-RPC server that interacts with a **OpenGauss** database using the **pg8000** driver.
+    - Use **`FastMCP`** version 2.2.10 for the RPC server
+    - Initiate FastMCP with name 'GaussDB MCP' and no version.
+    - you must use only one import 'from fastmcp import FastMCP'
+    - Use **pg8000** version 1.31.2 for DB connections.
+    - Initialize the database connection using **`pg8000.connect()`** with these environment variables:
+    - `DB_USER`, `DB_PASS`, `DB_HOST`, `DB_PORT`, `DB_NAME`.
+    - Run the server on **port 8080**.
+    - Handle errors gracefully (return `Error` with exceptions).
+    - For `get_data`, dynamically map column names to row values using `cursor.description`.
+    - Use a plain Python script. No class must be created.
+    - the main method must have mcp.run() and have transport sse and host 0.0.0.0
+    - Use python 3.12
+    - print full error and exceptions to stdout for all methods.
+
+    ### **Example Outputs:**
+    - `get_all_tables()` → `[{"name": "users"}, {"name": "products"}]`
+    - `get_data("users")` → `[{"id": 1, "name": "Alice"}, ...]`
+
+Files to be generated are:
+
+## gauss_db_server.py
+
+
+1. **`get_all_tables()`**
+   - Queries `information_schema.tables` to fetch all tables owned by the user in DB_USER OS variable.
+   - Returns a list of dictionaries like `[{"name": "table1"}, ...]`.
+   - Uses `pg8000` for raw SQL execution.
+   - Wraps the operation in a `try-except` block and returns a JSON-RPC `Error` on failure.
+   - add Python decorator **@mcp.tool()**.
+   - function's docstring must be - "Lists names of available tables in the database."
+
+2. **`get_data_from_table(table_name: str)`**
+   - Executes a raw SQL query (`SELECT * FROM {table_name}`).
+   - Dynamically extracts column names from `cursor.description`.
+   - Returns rows as a list of dictionaries (e.g., `[{"id": 1, "name": "Alice"}, ...]`).
+   - Uses `pg8000` for database access (no ORM).
+   - add Python decorator **@mcp.tool()**
+   - function's docstring must be - "Retrieves all rows from the table_name provided"
+
+## requirements.txt
+REQUIREMENTS: python PIP requirements for the above code
+Use python 3.12
+
+## Dockerfile
+REQUIREMENTS: Create a docker image for the above application with all dependencies installed.
+Database environment values will be injected only when container is started.
+The Dockerfile must have no ENV commands.

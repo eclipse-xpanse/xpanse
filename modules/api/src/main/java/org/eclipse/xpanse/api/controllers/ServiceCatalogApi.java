@@ -90,23 +90,8 @@ public class ServiceCatalogApi {
                     @RequestParam(name = "serviceHostingType", required = false)
                     ServiceHostingType serviceHostingType) {
 
-        ServiceTemplateQueryModel queryRequest =
-                ServiceTemplateQueryModel.builder()
-                        .category(categoryName)
-                        .csp(cspName)
-                        .serviceName(serviceName)
-                        .serviceVersion(serviceVersion)
-                        .serviceHostingType(serviceHostingType)
-                        .isAvailableInCatalog(true)
-                        .checkServiceVendor(false)
-                        .build();
-        List<ServiceTemplateEntity> serviceTemplateEntities =
-                serviceTemplateManage.listServiceTemplates(queryRequest);
-        log.info("{} orderable services found.", serviceTemplateEntities.size());
-        return serviceTemplateEntities.stream()
-                .sorted(Comparator.comparingInt(template -> template.getCsp().ordinal()))
-                .map(ServiceTemplateEntityConverter::convertToUserOrderableServiceVo)
-                .toList();
+        return getAllUserOrderableServices(
+                categoryName, cspName, serviceName, serviceVersion, serviceHostingType);
     }
 
     /**
@@ -128,22 +113,7 @@ public class ServiceCatalogApi {
             @Parameter(name = "serviceTemplateId", description = "The id of orderable service.")
                     @PathVariable("serviceTemplateId")
                     UUID serviceTemplateId) {
-        UserOperation userOperation = UserOperation.VIEW_DETAILS_OF_SERVICE_TEMPLATE;
-        ServiceTemplateEntity serviceTemplateEntity =
-                serviceTemplateManage.getServiceTemplateDetails(
-                        serviceTemplateId, userOperation, false, false);
-        if (!serviceTemplateEntity.getIsAvailableInCatalog()) {
-            String errorMsg =
-                    String.format(
-                            "Service template %s is unavailable to be used to order service",
-                            serviceTemplateId);
-            log.error(errorMsg);
-            throw new ServiceTemplateUnavailableException(errorMsg);
-        }
-        String successMsg =
-                String.format("Get orderable service with id %s successful.", serviceTemplateId);
-        log.info(successMsg);
-        return convertToUserOrderableServiceVo(serviceTemplateEntity);
+        return getServiceTemplateDetailsById(serviceTemplateId);
     }
 
     /**
@@ -169,5 +139,51 @@ public class ServiceCatalogApi {
                         apiUrl);
         log.info(successMsg);
         return Link.of(apiUrl, "OpenApi");
+    }
+
+    /** wrapper method to get details of a service template using it's ID. */
+    public UserOrderableServiceVo getServiceTemplateDetailsById(UUID serviceTemplateId) {
+        UserOperation userOperation = UserOperation.VIEW_DETAILS_OF_SERVICE_TEMPLATE;
+        ServiceTemplateEntity serviceTemplateEntity =
+                serviceTemplateManage.getServiceTemplateDetails(
+                        serviceTemplateId, userOperation, false, false);
+        if (!serviceTemplateEntity.getIsAvailableInCatalog()) {
+            String errorMsg =
+                    String.format(
+                            "Service template %s is unavailable to be used to order service",
+                            serviceTemplateId);
+            log.error(errorMsg);
+            throw new ServiceTemplateUnavailableException(errorMsg);
+        }
+        String successMsg =
+                String.format("Get orderable service with id %s successful.", serviceTemplateId);
+        log.info(successMsg);
+        return convertToUserOrderableServiceVo(serviceTemplateEntity);
+    }
+
+    /** Wrapper method to get all orderable services based on query parameters. */
+    public List<UserOrderableServiceVo> getAllUserOrderableServices(
+            Category categoryName,
+            Csp cspName,
+            String serviceName,
+            String serviceVersion,
+            ServiceHostingType serviceHostingType) {
+        ServiceTemplateQueryModel queryRequest =
+                ServiceTemplateQueryModel.builder()
+                        .category(categoryName)
+                        .csp(cspName)
+                        .serviceName(serviceName)
+                        .serviceVersion(serviceVersion)
+                        .serviceHostingType(serviceHostingType)
+                        .isAvailableInCatalog(true)
+                        .checkServiceVendor(false)
+                        .build();
+        List<ServiceTemplateEntity> serviceTemplateEntities =
+                serviceTemplateManage.listServiceTemplates(queryRequest);
+        log.info("{} orderable services found.", serviceTemplateEntities.size());
+        return serviceTemplateEntities.stream()
+                .sorted(Comparator.comparingInt(template -> template.getCsp().ordinal()))
+                .map(ServiceTemplateEntityConverter::convertToUserOrderableServiceVo)
+                .toList();
     }
 }

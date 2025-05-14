@@ -96,6 +96,11 @@
             <artifactId>workflow</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.xpanse.modules</groupId>
+            <artifactId>ai</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!--junit4 dependency needed in classpath for testcontainers due to a known issue-->
         <dependency>
             <groupId>junit</groupId>

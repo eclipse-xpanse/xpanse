@@ -176,8 +176,7 @@ public class ServiceDeployerApi {
                     ServiceDeploymentState serviceState) {
         // return type is DeployedService but actually returns one of the child types
         // VendorHostedDeployedServiceDetails or DeployedServiceDetails
-        return this.serviceDetailsViewManager.listDeployedServicesDetails(
-                category, csp, serviceName, serviceVersion, serviceState);
+        return getDeployedServiceDetails(category, csp, serviceName, serviceVersion, serviceState);
     }
 
     /**
@@ -195,7 +194,7 @@ public class ServiceDeployerApi {
     @AuditApiRequest(methodName = "getCspFromRequestUri")
     @OrderFailedApiResponses
     public ServiceOrder deploy(@Valid @RequestBody DeployRequest deployRequest) {
-        return this.deployService.createOrderToDeployNewService(deployRequest);
+        return deployService(deployRequest);
     }
 
     /**
@@ -414,5 +413,19 @@ public class ServiceDeployerApi {
     private CacheControl getCacheControl() {
         long durationTime = this.duration > 0 ? this.duration : 60;
         return CacheControl.maxAge(durationTime, TimeUnit.MINUTES).mustRevalidate();
+    }
+
+    public ServiceOrder deployService(DeployRequest deployRequest) {
+        return this.deployService.createOrderToDeployNewService(deployRequest);
+    }
+
+    public List<DeployedService> getDeployedServiceDetails(
+            Category category,
+            Csp csp,
+            String serviceName,
+            String serviceVersion,
+            ServiceDeploymentState serviceState) {
+        return this.serviceDetailsViewManager.listDeployedServicesDetails(
+                category, csp, serviceName, serviceVersion, serviceState);
     }
 }

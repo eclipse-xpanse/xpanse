@@ -36,6 +36,7 @@
         <module>observability</module>
         <module>async</module>
         <module>cache</module>
+        <module>ai</module>
     </modules>
 
 </project>
