@@ -39,7 +39,7 @@ public class AiClientTest {
     public void testPrompt() {
         Assertions.assertDoesNotThrow(
                 () ->
-                        applicationGenerationManager.generateMcpServerImage(
+                        applicationGenerationManager.generateApplicationServerImage(
                                 AiApplicationType.GAUSSDB_MCP));
     }
 }

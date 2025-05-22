@@ -1,19 +1,6 @@
-Generate only the implementation code for the following files. Include only the file contents that would be checked into GIT, with no explanation or markdown or comments or assumptions.
-INSTRUCTIONS:
-1. Generate ONLY executable code.
-2. NO explanations
-3. No comments
-4. No assumptions.
-5. No any explanation after each file.
-7. No information on how to use the file to be added. It must be completely avoided.
-
-Output each file's content must start with a ## followed by the file name. After this the markdown code block for the file must start.
-OUTPUT_FORMAT: CODE_ONLY
-
-
-Write a Python script for a JSON-RPC server that interacts with a **OpenGauss** database using the **pg8000** driver.
+Write a Python script for a JSON-RPC server that interacts with a <backend-name> database using the **pg8000** driver.
     - Use **`FastMCP`** version 2.2.10 for the RPC server
-    - Initiate FastMCP with name 'GaussDB MCP' and no version.
+    - Initiate FastMCP with name <application-name> and no version.
     - you must use only one import 'from fastmcp import FastMCP'
     - Use **pg8000** version 1.31.2 for DB connections.
     - Initialize the database connection using **`pg8000.connect()`** with these environment variables:
@@ -32,7 +19,7 @@ Write a Python script for a JSON-RPC server that interacts with a **OpenGauss** 
 
 Files to be generated are:
 
-## gauss_db_server.py
+## <application-name>_server.py
 
 
 1. **`get_all_tables()`**

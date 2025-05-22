@@ -166,7 +166,8 @@ public class McpTools {
         if (!isUserAccepted) {
             throw new ServiceTemplateRequestNotAllowed("User confirmation not provided.");
         }
-        String imageUrl = applicationGenerationManager.generateMcpServerImage(aiApplicationType);
+        String imageUrl =
+                applicationGenerationManager.generateApplicationServerImage(aiApplicationType);
         return serviceTemplateGenerator.generateServiceTemplate(aiApplicationType, imageUrl);
     }
 }
