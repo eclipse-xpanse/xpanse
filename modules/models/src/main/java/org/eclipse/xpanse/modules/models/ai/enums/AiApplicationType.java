@@ -13,8 +13,8 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 
 /** Enum of AiApplicationType. */
 public enum AiApplicationType {
-    GAUSSDB_MCP("gaussdb-mcp"),
-    MYSQL_MCP("mysql-mcp");
+    GAUSSDB_MCP("gaussdb_mcp"),
+    MYSQL_MCP("mysql_mcp");
 
     private final String value;
 

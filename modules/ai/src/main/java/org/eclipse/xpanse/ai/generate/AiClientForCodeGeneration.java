@@ -6,24 +6,32 @@
 
 package org.eclipse.xpanse.ai.generate;
 
+import static org.eclipse.xpanse.ai.generate.PromptTemplateVariables.APPLICATION_NAME_VAR;
+import static org.eclipse.xpanse.ai.generate.PromptTemplateVariables.BACKEND_NAME_VAR;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.ai.generate.structure.CodeGenerationResponseItem;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.template.st.StTemplateRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 /** Client bean that interacts with an LLM provider. */
 @Component
@@ -31,12 +39,9 @@ import org.springframework.stereotype.Component;
 @Profile("ai")
 public class AiClientForCodeGeneration {
 
-    private static final String SYSTEM_PROMPT =
-            """
-                you are a code generator.
-                You must generate fully usable code and leave nothing for the user to implement.
-                Output must contain only code. No examples, explanation, comments needed.
-            """;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final String SYSTEM_PROMPT_FILE = "system-prompt.txt";
 
     private final OpenAiChatModel chatModel;
 
@@ -46,7 +51,9 @@ public class AiClientForCodeGeneration {
     }
 
     /** Uses prompt and generates code fils by using LLM. */
-    public String generateCode(String prompt) throws IOException {
+    public String generateCode(
+            String promptFileLocation, String backendName, String applicationName)
+            throws IOException {
         log.info("sending request to LLM");
         ChatOptions options = OpenAiChatOptions.builder().temperature(0.0).topP(1.0).build();
         ChatClient chatClient =
@@ -54,66 +61,56 @@ public class AiClientForCodeGeneration {
                         .defaultOptions(options)
                         .defaultAdvisors(new SimpleLoggerAdvisor())
                         .build();
-        SystemMessage systemMessage = new SystemMessage(SYSTEM_PROMPT);
-        UserMessage userMessage = new UserMessage(prompt);
+
         String response =
-                chatClient.prompt(new Prompt(List.of(systemMessage, userMessage))).call().content();
+                chatClient
+                        .prompt()
+                        .system(new ClassPathResource(SYSTEM_PROMPT_FILE))
+                        .user(
+                                promptUserSpec ->
+                                        promptUserSpec
+                                                .text(new ClassPathResource(promptFileLocation))
+                                                .params(
+                                                        Map.of(
+                                                                APPLICATION_NAME_VAR,
+                                                                applicationName,
+                                                                BACKEND_NAME_VAR,
+                                                                backendName)))
+                        .templateRenderer(
+                                StTemplateRenderer.builder()
+                                        .startDelimiterToken('<')
+                                        .endDelimiterToken('>')
+                                        .build())
+                        .call()
+                        .content();
         log.info("Original Response: {}", response);
-        return processAndWriteToFiles(response);
+        CodeGenerationResponseItem[] codeGenerationResponse =
+                objectMapper.readValue(response, CodeGenerationResponseItem[].class);
+        return processAndWriteToFiles(codeGenerationResponse);
     }
 
-    private String processAndWriteToFiles(String input) throws IOException {
-        // Split the input into lines
-        String removeSpaces = input.trim();
-        String[] lines = removeSpaces.split("\n");
-
-        String currentFileName = null;
-        StringBuilder currentBlock = new StringBuilder();
-        boolean insideCodeBlock = false;
+    private String processAndWriteToFiles(CodeGenerationResponseItem[] codeGenerationResponse)
+            throws IOException {
         File directory =
                 new File(System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID());
-
         if (!directory.exists()) {
             boolean created = directory.mkdirs(); // mkdirs() creates parent directories as well
             if (created) {
-                log.info("Directory created successfully");
+                log.info("Directory {} created successfully", directory.getAbsolutePath());
             }
         }
 
-        for (String line : lines) {
-            // Check if the line starts with '## ' (this marks a file name)
-            if (line.startsWith("## ")) {
-                // If we already have a file to write, write the previous one
-                if (currentFileName != null && !currentBlock.isEmpty()) {
-                    writeToFile(
-                            directory.getAbsolutePath(), currentFileName, currentBlock.toString());
-                }
-                currentFileName = line.substring(3).trim(); // Extract after "## "
-                currentBlock = new StringBuilder();
-                insideCodeBlock = false;
-            } else if (line.startsWith("# ")) {
-                // If we already have a file to write, write the previous one
-                if (currentFileName != null && !currentBlock.isEmpty()) {
-                    writeToFile(
-                            directory.getAbsolutePath(), currentFileName, currentBlock.toString());
-                }
-                currentFileName = line.substring(2).trim(); // Extract after "# "
-                currentBlock = new StringBuilder();
-                insideCodeBlock = false;
-            } else if (line.startsWith("```")) {
-                insideCodeBlock = !insideCodeBlock;
-            } else {
-                if (insideCodeBlock) {
-                    currentBlock.append(line).append("\n");
-                }
-            }
-        }
-
-        // Write the last block to file
-        if (currentFileName != null && !currentBlock.isEmpty()) {
-            writeToFile(directory.getAbsolutePath(), currentFileName, currentBlock.toString());
-        }
-
+        Arrays.stream(codeGenerationResponse)
+                .forEach(
+                        item -> {
+                            String fileName = item.getFileName();
+                            String content = item.getContent();
+                            try {
+                                writeToFile(directory.getAbsolutePath(), fileName, content);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
         return directory.getAbsolutePath();
     }
 
@@ -122,6 +119,19 @@ public class AiClientForCodeGeneration {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write(content);
             log.info("Written to: {}", fileName);
+        }
+    }
+
+    private static String getSystemPrompt() {
+        try {
+            File file = ResourceUtils.getFile("classpath:system-prompt.txt");
+            if (!file.exists()) {
+                throw new XpanseUnhandledException("Could not find file: " + file.getName());
+            }
+            byte[] bytes = Files.readAllBytes(file.toPath());
+            return new String(bytes);
+        } catch (IOException e) {
+            throw new XpanseUnhandledException(e.getMessage());
         }
     }
 }

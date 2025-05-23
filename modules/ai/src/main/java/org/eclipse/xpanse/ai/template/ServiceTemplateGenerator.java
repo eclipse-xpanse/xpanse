@@ -55,7 +55,8 @@ public class ServiceTemplateGenerator {
                                                 + String.format(
                                                         "%s/%s",
                                                         TEMPLATES_FOLDER,
-                                                        "mcp/mcp-ecs-with-service-template.yml.peb"))
+                                                        getServiceTemplateFileName(
+                                                                aiApplicationType)))
                                 .getAbsolutePath(),
                         engine);
         log.info(serviceTemplate);
@@ -78,8 +79,14 @@ public class ServiceTemplateGenerator {
         try {
             return serviceTemplateApi.createServiceTemplate(ocl);
         } catch (Exception e) {
-
+            log.error("Failed to register service template", e);
             throw e;
         }
+    }
+
+    private String getServiceTemplateFileName(AiApplicationType aiApplicationType) {
+        return switch (aiApplicationType) {
+            case GAUSSDB_MCP, MYSQL_MCP -> "mcp/mcp-ecs-with-service-template.yml.peb";
+        };
     }
 }

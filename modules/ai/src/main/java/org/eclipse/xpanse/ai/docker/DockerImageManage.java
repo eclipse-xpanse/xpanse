@@ -36,6 +36,7 @@ public class DockerImageManage {
     private final String dockerRegistryUsername;
     private final String dockerRegistryPassword;
     private final String dockerRegistryOrganization;
+    private final String dockerImageBuildProxyUrl;
 
     /** Constructor method. */
     @Autowired
@@ -43,11 +44,13 @@ public class DockerImageManage {
             @Value("${ai.docker.registry.url}") String dockerRegistryUrl,
             @Value("${ai.docker.registry.username}") String dockerRegistryUsername,
             @Value("${ai.docker.registry.password}") String dockerRegistryPassword,
-            @Value("${ai.docker.registry.organization}") String dockerRegistryOrganization) {
+            @Value("${ai.docker.registry.organization}") String dockerRegistryOrganization,
+            @Value("${docker.image.build.proxy.url}") String dockerImageBuildProxyUrl) {
         this.dockerRegistryUrl = dockerRegistryUrl;
         this.dockerRegistryUsername = dockerRegistryUsername;
         this.dockerRegistryPassword = dockerRegistryPassword;
         this.dockerRegistryOrganization = dockerRegistryOrganization;
+        this.dockerImageBuildProxyUrl = dockerImageBuildProxyUrl;
     }
 
     /** creates docker image and pushes to a registry. */
@@ -94,6 +97,7 @@ public class DockerImageManage {
                             public void onNext(BuildResponseItem item) {
                                 log.info(item.getStream());
                                 if (item.isErrorIndicated()) {
+                                    assert item.getErrorDetail() != null;
                                     throw new RuntimeException(item.getErrorDetail().getMessage());
                                 }
                             }
@@ -103,8 +107,13 @@ public class DockerImageManage {
                                 .buildImageCmd(new File(codePath))
                                 .withTags(Collections.singleton(fullImageName))
                                 .withNoCache(true)
-                                .withTags(Collections.singleton(fullImageName))
-                                .withBuildArg("HTTPS_PROXY", "http://192.168.1.1:3128");
+                                .withTags(Collections.singleton(fullImageName));
+
+                if (!dockerImageBuildProxyUrl.isBlank()) {
+                    log.debug(
+                            "using proxy URL {} for docker image build.", dockerImageBuildProxyUrl);
+                    buildImageCmd.withBuildArg("HTTPS_PROXY", dockerImageBuildProxyUrl);
+                }
                 buildImageCmd.exec(resultCallback);
                 resultCallback.awaitCompletion();
                 log.info("Image built successfully.");
