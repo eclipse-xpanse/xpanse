@@ -81,7 +81,7 @@
         <jgit.version>7.2.0.202503040940-r</jgit.version>
         <semver4j.version>5.6.0</semver4j.version>
         <github-api.version>1.327</github-api.version>
-        <springdoc.openapi.plugin.version>1.4</springdoc.openapi.plugin.version>
+        <springdoc.openapi.plugin.version>1.5</springdoc.openapi.plugin.version>
         <swagger.parser.version>2.1.26</swagger.parser.version>
         <swagger.core.v3.version>2.2.32</swagger.core.v3.version>
         <hcl4j.version>0.9.8</hcl4j.version>
