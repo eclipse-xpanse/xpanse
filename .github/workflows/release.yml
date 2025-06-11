@@ -65,8 +65,8 @@ jobs:
           distribution: 'temurin'
           gpg-private-key: ${{ secrets.ORG_GPG_PRIVATE_KEY }}
           gpg-passphrase: ${{ secrets.ORG_GPG_PASSPHRASE }}
-          server-username: ${{ secrets.ORG_OSSRH_USERNAME }}
-          server-password: ${{ secrets.ORG_OSSRH_PASSWORD }}
+          server-username: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
+          server-password: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
           server-id: maven
 
       - name: Set current version env variable
@@ -154,8 +154,8 @@ jobs:
 
       - name: Release Application
         env:
-          JRELEASER_NEXUS2_MAVEN_CENTRAL_USERNAME: ${{ secrets.ORG_OSSRH_USERNAME }}
-          JRELEASER_NEXUS2_MAVEN_CENTRAL_PASSWORD: ${{ secrets.ORG_OSSRH_PASSWORD }}
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
+          JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.ORG_GPG_PASSPHRASE }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.ORG_GPG_PRIVATE_KEY }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
