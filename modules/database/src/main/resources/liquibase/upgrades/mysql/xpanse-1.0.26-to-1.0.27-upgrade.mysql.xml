@@ -1,0 +1,89 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ SPDX-FileCopyrightText: Huawei Inc.
+  ~
+  -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="swaroop (generated)" id="1749644601320-3">
+        <createTable tableName="SERVICE_DEPENDENT_OBJECT">
+            <column name="OBJECT_ID" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DEPENDENT_OBJECT_ID" type="BINARY(16)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-4">
+        <createTable tableName="SERVICE_OBJECT">
+            <column name="OBJECT_ID" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="OBJECT_IDENTIFIER_NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="OBJECT_TYPE" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PROPERTIES" type="JSON"/>
+            <column name="SERVICE_ID" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-5">
+        <createTable tableName="SERVICE_OBJECT_ORDER_HISTORY">
+            <column name="OBJECT_ID" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ORDER_ID" type="BINARY(16)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-6">
+        <addColumn tableName="SERVICE_CHANGE_REQUEST">
+            <column name="RESOURCE_NAME" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-7">
+        <addColumn tableName="SERVICE_CHANGE_REQUEST">
+            <column name="RESULT_MESSAGE" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-8">
+        <createIndex associatedWith="" indexName="FK_SERVICE_DEPLOYMENT_SERVICE_OBJECT" tableName="SERVICE_OBJECT">
+            <column name="SERVICE_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-9">
+        <createIndex associatedWith="" indexName="FK_SERVICE_OBJECT_SERVICE_DEPENDENT_OBJECT" tableName="SERVICE_DEPENDENT_OBJECT">
+            <column name="OBJECT_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-10">
+        <createIndex associatedWith="" indexName="FK_SERVICE_OBJECT_SERVICE_OBJECT_ORDER_HISTORY" tableName="SERVICE_OBJECT_ORDER_HISTORY">
+            <column name="ORDER_ID"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-11">
+        <addForeignKeyConstraint baseColumnNames="SERVICE_ID" baseTableName="SERVICE_OBJECT" constraintName="FK_SERVICE_DEPLOYMENT_SERVICE_OBJECT" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="ID" referencedTableName="SERVICE_DEPLOYMENT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-12">
+        <addForeignKeyConstraint baseColumnNames="OBJECT_ID" baseTableName="SERVICE_DEPENDENT_OBJECT" constraintName="FK_SERVICE_OBJECT_SERVICE_DEPENDENT_OBJECT" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="OBJECT_ID" referencedTableName="SERVICE_OBJECT" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-13">
+        <addForeignKeyConstraint baseColumnNames="ORDER_ID" baseTableName="SERVICE_OBJECT_ORDER_HISTORY" constraintName="FK_SERVICE_OBJECT_SERVICE_OBJECT_ORDER_HISTORY" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="ORDER_ID" referencedTableName="SERVICE_ORDER" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-14">
+        <dropColumn columnName="RESOURCENAME" tableName="SERVICE_CHANGE_REQUEST"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-15">
+        <dropColumn columnName="RESULTMESSAGE" tableName="SERVICE_CHANGE_REQUEST"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-1">
+        <modifyDataType columnName="RESOURCE_KIND" newDataType="ENUM('VM','RDS','CONTAINER','PUBLIC_IP','VPC','VOLUME','UNKNOWN','SECURITY_GROUP','SECURITY_GROUP_RULE','KEYPAIR','SUBNET')" tableName="SERVICE_RESOURCE"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749644601320-2">
+        <modifyDataType columnName="TASK_TYPE" newDataType="ENUM('DEPLOY','RETRY','ROLLBACK','MODIFY','DESTROY','PORT','RECREATE','LOCK_CHANGE','CONFIG_CHANGE','SERVICE_ACTION','PURGE','SERVICE_START','SERVICE_STOP','SERVICE_RESTART','OBJECT_CREATE','OBJECT_MODIFY','OBJECT_DELETE')" tableName="SERVICE_ORDER"/>
+    </changeSet>
+</databaseChangeLog>

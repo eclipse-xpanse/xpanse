@@ -1,0 +1,65 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ SPDX-FileCopyrightText: Huawei Inc.
+  ~
+  -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="swaroop (generated)" id="1749645340086-4">
+        <dropColumn columnName="CHANGEHANDLER" tableName="SERVICE_CHANGE_REQUEST"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-5">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-6">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_POLICY"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-7">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_RESOURCE"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-8">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_TEMPLATE"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-9">
+        <dropColumn columnName="CREATE_TIME" tableName="SERVICE_TEMPLATE_REQUEST_HISTORY"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-10">
+        <dropColumn columnName="CREATE_TIME" tableName="USER_POLICY"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-11">
+        <dropColumn columnName="CUSTOMERSERVICENAME" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-12">
+        <dropColumn columnName="DEPLOYREQUEST" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-13">
+        <dropColumn columnName="LOCKCONFIG" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-14">
+        <dropColumn columnName="RESOURCENAME" tableName="SERVICE_CHANGE_REQUEST"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-15">
+        <dropColumn columnName="RESULTMESSAGE" tableName="SERVICE_CHANGE_REQUEST"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-16">
+        <dropColumn columnName="RESULT_MESSAGE" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-17">
+        <dropColumn columnName="SERVICEVENDOR" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-18">
+        <dropColumn columnName="TASK_STATUS" tableName="SERVICE_ORDER"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-19">
+        <dropColumn columnName="USERID" tableName="SERVICE_DEPLOYMENT"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-1">
+        <addNotNullConstraint columnDataType="boolean" columnName="ENABLED" tableName="SERVICE_POLICY" validate="true"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-2">
+        <modifyDataType columnName="RESOURCE_KIND" newDataType="ENUM('VM','RDS','CONTAINER','PUBLIC_IP','VPC','VOLUME','UNKNOWN','SECURITY_GROUP','SECURITY_GROUP_RULE','KEYPAIR','SUBNET')" tableName="SERVICE_RESOURCE"/>
+    </changeSet>
+    <changeSet author="swaroop (generated)" id="1749645340086-3">
+        <modifyDataType columnName="TASK_TYPE" newDataType="ENUM('DEPLOY','RETRY','ROLLBACK','MODIFY','DESTROY','PORT','RECREATE','LOCK_CHANGE','CONFIG_CHANGE','SERVICE_ACTION','PURGE','SERVICE_START','SERVICE_STOP','SERVICE_RESTART','OBJECT_CREATE','OBJECT_MODIFY','OBJECT_DELETE')" tableName="SERVICE_ORDER"/>
+    </changeSet>
+</databaseChangeLog>
