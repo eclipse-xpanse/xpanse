@@ -85,7 +85,7 @@
         <swagger.parser.version>2.1.29</swagger.parser.version>
         <swagger.core.v3.version>2.2.32</swagger.core.v3.version>
         <hcl4j.version>0.9.8</hcl4j.version>
-        <jackson.datatype.jsr310.version>2.18.3</jackson.datatype.jsr310.version>
+        <jackson.datatype.jsr310.version>2.19.0</jackson.datatype.jsr310.version>
         <spotless.version>2.44.4</spotless.version>
         <liquibase.version>4.31.1</liquibase.version>
         <org.reflections.version>0.10.2</org.reflections.version>
