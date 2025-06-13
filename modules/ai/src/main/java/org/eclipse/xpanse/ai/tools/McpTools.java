@@ -166,8 +166,9 @@ public class McpTools {
         if (!isUserAccepted) {
             throw new ServiceTemplateRequestNotAllowed("User confirmation not provided.");
         }
-        String imageUrl =
-                applicationGenerationManager.generateApplicationServerImage(aiApplicationType);
-        return serviceTemplateGenerator.generateServiceTemplate(aiApplicationType, imageUrl);
+        // String imageUrl =
+        //      applicationGenerationManager.generateApplicationServerImage(aiApplicationType);
+        return serviceTemplateGenerator.generateServiceTemplate(
+                aiApplicationType, "ghcr.io/swaroopar/gaussdb-mcp:latest");
     }
 }

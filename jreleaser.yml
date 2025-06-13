@@ -11,9 +11,10 @@ project:
       primary: true
       width: 250
       height: 250
-  java:
-    version: "17"
-    groupId: "org.eclipse.xpanse"
+  languages:
+    java:
+      version: "21"
+      groupId: "org.eclipse.xpanse"
 release:
   github:
     overwrite: true
@@ -48,12 +49,10 @@ signing:
   armored: true
 deploy:
   maven:
-    nexus2:
+    mavenCentral:
       maven-central:
         active: ALWAYS
         url: https://central.sonatype.com/api/v1/publisher
-        closeRepository: true
-        releaseRepository: true
         stagingRepositories:
           - target/staging-deploy
         verifyPom: false
