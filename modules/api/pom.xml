@@ -12,11 +12,14 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>modules</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>api</artifactId>
+    <name>api</name>
+    <description>Contains all code exposes xpanse's capabilities as external APIs</description>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/modules/api</url>
     <dependencies>
         <dependency>
             <groupId>org.springdoc</groupId>

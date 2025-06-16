@@ -11,11 +11,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>orchestrator</artifactId>
+    <name>orchestrator</name>
     <packaging>jar</packaging>
+    <description>code related to the orchestrator which routes requests to different cloud plugins and deployers.</description>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/modules/orchestrator</url>
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>modules</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>

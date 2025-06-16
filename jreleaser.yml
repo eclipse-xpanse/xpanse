@@ -55,7 +55,7 @@ deploy:
         url: https://central.sonatype.com/api/v1/publisher
         stagingRepositories:
           - target/staging-deploy
-        verifyPom: false
+        verifyPom: true
 files:
   artifacts:
     - path: 'runtime/target/xpanse-runtime-{{projectEffectiveVersion}}.jar'

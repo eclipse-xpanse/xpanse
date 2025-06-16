@@ -31,6 +31,10 @@ jobs:
         with:
           tofu_version: 1.7.0
 
+      - name: Set up Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .github/workflows/.m2/settings.xml ~/.m2
       - name: Test
         run: mvn --batch-mode --update-snapshots --no-transfer-progress -Djacoco.skip=false test
 
