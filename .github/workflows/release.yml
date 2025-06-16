@@ -163,7 +163,7 @@ jobs:
           JRELEASER_PROJECT_VERSION: ${{ steps.new_version.outputs.next-version }}
         uses: jreleaser/release-action@v2
         with:
-          arguments: release
+          arguments: release --debug
 
       - name: Upload JReleaser release output
         if: always()
