@@ -68,6 +68,7 @@ jobs:
           server-username: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
           server-password: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
           server-id: maven
+
       - name: Set up Maven settings
         run: |
           mkdir -p ~/.m2
@@ -197,6 +198,11 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
+
+      - name: Set up Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .github/workflows/.m2/settings.xml ~/.m2
 
       - name: Generate API doc
         run: mvn verify -DskipTests -Pgenerate-openapi-doc

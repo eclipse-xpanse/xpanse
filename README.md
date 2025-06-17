@@ -26,6 +26,16 @@ All details on how to set up and run the project can be found on our documentati
 1. [Developer setup](https://eclipse.dev/xpanse/docs/developer-setup)
 2. [Pull Requests](https://eclipse.dev/xpanse/docs/Contribute/pull-requests)
 
+## Maven Configuration
+
+To use packages that are not published in maven central,
+you need to add the contents [from](.github/workflows/.m2/settings.xml) to your local `~/.m2/settings.xml` file.
+
+This configuration cannot be added to the project pom.xml directly
+since we publish our project to maven central, and it is not allowed to have dependencies to libraries that are not published in maven central.
+
+> ⚠️ **Warning:** Without this configuration, the build will fail.
+
 ## Configuration Language
 
 Details can be found on the project
