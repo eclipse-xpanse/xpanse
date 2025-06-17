@@ -89,7 +89,7 @@
         <spotless.version>2.44.4</spotless.version>
         <liquibase.version>4.31.1</liquibase.version>
         <org.reflections.version>0.10.2</org.reflections.version>
-        <docker.java.version>3.5.0</docker.java.version>
+        <docker.java.version>3.5.1</docker.java.version>
         <pebble.version>3.2.4</pebble.version>
         <apache.commons.compress.version>1.27.1</apache.commons.compress.version>
     </properties>
