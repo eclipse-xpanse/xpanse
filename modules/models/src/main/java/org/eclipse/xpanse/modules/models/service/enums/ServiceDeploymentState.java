@@ -22,7 +22,8 @@ public enum ServiceDeploymentState {
     ROLLBACK_FAILED("rollback failed"),
     MODIFYING("modifying"),
     MODIFICATION_FAILED("modification failed"),
-    MODIFICATION_SUCCESSFUL("modification successful");
+    MODIFICATION_SUCCESSFUL("modification successful"),
+    ROLLING_BACK("rolling back");
 
     private final String state;
 
