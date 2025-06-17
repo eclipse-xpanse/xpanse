@@ -14,13 +14,15 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>plugins</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>org.eclipse.xpanse.plugins</groupId>
     <artifactId>huaweicloud</artifactId>
-
+    <name>huaweicloud</name>
+    <description>plugins integrating orchestrator APIs to huawei cloud.</description>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/plugins/huaweicloud</url>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>

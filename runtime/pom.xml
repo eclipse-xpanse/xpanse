@@ -11,10 +11,13 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>xpanse-runtime</artifactId>
     <packaging>jar</packaging>
+    <description>the runtime module which packages all necessary jars and generates a bootable jar.</description>
+    <name>xpanse-runtime</name>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/runtime</url>
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>xpanse-parent</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <properties>

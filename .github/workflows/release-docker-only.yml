@@ -37,6 +37,10 @@ jobs:
         run: |
           echo "CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed s/-SNAPSHOT/""/g)" >> $GITHUB_ENV
 
+      - name: Set up Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .github/workflows/.m2/settings.xml ~/.m2
 
       - name: Remove SNAPSHOT from POM version
         run: mvn versions:set -DremoveSnapshot -DgenerateBackupPoms=false

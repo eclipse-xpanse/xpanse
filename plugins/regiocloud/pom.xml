@@ -12,11 +12,14 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>plugins</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>org.eclipse.xpanse.plugins</groupId>
     <artifactId>regiocloud</artifactId>
+    <name>regiocloud</name>
+    <description>plugins integrating orchestrator APIs to regio cloud.</description>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/plugins/regiocloud</url>
     <dependencies>
         <dependency>
             <artifactId>openstack-common</artifactId>

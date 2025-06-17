@@ -23,5 +23,9 @@ jobs:
         with:
           java-version: 21
           distribution: 'temurin'
+      - name: Set up Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .github/workflows/.m2/settings.xml ~/.m2
       - name: Check 3rd Party Licenses
         run: mvn license-tool:license-check -Plicense-check

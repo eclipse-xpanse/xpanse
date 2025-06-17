@@ -11,11 +11,14 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>modules</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>common</artifactId>
+    <name>common</name>
+    <description>all common and shared code in xpanse</description>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/modules/common</url>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>

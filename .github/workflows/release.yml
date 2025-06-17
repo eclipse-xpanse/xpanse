@@ -68,6 +68,10 @@ jobs:
           server-username: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
           server-password: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
           server-id: maven
+      - name: Set up Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .github/workflows/.m2/settings.xml ~/.m2/
 
       - name: Set current version env variable
         run: |
@@ -217,6 +221,11 @@ jobs:
         with:
           ref: ${{ github.ref }}
           token: ${{ secrets.BOT_GITHUB_TOKEN }}
+
+      - name: Set up Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .github/workflows/.m2/settings.xml ~/.m2
 
       - name: Update next development version in POMs
         run: mvn versions:set -DnewVersion=${{ needs.release.outputs.next-version }}-SNAPSHOT -DgenerateBackupPoms=false

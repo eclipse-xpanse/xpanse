@@ -12,17 +12,14 @@
   <parent>
     <groupId>org.eclipse.xpanse</groupId>
     <artifactId>modules</artifactId>
-    <version>1.0.27</version>
+    <version>1.0.26-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <groupId>org.eclipse.xpanse.modules</groupId>
   <artifactId>workflow</artifactId>
-  <repositories>
-    <repository>
-      <id>Alfresco Maven Repository</id>
-      <url>https://maven.alfresco.com/nexus/content/groups/public/</url>
-    </repository>
-  </repositories>
+  <name>workflow</name>
+  <description>code and config related to workflows used in xpanse</description>
+  <url>https://github.com/eclipse-xpanse/xpanse/tree/main/modules/workflow</url>
   <dependencies>
     <dependency>
       <groupId>org.activiti</groupId>

@@ -6,11 +6,14 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>modules</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
     </parent>
 
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>ai</artifactId>
+    <name>ai</name>
+    <description>contains code related to AI-based code generation</description>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/modules/ai</url>
     <dependencies>
         <dependency>
             <groupId>org.springframework.ai</groupId>

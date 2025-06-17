@@ -12,13 +12,15 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>xpanse-parent</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>modules</artifactId>
+    <name>modules</name>
     <packaging>pom</packaging>
-
+    <description>contains all modules that implement the xpanse logic which are common for all cloud providers.</description>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/modules</url>
     <modules>
         <module>api</module>
         <module>models</module>

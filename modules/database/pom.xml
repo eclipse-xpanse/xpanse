@@ -11,11 +11,14 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>modules</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>database</artifactId>
+    <name>database</name>
+    <description>database entities used in xpanse</description>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/modules/database</url>
     <properties>
         <liquibase.properties.file>liquibase.properties</liquibase.properties.file>
     </properties>

@@ -11,10 +11,13 @@
     <parent>
         <groupId>org.eclipse.xpanse</groupId>
         <artifactId>modules</artifactId>
-        <version>1.0.27</version>
+        <version>1.0.26-SNAPSHOT</version>
     </parent>
     <groupId>org.eclipse.xpanse.modules</groupId>
     <artifactId>logging</artifactId>
+    <name>logging</name>
+    <description>code and config related to logging</description>
+    <url>https://github.com/eclipse-xpanse/xpanse/tree/main/modules/logging</url>
     <dependencies>
         <dependency>
             <groupId>org.zalando</groupId>
