@@ -103,27 +103,22 @@ public class DeployResultManager {
         UUID orderId = deployResult.getOrderId();
         ServiceOrderEntity storedServiceOrder = serviceOrderStorage.getEntityById(orderId);
         ServiceOrderType taskType = storedServiceOrder.getTaskType();
+        boolean isRollbackRequired =
+                isFailedDeployTask(deployResult.getIsTaskSuccessful(), taskType)
+                        && Objects.nonNull(deployResult.getTfStateContent());
         ServiceDeploymentEntity updatedServiceDeployment =
-                updateServiceDeploymentWithDeployResult(deployResult, storedServiceOrder, taskType);
-        boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
-        // When the task failed and task type is deploy or retry, just update the task status and
-        // error message. If the tfState is not null, start a new rollback order task and wait
-        // the order callback.
-        if (isFailedDeployTask(isTaskSuccessful, taskType)) {
-            serviceOrderManager.completeOrderProgressWithDeployResult(
-                    storedServiceOrder, deployResult);
-            if (Objects.nonNull(deployResult.getTfStateContent())) {
-                DeployTask rollbackTask =
-                        serviceDeploymentEntityConverter.getDeployTaskByStoredService(
-                                ServiceOrderType.ROLLBACK, updatedServiceDeployment);
-                rollbackTask.setParentOrderId(orderId);
-                rollbackTask.setOriginalServiceId(storedServiceOrder.getOriginalServiceId());
-                rollbackTask.setWorkflowId(storedServiceOrder.getWorkflowId());
-                rollbackOnDeploymentFailure(rollbackTask, updatedServiceDeployment, handler);
-                return;
-            }
-        }
+                updateServiceDeploymentWithDeployResult(
+                        deployResult, storedServiceOrder, taskType, isRollbackRequired);
         updateServiceOrderEntityWithDeployResult(deployResult, storedServiceOrder);
+        if (isRollbackRequired) {
+            DeployTask rollbackTask =
+                    serviceDeploymentEntityConverter.getDeployTaskByStoredService(
+                            ServiceOrderType.ROLLBACK, updatedServiceDeployment);
+            rollbackTask.setParentOrderId(orderId);
+            rollbackTask.setOriginalServiceId(storedServiceOrder.getOriginalServiceId());
+            rollbackTask.setWorkflowId(storedServiceOrder.getWorkflowId());
+            rollbackOnDeploymentFailure(rollbackTask, updatedServiceDeployment, handler);
+        }
     }
 
     /** Perform rollback when deployment fails and destroy the created resources. */
@@ -167,7 +162,8 @@ public class DeployResultManager {
     private ServiceDeploymentEntity updateServiceDeploymentWithDeployResult(
             DeployResult deployResult,
             ServiceOrderEntity serviceOrderEntity,
-            ServiceOrderType taskType) {
+            ServiceOrderType taskType,
+            boolean isRollbackRequired) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 serviceOrderEntity.getServiceDeploymentEntity();
         log.info(
@@ -179,18 +175,10 @@ public class DeployResultManager {
         handleDeploymentResult(deployResult, serviceDeploymentToUpdate);
         boolean isTaskSuccessful = deployResult.getIsTaskSuccessful();
         ServiceDeploymentState deploymentState =
-                getServiceDeploymentState(taskType, isTaskSuccessful);
+                getServiceDeploymentState(taskType, isTaskSuccessful, isRollbackRequired);
         updateServiceState(deploymentState, serviceDeploymentToUpdate);
         if (Objects.nonNull(deploymentState)) {
-            if (deploymentState == ServiceDeploymentState.DEPLOY_FAILED) {
-                // when the task failed and task type is deploy or retry, and tfState is null,
-                // set the deployment state to DEPLOY_FAILED.
-                if (Objects.isNull(deployResult.getTfStateContent())) {
-                    serviceDeploymentToUpdate.setServiceDeploymentState(deploymentState);
-                }
-            } else {
-                serviceDeploymentToUpdate.setServiceDeploymentState(deploymentState);
-            }
+            serviceDeploymentToUpdate.setServiceDeploymentState(deploymentState);
         }
         if (deploymentState == ServiceDeploymentState.MODIFICATION_SUCCESSFUL) {
             try {
@@ -326,12 +314,14 @@ public class DeployResultManager {
     }
 
     private ServiceDeploymentState getServiceDeploymentState(
-            ServiceOrderType taskType, boolean isTaskSuccessful) {
+            ServiceOrderType taskType, boolean isTaskSuccessful, boolean isRollbackRequired) {
         return switch (taskType) {
             case DEPLOY, RETRY ->
                     isTaskSuccessful
                             ? ServiceDeploymentState.DEPLOY_SUCCESS
-                            : ServiceDeploymentState.DEPLOY_FAILED;
+                            : isRollbackRequired
+                                    ? ServiceDeploymentState.ROLLING_BACK
+                                    : ServiceDeploymentState.DEPLOY_FAILED;
             case DESTROY ->
                     isTaskSuccessful
                             ? ServiceDeploymentState.DESTROY_SUCCESS
@@ -423,6 +413,12 @@ public class DeployResultManager {
 
     private void completeParentServiceOrder(UUID parentOrderId, DeployResult deployResult) {
         ServiceOrderEntity parentOrder = serviceOrderStorage.getEntityById(parentOrderId);
+
+        // if parent order is already in final state, do not update the parent service order.
+        if (parentOrder.getOrderStatus() == OrderStatus.FAILED
+                || parentOrder.getOrderStatus() == OrderStatus.SUCCESSFUL) {
+            return;
+        }
         // When the parent order is not port or recreate task, complete it.
         if (parentOrder.getTaskType() != ServiceOrderType.PORT
                 && parentOrder.getTaskType() != ServiceOrderType.RECREATE) {
