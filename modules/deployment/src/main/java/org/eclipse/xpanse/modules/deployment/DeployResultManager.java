@@ -97,7 +97,9 @@ public class DeployResultManager {
         if (Objects.isNull(deployResult)
                 || Objects.isNull(deployResult.getOrderId())
                 || Objects.isNull(deployResult.getIsTaskSuccessful())) {
-            log.warn("Could not update service data with unuseful deploy result {}.", deployResult);
+            log.warn(
+                    "Deploy result has no useful information. No update required. DeployResult: {}",
+                    deployResult);
             return;
         }
         UUID orderId = deployResult.getOrderId();
@@ -310,7 +312,11 @@ public class DeployResultManager {
             serviceDeploymentEntity.setServiceState(ServiceState.NOT_RUNNING);
             serviceDeploymentEntity.setLastStoppedAt(OffsetDateTime.now());
         }
-        // case other cases, do not change the state of service.
+        if (state == ServiceDeploymentState.MODIFICATION_FAILED) {
+            // when modification fails, we do not know what's the exact state of the service.
+            serviceDeploymentEntity.setServiceState(ServiceState.UNKNOWN);
+        }
+        // case other cases, do not change the state of service .
     }
 
     private ServiceDeploymentState getServiceDeploymentState(

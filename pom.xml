@@ -92,6 +92,7 @@
         <docker.java.version>3.5.0</docker.java.version>
         <pebble.version>3.2.4</pebble.version>
         <apache.commons.compress.version>1.27.1</apache.commons.compress.version>
+        <spring.ai.version>1.0.0</spring.ai.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
@@ -197,7 +198,7 @@
             <dependency>
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
-                <version>1.0.0-M8</version>
+                <version>${spring.ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
