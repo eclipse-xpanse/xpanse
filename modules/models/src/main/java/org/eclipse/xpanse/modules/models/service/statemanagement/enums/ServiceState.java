@@ -18,7 +18,8 @@ public enum ServiceState {
     STARTING("starting"),
     STOPPING("stopping"),
     STOPPED("stopped"),
-    RESTARTING("restarting");
+    RESTARTING("restarting"),
+    UNKNOWN("unknown");
 
     private final String value;
 

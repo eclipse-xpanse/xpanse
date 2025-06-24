@@ -16,7 +16,9 @@ class ServiceStateTest {
         assertEquals(ServiceState.STOPPING, ServiceState.getByValue("stopping"));
         assertEquals(ServiceState.STOPPED, ServiceState.getByValue("stopped"));
         assertEquals(ServiceState.RESTARTING, ServiceState.getByValue("restarting"));
-        assertThrows(UnsupportedEnumValueException.class, () -> ServiceState.getByValue("unknown"));
+        assertEquals(ServiceState.UNKNOWN, ServiceState.getByValue("unknown"));
+        assertThrows(
+                UnsupportedEnumValueException.class, () -> ServiceState.getByValue("error_value"));
     }
 
     @Test
