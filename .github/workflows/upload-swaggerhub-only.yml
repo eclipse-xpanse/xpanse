@@ -15,69 +15,7 @@ on:
         type: boolean
         default: false
         description: Is the version the new default version.
-#
-# SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: Huawei Inc.
-#
----
-name: upload-to-swagger-hub-only
-# This job generates the API doc for the version requested and uploads it to SwaggerHub.
-on:
-  workflow_dispatch:
-    inputs:
-      VersionToBeUploaded:
-        type: string
-        description: Enter the version of the API that must be uploaded.Eg., 1.0.1
-      IsDefaultVersion:
-        type: boolean
-        default: false
-        description: Is the version the new default version.
 
-env:
-  BOT_USER_NAME: eclipse-xpanse-bot
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
-jobs:
-  upload-to-swagger-hub:
-    runs-on: ubuntu-latest
-    env:
-      SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
-      SWAGGERHUB_USER: ${{ secrets.SWAGGERHUB_USER }}
-    if: github.repository == 'eclipse-xpanse/xpanse'
-    permissions:
-      packages: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: v${{github.event.inputs.VersionToBeUploaded}}
-
-      - name: Set up Maven settings
-        run: |
-          mkdir -p ~/.m2
-          cp .github/workflows/.m2/settings.xml ~/.m2
-
-      - name: Set Up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: 21
-          distribution: 'temurin'
-
-      - name: Generate API doc
-        run: mvn verify -DskipTests -Pgenerate-openapi-doc
-
-      - name: Install SwaggerHub CLI
-        run: npm i -g swaggerhub-cli
-
-      - name: Create API with the version as default
-        if: ${{ github.event.inputs.IsDefaultVersion == 'true' }}
-        run: swaggerhub api:create ${{ env.SWAGGERHUB_USER }}/XpanseRuntimeApi --file runtime/target/openapi.json --visibility=public --published=publish --setdefault
-
-      - name: Create API as Non-default
-        if: ${{ github.event.inputs.IsDefaultVersion== 'false' }}
-        run: swaggerhub api:create ${{ env.SWAGGERHUB_USER }}/XpanseRuntimeApi --file runtime/target/openapi.json --visibility=public --published=publish
 env:
   BOT_USER_NAME: eclipse-xpanse-bot
   REGISTRY: ghcr.io
