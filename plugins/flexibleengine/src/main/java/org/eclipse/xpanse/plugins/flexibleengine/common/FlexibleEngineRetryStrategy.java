@@ -37,6 +37,11 @@ public class FlexibleEngineRetryStrategy implements BackoffStrategy {
         return retryMaxDelayMillions;
     }
 
+    @Override
+    public long computeDelayBeforeNextRetry(int retries) {
+        return retryMaxDelayMillions;
+    }
+
     /**
      * Set retry max attempts with config.
      *
