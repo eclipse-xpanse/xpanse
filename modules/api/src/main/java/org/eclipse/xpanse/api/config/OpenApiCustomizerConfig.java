@@ -22,6 +22,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiCustomizerConfig {
 
+    static {
+        // this will ensure the generated OpenApi docs to reuse enums instead of creating one enum
+        // for each declaration.
+        io.swagger.v3.core.jackson.ModelResolver.enumsAsRef = true;
+    }
+
     @Bean
     public OpenApiCustomizer enableArbitraryObjects() {
         return openApi ->
