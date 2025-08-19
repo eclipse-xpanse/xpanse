@@ -38,6 +38,11 @@ public class HuaweiCloudRetryStrategy implements BackoffStrategy {
         return retryMaxDelayMillions;
     }
 
+    @Override
+    public long computeDelayBeforeNextRetry(int i) {
+        return retryMaxDelayMillions;
+    }
+
     /**
      * Set retry max attempts with config.
      *
