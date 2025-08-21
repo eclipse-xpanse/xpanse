@@ -134,7 +134,7 @@ public class DeployerToolVersionsCacheManager
     }
 
     private Set<String> fetchVersionsFromWebsiteAndLoadCacheForDeployerTool(
-            DeployerKind deployerKind) throws Exception {
+            DeployerKind deployerKind) {
         Set<String> availableVersionsFromWebsite =
                 versionsFetcher.fetchOfficialVersionsOfDeployerTool(deployerKind);
         versionsCache.updateCachedVersionsOfDeployerTool(

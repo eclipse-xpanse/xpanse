@@ -8,6 +8,7 @@ package org.eclipse.xpanse.ai.tools;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
 import org.eclipse.xpanse.modules.models.ai.enums.AiApplicationType;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployRequest;
 import org.eclipse.xpanse.modules.models.service.deployment.SimpleDeployRequest;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
@@ -161,14 +163,18 @@ public class McpTools {
                                             + " for this parameter must come from user. If the user"
                                             + " says 'YES' then set it to true otherwise set it to"
                                             + " false")
-                    boolean isUserAccepted)
-            throws Exception {
+                    boolean isUserAccepted) {
         if (!isUserAccepted) {
             throw new ServiceTemplateRequestNotAllowed("User confirmation not provided.");
         }
-        // String imageUrl =
-        //      applicationGenerationManager.generateApplicationServerImage(aiApplicationType);
-        return serviceTemplateGenerator.generateServiceTemplate(
-                aiApplicationType, "ghcr.io/swaroopar/gaussdb-mcp:latest");
+        String imageUrl = null;
+        try {
+            imageUrl =
+                    applicationGenerationManager.generateApplicationServerImage(aiApplicationType);
+        } catch (IOException | InterruptedException e) {
+            log.error(e.getMessage(), e);
+            throw new XpanseUnhandledException(e.getMessage());
+        }
+        return serviceTemplateGenerator.generateServiceTemplate(aiApplicationType, imageUrl);
     }
 }

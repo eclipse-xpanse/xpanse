@@ -12,7 +12,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.io.Serial;
-import java.io.Serializable;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +19,7 @@ import org.springframework.validation.annotation.Validated;
 /** Defines the Deployer Tool. */
 @Data
 @Validated
-public class DeployerTool implements Serializable {
+public class DeployerTool {
 
     /** Deployer version required version regex. */
     @Hidden @JsonIgnoreProperties

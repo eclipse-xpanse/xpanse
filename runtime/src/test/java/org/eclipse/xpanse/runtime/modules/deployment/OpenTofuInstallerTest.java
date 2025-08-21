@@ -10,8 +10,10 @@ import java.io.File;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.OpenTofuInstaller;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
+import org.eclipse.xpanse.modules.security.auth.zitadel.ZitadelIdentityProviderService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(
         properties = {"http.request.retry.max.attempts=1", "spring.profiles.active=noauth,dev"})
@@ -19,6 +21,7 @@ class OpenTofuInstallerTest {
 
     @Resource private OpenTofuInstaller installer;
     @Resource private DeployerToolUtils deployerToolUtils;
+    @MockitoBean private ZitadelIdentityProviderService zitadelIdentityProviderService;
 
     @Test
     void testGetExecutableTerraformByVersion() {

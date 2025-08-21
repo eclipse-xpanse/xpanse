@@ -15,5 +15,5 @@ import lombok.Data;
 @Data
 public class TfStateResourceInstance {
 
-    public Map<String, Object> attributes;
+    private Map<String, Object> attributes;
 }

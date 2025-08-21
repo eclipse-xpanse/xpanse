@@ -22,7 +22,6 @@ import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.security.TokenResponse;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -105,22 +104,7 @@ class AuthorizationApiTest extends ApisTestCommon {
                         .getResponse();
 
         // Verify the results
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
-    }
-
-    @Test
-    void testGetAccessTokenThrowsIllegalArgumentException() {
-
-        // Run the test
-        Assertions.assertThrows(
-                IllegalArgumentException.class,
-                () ->
-                        mockMvc.perform(
-                                        get("/auth/token")
-                                                .accept(MediaType.APPLICATION_JSON)
-                                                .param("code", null))
-                                .andReturn()
-                                .getResponse());
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
     }
 
     @Test

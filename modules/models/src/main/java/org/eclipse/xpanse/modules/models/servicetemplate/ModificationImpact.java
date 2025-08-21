@@ -6,15 +6,11 @@
 package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.io.Serial;
-import java.io.Serializable;
 import lombok.Data;
 
 /** Defines for service ModificationImpact. */
 @Data
-public class ModificationImpact implements Serializable {
-
-    @Serial private static final long serialVersionUID = -4160044806152791293L;
+public class ModificationImpact {
 
     @Schema(description = "Is data lost when service configuration is modified.")
     private Boolean isDataLost;

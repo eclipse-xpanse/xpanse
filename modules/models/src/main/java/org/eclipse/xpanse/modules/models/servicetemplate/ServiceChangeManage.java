@@ -9,8 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +19,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 @Valid
 @Data
 @Slf4j
-public class ServiceChangeManage implements Serializable {
-
-    @Serial private static final long serialVersionUID = 1L;
+public class ServiceChangeManage {
 
     @NotNull
     @Schema(description = "the tool used to manage the service configuration.")

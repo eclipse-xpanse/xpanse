@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment.serviceporting.steps;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,7 +28,7 @@ import org.springframework.stereotype.Component;
 /** Service porting process destroy service processing class. */
 @Slf4j
 @Component
-public class StartDestroy implements Serializable, JavaDelegate {
+public class StartDestroy implements JavaDelegate {
 
     private final DeployService deployService;
     private final RuntimeService runtimeService;

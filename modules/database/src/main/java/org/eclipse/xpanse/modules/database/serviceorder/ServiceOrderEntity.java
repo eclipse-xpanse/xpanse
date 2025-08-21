@@ -21,7 +21,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.io.Serial;
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -42,7 +41,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Table(name = "SERVICE_ORDER")
 @Entity
 @Data
-public class ServiceOrderEntity implements Serializable {
+public class ServiceOrderEntity {
 
     @Serial private static final long serialVersionUID = 8759112775257851274L;
 

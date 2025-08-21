@@ -8,12 +8,15 @@ package org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.aggre
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.io.Serial;
 import org.openstack4j.model.ModelEntity;
 
 /** Data model for AggregationRequest objects. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"operations"})
 public class AggregationRequest implements ModelEntity {
+
+    @Serial private static final long serialVersionUID = 240913796673011260L;
 
     @JsonProperty("operations")
     private String operations;

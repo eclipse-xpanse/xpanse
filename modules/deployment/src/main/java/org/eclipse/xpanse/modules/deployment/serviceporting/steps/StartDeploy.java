@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment.serviceporting.steps;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,11 +32,11 @@ import org.springframework.stereotype.Component;
 /** Service porting process deployment service processing class. */
 @Slf4j
 @Component
-public class StartDeploy implements Serializable, JavaDelegate {
+public class StartDeploy implements JavaDelegate {
 
-    private final DeployService deployService;
-    private final RuntimeService runtimeService;
-    private final ServiceOrderManager serviceOrderManager;
+    private final transient DeployService deployService;
+    private final transient RuntimeService runtimeService;
+    private final transient ServiceOrderManager serviceOrderManager;
 
     /** Constructor for StartDeploy bean. */
     @Autowired

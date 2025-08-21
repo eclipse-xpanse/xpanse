@@ -10,6 +10,7 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.BuildImageCmd;
 import com.github.dockerjava.api.command.BuildImageResultCallback;
 import com.github.dockerjava.api.model.BuildResponseItem;
+import com.github.dockerjava.api.model.ResponseItem;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -96,9 +98,9 @@ public class DockerImageManage {
                             @Override
                             public void onNext(BuildResponseItem item) {
                                 log.info(item.getStream());
-                                if (item.isErrorIndicated()) {
-                                    assert item.getErrorDetail() != null;
-                                    throw new RuntimeException(item.getErrorDetail().getMessage());
+                                ResponseItem.ErrorDetail errorDetail = item.getErrorDetail();
+                                if (item.isErrorIndicated() && errorDetail != null) {
+                                    throw new XpanseUnhandledException(errorDetail.getMessage());
                                 }
                             }
                         };

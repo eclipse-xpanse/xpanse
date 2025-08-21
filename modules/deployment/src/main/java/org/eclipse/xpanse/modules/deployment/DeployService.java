@@ -46,6 +46,7 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInv
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceFlavorDowngradeNotAllowed;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceLockedException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceModifyParamsNotFoundException;
+import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
@@ -402,7 +403,7 @@ public class DeployService {
             log.error(
                     "Store new deploy service entity with id {} failed.",
                     deployTask.getServiceId());
-            throw new RuntimeException("Store new deploy service entity failed.");
+            throw new ServiceNotDeployedException("Store new deploy service entity failed.");
         }
         return storedEntity;
     }
@@ -426,7 +427,7 @@ public class DeployService {
         }
         deployResultManager.updateServiceWithDeployResult(deployResult, handler);
         if (Objects.nonNull(exception)) {
-            throw exception;
+            throw new ServiceNotDeployedException(exception.getMessage());
         }
     }
 
@@ -459,7 +460,7 @@ public class DeployService {
         }
         deployResultManager.updateServiceWithDeployResult(redeployResult, handler);
         if (Objects.nonNull(exception)) {
-            throw exception;
+            throw new ServiceNotDeployedException(exception.getMessage());
         }
     }
 
@@ -567,7 +568,7 @@ public class DeployService {
         }
         deployResultManager.updateServiceWithDeployResult(modifyResult, handler);
         if (Objects.nonNull(exception)) {
-            throw exception;
+            throw new ServiceNotDeployedException(exception.getMessage());
         }
     }
 
@@ -600,7 +601,7 @@ public class DeployService {
         }
         deployResultManager.updateServiceWithDeployResult(destroyResult, handler);
         if (Objects.nonNull(exception)) {
-            throw exception;
+            throw new ServiceNotDeployedException(exception.getMessage());
         }
     }
 
@@ -635,7 +636,7 @@ public class DeployService {
             }
             deployResultManager.updateServiceWithDeployResult(purgeResult, handler);
             if (Objects.nonNull(exception)) {
-                throw exception;
+                throw new ServiceNotDeployedException(exception.getMessage());
             }
         } else {
             log.info("No resources of service {} need to clear", purgeTask.getServiceId());

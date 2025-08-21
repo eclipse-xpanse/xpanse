@@ -7,16 +7,12 @@ package org.eclipse.xpanse.modules.models.billing;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 
 /** Defines the price calculation result of the flavor. */
 @Data
-public class FlavorPriceResult implements Serializable {
-
-    @Serial private static final long serialVersionUID = 9155558819505591596L;
+public class FlavorPriceResult {
 
     @NotNull
     @Schema(description = "The name of the flavor.")

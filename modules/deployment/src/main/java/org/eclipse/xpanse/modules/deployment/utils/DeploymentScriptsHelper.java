@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -234,7 +235,7 @@ public class DeploymentScriptsHelper {
 
     private File createScriptFile(String taskWorkspace, String scriptName, String scriptContent) {
         String scriptPath = taskWorkspace + File.separator + scriptName;
-        try (FileWriter scriptWriter = new FileWriter(scriptPath)) {
+        try (FileWriter scriptWriter = new FileWriter(scriptPath, StandardCharsets.UTF_8)) {
             scriptWriter.write(scriptContent);
             log.info("Created deployment script file {} successfully.", scriptPath);
             return new File(scriptPath);
@@ -247,7 +248,7 @@ public class DeploymentScriptsHelper {
 
     private File createServiceStateFile(String taskWorkspace, String tfStateContext) {
         String tfStateFileName = taskWorkspace + File.separator + TF_STATE_FILE_NAME;
-        try (FileWriter scriptWriter = new FileWriter(tfStateFileName)) {
+        try (FileWriter scriptWriter = new FileWriter(tfStateFileName, StandardCharsets.UTF_8)) {
             scriptWriter.write(tfStateContext);
             log.info("Create service state file success.");
             return new File(tfStateFileName);

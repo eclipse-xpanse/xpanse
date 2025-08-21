@@ -9,8 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Map;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +19,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableDataType;
 @Valid
 @Data
 @Slf4j
-public class ObjectParameter implements Serializable {
-
-    @Serial private static final long serialVersionUID = 8759114725757852274L;
+public class ObjectParameter {
 
     @NotNull
     @NotBlank

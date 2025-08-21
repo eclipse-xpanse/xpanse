@@ -24,9 +24,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.huaweicloud.sdk.core.invoker.SyncInvoker;
-import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
-import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesRequest;
-import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesResponse;
+import com.huaweicloud.sdk.ecs.v2.model.ListServerAzInfo;
+import com.huaweicloud.sdk.ecs.v2.model.ListServerAzInfoRequest;
+import com.huaweicloud.sdk.ecs.v2.model.ListServerAzInfoResponse;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
@@ -218,10 +218,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         addCredentialForHuaweiCloud();
         mockSdkClientsForHuaweiCloud();
 
-        NovaAvailabilityZone azA = new NovaAvailabilityZone().withZoneName("cn-southwest-2a");
-        NovaAvailabilityZone azD = new NovaAvailabilityZone().withZoneName("cn-southwest-2d");
-        NovaListAvailabilityZonesResponse response =
-                new NovaListAvailabilityZonesResponse().withAvailabilityZoneInfo(List.of(azA, azD));
+        ListServerAzInfo azA = new ListServerAzInfo().withAvailabilityZoneId("cn-southwest-2a");
+        ListServerAzInfo azD = new ListServerAzInfo().withAvailabilityZoneId("cn-southwest-2d");
+        ListServerAzInfoResponse response =
+                new ListServerAzInfoResponse().withAvailabilityZones(List.of(azA, azD));
         response.setHttpStatusCode(200);
         mockListAvailabilityZonesInvoker(response);
         // Run the test
@@ -236,10 +236,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         deleteCredential(Csp.HUAWEI_CLOUD, "Chinese Mainland", CredentialType.VARIABLES, "AK_SK");
     }
 
-    void mockListAvailabilityZonesInvoker(NovaListAvailabilityZonesResponse mockResponse) {
-        SyncInvoker<NovaListAvailabilityZonesRequest, NovaListAvailabilityZonesResponse>
-                mockInvoker = mock(SyncInvoker.class);
-        when(mockEcsClient.novaListAvailabilityZonesInvoker(any())).thenReturn(mockInvoker);
+    void mockListAvailabilityZonesInvoker(ListServerAzInfoResponse mockResponse) {
+        SyncInvoker<ListServerAzInfoRequest, ListServerAzInfoResponse> mockInvoker =
+                mock(SyncInvoker.class);
+        when(mockEcsClient.listServerAzInfoInvoker(any())).thenReturn(mockInvoker);
         when(mockInvoker.retryTimes(anyInt())).thenReturn(mockInvoker);
         when(mockInvoker.retryCondition(any())).thenReturn(mockInvoker);
         when(mockInvoker.backoffStrategy(any())).thenReturn(mockInvoker);
@@ -251,10 +251,10 @@ class ServiceDeployerApiTest extends ApisTestCommon {
         addCredentialForFlexibleEngine();
         mockSdkClientsForFlexibleEngine();
 
-        NovaAvailabilityZone azA = new NovaAvailabilityZone().withZoneName("eu-west-0a");
-        NovaAvailabilityZone azD = new NovaAvailabilityZone().withZoneName("eu-west-0b");
-        NovaListAvailabilityZonesResponse response =
-                new NovaListAvailabilityZonesResponse().withAvailabilityZoneInfo(List.of(azA, azD));
+        ListServerAzInfo azA = new ListServerAzInfo().withAvailabilityZoneId("eu-west-0a");
+        ListServerAzInfo azD = new ListServerAzInfo().withAvailabilityZoneId("eu-west-0b");
+        ListServerAzInfoResponse response =
+                new ListServerAzInfoResponse().withAvailabilityZones(List.of(azA, azD));
         response.setHttpStatusCode(200);
         mockListAvailabilityZonesInvoker(response);
         // Run the test

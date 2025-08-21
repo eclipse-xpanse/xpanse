@@ -10,8 +10,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +22,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.validators.DeploymentCo
 @Valid
 @Data
 @Slf4j
-public class Ocl implements Serializable {
-
-    @Serial private static final long serialVersionUID = -51411975788603138L;
+public class Ocl {
 
     @Valid
     @NotNull

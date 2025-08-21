@@ -20,8 +20,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -34,9 +32,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "SERVICE_OBJECT")
 @Entity
 @Data
-public class ServiceObjectEntity implements Serializable {
-
-    @Serial private static final long serialVersionUID = 8759122775257853274L;
+public class ServiceObjectEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.springframework.util.StreamUtils;
 
 /**
@@ -44,7 +45,7 @@ public class RereadbleBodyHttpServletRequest extends HttpServletRequestWrapper {
             try {
                 return cachedBodyServletInputStream.available() == 0;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new XpanseUnhandledException(e.getMessage());
             }
         }
 

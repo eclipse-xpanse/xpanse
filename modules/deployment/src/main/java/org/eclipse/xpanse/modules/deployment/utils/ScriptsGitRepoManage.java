@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentScriptsCreatio
 import org.eclipse.xpanse.modules.models.common.exceptions.GitRepoCloneException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetrySynchronizationManager;
@@ -58,16 +59,14 @@ public class ScriptsGitRepoManage {
             cloneCommand.setBranch(scriptsRepo.getBranch());
             cloneCommand.setTimeout(timeoutSeconds);
             try (Git git = cloneCommand.call()) {
-                git.checkout();
+                git.checkout().call();
             } catch (GitAPIException e) {
                 String errorMsg =
                         String.format(
                                 "Clone scripts from branch %s of repo %s error. %s",
                                 scriptsRepo.getBranch(), scriptsRepo.getRepoUrl(), e.getMessage());
-                int retryCount =
-                        Objects.isNull(RetrySynchronizationManager.getContext())
-                                ? 0
-                                : RetrySynchronizationManager.getContext().getRetryCount();
+                RetryContext retryContext = RetrySynchronizationManager.getContext();
+                int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
                 log.error(errorMsg + " Retry count:" + retryCount);
                 throw new GitRepoCloneException(errorMsg);
             }

@@ -8,16 +8,12 @@ package org.eclipse.xpanse.modules.models.billing;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 
 /** Defines the data model for the resource usage. */
 @Data
-public class ResourceUsage implements Serializable {
-
-    @Serial private static final long serialVersionUID = 240913796673011260L;
+public class ResourceUsage {
 
     @NotNull
     @NotEmpty

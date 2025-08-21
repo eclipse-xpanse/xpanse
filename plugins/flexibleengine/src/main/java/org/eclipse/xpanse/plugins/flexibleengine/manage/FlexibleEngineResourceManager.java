@@ -9,9 +9,9 @@ import com.bertramlabs.plugins.hcl4j.HCLParser;
 import com.bertramlabs.plugins.hcl4j.HCLParserException;
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.ecs.v2.EcsClient;
-import com.huaweicloud.sdk.ecs.v2.model.NovaAvailabilityZone;
-import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesRequest;
-import com.huaweicloud.sdk.ecs.v2.model.NovaListAvailabilityZonesResponse;
+import com.huaweicloud.sdk.ecs.v2.model.ListServerAzInfo;
+import com.huaweicloud.sdk.ecs.v2.model.ListServerAzInfoRequest;
+import com.huaweicloud.sdk.ecs.v2.model.ListServerAzInfoResponse;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsRequest;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsResponse;
 import com.huaweicloud.sdk.ecs.v2.model.NovaListKeypairsResult;
@@ -115,18 +115,18 @@ public class FlexibleEngineResourceManager {
         List<String> availabilityZoneNames = new ArrayList<>();
         try {
             EcsClient ecsClient = getEcsClient(siteName, regionName, userId);
-            NovaListAvailabilityZonesRequest request = new NovaListAvailabilityZonesRequest();
-            NovaListAvailabilityZonesResponse response =
+            ListServerAzInfoRequest request = new ListServerAzInfoRequest();
+            ListServerAzInfoResponse response =
                     ecsClient
-                            .novaListAvailabilityZonesInvoker(request)
+                            .listServerAzInfoInvoker(request)
                             .retryTimes(flexibleEngineRetryStrategy.getRetryMaxAttempts())
                             .retryCondition(flexibleEngineRetryStrategy::matchRetryCondition)
                             .backoffStrategy(flexibleEngineRetryStrategy)
                             .invoke();
             if (response.getHttpStatusCode() == 200) {
                 availabilityZoneNames =
-                        response.getAvailabilityZoneInfo().stream()
-                                .map(NovaAvailabilityZone::getZoneName)
+                        response.getAvailabilityZones().stream()
+                                .map(ListServerAzInfo::getAvailabilityZoneId)
                                 .toList();
             }
         } catch (Exception e) {

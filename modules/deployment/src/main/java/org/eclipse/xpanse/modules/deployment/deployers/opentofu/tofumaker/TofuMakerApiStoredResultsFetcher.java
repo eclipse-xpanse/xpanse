@@ -12,6 +12,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.RetrieveOpenTofuResultApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.ReFetchResult;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetrySynchronizationManager;
@@ -36,10 +37,8 @@ public class TofuMakerApiStoredResultsFetcher {
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public ReFetchResult reFetchResultByOrderId(UUID orderId) {
-        int retryCount =
-                Objects.isNull(RetrySynchronizationManager.getContext())
-                        ? 0
-                        : RetrySynchronizationManager.getContext().getRetryCount();
+        RetryContext retryContext = RetrySynchronizationManager.getContext();
+        int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
         log.info("Re-fetch result by service order id: {}. Retry count: {}", orderId, retryCount);
         return retrieveOpenTofuResultApi.getStoredTaskResultByRequestId(orderId);
     }
@@ -55,10 +54,8 @@ public class TofuMakerApiStoredResultsFetcher {
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public List<ReFetchResult> batchReFetchResultsByOrderIds(List<UUID> orderIds) {
-        int retryCount =
-                Objects.isNull(RetrySynchronizationManager.getContext())
-                        ? 0
-                        : RetrySynchronizationManager.getContext().getRetryCount();
+        RetryContext retryContext = RetrySynchronizationManager.getContext();
+        int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
         log.info(
                 "Batch re-fetch results by service order ids: {}. Retry count: {}",
                 orderIds,

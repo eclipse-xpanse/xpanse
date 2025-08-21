@@ -71,6 +71,7 @@ import org.springframework.web.util.UriComponentsBuilder;
         comments = "Generator version: 7.11.0")
 @Component(
         "org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.ApiClient")
+@SuppressWarnings("deprecation")
 public class ApiClient extends JavaTimeFormatter {
     public enum CollectionFormat {
         CSV(","),

@@ -9,8 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
@@ -21,9 +19,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 
 /** Request body for service deployment. */
 @Data
-public class DeployRequest implements Serializable {
-
-    @Serial private static final long serialVersionUID = -4803796371373728321L;
+public class DeployRequest {
 
     /** The category of the Service. */
     @NotNull

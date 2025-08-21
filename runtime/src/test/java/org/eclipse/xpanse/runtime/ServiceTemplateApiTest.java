@@ -1194,7 +1194,7 @@ class ServiceTemplateApiTest extends ApisTestCommon {
                 URI.create("file:src/test/resources/ocl_terraform_error.yml").toURL().toString();
         ErrorResponse expectedErrorResponse =
                 ErrorResponse.errorResponse(
-                        ErrorType.RUNTIME_ERROR,
+                        ErrorType.UNHANDLED_EXCEPTION,
                         Collections.singletonList("java.io.FileNotFoundException:"));
 
         // Run the test

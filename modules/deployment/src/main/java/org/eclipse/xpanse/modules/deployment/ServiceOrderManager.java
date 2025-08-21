@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.database.utils.EntityTranslationUtils;
 import org.eclipse.xpanse.modules.deployment.polling.ServiceOrderStatusChangePolling;
 import org.eclipse.xpanse.modules.deployment.utils.MdcUtils;
 import org.eclipse.xpanse.modules.models.common.enums.UserOperation;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
@@ -91,7 +92,7 @@ public class ServiceOrderManager {
         try {
             return objectMapper.readValue(objectMapper.writeValueAsString(request), Map.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new XpanseUnhandledException(e.getMessage());
         }
     }
 

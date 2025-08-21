@@ -38,6 +38,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @Service
 public class ZitadelIdentityProviderService implements IdentityProviderService {
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final Map<String, String> CODE_CHALLENGE_MAP = initCodeChallengeMap();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -87,9 +89,8 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     private static Map<String, String> initCodeChallengeMap() {
         Map<String, String> map = new HashMap<>(2);
         try {
-            SecureRandom sr = new SecureRandom();
             byte[] code = new byte[32];
-            sr.nextBytes(code);
+            SECURE_RANDOM.nextBytes(code);
             String verifier = Base64.getEncoder().encodeToString(code);
             map.put("code_verifier", verifier);
 
@@ -170,16 +171,16 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                             OBJECT_MAPPER.convertValue(metadataObject, new TypeReference<>() {});
                     if (!metadataMap.isEmpty()) {
                         Map<String, String> userMetadata = new HashMap<>();
-                        for (String key : metadataMap.keySet()) {
+                        for (Map.Entry<String, String> entry : metadataMap.entrySet()) {
                             String value =
                                     new String(
-                                            Base64.getDecoder().decode(metadataMap.get(key)),
+                                            Base64.getDecoder().decode(entry.getValue()),
                                             StandardCharsets.UTF_8);
-                            userMetadata.put(key, value);
-                            if (StringUtils.equals(isvKey, key)) {
+                            userMetadata.put(entry.getKey(), value);
+                            if (StringUtils.equals(isvKey, entry.getKey())) {
                                 currentUserInfo.setIsv(value);
                             }
-                            if (StringUtils.equals(cspKey, key)) {
+                            if (StringUtils.equals(cspKey, entry.getKey())) {
                                 currentUserInfo.setCsp(value);
                             }
                         }
@@ -243,7 +244,7 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
             return response.getBody();
         } catch (RestClientException e) {
             log.error("Get access token by code:{} form the IAM error.", code, e);
+            throw new AccessDeniedException(e.getMessage());
         }
-        return null;
     }
 }

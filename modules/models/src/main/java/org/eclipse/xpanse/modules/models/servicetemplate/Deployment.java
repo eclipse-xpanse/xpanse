@@ -9,8 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
@@ -18,9 +16,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 /** Defines the Deployment. */
 @Data
-public class Deployment implements Serializable {
-
-    @Serial private static final long serialVersionUID = 2566478948717883360L;
+public class Deployment {
 
     @Valid
     @NotNull

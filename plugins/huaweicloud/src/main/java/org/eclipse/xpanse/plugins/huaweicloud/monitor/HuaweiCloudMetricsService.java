@@ -170,12 +170,7 @@ public class HuaweiCloudMetricsService {
                     monitorMetricsStore.storeMonitorMetric(cacheKey, metric);
                     monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
                 } else {
-                    Metric cacheMetric = monitorMetricsStore.getMonitorMetric(cacheKey);
                     monitorMetricsStore.updateMetricsCacheTimeToLive(cacheKey);
-                    if (Objects.nonNull(cacheMetric)
-                            && !CollectionUtils.isEmpty(cacheMetric.getMetrics())) {
-                        metric = cacheMetric;
-                    }
                 }
             } catch (Exception e) {
                 log.error("Update metrics cache data error.{}", e.getMessage());

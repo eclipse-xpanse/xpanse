@@ -19,6 +19,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.ai.enums.AiApplicationType;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
 import org.springframework.context.annotation.Profile;
@@ -38,7 +39,7 @@ public class ServiceTemplateGenerator {
 
     /** Generates a service template and registers it to catalog. */
     public ServiceTemplateRequestInfo generateServiceTemplate(
-            AiApplicationType aiApplicationType, String imageFullUrl) throws Exception {
+            AiApplicationType aiApplicationType, String imageFullUrl) {
         PebbleEngine engine =
                 new PebbleEngine.Builder()
                         .strictVariables(true)
@@ -48,17 +49,23 @@ public class ServiceTemplateGenerator {
         templateContext.put("image_name", String.format(imageFullUrl, aiApplicationType.toValue()));
         templateContext.put("name", aiApplicationType.toValue());
 
-        String serviceTemplate =
-                executeTemplate(
-                        ResourceUtils.getFile(
-                                        "classpath:"
-                                                + String.format(
-                                                        "%s/%s",
-                                                        TEMPLATES_FOLDER,
-                                                        getServiceTemplateFileName(
-                                                                aiApplicationType)))
-                                .getAbsolutePath(),
-                        engine);
+        String serviceTemplate = null;
+        try {
+            serviceTemplate =
+                    executeTemplate(
+                            ResourceUtils.getFile(
+                                            "classpath:"
+                                                    + String.format(
+                                                            "%s/%s",
+                                                            TEMPLATES_FOLDER,
+                                                            getServiceTemplateFileName(
+                                                                    aiApplicationType)))
+                                    .getAbsolutePath(),
+                            engine);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new XpanseUnhandledException(e.getMessage());
+        }
         log.info(serviceTemplate);
         return createOcl(serviceTemplate);
     }
@@ -73,14 +80,14 @@ public class ServiceTemplateGenerator {
         return templateOutput;
     }
 
-    private ServiceTemplateRequestInfo createOcl(String oclTemplate) throws Exception {
+    private ServiceTemplateRequestInfo createOcl(String oclTemplate) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        Ocl ocl = mapper.readValue(oclTemplate, Ocl.class);
         try {
+            Ocl ocl = mapper.readValue(oclTemplate, Ocl.class);
             return serviceTemplateApi.createServiceTemplate(ocl);
         } catch (Exception e) {
             log.error("Failed to register service template", e);
-            throw e;
+            throw new XpanseUnhandledException(e.getMessage());
         }
     }
 

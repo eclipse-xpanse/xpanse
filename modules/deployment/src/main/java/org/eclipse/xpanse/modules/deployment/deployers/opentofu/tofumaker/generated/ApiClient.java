@@ -70,6 +70,7 @@ import org.springframework.web.util.UriComponentsBuilder;
         value = "org.openapitools.codegen.languages.JavaClientCodegen",
         comments = "Generator version: 7.11.0")
 @Component("org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.ApiClient")
+@SuppressWarnings("deprecation")
 public class ApiClient extends JavaTimeFormatter {
     public enum CollectionFormat {
         CSV(","),

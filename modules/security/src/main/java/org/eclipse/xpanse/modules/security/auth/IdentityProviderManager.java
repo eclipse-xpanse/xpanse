@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.security.auth;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
@@ -17,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -27,10 +27,19 @@ public class IdentityProviderManager implements ApplicationListener<ContextRefre
 
     @Getter private IdentityProviderService activeIdentityProviderService;
 
-    @Resource private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
-    @Value("${enable.web.security:false}")
-    private Boolean webSecurityIsEnabled;
+    private final Boolean webSecurityIsEnabled;
+
+    /** Constructor for IdentityProviderManager. */
+    public IdentityProviderManager(
+            @Nullable IdentityProviderService activeIdentityProviderService,
+            ApplicationContext applicationContext,
+            @Value("${enable.web.security:false}") Boolean webSecurityIsEnabled) {
+        this.activeIdentityProviderService = activeIdentityProviderService;
+        this.applicationContext = applicationContext;
+        this.webSecurityIsEnabled = webSecurityIsEnabled;
+    }
 
     /** Instantiates active IdentityProviderService. */
     @Override

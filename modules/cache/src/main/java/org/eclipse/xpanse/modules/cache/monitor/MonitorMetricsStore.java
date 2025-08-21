@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.cache.monitor;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.MONITOR_METRICS_CACHE_NAME;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.Nullable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -85,6 +86,9 @@ public class MonitorMetricsStore {
      *
      * @param cacheKey CredentialCacheKey.
      */
+    @SuppressFBWarnings(
+            value = "REC_CATCH_EXCEPTION",
+            justification = "Errors need not be forwarded to client.")
     public void updateMetricsCacheTimeToLive(MonitorMetricsCacheKey cacheKey) {
         if (!redisCacheEnabled || Objects.isNull(redisTemplate) || Objects.isNull(cacheKey)) {
             return;

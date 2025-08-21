@@ -42,7 +42,6 @@ import org.springframework.security.oauth2.server.resource.introspection.OpaqueT
 import org.springframework.security.oauth2.server.resource.introspection.SpringOpaqueTokenIntrospector;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
-import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -79,11 +78,9 @@ public class Oauth2WebSecurityFilter {
                 httpSecurityCorsConfigurer ->
                         httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
         http.securityMatcher("/xpanse/**");
-        MvcRequestMatcher.Builder mvcMatcherBuilder =
-                new MvcRequestMatcher.Builder(introspector).servletPath("/");
         http.authorizeHttpRequests(
                 arc -> {
-                    arc.requestMatchers(mvcMatcherBuilder.pattern("/xpanse/**")).authenticated();
+                    arc.requestMatchers("/xpanse/**").authenticated();
                     arc.anyRequest().authenticated();
                 });
         http.csrf(AbstractHttpConfigurer::disable);
@@ -119,10 +116,12 @@ public class Oauth2WebSecurityFilter {
                             oauth2.opaqueToken(
                                     opaque ->
                                             opaque.introspector(
-                                                            new SpringOpaqueTokenIntrospector(
-                                                                    introspectionUri,
-                                                                    clientId,
-                                                                    clientSecret))
+                                                            SpringOpaqueTokenIntrospector
+                                                                    .withIntrospectionUri(
+                                                                            introspectionUri)
+                                                                    .clientId(clientId)
+                                                                    .clientSecret(clientSecret)
+                                                                    .build())
                                                     .authenticationConverter(
                                                             opaqueTokenAuthenticationConverter)));
         }
