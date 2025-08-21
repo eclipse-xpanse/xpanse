@@ -48,7 +48,7 @@
         <slf4j-api.version>2.0.17</slf4j-api.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hypersistence-utils-hibernate.version>3.9.2</hypersistence-utils-hibernate.version>
-        <mockito.version>5.17.0</mockito.version>
+        <mockito.version>5.19.0</mockito.version>
         <testcontainers.version>1.20.5</testcontainers.version>
         <apache.commons.io.version>2.18.0</apache.commons.io.version>
         <apache.commons.lang.version>3.17.0</apache.commons.lang.version>
