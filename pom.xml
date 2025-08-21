@@ -78,7 +78,7 @@
         <opentelemetry.version>2.8.0</opentelemetry.version>
         <eclipse.dash.tool.plugin>1.1.0</eclipse.dash.tool.plugin>
         <java.uuid.generator.version>5.1.0</java.uuid.generator.version>
-        <jgit.version>7.2.0.202503040940-r</jgit.version>
+        <jgit.version>7.3.0.202506031305-r</jgit.version>
         <semver4j.version>5.7.1</semver4j.version>
         <github-api.version>1.327</github-api.version>
         <springdoc.openapi.plugin.version>1.5</springdoc.openapi.plugin.version>
