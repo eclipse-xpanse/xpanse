@@ -17,6 +17,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.eclipse.xpanse.api.controllers.ServiceTemplateApi;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
@@ -110,7 +111,7 @@ public class CspPluginValidator {
         try {
             return oclLoader.getOcl(URI.create(oclLocationValue).toURL());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new XpanseUnhandledException(e.getMessage());
         }
     }
 }

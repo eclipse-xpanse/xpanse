@@ -6,16 +6,12 @@
 package org.eclipse.xpanse.modules.models.service.deployment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Map;
 import lombok.Data;
 
 /** ModifyRequest model. */
 @Data
-public class ModifyRequest implements Serializable {
-
-    @Serial private static final long serialVersionUID = 8759112725757850274L;
+public class ModifyRequest {
 
     /** Customer provided name for the service. */
     @Schema(

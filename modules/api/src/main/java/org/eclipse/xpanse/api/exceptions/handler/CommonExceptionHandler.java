@@ -84,8 +84,9 @@ public class CommonExceptionHandler {
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             String errorMsg = fieldError.getField() + ": " + fieldError.getDefaultMessage();
             Object values = fieldError.getRejectedValue();
-            if (Objects.nonNull(fieldError.getCodes())) {
-                List<String> errorCodeList = Arrays.asList(fieldError.getCodes());
+            String[] codes = fieldError.getCodes();
+            if (Objects.nonNull(codes)) {
+                List<String> errorCodeList = Arrays.asList(codes);
                 String annotationName = errorCodeList.getLast();
                 if (StringUtils.equals(annotationName, "UniqueElements")) {
                     if (Objects.nonNull(values) && values instanceof List) {

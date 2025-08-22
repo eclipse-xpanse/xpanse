@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -139,9 +138,8 @@ public class ServiceTemplateApi {
     public ServiceTemplateRequestInfo fetch(
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
                     @RequestParam(name = "oclLocation")
-                    String oclLocation)
-            throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
+                    String oclLocation) {
+        Ocl ocl = oclLoader.getOclByLocation(oclLocation);
         return createServiceTemplate(ocl);
     }
 
@@ -177,9 +175,8 @@ public class ServiceTemplateApi {
                     Boolean isUnpublishUntilApproved,
             @Parameter(name = "oclLocation", description = "URL of Ocl file")
                     @RequestParam(name = "oclLocation")
-                    String oclLocation)
-            throws Exception {
-        Ocl ocl = oclLoader.getOcl(URI.create(oclLocation).toURL());
+                    String oclLocation) {
+        Ocl ocl = oclLoader.getOclByLocation(oclLocation);
         ServiceTemplateRequestHistoryEntity updateRequest =
                 serviceTemplateManage.updateServiceTemplate(
                         serviceTemplateId, ocl, isUnpublishUntilApproved);

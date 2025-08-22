@@ -7,6 +7,7 @@ package org.eclipse.xpanse.modules.security.hmac;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -151,13 +153,14 @@ public class HmacSignatureHeaderManage {
         try {
             Mac mac = Mac.getInstance(hmacAlgorithm);
             SecretKeySpec secretKeySpec =
-                    new SecretKeySpec(hmacSecretKey.getBytes(), hmacAlgorithm);
+                    new SecretKeySpec(
+                            hmacSecretKey.getBytes(Charset.defaultCharset()), hmacAlgorithm);
             mac.init(secretKeySpec);
-            byte[] hmacBytes = mac.doFinal(requestData.getBytes());
+            byte[] hmacBytes = mac.doFinal(requestData.getBytes(Charset.defaultCharset()));
             return Hex.encodeHexString(hmacBytes);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             log.error("Failed generating key", e);
-            throw new RuntimeException();
+            throw new XpanseUnhandledException(e.getMessage());
         }
     }
 }

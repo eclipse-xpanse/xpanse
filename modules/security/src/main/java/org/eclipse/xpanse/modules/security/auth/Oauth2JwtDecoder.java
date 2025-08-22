@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetrySynchronizationManager;
@@ -38,10 +39,8 @@ public class Oauth2JwtDecoder {
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public JwtDecoder createJwtDecoder(String issuerUri) {
-        int retryCount =
-                Objects.isNull(RetrySynchronizationManager.getContext())
-                        ? 0
-                        : RetrySynchronizationManager.getContext().getRetryCount();
+        RetryContext retryContext = RetrySynchronizationManager.getContext();
+        int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
         log.info(
                 "Creating Oauth2 JwtDecoder from issuerUri:{}. Retry count:{}",
                 issuerUri,

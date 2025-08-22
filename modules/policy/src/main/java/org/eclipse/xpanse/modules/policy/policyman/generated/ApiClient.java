@@ -51,6 +51,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen")
 @Component("org.eclipse.xpanse.modules.policy.policyman.generated.ApiClient")
+@SuppressWarnings("deprecation")
 public class ApiClient extends JavaTimeFormatter {
     public enum CollectionFormat {
         CSV(","),

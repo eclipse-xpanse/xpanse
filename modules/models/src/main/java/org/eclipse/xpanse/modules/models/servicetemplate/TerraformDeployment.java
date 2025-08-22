@@ -9,8 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
@@ -22,9 +20,7 @@ import org.springframework.validation.annotation.Validated;
 @EqualsAndHashCode
 @Data
 @Validated
-public class TerraformDeployment implements Serializable {
-
-    @Serial private static final long serialVersionUID = 2566478948717883360L;
+public class TerraformDeployment {
 
     @Schema(
             description =

@@ -10,8 +10,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,9 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Valid
 @Data
 @Slf4j
-public class ServiceChangeScript implements Serializable {
-
-    @Serial private static final long serialVersionUID = 1L;
+public class ServiceChangeScript {
 
     @NotNull
     @NotBlank

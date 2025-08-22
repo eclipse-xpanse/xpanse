@@ -1,0 +1,15 @@
+<FindBugsFilter>
+    <!-- Exclude exposing internal representation warnings -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,DM_CONVERT_CASE,CT_CONSTRUCTOR_THROW,VA_FORMAT_STRING_USES_NEWLINE,REC_CATCH_EXCEPTION,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,BC_UNCONFIRMED_CAST,SE_TRANSIENT_FIELD_NOT_RESTORED,SE_BAD_FIELD"/>
+    </Match>
+    <Match>
+        <Package name="~org\.eclipse\.xpanse\.modules\.policy\.policyman\.generated(\..*)?"/>
+    </Match>
+    <Match>
+        <Package name="~org\.eclipse\.xpanse\.modules\.deployment\.deployers\.terraform\.terraboot\.generated(\..*)?"/>
+    </Match>
+    <Match>
+        <Package name="~org\.eclipse\.xpanse\.modules\.deployment\.deployers\.opentofu\.tofumaker\.generated(\..*)?"/>
+    </Match>
+</FindBugsFilter>

@@ -39,6 +39,7 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.eclipse.xpanse.modules.security.auth.zitadel.ZitadelIdentityProviderService;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,6 +83,7 @@ class DeploymentExceptionHandlerTest {
     @MockitoBean private ServiceOrderManager serviceOrderManager;
     @MockitoBean private ServiceOrderStorage serviceOrderStorage;
     @MockitoBean private ServiceDeploymentEntityConverter serviceDeploymentEntityConverter;
+    @MockitoBean private ZitadelIdentityProviderService zitadelIdentityProviderService;
 
     @BeforeEach
     public void setup() {

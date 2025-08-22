@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment.serviceporting.steps;
 
+import java.io.Serial;
 import java.io.Serializable;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class ImportData implements Serializable, JavaDelegate {
+
+    @Serial private static final long serialVersionUID = 202406120001L;
 
     private final RuntimeService runtimeService;
 

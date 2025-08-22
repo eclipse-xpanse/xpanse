@@ -7,16 +7,12 @@ package org.eclipse.xpanse.modules.models.billing;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 
 /** Defines the rating mode of the managed service. */
 @Data
-public class RatingMode implements Serializable {
-
-    @Serial private static final long serialVersionUID = 240913796673011260L;
+public class RatingMode {
 
     @Schema(
             description =

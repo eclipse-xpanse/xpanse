@@ -27,6 +27,7 @@ import org.kohsuke.github.connector.GitHubConnectorResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetrySynchronizationManager;
@@ -77,10 +78,8 @@ public class DeployerToolVersionsFetcher {
             maxAttemptsExpression = "${http.request.retry.max.attempts}",
             backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public Set<String> fetchOfficialVersionsOfDeployerTool(DeployerKind deployerKind) {
-        int retryCount =
-                Objects.isNull(RetrySynchronizationManager.getContext())
-                        ? 0
-                        : RetrySynchronizationManager.getContext().getRetryCount();
+        RetryContext retryContext = RetrySynchronizationManager.getContext();
+        int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
         log.info(
                 "Start to fetch available versions from website for deployer tool {}."
                         + " Retry count: {}",
@@ -165,7 +164,7 @@ public class DeployerToolVersionsFetcher {
             connection.setConnectTimeout(10000);
             connection.setRequestMethod(HttpMethod.HEAD.name());
             return connection.getResponseCode() == HttpStatus.OK.value();
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new IOException("Failed to connect to the endpoint: " + endpoint);
         }

@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.modules.deployment.recreate.steps;
 
+import java.io.Serial;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class RecreateDestroyFailedManualHandlerListener implements ExecutionListener {
+
+    @Serial private static final long serialVersionUID = 202406120001L;
 
     @Override
     public void notify(DelegateExecution delegateExecution) {

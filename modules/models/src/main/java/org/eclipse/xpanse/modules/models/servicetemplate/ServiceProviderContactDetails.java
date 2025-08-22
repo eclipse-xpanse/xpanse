@@ -8,16 +8,13 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import org.hibernate.validator.constraints.UniqueElements;
 
 /** The contact details of the Cloud Service Provider. */
 @Data
-public class ServiceProviderContactDetails implements Serializable {
-    @Serial private static final long serialVersionUID = -574682470837775837L;
+public class ServiceProviderContactDetails {
 
     @Valid
     @Size(min = 1)

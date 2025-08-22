@@ -14,7 +14,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
 /** Client bean that interacts with an LLM provider. */
 @Component
@@ -108,7 +107,7 @@ public class AiClientForCodeGeneration {
                             try {
                                 writeToFile(directory.getAbsolutePath(), fileName, content);
                             } catch (IOException e) {
-                                throw new RuntimeException(e);
+                                throw new XpanseUnhandledException(e.getMessage());
                             }
                         });
         return directory.getAbsolutePath();
@@ -116,22 +115,10 @@ public class AiClientForCodeGeneration {
 
     private void writeToFile(String directory, String fileName, String content) throws IOException {
         File file = new File(directory + File.separator + fileName);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+        try (BufferedWriter writer =
+                new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write(content);
             log.info("Written to: {}", fileName);
-        }
-    }
-
-    private static String getSystemPrompt() {
-        try {
-            File file = ResourceUtils.getFile("classpath:system-prompt.txt");
-            if (!file.exists()) {
-                throw new XpanseUnhandledException("Could not find file: " + file.getName());
-            }
-            byte[] bytes = Files.readAllBytes(file.toPath());
-            return new String(bytes);
-        } catch (IOException e) {
-            throw new XpanseUnhandledException(e.getMessage());
         }
     }
 }

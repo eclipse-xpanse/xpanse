@@ -6,6 +6,7 @@
 package org.eclipse.xpanse.modules.observability;
 
 import java.net.URI;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
@@ -49,8 +50,9 @@ public class OpenTelemetryCollectorHealthCheck {
                 OpenTelemetryHealthCheckResponse openTelemetryHealthCheckResponse =
                         restClient.get().retrieve().body(OpenTelemetryHealthCheckResponse.class);
                 backendSystemStatus.setHealthStatus(
-                        openTelemetryHealthCheckResponse.getStatus()
-                                        == CollectorStatus.SERVER_AVAILABLE
+                        Objects.nonNull(openTelemetryHealthCheckResponse)
+                                        && openTelemetryHealthCheckResponse.getStatus()
+                                                == CollectorStatus.SERVER_AVAILABLE
                                 ? HealthStatus.OK
                                 : HealthStatus.NOK);
             } catch (RestClientException restClientException) {

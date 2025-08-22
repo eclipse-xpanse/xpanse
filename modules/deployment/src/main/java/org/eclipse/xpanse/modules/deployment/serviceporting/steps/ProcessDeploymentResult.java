@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment.serviceporting.steps;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,7 +28,7 @@ import org.springframework.stereotype.Component;
 /** Processing class for checking deployment status after deployment callback. */
 @Slf4j
 @Component
-public class ProcessDeploymentResult implements Serializable, JavaDelegate {
+public class ProcessDeploymentResult implements JavaDelegate {
 
     private final RuntimeService runtimeService;
     private final ServiceOrderManager serviceOrderManager;

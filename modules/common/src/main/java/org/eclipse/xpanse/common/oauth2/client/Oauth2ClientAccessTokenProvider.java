@@ -7,8 +7,8 @@ package org.eclipse.xpanse.common.oauth2.client;
 
 import static org.eclipse.xpanse.common.oauth2.client.Oauth2ClientConfiguration.OAUTH_CLIENT_ID;
 
-import jakarta.annotation.Resource;
 import java.util.Objects;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
@@ -25,8 +25,15 @@ import org.springframework.stereotype.Component;
 @Profile("oauth")
 public class Oauth2ClientAccessTokenProvider {
 
-    @Resource
-    private AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceAndManager;
+    private final AuthorizedClientServiceOAuth2AuthorizedClientManager
+            authorizedClientServiceAndManager;
+
+    @Autowired
+    public Oauth2ClientAccessTokenProvider(
+            AuthorizedClientServiceOAuth2AuthorizedClientManager
+                    authorizedClientServiceAndManager) {
+        this.authorizedClientServiceAndManager = authorizedClientServiceAndManager;
+    }
 
     /** Method to directly get the access token. */
     public String authenticateClientAndGetAccessToken() {
@@ -40,9 +47,11 @@ public class Oauth2ClientAccessTokenProvider {
         // This is where the token is retrieved from the Oauth providers.
         OAuth2AuthorizedClient authorizedClient =
                 this.authorizedClientServiceAndManager.authorize(authorizeRequest);
-
-        // Get the token from the authorized client object
-        OAuth2AccessToken accessToken = Objects.requireNonNull(authorizedClient).getAccessToken();
-        return accessToken.getTokenValue();
+        if (Objects.nonNull(authorizedClient)) {
+            OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+            return accessToken.getTokenValue();
+        } else {
+            return null;
+        }
     }
 }

@@ -7,6 +7,7 @@ package org.eclipse.xpanse.modules.models.credential;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,6 +19,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 
 /** List credential definition that can be provided from end user. */
 @Getter
+@SuppressFBWarnings(value = "RI_REDUNDANT_INTERFACES")
 public class CredentialVariables extends AbstractCredentialInfo implements Cloneable {
 
     /** The variables list of the credential. */
@@ -69,6 +71,7 @@ public class CredentialVariables extends AbstractCredentialInfo implements Clone
     }
 
     @Override
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CLONE")
     public CredentialVariables clone() {
         CredentialVariables clone = (CredentialVariables) super.clone();
         List<CredentialVariable> newVariables = new ArrayList<>();

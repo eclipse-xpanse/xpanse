@@ -18,8 +18,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -40,9 +38,7 @@ import org.hibernate.annotations.Type;
 @Table(name = "SERVICE_CHANGE_REQUEST")
 @Entity
 @Data
-public class ServiceChangeRequestEntity extends CreatedModifiedTime implements Serializable {
-
-    @Serial private static final long serialVersionUID = 8759112725757851274L;
+public class ServiceChangeRequestEntity extends CreatedModifiedTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

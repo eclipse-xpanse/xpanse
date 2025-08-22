@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.deployment.recreate.consts.RecreateConstants;
 import org.eclipse.xpanse.modules.deployment.serviceporting.consts.ServicePortingConstants;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResource;
@@ -157,7 +158,7 @@ public class DeployResultManager {
         }
         updateServiceWithDeployResult(rollbackResult, handler);
         if (Objects.nonNull(exception)) {
-            throw exception;
+            throw new XpanseUnhandledException(exception.getMessage());
         }
     }
 

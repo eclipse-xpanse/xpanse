@@ -9,20 +9,22 @@ package org.eclipse.xpanse.plugins.huaweicloud.common;
 import com.huaweicloud.sdk.core.SdkResponse;
 import com.huaweicloud.sdk.core.exception.ClientRequestException;
 import com.huaweicloud.sdk.core.exception.ServiceResponseException;
-import com.huaweicloud.sdk.core.retry.RetryContext;
 import com.huaweicloud.sdk.core.retry.backoff.BackoffStrategy;
 import java.util.Objects;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /** Define retry strategy. */
 @Slf4j
 @Component
+@Getter
 public class HuaweiCloudRetryStrategy implements BackoffStrategy {
 
     public static final int WAITING_JOB_SUCCESS_RETRY_TIMES = 30;
@@ -30,11 +32,12 @@ public class HuaweiCloudRetryStrategy implements BackoffStrategy {
     private static final int ERROR_CODE_INTERNAL_SERVER_ERROR = 500;
     private static final int DEFAULT_RETRY_ATTEMPTS = 5;
     private static final long DEFAULT_DELAY_MILLIONS = 30000L;
-    private static int retryMaxAttempts;
-    private static long retryMaxDelayMillions;
+    private int retryMaxAttempts;
+    private long retryMaxDelayMillions;
 
     @Override
-    public <T> long computeDelayBeforeNextRetry(RetryContext<T> retryContext) {
+    public <T> long computeDelayBeforeNextRetry(
+            com.huaweicloud.sdk.core.retry.RetryContext<T> retryContext) {
         return retryMaxDelayMillions;
     }
 
@@ -76,15 +79,6 @@ public class HuaweiCloudRetryStrategy implements BackoffStrategy {
     }
 
     /**
-     * Get retry max attempts.
-     *
-     * @return retry max attempts.
-     */
-    public int getRetryMaxAttempts() {
-        return retryMaxAttempts;
-    }
-
-    /**
      * Match retry condition.
      *
      * @param response response
@@ -109,10 +103,8 @@ public class HuaweiCloudRetryStrategy implements BackoffStrategy {
      * @param ex Exception
      */
     public void handleAuthExceptionForSpringRetry(Exception ex) {
-        int retryCount =
-                Objects.isNull(RetrySynchronizationManager.getContext())
-                        ? 0
-                        : RetrySynchronizationManager.getContext().getRetryCount();
+        RetryContext retryContext = RetrySynchronizationManager.getContext();
+        int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
         log.error(ex.getMessage() + System.lineSeparator() + "Retry count:" + retryCount);
         if (ex instanceof ClientAuthenticationFailedException authEx) {
             throw authEx;

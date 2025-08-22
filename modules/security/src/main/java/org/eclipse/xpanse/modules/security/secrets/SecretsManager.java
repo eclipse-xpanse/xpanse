@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.security.secrets;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -83,7 +84,9 @@ public class SecretsManager {
                                     algorithmPadding)
                             .doFinal(byteEncode);
             return Base64.encodeBase64String(encryptedContent);
-        } catch (Exception e) {
+        } catch (SensitiveFieldEncryptionOrDecryptionFailedException
+                | BadPaddingException
+                | IllegalBlockSizeException e) {
             log.error("Secret encryption error ", e);
             throw new SensitiveFieldEncryptionOrDecryptionFailedException(e.getMessage());
         }
@@ -148,7 +151,7 @@ public class SecretsManager {
                     mode,
                     secretKey,
                     Strings.isNotBlank(initialVector)
-                            ? new IvParameterSpec(initialVector.getBytes())
+                            ? new IvParameterSpec(initialVector.getBytes(Charset.defaultCharset()))
                             : null);
             return cipher;
         } catch (InvalidAlgorithmParameterException

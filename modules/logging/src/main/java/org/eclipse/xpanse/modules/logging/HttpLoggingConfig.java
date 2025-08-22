@@ -3,33 +3,28 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
+// HttpLoggingConfig.java
+
 package org.eclipse.xpanse.modules.logging;
 
 import java.util.List;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /** Reads HTTP logging related configuration from spring context. */
+@Getter
 @Configuration
 public class HttpLoggingConfig {
-    private static boolean isHttpLoggingEnabled;
-    private static List<String> excludedUris;
 
-    @Value("${http.logging.enabled:true}")
-    public void setIsHttpLoggingEnabled(boolean isHttpLoggingEnabled) {
-        HttpLoggingConfig.isHttpLoggingEnabled = isHttpLoggingEnabled;
-    }
+    private final boolean isHttpLoggingEnabled;
+    private final List<String> excludedUris;
 
-    @Value("${http.logging.exclude.uri:}#{T(java.util.Collections).emptyList()}")
-    public void setExcludedUris(List<String> excludedUris) {
-        HttpLoggingConfig.excludedUris = excludedUris;
-    }
-
-    public static boolean isHttpLoggingEnabled() {
-        return isHttpLoggingEnabled;
-    }
-
-    public static List<String> getExcludedUris() {
-        return excludedUris;
+    public HttpLoggingConfig(
+            @Value("${http.logging.enabled:true}") boolean isHttpLoggingEnabled,
+            @Value("${http.logging.exclude.uri:}#{T(java.util.Collections).emptyList()}")
+                    List<String> excludedUris) {
+        this.isHttpLoggingEnabled = isHttpLoggingEnabled;
+        this.excludedUris = excludedUris;
     }
 }

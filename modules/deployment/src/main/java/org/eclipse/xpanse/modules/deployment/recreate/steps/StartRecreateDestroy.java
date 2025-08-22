@@ -6,8 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment.recreate.steps;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,9 +28,7 @@ import org.springframework.stereotype.Component;
 /** Recreate process deployment service processing class. */
 @Slf4j
 @Component
-public class StartRecreateDestroy implements Serializable, JavaDelegate {
-
-    @Serial private static final long serialVersionUID = 2725212494105579585L;
+public class StartRecreateDestroy implements JavaDelegate {
 
     private final DeployService deployService;
     private final ServiceOrderManager serviceOrderManager;

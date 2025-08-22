@@ -51,17 +51,17 @@ public class AvailabilityZonesRequestValidator {
         }
 
         Map<String, String> requiredZoneVarValues = new HashMap<>();
-        for (String zoneVarName : inputMap.keySet()) {
-            if (requiredZoneVarNames.contains(zoneVarName)) {
-                if (requiredZoneVarValues.containsValue(inputMap.get(zoneVarName))) {
+        for (Map.Entry<String, String> entry : inputMap.entrySet()) {
+            if (requiredZoneVarNames.contains(entry.getKey())) {
+                if (requiredZoneVarValues.containsValue(entry.getValue())) {
                     String duplicatedValuesMessage =
                             String.format(
                                     "The values of required "
                                             + "availability zones variables %s are duplicated.",
-                                    inputMap.get(zoneVarName));
+                                    inputMap.get(entry.getValue()));
                     throw new VariableValidationFailedException(List.of(duplicatedValuesMessage));
                 } else {
-                    requiredZoneVarValues.put(zoneVarName, inputMap.get(zoneVarName));
+                    requiredZoneVarValues.put(entry.getValue(), entry.getValue());
                 }
             }
         }

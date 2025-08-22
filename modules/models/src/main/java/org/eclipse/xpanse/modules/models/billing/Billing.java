@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
@@ -17,7 +16,7 @@ import org.hibernate.validator.constraints.UniqueElements;
 
 /** Defines the billing model of the managed service. */
 @Data
-public class Billing implements Serializable {
+public class Billing {
 
     @Serial private static final long serialVersionUID = 240913796673011260L;
 

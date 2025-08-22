@@ -10,17 +10,13 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
 
 /** Defines for service flavor. */
 @Data
-public class ServiceFlavor implements Serializable {
-
-    @Serial private static final long serialVersionUID = 7178375302626204744L;
+public class ServiceFlavor {
 
     @NotNull
     @NotBlank

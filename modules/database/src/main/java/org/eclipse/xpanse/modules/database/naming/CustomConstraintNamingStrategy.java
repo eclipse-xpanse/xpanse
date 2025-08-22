@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.modules.database.naming;
 
+import java.io.Serial;
 import java.util.stream.Collectors;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.ImplicitForeignKeyNameSource;
@@ -16,6 +17,8 @@ import org.hibernate.boot.model.naming.ImplicitUniqueKeyNameSource;
  * hbm-ddl feature.
  */
 public class CustomConstraintNamingStrategy extends ImplicitNamingStrategyJpaCompliantImpl {
+
+    @Serial private static final long serialVersionUID = 202406110001L;
 
     @Override
     public Identifier determineForeignKeyName(ImplicitForeignKeyNameSource source) {

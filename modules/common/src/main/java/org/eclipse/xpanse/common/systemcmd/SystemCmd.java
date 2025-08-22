@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -123,28 +124,34 @@ public class SystemCmd {
         // some cases reading stdout first works and in some cases reading stderr first works.
         // we now let both stdout and stderr streams to be fully read in parallel and then read
         // the output after the buffers are fully read.
-        BufferedReader stdoutReader =
-                new BufferedReader(new InputStreamReader(process.getInputStream()));
-        ExecutorService threadToReadStdout = Executors.newSingleThreadExecutor();
-        Future<String> stdOutFuture =
-                threadToReadStdout.submit(() -> readStream(stdoutReader, contextMap));
+        try (BufferedReader stdoutReader =
+                new BufferedReader(
+                        new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+            ExecutorService threadToReadStdout = Executors.newSingleThreadExecutor();
+            Future<String> stdOutFuture =
+                    threadToReadStdout.submit(() -> readStream(stdoutReader, contextMap));
 
-        BufferedReader stdErrorReader =
-                new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        ExecutorService threadToReadStdErr = Executors.newSingleThreadExecutor();
-        Future<String> stdErrFuture =
-                threadToReadStdErr.submit(() -> readStream(stdErrorReader, contextMap));
+            try (BufferedReader stdErrorReader =
+                    new BufferedReader(
+                            new InputStreamReader(
+                                    process.getErrorStream(), StandardCharsets.UTF_8))) {
+                ExecutorService threadToReadStdErr = Executors.newSingleThreadExecutor();
+                Future<String> stdErrFuture =
+                        threadToReadStdErr.submit(() -> readStream(stdErrorReader, contextMap));
 
-        int count = 0;
-        while (!stdOutFuture.isDone() || !stdErrFuture.isDone()) {
-            if (count++ < 10 || count % 100000 == 0) {
-                log.debug("Command output and error streams are still being read.");
+                int count = 0;
+                while (!stdOutFuture.isDone() || !stdErrFuture.isDone()) {
+                    if (count++ < 10 || count % 100000 == 0) {
+                        log.debug("Command output and error streams are still being read.");
+                    }
+                }
+
+                systemCmdResult.setCommandStdError(stdErrFuture.get());
+                systemCmdResult.setCommandStdOutput(stdOutFuture.get());
+                threadToReadStdout.shutdown();
+                threadToReadStdErr.shutdown();
+                // ... rest of the code using stdErrFuture and threadToReadStdErr
             }
         }
-
-        systemCmdResult.setCommandStdError(stdErrFuture.get());
-        systemCmdResult.setCommandStdOutput(stdOutFuture.get());
-        threadToReadStdout.shutdown();
-        threadToReadStdErr.shutdown();
     }
 }

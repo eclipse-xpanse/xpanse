@@ -9,8 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,9 +19,7 @@ import org.springframework.validation.annotation.Validated;
 @EqualsAndHashCode
 @Data
 @Validated
-public class HelmDeployment implements Serializable {
-
-    @Serial private static final long serialVersionUID = 2566478948717883360L;
+public class HelmDeployment {
 
     @Valid
     @NotNull

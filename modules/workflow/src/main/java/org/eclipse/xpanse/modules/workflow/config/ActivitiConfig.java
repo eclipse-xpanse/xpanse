@@ -79,6 +79,7 @@ public class ActivitiConfig {
         springProcessEngineConfiguration.setDeploymentResources(resources);
         springProcessEngineConfiguration.setHistoryLevel(historyLevel);
         springProcessEngineConfiguration.setApplicationContext(this.applicationContext);
+        springProcessEngineConfiguration.setSerializePOJOsInVariablesToJson(true);
         return springProcessEngineConfiguration;
     }
 

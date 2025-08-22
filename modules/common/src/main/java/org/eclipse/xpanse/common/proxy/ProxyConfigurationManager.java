@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Getter
 @Component
-public class ProxyConfigurationManager {
+public final class ProxyConfigurationManager {
 
     private final ProxyDetails httpProxyDetails;
     private final ProxyDetails httpsProxyDetails;
@@ -69,7 +70,7 @@ public class ProxyConfigurationManager {
                     parts[0].replaceFirst("^(http://|https://)", ""); // Remove protocol
             return credentials.split(":");
         }
-        return null;
+        return new String[0];
     }
 
     /** Priority is given to the lower case proxy variables which are the linux standards. */
@@ -94,10 +95,8 @@ public class ProxyConfigurationManager {
                                     uri.getPort() != -1
                                             ? uri.getPort()
                                             : URL.of(uri, null).getDefaultPort())
-                            .proxyUsername(
-                                    Objects.nonNull(proxyCredentials) ? proxyCredentials[0] : null)
-                            .proxyPassword(
-                                    Objects.nonNull(proxyCredentials) ? proxyCredentials[1] : null)
+                            .proxyUsername(proxyCredentials.length > 0 ? proxyCredentials[0] : null)
+                            .proxyPassword(proxyCredentials.length > 0 ? proxyCredentials[1] : null)
                             .build();
             System.setProperty(
                     isHttpProxy ? "http.proxyHost" : "https.proxyHost",
@@ -108,7 +107,7 @@ public class ProxyConfigurationManager {
             return proxyDetails;
         } catch (URISyntaxException | MalformedURLException e) {
             log.error("Error parsing proxy information", e);
-            throw new RuntimeException(e);
+            throw new XpanseUnhandledException(e.getMessage());
         }
     }
 }

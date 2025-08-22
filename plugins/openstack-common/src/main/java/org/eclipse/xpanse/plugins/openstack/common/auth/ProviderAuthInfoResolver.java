@@ -34,6 +34,7 @@ import org.openstack4j.api.OSClient;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.RetryContext;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
@@ -187,10 +188,8 @@ public class ProviderAuthInfoResolver {
      * @param ex Exception
      */
     public void handleAuthExceptionForSpringRetry(Exception ex) {
-        int retryCount =
-                Objects.isNull(RetrySynchronizationManager.getContext())
-                        ? 0
-                        : RetrySynchronizationManager.getContext().getRetryCount();
+        RetryContext retryContext = RetrySynchronizationManager.getContext();
+        int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
         log.error("Handler auth exception {}. Retry count: {} ", ex.getMessage(), retryCount);
         if (ex instanceof ClientAuthenticationFailedException) {
             throw new ClientAuthenticationFailedException(ex.getMessage());

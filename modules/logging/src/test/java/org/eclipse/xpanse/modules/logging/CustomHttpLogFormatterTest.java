@@ -26,7 +26,7 @@ class CustomHttpLogFormatterTest {
     @BeforeEach
     void setUp() {
         customHttpLogFormatterUnderTest = new CustomHttpLogFormatter();
-        customHttpLogWriterUnderTest = new CustomHttpLogWriter();
+        customHttpLogWriterUnderTest = new CustomHttpLogWriter(true);
     }
 
     @Test

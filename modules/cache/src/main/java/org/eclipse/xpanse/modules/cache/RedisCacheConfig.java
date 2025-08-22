@@ -195,18 +195,18 @@ public class RedisCacheConfig {
         return template;
     }
 
-    private void checkRedisIsAvailable() throws RuntimeException {
+    private void checkRedisIsAvailable() {
         try (RedisConnection ignored = connectionFactory.getConnection()) {
             log.info("Redis service is available.");
         } catch (RedisConnectionFailureException e) {
             log.error("Failed to connect to Redis server. Error message: {}", e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            throw e;
         } catch (Exception e) {
             log.error(
                     "Error occurred while checking Redis availability. Error message: {}",
                     e.getMessage(),
                     e);
-            throw new RuntimeException(e.getMessage(), e);
+            throw e;
         }
     }
 

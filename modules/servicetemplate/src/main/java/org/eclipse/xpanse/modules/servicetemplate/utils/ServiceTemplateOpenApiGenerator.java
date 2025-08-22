@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -170,7 +171,8 @@ public class ServiceTemplateOpenApiGenerator {
                 return this.openApiUrlManage.getOpenApiUrl(serviceId);
             } else {
                 String apiDocsJson = getApiDocsJson(registerService);
-                try (FileWriter apiWriter = new FileWriter(yamlFile.getPath())) {
+                try (FileWriter apiWriter =
+                        new FileWriter(yamlFile.getPath(), StandardCharsets.UTF_8)) {
                     apiWriter.write(apiDocsJson);
                 }
                 log.info("Service openApi yamlFile:{} create successful.", yamlFile.getPath());
@@ -183,25 +185,28 @@ public class ServiceTemplateOpenApiGenerator {
                                 jarPath.getPath(), yamlFile.getPath(), openApiDir);
                 Process exec = Runtime.getRuntime().exec(comm.split("\\s+"));
                 StringBuilder stdErrOut = new StringBuilder();
-                BufferedReader outputReader =
-                        new BufferedReader(new InputStreamReader(exec.getErrorStream()));
-                String line;
-                while ((line = outputReader.readLine()) != null) {
-                    stdErrOut.append(line);
-                    log.error(line);
-                }
-                exec.waitFor();
-                if (exec.exitValue() != 0) {
-                    log.error("Create service openApi html file failed. {}", stdErrOut);
-                }
-                // Modify the file name to serviceId.html
-                File tempHtmlFile = new File(openApiDir, "index.html");
-                if (tempHtmlFile.exists() && (tempHtmlFile.renameTo(htmlFile))) {
-                    log.info(
-                            "Created service openApi html file:{} successfully.",
-                            htmlFile.getName());
-                    if (htmlFile.exists()) {
-                        return this.openApiUrlManage.getOpenApiUrl(serviceId);
+                try (BufferedReader outputReader =
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        exec.getErrorStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = outputReader.readLine()) != null) {
+                        stdErrOut.append(line);
+                        log.error(line);
+                    }
+                    exec.waitFor();
+                    if (exec.exitValue() != 0) {
+                        log.error("Create service openApi html file failed. {}", stdErrOut);
+                    }
+                    // Modify the file name to serviceId.html
+                    File tempHtmlFile = new File(openApiDir, "index.html");
+                    if (tempHtmlFile.exists() && (tempHtmlFile.renameTo(htmlFile))) {
+                        log.info(
+                                "Created service openApi html file:{} successfully.",
+                                htmlFile.getName());
+                        if (htmlFile.exists()) {
+                            return this.openApiUrlManage.getOpenApiUrl(serviceId);
+                        }
                     }
                 }
             } else {

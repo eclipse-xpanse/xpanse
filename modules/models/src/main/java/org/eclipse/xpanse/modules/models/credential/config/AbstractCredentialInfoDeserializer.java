@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.List;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,8 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
  */
 @Slf4j
 public class AbstractCredentialInfoDeserializer extends StdDeserializer<AbstractCredentialInfo> {
+
+    @Serial private static final long serialVersionUID = 20240611000123L;
 
     /** Default constructor. */
     public AbstractCredentialInfoDeserializer() {

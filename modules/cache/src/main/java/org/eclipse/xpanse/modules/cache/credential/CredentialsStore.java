@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.cache.credential;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.CREDENTIAL_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEFAULT_CREDENTIAL_CACHE_EXPIRE_TIME_IN_SECONDS;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.Nullable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -83,6 +84,9 @@ public class CredentialsStore {
      *
      * @param cacheKey CredentialCacheKey.
      */
+    @SuppressFBWarnings(
+            value = "REC_CATCH_EXCEPTION",
+            justification = "Errors need not be forwarded to client.")
     public void updateCredentialCacheTimeToLive(CredentialCacheKey cacheKey) {
         if (!redisCacheEnabled
                 || Objects.isNull(credentialRedisTemplate)
