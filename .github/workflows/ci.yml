@@ -14,7 +14,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -39,6 +38,20 @@ jobs:
         run: mvn spotless:check &&  mvn checkstyle:check
       - name: Build
         run: mvn --batch-mode --update-snapshots --no-transfer-progress verify
+  check-swagger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Set Up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+      - name: Set up Maven settings
+        run: |
+          mkdir -p ~/.m2
+          cp .github/workflows/.m2/settings.xml ~/.m2/
       - name: Generate API doc
         run: mvn verify -DskipTests -Pgenerate-openapi-doc
       - name: Validate OpenAPI definition
@@ -46,4 +59,3 @@ jobs:
         with:
           definition-file: runtime/target/openapi.json
           fails-on: 2
-
