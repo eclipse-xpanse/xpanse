@@ -31,10 +31,10 @@ public class OpenTofuInstaller {
             "%s/download/v%s/tofu_%s_%s_%s.zip";
     private static final String OPEN_TOFU_EXECUTOR_NAME_PREFIX = "tofu-";
 
-    @Value("${deployer.opontofu.download.base.url:https://github.com/opentofu/opentofu/releases}")
+    @Value("${deployer.opentofu.download.base.url:https://github.com/opentofu/opentofu/releases}")
     private String openTofuDownloadBaseUrl;
 
-    @Value("${deployer.opontofu.install.dir:/opt/opentofu}")
+    @Value("${deployer.opentofu.install.dir:/opt/opentofu}")
     private String openTofuInstallDir;
 
     @Resource private DeployerToolUtils deployerToolUtils;
