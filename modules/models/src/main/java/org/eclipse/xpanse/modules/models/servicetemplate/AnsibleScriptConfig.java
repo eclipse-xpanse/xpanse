@@ -26,13 +26,15 @@ public class AnsibleScriptConfig {
             description =
                     "name of the ansible playbook. Should be the fully qualified file name"
                             + " (including the directory path) in the repo.",
-            example = "playbook-name.yml")
+            examples = "playbook-name.yml")
     private String playbookName;
 
     @NotNull
     @NotBlank
     @NotEmpty
-    @Schema(description = "Path where the virtualenv must be created.", example = "/tmp/virtualEnv")
+    @Schema(
+            description = "Path where the virtualenv must be created.",
+            examples = "/tmp/virtualEnv")
     private String virtualEnv;
 
     @NotNull
@@ -42,7 +44,7 @@ public class AnsibleScriptConfig {
             description =
                     "Version of the python. This version of python "
                             + "must be available in node which is acting as the configManager.",
-            example = "3.10")
+            examples = "3.10")
     private String pythonVersion;
 
     @NotNull
@@ -72,7 +74,7 @@ public class AnsibleScriptConfig {
             description =
                     "the python module requirements file in GIT repo. Should be the fully qualified"
                             + " file name (including the directory path). ",
-            example = "modules/requirements.txt")
+            examples = "modules/requirements.txt")
     private String requirementsFile;
 
     @NotNull
