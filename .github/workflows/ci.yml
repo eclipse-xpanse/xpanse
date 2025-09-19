@@ -42,6 +42,8 @@ jobs:
       - name: Generate API doc
         run: mvn verify -DskipTests -Pgenerate-openapi-doc
       - name: Validate OpenAPI definition
-        uses: swaggerexpert/swagger-editor-validate@v1
+        uses: swaggerexpert/apidom-validate@v1
         with:
           definition-file: runtime/target/openapi.json
+          fails-on: 2
+
