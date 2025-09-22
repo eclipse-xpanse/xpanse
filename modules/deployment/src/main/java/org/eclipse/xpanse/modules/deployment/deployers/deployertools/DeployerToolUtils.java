@@ -55,6 +55,7 @@ public class DeployerToolUtils {
      * Get executor path which matches the required version.
      *
      * @param executorNamePrefix executor name prefix
+     * @param versionCommandArgument argument to be passed to the binary to output the version
      * @param versionCommandOutputPattern pattern to get version from command output
      * @param installationDir installation directory
      * @param requiredOperator operator in required version
@@ -63,6 +64,7 @@ public class DeployerToolUtils {
      */
     public String getExecutorPathMatchedRequiredVersion(
             String executorNamePrefix,
+            String versionCommandArgument,
             Pattern versionCommandOutputPattern,
             String installationDir,
             String requiredOperator,
@@ -98,7 +100,11 @@ public class DeployerToolUtils {
         if (StringUtils.isNotBlank(findBestVersion)) {
             File executorFile = executorVersionFileMap.get(findBestVersion);
             if (checkIfExecutorIsMatchedRequiredVersion(
-                    executorFile, versionCommandOutputPattern, requiredOperator, requiredNumber)) {
+                    executorFile,
+                    versionCommandArgument,
+                    versionCommandOutputPattern,
+                    requiredOperator,
+                    requiredNumber)) {
                 log.info(
                         "Found the installed executor {} matched the required version {} "
                                 + "successfully.",
@@ -349,12 +355,15 @@ public class DeployerToolUtils {
      */
     public boolean checkIfExecutorIsMatchedRequiredVersion(
             File executorFile,
+            String versionCommandArgument,
             Pattern versionCommandOutputPattern,
             String requiredOperator,
             String requiredNumber) {
         String versionNumber =
                 getExactVersionOfExecutor(
-                        executorFile.getAbsolutePath(), versionCommandOutputPattern);
+                        executorFile.getAbsolutePath(),
+                        versionCommandArgument,
+                        versionCommandOutputPattern);
         if (StringUtils.isNotBlank(versionNumber)) {
             return isVersionSatisfied(versionNumber, requiredOperator, requiredNumber);
         }
@@ -367,8 +376,8 @@ public class DeployerToolUtils {
      * @param executorFile executor file
      * @return If true, the executor can be executed, otherwise return false.
      */
-    public boolean checkIfExecutorCanBeExecuted(File executorFile) {
-        String versionOutput = getVersionCommandOutput(executorFile);
+    public boolean checkIfExecutorCanBeExecuted(File executorFile, String versionCommandArgument) {
+        String versionOutput = getVersionCommandOutput(executorFile, versionCommandArgument);
         return StringUtils.isNotBlank(versionOutput);
     }
 
@@ -379,8 +388,11 @@ public class DeployerToolUtils {
      * @return exact version of executor.
      */
     public String getExactVersionOfExecutor(
-            String executorPath, Pattern versionCommandOutputPattern) {
-        String versionOutput = getVersionCommandOutput(new File(executorPath));
+            String executorPath,
+            String versionCommandArgument,
+            Pattern versionCommandOutputPattern) {
+        String versionOutput =
+                getVersionCommandOutput(new File(executorPath), versionCommandArgument);
         if (StringUtils.isNotBlank(versionOutput)) {
             Matcher matcher = versionCommandOutputPattern.matcher(versionOutput);
             if (matcher.find()) {
@@ -391,7 +403,7 @@ public class DeployerToolUtils {
         return null;
     }
 
-    private String getVersionCommandOutput(File executorFile) {
+    private String getVersionCommandOutput(File executorFile, String versionCommandArguments) {
         try {
             if (!executorFile.exists() && !executorFile.isFile()) {
                 return null;
@@ -405,7 +417,7 @@ public class DeployerToolUtils {
                 }
             }
             SystemCmdResult versionCheckResult =
-                    systemCmd.execute(executorFile.getAbsolutePath() + " version");
+                    systemCmd.execute(executorFile.getAbsolutePath() + versionCommandArguments);
             if (versionCheckResult.isCommandSuccessful()) {
                 return versionCheckResult.getCommandStdOutput();
             } else {

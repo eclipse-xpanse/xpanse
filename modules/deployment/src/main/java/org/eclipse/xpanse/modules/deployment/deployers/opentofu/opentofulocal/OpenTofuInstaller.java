@@ -27,6 +27,8 @@ public class OpenTofuInstaller {
     public static final Pattern OPEN_TOFU_VERSION_OUTPUT_PATTERN =
             Pattern.compile("^OpenTofu\\s+v(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\b");
 
+    private static final String OPEN_TOFU_VERSION_COMMAND_ARGUMENT = " version";
+
     private static final String OPEN_TOFU_BINARY_DOWNLOAD_URL_FORMAT =
             "%s/download/v%s/tofu_%s_%s_%s.zip";
     private static final String OPEN_TOFU_EXECUTOR_NAME_PREFIX = "tofu-";
@@ -40,11 +42,11 @@ public class OpenTofuInstaller {
     @Resource private DeployerToolUtils deployerToolUtils;
 
     /**
-     * Find the executable binary path of the Terraform tool that matches the required version. If
-     * no matching executable binary is found, install the Terraform tool with the required version
-     * and then return the path.
+     * Find the executable binary path of the OpenTofu tool that matches the required version. If no
+     * matching executable binary is found, install the OpenTofu tool with the required version and
+     * then return the path.
      *
-     * @param requiredVersion The required version of Terraform tool.
+     * @param requiredVersion The required version of OpenTofu tool.
      * @return The path of the executable binary.
      */
     @Retryable(
@@ -64,13 +66,14 @@ public class OpenTofuInstaller {
         String matchedVersionExecutorPath =
                 deployerToolUtils.getExecutorPathMatchedRequiredVersion(
                         OPEN_TOFU_EXECUTOR_NAME_PREFIX,
+                        OPEN_TOFU_VERSION_COMMAND_ARGUMENT,
                         OPEN_TOFU_VERSION_OUTPUT_PATTERN,
                         this.openTofuInstallDir,
                         requiredOperator,
                         requiredNumber);
         if (StringUtils.isBlank(matchedVersionExecutorPath)) {
             log.info(
-                    "Not found any openTofu executor matched the required version {} from the "
+                    "No openTofu executor matched the required version {} from the "
                             + "openTofu installation dir {}, start to download and install one.",
                     requiredVersion,
                     this.openTofuInstallDir);
@@ -87,7 +90,7 @@ public class OpenTofuInstaller {
      */
     public String getExactVersionOfOpenTofu(String executorPath) {
         return deployerToolUtils.getExactVersionOfExecutor(
-                executorPath, OPEN_TOFU_VERSION_OUTPUT_PATTERN);
+                executorPath, OPEN_TOFU_VERSION_COMMAND_ARGUMENT, OPEN_TOFU_VERSION_OUTPUT_PATTERN);
     }
 
     private String installOpenTofuByRequiredVersion(
@@ -102,7 +105,8 @@ public class OpenTofuInstaller {
                         OPEN_TOFU_BINARY_DOWNLOAD_URL_FORMAT,
                         this.openTofuDownloadBaseUrl,
                         this.openTofuInstallDir);
-        if (deployerToolUtils.checkIfExecutorCanBeExecuted(installedExecutorFile)) {
+        if (deployerToolUtils.checkIfExecutorCanBeExecuted(
+                installedExecutorFile, OPEN_TOFU_VERSION_COMMAND_ARGUMENT)) {
             log.info("OpenTofu with version {}  installed successfully.", installedExecutorFile);
             return installedExecutorFile.getAbsolutePath();
         }

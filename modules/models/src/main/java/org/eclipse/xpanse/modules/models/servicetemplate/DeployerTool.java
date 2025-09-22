@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import java.io.Serial;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.validation.annotation.Validated;
@@ -25,8 +24,6 @@ public class DeployerTool {
     @Hidden @JsonIgnoreProperties
     public static final String DEPLOYER_TOOL_REQUIRED_VERSION_REGEX =
             "^(=|>=|<=)\\s*[vV]?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$";
-
-    @Serial private static final long serialVersionUID = 163119346767744353L;
 
     @NotNull
     @Schema(description = "The type of the deployer which will handle the service deployment.")
