@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class HelmBinaryInstaller {
 
-    private static final String POSIX_USER_INSTALL_FOLDER = ".local";
+    private static final String POSIX_USER_INSTALL_FOLDER = ".local/bin";
     private static final String WINDOWS_USER_INSTALL_FOLDER = "APPDATA";
     private static final String HELM_INSTALL_FOLDER = "helm";
     private static final String HELM_FILE_NAME_IN_TAR_BALL = "/helm";

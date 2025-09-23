@@ -35,6 +35,16 @@ on:
         description: Input the multiple versions of OpenTofu to install
         required: true
         default: '1.6.0,1.7.0,1.8.0'
+      DEFAULT_HELM_VERSION:
+        type: string
+        description: Input the default version of Helm to install
+        required: true
+        default: '3.18.0'
+      HELM_VERSIONS:
+        type: string
+        description: Input the multiple versions of Helm to install
+        required: true
+        default: '3.16.0,3.17.0'
 
 env:
   BOT_USER_NAME: eclipse-xpanse-bot
