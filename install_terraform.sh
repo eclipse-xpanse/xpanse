@@ -1,4 +1,10 @@
 #!/bin/sh
+
+#
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Huawei Inc.
+#
+
 if [ -z "$1" ] || [ -z "$2" ]; then
     echo "Error：TERRAFORM_INSTALL_PATH and DEFAULT_TERRAFORM_VERSION could not be empty."
     exit 1
