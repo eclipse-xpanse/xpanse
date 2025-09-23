@@ -27,6 +27,8 @@ public class TerraformInstaller {
     public static final Pattern TERRAFORM_VERSION_OUTPUT_PATTERN =
             Pattern.compile("^Terraform\\s+v(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\b");
 
+    private static final String TERRAFORM_VERSION_COMMAND_ARGUMENT = " version";
+
     private static final String TERRAFORM_BINARY_DOWNLOAD_URL_FORMAT =
             "%s/%s/terraform_%s_%s_%s.zip";
     private static final String TERRAFORM_EXECUTOR_NAME_PREFIX = "terraform-";
@@ -64,13 +66,14 @@ public class TerraformInstaller {
         String matchedVersionExecutorPath =
                 deployerToolUtils.getExecutorPathMatchedRequiredVersion(
                         TERRAFORM_EXECUTOR_NAME_PREFIX,
+                        TERRAFORM_VERSION_COMMAND_ARGUMENT,
                         TERRAFORM_VERSION_OUTPUT_PATTERN,
                         this.terraformInstallDir,
                         requiredOperator,
                         requiredNumber);
         if (StringUtils.isBlank(matchedVersionExecutorPath)) {
             log.info(
-                    "Not found any terraform executor matched the required version {} from the "
+                    "No terraform executor matched the required version {} from the "
                             + "terraform installation dir {}, start to download and install one.",
                     requiredVersion,
                     this.terraformInstallDir);
@@ -87,7 +90,7 @@ public class TerraformInstaller {
      */
     public String getExactVersionOfTerraform(String executorPath) {
         return deployerToolUtils.getExactVersionOfExecutor(
-                executorPath, TERRAFORM_VERSION_OUTPUT_PATTERN);
+                executorPath, TERRAFORM_VERSION_COMMAND_ARGUMENT, TERRAFORM_VERSION_OUTPUT_PATTERN);
     }
 
     private String installTerraformByRequiredVersion(
@@ -102,7 +105,8 @@ public class TerraformInstaller {
                         TERRAFORM_BINARY_DOWNLOAD_URL_FORMAT,
                         this.terraformDownloadBaseUrl,
                         this.terraformInstallDir);
-        if (deployerToolUtils.checkIfExecutorCanBeExecuted(installedExecutorFile)) {
+        if (deployerToolUtils.checkIfExecutorCanBeExecuted(
+                installedExecutorFile, TERRAFORM_VERSION_COMMAND_ARGUMENT)) {
             log.info("Terraform with version {}  installed successfully.", installedExecutorFile);
             return installedExecutorFile.getAbsolutePath();
         }

@@ -38,6 +38,7 @@ class OpenTofuInstallerTest {
         assertTrue(
                 deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(
                         new File(terraformPath1),
+                        " version",
                         OPEN_TOFU_VERSION_OUTPUT_PATTERN,
                         operatorAndNumber1[0],
                         operatorAndNumber1[1]));
@@ -50,6 +51,7 @@ class OpenTofuInstallerTest {
         assertTrue(
                 deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(
                         new File(terraformPath2),
+                        " version",
                         OPEN_TOFU_VERSION_OUTPUT_PATTERN,
                         operatorAndNumber2[0],
                         operatorAndNumber2[1]));
@@ -62,6 +64,7 @@ class OpenTofuInstallerTest {
         assertTrue(
                 deployerToolUtils.checkIfExecutorIsMatchedRequiredVersion(
                         new File(terraformPath3),
+                        " version",
                         OPEN_TOFU_VERSION_OUTPUT_PATTERN,
                         operatorAndNumber3[0],
                         operatorAndNumber3[1]));

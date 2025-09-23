@@ -7,6 +7,8 @@ package org.eclipse.xpanse.modules.deployment.deployers.deployertools;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
@@ -14,7 +16,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.kohsuke.github.GHRepository;
@@ -41,7 +45,7 @@ public class DeployerToolVersionsFetcher {
     private static final Pattern OFFICIAL_VERSION_PATTERN =
             Pattern.compile("^v(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})$");
 
-    @Value("${deployer.terraform.github.api.endpoint:https//api.github.com}")
+    @Value("${deployer.terraform.github.api.endpoint:https://api.github.com}")
     private String terraformGithubApiEndpoint;
 
     @Value("${deployer.terraform.github.repository:hashicorp/terraform}")
@@ -50,7 +54,7 @@ public class DeployerToolVersionsFetcher {
     @Value("${deployer.terraform.default.supported.versions}")
     private String terraformDefaultVersionsStr;
 
-    @Value("${deployer.opentofu.github.api.endpoint:https//api.github.com}")
+    @Value("${deployer.opentofu.github.api.endpoint:https://api.github.com}")
     private String openTofuGithubApiEndpoint;
 
     @Value("${deployer.opentofu.github.repository:opentofu/opentofu}")
@@ -59,14 +63,16 @@ public class DeployerToolVersionsFetcher {
     @Value("${deployer.opentofu.default.supported.versions}")
     private String openTofuDefaultVersionsStr;
 
-    @Value("${deployer.helm.github.api.endpoint}")
+    @Value("${deployer.helm.github.api.endpoint:https://api.github.com}")
     private String helmGithubApiEndpoint;
 
-    @Value("${deployer.helm.github.repository}")
+    @Value("${deployer.helm.github.repository:helm/helm}")
     private String helmGithubRepository;
 
-    @Value("${deployer.helm.default.supported.versions}")
+    @Value("${deployer.helm.default.supported.versions:}")
     private String helmDefaultVersionsStr;
+
+    @Resource private ProxyConfigurationManager proxyConfigurationManager;
 
     /**
      * Fetch all available versions from the website of deployer.
@@ -93,11 +99,23 @@ public class DeployerToolVersionsFetcher {
                         String.format("Endpoint %s is not reachable.", apiEndpoint));
             }
             String githubRepository = getGithubRepository(deployerKind);
-            GitHub gitHub =
+            GitHubBuilder gitHubBuilder =
                     new GitHubBuilder()
                             .withEndpoint(apiEndpoint)
-                            .withRateLimitHandler(getGithubRateLimitHandler())
-                            .build();
+                            .withRateLimitHandler(getGithubRateLimitHandler());
+            if (proxyConfigurationManager.getHttpsProxyDetails() != null) {
+                gitHubBuilder.withProxy(
+                        new Proxy(
+                                Proxy.Type.HTTP,
+                                new InetSocketAddress(
+                                        proxyConfigurationManager
+                                                .getHttpsProxyDetails()
+                                                .getProxyHost(),
+                                        proxyConfigurationManager
+                                                .getHttpsProxyDetails()
+                                                .getProxyPort())));
+            }
+            GitHub gitHub = gitHubBuilder.build();
             GHRepository repository = gitHub.getRepository(githubRepository);
             PagedIterable<GHTag> tags = repository.listTags();
             tags.forEach(
