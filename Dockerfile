@@ -5,7 +5,7 @@ ENV XPANSE_HOME_DIR=/home/xpanse
 
 # Install dependencies
 RUN apk update && \
-    apk add --no-cache unzip wget openssh-keygen openssl
+    apk add --no-cache unzip wget openssh-keygen openssl bash
 
 # Install mulitple versions of Terraform
 ENV TERRAFORM_INSTALL_PATH=/opt/terraform
