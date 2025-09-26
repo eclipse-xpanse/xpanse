@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 
 ENV XPANSE_USER=xpanse
 ENV XPANSE_HOME_DIR=/home/xpanse
