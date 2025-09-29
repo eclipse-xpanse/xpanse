@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +32,28 @@ public class OpenTofuInstaller {
             "%s/download/v%s/tofu_%s_%s_%s.zip";
     private static final String OPEN_TOFU_EXECUTOR_NAME_PREFIX = "tofu-";
 
-    @Value("${deployer.opentofu.download.base.url:https://github.com/opentofu/opentofu/releases}")
-    private String openTofuDownloadBaseUrl;
+    private final String openTofuDownloadBaseUrl;
 
-    @Value("${deployer.opentofu.install.dir:/opt/opentofu}")
-    private String openTofuInstallDir;
+    private final String openTofuInstallDir;
 
-    @Resource private DeployerToolUtils deployerToolUtils;
+    private final DeployerToolUtils deployerToolUtils;
+
+    /** Constructor method for the bean. */
+    public OpenTofuInstaller(
+            @Value(
+                            "${deployer.opentofu.download.base.url:https://github.com/opentofu/opentofu/releases}")
+                    String openTofuDownloadBaseUrl,
+            @Value("${deployer.opentofu.install.dir}") String openTofuInstallDir,
+            DeployerToolUtils deployerToolUtils) {
+        this.openTofuDownloadBaseUrl = openTofuDownloadBaseUrl;
+        this.deployerToolUtils = deployerToolUtils;
+        // if not specific location is provided, then use the default user's app location.
+        this.openTofuInstallDir =
+                openTofuInstallDir.isBlank()
+                        ? deployerToolUtils.getUserAppInstallFolder().toFile().getAbsolutePath()
+                        : openTofuInstallDir;
+        log.info("Opentofu deployer uses {} for installing binaries", this.openTofuInstallDir);
+    }
 
     /**
      * Find the executable binary path of the OpenTofu tool that matches the required version. If no

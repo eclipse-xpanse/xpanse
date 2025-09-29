@@ -44,6 +44,7 @@ class ServiceTemplateEntityTest {
     private Csp csp;
     private String name;
     private String version;
+    private String shortCode;
     private ServiceHostingType serviceHostingType;
     private Ocl ocl;
     private JsonObjectSchema jsonObjectSchema;
@@ -68,6 +69,7 @@ class ServiceTemplateEntityTest {
         csp = ocl.getCloudServiceProvider().getName();
         name = ocl.getName();
         version = ocl.getVersion();
+        shortCode = ocl.getShortCode();
         serviceProviderContactDetails = ocl.getServiceProviderContactDetails();
         serviceHostingType = ocl.getServiceHostingType();
 
@@ -87,6 +89,7 @@ class ServiceTemplateEntityTest {
         testEntity.setServiceProviderContactDetails(serviceProviderContactDetails);
         testEntity.setServicePolicyList(mockServicePolicyList);
         testEntity.setServiceTemplateHistory(mockServiceTemplateHistory);
+        testEntity.setShortCode(shortCode);
     }
 
     @Test
@@ -109,6 +112,7 @@ class ServiceTemplateEntityTest {
         assertEquals(serviceProviderContactDetails, testEntity.getServiceProviderContactDetails());
         assertEquals(mockServicePolicyList, testEntity.getServicePolicyList());
         assertEquals(mockServiceTemplateHistory, testEntity.getServiceTemplateHistory());
+        assertEquals(shortCode, testEntity.getShortCode());
     }
 
     @Test
@@ -134,6 +138,8 @@ class ServiceTemplateEntityTest {
                         + id
                         + ", name="
                         + name
+                        + ", shortCode="
+                        + shortCode
                         + ", version="
                         + version
                         + ", csp="

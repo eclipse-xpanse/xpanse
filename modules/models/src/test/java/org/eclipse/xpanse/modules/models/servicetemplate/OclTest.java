@@ -29,6 +29,7 @@ class OclTest {
     private final String serviceVendor = "serviceVendor";
     private final String icon = "icon";
     private final String eula = "eula";
+    private final String shortCode = "shortCode";
     private final ServiceHostingType serviceHostingType = ServiceHostingType.SELF;
     @Mock private CloudServiceProvider cloudServiceProvider;
     @Mock private Deployment deployment;
@@ -61,6 +62,7 @@ class OclTest {
         ocl.setServiceConfigurationManage(serviceConfigurationManage);
         ocl.setServiceActions(serviceActions);
         ocl.setServiceObjects(serviceObjects);
+        ocl.setShortCode(shortCode);
     }
 
     @Test
@@ -82,6 +84,7 @@ class OclTest {
         assertEquals(serviceConfigurationManage, ocl.getServiceConfigurationManage());
         assertEquals(serviceActions, ocl.getServiceActions());
         assertEquals(serviceObjects, ocl.getServiceObjects());
+        assertEquals(shortCode, ocl.getShortCode());
     }
 
     @Test
@@ -109,6 +112,8 @@ class OclTest {
                         + version
                         + ", name="
                         + name
+                        + ", shortCode="
+                        + shortCode
                         + ", serviceVersion="
                         + serviceVersion
                         + ", description="

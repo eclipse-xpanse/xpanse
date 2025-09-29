@@ -36,6 +36,7 @@ class UserOrderableServiceVoTest {
     private final UUID id = UUID.randomUUID();
     private final String name = "name";
     private final String version = "version";
+    private final String shortCode = "shortCode";
     private final List<ServiceChangeParameter> configurationParameters = List.of();
     @Mock private Category mockCategory;
     @Mock private Csp mockCsp;
@@ -75,6 +76,7 @@ class UserOrderableServiceVoTest {
         test.setConfigurationParameters(configurationParameters);
         test.setServiceActions(mockServiceActions);
         test.setServiceObjects(mockServiceObjects);
+        test.setShortCode(shortCode);
     }
 
     @Test
@@ -100,6 +102,7 @@ class UserOrderableServiceVoTest {
         assertThat(test.getConfigurationParameters()).isEqualTo(configurationParameters);
         assertThat(test.getServiceActions()).isEqualTo(mockServiceActions);
         assertThat(test.getServiceObjects()).isEqualTo(mockServiceObjects);
+        assertThat(test.getShortCode()).isEqualTo(shortCode);
     }
 
     @Test
@@ -126,6 +129,8 @@ class UserOrderableServiceVoTest {
                         + mockCategory
                         + ", name="
                         + name
+                        + ", shortCode="
+                        + shortCode
                         + ", version="
                         + version
                         + ", csp="

@@ -48,6 +48,12 @@ public class ServiceTemplateDetailVo extends RepresentationModel<ServiceTemplate
 
     @NotNull
     @NotBlank
+    @NotEmpty
+    @Schema(description = "Short code of the service. This will be used in other configurations.")
+    private String shortCode;
+
+    @NotNull
+    @NotBlank
     @Schema(description = "Version of the registered service.")
     private String version;
 

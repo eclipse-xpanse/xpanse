@@ -16,6 +16,8 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -23,11 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.common.systemcmd.SystemCmd;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
@@ -44,6 +48,8 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class DeployerToolUtils {
 
+    private static final String POSIX_USER_INSTALL_FOLDER = ".local/bin";
+    private static final String WINDOWS_USER_INSTALL_FOLDER = "USERPROFILE";
     private static final Pattern DEPLOYER_TOOL_REQUIRED_VERSION_PATTERN =
             Pattern.compile(DeployerTool.DEPLOYER_TOOL_REQUIRED_VERSION_REGEX);
     private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
@@ -139,17 +145,14 @@ public class DeployerToolUtils {
         try {
             if (!parentDir.exists()) {
                 log.info(
-                        "Created the installation dir {} {}.",
+                        "Creating the installation dir {} {}.",
                         parentDir.getAbsolutePath(),
-                        parentDir.mkdirs() ? "successfully" : "failed");
+                        parentDir.mkdirs() ? "is successful" : "failed");
             }
             // download the binary zip file from website into the installation directory
             File terraformZipFile =
                     downloadDeployerToolBinaryZipFile(
-                            binaryDownloadUrlFormat,
-                            downloadBaseUrl,
-                            versionNumber,
-                            installationDir);
+                            binaryDownloadUrlFormat, downloadBaseUrl, versionNumber);
             // extract the executable binary from the zip file
             extractExecutorFromZipFile(terraformZipFile, executorFile, executorNamePrefix);
         } catch (IOException e) {
@@ -159,21 +162,21 @@ public class DeployerToolUtils {
             throw new InvalidDeployerToolException(errorMsg);
         }
         // delete the non-executable files
-        deleteNonExecutorFiles(parentDir, executorNamePrefix);
+        deleteNonExecutorFiles(FileUtils.getTempDirectory(), executorNamePrefix);
         return executorFile;
     }
 
     private File downloadDeployerToolBinaryZipFile(
-            String binaryDownloadUrlFormat,
-            String downloadBaseUrl,
-            String versionNumber,
-            String installationDir)
+            String binaryDownloadUrlFormat, String downloadBaseUrl, String versionNumber)
             throws IOException {
         String binaryDownloadUrl =
                 getExecutorBinaryDownloadUrl(
                         binaryDownloadUrlFormat, downloadBaseUrl, versionNumber);
         String binaryZipFileName = getExecutorBinaryZipFileName(binaryDownloadUrl);
-        File binaryZipFile = new File(installationDir, binaryZipFileName);
+        File binaryZipFile =
+                new File(
+                        Files.createTempDirectory(UUID.randomUUID().toString()).toFile(),
+                        binaryZipFileName);
         URL url = URI.create(binaryDownloadUrl).toURL();
         try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                 FileOutputStream fos = new FileOutputStream(binaryZipFile, false)) {
@@ -202,11 +205,12 @@ public class DeployerToolUtils {
         }
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(binaryZipFile))) {
             log.info("Unzipping deployer tool binary zip file {}", binaryZipFile.getAbsolutePath());
+
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
                     String entryName = entry.getName();
-                    File entryDestinationFile = new File(executorFile.getParentFile(), entryName);
+                    File entryDestinationFile = new File(FileUtils.getTempDirectory(), entryName);
                     if (isExecutorFileInZipForTerraform(entryName, executorNamePrefix)) {
                         extractFile(zis, entryDestinationFile);
                         Files.move(
@@ -499,5 +503,24 @@ public class DeployerToolUtils {
             return "solaris";
         }
         return "Unsupported OS";
+    }
+
+    /**
+     * Function returns the user's default local binary installation folder. It handles both windows
+     * and POSIX operating systems.
+     */
+    public Path getUserAppInstallFolder() {
+        String os = System.getProperty("os.name").toLowerCase();
+        // install binary on the local folders where the users have full access.
+        if (os.contains("win")) {
+            return Paths.get(
+                    System.getenv(WINDOWS_USER_INSTALL_FOLDER),
+                    "AppData",
+                    "Local",
+                    "Microsoft",
+                    "WindowsApps");
+        } else {
+            return Paths.get(FileUtils.getUserDirectoryPath(), POSIX_USER_INSTALL_FOLDER);
+        }
     }
 }

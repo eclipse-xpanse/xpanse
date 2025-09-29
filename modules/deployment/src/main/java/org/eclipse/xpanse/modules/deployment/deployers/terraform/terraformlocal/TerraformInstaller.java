@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -33,13 +33,29 @@ public class TerraformInstaller {
             "%s/%s/terraform_%s_%s_%s.zip";
     private static final String TERRAFORM_EXECUTOR_NAME_PREFIX = "terraform-";
 
-    @Value("${deployer.terraform.download.base.url:https://releases.hashicorp.com/terraform}")
-    private String terraformDownloadBaseUrl;
+    private final String terraformDownloadBaseUrl;
 
-    @Value("${deployer.terraform.install.dir:/opt/terraform}")
-    private String terraformInstallDir;
+    private final String terraformInstallDir;
 
-    @Resource private DeployerToolUtils deployerToolUtils;
+    private final DeployerToolUtils deployerToolUtils;
+
+    /** Constructor method for the bean. */
+    @Autowired
+    public TerraformInstaller(
+            @Value(
+                            "${deployer.terraform.download.base.url:https://releases.hashicorp.com/terraform}")
+                    String terraformDownloadBaseUrl,
+            @Value("${deployer.terraform.install.dir}") String terraformInstallDir,
+            DeployerToolUtils deployerToolUtils) {
+        this.terraformDownloadBaseUrl = terraformDownloadBaseUrl;
+        this.deployerToolUtils = deployerToolUtils;
+        // if not specific location is provided, then use the default user's app location.
+        this.terraformInstallDir =
+                terraformInstallDir.isBlank()
+                        ? deployerToolUtils.getUserAppInstallFolder().toFile().getAbsolutePath()
+                        : terraformInstallDir;
+        log.info("Terraform deployer uses {} for installing binaries", this.terraformInstallDir);
+    }
 
     /**
      * Find the executable binary path of the Terraform tool that matches the required version. If

@@ -26,9 +26,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class HelmBinaryInstaller {
 
-    private static final String POSIX_USER_INSTALL_FOLDER = ".local/bin";
-    private static final String WINDOWS_USER_INSTALL_FOLDER = "APPDATA";
-    private static final String HELM_INSTALL_FOLDER = "helm";
     private static final String HELM_FILE_NAME_IN_TAR_BALL = "/helm";
 
     /** The pattern of the output of the command helm version. */
@@ -61,17 +58,17 @@ public class HelmBinaryInstaller {
             @Value("${deployer.helm.install.dir:}") String helmInstallDir,
             DeployerToolUtils deployerToolUtils,
             DeployerTarFileManage deployerTarFileManage) {
+        this.helmDownloadBaseUrl = helmDownloadBaseUrl;
+        this.deployerToolUtils = deployerToolUtils;
+        this.deployerTarFileManage = deployerTarFileManage;
         if (StringUtils.isBlank(helmInstallDir)) {
-            this.installBaseDirectory = getUserAppInstallFolder();
+            this.installBaseDirectory = deployerToolUtils.getUserAppInstallFolder();
         } else {
             this.installBaseDirectory = Paths.get(helmInstallDir);
         }
         log.info(
                 "helm deployer uses {} for installing binaries",
                 this.installBaseDirectory.toAbsolutePath());
-        this.helmDownloadBaseUrl = helmDownloadBaseUrl;
-        this.deployerToolUtils = deployerToolUtils;
-        this.deployerTarFileManage = deployerTarFileManage;
     }
 
     /**
@@ -136,19 +133,6 @@ public class HelmBinaryInstaller {
                         bestVersionNumber, this.installBaseDirectory.toAbsolutePath());
         log.error(errorMsg);
         throw new InvalidDeployerToolException(errorMsg);
-    }
-
-    private Path getUserAppInstallFolder() {
-        String os = System.getProperty("os.name").toLowerCase();
-        // install binary on the local folders where the users have full access.
-        if (os.contains("win")) {
-            return Paths.get(System.getenv(WINDOWS_USER_INSTALL_FOLDER), HELM_INSTALL_FOLDER);
-        } else {
-            return Paths.get(
-                    System.getProperty("user.home"),
-                    POSIX_USER_INSTALL_FOLDER,
-                    HELM_INSTALL_FOLDER);
-        }
     }
 
     private Path getInstallSubDir(String bestVersion) {

@@ -4,6 +4,8 @@ version: 1.0
 category: others
 # The Service provided by the ISV, the name will be shown on the console as a service.
 name: helm-test
+# The short code of the service provided by ISV. This will be used by the cloud provider internally.
+shortCode: test
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: 1.0.0
 # For the users may have more than one service, the @serviceVendor can be used to separate the clusters.
