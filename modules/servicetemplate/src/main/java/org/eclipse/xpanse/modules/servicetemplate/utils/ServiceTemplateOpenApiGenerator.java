@@ -333,7 +333,7 @@ public class ServiceTemplateOpenApiGenerator {
         }
         // CHECKSTYLE OFF: LineLength
         return String.format(
-                """
+"""
 {
     "openapi": "3.0.1",
     "info": {
@@ -671,7 +671,8 @@ public class ServiceTemplateOpenApiGenerator {
     private String getSecuritySchemes() {
         if (Objects.nonNull(zitadelIdentityProviderService)) {
             // CHECKSTYLE OFF: Indentation
-            return """
+            return
+"""
 ,
 "securitySchemes": {
     "OAuth2Flow": {
@@ -744,7 +745,7 @@ public class ServiceTemplateOpenApiGenerator {
             if (!CollectionUtils.isEmpty(availabilityZones)) {
                 availabilityZonesSchemaStr =
                         String.format(
-                                """
+"""
                    ,
                    "availabilityZones": {
                        "required": %s,

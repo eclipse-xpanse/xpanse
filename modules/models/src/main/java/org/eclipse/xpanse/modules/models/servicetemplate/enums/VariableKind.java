@@ -15,7 +15,8 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 @Schema(
         enumAsRef = true,
         description =
-                """
+                // CHECKSTYLE OFF: Indentation
+"""
 - `fix_env`: Values for variable of this type are defined by the managed service provider\s
 in the OCL template. Runtime will inject it to deployer as environment variables.\s
 This variable is not visible to the end user.
@@ -40,7 +41,9 @@ End user cannot see or change this variable.
 - `env_variable`: Value to this variable is read by runtime\s
 (it can read from other sources, e.g., OS env variables)\s
 and injected as a regular variable to the deployer.\s
-End user cannot see or change this variable.""")
+End user cannot see or change this variable.\
+""")
+// CHECKSTYLE ON: Indentation
 public enum VariableKind {
     FIX_ENV("fix_env"),
     FIX_VARIABLE("fix_variable"),

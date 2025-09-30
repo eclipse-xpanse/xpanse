@@ -33,11 +33,11 @@
         <module>plugins</module>
     </modules>
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <spring-boot.version>3.5.6</spring-boot.version>
         <spring.retry.version>2.0.11</spring.retry.version>
         <junit-jupiter.version>5.13.4</junit-jupiter.version>
-        <lombok.version>1.18.38</lombok.version>
+        <lombok.version>1.18.42</lombok.version>
         <checkstyle-maven-plugin.version>3.6.0</checkstyle-maven-plugin.version>
         <logbook.version>3.12.3</logbook.version>
         <wiremock.version>3.13.1</wiremock.version>
@@ -86,7 +86,7 @@
         <swagger.core.v3.version>2.2.37</swagger.core.v3.version>
         <hcl4j.version>0.9.8</hcl4j.version>
         <jackson.datatype.jsr310.version>2.20.0</jackson.datatype.jsr310.version>
-        <spotless.version>2.46.1</spotless.version>
+        <spotless.version>3.0.0</spotless.version>
         <liquibase.version>4.31.1</liquibase.version>
         <org.reflections.version>0.10.2</org.reflections.version>
         <docker.java.version>3.6.0</docker.java.version>
@@ -333,6 +333,7 @@
                     <compilerArgs>
                         <arg>-Xlint:deprecation</arg>
                         <arg>-Werror</arg>
+                        <arg>-proc:full</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

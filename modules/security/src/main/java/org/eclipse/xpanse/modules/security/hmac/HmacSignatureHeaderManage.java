@@ -128,9 +128,10 @@ public class HmacSignatureHeaderManage {
     // multiple headers, URL and the request payload data separated by new line.
     private String getSignatureValue(String headersInSignature, String webhookUrl, String payload) {
         return """
-               %s
-               %s
-               %s"""
+        %s
+        %s
+        %s\
+        """
                 .formatted(headersInSignature, webhookUrl, payload);
     }
 
