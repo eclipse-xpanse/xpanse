@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerTarFileManage;
+import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerTarGzFileManage;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -48,7 +48,7 @@ public class HelmBinaryInstaller {
 
     @Resource private DeployerToolUtils deployerToolUtils;
 
-    @Resource private DeployerTarFileManage deployerTarFileManage;
+    @Resource private DeployerTarGzFileManage deployerTarGzFileManage;
 
     /** Constructor for component. */
     @Autowired
@@ -57,10 +57,10 @@ public class HelmBinaryInstaller {
                     String helmDownloadBaseUrl,
             @Value("${deployer.helm.install.dir:}") String helmInstallDir,
             DeployerToolUtils deployerToolUtils,
-            DeployerTarFileManage deployerTarFileManage) {
+            DeployerTarGzFileManage deployerTarGzFileManage) {
         this.helmDownloadBaseUrl = helmDownloadBaseUrl;
         this.deployerToolUtils = deployerToolUtils;
-        this.deployerTarFileManage = deployerTarFileManage;
+        this.deployerTarGzFileManage = deployerTarGzFileManage;
         if (StringUtils.isBlank(helmInstallDir)) {
             this.installBaseDirectory = deployerToolUtils.getUserAppInstallFolder();
         } else {
@@ -117,7 +117,7 @@ public class HelmBinaryInstaller {
                 deployerToolUtils.getBestAvailableVersionMatchingRequiredVersion(
                         DeployerKind.HELM, requiredOperator, requiredNumber);
         Path helmInstaller = getInstallSubDir(bestVersionNumber);
-        deployerTarFileManage.downloadExtractAndCopyFileToInstallerLocation(
+        deployerTarGzFileManage.downloadExtractAndCopyFileToInstallerLocation(
                 HELM_FILE_NAME_IN_TAR_BALL,
                 DeployerKind.HELM,
                 getDownloadFileUrl(bestVersionNumber),
