@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +19,6 @@ import lombok.Data;
 /** The result of the deployment. */
 @Data
 public class DeployResult {
-
-    @Serial private static final long serialVersionUID = 2268625554476607215L;
 
     @NotNull
     @Schema(description = "The id of the service order task.")
