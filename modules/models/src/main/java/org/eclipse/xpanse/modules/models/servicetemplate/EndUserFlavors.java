@@ -7,7 +7,6 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,7 +21,6 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class EndUserFlavors extends ServiceFlavor {
-    @Serial private static final long serialVersionUID = 8791396314490350992L;
 
     @NotNull
     @Schema(description = "The flavors of the orderable service.")

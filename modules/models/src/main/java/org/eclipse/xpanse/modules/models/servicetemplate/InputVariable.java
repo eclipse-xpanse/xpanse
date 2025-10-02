@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.models.servicetemplate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serial;
 import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
@@ -18,8 +17,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableKind;
 /** Defines for the deploy variable. */
 @Data
 public class InputVariable {
-
-    @Serial private static final long serialVersionUID = 4180720936204332115L;
 
     @NotNull
     @NotBlank

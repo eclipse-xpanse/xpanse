@@ -20,7 +20,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.io.Serial;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -43,7 +42,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Data
 public class ServiceOrderEntity {
 
-    @Serial private static final long serialVersionUID = 8759112775257851274L;
+    private static final long serialVersionUID = 8759112775257851274L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
