@@ -94,7 +94,7 @@
         <apache.commons.compress.version>1.28.0</apache.commons.compress.version>
         <spring.ai.version>1.0.0</spring.ai.version>
         <spotbugs.plugin.version>4.9.3.2</spotbugs.plugin.version>
-        <spotbugs.annotations.version>4.9.4</spotbugs.annotations.version>
+        <spotbugs.annotations.version>4.9.6</spotbugs.annotations.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
