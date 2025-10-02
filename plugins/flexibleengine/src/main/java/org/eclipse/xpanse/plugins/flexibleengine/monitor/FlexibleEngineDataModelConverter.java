@@ -353,16 +353,16 @@ public class FlexibleEngineDataModelConverter {
         MonitorResourceType type = null;
         switch (metricName) {
             case FlexibleEngineMonitorMetrics.CPU_USAGE,
-                            FlexibleEngineMonitorMetrics.CPU_UTILIZED ->
+                    FlexibleEngineMonitorMetrics.CPU_UTILIZED ->
                     type = MonitorResourceType.CPU;
             case FlexibleEngineMonitorMetrics.MEM_UTILIZED,
-                            FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE ->
+                    FlexibleEngineMonitorMetrics.MEM_USED_IN_PERCENTAGE ->
                     type = MonitorResourceType.MEM;
             case FlexibleEngineMonitorMetrics.VM_NET_BIT_RECV,
-                            FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_IN ->
+                    FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_IN ->
                     type = MonitorResourceType.VM_NETWORK_INCOMING;
             case FlexibleEngineMonitorMetrics.VM_NET_BIT_SENT,
-                            FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT ->
+                    FlexibleEngineMonitorMetrics.VM_NETWORK_BANDWIDTH_OUT ->
                     type = MonitorResourceType.VM_NETWORK_OUTGOING;
             default -> {}
         }

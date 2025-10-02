@@ -36,7 +36,7 @@ class InstanceNetworkResourceTest {
 
     InstanceNetworkResource getInstanceByJson() throws Exception {
         String json =
-                """
+"""
 {
     "creator": "91ac6b28dc5f4a519422f3154bc4d14d:2c2c51522b0342fc94254c1b3afb95b5",
     "started_at": "2023-06-05T11:10:18.130486+00:00",
