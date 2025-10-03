@@ -306,6 +306,7 @@ public class ServiceTemplateManage {
         newServiceTemplate.setVersion(getSemverVersion(ocl.getServiceVersion()).getVersion());
         newServiceTemplate.setServiceHostingType(ocl.getServiceHostingType());
         newServiceTemplate.setServiceProviderContactDetails(ocl.getServiceProviderContactDetails());
+        newServiceTemplate.setShortCode(ocl.getShortCode());
         if (!userServiceHelper.isAuthEnable()) {
             newServiceTemplate.setServiceVendor(ocl.getServiceVendor());
         } else {

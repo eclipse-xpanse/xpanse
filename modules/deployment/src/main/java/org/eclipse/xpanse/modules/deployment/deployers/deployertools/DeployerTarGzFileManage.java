@@ -15,6 +15,7 @@ import java.util.zip.GZIPInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.helm.exceptions.HelmBinaryInstallationFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class DeployerTarFileManage {
+public class DeployerTarGzFileManage {
 
     /**
      * Main method to download, unpack and copy the binary.
@@ -41,6 +42,7 @@ public class DeployerTarFileManage {
             String url,
             Path installPath) {
         Path parentInstallFolder = installPath.getParent();
+        Path temporaryFileForTarGz;
         try {
             if (parentInstallFolder != null) {
                 Files.createDirectories(parentInstallFolder);
@@ -48,17 +50,18 @@ public class DeployerTarFileManage {
                 throw new HelmBinaryInstallationFailedException(
                         "installation path provided is null.");
             }
-            Path tarGz = Files.createTempFile(deployerKind.toValue(), ".tar.gz");
+            temporaryFileForTarGz = Files.createTempFile(deployerKind.toValue(), ".tar.gz");
 
             // Downloads the tar file and write it directly to temp file.
             try (InputStream in = URI.create(url).toURL().openStream()) {
                 log.info("Downloading binaries from {}", url);
-                Files.copy(in, tarGz, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(in, temporaryFileForTarGz, StandardCopyOption.REPLACE_EXISTING);
             }
             // Chain streams - gzip is streamed as input to tar and
             // then tar extracts only the helm binary form the tar ball.
             try (TarArchiveInputStream tarIn =
-                    new TarArchiveInputStream(new GZIPInputStream(Files.newInputStream(tarGz)))) {
+                    new TarArchiveInputStream(
+                            new GZIPInputStream(Files.newInputStream(temporaryFileForTarGz)))) {
                 TarArchiveEntry entry;
                 // gets the next file in the tar ball.
                 while ((entry = tarIn.getNextEntry()) != null) {
@@ -76,5 +79,6 @@ public class DeployerTarFileManage {
             log.error(e.getMessage(), e);
             throw new HelmBinaryInstallationFailedException(e.getMessage());
         }
+        FileUtils.deleteQuietly(temporaryFileForTarGz.toFile());
     }
 }

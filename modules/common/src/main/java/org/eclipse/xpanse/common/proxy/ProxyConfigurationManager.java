@@ -6,7 +6,9 @@
 
 package org.eclipse.xpanse.common.proxy;
 
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -55,6 +57,21 @@ public final class ProxyConfigurationManager {
         } else {
             this.httpsProxyDetails = null;
         }
+    }
+
+    /**
+     * This returns the JDK's proxy object. The clients can directly use it without the need to
+     * construct it again.
+     */
+    public Proxy getHttpsProxy() {
+        if (Objects.nonNull(httpsProxyDetails)) {
+            return new Proxy(
+                    Proxy.Type.HTTP,
+                    new InetSocketAddress(
+                            this.getHttpsProxyDetails().getProxyHost(),
+                            this.getHttpsProxyDetails().getProxyPort()));
+        }
+        return null;
     }
 
     /**

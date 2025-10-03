@@ -57,6 +57,9 @@ public class ServiceTemplateEntity extends CreatedModifiedTime {
     @Column(name = "NAME", nullable = false)
     private String name;
 
+    @Column(name = "SHORT_CODE", nullable = false)
+    private String shortCode;
+
     @Column(name = "VERSION", nullable = false)
     private String version;
 

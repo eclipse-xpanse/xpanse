@@ -13,7 +13,7 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngi
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.util.Collections;
 import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
-import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerTarFileManage;
+import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerTarGzFileManage;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolVersionsFetcher;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.cache.DeployerToolVersionsCache;
@@ -33,7 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         classes = {
             DeployerToolUtils.class,
             HelmBinaryInstaller.class,
-            DeployerTarFileManage.class,
+            DeployerTarGzFileManage.class,
             DeployerToolVersionsFetcher.class,
             DeployerToolVersionsCacheManager.class,
             DeployerToolVersionsCache.class,

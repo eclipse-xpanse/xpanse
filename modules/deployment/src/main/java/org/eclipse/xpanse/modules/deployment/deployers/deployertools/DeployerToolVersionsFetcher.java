@@ -7,8 +7,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.deployertools;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
@@ -20,6 +18,7 @@ import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
+import org.eclipse.xpanse.modules.models.common.exceptions.RateLimiterException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTag;
@@ -30,7 +29,6 @@ import org.kohsuke.github.PagedIterable;
 import org.kohsuke.github.connector.GitHubConnectorResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -103,17 +101,9 @@ public class DeployerToolVersionsFetcher {
                     new GitHubBuilder()
                             .withEndpoint(apiEndpoint)
                             .withRateLimitHandler(getGithubRateLimitHandler());
-            if (proxyConfigurationManager.getHttpsProxyDetails() != null) {
-                gitHubBuilder.withProxy(
-                        new Proxy(
-                                Proxy.Type.HTTP,
-                                new InetSocketAddress(
-                                        proxyConfigurationManager
-                                                .getHttpsProxyDetails()
-                                                .getProxyHost(),
-                                        proxyConfigurationManager
-                                                .getHttpsProxyDetails()
-                                                .getProxyPort())));
+            if (proxyConfigurationManager.getHttpsProxy() != null) {
+                log.info("using proxy to connect to github");
+                gitHubBuilder.withProxy(proxyConfigurationManager.getHttpsProxy());
             }
             GitHub gitHub = gitHubBuilder.build();
             GHRepository repository = gitHub.getRepository(githubRepository);
@@ -126,6 +116,9 @@ public class DeployerToolVersionsFetcher {
                             allVersions.add(version.substring(1));
                         }
                     });
+        } catch (RateLimiterException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             String errorMsg =
                     String.format(
@@ -175,16 +168,27 @@ public class DeployerToolVersionsFetcher {
         };
     }
 
-    private boolean isEndpointReachable(String endpoint) throws IOException {
+    private boolean isEndpointReachable(String endpoint) {
         try {
             URL url = URI.create(endpoint).toURL();
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection =
+                    Objects.nonNull(proxyConfigurationManager.getHttpsProxy())
+                            ? (HttpURLConnection)
+                                    url.openConnection(proxyConfigurationManager.getHttpsProxy())
+                            : (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(10000);
             connection.setRequestMethod(HttpMethod.HEAD.name());
-            return connection.getResponseCode() == HttpStatus.OK.value();
+            if (isNoRetriesAllowed(connection.getResponseCode(), connection.getResponseMessage())) {
+                throw new RateLimiterException(connection.getResponseMessage());
+            }
+            return true;
+        } catch (RateLimiterException e) {
+            log.error(e.getMessage(), e);
+            throw e;
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new IOException("Failed to connect to the endpoint: " + endpoint);
+            throw new ClientApiCallFailedException(
+                    "Failed to connect to the endpoint: " + endpoint);
         }
     }
 
@@ -216,8 +220,17 @@ public class DeployerToolVersionsFetcher {
                                 "GitHub API rate limit exceeded. "
                                         + "Rate limit: %s, remaining: %s, reset time: %s",
                                 limit, remaining, reset);
-                throw new ClientApiCallFailedException(errorMsg);
+                throw new RateLimiterException(errorMsg);
             }
         };
+    }
+
+    private boolean isNoRetriesAllowed(int responseCode, String responseMessage) {
+        if (responseCode == 429) {
+            return true;
+        } else {
+            return responseMessage.toLowerCase().contains("rate limit exceeded")
+                    && responseMessage.toLowerCase().contains("too many requests");
+        }
     }
 }
