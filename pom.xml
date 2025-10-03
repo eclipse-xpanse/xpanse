@@ -92,7 +92,7 @@
         <docker.java.version>3.6.0</docker.java.version>
         <pebble.version>3.2.4</pebble.version>
         <apache.commons.compress.version>1.28.0</apache.commons.compress.version>
-        <spring.ai.version>1.0.0</spring.ai.version>
+        <spring.ai.version>1.0.3</spring.ai.version>
         <spotbugs.plugin.version>4.9.3.2</spotbugs.plugin.version>
         <spotbugs.annotations.version>4.9.4</spotbugs.annotations.version>
     </properties>
