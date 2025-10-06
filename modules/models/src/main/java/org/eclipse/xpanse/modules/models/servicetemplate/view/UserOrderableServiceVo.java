@@ -50,6 +50,11 @@ public class UserOrderableServiceVo extends RepresentationModel<UserOrderableSer
 
     @NotNull
     @NotBlank
+    @Schema(description = "Short code of the service.")
+    private String shortCode;
+
+    @NotNull
+    @NotBlank
     @Schema(description = "The version of the orderable service.")
     private String version;
 

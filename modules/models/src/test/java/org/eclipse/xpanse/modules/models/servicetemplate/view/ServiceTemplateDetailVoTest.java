@@ -51,6 +51,7 @@ class ServiceTemplateDetailVoTest {
             ServiceTemplateRegistrationState.APPROVED;
     private final Boolean isAvailableInCatalog = true;
     private final Boolean isReviewInProgress = false;
+    private final String shortCode = "test";
     @Mock private ServiceChangeManage serviceConfigurationManage;
     @Mock private ServiceProviderContactDetails serviceProviderContactDetails;
     @Mock private List<Region> regions;
@@ -89,6 +90,7 @@ class ServiceTemplateDetailVoTest {
         test.setServiceConfigurationManage(serviceConfigurationManage);
         test.setServiceActions(serviceActions);
         test.setServiceObjects(serviceObjects);
+        test.setShortCode(shortCode);
     }
 
     @Test
@@ -114,6 +116,7 @@ class ServiceTemplateDetailVoTest {
         assertEquals(eula, test.getEula());
         assertEquals(serviceConfigurationManage, test.getServiceConfigurationManage());
         assertEquals(serviceActions, test.getServiceActions());
+        assertEquals(shortCode, test.getShortCode());
     }
 
     @Test
@@ -137,6 +140,8 @@ class ServiceTemplateDetailVoTest {
                         + uuid
                         + ", name="
                         + name
+                        + ", shortCode="
+                        + shortCode
                         + ", version="
                         + version
                         + ", csp="

@@ -5,12 +5,12 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerZipFileManage;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,14 +32,37 @@ public class OpenTofuInstaller {
     private static final String OPEN_TOFU_BINARY_DOWNLOAD_URL_FORMAT =
             "%s/download/v%s/tofu_%s_%s_%s.zip";
     private static final String OPEN_TOFU_EXECUTOR_NAME_PREFIX = "tofu-";
+    private static final String OPENTOFU_EXECUTOR_NAME_IN_INSTALLER_ZIP = "tofu";
 
-    @Value("${deployer.opentofu.download.base.url:https://github.com/opentofu/opentofu/releases}")
-    private String openTofuDownloadBaseUrl;
+    private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
+    private static final String OS_ARCH = System.getProperty("os.arch").toLowerCase();
 
-    @Value("${deployer.opentofu.install.dir:/opt/opentofu}")
-    private String openTofuInstallDir;
+    private final String openTofuDownloadBaseUrl;
 
-    @Resource private DeployerToolUtils deployerToolUtils;
+    private final String openTofuInstallDir;
+
+    private final DeployerToolUtils deployerToolUtils;
+
+    private final DeployerZipFileManage deployerZipFileManage;
+
+    /** Constructor method for the bean. */
+    public OpenTofuInstaller(
+            @Value(
+                            "${deployer.opentofu.download.base.url:https://github.com/opentofu/opentofu/releases}")
+                    String openTofuDownloadBaseUrl,
+            @Value("${deployer.opentofu.install.dir}") String openTofuInstallDir,
+            DeployerToolUtils deployerToolUtils,
+            DeployerZipFileManage deployerZipFileManage) {
+        this.openTofuDownloadBaseUrl = openTofuDownloadBaseUrl;
+        this.deployerToolUtils = deployerToolUtils;
+        this.deployerZipFileManage = deployerZipFileManage;
+        // if not specific location is provided, then use the default user's app location.
+        this.openTofuInstallDir =
+                openTofuInstallDir.isBlank()
+                        ? deployerToolUtils.getUserAppInstallFolder().toFile().getAbsolutePath()
+                        : openTofuInstallDir;
+        log.info("Opentofu deployer uses {} for installing binaries", this.openTofuInstallDir);
+    }
 
     /**
      * Find the executable binary path of the OpenTofu tool that matches the required version. If no
@@ -99,11 +122,11 @@ public class OpenTofuInstaller {
                 deployerToolUtils.getBestAvailableVersionMatchingRequiredVersion(
                         DeployerKind.OPEN_TOFU, requiredOperator, requiredNumber);
         File installedExecutorFile =
-                deployerToolUtils.installDeployerToolWithVersion(
-                        OPEN_TOFU_EXECUTOR_NAME_PREFIX,
-                        bestVersionNumber,
-                        OPEN_TOFU_BINARY_DOWNLOAD_URL_FORMAT,
-                        this.openTofuDownloadBaseUrl,
+                deployerZipFileManage.downloadZipExtractAndInstall(
+                        OPENTOFU_EXECUTOR_NAME_IN_INSTALLER_ZIP,
+                        getExecutorNameWithVersion(
+                                OPEN_TOFU_EXECUTOR_NAME_PREFIX, bestVersionNumber),
+                        getExecutorBinaryDownloadUrl(bestVersionNumber),
                         this.openTofuInstallDir);
         if (deployerToolUtils.checkIfExecutorCanBeExecuted(
                 installedExecutorFile, OPEN_TOFU_VERSION_COMMAND_ARGUMENT)) {
@@ -116,5 +139,36 @@ public class OpenTofuInstaller {
                         bestVersionNumber, this.openTofuInstallDir);
         log.error(errorMsg);
         throw new InvalidDeployerToolException(errorMsg);
+    }
+
+    private String getExecutorBinaryDownloadUrl(String versionNumber) {
+        return String.format(
+                OPEN_TOFU_BINARY_DOWNLOAD_URL_FORMAT,
+                this.openTofuDownloadBaseUrl,
+                versionNumber,
+                versionNumber,
+                getOperatingSystemCode(),
+                OS_ARCH);
+    }
+
+    private String getOperatingSystemCode() {
+        if (OS_NAME.contains("windows")) {
+            return "windows";
+        } else if (OS_NAME.contains("linux")) {
+            return "linux";
+        } else if (OS_NAME.contains("mac")) {
+            return "darwin";
+        } else if (OS_NAME.contains("freebsd")) {
+            return "freebsd";
+        } else if (OS_NAME.contains("openbsd")) {
+            return "openbsd";
+        } else if (OS_NAME.contains("solaris") || OS_NAME.contains("sunos")) {
+            return "solaris";
+        }
+        return "Unsupported OS";
+    }
+
+    public String getExecutorNameWithVersion(String executorNamePrefix, String versionNumber) {
+        return executorNamePrefix + versionNumber;
     }
 }

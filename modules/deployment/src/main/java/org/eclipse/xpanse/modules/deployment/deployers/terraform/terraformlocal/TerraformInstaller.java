@@ -5,17 +5,16 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
+import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerZipFileManage;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 /** Defines methods for handling terraform with required version. */
@@ -32,14 +31,38 @@ public class TerraformInstaller {
     private static final String TERRAFORM_BINARY_DOWNLOAD_URL_FORMAT =
             "%s/%s/terraform_%s_%s_%s.zip";
     private static final String TERRAFORM_EXECUTOR_NAME_PREFIX = "terraform-";
+    private static final String TERRAFORM_EXECUTOR_NAME_IN_INSTALLER_ZIP = "terraform";
 
-    @Value("${deployer.terraform.download.base.url:https://releases.hashicorp.com/terraform}")
-    private String terraformDownloadBaseUrl;
+    private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
+    private static final String OS_ARCH = System.getProperty("os.arch").toLowerCase();
 
-    @Value("${deployer.terraform.install.dir:/opt/terraform}")
-    private String terraformInstallDir;
+    private final String terraformDownloadBaseUrl;
 
-    @Resource private DeployerToolUtils deployerToolUtils;
+    private final String terraformInstallDir;
+
+    private final DeployerToolUtils deployerToolUtils;
+
+    private final DeployerZipFileManage deployerZipFileManage;
+
+    /** Constructor method for the bean. */
+    @Autowired
+    public TerraformInstaller(
+            @Value(
+                            "${deployer.terraform.download.base.url:https://releases.hashicorp.com/terraform}")
+                    String terraformDownloadBaseUrl,
+            @Value("${deployer.terraform.install.dir}") String terraformInstallDir,
+            DeployerToolUtils deployerToolUtils,
+            DeployerZipFileManage deployerZipFileManage) {
+        this.terraformDownloadBaseUrl = terraformDownloadBaseUrl;
+        this.deployerToolUtils = deployerToolUtils;
+        this.deployerZipFileManage = deployerZipFileManage;
+        // if not specific location is provided, then use the default user's app location.
+        this.terraformInstallDir =
+                terraformInstallDir.isBlank()
+                        ? deployerToolUtils.getUserAppInstallFolder().toFile().getAbsolutePath()
+                        : terraformInstallDir;
+        log.info("Terraform deployer uses {} for installing binaries", this.terraformInstallDir);
+    }
 
     /**
      * Find the executable binary path of the Terraform tool that matches the required version. If
@@ -49,10 +72,6 @@ public class TerraformInstaller {
      * @param requiredVersion The required version of Terraform tool.
      * @return The path of the executable binary.
      */
-    @Retryable(
-            retryFor = InvalidDeployerToolException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
     public String getExecutorPathThatMatchesRequiredVersion(String requiredVersion) {
         if (StringUtils.isBlank(requiredVersion)) {
             log.info("No required version of terraform is specified, use the default terraform.");
@@ -99,11 +118,11 @@ public class TerraformInstaller {
                 deployerToolUtils.getBestAvailableVersionMatchingRequiredVersion(
                         DeployerKind.TERRAFORM, requiredOperator, requiredNumber);
         File installedExecutorFile =
-                deployerToolUtils.installDeployerToolWithVersion(
-                        TERRAFORM_EXECUTOR_NAME_PREFIX,
-                        bestVersionNumber,
-                        TERRAFORM_BINARY_DOWNLOAD_URL_FORMAT,
-                        this.terraformDownloadBaseUrl,
+                deployerZipFileManage.downloadZipExtractAndInstall(
+                        TERRAFORM_EXECUTOR_NAME_IN_INSTALLER_ZIP,
+                        getExecutorNameWithVersion(
+                                TERRAFORM_EXECUTOR_NAME_PREFIX, bestVersionNumber),
+                        getExecutorBinaryDownloadUrl(bestVersionNumber),
                         this.terraformInstallDir);
         if (deployerToolUtils.checkIfExecutorCanBeExecuted(
                 installedExecutorFile, TERRAFORM_VERSION_COMMAND_ARGUMENT)) {
@@ -116,5 +135,36 @@ public class TerraformInstaller {
                         bestVersionNumber, this.terraformInstallDir);
         log.error(errorMsg);
         throw new InvalidDeployerToolException(errorMsg);
+    }
+
+    private String getExecutorBinaryDownloadUrl(String versionNumber) {
+        return String.format(
+                TERRAFORM_BINARY_DOWNLOAD_URL_FORMAT,
+                this.terraformDownloadBaseUrl,
+                versionNumber,
+                versionNumber,
+                getOperatingSystemCode(),
+                OS_ARCH);
+    }
+
+    private String getOperatingSystemCode() {
+        if (OS_NAME.contains("windows")) {
+            return "windows";
+        } else if (OS_NAME.contains("linux")) {
+            return "linux";
+        } else if (OS_NAME.contains("mac")) {
+            return "darwin";
+        } else if (OS_NAME.contains("freebsd")) {
+            return "freebsd";
+        } else if (OS_NAME.contains("openbsd")) {
+            return "openbsd";
+        } else if (OS_NAME.contains("solaris") || OS_NAME.contains("sunos")) {
+            return "solaris";
+        }
+        return "Unsupported OS";
+    }
+
+    public String getExecutorNameWithVersion(String executorNamePrefix, String versionNumber) {
+        return executorNamePrefix + versionNumber;
     }
 }

@@ -6,17 +6,9 @@
 package org.eclipse.xpanse.modules.deployment.deployers.deployertools;
 
 import jakarta.annotation.Resource;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,9 +17,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.common.systemcmd.SystemCmd;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
@@ -44,10 +35,10 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class DeployerToolUtils {
 
+    private static final String POSIX_USER_INSTALL_FOLDER = ".local/bin";
+    private static final String WINDOWS_USER_INSTALL_FOLDER = "USERPROFILE";
     private static final Pattern DEPLOYER_TOOL_REQUIRED_VERSION_PATTERN =
             Pattern.compile(DeployerTool.DEPLOYER_TOOL_REQUIRED_VERSION_REGEX);
-    private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
-    private static final String OS_ARCH = System.getProperty("os.arch").toLowerCase();
     private final SystemCmd systemCmd = new SystemCmd();
     @Resource private DeployerToolVersionsCacheManager versionsCacheManager;
 
@@ -114,145 +105,6 @@ public class DeployerToolUtils {
             }
         }
         return null;
-    }
-
-    /**
-     * Install the executor with specific version into the path.
-     *
-     * @param executorNamePrefix executor name prefix
-     * @param versionNumber version number
-     * @param binaryDownloadUrlFormat binary download url format
-     * @param downloadBaseUrl download base url
-     * @param installationDir installation directory
-     * @return executor path
-     */
-    public File installDeployerToolWithVersion(
-            String executorNamePrefix,
-            String versionNumber,
-            String binaryDownloadUrlFormat,
-            String downloadBaseUrl,
-            String installationDir) {
-        // Install the executor with specific version into the path.
-        String executorName = getExecutorNameWithVersion(executorNamePrefix, versionNumber);
-        File executorFile = new File(installationDir, executorName);
-        File parentDir = executorFile.getParentFile();
-        try {
-            if (!parentDir.exists()) {
-                log.info(
-                        "Created the installation dir {} {}.",
-                        parentDir.getAbsolutePath(),
-                        parentDir.mkdirs() ? "successfully" : "failed");
-            }
-            // download the binary zip file from website into the installation directory
-            File terraformZipFile =
-                    downloadDeployerToolBinaryZipFile(
-                            binaryDownloadUrlFormat,
-                            downloadBaseUrl,
-                            versionNumber,
-                            installationDir);
-            // extract the executable binary from the zip file
-            extractExecutorFromZipFile(terraformZipFile, executorFile, executorNamePrefix);
-        } catch (IOException e) {
-            String errorMsg =
-                    String.format("Failed to install deployer tool with version %s.", executorName);
-            log.error(errorMsg, e);
-            throw new InvalidDeployerToolException(errorMsg);
-        }
-        // delete the non-executable files
-        deleteNonExecutorFiles(parentDir, executorNamePrefix);
-        return executorFile;
-    }
-
-    private File downloadDeployerToolBinaryZipFile(
-            String binaryDownloadUrlFormat,
-            String downloadBaseUrl,
-            String versionNumber,
-            String installationDir)
-            throws IOException {
-        String binaryDownloadUrl =
-                getExecutorBinaryDownloadUrl(
-                        binaryDownloadUrlFormat, downloadBaseUrl, versionNumber);
-        String binaryZipFileName = getExecutorBinaryZipFileName(binaryDownloadUrl);
-        File binaryZipFile = new File(installationDir, binaryZipFileName);
-        URL url = URI.create(binaryDownloadUrl).toURL();
-        try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-                FileOutputStream fos = new FileOutputStream(binaryZipFile, false)) {
-            log.info(
-                    "Downloading deployer tool binary file from {} to {}",
-                    url,
-                    binaryZipFile.getAbsolutePath());
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            log.info(
-                    "Downloaded deployer tool binary file from {} to {} successfully.",
-                    url,
-                    binaryZipFile.getAbsolutePath());
-        }
-        return binaryZipFile;
-    }
-
-    private void extractExecutorFromZipFile(
-            File binaryZipFile, File executorFile, String executorNamePrefix) throws IOException {
-        if (!binaryZipFile.exists()) {
-            String errorMsg =
-                    String.format(
-                            "Deployer tool binary zip file %s not found.",
-                            binaryZipFile.getAbsolutePath());
-            log.error(errorMsg);
-            throw new IOException(errorMsg);
-        }
-        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(binaryZipFile))) {
-            log.info("Unzipping deployer tool binary zip file {}", binaryZipFile.getAbsolutePath());
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
-                if (!entry.isDirectory()) {
-                    String entryName = entry.getName();
-                    File entryDestinationFile = new File(executorFile.getParentFile(), entryName);
-                    if (isExecutorFileInZipForTerraform(entryName, executorNamePrefix)) {
-                        extractFile(zis, entryDestinationFile);
-                        Files.move(
-                                entryDestinationFile.toPath(),
-                                executorFile.toPath(),
-                                StandardCopyOption.REPLACE_EXISTING);
-                        log.info(
-                                "Unzipped deployer tool file {} and extract the executor {} "
-                                        + "successfully.",
-                                binaryZipFile.getAbsolutePath(),
-                                executorFile.getAbsolutePath());
-                    }
-                }
-            }
-        }
-    }
-
-    private boolean isExecutorFileInZipForTerraform(String entryName, String executorNamePrefix) {
-        executorNamePrefix = executorNamePrefix.substring(0, executorNamePrefix.length() - 1);
-        return entryName.startsWith(executorNamePrefix);
-    }
-
-    private void extractFile(ZipInputStream zis, File destinationFile) throws IOException {
-        try (BufferedOutputStream bos =
-                new BufferedOutputStream(new FileOutputStream(destinationFile))) {
-            byte[] bytesIn = new byte[4096];
-            int read;
-            while ((read = zis.read(bytesIn)) != -1) {
-                bos.write(bytesIn, 0, read);
-            }
-        }
-    }
-
-    private void deleteNonExecutorFiles(File dir, String executorNamePrefix) {
-        File[] files = dir.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteNonExecutorFiles(file, executorNamePrefix);
-                } else {
-                    if (!file.getName().startsWith(executorNamePrefix) && !file.delete()) {
-                        log.warn("Failed to delete file {}.", file.getAbsolutePath());
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -451,53 +303,26 @@ public class DeployerToolUtils {
         return false;
     }
 
-    /**
-     * Get executor name with version.
-     *
-     * @param versionNumber version number
-     * @return binary file name
-     */
-    public String getExecutorNameWithVersion(String executorNamePrefix, String versionNumber) {
-        return executorNamePrefix + versionNumber;
-    }
-
-    /**
-     * Get whole download url of the executor binary file.
-     *
-     * @param binaryDownloadUrlFormat binary download url format
-     * @param downloadBaseUrl download base url
-     * @param versionNumber version number
-     * @return whole download url of the executor binary file
-     */
-    private String getExecutorBinaryDownloadUrl(
-            String binaryDownloadUrlFormat, String downloadBaseUrl, String versionNumber) {
-        return String.format(
-                binaryDownloadUrlFormat,
-                downloadBaseUrl,
-                versionNumber,
-                versionNumber,
-                getOperatingSystemCode(),
-                OS_ARCH);
-    }
-
-    private String getExecutorBinaryZipFileName(String executorBinaryDownloadUrl) {
+    public String getFileNameFromDownloadUrl(String executorBinaryDownloadUrl) {
         return executorBinaryDownloadUrl.substring(executorBinaryDownloadUrl.lastIndexOf("/") + 1);
     }
 
-    private String getOperatingSystemCode() {
-        if (OS_NAME.contains("windows")) {
-            return "windows";
-        } else if (OS_NAME.contains("linux")) {
-            return "linux";
-        } else if (OS_NAME.contains("mac")) {
-            return "darwin";
-        } else if (OS_NAME.contains("freebsd")) {
-            return "freebsd";
-        } else if (OS_NAME.contains("openbsd")) {
-            return "openbsd";
-        } else if (OS_NAME.contains("solaris") || OS_NAME.contains("sunos")) {
-            return "solaris";
+    /**
+     * Function returns the user's default local binary installation folder. It handles both windows
+     * and POSIX operating systems.
+     */
+    public Path getUserAppInstallFolder() {
+        String os = System.getProperty("os.name").toLowerCase();
+        // install binary on the local folders where the users have full access.
+        if (os.contains("win")) {
+            return Paths.get(
+                    System.getenv(WINDOWS_USER_INSTALL_FOLDER),
+                    "AppData",
+                    "Local",
+                    "Microsoft",
+                    "WindowsApps");
+        } else {
+            return Paths.get(FileUtils.getUserDirectoryPath(), POSIX_USER_INSTALL_FOLDER);
         }
-        return "Unsupported OS";
     }
 }
