@@ -68,17 +68,17 @@ public class ServiceDeploymentEntityHandler {
         }
         return switch (serviceOrderType) {
             case MODIFY,
-                            PORT,
-                            DESTROY,
-                            LOCK_CHANGE,
-                            CONFIG_CHANGE,
-                            SERVICE_ACTION,
-                            SERVICE_START,
-                            SERVICE_STOP,
-                            SERVICE_RESTART,
-                            OBJECT_CREATE,
-                            OBJECT_MODIFY,
-                            OBJECT_DELETE ->
+                    PORT,
+                    DESTROY,
+                    LOCK_CHANGE,
+                    CONFIG_CHANGE,
+                    SERVICE_ACTION,
+                    SERVICE_START,
+                    SERVICE_STOP,
+                    SERVICE_RESTART,
+                    OBJECT_CREATE,
+                    OBJECT_MODIFY,
+                    OBJECT_DELETE ->
                     state == ServiceDeploymentState.DEPLOY_SUCCESS
                             || state == ServiceDeploymentState.MODIFICATION_SUCCESSFUL
                             || state == ServiceDeploymentState.MODIFICATION_FAILED;

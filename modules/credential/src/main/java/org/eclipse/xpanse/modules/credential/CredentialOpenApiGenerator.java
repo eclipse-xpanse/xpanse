@@ -297,7 +297,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
         String variablesExampleStr = getVariablesExampleStr(credentialVariables.getVariables());
         // CHECKSTYLE OFF: LineLength
         return String.format(
-                """
+"""
 {
     "openapi": "3.0.1",
     "info": {
@@ -589,7 +589,8 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
     private String getSecuritySchemes() {
         if (Objects.nonNull(zitadelIdentityProviderService)) {
             // CHECKSTYLE OFF: Indentation
-            return """
+            return
+"""
 ,
 "securitySchemes": {
     "OAuth2Flow": {
