@@ -87,7 +87,7 @@
         <hcl4j.version>0.9.8</hcl4j.version>
         <jackson.datatype.jsr310.version>2.20.0</jackson.datatype.jsr310.version>
         <spotless.version>3.0.0</spotless.version>
-        <liquibase.version>4.31.1</liquibase.version>
+        <liquibase.version>5.0.1</liquibase.version>
         <org.reflections.version>0.10.2</org.reflections.version>
         <docker.java.version>3.6.0</docker.java.version>
         <pebble.version>3.2.4</pebble.version>
