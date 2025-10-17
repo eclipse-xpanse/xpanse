@@ -57,6 +57,8 @@ class FlavorsWithPriceTest {
                         + mockModificationImpact
                         + ", isDowngradeAllowed="
                         + isDowngradeAllowed
+                        + ", apiMethodConfig="
+                        + null
                         + ")";
         assertThat(test.toString()).isEqualTo(result);
     }

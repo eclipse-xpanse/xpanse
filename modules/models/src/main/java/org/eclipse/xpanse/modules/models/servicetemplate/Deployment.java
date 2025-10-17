@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
+import org.eclipse.xpanse.modules.models.servicetemplate.controller.ControllerApiMethods;
 import org.hibernate.validator.constraints.UniqueElements;
 
 /** Defines the Deployment. */
@@ -46,4 +47,10 @@ public class Deployment {
                     "Deployment information for Helm based deployments. "
                             + "This is mandatory if the deployer kind is Helm")
     private HelmDeployment helmDeployment;
+
+    @Schema(
+            description =
+                    "controller methods for service deployment. "
+                            + "There can be one method for deploy, destroy, modify, port, etc.")
+    ControllerApiMethods controllerApiMethods;
 }

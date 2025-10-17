@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 
-/** Defines the tool of service object manage. */
+/** Defines what's being done with the object. */
 public enum ObjectActionType {
     CREATE("create"),
     UPDATE("update"),

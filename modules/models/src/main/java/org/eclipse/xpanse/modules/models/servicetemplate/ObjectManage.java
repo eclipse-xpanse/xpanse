@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.servicetemplate.controller.ControllerApiMethods;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ObjectActionType;
 import org.hibernate.validator.constraints.UniqueElements;
 
@@ -41,4 +42,10 @@ public class ObjectManage {
                             + " All parameters are put together to build a JSON 'object' with each"
                             + " parameter as a property of this object.")
     private List<ObjectParameter> objectParameters;
+
+    @Schema(
+            description =
+                    "controller methods for service objects. There can be one or more methods to"
+                            + " manage objects and one method to read objects.")
+    private ControllerApiMethods controllerApiMethods;
 }

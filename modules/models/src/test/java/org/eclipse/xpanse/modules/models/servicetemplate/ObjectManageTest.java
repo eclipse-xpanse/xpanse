@@ -71,6 +71,8 @@ public class ObjectManageTest {
                         + objectHandlerScript
                         + ", objectParameters="
                         + objectParameters
+                        + ", controllerApiMethods="
+                        + null
                         + ")";
         assertEquals(expectedString, objectManage.toString());
     }

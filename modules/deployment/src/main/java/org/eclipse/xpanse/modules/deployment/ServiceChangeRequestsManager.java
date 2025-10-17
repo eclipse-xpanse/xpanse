@@ -45,7 +45,7 @@ public class ServiceChangeRequestsManager {
     /**
      * creates one service order and then one or more service change requests in database depending
      * on the service template configuration and the changes requested by the user. The method also
-     * creates a corresponding service order for the same. .
+     * creates a corresponding service order for the same.
      *
      * @param serviceDeploymentEntity serviceDeploymentEntity for which the change is requested.
      * @param originalRequestObject full request object received from the user.

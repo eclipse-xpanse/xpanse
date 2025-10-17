@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.billing.Billing;
 import org.eclipse.xpanse.modules.models.common.enums.Category;
+import org.eclipse.xpanse.modules.models.servicetemplate.controller.ServiceControllerConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.validators.DeploymentConfigurationConstraint;
 
@@ -40,6 +41,9 @@ public class Ocl {
     @NotEmpty
     @Schema(description = "The name of the managed service")
     private String name;
+
+    @Schema(description = "Optional custom API configuration if CSP generates the controller app.")
+    private ServiceControllerConfig serviceControllerConfig;
 
     @NotNull
     @NotBlank
@@ -81,6 +85,13 @@ public class Ocl {
     @DeploymentConfigurationConstraint
     @Schema(description = "The deployment of the managed service")
     private Deployment deployment;
+
+    @Valid
+    @NotNull
+    @Schema(
+            description =
+                    "describes service resource state management such as start, stop and restart.")
+    private ResourceStateManage resourceStateManage;
 
     @Valid
     @NotNull

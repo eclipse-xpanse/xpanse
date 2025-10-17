@@ -57,6 +57,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.InputValidateDiagnostics;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.eclipse.xpanse.modules.servicetemplate.controller.ServiceControllerApiManage;
 import org.eclipse.xpanse.modules.servicetemplate.price.BillingConfigValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.IconProcessorUtil;
@@ -91,6 +92,7 @@ public class ServiceTemplateManage {
     @Resource private PluginManager pluginManager;
     @Resource private ServiceConfigurationParameterValidator serviceConfigurationParameterValidator;
     @Resource private ServiceActionTemplateValidator serviceActionTemplateValidator;
+    @Resource private ServiceControllerApiManage serviceControllerApiManage;
 
     /**
      * Register service template using the ocl.
@@ -109,6 +111,7 @@ public class ServiceTemplateManage {
         List<ServiceTemplateEntity> existingServiceTemplates =
                 templateStorage.listServiceTemplates(queryModel);
         validateServiceVersion(ocl.getServiceVersion(), existingServiceTemplates);
+        serviceControllerApiManage.generateServiceControllerOpenApiDoc(ocl);
         boolean isAutoApprovedEnabled = isAutoApproveEnabledForCsp(ocl);
         ServiceTemplateEntity serviceTemplateToRegister = createServiceTemplateEntity(ocl);
         updateServiceTemplateRegistrationState(serviceTemplateToRegister, isAutoApprovedEnabled);
@@ -136,6 +139,7 @@ public class ServiceTemplateManage {
                 getServiceTemplateDetails(id, userOperation, true, false);
         ServiceTemplateRegistrationState registrationState =
                 serviceTemplateToUpdate.getServiceTemplateRegistrationState();
+        serviceControllerApiManage.generateServiceControllerOpenApiDoc(ocl);
         if (registrationState == ServiceTemplateRegistrationState.APPROVED) {
             return updateServiceTemplateWhenRegistrationApproved(
                     ocl, serviceTemplateToUpdate, isRemoveFromCatalogUntilApproved);

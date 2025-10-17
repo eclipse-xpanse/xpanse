@@ -48,7 +48,7 @@ public class ObjectParameter {
     @Schema(description = "Sensitive scope of service config parameter storage")
     private SensitiveScope sensitiveScope = SensitiveScope.ALWAYS;
 
-    @Schema(description = "idicates whether the object parameter is mandatory.")
+    @Schema(description = "indicates whether the object parameter is mandatory.")
     private Boolean isMandatory = true;
 
     @Schema(description = "the type of the linkedObject.")

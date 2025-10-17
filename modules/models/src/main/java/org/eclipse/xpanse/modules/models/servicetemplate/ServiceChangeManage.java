@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.models.servicetemplate.controller.ControllerApiMethods;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ConfigurationManagerTool;
 import org.hibernate.validator.constraints.UniqueElements;
 
@@ -38,4 +39,10 @@ public class ServiceChangeManage {
     @UniqueElements
     @Schema(description = "The collection of service configuration parameters.")
     private List<ServiceChangeParameter> configurationParameters;
+
+    @Schema(
+            description =
+                    "controller methods for service configuration. One method for changing service"
+                            + " configuration and one method for reading current configuration.")
+    private ControllerApiMethods controllerApiMethods;
 }
