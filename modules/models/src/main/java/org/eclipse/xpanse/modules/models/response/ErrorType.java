@@ -87,7 +87,9 @@ public enum ErrorType {
     SERVICE_ACTION_CHANGE_ORDER_ALREADY_EXISTS("Service Action Change Order Already Exists"),
     INVALID_SERVICE_OBJECT_REQUEST("Invalid Service Object Request"),
     SERVICE_OBJECT_NOT_FOUND("Service Object Not Found"),
-    SERVICE_OBJECT_CHANGE_ORDER_ALREADY_EXISTS("Service Object Change Order Already Exists");
+    SERVICE_OBJECT_CHANGE_ORDER_ALREADY_EXISTS("Service Object Change Order Already Exists"),
+    INVALID_SERVICE_CONTROLLER_CONFIGURATION(
+            "Service controller API configuration provided is invalid");
 
     private final String value;
 

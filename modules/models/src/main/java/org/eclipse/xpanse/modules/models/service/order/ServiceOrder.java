@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Order details")
 public class ServiceOrder {
 
     @NotNull

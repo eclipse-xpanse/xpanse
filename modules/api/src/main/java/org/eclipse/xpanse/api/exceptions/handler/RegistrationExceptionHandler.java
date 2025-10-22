@@ -17,6 +17,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServi
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidServiceVersionException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.InvalidValueSchemaException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.MandatoryValueMissingForFixedVariablesException;
+import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceControllerConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
@@ -161,5 +162,15 @@ public class RegistrationExceptionHandler {
         return getErrorResponse(
                 ErrorType.REVIEW_SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED,
                 Collections.singletonList(ex.getMessage()));
+    }
+
+    /** Exception handler for ReviewServiceTemplateRequestNotAllowed. */
+    @ExceptionHandler({ServiceControllerConfigurationInvalidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleReviewServiceTemplateRequestNotAllowed(
+            ServiceControllerConfigurationInvalidException ex) {
+        return getErrorResponse(
+                ErrorType.REVIEW_SERVICE_TEMPLATE_REQUEST_NOT_ALLOWED, ex.getErrorReasons());
     }
 }

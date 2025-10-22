@@ -31,6 +31,7 @@ import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.statemanagement.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.servicechange.exceptions.ServiceStateNotControllable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
@@ -63,6 +64,7 @@ public class ServiceStateManager {
     public ServiceOrder startService(UUID serviceId) {
         ServiceOrderType taskType = ServiceOrderType.SERVICE_START;
         ServiceDeploymentEntity service = getDeployedServiceAndValidateState(serviceId, taskType);
+        checkIfServiceIsControllable(service);
         OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(service.getCsp());
         ServiceStateManageRequest startRequest = getServiceManagerRequest(service);
         ServiceOrderEntity serviceOrderEntity = createNewManagementTask(taskType, service);
@@ -123,6 +125,7 @@ public class ServiceStateManager {
     public ServiceOrder stopService(UUID serviceId) {
         ServiceOrderType taskType = ServiceOrderType.SERVICE_STOP;
         ServiceDeploymentEntity service = getDeployedServiceAndValidateState(serviceId, taskType);
+        checkIfServiceIsControllable(service);
         OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(service.getCsp());
         ServiceStateManageRequest stopRequest = getServiceManagerRequest(service);
         ServiceOrderEntity serviceOrderEntity = createNewManagementTask(taskType, service);
@@ -175,6 +178,7 @@ public class ServiceStateManager {
     public ServiceOrder restartService(UUID serviceId) {
         ServiceOrderType taskType = ServiceOrderType.SERVICE_RESTART;
         ServiceDeploymentEntity service = getDeployedServiceAndValidateState(serviceId, taskType);
+        checkIfServiceIsControllable(service);
         OrchestratorPlugin plugin = pluginManager.getOrchestratorPlugin(service.getCsp());
         ServiceStateManageRequest restartRequest = getServiceManagerRequest(service);
         ServiceOrderEntity serviceOrderEntity = createNewManagementTask(taskType, service);
@@ -331,5 +335,14 @@ public class ServiceStateManager {
 
     private String getUserId() {
         return userServiceHelper.getCurrentUserId();
+    }
+
+    private void checkIfServiceIsControllable(ServiceDeploymentEntity service) {
+        if (!service.getServiceTemplateEntity()
+                .getOcl()
+                .getResourceStateManage()
+                .getIsResourceStateControllable()) {
+            throw new ServiceStateNotControllable("This service state cannot be controlled.");
+        }
     }
 }

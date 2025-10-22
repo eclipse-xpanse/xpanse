@@ -75,5 +75,10 @@
             <artifactId>semver4j</artifactId>
             <version>${semver4j.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser-v3</artifactId>
+            <version>${swagger.parser.version}</version>
+        </dependency>
     </dependencies>
 </project>

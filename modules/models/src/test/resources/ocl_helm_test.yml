@@ -236,6 +236,8 @@ serviceProviderContactDetails:
   phones: [ "011-13422222222","022-13344444444" ]
   chats: [ "test1234","test1235" ]
   websites: [ "https://hw.com","https://hwcloud.com" ]
+resourceStateManage:
+  isResourceStateControllable: true
 deployment:
   deployerTool:
     # kind, Supported values are terraform, opentofu.

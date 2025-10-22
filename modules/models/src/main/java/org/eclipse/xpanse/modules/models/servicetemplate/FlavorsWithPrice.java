@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Data;
+import org.eclipse.xpanse.modules.models.servicetemplate.controller.ApiMethodConfig;
 import org.hibernate.validator.constraints.UniqueElements;
 
 /** Defines for service flavors with price. */
@@ -29,6 +30,9 @@ public class FlavorsWithPrice {
     @NotNull
     @Schema(description = "Whether the downgrading is allowed, default value: true.")
     private Boolean isDowngradeAllowed = true;
+
+    @Schema(description = "Flavor change method config in the service controller API layer.")
+    private ApiMethodConfig apiMethodConfig;
 
     public Boolean isDowngradeAllowed() {
         return isDowngradeAllowed;

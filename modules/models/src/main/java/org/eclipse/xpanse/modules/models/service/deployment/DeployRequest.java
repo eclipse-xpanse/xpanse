@@ -19,6 +19,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 
 /** Request body for service deployment. */
 @Data
+@Schema(description = "data model for creating new service deployments.")
 public class DeployRequest {
 
     /** The category of the Service. */

@@ -112,6 +112,8 @@ class OclTest {
                         + version
                         + ", name="
                         + name
+                        + ", serviceControllerConfig="
+                        + null
                         + ", shortCode="
                         + shortCode
                         + ", serviceVersion="
@@ -126,6 +128,8 @@ class OclTest {
                         + cloudServiceProvider
                         + ", deployment="
                         + deployment
+                        + ", resourceStateManage="
+                        + null
                         + ", flavors="
                         + flavors
                         + ", billing="

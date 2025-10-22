@@ -350,6 +350,8 @@ serviceConfigurationManage:
         isDataLost: true
         isServiceInterrupted: true
       isReadOnly: false
+resourceStateManage:
+  isResourceStateControllable: true
 deployment:
   deployerTool:
     # kind, Supported values are terraform, opentofu.
