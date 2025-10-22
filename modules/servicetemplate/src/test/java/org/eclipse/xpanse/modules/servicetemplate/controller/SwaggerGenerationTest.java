@@ -37,6 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             ServiceInputVariablesJsonSchemaGenerator.class,
             ActionMethodsManage.class,
             ObjectMethodsManage.class,
+            FlavorMethodsManage.class,
         })
 public class SwaggerGenerationTest {
 
