@@ -34,6 +34,7 @@ public class ServiceControllerApiManage {
     private final ConfigurationMethodsManage configurationMethodsManage;
     private final ActionMethodsManage actionMethodsManage;
     private final ObjectMethodsManage objectMethodsManage;
+    private final FlavorMethodsManage flavorMethodsManage;
 
     /** Bean constructor. */
     @Autowired
@@ -42,12 +43,14 @@ public class ServiceControllerApiManage {
             ServiceStateMethodsManage serviceStateMethodsManage,
             ConfigurationMethodsManage configurationMethodsManage,
             ActionMethodsManage actionMethodsManage,
-            ObjectMethodsManage objectMethodsManage) {
+            ObjectMethodsManage objectMethodsManage,
+            FlavorMethodsManage flavorMethodsManage) {
         this.deploymentMethodsManage = deploymentMethodsManage;
         this.serviceStateMethodsManage = serviceStateMethodsManage;
         this.configurationMethodsManage = configurationMethodsManage;
         this.actionMethodsManage = actionMethodsManage;
         this.objectMethodsManage = objectMethodsManage;
+        this.flavorMethodsManage = flavorMethodsManage;
     }
 
     /**
@@ -96,6 +99,10 @@ public class ServiceControllerApiManage {
         }
         if (ocl.getServiceObjects() != null) {
             objectMethodsManage.addServiceObjectMethods(openApi, ocl, components);
+        }
+        if (ocl.getFlavors().getControllerApiMethods() != null
+                && ocl.getFlavors().getControllerApiMethods().getApiWriteMethodConfigs() != null) {
+            flavorMethodsManage.addFlavorMethods(openApi, ocl, components);
         }
         try {
             SwaggerParseResult parsed =
