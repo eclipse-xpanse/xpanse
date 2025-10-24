@@ -77,7 +77,7 @@ public class ActionMethodsManage {
             Components components) {
         schemaUtils.addTagIfUnique(apiWriteMethodConfig.getServiceGroupName(), openApi);
         Operation operation = operationManage.buildOperationForWriteMethods(apiWriteMethodConfig);
-        operation.addExtension(X_ACTION_NAME, serviceAction.getType());
+        operation.addExtension(X_ACTION_NAME, serviceAction.getName());
         if (apiWriteMethodConfig.getMethodParameters() != null) {
             apiWriteMethodConfig
                     .getMethodParameters()

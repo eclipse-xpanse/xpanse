@@ -35,7 +35,7 @@ public class ApiReadMethodConfig extends ApiMethodConfig {
     @Schema(
             description =
                     "Describes if the response is a list/array. When true, the service returns the"
-                            + " lsit of the response body defined in the responseBody.")
+                            + " list of the response body defined in the responseBody.")
     @NotNull
     private Boolean isArray = false;
 }

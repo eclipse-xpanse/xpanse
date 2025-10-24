@@ -5,6 +5,7 @@
 
 package org.eclipse.xpanse.modules.servicetemplate.controller;
 
+import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import jakarta.inject.Inject;
 import java.io.IOException;
@@ -38,6 +39,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             ActionMethodsManage.class,
             ObjectMethodsManage.class,
             FlavorMethodsManage.class,
+            CommonReadMethodsManage.class,
         })
 public class SwaggerGenerationTest {
 
@@ -52,6 +54,7 @@ public class SwaggerGenerationTest {
                         URI.create("file:src/test/resources/ocl_test_swagger_generate.yml")
                                 .toURL());
         OpenAPI openAPI = serviceControllerApiManage.generateServiceControllerOpenApiDoc(ocl);
+        Yaml.mapper().writeValueAsString(openAPI);
         Assertions.assertNotNull(openAPI);
     }
 }
