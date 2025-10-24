@@ -14,6 +14,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.BooleanSchema;
 import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.ObjectSchema;
@@ -24,11 +25,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceConfigurationVariablesJsonSchemaGenerator;
 import org.eclipse.xpanse.modules.models.service.utils.ServiceInputVariablesJsonSchemaGenerator;
+import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.MappableFields;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.controller.ServiceControllerConfig;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.CommonReadDomainType;
+import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableDataType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceControllerConfigurationInvalidException;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +42,9 @@ import org.springframework.stereotype.Component;
 
 /** Utility methods for creating OpenAPI schema. */
 @Slf4j
+@SuppressWarnings("rawtypes")
 @Component
 public class SchemaUtils {
-
-    private static final List<String> FIELDS_TO_BE_REMOVED =
-            List.of("serviceName", "category", "objectType", "actionName");
 
     private final ServiceConfigurationVariablesJsonSchemaGenerator
             serviceConfigurationVariablesJsonSchemaGenerator;
@@ -62,13 +66,15 @@ public class SchemaUtils {
             Class<?> parentType,
             Components components,
             List<String> fieldsToBeRemoved,
-            String customOriginalTypeName) {
+            String customOriginalTypeName,
+            Ocl ocl) {
         Map<String, Schema> schemas = ModelConverters.getInstance().read(parentType);
         Schema<?> parentSchema = schemas.get(parentType.getSimpleName());
         parentSchema.setTitle(customOriginalTypeName);
         parentSchema.setName(customOriginalTypeName);
         components.addSchemas(customOriginalTypeName, parentSchema);
         addAllChildTypesAsSchemas(components, parentType, fieldsToBeRemoved);
+        replaceGlobalChildPropertiesWithCustomTypeNames(parentSchema, ocl, components);
         return parentSchema;
     }
 
@@ -86,27 +92,89 @@ public class SchemaUtils {
     }
 
     /**
+     * In the OCL, the service provider declares data models and names for different domains of the
+     * service. But there are some common services which span across multiple domains. In such
+     * cases, the property names must be taken from OCL from respective domains and update the type
+     * correspondingly. Example - For configuration management, service provider can define specific
+     * names. But when there is a common method for searching all services, it returns also the
+     * configuration of the corresponding service. This must map to the custom names and types
+     * provided for the configuration of that service.
+     */
+    private void replaceGlobalChildPropertiesWithCustomTypeNames(
+            Schema<?> parentSchema, Ocl ocl, Components components) {
+        updateChildNamesAndSchemaRef(
+                parentSchema, ocl, components, ServiceConfigurationDetails.class);
+        updateChildNamesAndSchemaRef(parentSchema, ocl, components, ServiceOrderDetails.class);
+    }
+
+    private void updateChildNamesAndSchemaRef(
+            Schema<?> schema, Ocl ocl, Components components, Class<?> globalNameToBeReplaced) {
+        // case where the property name is not same as globalTypeName. So we just search using
+        // reference and update only the reference. Name itself is not updated.
+        if (schema.get$ref() != null
+                && schema.get$ref()
+                        .equals(getComponentSchemaPath(globalNameToBeReplaced.getSimpleName()))) {
+            schema.set$ref(
+                    getComponentSchemaPath(
+                            mapInternalTypeToCustomType(globalNameToBeReplaced, ocl)));
+            components.getSchemas().remove(globalNameToBeReplaced.getSimpleName());
+            return;
+        }
+        // case where schema has no ref as above or no further properties.
+        if (schema.getProperties() == null) {
+            return;
+        }
+        // case where property name is same as the global type name. In this case, the property name
+        // as well as the schema must be updated.
+        if (schema.getProperties()
+                .containsKey(StringUtils.uncapitalize(globalNameToBeReplaced.getSimpleName()))) {
+            schema.getProperties()
+                    .remove(StringUtils.uncapitalize(globalNameToBeReplaced.getSimpleName()));
+            schema.getProperties()
+                    .put(
+                            StringUtils.uncapitalize(getCustomTypeNameForConfiguration(ocl)),
+                            new Schema()
+                                    .$ref(
+                                            getComponentSchemaPath(
+                                                    getCustomTypeNameForConfiguration(ocl))));
+            components.getSchemas().remove(globalNameToBeReplaced.getSimpleName());
+            return;
+        }
+
+        for (Map.Entry<String, Schema> entry : schema.getProperties().entrySet()) {
+            Schema value = entry.getValue();
+            if (value.getItems() != null) {
+                updateChildNamesAndSchemaRef(
+                        value.getItems(), ocl, components, globalNameToBeReplaced);
+            }
+            if (value.getProperties() != null) {
+                updateChildNamesAndSchemaRef(value, ocl, components, globalNameToBeReplaced);
+            }
+        }
+    }
+
+    /**
      * This method provides the fields/properties that are not necessary when the service is
      * deployed as a separate controller. The fields to be removed depends on the service template
      * data.
      */
     public List<String> getAllFieldsToBeRemoved(ServiceControllerConfig serviceControllerConfig) {
-        List<String> valuesToBeRemoved = new ArrayList<>(FIELDS_TO_BE_REMOVED);
+        List<String> valuesToBeRemoved = new ArrayList<>(XpanseGlobalNames.FIELDS_TO_BE_REMOVED);
         if (serviceControllerConfig.getServiceControllerMode().getIsRegionSpecificController()) {
-            valuesToBeRemoved.add("region");
+            valuesToBeRemoved.add(XpanseGlobalNames.REGION_PROPERTY_NAME);
         }
         if (!serviceControllerConfig
                 .getServiceControllerMode()
                 .getIsSupportsMultipleHostingTypes()) {
-            valuesToBeRemoved.add("serviceHostingType");
+            valuesToBeRemoved.add(XpanseGlobalNames.SERVICE_HOSTING_TYPE_PROPERTY_NAME);
         }
         if (!serviceControllerConfig
                 .getServiceControllerMode()
                 .getIsSupportsMultipleCloudProviders()) {
-            valuesToBeRemoved.add("csp");
+            valuesToBeRemoved.add(XpanseGlobalNames.CSP_TYPE_PROPERTY_NAME);
         }
         if (!serviceControllerConfig.getServiceControllerMode().getIsSupportsMultipleVersions()) {
-            valuesToBeRemoved.add("version");
+            valuesToBeRemoved.add(XpanseGlobalNames.SERVICE_VERSION_PROPERTY_NAME);
         }
         return valuesToBeRemoved;
     }
@@ -116,39 +184,45 @@ public class SchemaUtils {
      * as a separate controller. The fields to be removed depends on the service template data.
      */
     public void removeValuesToBeSuppressed(Schema<?> schema, List<String> valuesToBeRemoved) {
-        if (schema == null) {
+        if (schema == null || schema.getProperties() == null) {
             return;
         }
-        Map<String, Schema> properties = schema.getProperties();
-        valuesToBeRemoved.forEach(
-                field -> {
-                    if (properties != null) {
-                        properties.remove(field);
-                        if (schema.getRequired() != null) {
-                            schema.getRequired().removeIf(property -> property.equals(field));
-                        } // remove old key
+        valuesToBeRemoved.forEach(field -> removeFieldFromSchema(schema, field));
+    }
+
+    private void removeFieldFromSchema(Schema<?> schema, String fieldName) {
+        log.info("removing values to be suppressed for {} from {}", fieldName, schema.getName());
+        if (schema.getProperties() != null) {
+            if (schema.getProperties().containsKey(fieldName)) {
+                schema.getProperties().remove(fieldName);
+                if (schema.getRequired() != null) {
+                    schema.getRequired().removeIf(property -> property.equals(fieldName));
+                }
+                // if the entire property is removed, no need to loop the child elements.
+            } else {
+                for (Schema<?> child : schema.getProperties().values()) {
+                    if (child.getProperties() != null) {
+                        removeFieldFromSchema(child, fieldName);
                     }
-                    if (properties != null) {
-                        for (Schema<?> child : properties.values()) {
-                            removeValuesToBeSuppressed(child, valuesToBeRemoved);
-                        }
-                    }
-                });
+                }
+            }
+        }
     }
 
     private Schema<?> buildDynamicObjectSchema(
-            String description, Map<String, Map<String, Object>> fields) {
+            String description, Map<String, Map<String, Object>> fields, String schemaName) {
 
-        Schema<?> parent = new ObjectSchema().description(description);
+        Schema<?> parent = new ObjectSchema().description(description).name(schemaName);
 
         for (var entry : fields.entrySet()) {
             Map<String, Object> attributes = entry.getValue();
 
             Schema<?> s = new Schema<>();
-            switch ((String) attributes.get("type")) {
-                case "string" -> s = new StringSchema();
-                case "number" -> s = new IntegerSchema();
-                case "boolean" -> s = new BooleanSchema();
+            switch (VariableDataType.getByValue(attributes.get("type").toString())) {
+                case VariableDataType.STRING -> s = new StringSchema();
+                case VariableDataType.NUMBER -> s = new IntegerSchema();
+                case VariableDataType.BOOLEAN -> s = new BooleanSchema();
+                case VariableDataType.ARRAY -> s = new ArraySchema();
                 default -> new ObjectSchema().description(description);
             }
 
@@ -169,26 +243,42 @@ public class SchemaUtils {
             }
             parent.addProperty(entry.getKey(), s);
         }
-
         parent.setAdditionalProperties(false);
         return parent;
     }
 
+    /** Method manages all properties that are related to xpanse's variable definition in OCL. */
+    public void generateOpenApiSchemaForXpanseVariableDefinitions(
+            Ocl ocl, Schema<?> originalSchema) {
+        log.info("generating schema for variable definitions");
+        generateServiceDeploymentVariables(ocl, originalSchema);
+        generateSchemaForParameterVariables(
+                ocl, originalSchema, XpanseGlobalNames.CONFIGURATION_VALUES_PROPERTY_NAME);
+        generateSchemaForParameterVariables(
+                ocl, originalSchema, XpanseGlobalNames.ACTION_INPUTS_PROPERTY_NAME);
+        generateSchemaForParameterVariables(
+                ocl, originalSchema, XpanseGlobalNames.SERVICE_OBJECT_INPUTS_PROPERTY_NAME);
+    }
+
     /** This method converts the deployment variables into a OpenAPI schema object. */
-    public void generateServiceDeploymentVariables(Ocl ocl, Schema<?> originalSchema) {
-        if (originalSchema.getProperties().get("serviceRequestProperties") != null) {
+    private void generateServiceDeploymentVariables(Ocl ocl, Schema<?> originalSchema) {
+        if (originalSchema.getProperties().get(XpanseGlobalNames.SERVICE_INPUTS_PROPERTY_NAME)
+                != null) {
             JsonObjectSchema jsonObjectSchema =
                     serviceInputVariablesJsonSchemaGenerator.buildJsonSchemaOfInputVariables(
                             ocl.getDeployment().getTerraformDeployment().getInputVariables());
             Schema<?> deploymentVariables =
                     buildDynamicObjectSchema(
-                            ocl.getDescription(), jsonObjectSchema.getProperties());
-            originalSchema.addProperty("serviceRequestProperties", deploymentVariables);
+                            ocl.getDescription(),
+                            jsonObjectSchema.getProperties(),
+                            XpanseGlobalNames.SERVICE_INPUTS_PROPERTY_NAME);
+            originalSchema.addProperty(
+                    XpanseGlobalNames.SERVICE_INPUTS_PROPERTY_NAME, deploymentVariables);
         }
     }
 
     /** This method converts any parameter variables into a OpenAPI schema object. */
-    public void generateSchemaForParameterVariables(
+    private void generateSchemaForParameterVariables(
             Ocl ocl, Schema<?> originalSchema, String jsonKeyName) {
         if (originalSchema.getProperties().get(jsonKeyName) != null) {
             JsonObjectSchema jsonObjectSchema =
@@ -198,7 +288,7 @@ public class SchemaUtils {
                                             .getConfigurationParameters());
             Schema<?> configurationProperties =
                     buildDynamicObjectSchema(
-                            ocl.getDescription(), jsonObjectSchema.getProperties());
+                            ocl.getDescription(), jsonObjectSchema.getProperties(), jsonKeyName);
             originalSchema.addProperty(jsonKeyName, configurationProperties);
         }
     }
@@ -208,6 +298,9 @@ public class SchemaUtils {
         try {
             ObjectMapper mapper = new ObjectMapper();
             Schema<?> schema = mapper.readValue(jsonSchema, Schema.class);
+            if (schema.getName() == null) {
+                schema.setName(schema.getTitle());
+            }
             components.addSchemas(schema.getTitle(), schema);
             return schema;
         } catch (JsonProcessingException e) {
@@ -220,11 +313,12 @@ public class SchemaUtils {
     /** This method replaces property names in a schema with the mappings provided. */
     public void replacePropertiesWithCustomName(
             Map<MappableFields, String> mappableFieldsStringMap, Schema<?> schema) {
+        log.info("replacing global mappable names with custom names");
         if (mappableFieldsStringMap != null) {
             mappableFieldsStringMap.forEach(
-                    (standardName, customNameMapping) -> {
-                        renamePropertyRecursive(schema, standardName.toValue(), customNameMapping);
-                    });
+                    (standardName, customNameMapping) ->
+                            renamePropertyRecursive(
+                                    schema, standardName.toValue(), customNameMapping));
         }
     }
 
@@ -272,7 +366,7 @@ public class SchemaUtils {
     /** This method checks and adds unique tags to the OpenAPI . */
     public void addTagIfUnique(String tagName, OpenAPI openApi) {
         if (openApi.getTags() == null) {
-            openApi.setTags(new java.util.ArrayList<>());
+            openApi.setTags(new ArrayList<>());
         }
 
         boolean exists = openApi.getTags().stream().anyMatch(t -> t.getName().equals(tagName));
@@ -297,7 +391,6 @@ public class SchemaUtils {
         }
 
         switch (method) {
-            case GET -> pathItem.setGet(operation);
             case POST -> pathItem.setPost(operation);
             case PUT -> pathItem.setPut(operation);
             case DELETE -> pathItem.setDelete(operation);
@@ -309,5 +402,58 @@ public class SchemaUtils {
         }
 
         paths.addPathItem(path, pathItem);
+    }
+
+    private String mapInternalTypeToCustomType(Class<?> type, Ocl ocl) {
+        return switch (type.getSimpleName()) {
+            case XpanseGlobalNames.SERVICE_ORDER_DETAILS -> getCustomTypeNameForOrders(ocl);
+            case XpanseGlobalNames.SERVICE_CONFIGURATION_TYPE_NAME ->
+                    getCustomTypeNameForConfiguration(ocl);
+            default -> throw new IllegalStateException("Unexpected value: " + type.getSimpleName());
+        };
+    }
+
+    private String getCustomTypeNameForOrders(Ocl ocl) {
+        if (ocl.getServiceControllerConfig() == null
+                || ocl.getServiceControllerConfig().getCommonReadMethods() == null) {
+            return null;
+        }
+
+        return ocl.getServiceControllerConfig().getCommonReadMethods().stream()
+                .filter(m -> m.getReadDomainType() == CommonReadDomainType.ORDERS)
+                .map(m -> m.getResponseBody().getTypeName())
+                .findFirst()
+                .orElse(null);
+    }
+
+    private String getCustomTypeNameForConfiguration(Ocl ocl) {
+        if (ocl.getServiceConfigurationManage() == null
+                || ocl.getServiceConfigurationManage().getControllerApiMethods() == null
+                || ocl.getServiceConfigurationManage()
+                                .getControllerApiMethods()
+                                .getApiReadMethodConfigs()
+                        == null) {
+            return null;
+        }
+
+        return ocl
+                .getServiceConfigurationManage()
+                .getControllerApiMethods()
+                .getApiReadMethodConfigs()
+                .stream()
+                .map(m -> m.getResponseBody().getTypeName())
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Method checks if a component is already added in the schema and reuses it instead of building
+     * it again.
+     */
+    public Schema<?> reuseExistingComponentIfExists(Components components, String typeName) {
+        if (components.getSchemas() == null) {
+            return null;
+        }
+        return components.getSchemas().getOrDefault(typeName, null);
     }
 }

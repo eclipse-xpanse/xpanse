@@ -15,7 +15,62 @@ serviceControllerConfig:
     isSupportsMultipleVersions: false
     isSupportsMultipleCloudProviders: false
     isSupportsMultipleHostingTypes: false
-
+  commonReadMethods:
+    - methodName: getDatabases
+      serviceUri: "/{projectId}/databases"
+      methodDescription: "List all available databases"
+      serviceGroupName: Databases
+      readDomainType: services
+      methodParameters:
+        - name: projectId
+          description: project ID of the tenant.
+          mandatory: true
+          in: "path"
+        - name: databaseId
+          description: ID of the database.
+          mandatory: false
+          in: "query"
+      responseBody:
+        typeName: DatabaseDetails
+      isArray: true
+    - methodName: getDatabaseById
+      serviceUri: "/{projectId}/database/{databaseId}"
+      methodDescription: "get database by Id"
+      serviceGroupName: Databases
+      readDomainType: services
+      methodParameters:
+        - name: projectId
+          description: project ID of the tenant.
+          mandatory: true
+          in: "path"
+        - name: databaseId
+          description: ID of the database.
+          mandatory: true
+          in: "path"
+      responseBody:
+        typeName: DatabaseDetails
+      isArray: false
+    - methodName: getOrderDetails
+      serviceUri: "/{projectId}/databases/orders"
+      methodDescription: "service to orders related to a database."
+      readDomainType: orders
+      serviceGroupName: Database Orders
+      methodParameters:
+        - name: projectId
+          description: project ID of the tenant.
+          mandatory: true
+          in: "path"
+        - name: orderId
+          description: ID of the order.
+          mandatory: false
+          in: "query"
+        - name: databaseId
+          description: ID of the database.
+          mandatory: false
+          in: "query"
+      responseBody:
+        typeName: DatabaseOrderDetails
+      isArray: true
 # The version of the service, the end-user can select the version they want to deploy.
 serviceVersion: 1.0.0
 # For the users may have more than one service, the @serviceVendor can be used to separate the clusters.
@@ -264,7 +319,7 @@ serviceObjects:
               responseBody:
                 typeName: DatabaseUserDetails
               standardNameMappings:
-                objectId: databaseId
+                objectId: userId
             - methodName: readDatabaseUsers
               serviceUri: "/{projectId}/database/user/{databaseId}"
               methodDescription: "service to read users of a database."

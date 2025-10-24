@@ -23,9 +23,9 @@ public enum VariableDataType {
         this.type = type;
     }
 
-    /** For VariableKind serialize. */
+    /** For VariableKind deserialize. */
     @JsonCreator
-    public VariableDataType getByValue(String type) {
+    public static VariableDataType getByValue(String type) {
         for (VariableDataType variableDataType : values()) {
             if (StringUtils.equalsIgnoreCase(variableDataType.type, type)) {
                 return variableDataType;
@@ -35,7 +35,7 @@ public enum VariableDataType {
                 String.format("VariableDataType value %s is not supported.", type));
     }
 
-    /** For VariableKind deserialize. */
+    /** For VariableKind serialize. */
     @JsonValue
     public String toValue() {
         return this.type;
