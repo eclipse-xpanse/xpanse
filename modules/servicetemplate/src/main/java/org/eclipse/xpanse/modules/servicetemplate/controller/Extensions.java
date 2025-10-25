@@ -15,4 +15,5 @@ public class Extensions {
     public static final String X_OBJECT_NAME = "x-object-Name";
     public static final String X_ACTION_NAME = "x-Action-name";
     public static final String X_GLOBAL_SERVICE_MAPPINGS = "x-global-service-mappings";
+    public static final String X_READ_DOMAIN = "x-read-domain";
 }
