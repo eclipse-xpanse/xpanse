@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.models.servicetemplate.controller;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import org.eclipse.xpanse.modules.models.servicetemplate.MappableFields;
@@ -34,4 +35,10 @@ public class ServiceControllerConfig {
     private ServiceControllerMode serviceControllerMode;
 
     private Map<String, String> errorCodeMappings;
+
+    @Schema(
+            description =
+                    "common read methods for the service. Contains information for listing service"
+                            + " and order details.")
+    private List<CommonApiReadMethodConfig> commonReadMethods;
 }

@@ -35,6 +35,7 @@ public class ServiceControllerApiManage {
     private final ActionMethodsManage actionMethodsManage;
     private final ObjectMethodsManage objectMethodsManage;
     private final FlavorMethodsManage flavorMethodsManage;
+    private final CommonReadMethodsManage commonReadMethodsManage;
 
     /** Bean constructor. */
     @Autowired
@@ -44,13 +45,15 @@ public class ServiceControllerApiManage {
             ConfigurationMethodsManage configurationMethodsManage,
             ActionMethodsManage actionMethodsManage,
             ObjectMethodsManage objectMethodsManage,
-            FlavorMethodsManage flavorMethodsManage) {
+            FlavorMethodsManage flavorMethodsManage,
+            CommonReadMethodsManage commonReadMethodsManage) {
         this.deploymentMethodsManage = deploymentMethodsManage;
         this.serviceStateMethodsManage = serviceStateMethodsManage;
         this.configurationMethodsManage = configurationMethodsManage;
         this.actionMethodsManage = actionMethodsManage;
         this.objectMethodsManage = objectMethodsManage;
         this.flavorMethodsManage = flavorMethodsManage;
+        this.commonReadMethodsManage = commonReadMethodsManage;
     }
 
     /**
@@ -104,6 +107,10 @@ public class ServiceControllerApiManage {
                 && ocl.getFlavors().getControllerApiMethods().getApiWriteMethodConfigs() != null) {
             flavorMethodsManage.addFlavorMethods(openApi, ocl, components);
         }
+        if (ocl.getServiceControllerConfig() != null
+                && ocl.getServiceControllerConfig().getCommonReadMethods() != null) {
+            commonReadMethodsManage.addCommonReadMethods(openApi, ocl, components);
+        }
         try {
             SwaggerParseResult parsed =
                     new OpenAPIV3Parser().readContents(Yaml.mapper().writeValueAsString(openApi));
@@ -111,7 +118,6 @@ public class ServiceControllerApiManage {
                 parsed.getMessages().forEach(log::error);
                 throw new ServiceControllerConfigurationInvalidException(parsed.getMessages());
             }
-            Yaml.mapper().writeValueAsString(openApi);
             return parsed.getOpenAPI();
         } catch (JsonProcessingException e) {
             log.error("Error parsing the generated OpenAPI document", e);
