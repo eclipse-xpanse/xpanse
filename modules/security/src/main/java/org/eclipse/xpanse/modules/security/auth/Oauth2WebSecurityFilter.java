@@ -24,8 +24,9 @@ import org.eclipse.xpanse.modules.models.response.ErrorType;
 import org.eclipse.xpanse.modules.models.response.OrderFailedErrorResponse;
 import org.eclipse.xpanse.modules.security.auth.common.XpanseAuthentication;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -58,14 +59,12 @@ public class Oauth2WebSecurityFilter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${spring.security.oauth2.resourceserver.opaquetoken.introspection-uri}")
-    private String introspectionUri;
+    private final OAuth2ResourceServerProperties oauthResourceServerProperties;
 
-    @Value("${spring.security.oauth2.resourceserver.opaquetoken.client-id}")
-    private String clientId;
-
-    @Value("${spring.security.oauth2.resourceserver.opaquetoken.client-secret}")
-    private String clientSecret;
+    @Autowired
+    public Oauth2WebSecurityFilter(OAuth2ResourceServerProperties oauthResourceServerProperties) {
+        this.oauthResourceServerProperties = oauthResourceServerProperties;
+    }
 
     private void configureHttpSecurity(
             HttpSecurity http,
@@ -118,9 +117,17 @@ public class Oauth2WebSecurityFilter {
                                             opaque.introspector(
                                                             SpringOpaqueTokenIntrospector
                                                                     .withIntrospectionUri(
-                                                                            introspectionUri)
-                                                                    .clientId(clientId)
-                                                                    .clientSecret(clientSecret)
+                                                                            oauthResourceServerProperties
+                                                                                    .getOpaquetoken()
+                                                                                    .getIntrospectionUri())
+                                                                    .clientId(
+                                                                            oauthResourceServerProperties
+                                                                                    .getOpaquetoken()
+                                                                                    .getClientId())
+                                                                    .clientSecret(
+                                                                            oauthResourceServerProperties
+                                                                                    .getOpaquetoken()
+                                                                                    .getClientSecret())
                                                                     .build())
                                                     .authenticationConverter(
                                                             opaqueTokenAuthenticationConverter)));
@@ -170,7 +177,7 @@ public class Oauth2WebSecurityFilter {
     /** Configuration applied when method security is disabled. */
     @Profile("oauth")
     @EnableWebSecurity
-    @ConditionalOnProperty(name = "enable.role.protection", havingValue = "false")
+    @ConditionalOnProperty(name = "xpanse.security.enable-role-protection", havingValue = "false")
     public class WebSecurityWithoutMethodSecurity {
 
         /** Configures basic security handler per HTTP session. */
@@ -196,7 +203,7 @@ public class Oauth2WebSecurityFilter {
     @EnableWebSecurity
     @EnableMethodSecurity(securedEnabled = true)
     @ConditionalOnProperty(
-            name = "enable.role.protection",
+            name = "xpanse.security.enable-web-security",
             havingValue = "true",
             matchIfMissing = true)
     public class WebSecurityWithMethodSecurity {

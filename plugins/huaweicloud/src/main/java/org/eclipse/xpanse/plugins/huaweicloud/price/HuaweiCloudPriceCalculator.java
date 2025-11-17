@@ -33,8 +33,9 @@ public class HuaweiCloudPriceCalculator {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public FlavorPriceResult getServiceFlavorPrice(ServiceFlavorPriceRequest request) {
         if (request.getBillingMode() == BillingMode.PAY_PER_USE) {
             return getServiceFlavorPriceWithPayPerUse(request);

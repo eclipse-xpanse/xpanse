@@ -19,8 +19,8 @@ import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
@@ -43,7 +43,7 @@ public class OpenTofuLocalDeployment implements Deployer {
     public static final String TF_DEBUG_FLAG = "TF_LOG";
     @Resource private OpenTofuInstaller openTofuInstaller;
     @Resource private DeployEnvironments deployEnvironments;
-    @Resource private OpenTofuLocalConfig openTofuLocalConfig;
+    @Resource private DeploymentProperties deploymentProperties;
 
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
@@ -233,11 +233,13 @@ public class OpenTofuLocalDeployment implements Deployer {
             Map<String, Object> inputVariables,
             String workspace,
             Deployment deployment) {
-        if (openTofuLocalConfig.isDebugEnabled()) {
+        if (deploymentProperties.getOpentofuLocal().getDebug().getEnabled()) {
             log.info(
                     "Debug enabled for OpenTofu CLI with level {}",
-                    openTofuLocalConfig.getDebugLogLevel());
-            envVariables.put(TF_DEBUG_FLAG, openTofuLocalConfig.getDebugLogLevel());
+                    deploymentProperties.getOpentofuLocal().getDebug().getLevelValue());
+            envVariables.put(
+                    TF_DEBUG_FLAG,
+                    deploymentProperties.getOpentofuLocal().getDebug().getLevelValue());
         }
         String executorPath =
                 openTofuInstaller.getExecutorPathThatMatchesRequiredVersion(
@@ -271,6 +273,6 @@ public class OpenTofuLocalDeployment implements Deployer {
     }
 
     private String getDeployerConfigWorkspace() {
-        return openTofuLocalConfig.getWorkspaceDirectory();
+        return deploymentProperties.getOpentofuLocal().getWorkspace().getDirectory();
     }
 }

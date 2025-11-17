@@ -27,8 +27,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.util.Strings;
 import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableDataType;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,30 +42,20 @@ import org.springframework.stereotype.Component;
 public class SecretsManager {
 
     private final byte[] usedSecretKey;
-    private final String initialVector;
-    private final String algorithmName;
-    private final String algorithmMode;
-    private final String algorithmPadding;
+    private final SecurityProperties securityProperties;
 
-    /** Constructor for SecretsManager. */
+    /** Constructor Method. */
     @Autowired
-    public SecretsManager(
-            @Value("${xpanse.secrets.encryption.secrete.key.file}") String secretKeyFileName,
-            @Value("${xpanse.secrets.encryption.secrete.key.value}") String secretKey,
-            @Value("${xpanse.secrets.encryption.initial.vector}") String initialVector,
-            @Value("${xpanse.secrets.encryption.algorithm.name}") String algorithmName,
-            @Value("${xpanse.secrets.encryption.algorithm.mode}") String algorithmMode,
-            @Value("${xpanse.secrets.encryption.algorithm.padding}") String algorithmPadding) {
-        byte[] usedSecretKey = getCipherSecretKey(secretKeyFileName, secretKey);
+    public SecretsManager(SecurityProperties securityProperties) {
+        usedSecretKey =
+                getCipherSecretKey(
+                        securityProperties.getSecretsEncryption().getSecretKeyFile(),
+                        securityProperties.getSecretsEncryption().getSecretKeyValue());
         if (usedSecretKey.length == 0) {
             throw new SensitiveFieldEncryptionOrDecryptionFailedException(
                     "Secret key is empty. Either a secret key or a secret key file is required.");
         }
-        this.algorithmName = algorithmName;
-        this.algorithmMode = algorithmMode;
-        this.algorithmPadding = algorithmPadding;
-        this.initialVector = initialVector;
-        this.usedSecretKey = usedSecretKey;
+        this.securityProperties = securityProperties;
         validateConfiguration();
     }
 
@@ -78,10 +68,8 @@ public class SecretsManager {
                     getCipher(
                                     Cipher.ENCRYPT_MODE,
                                     usedSecretKey,
-                                    initialVector,
-                                    algorithmName,
-                                    algorithmMode,
-                                    algorithmPadding)
+                                    securityProperties.getSecretsEncryption().getInitialVector(),
+                                    securityProperties.getSecretsEncryption().getAlgorithmName())
                             .doFinal(byteEncode);
             return Base64.encodeBase64String(encryptedContent);
         } catch (SensitiveFieldEncryptionOrDecryptionFailedException
@@ -101,10 +89,8 @@ public class SecretsManager {
                     getCipher(
                                     Cipher.DECRYPT_MODE,
                                     usedSecretKey,
-                                    initialVector,
-                                    algorithmName,
-                                    algorithmMode,
-                                    algorithmPadding)
+                                    securityProperties.getSecretsEncryption().getInitialVector(),
+                                    securityProperties.getSecretsEncryption().getAlgorithmName())
                             .doFinal(byteContent);
             return new String(byteDecode, StandardCharsets.UTF_8);
         } catch (IllegalBlockSizeException | BadPaddingException e) {
@@ -137,12 +123,7 @@ public class SecretsManager {
     }
 
     private Cipher getCipher(
-            int mode,
-            byte[] usedSecretKey,
-            String initialVector,
-            String algorithmName,
-            String algorithmMode,
-            String algorithmPadding) {
+            int mode, byte[] usedSecretKey, String initialVector, String algorithmName) {
         Cipher cipher;
         try {
             SecretKey secretKey = new SecretKeySpec(usedSecretKey, algorithmName);
@@ -196,6 +177,10 @@ public class SecretsManager {
     }
 
     private String getTransformationFullName() {
-        return this.algorithmName + '/' + this.algorithmMode + '/' + this.algorithmPadding;
+        return this.securityProperties.getSecretsEncryption().getAlgorithmName()
+                + '/'
+                + this.securityProperties.getSecretsEncryption().getAlgorithmMode()
+                + '/'
+                + this.securityProperties.getSecretsEncryption().getAlgorithmPadding();
     }
 }

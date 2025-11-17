@@ -3,9 +3,9 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.common.oauth2.client;
+package org.eclipse.xpanse.modules.security.auth.client;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -29,17 +29,20 @@ public class Oauth2ClientConfiguration {
 
     public static final String OAUTH_CLIENT_ID = "oauth2";
     private static final String[] DEFAULT_SCOPES = {"openid", "profile"};
+    private final SecurityProperties securityProperties;
+
+    /** Constructor method. */
+    public Oauth2ClientConfiguration(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+    }
 
     // Create the Oauth client registration
     @Bean
-    ClientRegistration oauthClientRegistration(
-            @Value("${oauth.token.url}") String tokenUri,
-            @Value("${oauth.protected.api.client.id}") String clientId,
-            @Value("${oauth.protected.api.client.secret}") String clientSecret) {
+    ClientRegistration oauthClientRegistration() {
         return ClientRegistration.withRegistrationId(OAUTH_CLIENT_ID)
-                .tokenUri(tokenUri)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
+                .tokenUri(securityProperties.getOauth().getTokenUrl())
+                .clientId(securityProperties.getOauth().getClient().getClientId())
+                .clientSecret(securityProperties.getOauth().getClient().getClientSecret())
                 .scope(DEFAULT_SCOPES)
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .build();

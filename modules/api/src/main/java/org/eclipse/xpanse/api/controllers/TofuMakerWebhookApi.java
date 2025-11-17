@@ -36,7 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("tofu-maker")
 @CrossOrigin
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class TofuMakerWebhookApi {
 
     @Resource
@@ -46,7 +49,7 @@ public class TofuMakerWebhookApi {
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result of the order task from tofu-maker")
     @PostMapping(
-            value = "${webhook.tofu-maker.orderCallbackUri}/{orderId}",
+            value = "${xpanse.deployer.tofu-maker.webhook-callback-uri}/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceOrderId", paramTypes = UUID.class)

@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.assertj.core.api.Assertions;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -16,9 +19,10 @@ import wiremock.org.apache.commons.io.IOUtils;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(
         properties = {
-            "xpanse.webhook.hmac.request.signing.key=1c30e4b1fad574f88572e25d0da03f34365f4ae92eda22bfd3a8c53cb5102f27",
+            "xpanse.security.webhook-hmac-signing-key=1c30e4b1fad574f88572e25d0da03f34365f4ae92eda22bfd3a8c53cb5102f27",
         })
-@ContextConfiguration(classes = {HmacSignatureHeaderManage.class})
+@Import(RefreshAutoConfiguration.class)
+@ContextConfiguration(classes = {HmacSignatureHeaderManage.class, SecurityProperties.class})
 public class HmacValidationTest {
 
     @Autowired HmacSignatureHeaderManage hmacSignatureHeaderManage;

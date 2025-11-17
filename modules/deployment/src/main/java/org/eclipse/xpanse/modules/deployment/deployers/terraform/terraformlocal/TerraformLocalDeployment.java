@@ -18,10 +18,10 @@ import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformResult;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
@@ -42,7 +42,7 @@ public class TerraformLocalDeployment implements Deployer {
     public static final String TF_DEBUG_FLAG = "TF_LOG";
     @Resource private TerraformInstaller terraformInstaller;
     @Resource private DeployEnvironments deployEnvironments;
-    @Resource private TerraformLocalConfig terraformLocalConfig;
+    @Resource private DeploymentProperties deploymentProperties;
 
     @Resource(name = ASYNC_EXECUTOR_NAME)
     private Executor taskExecutor;
@@ -235,11 +235,13 @@ public class TerraformLocalDeployment implements Deployer {
             Map<String, Object> inputVariables,
             String workspace,
             Deployment deployment) {
-        if (terraformLocalConfig.isDebugEnabled()) {
+        if (deploymentProperties.getTerraformLocal().getDebug().getEnabled()) {
             log.info(
                     "Debug enabled for Terraform CLI with level {}",
-                    terraformLocalConfig.getDebugLogLevel());
-            envVariables.put(TF_DEBUG_FLAG, terraformLocalConfig.getDebugLogLevel());
+                    deploymentProperties.getTerraformLocal().getDebug().getLevelValue());
+            envVariables.put(
+                    TF_DEBUG_FLAG,
+                    deploymentProperties.getTerraformLocal().getDebug().getLevelValue());
         }
         String executorPath =
                 terraformInstaller.getExecutorPathThatMatchesRequiredVersion(
@@ -273,6 +275,6 @@ public class TerraformLocalDeployment implements Deployer {
     }
 
     private String getDeployerConfigWorkspace() {
-        return terraformLocalConfig.getWorkspaceDirectory();
+        return deploymentProperties.getTerraformLocal().getWorkspace().getDirectory();
     }
 }

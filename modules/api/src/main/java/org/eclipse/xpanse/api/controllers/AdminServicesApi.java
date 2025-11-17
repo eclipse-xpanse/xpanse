@@ -54,7 +54,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/xpanse")
 @Secured({ROLE_ADMIN})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class AdminServicesApi {
 
     private final TerraBootManager terraBootManager;

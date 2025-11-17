@@ -28,7 +28,6 @@ import com.huaweicloud.sdk.iam.v3.IamClient;
 import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsRequest;
 import com.huaweicloud.sdk.iam.v3.model.KeystoneListProjectsResponse;
 import com.huaweicloud.sdk.vpc.v2.VpcClient;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,7 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
-import org.springframework.beans.factory.annotation.Value;
+import org.eclipse.xpanse.plugins.flexibleengine.config.FlexibleEnginePluginProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /** FlexibleEngine Service Client. */
@@ -44,10 +44,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlexibleEngineClient extends FlexibleEngineCredentials {
 
-    @Value("${flexibleengine.sdk.enable.http.debug.logs:false}")
-    private boolean sdkHttpDebugLogsEnabled;
+    private final FlexibleEnginePluginProperties flexibleEnginePluginProperties;
 
-    @Resource private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+    private final FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+
+    @Autowired
+    public FlexibleEngineClient(
+            FlexibleEnginePluginProperties flexibleEnginePluginProperties,
+            FlexibleEngineRetryStrategy flexibleEngineRetryStrategy) {
+        this.flexibleEnginePluginProperties = flexibleEnginePluginProperties;
+        this.flexibleEngineRetryStrategy = flexibleEngineRetryStrategy;
+    }
 
     /**
      * Get client for service ECS.
@@ -162,7 +169,7 @@ public class FlexibleEngineClient extends FlexibleEngineCredentials {
 
     private HttpConfig getHttpConfig() {
         HttpConfig httpConfig = HttpConfig.getDefaultHttpConfig();
-        if (sdkHttpDebugLogsEnabled) {
+        if (flexibleEnginePluginProperties.getEnableSdkHttpDebugLogs()) {
             HttpListener requestListener = HttpListener.forRequestListener(this::outputRequestInfo);
             httpConfig.addHttpListener(requestListener);
 

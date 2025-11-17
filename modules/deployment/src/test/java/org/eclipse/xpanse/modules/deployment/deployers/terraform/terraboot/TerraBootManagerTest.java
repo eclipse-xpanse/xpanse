@@ -8,35 +8,38 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.AdminApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraBootSystemStatus;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientException;
 
-@ExtendWith(MockitoExtension.class)
+@ContextConfiguration(classes = {TerraBootManager.class, DeploymentProperties.class})
+@TestPropertySource(
+        properties = {
+            "spring.profiles.active=terra-boot",
+            "xpanse.deployer.terra-boot.endpoint=http://localhost:8090"
+        })
+@Import(RefreshAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
 class TerraBootManagerTest {
 
-    @Mock private AdminApi mockTerraformApi;
+    @MockitoBean private AdminApi mockTerraformApi;
 
-    @Mock private TerraBootHelper terraBootHelper;
+    @MockitoBean private TerraBootHelper terraBootHelper;
 
-    @InjectMocks private TerraBootManager terraBootManagerUnderTest;
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(
-                terraBootManagerUnderTest, "springProfilesActive", "terra-boot");
-        ReflectionTestUtils.setField(terraBootManagerUnderTest, "terraBootBaseUrl", "endpoint");
-    }
+    @Autowired private TerraBootManager terraBootManagerUnderTest;
 
     @Test
     void testGetTerraBootStatus() {
@@ -45,7 +48,7 @@ class TerraBootManagerTest {
         expectedResult.setBackendSystemType(BackendSystemType.TERRA_BOOT);
         expectedResult.setName(BackendSystemType.TERRA_BOOT.toValue());
         expectedResult.setHealthStatus(HealthStatus.OK);
-        expectedResult.setEndpoint("endpoint");
+        expectedResult.setEndpoint("http://localhost:8090");
 
         // Configure TerraformApi.healthCheck(...).
         final TerraBootSystemStatus terraBootSystemStatus = new TerraBootSystemStatus();
@@ -66,7 +69,7 @@ class TerraBootManagerTest {
         expectedResult.setBackendSystemType(BackendSystemType.TERRA_BOOT);
         expectedResult.setName(BackendSystemType.TERRA_BOOT.toValue());
         expectedResult.setHealthStatus(HealthStatus.NOK);
-        expectedResult.setEndpoint("endpoint");
+        expectedResult.setEndpoint("http://localhost:8090");
 
         when(mockTerraformApi.healthCheck()).thenThrow(RestClientException.class);
 
@@ -84,7 +87,7 @@ class TerraBootManagerTest {
         expectedResult.setBackendSystemType(BackendSystemType.TERRA_BOOT);
         expectedResult.setName(BackendSystemType.TERRA_BOOT.toValue());
         expectedResult.setHealthStatus(HealthStatus.NOK);
-        expectedResult.setEndpoint("endpoint");
+        expectedResult.setEndpoint("http://localhost:8090");
 
         // Configure TerraformApi.healthCheck(...).
         final TerraBootSystemStatus terraBootSystemStatus = new TerraBootSystemStatus();
@@ -96,16 +99,5 @@ class TerraBootManagerTest {
 
         // Verify the results
         assertThat(result).isEqualTo(expectedResult);
-    }
-
-    @Test
-    void testGetTerraBootStatus_WhenTerraBootNotActive() {
-        ReflectionTestUtils.setField(terraBootManagerUnderTest, "springProfilesActive", "oauth");
-
-        // Run the test
-        final BackendSystemStatus result = terraBootManagerUnderTest.getTerraBootStatus();
-
-        // Verify the results
-        assertThat(result).isEqualTo(null);
     }
 }

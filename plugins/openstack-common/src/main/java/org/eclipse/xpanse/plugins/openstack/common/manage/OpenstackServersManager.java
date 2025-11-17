@@ -35,8 +35,9 @@ public class OpenstackServersManager {
     /** Start the OpenStack Nova VM. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean startService(Csp csp, ServiceStateManageRequest request) {
         try {
             String userId = request.getUserId();
@@ -78,8 +79,9 @@ public class OpenstackServersManager {
     /** Stop the OpenStack Nova VM. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean stopService(Csp csp, ServiceStateManageRequest request) {
         try {
             String site = request.getRegion().getSite();
@@ -121,8 +123,9 @@ public class OpenstackServersManager {
     /** Restart the OpenStack Nova VM. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean restartService(Csp csp, ServiceStateManageRequest request) {
         try {
             String site = request.getRegion().getSite();

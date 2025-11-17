@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.eclipse.xpanse.modules.cache.config.CacheProperties;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -32,6 +33,7 @@ import org.eclipse.xpanse.plugins.flexibleengine.FlexibleEngineOrchestratorPlugi
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
+import org.eclipse.xpanse.plugins.flexibleengine.config.FlexibleEnginePluginProperties;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceManager;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
@@ -62,7 +64,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             FlexibleEngineTerraformResourceHandler.class,
             FlexibleEngineResourceManager.class,
             FlexibleEnginePriceCalculator.class,
-            FlexibleEngineRetryStrategy.class
+            FlexibleEngineRetryStrategy.class,
+            CacheProperties.class,
+            FlexibleEnginePluginProperties.class,
         })
 class FlexibleEngineMonitorIntegrationTest {
 

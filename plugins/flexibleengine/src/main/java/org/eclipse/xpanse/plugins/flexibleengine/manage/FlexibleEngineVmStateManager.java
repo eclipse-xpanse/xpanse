@@ -46,8 +46,9 @@ public class FlexibleEngineVmStateManager {
     /** Start the FlexibleEngine Ecs server. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
@@ -72,8 +73,9 @@ public class FlexibleEngineVmStateManager {
     /** Stop the FlexibleEngine Ecs server. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
@@ -98,8 +100,9 @@ public class FlexibleEngineVmStateManager {
     /** Restart the FlexibleEngine Ecs server. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);

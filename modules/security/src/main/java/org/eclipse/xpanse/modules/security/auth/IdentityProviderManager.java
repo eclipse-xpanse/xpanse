@@ -12,7 +12,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfoHolder;
-import org.springframework.beans.factory.annotation.Value;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -29,22 +30,23 @@ public class IdentityProviderManager implements ApplicationListener<ContextRefre
 
     private final ApplicationContext applicationContext;
 
-    private final Boolean webSecurityIsEnabled;
+    private final SecurityProperties securityProperties;
 
     /** Constructor for IdentityProviderManager. */
+    @Autowired
     public IdentityProviderManager(
             @Nullable IdentityProviderService activeIdentityProviderService,
             ApplicationContext applicationContext,
-            @Value("${enable.web.security:false}") Boolean webSecurityIsEnabled) {
+            SecurityProperties securityProperties) {
         this.activeIdentityProviderService = activeIdentityProviderService;
         this.applicationContext = applicationContext;
-        this.webSecurityIsEnabled = webSecurityIsEnabled;
+        this.securityProperties = securityProperties;
     }
 
     /** Instantiates active IdentityProviderService. */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (!webSecurityIsEnabled) {
+        if (!securityProperties.isEnableWebSecurity()) {
             log.info("Security is disabled, authentication and authorization are not required.");
             activeIdentityProviderService = null;
             return;

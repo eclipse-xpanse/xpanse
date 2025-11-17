@@ -10,7 +10,6 @@ import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
 
 import com.huaweicloud.sdk.iam.v3.region.IamRegion;
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,13 +39,14 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
+import org.eclipse.xpanse.plugins.huaweicloud.config.HuaweiCloudPluginProperties;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.constant.HuaweiCloudMonitorConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -56,14 +56,29 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
-    @Resource private HuaweiCloudTerraformResourceHandler terraformResourceHandler;
-    @Resource private HuaweiCloudMetricsService metricsService;
-    @Resource private HuaweiCloudVmStateManager vmStateManager;
-    @Resource private HuaweiCloudResourceManager resourceManager;
-    @Resource private HuaweiCloudPriceCalculator priceCalculator;
+    private final HuaweiCloudTerraformResourceHandler terraformResourceHandler;
+    private final HuaweiCloudMetricsService metricsService;
+    private final HuaweiCloudVmStateManager vmStateManager;
+    private final HuaweiCloudResourceManager resourceManager;
+    private final HuaweiCloudPriceCalculator priceCalculator;
+    private final HuaweiCloudPluginProperties huaweiCloudPluginProperties;
 
-    @Value("${huaweicloud.auto.approve.service.template.enabled:false}")
-    private boolean autoApproveServiceTemplateEnabled;
+    /** Constructor method. */
+    @Autowired
+    public HuaweiCloudOrchestratorPlugin(
+            HuaweiCloudTerraformResourceHandler terraformResourceHandler,
+            HuaweiCloudMetricsService metricsService,
+            HuaweiCloudVmStateManager vmStateManager,
+            HuaweiCloudResourceManager resourceManager,
+            HuaweiCloudPriceCalculator priceCalculator,
+            HuaweiCloudPluginProperties huaweiCloudPluginProperties) {
+        this.terraformResourceHandler = terraformResourceHandler;
+        this.metricsService = metricsService;
+        this.vmStateManager = vmStateManager;
+        this.resourceManager = resourceManager;
+        this.priceCalculator = priceCalculator;
+        this.huaweiCloudPluginProperties = huaweiCloudPluginProperties;
+    }
 
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
@@ -107,7 +122,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public ServiceTemplateReviewPluginResultType validateServiceTemplate(Ocl ocl) {
-        if (autoApproveServiceTemplateEnabled) {
+        if (huaweiCloudPluginProperties.getServiceTemplate().getAutoApprove()) {
             return ServiceTemplateReviewPluginResultType.APPROVED;
         }
         return ServiceTemplateReviewPluginResultType.MANUAL_REVIEW_REQUIRED;

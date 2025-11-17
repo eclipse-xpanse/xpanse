@@ -70,6 +70,7 @@ import org.semver4j.SemverException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /** Implement Interface to manage service template newTemplate in database. */
@@ -498,6 +499,7 @@ public class ServiceTemplateManage {
      * @param requestId the ID of service template request.
      * @param review the review.
      */
+    @Transactional
     public void reviewServiceTemplateRequest(UUID requestId, ReviewServiceTemplateRequest review) {
         ServiceTemplateRequestHistoryEntity existingTemplateRequest =
                 templateRequestStorage.getEntityByRequestId(requestId);
@@ -665,6 +667,7 @@ public class ServiceTemplateManage {
      * @param checkCsp check csp.
      * @return list of service template request history.
      */
+    @Transactional
     public List<ServiceTemplateRequestHistory> getServiceTemplateRequestHistoryByServiceTemplateId(
             UUID serviceTemplateId,
             ServiceTemplateRequestType requestType,

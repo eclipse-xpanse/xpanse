@@ -9,11 +9,11 @@ import java.io.File;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerZipFileManage;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -37,9 +37,7 @@ public class OpenTofuInstaller {
     private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
     private static final String OS_ARCH = System.getProperty("os.arch").toLowerCase();
 
-    private final String openTofuDownloadBaseUrl;
-
-    private final String openTofuInstallDir;
+    private final DeploymentProperties deploymentProperties;
 
     private final DeployerToolUtils deployerToolUtils;
 
@@ -47,21 +45,12 @@ public class OpenTofuInstaller {
 
     /** Constructor method for the bean. */
     public OpenTofuInstaller(
-            @Value(
-                            "${deployer.opentofu.download.base.url:https://github.com/opentofu/opentofu/releases}")
-                    String openTofuDownloadBaseUrl,
-            @Value("${deployer.opentofu.install.dir}") String openTofuInstallDir,
+            DeploymentProperties deploymentProperties,
             DeployerToolUtils deployerToolUtils,
             DeployerZipFileManage deployerZipFileManage) {
-        this.openTofuDownloadBaseUrl = openTofuDownloadBaseUrl;
         this.deployerToolUtils = deployerToolUtils;
         this.deployerZipFileManage = deployerZipFileManage;
-        // if not specific location is provided, then use the default user's app location.
-        this.openTofuInstallDir =
-                openTofuInstallDir.isBlank()
-                        ? deployerToolUtils.getUserAppInstallFolder().toFile().getAbsolutePath()
-                        : openTofuInstallDir;
-        log.info("Opentofu deployer uses {} for installing binaries", this.openTofuInstallDir);
+        this.deploymentProperties = deploymentProperties;
     }
 
     /**
@@ -74,8 +63,9 @@ public class OpenTofuInstaller {
      */
     @Retryable(
             retryFor = InvalidDeployerToolException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public String getExecutorPathThatMatchesRequiredVersion(String requiredVersion) {
         if (StringUtils.isBlank(requiredVersion)) {
             log.info("No required version of openTofu is specified, use the default openTofu.");
@@ -91,7 +81,7 @@ public class OpenTofuInstaller {
                         OPEN_TOFU_EXECUTOR_NAME_PREFIX,
                         OPEN_TOFU_VERSION_COMMAND_ARGUMENT,
                         OPEN_TOFU_VERSION_OUTPUT_PATTERN,
-                        this.openTofuInstallDir,
+                        getOpenTofuInstallationDir(),
                         requiredOperator,
                         requiredNumber);
         if (StringUtils.isBlank(matchedVersionExecutorPath)) {
@@ -99,7 +89,7 @@ public class OpenTofuInstaller {
                     "No openTofu executor matched the required version {} from the "
                             + "openTofu installation dir {}, start to download and install one.",
                     requiredVersion,
-                    this.openTofuInstallDir);
+                    getOpenTofuInstallationDir());
             return installOpenTofuByRequiredVersion(requiredOperator, requiredNumber);
         }
         return matchedVersionExecutorPath;
@@ -127,7 +117,7 @@ public class OpenTofuInstaller {
                         getExecutorNameWithVersion(
                                 OPEN_TOFU_EXECUTOR_NAME_PREFIX, bestVersionNumber),
                         getExecutorBinaryDownloadUrl(bestVersionNumber),
-                        this.openTofuInstallDir);
+                        getOpenTofuInstallationDir());
         if (deployerToolUtils.checkIfExecutorCanBeExecuted(
                 installedExecutorFile, OPEN_TOFU_VERSION_COMMAND_ARGUMENT)) {
             log.info("OpenTofu with version {}  installed successfully.", installedExecutorFile);
@@ -136,7 +126,7 @@ public class OpenTofuInstaller {
         String errorMsg =
                 String.format(
                         "Installing openTofu with version %s into the dir %s " + "failed. ",
-                        bestVersionNumber, this.openTofuInstallDir);
+                        bestVersionNumber, getOpenTofuInstallationDir());
         log.error(errorMsg);
         throw new InvalidDeployerToolException(errorMsg);
     }
@@ -144,7 +134,7 @@ public class OpenTofuInstaller {
     private String getExecutorBinaryDownloadUrl(String versionNumber) {
         return String.format(
                 OPEN_TOFU_BINARY_DOWNLOAD_URL_FORMAT,
-                this.openTofuDownloadBaseUrl,
+                deploymentProperties.getOpentofuLocal().getDownloadBaseUrl(),
                 versionNumber,
                 versionNumber,
                 getOperatingSystemCode(),
@@ -170,5 +160,14 @@ public class OpenTofuInstaller {
 
     public String getExecutorNameWithVersion(String executorNamePrefix, String versionNumber) {
         return executorNamePrefix + versionNumber;
+    }
+
+    private String getOpenTofuInstallationDir() {
+        String installationDir =
+                deploymentProperties.getOpentofuLocal().getInstallDir().isBlank()
+                        ? deployerToolUtils.getUserAppInstallFolder().toFile().getAbsolutePath()
+                        : deploymentProperties.getOpentofuLocal().getInstallDir();
+        log.info("Opentofu deployer uses {} for installing binaries", installationDir);
+        return installationDir;
     }
 }

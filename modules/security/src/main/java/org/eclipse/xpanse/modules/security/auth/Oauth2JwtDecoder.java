@@ -36,8 +36,9 @@ public class Oauth2JwtDecoder {
      */
     @Retryable(
             retryFor = Exception.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public JwtDecoder createJwtDecoder(String issuerUri) {
         RetryContext retryContext = RetrySynchronizationManager.getContext();
         int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();

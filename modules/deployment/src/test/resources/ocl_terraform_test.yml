@@ -396,4 +396,5 @@ deployment:
   
         output "admin_passwd" {
           value = var.admin_passwd == "" ? nonsensitive(local.admin_passwd) : local.admin_passwd
+          sensitive = true
         }

@@ -43,7 +43,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse/isv")
 @CrossOrigin
 @Secured({ROLE_ISV})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class IsvCloudCredentialsApi {
 
     @Resource private CredentialCenter credentialCenter;

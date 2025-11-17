@@ -31,8 +31,9 @@ public class TerraBootApiStoredResultsFetcher {
      */
     @Retryable(
             retryFor = RestClientException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public ReFetchResult reFetchResultByOrderId(UUID orderId) {
         return retrieveTerraformResultApi.getStoredTaskResultByRequestId(orderId);
     }
@@ -45,8 +46,9 @@ public class TerraBootApiStoredResultsFetcher {
      */
     @Retryable(
             retryFor = RestClientException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<ReFetchResult> batchReFetchResultsByOrderIds(List<UUID> orderIds) {
         return retrieveTerraformResultApi.getBatchTaskResults(orderIds);
     }

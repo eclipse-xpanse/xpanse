@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.config.AgentApiProperties;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
@@ -53,6 +54,8 @@ public class DeployEnvironments {
 
     private final Environment environment;
 
+    private final AgentApiProperties agentApiProperties;
+
     /**
      * Constructor to initialize DeployEnvironments bean.
      *
@@ -66,11 +69,13 @@ public class DeployEnvironments {
             CredentialCenter credentialCenter,
             SecretsManager secretsManager,
             PluginManager pluginManager,
-            Environment environment) {
+            Environment environment,
+            AgentApiProperties agentApiProperties) {
         this.credentialCenter = credentialCenter;
         this.secretsManager = secretsManager;
         this.pluginManager = pluginManager;
         this.environment = environment;
+        this.agentApiProperties = agentApiProperties;
     }
 
     /**
@@ -192,8 +197,7 @@ public class DeployEnvironments {
             variables.put(
                     VAR_AGENT_VERSION,
                     task.getOcl().getServiceConfigurationManage().getAgentVersion());
-            variables.put(
-                    VAR_XPANSE_API_ENDPOINT, this.environment.getProperty("agent.api.end.point"));
+            variables.put(VAR_XPANSE_API_ENDPOINT, agentApiProperties.getEndpoint());
         }
         return variables;
     }

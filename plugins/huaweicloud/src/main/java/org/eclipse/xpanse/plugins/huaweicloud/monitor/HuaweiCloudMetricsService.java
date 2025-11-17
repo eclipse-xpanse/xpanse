@@ -58,8 +58,9 @@ public class HuaweiCloudMetricsService {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<Metric> getMetricsByResource(ResourceMetricsRequest resourceMetricRequest) {
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         String siteName = resourceMetricRequest.getRegion().getSite();
@@ -110,8 +111,9 @@ public class HuaweiCloudMetricsService {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<Metric> getMetricsByService(ServiceMetricsRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
 

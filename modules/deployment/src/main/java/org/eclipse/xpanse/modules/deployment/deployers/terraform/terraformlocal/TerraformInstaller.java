@@ -9,12 +9,12 @@ import java.io.File;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerZipFileManage;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /** Defines methods for handling terraform with required version. */
@@ -36,9 +36,7 @@ public class TerraformInstaller {
     private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
     private static final String OS_ARCH = System.getProperty("os.arch").toLowerCase();
 
-    private final String terraformDownloadBaseUrl;
-
-    private final String terraformInstallDir;
+    private final DeploymentProperties deploymentProperties;
 
     private final DeployerToolUtils deployerToolUtils;
 
@@ -47,21 +45,12 @@ public class TerraformInstaller {
     /** Constructor method for the bean. */
     @Autowired
     public TerraformInstaller(
-            @Value(
-                            "${deployer.terraform.download.base.url:https://releases.hashicorp.com/terraform}")
-                    String terraformDownloadBaseUrl,
-            @Value("${deployer.terraform.install.dir}") String terraformInstallDir,
+            DeploymentProperties deploymentProperties,
             DeployerToolUtils deployerToolUtils,
             DeployerZipFileManage deployerZipFileManage) {
-        this.terraformDownloadBaseUrl = terraformDownloadBaseUrl;
+        this.deploymentProperties = deploymentProperties;
         this.deployerToolUtils = deployerToolUtils;
         this.deployerZipFileManage = deployerZipFileManage;
-        // if not specific location is provided, then use the default user's app location.
-        this.terraformInstallDir =
-                terraformInstallDir.isBlank()
-                        ? deployerToolUtils.getUserAppInstallFolder().toFile().getAbsolutePath()
-                        : terraformInstallDir;
-        log.info("Terraform deployer uses {} for installing binaries", this.terraformInstallDir);
     }
 
     /**
@@ -87,7 +76,7 @@ public class TerraformInstaller {
                         TERRAFORM_EXECUTOR_NAME_PREFIX,
                         TERRAFORM_VERSION_COMMAND_ARGUMENT,
                         TERRAFORM_VERSION_OUTPUT_PATTERN,
-                        this.terraformInstallDir,
+                        getTerraformInstallationDir(),
                         requiredOperator,
                         requiredNumber);
         if (StringUtils.isBlank(matchedVersionExecutorPath)) {
@@ -95,7 +84,7 @@ public class TerraformInstaller {
                     "No terraform executor matched the required version {} from the "
                             + "terraform installation dir {}, start to download and install one.",
                     requiredVersion,
-                    this.terraformInstallDir);
+                    getTerraformInstallationDir());
             return installTerraformByRequiredVersion(requiredOperator, requiredNumber);
         }
         return matchedVersionExecutorPath;
@@ -123,7 +112,7 @@ public class TerraformInstaller {
                         getExecutorNameWithVersion(
                                 TERRAFORM_EXECUTOR_NAME_PREFIX, bestVersionNumber),
                         getExecutorBinaryDownloadUrl(bestVersionNumber),
-                        this.terraformInstallDir);
+                        getTerraformInstallationDir());
         if (deployerToolUtils.checkIfExecutorCanBeExecuted(
                 installedExecutorFile, TERRAFORM_VERSION_COMMAND_ARGUMENT)) {
             log.info("Terraform with version {}  installed successfully.", installedExecutorFile);
@@ -132,7 +121,7 @@ public class TerraformInstaller {
         String errorMsg =
                 String.format(
                         "Installing terraform with version %s into the dir %s " + "failed. ",
-                        bestVersionNumber, this.terraformInstallDir);
+                        bestVersionNumber, getTerraformInstallationDir());
         log.error(errorMsg);
         throw new InvalidDeployerToolException(errorMsg);
     }
@@ -140,7 +129,7 @@ public class TerraformInstaller {
     private String getExecutorBinaryDownloadUrl(String versionNumber) {
         return String.format(
                 TERRAFORM_BINARY_DOWNLOAD_URL_FORMAT,
-                this.terraformDownloadBaseUrl,
+                this.deploymentProperties.getTerraformLocal().getDownloadBaseUrl(),
                 versionNumber,
                 versionNumber,
                 getOperatingSystemCode(),
@@ -166,5 +155,12 @@ public class TerraformInstaller {
 
     public String getExecutorNameWithVersion(String executorNamePrefix, String versionNumber) {
         return executorNamePrefix + versionNumber;
+    }
+
+    private String getTerraformInstallationDir() {
+        // if not specific location is provided, then use the default user's app location.
+        return deploymentProperties.getTerraformLocal().getInstallDir().isBlank()
+                ? deployerToolUtils.getUserAppInstallFolder().toFile().getAbsolutePath()
+                : deploymentProperties.getTerraformLocal().getInstallDir();
     }
 }

@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.ai.config.AiProperties;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -34,36 +34,23 @@ import org.springframework.stereotype.Component;
 public class DockerImageManage {
 
     private static final String DEFAULT_VERSION = "latest";
-    private final String dockerRegistryUrl;
-    private final String dockerRegistryUsername;
-    private final String dockerRegistryPassword;
-    private final String dockerRegistryOrganization;
-    private final String dockerImageBuildProxyUrl;
+    private final AiProperties aiProperties;
 
     /** Constructor method. */
     @Autowired
-    public DockerImageManage(
-            @Value("${ai.docker.registry.url}") String dockerRegistryUrl,
-            @Value("${ai.docker.registry.username}") String dockerRegistryUsername,
-            @Value("${ai.docker.registry.password}") String dockerRegistryPassword,
-            @Value("${ai.docker.registry.organization}") String dockerRegistryOrganization,
-            @Value("${docker.image.build.proxy.url}") String dockerImageBuildProxyUrl) {
-        this.dockerRegistryUrl = dockerRegistryUrl;
-        this.dockerRegistryUsername = dockerRegistryUsername;
-        this.dockerRegistryPassword = dockerRegistryPassword;
-        this.dockerRegistryOrganization = dockerRegistryOrganization;
-        this.dockerImageBuildProxyUrl = dockerImageBuildProxyUrl;
+    public DockerImageManage(AiProperties aiProperties) {
+        this.aiProperties = aiProperties;
     }
 
     /** creates docker image and pushes to a registry. */
     public String createAndPushImage(String codePath, String imageName)
             throws IOException, InterruptedException {
         String fullImageName =
-                dockerRegistryUrl
+                aiProperties.getDocker().getRegistryUrl()
                         + '/'
-                        + (dockerRegistryOrganization.isBlank()
-                                ? dockerRegistryUsername
-                                : dockerRegistryOrganization)
+                        + (aiProperties.getDocker().getRegistryOrganization().isBlank()
+                                ? aiProperties.getDocker().getRegistryUsername()
+                                : aiProperties.getDocker().getRegistryOrganization())
                         + '/'
                         + imageName
                         + ':'
@@ -71,9 +58,9 @@ public class DockerImageManage {
 
         DockerClientConfig config =
                 DefaultDockerClientConfig.createDefaultConfigBuilder()
-                        .withRegistryUrl(dockerRegistryUrl)
-                        .withRegistryUsername(dockerRegistryUsername)
-                        .withRegistryPassword(dockerRegistryPassword)
+                        .withRegistryUrl(aiProperties.getDocker().getRegistryUrl())
+                        .withRegistryUsername(aiProperties.getDocker().getRegistryUsername())
+                        .withRegistryPassword(aiProperties.getDocker().getRegistryPassword())
                         .withDockerTlsVerify(false)
                         .withDockerHost("unix:///var/run/docker.sock")
                         .build();
@@ -111,16 +98,21 @@ public class DockerImageManage {
                                 .withNoCache(true)
                                 .withTags(Collections.singleton(fullImageName));
 
-                if (!dockerImageBuildProxyUrl.isBlank()) {
+                if (!aiProperties.getDocker().getProxyUrl().isBlank()) {
                     log.debug(
-                            "using proxy URL {} for docker image build.", dockerImageBuildProxyUrl);
-                    buildImageCmd.withBuildArg("HTTPS_PROXY", dockerImageBuildProxyUrl);
+                            "using proxy URL {} for docker image build.",
+                            aiProperties.getDocker().getProxyUrl());
+                    buildImageCmd.withBuildArg(
+                            "HTTPS_PROXY", aiProperties.getDocker().getProxyUrl());
                 }
                 buildImageCmd.exec(resultCallback);
                 resultCallback.awaitCompletion();
                 log.info("Image built successfully.");
 
-                log.info("Pushing image: {} to {}", fullImageName, dockerRegistryUrl);
+                log.info(
+                        "Pushing image: {} to {}",
+                        fullImageName,
+                        aiProperties.getDocker().getRegistryUrl());
                 dockerClient.pushImageCmd(fullImageName).start().awaitCompletion();
             }
             log.info("Image pushed successfully to GitHub Packages.");

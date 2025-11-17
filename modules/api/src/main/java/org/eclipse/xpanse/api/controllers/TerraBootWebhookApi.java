@@ -36,7 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("terra-boot")
 @CrossOrigin
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class TerraBootWebhookApi {
 
     @Resource
@@ -46,7 +49,7 @@ public class TerraBootWebhookApi {
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result of the order task from terra-boot.")
     @PostMapping(
-            value = "${webhook.terra-boot.orderCallbackUri}/{orderId}",
+            value = "${xpanse.deployer.terra-boot.webhook-callback-uri}/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceOrderId", paramTypes = UUID.class)

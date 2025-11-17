@@ -9,28 +9,34 @@ import java.util.Map;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
 import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfo;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@ExtendWith(MockitoExtension.class)
+@ContextConfiguration(classes = {UserServiceHelper.class, SecurityProperties.class})
+@Import(RefreshAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
 class UserServiceHelperTest {
 
     private final String userId = "userId";
     private final String isv = "isv";
     private final Csp csp = Csp.HUAWEI_CLOUD;
     private final List<String> roles = List.of("admin", "csp", "isv", "user");
-    @Mock private IdentityProviderManager mockIdentityProviderManager;
-    @InjectMocks private UserServiceHelper userServiceHelperUnderTest;
+    @MockitoBean private IdentityProviderManager mockIdentityProviderManager;
+    @Autowired SecurityProperties securityProperties;
+    @Autowired private UserServiceHelper userServiceHelperUnderTest;
 
     void setUpSecurityConfig(boolean webSecurityIsEnabled, boolean roleProtectionIsEnabled) {
+        ReflectionTestUtils.setField(securityProperties, "enableWebSecurity", webSecurityIsEnabled);
         ReflectionTestUtils.setField(
-                userServiceHelperUnderTest, "webSecurityIsEnabled", webSecurityIsEnabled);
-        ReflectionTestUtils.setField(
-                userServiceHelperUnderTest, "roleProtectionIsEnabled", roleProtectionIsEnabled);
+                securityProperties, "enableRoleProtection", roleProtectionIsEnabled);
     }
 
     CurrentUserInfo getMockCurrentUserInfo() {

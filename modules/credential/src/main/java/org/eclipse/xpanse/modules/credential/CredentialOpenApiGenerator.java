@@ -32,6 +32,7 @@ import org.eclipse.xpanse.modules.models.credential.exceptions.NoCredentialDefin
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.auth.zitadel.ZitadelIdentityProviderService;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -52,11 +53,7 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
     private final OpenApiGeneratorJarManage openApiGeneratorJarManage;
     private final ZitadelIdentityProviderService zitadelIdentityProviderService;
 
-    @Value("${enable.web.security:false}")
-    private Boolean webSecurityIsEnabled;
-
-    @Value("${enable.role.protection:false}")
-    private Boolean roleProtectionIsEnabled;
+    private final SecurityProperties securityProperties;
 
     /** Constructor of CredentialOpenApiGenerator. */
     @Autowired
@@ -65,12 +62,14 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
             @Nullable ZitadelIdentityProviderService zitadelIdentityProviderService,
             PluginManager pluginManager,
             OpenApiUrlManage openApiUrlManage,
-            OpenApiGeneratorJarManage openApiGeneratorJarManage) {
+            OpenApiGeneratorJarManage openApiGeneratorJarManage,
+            SecurityProperties securityProperties) {
         this.appVersion = appVersion;
         this.zitadelIdentityProviderService = zitadelIdentityProviderService;
         this.pluginManager = pluginManager;
         this.openApiUrlManage = openApiUrlManage;
         this.openApiGeneratorJarManage = openApiGeneratorJarManage;
+        this.securityProperties = securityProperties;
     }
 
     /**
@@ -247,15 +246,20 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
                 throw new NoCredentialDefinitionAvailable(errorMsg);
             }
         }
-        if (openApiGeneratorJarManage.getOpenapiPath().endsWith("/")) {
+        if (openApiGeneratorJarManage
+                .getOpenApiGeneratorProperties()
+                .getFileGenerationPath()
+                .endsWith("/")) {
             return getServiceUrl()
                     + "/"
-                    + openApiGeneratorJarManage.getOpenapiPath()
+                    + openApiGeneratorJarManage
+                            .getOpenApiGeneratorProperties()
+                            .getFileGenerationPath()
                     + htmlFileName;
         }
         return getServiceUrl()
                 + "/"
-                + openApiGeneratorJarManage.getOpenapiPath()
+                + openApiGeneratorJarManage.getOpenApiGeneratorProperties().getFileGenerationPath()
                 + "/"
                 + htmlFileName;
     }
@@ -558,9 +562,11 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
     }
 
     private String getSecurityConfigList() {
-        if (webSecurityIsEnabled) {
+        if (securityProperties.isEnableWebSecurity()) {
             String roleScopeStr =
-                    roleProtectionIsEnabled ? "\"urn:zitadel:iam:org:project:roles\"," : "";
+                    securityProperties.isEnableRoleProtection()
+                            ? "\"urn:zitadel:iam:org:project:roles\","
+                            : "";
             return String.format(
                     """
                     "security": [
@@ -580,7 +586,8 @@ public class CredentialOpenApiGenerator implements ApplicationListener<Applicati
     }
 
     private String getRequiredRolesDesc() {
-        if (webSecurityIsEnabled && roleProtectionIsEnabled) {
+        if (securityProperties.isEnableWebSecurity()
+                && securityProperties.isEnableRoleProtection()) {
             return "<br>Required role:<b> admin</b> or <b>user</b>";
         }
         return "";

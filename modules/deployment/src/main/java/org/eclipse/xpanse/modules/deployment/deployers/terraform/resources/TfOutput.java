@@ -23,6 +23,7 @@ public class TfOutput {
 
     private String type;
     private String value;
+    private boolean sensitive;
 
     /**
      * Convert type object to string.

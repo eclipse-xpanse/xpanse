@@ -7,35 +7,36 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.conf
 
 import static org.mockito.Mockito.verify;
 
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.ApiClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@ContextConfiguration(classes = {TerraBootApiClientConfig.class, DeploymentProperties.class})
+@TestPropertySource(
+        properties = {
+            "xpanse.deployer.terra-boot.endpoint=http://localhost:9090",
+        })
+@Import(RefreshAutoConfiguration.class)
+@ActiveProfiles("terra-boot")
+@ExtendWith(SpringExtension.class)
 class TerraBootApiClientConfigTest {
 
-    @Mock private ApiClient mockApiClient;
+    @MockitoBean private ApiClient mockApiClient;
 
-    @InjectMocks private TerraBootApiClientConfig terraBootApiClientConfigUnderTest;
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(
-                terraBootApiClientConfigUnderTest, "terraBootBaseUrl", "http://localhost:9090");
-    }
+    @Autowired private TerraBootApiClientConfig terraBootApiClientConfigUnderTest;
 
     @Test
     void testApiClientConfig() {
-        // Setup
-        // Run the test
-        terraBootApiClientConfigUnderTest.apiClientConfig();
-
-        // Verify the results
+        // Verify if the setBaePath was called by the SpringFramework
         verify(mockApiClient).setBasePath("http://localhost:9090");
     }
 }

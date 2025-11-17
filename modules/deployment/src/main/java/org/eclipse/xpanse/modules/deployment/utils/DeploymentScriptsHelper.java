@@ -6,7 +6,6 @@
 package org.eclipse.xpanse.modules.deployment.utils;
 
 import jakarta.annotation.Nullable;
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,10 +31,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
+import org.eclipse.xpanse.modules.deployment.config.OrderProperties;
 import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentScriptsCreationFailedException;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FileLockedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /** Bean to manage deployment scripts. */
@@ -50,16 +51,20 @@ public class DeploymentScriptsHelper {
             Arrays.asList(".tf", ".tfstate", ".binary", ".hcl");
     private static final String MODE = "rw";
 
-    @Value("${wait.time.for.deploy.result.file.lock.in.seconds}")
-    private int awaitAtMost;
+    private final ScriptsGitRepoManage scriptsGitRepoManage;
+    private final OrderProperties orderProperties;
+    private final DeploymentProperties deploymentProperties;
 
-    @Value("${polling.interval.for.deploy.result.file.lock.check.in.seconds}")
-    private int awaitPollingInterval;
-
-    @Value("${clean.workspace.after.deployment.enabled:true}")
-    private boolean cleanWorkspaceAfterDeploymentEnabled;
-
-    @Resource private ScriptsGitRepoManage scriptsGitRepoManage;
+    /** Constructor method. */
+    @Autowired
+    public DeploymentScriptsHelper(
+            ScriptsGitRepoManage scriptsGitRepoManage,
+            OrderProperties orderProperties,
+            DeploymentProperties deploymentProperties) {
+        this.scriptsGitRepoManage = scriptsGitRepoManage;
+        this.orderProperties = orderProperties;
+        this.deploymentProperties = deploymentProperties;
+    }
 
     /**
      * Create workspace directory for a deployment task.
@@ -180,7 +185,7 @@ public class DeploymentScriptsHelper {
      * @param taskWorkspace workspace directory for the task.
      */
     public void deleteTaskWorkspace(String taskWorkspace) {
-        if (cleanWorkspaceAfterDeploymentEnabled) {
+        if (deploymentProperties.getCleanWorkspaceAfterDeploymentEnabled()) {
             Path path = Paths.get(taskWorkspace);
             try (Stream<Path> pathStream = Files.walk(path)) {
                 pathStream
@@ -283,8 +288,12 @@ public class DeploymentScriptsHelper {
     private void waitUntilFileIsNotLocked(String tfStateFilePath) {
         try {
             Awaitility.await()
-                    .atMost(Duration.ofSeconds(awaitAtMost))
-                    .pollInterval(Duration.ofSeconds(awaitPollingInterval))
+                    .atMost(
+                            Duration.ofSeconds(
+                                    orderProperties.getOrderStatus().getLongPollingSeconds()))
+                    .pollInterval(
+                            Duration.ofSeconds(
+                                    orderProperties.getOrderStatus().getLongPollingSeconds()))
                     .pollDelay(0, TimeUnit.SECONDS)
                     .until(() -> !isTfStateFileLocked(tfStateFilePath));
         } catch (ConditionTimeoutException e) {

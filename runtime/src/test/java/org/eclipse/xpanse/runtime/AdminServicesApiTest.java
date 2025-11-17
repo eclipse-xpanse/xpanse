@@ -117,7 +117,7 @@ class AdminServicesApiTest extends ApisTestCommon {
         assertEquals(response.getStatus(), HttpStatus.OK.value());
         SystemStatus stackStatus =
                 objectMapper.readValue(response.getContentAsString(), SystemStatus.class);
-        assertEquals(stackStatus.getHealthStatus(), HealthStatus.OK);
+        assertEquals(HealthStatus.OK, stackStatus.getHealthStatus());
     }
 
     @Test

@@ -14,7 +14,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueE
 public enum SensitiveScope {
     // Not sensitive.
     NONE("none"),
-    // Only sensitive in one request, no need to be stored.
+    // Only sensitive in one request, no need to be stored. Deleted after the data is viewed once.
     ONCE("once"),
     // Keep sensitive in all the cycle life.
     ALWAYS("always");

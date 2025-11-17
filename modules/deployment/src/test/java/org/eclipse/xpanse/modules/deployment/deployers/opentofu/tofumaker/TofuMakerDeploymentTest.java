@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.config.TofuMakerConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.AdminApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromGitRepoApi;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.api.OpenTofuFromScriptsApi;
@@ -57,12 +56,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             DeployEnvironments.class,
             PluginManager.class,
             OpenTofuFromScriptsApi.class,
-            TofuMakerConfig.class,
             ServiceDeploymentEntityHandler.class,
             TofuMakerScriptValidator.class,
             TofuMakerServiceDeployer.class,
             TofuMakerDeployment.class,
-            TofuMakerHelper.class,
             AdminApi.class,
             TofuMakerDeploymentPlanManage.class,
             TofuMakerServiceDestroyer.class
@@ -87,7 +84,6 @@ class TofuMakerDeploymentTest {
     @MockitoBean DeployEnvironments deployEnvironments;
     @MockitoBean PluginManager pluginManager;
     @MockitoBean OpenTofuFromScriptsApi terraformApi;
-    @MockitoBean TofuMakerConfig tofuMakerConfig;
     @MockitoBean ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @MockitoBean TofuMakerScriptValidator tofuMakerScriptValidator;
     @MockitoBean OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
@@ -95,6 +91,7 @@ class TofuMakerDeploymentTest {
     @Autowired TofuMakerServiceDeployer tofuMakerServiceDeployer;
     @Autowired TofuMakerServiceModifier tofuMakerServiceModifier;
     @MockitoBean AdminApi adminApi;
+    @MockitoBean TofuMakerHelper tofuMakerHelper;
 
     @Autowired private TofuMakerDeployment openTofuMakerDeployment;
 

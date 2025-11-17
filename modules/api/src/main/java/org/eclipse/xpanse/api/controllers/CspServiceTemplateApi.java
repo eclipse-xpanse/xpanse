@@ -56,7 +56,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_CSP})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class CspServiceTemplateApi {
 
     @Resource private ServiceTemplateManage serviceTemplateManage;

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import org.eclipse.xpanse.api.config.CspPluginValidator;
 import org.eclipse.xpanse.api.controllers.ServiceDeployerApi;
+import org.eclipse.xpanse.modules.cache.config.CacheProperties;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.DeployerKindManager;
@@ -40,12 +41,15 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.eclipse.xpanse.modules.security.auth.zitadel.ZitadelIdentityProviderService;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -66,8 +70,11 @@ import org.springframework.web.context.WebApplicationContext;
             ServiceOrderManager.class,
             CspPluginValidator.class,
             ServiceDeploymentEntityConverter.class,
-            PluginManager.class
+            PluginManager.class,
+            CacheProperties.class,
+            SecurityProperties.class,
         })
+@Import(RefreshAutoConfiguration.class)
 @WebMvcTest
 class DeploymentExceptionHandlerTest {
     private MockMvc mockMvc;

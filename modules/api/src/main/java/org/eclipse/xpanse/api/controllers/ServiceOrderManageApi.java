@@ -43,7 +43,10 @@ import org.springframework.web.context.request.async.DeferredResult;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_ISV, ROLE_USER})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class ServiceOrderManageApi {
     @Resource private ServiceOrderManager serviceOrderManager;
 

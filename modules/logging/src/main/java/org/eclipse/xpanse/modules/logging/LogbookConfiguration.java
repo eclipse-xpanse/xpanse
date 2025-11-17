@@ -14,21 +14,20 @@ import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.zalando.logbook.HttpRequest;
 import org.zalando.logbook.Logbook;
 import org.zalando.logbook.core.DefaultSink;
 
 /** Bean to auto configure Logbook configuration. */
 @Configuration
-@DependsOn(value = "httpLoggingConfig")
 public class LogbookConfiguration {
 
-    private final HttpLoggingConfig httpLoggingConfig;
+    private final HttpServerRequestLoggingProperties httpServerRequestLoggingProperties;
 
     @Autowired
-    public LogbookConfiguration(HttpLoggingConfig httpLoggingConfig) {
-        this.httpLoggingConfig = httpLoggingConfig;
+    public LogbookConfiguration(
+            HttpServerRequestLoggingProperties httpServerRequestLoggingProperties) {
+        this.httpServerRequestLoggingProperties = httpServerRequestLoggingProperties;
     }
 
     /** Method to instantiate Logbook bean. */
@@ -40,13 +39,14 @@ public class LogbookConfiguration {
                 .sink(
                         new DefaultSink(
                                 new CustomHttpLogFormatter(),
-                                new CustomHttpLogWriter(httpLoggingConfig.isHttpLoggingEnabled())))
+                                new CustomHttpLogWriter(
+                                        httpServerRequestLoggingProperties.getEnabled())))
                 .build();
     }
 
     private List<Predicate<HttpRequest>> getExcludedUris() {
         List<Predicate<HttpRequest>> predicates = new ArrayList<>();
-        for (String excludedUri : httpLoggingConfig.getExcludedUris()) {
+        for (String excludedUri : httpServerRequestLoggingProperties.getExcludeUri()) {
             predicates.add(requestTo(excludedUri));
         }
         return predicates;

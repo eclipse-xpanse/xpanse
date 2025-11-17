@@ -5,18 +5,17 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.helm.installer;
 
-import jakarta.annotation.Resource;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerTarGzFileManage;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -42,33 +41,21 @@ public class HelmBinaryInstaller {
 
     private static final String HELM_VERSION_COMMAND = " version";
 
-    private final Path installBaseDirectory;
+    private final DeployerToolUtils deployerToolUtils;
 
-    private final String helmDownloadBaseUrl;
+    private final DeployerTarGzFileManage deployerTarGzFileManage;
 
-    @Resource private DeployerToolUtils deployerToolUtils;
-
-    @Resource private DeployerTarGzFileManage deployerTarGzFileManage;
+    private final DeploymentProperties deploymentProperties;
 
     /** Constructor for component. */
     @Autowired
     public HelmBinaryInstaller(
-            @Value("${deployer.helm.download.base.url:https://get.helm.sh/}")
-                    String helmDownloadBaseUrl,
-            @Value("${deployer.helm.install.dir:}") String helmInstallDir,
             DeployerToolUtils deployerToolUtils,
-            DeployerTarGzFileManage deployerTarGzFileManage) {
-        this.helmDownloadBaseUrl = helmDownloadBaseUrl;
+            DeployerTarGzFileManage deployerTarGzFileManage,
+            DeploymentProperties deploymentProperties) {
         this.deployerToolUtils = deployerToolUtils;
         this.deployerTarGzFileManage = deployerTarGzFileManage;
-        if (StringUtils.isBlank(helmInstallDir)) {
-            this.installBaseDirectory = deployerToolUtils.getUserAppInstallFolder();
-        } else {
-            this.installBaseDirectory = Paths.get(helmInstallDir);
-        }
-        log.info(
-                "helm deployer uses {} for installing binaries",
-                this.installBaseDirectory.toAbsolutePath());
+        this.deploymentProperties = deploymentProperties;
     }
 
     /**
@@ -81,8 +68,9 @@ public class HelmBinaryInstaller {
      */
     @Retryable(
             retryFor = InvalidDeployerToolException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public String getExecutorPathThatMatchesRequiredVersion(String requiredVersion) {
         if (StringUtils.isBlank(requiredVersion)) {
             log.info("No required version of helm is specified, use the default helm.");
@@ -98,7 +86,7 @@ public class HelmBinaryInstaller {
                         HELM_EXECUTOR_NAME_PREFIX,
                         HELM_VERSION_COMMAND,
                         HELM_VERSION_OUTPUT_PATTERN,
-                        this.installBaseDirectory.toAbsolutePath().toString(),
+                        this.getHelmInstallDir().toAbsolutePath().toString(),
                         requiredOperator,
                         requiredNumber);
         if (StringUtils.isBlank(matchedVersionExecutorPath)) {
@@ -106,7 +94,7 @@ public class HelmBinaryInstaller {
                     "No helm executor matched the required version {} from the "
                             + "helm installation dir {}, start to download and install one.",
                     requiredVersion,
-                    this.installBaseDirectory.toAbsolutePath());
+                    this.getHelmInstallDir().toAbsolutePath());
             return installHelmByRequiredVersion(requiredOperator, requiredNumber);
         }
         return matchedVersionExecutorPath;
@@ -130,14 +118,14 @@ public class HelmBinaryInstaller {
         String errorMsg =
                 String.format(
                         "Installing helm with version %s into the dir %s " + "failed. ",
-                        bestVersionNumber, this.installBaseDirectory.toAbsolutePath());
+                        bestVersionNumber, this.getHelmInstallDir().toAbsolutePath());
         log.error(errorMsg);
         throw new InvalidDeployerToolException(errorMsg);
     }
 
     private Path getInstallSubDir(String bestVersion) {
         return Paths.get(
-                this.installBaseDirectory.toAbsolutePath().toString(),
+                this.getHelmInstallDir().toAbsolutePath().toString(),
                 HELM_EXECUTOR_NAME_PREFIX + bestVersion);
     }
 
@@ -153,11 +141,19 @@ public class HelmBinaryInstaller {
     }
 
     private String getDownloadFileUrl(String version) {
-        return this.helmDownloadBaseUrl
+        return this.deploymentProperties.getHelm().getDownloadBaseUrl()
                 + String.format(
                         HELM_BINARY_DOWNLOAD_URL_FORMAT,
                         version,
                         System.getProperty("os.name").toLowerCase(),
                         getArchitecture());
+    }
+
+    private Path getHelmInstallDir() {
+        if (StringUtils.isBlank(deploymentProperties.getHelm().getInstallDir())) {
+            return deployerToolUtils.getUserAppInstallFolder();
+        } else {
+            return Paths.get(deploymentProperties.getHelm().getInstallDir());
+        }
     }
 }

@@ -41,7 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(
         properties = {
             "spring.profiles.active=oauth,zitadel,zitadel-local,mysql,test,dev",
-            "huaweicloud.auto.approve.service.template.enabled=true"
+            "xpanse.plugins.huaweicloud.service-template.auto-approve=true"
         })
 @AutoConfigureMockMvc
 class RegistrationWithMysqlTest extends AbstractMysqlIntegrationTest {

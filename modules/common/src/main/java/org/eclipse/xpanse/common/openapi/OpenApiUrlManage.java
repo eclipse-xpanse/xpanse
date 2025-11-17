@@ -8,8 +8,9 @@ package org.eclipse.xpanse.common.openapi;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.config.OpenApiGeneratorProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -18,16 +19,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @Component
 public class OpenApiUrlManage {
 
-    private final String openapiPath;
-    private final Integer port;
+    private final OpenApiGeneratorProperties openApiGeneratorProperties;
+    private final Environment environment;
 
     /** OpenApiUrlManage constructor. */
     @Autowired
     public OpenApiUrlManage(
-            @Value("${openapi.path:openapi/}") String openapiPath,
-            @Value("${server.port:8080}") Integer port) {
-        this.openapiPath = openapiPath;
-        this.port = port;
+            OpenApiGeneratorProperties openApiGeneratorProperties, Environment environment) {
+        this.openApiGeneratorProperties = openApiGeneratorProperties;
+        this.environment = environment;
     }
 
     /**
@@ -47,7 +47,7 @@ public class OpenApiUrlManage {
             } catch (UnknownHostException ex) {
                 log.error("Get localHost error.", ex);
             }
-            return "http://" + host + ":" + port;
+            return "http://" + host + ":" + environment.getProperty("server.port");
         }
     }
 
@@ -57,9 +57,18 @@ public class OpenApiUrlManage {
      * @return openApiUrl
      */
     public String getOpenApiUrl(String id) {
-        if (openapiPath.endsWith("/")) {
-            return getServiceUrl() + "/" + openapiPath + id + ".html";
+        if (openApiGeneratorProperties.getFileGenerationPath().endsWith("/")) {
+            return getServiceUrl()
+                    + "/"
+                    + openApiGeneratorProperties.getFileGenerationPath()
+                    + id
+                    + ".html";
         }
-        return getServiceUrl() + "/" + openapiPath + "/" + id + ".html";
+        return getServiceUrl()
+                + "/"
+                + openApiGeneratorProperties.getFileGenerationPath()
+                + "/"
+                + id
+                + ".html";
     }
 }

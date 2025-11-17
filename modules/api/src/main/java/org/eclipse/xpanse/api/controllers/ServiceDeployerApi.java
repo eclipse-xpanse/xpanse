@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.api.config.OrderFailedApiResponses;
+import org.eclipse.xpanse.modules.cache.config.CacheProperties;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceDetailsViewManager;
@@ -43,7 +44,6 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
@@ -69,12 +69,13 @@ import org.springframework.web.context.request.async.DeferredResult;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class ServiceDeployerApi {
 
-    @Value("${region.azs.cache.expire.time.in.minutes:60}")
-    private long duration;
-
+    @Resource private CacheProperties cacheProperties;
     @Resource private DeployService deployService;
     @Resource private ServiceLockConfigService lockConfigService;
     @Resource private ServiceDetailsViewManager serviceDetailsViewManager;
@@ -411,7 +412,10 @@ public class ServiceDeployerApi {
     }
 
     private CacheControl getCacheControl() {
-        long durationTime = this.duration > 0 ? this.duration : 60;
+        long durationTime =
+                this.cacheProperties.getAvailabilityZoneCacheMinutes() > 0
+                        ? this.cacheProperties.getAvailabilityZoneCacheMinutes()
+                        : 60;
         return CacheControl.maxAge(durationTime, TimeUnit.MINUTES).mustRevalidate();
     }
 

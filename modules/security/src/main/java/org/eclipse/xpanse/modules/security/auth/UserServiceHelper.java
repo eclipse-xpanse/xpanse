@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.security.auth;
 
-import jakarta.annotation.Resource;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +13,8 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.common.exceptions.UnsupportedEnumValueException;
 import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInException;
 import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfo;
-import org.springframework.beans.factory.annotation.Value;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,14 +28,16 @@ import org.springframework.util.CollectionUtils;
 public class UserServiceHelper {
 
     private static final String NO_AUTH_DEFAULT_USER_ID = "no-auth-user-id";
+    private final SecurityProperties securityProperties;
+    private final IdentityProviderManager identityProviderManager;
 
-    @Value("${enable.web.security:true}")
-    private Boolean webSecurityIsEnabled;
-
-    @Value("${enable.role.protection:true}")
-    private Boolean roleProtectionIsEnabled;
-
-    @Resource private IdentityProviderManager identityProviderManager;
+    @Autowired
+    public UserServiceHelper(
+            SecurityProperties securityProperties,
+            IdentityProviderManager identityProviderManager) {
+        this.securityProperties = securityProperties;
+        this.identityProviderManager = identityProviderManager;
+    }
 
     /**
      * Check if the current user has the role.
@@ -44,10 +46,10 @@ public class UserServiceHelper {
      * @return true if the current user has the role, false otherwise.
      */
     public boolean currentUserHasRole(String role) {
-        if (!webSecurityIsEnabled) {
+        if (!securityProperties.isEnableWebSecurity()) {
             return true;
         }
-        if (!roleProtectionIsEnabled) {
+        if (!securityProperties.isEnableRoleProtection()) {
             return true;
         }
         CurrentUserInfo currentUserInfo = getCurrentUserInfo();
@@ -63,7 +65,7 @@ public class UserServiceHelper {
      * @return true if the current user is the owner user, false otherwise.
      */
     public boolean currentUserIsOwner(String ownerId) {
-        if (!webSecurityIsEnabled) {
+        if (!securityProperties.isEnableWebSecurity()) {
             return true;
         }
         return StringUtils.equals(ownerId, getCurrentUserId());
@@ -76,7 +78,7 @@ public class UserServiceHelper {
      * @return true if the current user has the owner serviceVendor, false otherwise.
      */
     public boolean currentUserCanManageIsv(String ownerIsv) {
-        if (!webSecurityIsEnabled) {
+        if (!securityProperties.isEnableWebSecurity()) {
             return true;
         }
         return StringUtils.equals(ownerIsv, getIsvManagedByCurrentUser());
@@ -89,7 +91,7 @@ public class UserServiceHelper {
      * @return true if the current user can manage the csp, false otherwise.
      */
     public boolean currentUserCanManageCsp(Csp ownerCsp) {
-        if (!webSecurityIsEnabled) {
+        if (!securityProperties.isEnableWebSecurity()) {
             return true;
         }
         return Objects.equals(ownerCsp, getCspManagedByCurrentUser());
@@ -97,7 +99,7 @@ public class UserServiceHelper {
 
     /** Get the current user id. */
     public String getCurrentUserId() {
-        if (!webSecurityIsEnabled) {
+        if (!securityProperties.isEnableWebSecurity()) {
             return NO_AUTH_DEFAULT_USER_ID;
         }
         return getCurrentUserInfo().getUserId();
@@ -118,7 +120,7 @@ public class UserServiceHelper {
 
     /** Get the service vendor managed by the current user . */
     public String getIsvManagedByCurrentUser() {
-        if (!webSecurityIsEnabled) {
+        if (!securityProperties.isEnableWebSecurity()) {
             return null;
         }
         CurrentUserInfo userInfo = getCurrentUserInfo();
@@ -130,7 +132,7 @@ public class UserServiceHelper {
 
     /** Get the auth enable result. */
     public boolean isAuthEnable() {
-        return webSecurityIsEnabled;
+        return securityProperties.isEnableWebSecurity();
     }
 
     /** Necessary to check if request was bypassed by the auth filter. */
@@ -143,7 +145,7 @@ public class UserServiceHelper {
 
     /** Get the csp managed by the current user. */
     public Csp getCspManagedByCurrentUser() {
-        if (!webSecurityIsEnabled) {
+        if (!securityProperties.isEnableWebSecurity()) {
             return null;
         }
         CurrentUserInfo currentUserInfo = getCurrentUserInfo();

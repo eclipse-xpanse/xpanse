@@ -69,8 +69,9 @@ public class HuaweiCloudResourceManager {
     /** List HuaweiCloud resource by the kind of ReusableCloudResource. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<String> getExistingResourceNamesWithKind(
             String siteName, String regionName, String userId, DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
@@ -102,8 +103,9 @@ public class HuaweiCloudResourceManager {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<String> getAvailabilityZonesOfRegion(
             String siteName, String regionName, String userId) {
         List<String> availabilityZoneNames = new ArrayList<>();

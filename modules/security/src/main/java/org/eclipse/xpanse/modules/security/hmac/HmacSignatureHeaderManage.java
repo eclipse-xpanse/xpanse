@@ -17,10 +17,11 @@ import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.logging.log4j.util.Strings;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
@@ -40,19 +41,18 @@ public class HmacSignatureHeaderManage {
     private static final String ALGORITHM_KEY = "algorithm";
     private static final String HEADERS_USED_IN_SIGNATURE_KEY = "headers";
     private static final String SIGNATURE_KEY = "signature";
-    private final String hmacSecretKey;
     private static final String SIGNATURE_HEADER_SEPARATOR = ";";
     private static final String SIGNATURE_HEADER_KEY_VALUE_SEPARATOR = "=";
     private static final String SIGNATURE_CONTENT_VALUES_SEPARATOR = "\n";
     // separator between the list of header names that are part of the generated signature.
     private static final String SIGNATURE_HEADERS_LIST_SEPARATOR = " ";
+    private final SecurityProperties securityProperties;
 
     /** constructor for HmacSignatureHeaderManage. */
     @Autowired
-    public HmacSignatureHeaderManage(
-            @Value("${xpanse.webhook.hmac.request.signing.key}") String hmacSecretKey) {
-        this.hmacSecretKey = hmacSecretKey;
-        if (hmacSecretKey.isBlank()) {
+    public HmacSignatureHeaderManage(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+        if (Strings.isBlank(securityProperties.getWebhookHmacSigningKey())) {
             throw new IllegalArgumentException("hmacSecretKey is blank");
         }
     }
@@ -155,7 +155,10 @@ public class HmacSignatureHeaderManage {
             Mac mac = Mac.getInstance(hmacAlgorithm);
             SecretKeySpec secretKeySpec =
                     new SecretKeySpec(
-                            hmacSecretKey.getBytes(Charset.defaultCharset()), hmacAlgorithm);
+                            securityProperties
+                                    .getWebhookHmacSigningKey()
+                                    .getBytes(Charset.defaultCharset()),
+                            hmacAlgorithm);
             mac.init(secretKeySpec);
             byte[] hmacBytes = mac.doFinal(requestData.getBytes(Charset.defaultCharset()));
             return Hex.encodeHexString(hmacBytes);

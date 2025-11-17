@@ -41,8 +41,9 @@ public class HuaweiCloudVmStateManager {
     /** Start the Huawei Cloud Ecs server. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean startService(ServiceStateManageRequest serviceStateManageRequest) {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
@@ -67,8 +68,9 @@ public class HuaweiCloudVmStateManager {
     /** Stop the Huawei Cloud Ecs server. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean stopService(ServiceStateManageRequest serviceStateManageRequest) {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);
@@ -93,8 +95,9 @@ public class HuaweiCloudVmStateManager {
     /** Restart the Huawei Cloud Ecs server. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean restartService(ServiceStateManageRequest serviceStateManageRequest) {
         try {
             EcsClient ecsClient = getEcsClient(serviceStateManageRequest);

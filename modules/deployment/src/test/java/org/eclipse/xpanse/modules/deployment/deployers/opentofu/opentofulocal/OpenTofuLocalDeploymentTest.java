@@ -21,15 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.xpanse.modules.async.TaskConfiguration;
+import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
+import org.eclipse.xpanse.modules.deployment.config.GitProperties;
+import org.eclipse.xpanse.modules.deployment.config.OrderProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal.config.OpenTofuLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
@@ -44,6 +47,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.orchestrator.config.OrchestratorProperties;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.InputValidateDiagnostics;
@@ -51,17 +55,46 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /** Test for OpenTofuDeployment. */
 @Slf4j
-@ExtendWith({MockitoExtension.class})
+@ContextConfiguration(
+        classes = {
+            OpenTofuLocalDeployment.class,
+            DeploymentScriptsHelper.class,
+            OpenTofuInstaller.class,
+            ScriptsGitRepoManage.class,
+            DeployEnvironments.class,
+            PluginManager.class,
+            DeployService.class,
+            OpenTofuDeploymentResultCallbackManager.class,
+            ServiceDeploymentEntityHandler.class,
+            DeploymentProperties.class,
+            TaskConfiguration.class,
+            GitProperties.class,
+            OrderProperties.class,
+            OrchestratorProperties.class
+        })
+@Import(RefreshAutoConfiguration.class)
+@TestPropertySource(
+        properties = {
+            "xpanse.deployer.clean-workspace-after-deployment-enabled=true",
+            "xpanse.deployer.opentofu-local.debug.enabled=false",
+            "xpanse.deployer.opentofu-local.workspace.directory=xpanse_workspace",
+            "xpanse.order.order-status.long-polling-seconds=10",
+            "xpanse.order.order-status.polling-interval-seconds=5"
+        })
+@ExtendWith({SpringExtension.class})
 class OpenTofuLocalDeploymentTest {
 
     private final String errorScript = "error_script";
@@ -75,29 +108,19 @@ class OpenTofuLocalDeploymentTest {
               value = resource.random_id_2.new.id
             }
             """;
-    @InjectMocks OpenTofuLocalDeployment openTofuLocalDeployment;
-    @InjectMocks DeploymentScriptsHelper scriptsHelper;
-    @Mock OpenTofuInstaller openTofuInstaller;
-    @InjectMocks ScriptsGitRepoManage scriptsGitRepoManage;
-    @InjectMocks OpenTofuLocalConfig openTofuLocalConfig;
-    @Mock DeployEnvironments deployEnvironments;
-    @Mock PluginManager pluginManager;
-    @Mock DeployService deployService;
-    @Mock Executor taskExecutor;
-    @Mock OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
-    @Mock ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @MockitoBean OpenTofuInstaller openTofuInstaller;
+    @MockitoBean ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @MockitoBean DeployEnvironments deployEnvironments;
+    @Autowired OpenTofuLocalDeployment openTofuLocalDeployment;
+    @MockitoBean OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+    @MockitoBean DeployService deployService;
+    @MockitoBean CredentialCenter credentialCenter;
+    @MockitoBean PluginManager pluginManager;
     private Ocl ocl;
     private Ocl oclWithGitScripts;
 
     @BeforeEach
     void setUp() throws Exception {
-        ReflectionTestUtils.setField(openTofuLocalConfig, "workspaceDirectory", "ws-test");
-        ReflectionTestUtils.setField(scriptsHelper, "awaitAtMost", 60);
-        ReflectionTestUtils.setField(scriptsHelper, "awaitPollingInterval", 1);
-        ReflectionTestUtils.setField(scriptsHelper, "scriptsGitRepoManage", scriptsGitRepoManage);
-        ReflectionTestUtils.setField(
-                openTofuLocalDeployment, "openTofuLocalConfig", openTofuLocalConfig);
-        ReflectionTestUtils.setField(openTofuLocalDeployment, "scriptsHelper", scriptsHelper);
         OclLoader oclLoader = new OclLoader();
         ocl =
                 oclLoader.getOcl(

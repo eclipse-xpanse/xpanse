@@ -3,34 +3,30 @@ package org.eclipse.xpanse.modules.policy.policyman.config;
 import static org.mockito.Mockito.verify;
 
 import org.eclipse.xpanse.modules.policy.policyman.generated.ApiClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@ContextConfiguration(classes = {PolicyManRestApiClientConfig.class, PolicyManProperties.class})
+@TestPropertySource(properties = {"xpanse.policy-man.endpoint=http://localhost:9090"})
+@Import(RefreshAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
 class PolicyManRestApiClientConfigTest {
 
-    @Mock private ApiClient mockApiClient;
+    @MockitoBean private ApiClient mockApiClient;
 
-    @InjectMocks private PolicyManRestApiClientConfig policyManRestApiClientConfigUnderTest;
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(
-                policyManRestApiClientConfigUnderTest, "policyManBaseUrl", "basePath");
-    }
+    @Autowired private PolicyManRestApiClientConfig policyManRestApiClientConfigUnderTest;
 
     @Test
     void testApiClientConfig() {
-        // Setup
-        // Run the test
-        policyManRestApiClientConfigUnderTest.apiClientConfig();
 
         // Verify the results
-        verify(mockApiClient).setBasePath("basePath");
+        verify(mockApiClient).setBasePath("http://localhost:9090");
     }
 }

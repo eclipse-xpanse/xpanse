@@ -1,5 +1,6 @@
 package org.eclipse.xpanse.modules.security.auth.zitadel.converter;
 
+import static org.instancio.Select.field;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -7,26 +8,23 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.xpanse.modules.security.auth.Oauth2GrantedAuthoritiesExtractor;
-import org.junit.jupiter.api.BeforeEach;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.test.util.ReflectionTestUtils;
 
 public class GrantedAuthoritiesExtractorTest {
 
     Oauth2GrantedAuthoritiesExtractor grantedAuthoritiesExtractor =
-            new Oauth2GrantedAuthoritiesExtractor();
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(grantedAuthoritiesExtractor, "defaultRole", "user");
-        ReflectionTestUtils.setField(grantedAuthoritiesExtractor, "userIdKey", "sub");
-        ReflectionTestUtils.setField(
-                grantedAuthoritiesExtractor,
-                "grantedRolesScope",
-                "urn:zitadel:iam:org:project:roles");
-    }
+            new Oauth2GrantedAuthoritiesExtractor(
+                    Instancio.of(SecurityProperties.class)
+                            .set(field(SecurityProperties.OAuth::getDefaultRole), "user")
+                            .set(field(SecurityProperties.Claims::getUserIdKey), "sub")
+                            .set(
+                                    field(SecurityProperties.Claims::getGrantedRolesKey),
+                                    "urn:zitadel:iam:org:project:roles")
+                            .create());
 
     @Test
     void testConvertJwt() {

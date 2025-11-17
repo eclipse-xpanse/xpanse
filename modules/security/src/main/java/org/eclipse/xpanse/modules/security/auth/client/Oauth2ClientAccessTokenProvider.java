@@ -3,9 +3,9 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-package org.eclipse.xpanse.common.oauth2.client;
+package org.eclipse.xpanse.modules.security.auth.client;
 
-import static org.eclipse.xpanse.common.oauth2.client.Oauth2ClientConfiguration.OAUTH_CLIENT_ID;
+import static org.eclipse.xpanse.modules.security.auth.client.Oauth2ClientConfiguration.OAUTH_CLIENT_ID;
 
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -37,7 +37,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 /** Bean to configure services as MCP tools. */
 @Component
 @Slf4j
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 @Profile("ai")
 public class McpTools {
 

@@ -15,15 +15,16 @@ import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.MONITOR_MET
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.REGION_AZS_CACHE_NAME;
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLAVOR_PRICE_CACHE_NAME;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.cache.config.CacheProperties;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,25 +45,23 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /** Redis cache configuration class. */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "enable.redis.distributed.cache", havingValue = "true")
+@ConditionalOnProperty(name = "xpanse.cache.redis-enabled", havingValue = "true")
 public class RedisCacheConfig {
 
-    @Resource private RedisConnectionFactory connectionFactory;
+    private final RedisConnectionFactory connectionFactory;
+    private final RedisProperties redisProperties;
+    private final CacheProperties cacheProperties;
 
-    @Value("${region.azs.cache.expire.time.in.minutes:60}")
-    private long regionAzsCacheDuration;
-
-    @Value("${service.flavor.price.cache.expire.time.in.minutes:60}")
-    private long flavorPriceCacheDuration;
-
-    @Value("${service.monitor.metrics.cache.expire.time.in.minutes:60}")
-    private long monitorMetricsCacheDuration;
-
-    @Value("${spring.data.redis.host}")
-    private String redisHost;
-
-    @Value("${spring.data.redis.port}")
-    private String redisPort;
+    /** Constructor method. */
+    @Autowired
+    public RedisCacheConfig(
+            RedisConnectionFactory connectionFactory,
+            RedisProperties redisProperties,
+            CacheProperties cacheProperties) {
+        this.connectionFactory = connectionFactory;
+        this.redisProperties = redisProperties;
+        this.cacheProperties = cacheProperties;
+    }
 
     /**
      * Config cache manager with caffeine.
@@ -114,14 +113,14 @@ public class RedisCacheConfig {
             return config.getHostName() + ":" + config.getPort();
         } catch (Exception e) {
             log.error("Failed to get redis endpoint by connectionFactory.", e);
-            return redisHost + ":" + redisPort;
+            return this.redisProperties.getHost() + ":" + this.redisProperties.getPort();
         }
     }
 
     private RedisCacheConfiguration getRegionAzsCache() {
         long duration =
-                regionAzsCacheDuration > 0
-                        ? regionAzsCacheDuration
+                this.cacheProperties.getAvailabilityZoneCacheMinutes() > 0
+                        ? this.cacheProperties.getAvailabilityZoneCacheMinutes()
                         : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))
@@ -131,8 +130,8 @@ public class RedisCacheConfig {
 
     private RedisCacheConfiguration getServiceFlavorPriceCache() {
         long duration =
-                flavorPriceCacheDuration > 0
-                        ? flavorPriceCacheDuration
+                this.cacheProperties.getServicePriceCacheMinutes() > 0
+                        ? this.cacheProperties.getServicePriceCacheMinutes()
                         : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))
@@ -149,8 +148,8 @@ public class RedisCacheConfig {
 
     private RedisCacheConfiguration getMonitorMetricsCache() {
         long duration =
-                monitorMetricsCacheDuration > 0
-                        ? monitorMetricsCacheDuration
+                this.cacheProperties.getMonitorMetricsCacheMinutes() > 0
+                        ? this.cacheProperties.getMonitorMetricsCacheMinutes()
                         : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(duration))

@@ -7,26 +7,29 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfo;
+import org.eclipse.xpanse.modules.security.auth.zitadel.ZitadelIdentityProviderService;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@ContextConfiguration(classes = {IdentityProviderManager.class, SecurityProperties.class})
+@TestPropertySource(properties = {"xpanse.security.enable-web-security=true"})
+@ActiveProfiles(value = {"oauth", "zitadel"})
+@Import(RefreshAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
 class IdentityProviderManagerTest {
 
-    @Mock private ApplicationContext mockApplicationContext;
-    @Mock private IdentityProviderService mockActiveIdentityProviderService;
+    @MockitoBean private ZitadelIdentityProviderService mockActiveIdentityProviderService;
 
-    @InjectMocks private IdentityProviderManager identityProviderManagerUnderTest;
-
-    void setUpSecurityConfig(boolean webSecurityIsEnabled) {
-        ReflectionTestUtils.setField(
-                identityProviderManagerUnderTest, "webSecurityIsEnabled", webSecurityIsEnabled);
-    }
+    @Autowired private IdentityProviderManager identityProviderManagerUnderTest;
 
     CurrentUserInfo getMockCurrentUserInfo() {
         final String userId = "userId";
@@ -44,7 +47,6 @@ class IdentityProviderManagerTest {
 
     @Test
     void testLoadActiveIdentityProviderServices() {
-        setUpSecurityConfig(true);
         assertThat(identityProviderManagerUnderTest.getActiveIdentityProviderService())
                 .isEqualTo(mockActiveIdentityProviderService);
     }

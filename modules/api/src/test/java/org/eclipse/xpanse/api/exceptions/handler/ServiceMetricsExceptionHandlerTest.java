@@ -20,11 +20,14 @@ import org.eclipse.xpanse.modules.monitor.ServiceMetricsAdapter;
 import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -40,8 +43,10 @@ import org.springframework.web.context.WebApplicationContext;
             ServiceMetricsExceptionHandler.class,
             IdentityProviderManager.class,
             PluginManager.class,
-            CspPluginValidator.class
+            CspPluginValidator.class,
+            SecurityProperties.class
         })
+@Import(RefreshAutoConfiguration.class)
 @WebMvcTest
 class ServiceMetricsExceptionHandlerTest {
 

@@ -9,6 +9,7 @@ import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
+import org.eclipse.xpanse.modules.policy.policyman.config.PolicyManProperties;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.AdminApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesEvaluationApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
@@ -16,28 +17,28 @@ import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalCmdList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.SystemStatus;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientException;
 
-@ExtendWith(MockitoExtension.class)
+@ContextConfiguration(classes = {PolicyManager.class, PolicyManProperties.class})
+@TestPropertySource(properties = {"xpanse.policy-man.endpoint=http://localhost:9090"})
+@Import(RefreshAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
 class PolicyManagerTest {
 
-    @Mock private AdminApi mockAdminApi;
-    @Mock private PoliciesValidateApi mockPoliciesValidateApi;
-    @Mock private PoliciesEvaluationApi mockPoliciesEvaluationApi;
+    @MockitoBean private AdminApi mockAdminApi;
+    @MockitoBean private PoliciesValidateApi mockPoliciesValidateApi;
+    @MockitoBean private PoliciesEvaluationApi mockPoliciesEvaluationApi;
 
-    @InjectMocks private PolicyManager policyManagerUnderTest;
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(policyManagerUnderTest, "policyManBaseUrl", "endpoint");
-    }
+    @Autowired private PolicyManager policyManagerUnderTest;
 
     @Test
     void testGetPolicyManStatus() {
@@ -46,7 +47,7 @@ class PolicyManagerTest {
         expectedResult.setBackendSystemType(BackendSystemType.POLICY_MAN);
         expectedResult.setName(BackendSystemType.POLICY_MAN.toValue());
         expectedResult.setHealthStatus(HealthStatus.OK);
-        expectedResult.setEndpoint("endpoint");
+        expectedResult.setEndpoint("http://localhost:9090");
 
         // Configure AdminApi.healthGet(...).
         final SystemStatus systemStatus = new SystemStatus();
@@ -68,7 +69,7 @@ class PolicyManagerTest {
         expectedResult.setBackendSystemType(BackendSystemType.POLICY_MAN);
         expectedResult.setName(BackendSystemType.POLICY_MAN.toValue());
         expectedResult.setHealthStatus(HealthStatus.NOK);
-        expectedResult.setEndpoint("endpoint");
+        expectedResult.setEndpoint("http://localhost:9090");
 
         when(mockAdminApi.healthGet()).thenThrow(RestClientException.class);
 

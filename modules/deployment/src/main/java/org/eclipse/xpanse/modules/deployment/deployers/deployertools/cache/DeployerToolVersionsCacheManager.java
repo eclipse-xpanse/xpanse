@@ -8,6 +8,7 @@ package org.eclipse.xpanse.modules.deployment.deployers.deployertools.cache;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Resource;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -89,8 +90,9 @@ public class DeployerToolVersionsCacheManager
                                 Set<String> cachedVersions =
                                         versionsCache.getVersionsCacheOfDeployerTool(deployerKind);
                                 Set<String> defaultVersions =
-                                        versionsFetcher.getVersionsFromDefaultConfigOfDeployerTool(
-                                                deployerKind);
+                                        new HashSet<>(
+                                                versionsFetcher.getDefaultVersionsByDeployerKind(
+                                                        deployerKind));
                                 if (CollectionUtils.isEmpty(cachedVersions)
                                         || Objects.equals(cachedVersions, defaultVersions)) {
                                     fetchVersionsFromWebsiteAndLoadCacheForDeployerTool(
@@ -117,7 +119,7 @@ public class DeployerToolVersionsCacheManager
     public Set<String> getAvailableVersionsOfDeployerTool(DeployerKind deployerKind) {
         Set<String> cachedVersions = versionsCache.getVersionsCacheOfDeployerTool(deployerKind);
         Set<String> defaultVersions =
-                versionsFetcher.getVersionsFromDefaultConfigOfDeployerTool(deployerKind);
+                new HashSet<>(versionsFetcher.getDefaultVersionsByDeployerKind(deployerKind));
         if (CollectionUtils.isEmpty(cachedVersions)
                 || Objects.equals(cachedVersions, defaultVersions)) {
             try {

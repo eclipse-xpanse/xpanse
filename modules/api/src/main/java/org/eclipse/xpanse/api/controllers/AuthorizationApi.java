@@ -33,7 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("oauth")
 @CrossOrigin
 @RestController
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class AuthorizationApi {
 
     @Resource private IdentityProviderManager identityProviderManager;

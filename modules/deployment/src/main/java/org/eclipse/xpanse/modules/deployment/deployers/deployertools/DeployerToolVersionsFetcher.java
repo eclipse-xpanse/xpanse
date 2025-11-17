@@ -10,13 +10,14 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.models.common.exceptions.RateLimiterException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
@@ -27,7 +28,7 @@ import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.GitHubRateLimitHandler;
 import org.kohsuke.github.PagedIterable;
 import org.kohsuke.github.connector.GitHubConnectorResponse;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.annotation.Backoff;
@@ -43,34 +44,18 @@ public class DeployerToolVersionsFetcher {
     private static final Pattern OFFICIAL_VERSION_PATTERN =
             Pattern.compile("^v(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})$");
 
-    @Value("${deployer.terraform.github.api.endpoint:https://api.github.com}")
-    private String terraformGithubApiEndpoint;
+    private final DeploymentProperties deploymentProperties;
 
-    @Value("${deployer.terraform.github.repository:hashicorp/terraform}")
-    private String terraformGithubRepository;
+    private final ProxyConfigurationManager proxyConfigurationManager;
 
-    @Value("${deployer.terraform.default.supported.versions}")
-    private String terraformDefaultVersionsStr;
-
-    @Value("${deployer.opentofu.github.api.endpoint:https://api.github.com}")
-    private String openTofuGithubApiEndpoint;
-
-    @Value("${deployer.opentofu.github.repository:opentofu/opentofu}")
-    private String openTofuGithubRepository;
-
-    @Value("${deployer.opentofu.default.supported.versions}")
-    private String openTofuDefaultVersionsStr;
-
-    @Value("${deployer.helm.github.api.endpoint:https://api.github.com}")
-    private String helmGithubApiEndpoint;
-
-    @Value("${deployer.helm.github.repository:helm/helm}")
-    private String helmGithubRepository;
-
-    @Value("${deployer.helm.default.supported.versions:}")
-    private String helmDefaultVersionsStr;
-
-    @Resource private ProxyConfigurationManager proxyConfigurationManager;
+    /** Constructor method. */
+    @Autowired
+    public DeployerToolVersionsFetcher(
+            DeploymentProperties deploymentProperties,
+            ProxyConfigurationManager proxyConfigurationManager) {
+        this.deploymentProperties = deploymentProperties;
+        this.proxyConfigurationManager = proxyConfigurationManager;
+    }
 
     /**
      * Fetch all available versions from the website of deployer.
@@ -79,8 +64,9 @@ public class DeployerToolVersionsFetcher {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public Set<String> fetchOfficialVersionsOfDeployerTool(DeployerKind deployerKind) {
         RetryContext retryContext = RetrySynchronizationManager.getContext();
         int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
@@ -143,28 +129,11 @@ public class DeployerToolVersionsFetcher {
         return allVersions;
     }
 
-    /**
-     * Get default versions from config.
-     *
-     * @return default versions.
-     */
-    public Set<String> getVersionsFromDefaultConfigOfDeployerTool(DeployerKind deployerKind) {
-        String defaultVersionsString = getDefaultVersionsString(deployerKind);
-        Set<String> defaultVersions =
-                Set.of(defaultVersionsString.replaceAll("//s+", "").split(","));
-        log.info(
-                "Get versions {} from default config value {} for deployer tool {}",
-                defaultVersions,
-                defaultVersionsString,
-                deployerKind.toValue());
-        return defaultVersions;
-    }
-
     private String getGithubApiEndpoint(DeployerKind deployerKind) {
         return switch (deployerKind) {
-            case TERRAFORM -> terraformGithubApiEndpoint;
-            case OPEN_TOFU -> openTofuGithubApiEndpoint;
-            case HELM -> helmGithubApiEndpoint;
+            case TERRAFORM -> deploymentProperties.getTerraformLocal().getGithub().getApiEndpoint();
+            case OPEN_TOFU -> deploymentProperties.getOpentofuLocal().getGithub().getApiEndpoint();
+            case HELM -> deploymentProperties.getHelm().getGithub().getApiEndpoint();
         };
     }
 
@@ -194,17 +163,19 @@ public class DeployerToolVersionsFetcher {
 
     private String getGithubRepository(DeployerKind deployerKind) {
         return switch (deployerKind) {
-            case TERRAFORM -> terraformGithubRepository;
-            case OPEN_TOFU -> openTofuGithubRepository;
-            case HELM -> helmGithubRepository;
+            case TERRAFORM -> deploymentProperties.getTerraformLocal().getGithub().getRepository();
+            case OPEN_TOFU -> deploymentProperties.getOpentofuLocal().getGithub().getRepository();
+            case HELM -> deploymentProperties.getHelm().getGithub().getRepository();
         };
     }
 
-    private String getDefaultVersionsString(DeployerKind deployerKind) {
+    /** Returns the default supported versions a deployer tool. */
+    public List<String> getDefaultVersionsByDeployerKind(DeployerKind deployerKind) {
         return switch (deployerKind) {
-            case TERRAFORM -> terraformDefaultVersionsStr;
-            case OPEN_TOFU -> openTofuDefaultVersionsStr;
-            case HELM -> helmDefaultVersionsStr;
+            case TERRAFORM ->
+                    deploymentProperties.getTerraformLocal().getDefaultSupportedVersions();
+            case OPEN_TOFU -> deploymentProperties.getOpentofuLocal().getDefaultSupportedVersions();
+            case HELM -> deploymentProperties.getHelm().getDefaultSupportedVersions();
         };
     }
 

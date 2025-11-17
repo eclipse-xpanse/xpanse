@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.security.auth.zitadel;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,8 +27,9 @@ import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
 import org.eclipse.xpanse.modules.security.auth.IdentityProviderService;
 import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.security.auth.common.XpanseAuthentication;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -58,33 +58,16 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     private static final Map<String, String> CODE_CHALLENGE_MAP = initCodeChallengeMap();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    @Qualifier("zitadelRestTemplate")
-    @Resource
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final SecurityProperties securityProperties;
 
-    @Value("${authorization.server.endpoint}")
-    private String iamServerEndpoint;
-
-    @Value("${authorization.swagger.ui.client.id}")
-    private String clientId;
-
-    @Value("${authorization.csp.key}")
-    private String cspKey;
-
-    @Value("${authorization.required.scopes}")
-    private String requiredScopes;
-
-    @Value("${authorization.userid.key}")
-    private String userIdKey;
-
-    @Value("${authorization.username.key}")
-    private String usernameKey;
-
-    @Value("${authorization.metadata.key}")
-    private String metadataKey;
-
-    @Value("${authorization.isv.key}")
-    private String isvKey;
+    @Autowired
+    public ZitadelIdentityProviderService(
+            SecurityProperties securityProperties,
+            @Qualifier("zitadelRestTemplate") RestTemplate restTemplate) {
+        this.securityProperties = securityProperties;
+        this.restTemplate = restTemplate;
+    }
 
     private static Map<String, String> initCodeChallengeMap() {
         Map<String, String> map = new HashMap<>(2);
@@ -110,15 +93,17 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
     @Override
     @Retryable(
             retryFor = RestClientException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public BackendSystemStatus getIdentityProviderStatus() {
         BackendSystemStatus status = new BackendSystemStatus();
         status.setBackendSystemType(BackendSystemType.IDENTITY_PROVIDER);
         status.setName(IdentityProviderType.ZITADEL.toValue());
-        status.setEndpoint(iamServerEndpoint);
+        status.setEndpoint(securityProperties.getOauth().getAuthProviderEndpoint());
         status.setHealthStatus(HealthStatus.NOK);
-        String healthCheckUrl = iamServerEndpoint + "/debug/healthz";
+        String healthCheckUrl =
+                securityProperties.getOauth().getAuthProviderEndpoint() + "/debug/healthz";
         try {
             ResponseEntity<String> response =
                     restTemplate.getForEntity(healthCheckUrl, String.class);
@@ -150,12 +135,21 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
 
         if (Objects.nonNull(claimsMap) && !claimsMap.isEmpty()) {
             CurrentUserInfo currentUserInfo = new CurrentUserInfo();
-            if (claimsMap.containsKey(userIdKey)) {
-                currentUserInfo.setUserId(String.valueOf(claimsMap.get(userIdKey)));
+            if (claimsMap.containsKey(securityProperties.getOauth().getClaims().getUserIdKey())) {
+                currentUserInfo.setUserId(
+                        String.valueOf(
+                                claimsMap.get(
+                                        securityProperties.getOauth().getClaims().getUserIdKey())));
             }
 
-            if (claimsMap.containsKey(usernameKey)) {
-                currentUserInfo.setUserName(String.valueOf(claimsMap.get(usernameKey)));
+            if (claimsMap.containsKey(securityProperties.getOauth().getClaims().getUsernameKey())) {
+                currentUserInfo.setUserName(
+                        String.valueOf(
+                                claimsMap.get(
+                                        securityProperties
+                                                .getOauth()
+                                                .getClaims()
+                                                .getUsernameKey())));
             }
 
             List<String> roles =
@@ -164,8 +158,9 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                             .toList();
             currentUserInfo.setRoles(roles);
 
-            if (claimsMap.containsKey(metadataKey)) {
-                Object metadataObject = claimsMap.get(metadataKey);
+            if (claimsMap.containsKey(securityProperties.getOauth().getClaims().getMetaDataKey())) {
+                Object metadataObject =
+                        claimsMap.get(securityProperties.getOauth().getClaims().getMetaDataKey());
                 if (Objects.nonNull(metadataObject)) {
                     Map<String, String> metadataMap =
                             OBJECT_MAPPER.convertValue(metadataObject, new TypeReference<>() {});
@@ -177,10 +172,14 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                                             Base64.getDecoder().decode(entry.getValue()),
                                             StandardCharsets.UTF_8);
                             userMetadata.put(entry.getKey(), value);
-                            if (StringUtils.equals(isvKey, entry.getKey())) {
+                            if (StringUtils.equals(
+                                    securityProperties.getOauth().getMetaData().getIsvKey(),
+                                    entry.getKey())) {
                                 currentUserInfo.setIsv(value);
                             }
-                            if (StringUtils.equals(cspKey, entry.getKey())) {
+                            if (StringUtils.equals(
+                                    securityProperties.getOauth().getMetaData().getCspKey(),
+                                    entry.getKey())) {
                                 currentUserInfo.setCsp(value);
                             }
                         }
@@ -201,16 +200,16 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
                 ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()
                         + "/auth/token";
         stringBuilder
-                .append(iamServerEndpoint)
+                .append(securityProperties.getOauth().getAuthProviderEndpoint())
                 .append("/oauth/v2/authorize")
                 .append("?")
                 .append("client_id=")
-                .append(clientId)
+                .append(securityProperties.getOauth().getSwaggerUi().getClientId())
                 .append("&")
                 .append("response_type=code")
                 .append("&")
                 .append("scope=")
-                .append(requiredScopes)
+                .append(securityProperties.getOauth().getScopes().getRequiredScopes())
                 .append("&")
                 .append("redirect_uri=")
                 .append(redirectUrl)
@@ -227,7 +226,7 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("code", code);
         map.add("grant_type", "authorization_code");
-        map.add("client_id", clientId);
+        map.add("client_id", securityProperties.getOauth().getSwaggerUi().getClientId());
         map.add("code_verifier", CODE_CHALLENGE_MAP.get("code_verifier"));
         String redirectUrl =
                 ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()
@@ -237,7 +236,8 @@ public class ZitadelIdentityProviderService implements IdentityProviderService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<MultiValueMap<String, Object>> param = new HttpEntity<>(map, headers);
 
-        String tokenUrl = iamServerEndpoint + "/oauth/v2/token";
+        String tokenUrl =
+                securityProperties.getOauth().getAuthProviderEndpoint() + "/oauth/v2/token";
         try {
             ResponseEntity<TokenResponse> response =
                     restTemplate.postForEntity(tokenUrl, param, TokenResponse.class);

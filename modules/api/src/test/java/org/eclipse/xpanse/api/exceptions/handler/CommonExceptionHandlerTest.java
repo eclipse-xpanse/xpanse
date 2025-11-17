@@ -22,12 +22,15 @@ import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledExcept
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ContextConfiguration;
@@ -47,8 +50,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
             CommonExceptionHandler.class,
             OclLoader.class,
             CspPluginValidator.class,
-            PluginManager.class
+            PluginManager.class,
+            SecurityProperties.class
         })
+@Import(RefreshAutoConfiguration.class)
 @WebMvcTest
 class CommonExceptionHandlerTest {
 

@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks;
 
-import jakarta.annotation.Resource;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class OpenTofuDeploymentResultCallbackManager {
-    @Resource private DeployResultManager deployResultManager;
+    private final DeployResultManager deployResultManager;
+
+    public OpenTofuDeploymentResultCallbackManager(DeployResultManager deployResultManager) {
+        this.deployResultManager = deployResultManager;
+    }
 
     /**
      * Handle the callback of the order task.

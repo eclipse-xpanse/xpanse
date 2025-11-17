@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.polling;
 
-import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +16,10 @@ import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderStorage;
+import org.eclipse.xpanse.modules.deployment.config.OrderProperties;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -31,13 +31,15 @@ public class ServiceOrderStatusChangePolling {
     private static final List<OrderStatus> FINAL_TASK_STATUS =
             Arrays.asList(OrderStatus.FAILED, OrderStatus.SUCCESSFUL);
 
-    @Value("${service.order.status.long.polling.interval.in.seconds:5}")
-    private int pollingInterval;
+    private final OrderProperties orderProperties;
+    private final ServiceOrderStorage orderStorage;
 
-    @Value("${service.order.status.long.polling.wait.time.in.seconds:60}")
-    private int pollingWaitPeriod;
-
-    @Resource private ServiceOrderStorage orderStorage;
+    @Autowired
+    public ServiceOrderStatusChangePolling(
+            OrderProperties orderProperties, ServiceOrderStorage orderStorage) {
+        this.orderProperties = orderProperties;
+        this.orderStorage = orderStorage;
+    }
 
     /**
      * Fetch status of the service order by polling database for a fixed period of time.
@@ -61,9 +63,13 @@ public class ServiceOrderStatusChangePolling {
                                 null));
         try {
             Awaitility.await()
-                    .atMost(pollingWaitPeriod, TimeUnit.SECONDS)
+                    .atMost(
+                            orderProperties.getOrderStatus().getLongPollingSeconds(),
+                            TimeUnit.SECONDS)
                     .pollDelay(0, TimeUnit.SECONDS) // first check runs without wait.
-                    .pollInterval(pollingInterval, TimeUnit.SECONDS)
+                    .pollInterval(
+                            orderProperties.getOrderStatus().getPollingIntervalSeconds(),
+                            TimeUnit.SECONDS)
                     .until(
                             () -> {
                                 ServiceOrderEntity serviceOrderEntity =

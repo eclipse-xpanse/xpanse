@@ -30,31 +30,40 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableS
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
+import org.eclipse.xpanse.plugins.flexibleengine.config.FlexibleEnginePluginProperties;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceManager;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
+import org.eclipse.xpanse.plugins.flexibleengine.price.FlexibleEnginePriceCalculator;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@TestPropertySource(
+        properties = {
+            "xpanse.plugins.flexibleengine.service-template.auto-approve=true",
+        })
+@Import(RefreshAutoConfiguration.class)
+@ContextConfiguration(
+        classes = {FlexibleEngineOrchestratorPlugin.class, FlexibleEnginePluginProperties.class})
+@ExtendWith(SpringExtension.class)
 class FlexibleEngineOrchestratorPluginTest {
-    @Mock private FlexibleEngineTerraformResourceHandler mockFlexibleEngineTerraformResourceHandler;
-    @Mock private FlexibleEngineMetricsService mockFlexibleEngineMetricsService;
-    @Mock private FlexibleEngineVmStateManager mockFlexibleEngineVmStateManagerService;
-    @Mock private FlexibleEngineResourceManager flexibleEngineResourceManager;
-    @InjectMocks private FlexibleEngineOrchestratorPlugin plugin;
+    @MockitoBean
+    private FlexibleEngineTerraformResourceHandler mockFlexibleEngineTerraformResourceHandler;
 
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(plugin, "autoApproveServiceTemplateEnabled", true);
-    }
+    @MockitoBean private FlexibleEngineMetricsService mockFlexibleEngineMetricsService;
+    @MockitoBean private FlexibleEngineVmStateManager mockFlexibleEngineVmStateManagerService;
+    @MockitoBean private FlexibleEngineResourceManager flexibleEngineResourceManager;
+    @MockitoBean private FlexibleEnginePriceCalculator flexibleEnginePriceCalculator;
+    @Autowired private FlexibleEngineOrchestratorPlugin plugin;
 
     @Test
     void testGetResourceHandler() {

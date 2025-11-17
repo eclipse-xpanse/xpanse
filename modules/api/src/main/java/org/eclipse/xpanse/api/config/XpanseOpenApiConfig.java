@@ -7,7 +7,8 @@
 package org.eclipse.xpanse.api.config;
 
 import java.io.File;
-import org.springframework.beans.factory.annotation.Value;
+import org.eclipse.xpanse.common.config.OpenApiGeneratorProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.ForwardedHeaderFilter;
@@ -22,11 +23,12 @@ public class XpanseOpenApiConfig implements WebMvcConfigurer {
     public static final String PROJECT_PATH =
             "file:" + System.getProperty("user.dir") + File.separator;
 
-    @Value("${openapi.path:openapi/}")
-    private String openapiPath;
+    private final OpenApiGeneratorProperties openApiGeneratorProperties;
 
-    @Value("${openapi.url:/openapi/*}")
-    private String openapiUrl;
+    @Autowired
+    public XpanseOpenApiConfig(OpenApiGeneratorProperties openApiGeneratorProperties) {
+        this.openApiGeneratorProperties = openApiGeneratorProperties;
+    }
 
     @Bean
     ForwardedHeaderFilter forwardedHeaderFilter() {
@@ -40,9 +42,10 @@ public class XpanseOpenApiConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(openapiUrl)
-                .addResourceLocations(openapiPath)
-                .addResourceLocations(PROJECT_PATH + openapiPath);
+        registry.addResourceHandler(openApiGeneratorProperties.getFileResourcesUri())
+                .addResourceLocations(openApiGeneratorProperties.getFileGenerationPath())
+                .addResourceLocations(
+                        PROJECT_PATH + openApiGeneratorProperties.getFileGenerationPath());
     }
 
     /**
@@ -52,7 +55,7 @@ public class XpanseOpenApiConfig implements WebMvcConfigurer {
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping(openapiUrl)
+        registry.addMapping(openApiGeneratorProperties.getFileResourcesUri())
                 .allowedOriginPatterns("*")
                 .allowCredentials(true)
                 .allowedMethods("GET")
