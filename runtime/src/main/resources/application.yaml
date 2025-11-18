@@ -2,7 +2,7 @@
 app:
   version: "@project.version@"
 server:
-  port: 8083
+  port: 8080
   shutdown: graceful
 spring:
   application:
