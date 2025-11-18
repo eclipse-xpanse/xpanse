@@ -19,13 +19,13 @@ import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersResponse;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobRequest;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse.StatusEnum;
-import jakarta.annotation.Resource;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -34,9 +34,21 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class HuaweiCloudVmStateManager {
-    @Resource private HuaweiCloudClient huaweiCloudClient;
-    @Resource private HuaweiCloudServerManageRequestConverter converter;
-    @Resource private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
+
+    private final HuaweiCloudClient huaweiCloudClient;
+    private final HuaweiCloudServerManageRequestConverter converter;
+    private final HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
+
+    /** Constructor method. */
+    @Autowired
+    public HuaweiCloudVmStateManager(
+            HuaweiCloudClient huaweiCloudClient,
+            HuaweiCloudServerManageRequestConverter converter,
+            HuaweiCloudRetryStrategy huaweiCloudRetryStrategy) {
+        this.huaweiCloudClient = huaweiCloudClient;
+        this.converter = converter;
+        this.huaweiCloudRetryStrategy = huaweiCloudRetryStrategy;
+    }
 
     /** Start the Huawei Cloud Ecs server. */
     @Retryable(

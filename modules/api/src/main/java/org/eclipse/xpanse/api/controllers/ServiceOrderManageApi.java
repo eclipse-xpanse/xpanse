@@ -13,7 +13,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +22,7 @@ import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderDetails;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -48,7 +48,13 @@ import org.springframework.web.context.request.async.DeferredResult;
         havingValue = "false",
         matchIfMissing = true)
 public class ServiceOrderManageApi {
-    @Resource private ServiceOrderManager serviceOrderManager;
+    private final ServiceOrderManager serviceOrderManager;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceOrderManageApi(ServiceOrderManager serviceOrderManager) {
+        this.serviceOrderManager = serviceOrderManager;
+    }
 
     /**
      * List service orders by the service id.

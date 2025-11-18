@@ -9,7 +9,6 @@ package org.eclipse.xpanse.api.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,7 +38,12 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class AuthorizationApi {
 
-    @Resource private IdentityProviderManager identityProviderManager;
+    private final IdentityProviderManager identityProviderManager;
+
+    /** Constructor method. */
+    public AuthorizationApi(IdentityProviderManager identityProviderManager) {
+        this.identityProviderManager = identityProviderManager;
+    }
 
     @Tag(name = "AuthManagement", description = "APIs for user authentication and authorization.")
     @Operation(description = "Get and redirect authorization url for user to authenticate.")

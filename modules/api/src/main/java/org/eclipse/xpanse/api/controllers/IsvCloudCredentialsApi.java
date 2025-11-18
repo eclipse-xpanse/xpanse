@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,8 +49,16 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class IsvCloudCredentialsApi {
 
-    @Resource private CredentialCenter credentialCenter;
-    @Resource private UserServiceHelper userServiceHelper;
+    private final CredentialCenter credentialCenter;
+    private final UserServiceHelper userServiceHelper;
+
+    /** Constructor method. */
+    @Autowired
+    public IsvCloudCredentialsApi(
+            CredentialCenter credentialCenter, UserServiceHelper userServiceHelper) {
+        this.credentialCenter = credentialCenter;
+        this.userServiceHelper = userServiceHelper;
+    }
 
     /**
      * Users in the ISV role get all cloud provider credentials added by the user for a cloud

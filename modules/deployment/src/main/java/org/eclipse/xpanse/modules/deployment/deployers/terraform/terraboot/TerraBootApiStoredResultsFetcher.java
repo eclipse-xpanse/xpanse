@@ -5,12 +5,12 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.RetrieveTerraformResultApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.ReFetchResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,13 @@ import org.springframework.web.client.RestClientException;
 @Component
 public class TerraBootApiStoredResultsFetcher {
 
-    @Resource private RetrieveTerraformResultApi retrieveTerraformResultApi;
+    private final RetrieveTerraformResultApi retrieveTerraformResultApi;
+
+    /** Constructor method. */
+    @Autowired
+    public TerraBootApiStoredResultsFetcher(RetrieveTerraformResultApi retrieveTerraformResultApi) {
+        this.retrieveTerraformResultApi = retrieveTerraformResultApi;
+    }
 
     /**
      * Fetch result by service order id.

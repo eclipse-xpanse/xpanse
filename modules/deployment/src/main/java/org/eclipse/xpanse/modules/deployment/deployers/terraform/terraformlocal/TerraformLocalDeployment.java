@@ -7,7 +7,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal
 
 import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +30,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -40,16 +41,32 @@ import org.springframework.stereotype.Component;
 @ConditionalOnMissingBean(TerraBootDeployment.class)
 public class TerraformLocalDeployment implements Deployer {
     public static final String TF_DEBUG_FLAG = "TF_LOG";
-    @Resource private TerraformInstaller terraformInstaller;
-    @Resource private DeployEnvironments deployEnvironments;
-    @Resource private DeploymentProperties deploymentProperties;
+    private final TerraformInstaller terraformInstaller;
+    private final DeployEnvironments deployEnvironments;
+    private final DeploymentProperties deploymentProperties;
+    private final Executor taskExecutor;
+    private final TerraformDeploymentResultCallbackManager terraformResultCallbackManager;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final DeploymentScriptsHelper scriptsHelper;
 
-    @Resource(name = ASYNC_EXECUTOR_NAME)
-    private Executor taskExecutor;
-
-    @Resource private TerraformDeploymentResultCallbackManager terraformResultCallbackManager;
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Resource private DeploymentScriptsHelper scriptsHelper;
+    /** Constructor method. */
+    @Autowired
+    public TerraformLocalDeployment(
+            TerraformInstaller terraformInstaller,
+            DeployEnvironments deployEnvironments,
+            DeploymentProperties deploymentProperties,
+            @Qualifier(ASYNC_EXECUTOR_NAME) Executor taskExecutor,
+            TerraformDeploymentResultCallbackManager terraformResultCallbackManager,
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            DeploymentScriptsHelper scriptsHelper) {
+        this.terraformInstaller = terraformInstaller;
+        this.deployEnvironments = deployEnvironments;
+        this.deploymentProperties = deploymentProperties;
+        this.taskExecutor = taskExecutor;
+        this.terraformResultCallbackManager = terraformResultCallbackManager;
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.scriptsHelper = scriptsHelper;
+    }
 
     /**
      * Deploy the DeployTask.

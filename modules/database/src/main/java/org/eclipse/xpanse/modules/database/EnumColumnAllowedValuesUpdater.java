@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.database;
 
-import jakarta.annotation.Resource;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Enumerated;
@@ -35,12 +34,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class EnumColumnAllowedValuesUpdater implements ApplicationListener<ContextRefreshedEvent> {
 
-    @Resource private EntityManagerFactory entityManagerFactory;
+    private final EntityManagerFactory entityManagerFactory;
+    private final EnumColumnConstraintManage enumColumnConstraintManage;
+    private final String dataSourceName;
 
-    @Resource private EnumColumnConstraintManage enumColumnConstraintManage;
-
-    @Value("${spring.datasource.name:h2}")
-    private String dataSourceName;
+    /** Constructor method. */
+    public EnumColumnAllowedValuesUpdater(
+            EntityManagerFactory entityManagerFactory,
+            EnumColumnConstraintManage enumColumnConstraintManage,
+            @Value("${spring.datasource.name:h2}") String dataSourceName) {
+        this.entityManagerFactory = entityManagerFactory;
+        this.enumColumnConstraintManage = enumColumnConstraintManage;
+        this.dataSourceName = dataSourceName;
+    }
 
     /** Update the values of all enum columns in all tables. */
     @Override

@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,7 +23,11 @@ import org.springframework.web.client.RestClientException;
 @Component
 public class TofuMakerApiStoredResultsFetcher {
 
-    @Resource private RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
+    private final RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
+
+    public TofuMakerApiStoredResultsFetcher(RetrieveOpenTofuResultApi retrieveOpenTofuResultApi) {
+        this.retrieveOpenTofuResultApi = retrieveOpenTofuResultApi;
+    }
 
     /**
      * Fetch result by service order id.

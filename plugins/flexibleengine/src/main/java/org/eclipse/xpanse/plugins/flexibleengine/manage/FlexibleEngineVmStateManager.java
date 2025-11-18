@@ -19,7 +19,6 @@ import com.huaweicloud.sdk.ecs.v2.model.BatchStopServersResponse;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobRequest;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse;
 import com.huaweicloud.sdk.ecs.v2.model.ShowJobResponse.StatusEnum;
-import jakarta.annotation.Resource;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
@@ -30,6 +29,7 @@ import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -38,10 +38,24 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class FlexibleEngineVmStateManager {
-    @Resource private CredentialCenter credentialCenter;
-    @Resource private FlexibleEngineClient flexibleEngineClient;
-    @Resource private FlexibleEngineServerManageRequestConverter requestConverter;
-    @Resource private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+
+    private final CredentialCenter credentialCenter;
+    private final FlexibleEngineClient flexibleEngineClient;
+    private final FlexibleEngineServerManageRequestConverter requestConverter;
+    private final FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+
+    /** Constructor method. */
+    @Autowired
+    public FlexibleEngineVmStateManager(
+            CredentialCenter credentialCenter,
+            FlexibleEngineClient flexibleEngineClient,
+            FlexibleEngineServerManageRequestConverter requestConverter,
+            FlexibleEngineRetryStrategy flexibleEngineRetryStrategy) {
+        this.credentialCenter = credentialCenter;
+        this.flexibleEngineClient = flexibleEngineClient;
+        this.requestConverter = requestConverter;
+        this.flexibleEngineRetryStrategy = flexibleEngineRetryStrategy;
+    }
 
     /** Start the FlexibleEngine Ecs server. */
     @Retryable(

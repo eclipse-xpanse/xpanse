@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +35,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTempl
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,10 +60,23 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class ServiceRecreateApi {
 
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Resource private ServiceOrderManager serviceOrderManager;
-    @Resource private UserServiceHelper userServiceHelper;
-    @Resource private WorkflowUtils workflowUtils;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final ServiceOrderManager serviceOrderManager;
+    private final UserServiceHelper userServiceHelper;
+    private final WorkflowUtils workflowUtils;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceRecreateApi(
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            ServiceOrderManager serviceOrderManager,
+            UserServiceHelper userServiceHelper,
+            WorkflowUtils workflowUtils) {
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.serviceOrderManager = serviceOrderManager;
+        this.userServiceHelper = userServiceHelper;
+        this.workflowUtils = workflowUtils;
+    }
 
     /**
      * Create a job to recreate the deployed service.

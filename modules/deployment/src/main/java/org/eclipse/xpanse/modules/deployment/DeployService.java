@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.deployment;
 
 import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 
-import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,6 +64,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -78,25 +78,55 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Slf4j
 @Component
 public class DeployService {
-    @Resource private UserServiceHelper userServiceHelper;
-    @Resource private PluginManager pluginManager;
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource private ServiceInputVariablesJsonSchemaValidator inputVariablesJsonSchemaValidator;
-    @Resource private PolicyValidator policyValidator;
-    @Resource private SensitiveDataHandler sensitiveDataHandler;
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Resource private DeployResultManager deployResultManager;
-    @Resource private DeployerKindManager deployerKindManager;
-    @Resource private ServiceDeploymentEntityConverter serviceDeploymentEntityConverter;
-    @Resource private ServiceOrderManager serviceOrderManager;
-    @Resource private ServiceDeploymentStatusChangePolling serviceDeploymentStatusChangePolling;
+    private final UserServiceHelper userServiceHelper;
+    private final PluginManager pluginManager;
+    private final ServiceTemplateStorage serviceTemplateStorage;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+    private final ServiceInputVariablesJsonSchemaValidator inputVariablesJsonSchemaValidator;
+    private final PolicyValidator policyValidator;
+    private final SensitiveDataHandler sensitiveDataHandler;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final DeployResultManager deployResultManager;
+    private final DeployerKindManager deployerKindManager;
+    private final ServiceDeploymentEntityConverter serviceDeploymentEntityConverter;
+    private final ServiceOrderManager serviceOrderManager;
+    private final ServiceDeploymentStatusChangePolling serviceDeploymentStatusChangePolling;
+    private final Executor taskExecutor;
+    private final String activeProfiles;
 
-    @Resource(name = ASYNC_EXECUTOR_NAME)
-    private Executor taskExecutor;
-
-    @Value("${spring.profiles.active}")
-    private String activeProfiles;
+    /** Constructor method. */
+    public DeployService(
+            UserServiceHelper userServiceHelper,
+            PluginManager pluginManager,
+            ServiceTemplateStorage serviceTemplateStorage,
+            ServiceDeploymentStorage serviceDeploymentStorage,
+            ServiceInputVariablesJsonSchemaValidator inputVariablesJsonSchemaValidator,
+            PolicyValidator policyValidator,
+            SensitiveDataHandler sensitiveDataHandler,
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            DeployResultManager deployResultManager,
+            DeployerKindManager deployerKindManager,
+            ServiceDeploymentEntityConverter serviceDeploymentEntityConverter,
+            ServiceOrderManager serviceOrderManager,
+            ServiceDeploymentStatusChangePolling serviceDeploymentStatusChangePolling,
+            @Qualifier(ASYNC_EXECUTOR_NAME) Executor taskExecutor,
+            @Value("${spring.profiles.active}") String activeProfiles) {
+        this.userServiceHelper = userServiceHelper;
+        this.pluginManager = pluginManager;
+        this.serviceTemplateStorage = serviceTemplateStorage;
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+        this.inputVariablesJsonSchemaValidator = inputVariablesJsonSchemaValidator;
+        this.policyValidator = policyValidator;
+        this.sensitiveDataHandler = sensitiveDataHandler;
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.deployResultManager = deployResultManager;
+        this.deployerKindManager = deployerKindManager;
+        this.serviceDeploymentEntityConverter = serviceDeploymentEntityConverter;
+        this.serviceOrderManager = serviceOrderManager;
+        this.serviceDeploymentStatusChangePolling = serviceDeploymentStatusChangePolling;
+        this.taskExecutor = taskExecutor;
+        this.activeProfiles = activeProfiles;
+    }
 
     /**
      * Create order to deploy new service.

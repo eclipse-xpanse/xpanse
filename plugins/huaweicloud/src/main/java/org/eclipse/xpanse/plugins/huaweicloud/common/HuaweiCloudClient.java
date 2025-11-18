@@ -28,6 +28,7 @@ import com.huaweicloud.sdk.vpc.v2.region.VpcRegion;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
+import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.plugins.huaweicloud.config.HuaweiCloudPluginProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,10 +41,13 @@ public class HuaweiCloudClient extends HuaweiCloudCredentials {
     private final ProxyConfigurationManager proxyConfigurationManager;
     private final HuaweiCloudPluginProperties huaweiCloudPluginProperties;
 
+    /** Constructor method. */
     @Autowired
     public HuaweiCloudClient(
             ProxyConfigurationManager proxyConfigurationManager,
-            HuaweiCloudPluginProperties huaweiCloudPluginProperties) {
+            HuaweiCloudPluginProperties huaweiCloudPluginProperties,
+            CredentialCenter credentialCenter) {
+        super(credentialCenter);
         this.proxyConfigurationManager = proxyConfigurationManager;
         this.huaweiCloudPluginProperties = huaweiCloudPluginProperties;
     }

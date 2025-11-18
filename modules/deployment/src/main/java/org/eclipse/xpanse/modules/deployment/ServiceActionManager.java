@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.deployment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +35,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceAction;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -46,19 +46,32 @@ public class ServiceActionManager {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-
-    @Resource private DeployService deployService;
-
-    @Resource private ServiceChangeRequestsManager serviceChangeRequestsManager;
-
-    @Resource
-    private ServiceConfigurationVariablesJsonSchemaValidator
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final DeployService deployService;
+    private final ServiceChangeRequestsManager serviceChangeRequestsManager;
+    private final ServiceConfigurationVariablesJsonSchemaValidator
             serviceConfigurationVariablesJsonSchemaValidator;
-
-    @Resource
-    private ServiceConfigurationVariablesJsonSchemaGenerator
+    private final ServiceConfigurationVariablesJsonSchemaGenerator
             serviceConfigurationVariablesJsonSchemaGenerator;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceActionManager(
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            DeployService deployService,
+            ServiceChangeRequestsManager serviceChangeRequestsManager,
+            ServiceConfigurationVariablesJsonSchemaValidator
+                    serviceConfigurationVariablesJsonSchemaValidator,
+            ServiceConfigurationVariablesJsonSchemaGenerator
+                    serviceConfigurationVariablesJsonSchemaGenerator) {
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.deployService = deployService;
+        this.serviceChangeRequestsManager = serviceChangeRequestsManager;
+        this.serviceConfigurationVariablesJsonSchemaValidator =
+                serviceConfigurationVariablesJsonSchemaValidator;
+        this.serviceConfigurationVariablesJsonSchemaGenerator =
+                serviceConfigurationVariablesJsonSchemaGenerator;
+    }
 
     /** create service action. */
     public ServiceOrder createServiceAction(UUID serviceId, ServiceActionRequest request) {

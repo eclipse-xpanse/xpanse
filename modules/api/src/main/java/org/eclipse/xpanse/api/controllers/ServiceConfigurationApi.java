@@ -12,7 +12,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +20,7 @@ import org.eclipse.xpanse.modules.deployment.ServiceConfigurationManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationDetails;
 import org.eclipse.xpanse.modules.models.serviceconfiguration.ServiceConfigurationUpdate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,7 +46,13 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class ServiceConfigurationApi {
 
-    @Resource private ServiceConfigurationManager serviceConfigurationManager;
+    private final ServiceConfigurationManager serviceConfigurationManager;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceConfigurationApi(ServiceConfigurationManager serviceConfigurationManager) {
+        this.serviceConfigurationManager = serviceConfigurationManager;
+    }
 
     /**
      * Query the service's current configuration by id of the deployed service.

@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +20,7 @@ import org.eclipse.xpanse.modules.cache.config.CacheProperties;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.servicetemplate.price.ServicePricesManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
@@ -46,9 +46,16 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class ServicePricingApi {
 
-    @Resource private CacheProperties cacheProperties;
+    private final CacheProperties cacheProperties;
+    private final ServicePricesManager servicePricesManager;
 
-    @Resource private ServicePricesManager servicePricesManager;
+    /** Constructor method. */
+    @Autowired
+    public ServicePricingApi(
+            CacheProperties cacheProperties, ServicePricesManager servicePricesManager) {
+        this.cacheProperties = cacheProperties;
+        this.servicePricesManager = servicePricesManager;
+    }
 
     /** Get the price of one specific flavor of the service. */
     @Tag(

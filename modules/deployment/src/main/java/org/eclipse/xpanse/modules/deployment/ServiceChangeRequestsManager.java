@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,7 @@ import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails
 import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
 import org.eclipse.xpanse.modules.models.servicechange.exceptions.ServiceChangeRequestEntityNotFoundException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -38,9 +38,17 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class ServiceChangeRequestsManager {
 
-    @Resource private ServiceChangeRequestStorage serviceChangeRequestStorage;
+    private final ServiceChangeRequestStorage serviceChangeRequestStorage;
+    private final ServiceOrderManager serviceOrderManager;
 
-    @Resource private ServiceOrderManager serviceOrderManager;
+    /** Constructor method. */
+    @Autowired
+    public ServiceChangeRequestsManager(
+            ServiceChangeRequestStorage serviceChangeRequestStorage,
+            ServiceOrderManager serviceOrderManager) {
+        this.serviceChangeRequestStorage = serviceChangeRequestStorage;
+        this.serviceOrderManager = serviceOrderManager;
+    }
 
     /**
      * creates one service order and then one or more service change requests in database depending

@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.servicetemplate;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -68,6 +67,7 @@ import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGe
 import org.semver4j.Semver;
 import org.semver4j.SemverException;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,21 +79,47 @@ import org.springframework.util.CollectionUtils;
 public class ServiceTemplateManage {
 
     private static final String AUTO_APPROVED_REVIEW_COMMENT = "auto-approved by CSP";
-    @Resource private ServiceTemplateStorage templateStorage;
-    @Resource private ServiceTemplateRequestHistoryStorage templateRequestStorage;
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource private ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
-    @Resource private UserServiceHelper userServiceHelper;
+    private final ServiceTemplateStorage templateStorage;
+    private final ServiceTemplateRequestHistoryStorage templateRequestStorage;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+    private final ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator;
+    private final UserServiceHelper userServiceHelper;
+    private final ServiceInputVariablesJsonSchemaGenerator serviceInputVariablesJsonSchemaGenerator;
+    private final DeployerKindManager deployerKindManager;
+    private final BillingConfigValidator billingConfigValidator;
+    private final PluginManager pluginManager;
+    private final ServiceConfigurationParameterValidator serviceConfigurationParameterValidator;
+    private final ServiceActionTemplateValidator serviceActionTemplateValidator;
+    private final ServiceControllerApiManage serviceControllerApiManage;
 
-    @Resource
-    private ServiceInputVariablesJsonSchemaGenerator serviceInputVariablesJsonSchemaGenerator;
-
-    @Resource private DeployerKindManager deployerKindManager;
-    @Resource private BillingConfigValidator billingConfigValidator;
-    @Resource private PluginManager pluginManager;
-    @Resource private ServiceConfigurationParameterValidator serviceConfigurationParameterValidator;
-    @Resource private ServiceActionTemplateValidator serviceActionTemplateValidator;
-    @Resource private ServiceControllerApiManage serviceControllerApiManage;
+    /** Constructor method. */
+    @Autowired
+    public ServiceTemplateManage(
+            ServiceTemplateStorage templateStorage,
+            ServiceTemplateRequestHistoryStorage templateRequestStorage,
+            ServiceDeploymentStorage serviceDeploymentStorage,
+            ServiceTemplateOpenApiGenerator serviceTemplateOpenApiGenerator,
+            UserServiceHelper userServiceHelper,
+            ServiceInputVariablesJsonSchemaGenerator serviceInputVariablesJsonSchemaGenerator,
+            DeployerKindManager deployerKindManager,
+            BillingConfigValidator billingConfigValidator,
+            PluginManager pluginManager,
+            ServiceConfigurationParameterValidator serviceConfigurationParameterValidator,
+            ServiceActionTemplateValidator serviceActionTemplateValidator,
+            ServiceControllerApiManage serviceControllerApiManage) {
+        this.templateStorage = templateStorage;
+        this.templateRequestStorage = templateRequestStorage;
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+        this.serviceTemplateOpenApiGenerator = serviceTemplateOpenApiGenerator;
+        this.userServiceHelper = userServiceHelper;
+        this.serviceInputVariablesJsonSchemaGenerator = serviceInputVariablesJsonSchemaGenerator;
+        this.deployerKindManager = deployerKindManager;
+        this.billingConfigValidator = billingConfigValidator;
+        this.pluginManager = pluginManager;
+        this.serviceConfigurationParameterValidator = serviceConfigurationParameterValidator;
+        this.serviceActionTemplateValidator = serviceActionTemplateValidator;
+        this.serviceControllerApiManage = serviceControllerApiManage;
+    }
 
     /**
      * Register service template using the ocl.

@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,7 +46,13 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class IsvServiceDeployApi {
 
-    @Resource private ServiceDetailsViewManager serviceDetailsViewManager;
+    private final ServiceDetailsViewManager serviceDetailsViewManager;
+
+    /** Constructor method. */
+    @Autowired
+    public IsvServiceDeployApi(ServiceDetailsViewManager serviceDetailsViewManager) {
+        this.serviceDetailsViewManager = serviceDetailsViewManager;
+    }
 
     /**
      * List all deployed services by a user of ISV.

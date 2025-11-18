@@ -37,7 +37,6 @@ import com.huaweicloud.sdk.vpc.v2.model.SecurityGroup;
 import com.huaweicloud.sdk.vpc.v2.model.SecurityGroupRule;
 import com.huaweicloud.sdk.vpc.v2.model.Subnet;
 import com.huaweicloud.sdk.vpc.v2.model.Vpc;
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +54,7 @@ import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -68,9 +68,20 @@ public class FlexibleEngineResourceManager {
     public static final String RESOURCE = "resource";
     public static final String FLEXIBLE_ENGINE_COMPUTE_INSTANCE =
             "flexibleengine_compute_instance_v2";
-    @Resource private CredentialCenter credentialCenter;
-    @Resource private FlexibleEngineClient flexibleEngineClient;
-    @Resource private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+    private final CredentialCenter credentialCenter;
+    private final FlexibleEngineClient flexibleEngineClient;
+    private final FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+
+    /** Constructor method. */
+    @Autowired
+    public FlexibleEngineResourceManager(
+            CredentialCenter credentialCenter,
+            FlexibleEngineClient flexibleEngineClient,
+            FlexibleEngineRetryStrategy flexibleEngineRetryStrategy) {
+        this.credentialCenter = credentialCenter;
+        this.flexibleEngineClient = flexibleEngineClient;
+        this.flexibleEngineRetryStrategy = flexibleEngineRetryStrategy;
+    }
 
     /** List FlexibleEngine resource by the kind of ReusableCloudResource. */
     @Retryable(

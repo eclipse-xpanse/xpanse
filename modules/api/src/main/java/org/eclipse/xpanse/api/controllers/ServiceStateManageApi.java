@@ -11,12 +11,12 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceStateManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,7 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class ServiceStateManageApi {
 
-    @Resource private ServiceStateManager serviceStateManager;
+    private final ServiceStateManager serviceStateManager;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceStateManageApi(ServiceStateManager serviceStateManager) {
+        this.serviceStateManager = serviceStateManager;
+    }
 
     /**
      * Start the deployed service by the service id.

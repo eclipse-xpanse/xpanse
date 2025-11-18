@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,7 @@ import org.eclipse.xpanse.modules.models.service.deployment.exceptions.InvalidSe
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /** Bean for grouping common methods for handling ServiceDeploymentEntity. */
@@ -23,7 +23,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceDeploymentEntityHandler {
 
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceDeploymentEntityHandler(ServiceDeploymentStorage serviceDeploymentStorage) {
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+    }
 
     /**
      * Get deploy service entity by id.

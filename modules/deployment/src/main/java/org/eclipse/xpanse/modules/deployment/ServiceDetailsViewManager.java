@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +35,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeParameter;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingType;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -45,11 +45,26 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class ServiceDetailsViewManager {
 
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Resource private UserServiceHelper userServiceHelper;
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource private ServiceResultReFetchManager serviceResultReFetchManager;
-    @Resource private SensitiveDataHandler sensitiveDataHandler;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final UserServiceHelper userServiceHelper;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+    private final ServiceResultReFetchManager serviceResultReFetchManager;
+    private final SensitiveDataHandler sensitiveDataHandler;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceDetailsViewManager(
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            UserServiceHelper userServiceHelper,
+            ServiceDeploymentStorage serviceDeploymentStorage,
+            ServiceResultReFetchManager serviceResultReFetchManager,
+            SensitiveDataHandler sensitiveDataHandler) {
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.userServiceHelper = userServiceHelper;
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+        this.serviceResultReFetchManager = serviceResultReFetchManager;
+        this.sensitiveDataHandler = sensitiveDataHandler;
+    }
 
     /**
      * Get deploy service detail by id.

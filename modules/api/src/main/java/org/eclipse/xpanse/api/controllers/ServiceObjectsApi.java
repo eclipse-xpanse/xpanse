@@ -12,7 +12,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,11 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class ServiceObjectsApi {
 
-    @Resource private ServiceObjectManager serviceObjectManager;
+    private final ServiceObjectManager serviceObjectManager;
+
+    public ServiceObjectsApi(ServiceObjectManager serviceObjectManager) {
+        this.serviceObjectManager = serviceObjectManager;
+    }
 
     /**
      * Get details of the managed service by serviceId.

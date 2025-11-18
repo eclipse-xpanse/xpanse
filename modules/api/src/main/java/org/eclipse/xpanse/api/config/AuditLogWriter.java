@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.api.config;
 
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.time.OffsetDateTime;
@@ -40,9 +39,19 @@ public class AuditLogWriter {
 
     private static final String DEFAULT_GET_CSP_METHOD_NAME = "getCspFromRequestUri";
 
-    @Resource private PluginManager pluginManager;
-    @Resource private UserServiceHelper userServiceHelper;
-    @Resource private GetCspInfoFromRequest getCspInfoFromRequest;
+    private final PluginManager pluginManager;
+    private final UserServiceHelper userServiceHelper;
+    private final GetCspInfoFromRequest getCspInfoFromRequest;
+
+    /** Constructor method. */
+    public AuditLogWriter(
+            PluginManager pluginManager,
+            UserServiceHelper userServiceHelper,
+            GetCspInfoFromRequest getCspInfoFromRequest) {
+        this.pluginManager = pluginManager;
+        this.userServiceHelper = userServiceHelper;
+        this.getCspInfoFromRequest = getCspInfoFromRequest;
+    }
 
     /** Pointcut for all controller methods. */
     @Pointcut("execution(* org.eclipse.xpanse.api.controllers.*.*(..))")

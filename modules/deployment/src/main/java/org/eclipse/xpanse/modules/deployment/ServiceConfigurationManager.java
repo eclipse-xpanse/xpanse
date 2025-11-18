@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -46,6 +45,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -55,23 +55,38 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class ServiceConfigurationManager {
 
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-
-    @Resource private ServiceConfigurationStorage serviceConfigurationStorage;
-
-    @Resource private DeployService deployService;
-
-    @Resource private ServiceChangeRequestsManager serviceChangeRequestsManager;
-
-    @Resource private UserServiceHelper userServiceHelper;
-
-    @Resource
-    private ServiceConfigurationVariablesJsonSchemaValidator
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final ServiceConfigurationStorage serviceConfigurationStorage;
+    private final DeployService deployService;
+    private final ServiceChangeRequestsManager serviceChangeRequestsManager;
+    private final UserServiceHelper userServiceHelper;
+    private final ServiceConfigurationVariablesJsonSchemaValidator
             serviceConfigurationVariablesJsonSchemaValidator;
-
-    @Resource
-    private ServiceConfigurationVariablesJsonSchemaGenerator
+    private final ServiceConfigurationVariablesJsonSchemaGenerator
             serviceConfigurationVariablesJsonSchemaGenerator;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceConfigurationManager(
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            ServiceConfigurationStorage serviceConfigurationStorage,
+            DeployService deployService,
+            ServiceChangeRequestsManager serviceChangeRequestsManager,
+            UserServiceHelper userServiceHelper,
+            ServiceConfigurationVariablesJsonSchemaValidator
+                    serviceConfigurationVariablesJsonSchemaValidator,
+            ServiceConfigurationVariablesJsonSchemaGenerator
+                    serviceConfigurationVariablesJsonSchemaGenerator) {
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.serviceConfigurationStorage = serviceConfigurationStorage;
+        this.deployService = deployService;
+        this.serviceChangeRequestsManager = serviceChangeRequestsManager;
+        this.userServiceHelper = userServiceHelper;
+        this.serviceConfigurationVariablesJsonSchemaValidator =
+                serviceConfigurationVariablesJsonSchemaValidator;
+        this.serviceConfigurationVariablesJsonSchemaGenerator =
+                serviceConfigurationVariablesJsonSchemaGenerator;
+    }
 
     /**
      * Query the service's current configuration by id of the deployed service.

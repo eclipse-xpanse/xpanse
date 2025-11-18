@@ -1,0 +1,7 @@
+---
+xpanse:
+  http-server-request-logging:
+    enabled: true
+  http-client-request:
+    retry-max-attempts: 1
+    delay-milliseconds: 1000

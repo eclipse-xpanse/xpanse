@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.opentofu.opentofulocal;
 
 import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +31,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -40,17 +41,34 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnMissingBean(TofuMakerDeployment.class)
 public class OpenTofuLocalDeployment implements Deployer {
+
     public static final String TF_DEBUG_FLAG = "TF_LOG";
-    @Resource private OpenTofuInstaller openTofuInstaller;
-    @Resource private DeployEnvironments deployEnvironments;
-    @Resource private DeploymentProperties deploymentProperties;
+    private final OpenTofuInstaller openTofuInstaller;
+    private final DeployEnvironments deployEnvironments;
+    private final DeploymentProperties deploymentProperties;
+    private final OpenTofuDeploymentResultCallbackManager openTofuResultCallbackManager;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final DeploymentScriptsHelper scriptsHelper;
+    private final Executor taskExecutor;
 
-    @Resource(name = ASYNC_EXECUTOR_NAME)
-    private Executor taskExecutor;
-
-    @Resource private OpenTofuDeploymentResultCallbackManager openTofuResultCallbackManager;
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Resource private DeploymentScriptsHelper scriptsHelper;
+    /** Constructor method. */
+    @Autowired
+    public OpenTofuLocalDeployment(
+            OpenTofuInstaller openTofuInstaller,
+            DeployEnvironments deployEnvironments,
+            DeploymentProperties deploymentProperties,
+            OpenTofuDeploymentResultCallbackManager openTofuResultCallbackManager,
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            DeploymentScriptsHelper scriptsHelper,
+            @Qualifier(ASYNC_EXECUTOR_NAME) Executor taskExecutor) {
+        this.openTofuInstaller = openTofuInstaller;
+        this.deployEnvironments = deployEnvironments;
+        this.deploymentProperties = deploymentProperties;
+        this.openTofuResultCallbackManager = openTofuResultCallbackManager;
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.scriptsHelper = scriptsHelper;
+        this.taskExecutor = taskExecutor;
+    }
 
     /**
      * Deploy the DeployTask.

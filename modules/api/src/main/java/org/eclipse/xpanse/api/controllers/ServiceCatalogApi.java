@@ -14,7 +14,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +29,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateUnavailableException;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -55,7 +55,13 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class ServiceCatalogApi {
 
-    @Resource private ServiceTemplateManage serviceTemplateManage;
+    private final ServiceTemplateManage serviceTemplateManage;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceCatalogApi(ServiceTemplateManage serviceTemplateManage) {
+        this.serviceTemplateManage = serviceTemplateManage;
+    }
 
     /**
      * List all approved service templates which are available for user to order/deploy.

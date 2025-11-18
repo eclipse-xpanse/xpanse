@@ -23,9 +23,8 @@ class TerraBootRestTemplateConfigTest {
 
     @BeforeEach
     void setUp() {
-        terraBootRestTemplateConfigUnderTest = new TerraBootRestTemplateConfig();
-        terraBootRestTemplateConfigUnderTest.restTemplateLoggingInterceptor =
-                mockRestTemplateLoggingInterceptor;
+        terraBootRestTemplateConfigUnderTest =
+                new TerraBootRestTemplateConfig(mockRestTemplateLoggingInterceptor);
     }
 
     @Test

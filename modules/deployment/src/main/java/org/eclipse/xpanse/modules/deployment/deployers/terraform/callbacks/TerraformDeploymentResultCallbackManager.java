@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks;
 
-import jakarta.annotation.Resource;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -14,13 +13,20 @@ import org.eclipse.xpanse.modules.deployment.DeployResultManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformResult;
 import org.eclipse.xpanse.modules.models.service.deployment.DeployResult;
 import org.eclipse.xpanse.modules.models.service.enums.Handler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /** Bean for managing deployer terraform callback functions. */
 @Slf4j
 @Component
 public class TerraformDeploymentResultCallbackManager {
-    @Resource private DeployResultManager deployResultManager;
+    private final DeployResultManager deployResultManager;
+
+    /** Constructor method. */
+    @Autowired
+    public TerraformDeploymentResultCallbackManager(DeployResultManager deployResultManager) {
+        this.deployResultManager = deployResultManager;
+    }
 
     /**
      * Handle the callback of the order task.

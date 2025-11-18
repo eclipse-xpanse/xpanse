@@ -1,0 +1,8 @@
+---
+otel:
+  exporter:
+    otlp:
+      endpoint: http://localhost:4318
+    health-check-port: 13133
+  sdk:
+    disabled: false

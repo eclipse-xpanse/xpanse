@@ -6,7 +6,6 @@
 package org.eclipse.xpanse.modules.deployment.deployers.deployertools.cache;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
@@ -25,8 +24,16 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class DeployerToolVersionsCacheManager
         implements ApplicationListener<ApplicationStartedEvent> {
-    @Resource private DeployerToolVersionsCache versionsCache;
-    @Resource private DeployerToolVersionsFetcher versionsFetcher;
+
+    private final DeployerToolVersionsCache versionsCache;
+    private final DeployerToolVersionsFetcher versionsFetcher;
+
+    /** Constructor method. */
+    public DeployerToolVersionsCacheManager(
+            DeployerToolVersionsCache versionsCache, DeployerToolVersionsFetcher versionsFetcher) {
+        this.versionsCache = versionsCache;
+        this.versionsFetcher = versionsFetcher;
+    }
 
     /** Initialize the versions caches for all deployer tools. */
     @Override

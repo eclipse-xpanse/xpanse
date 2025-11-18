@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.deployment;
 
 import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 
-import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +37,8 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -47,13 +48,26 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class ServiceStateManager {
 
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentHandler;
-    @Resource private PluginManager pluginManager;
-    @Resource private UserServiceHelper userServiceHelper;
-    @Resource private ServiceOrderManager serviceOrderManager;
+    private final ServiceDeploymentEntityHandler serviceDeploymentHandler;
+    private final PluginManager pluginManager;
+    private final UserServiceHelper userServiceHelper;
+    private final ServiceOrderManager serviceOrderManager;
+    private final Executor taskExecutor;
 
-    @Resource(name = ASYNC_EXECUTOR_NAME)
-    private Executor taskExecutor;
+    /** Constructor method. */
+    @Autowired
+    public ServiceStateManager(
+            ServiceDeploymentEntityHandler serviceDeploymentHandler,
+            PluginManager pluginManager,
+            UserServiceHelper userServiceHelper,
+            ServiceOrderManager serviceOrderManager,
+            @Qualifier(ASYNC_EXECUTOR_NAME) Executor taskExecutor) {
+        this.serviceDeploymentHandler = serviceDeploymentHandler;
+        this.pluginManager = pluginManager;
+        this.userServiceHelper = userServiceHelper;
+        this.serviceOrderManager = serviceOrderManager;
+        this.taskExecutor = taskExecutor;
+    }
 
     /**
      * Start the service by the deployed service id.

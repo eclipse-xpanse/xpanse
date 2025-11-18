@@ -1,0 +1,22 @@
+---
+xpanse:
+  security:
+    oauth:
+      auth-url: ${xpanse.security.oauth.auth-provider-endpoint}/oauth/v2/authorize
+      token:url: ${xpanse.security.oauth.auth-provider-endpoint}/oauth/v2/token
+      scopes:
+        openid: "openid"
+        profile: "profile"
+        metadata: "urn:zitadel:iam:user:metadata"
+        roles: "urn:zitadel:iam:org:project:roles"
+        required-scopes:  "openid profile urn:zitadel:iam:org:projects:roles urn:zitadel:iam:user:metadata"
+      # keys to parse the claims map.
+      claims:
+        username-key: "name"
+        meta-data-key: "urn:zitadel:iam:user:metadata"
+        granted-roles-key: "urn:zitadel:iam:org:project:roles"
+        user-id-key: "sub"
+      meta-data:
+        isv-key: "isv"
+        csp-key: "csp"
+      default-role: user

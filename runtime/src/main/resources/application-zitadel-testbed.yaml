@@ -1,0 +1,14 @@
+---
+xpanse:
+  security:
+    oauth:
+      auth-provider-endpoint: https://xpanse-demo.eclipseprojects.io
+      token-type: JWT
+      server:
+        api-client-id: 330255867729477635
+        api-client-secret: jg5Hj002ezVnW153Gkq51jrhVIbegLEHw3QC37rGTnKOJOepYU2Q0eGgtCWYogsJ
+      client:
+        client-id: apiclient
+        client-secret: xNMswXhqJUEL1yX85Qjv5UtZuebyrbRQu5lgHXH6YUAYIPlQctArbmFbhuLbm53p
+      swagger-ui:
+        client-id: 330255867746254851

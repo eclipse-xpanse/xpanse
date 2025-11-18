@@ -5,9 +5,9 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.config;
 
-import jakarta.annotation.Resource;
 import java.util.Collections;
 import org.eclipse.xpanse.modules.logging.RestTemplateLoggingInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,7 +17,14 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class TerraBootRestTemplateConfig {
 
-    @Resource RestTemplateLoggingInterceptor restTemplateLoggingInterceptor;
+    private final RestTemplateLoggingInterceptor restTemplateLoggingInterceptor;
+
+    /** Constructor method. */
+    @Autowired
+    public TerraBootRestTemplateConfig(
+            RestTemplateLoggingInterceptor restTemplateLoggingInterceptor) {
+        this.restTemplateLoggingInterceptor = restTemplateLoggingInterceptor;
+    }
 
     /** create a standard RestTemplate bean. */
     @Primary

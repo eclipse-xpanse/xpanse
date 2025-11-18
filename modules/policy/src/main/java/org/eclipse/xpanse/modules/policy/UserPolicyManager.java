@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.policy;
 
-import jakarta.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +24,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryReques
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -34,10 +34,20 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class UserPolicyManager {
 
-    @Resource private PolicyManager policyManager;
+    private final PolicyManager policyManager;
+    private final UserServiceHelper userServiceHelper;
+    private final UserPolicyStorage userPolicyStorage;
 
-    @Resource private UserServiceHelper userServiceHelper;
-    @Resource private UserPolicyStorage userPolicyStorage;
+    /** Constructor method. */
+    @Autowired
+    public UserPolicyManager(
+            PolicyManager policyManager,
+            UserServiceHelper userServiceHelper,
+            UserPolicyStorage userPolicyStorage) {
+        this.policyManager = policyManager;
+        this.userServiceHelper = userServiceHelper;
+        this.userPolicyStorage = userPolicyStorage;
+    }
 
     /**
      * Get the query model for listing policies.

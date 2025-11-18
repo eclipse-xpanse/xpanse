@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.workflow.utils;
 
-import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -27,17 +26,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /** Process tool class. */
 @Component
 public class WorkflowUtils {
 
-    @Resource private RuntimeService runtimeService;
+    private final RuntimeService runtimeService;
+    private final TaskService taskService;
+    private final HistoryService historyService;
 
-    @Resource private TaskService taskService;
-
-    @Resource private HistoryService historyService;
+    /** Constructor method. */
+    @Autowired
+    public WorkflowUtils(
+            RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
+        this.runtimeService = runtimeService;
+        this.taskService = taskService;
+        this.historyService = historyService;
+    }
 
     /**
      * Start the process through the process definition key.

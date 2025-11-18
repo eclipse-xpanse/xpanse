@@ -9,13 +9,13 @@ package org.eclipse.xpanse.api.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -42,8 +42,14 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class TofuMakerWebhookApi {
 
-    @Resource
-    private OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+    private final OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+
+    /** Constructor method. */
+    @Autowired
+    public TofuMakerWebhookApi(
+            OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager) {
+        this.openTofuDeploymentResultCallbackManager = openTofuDeploymentResultCallbackManager;
+    }
 
     /** Webhook methods to receive openTofu execution result. */
     @Tag(name = "Webhook", description = "Webhook APIs")

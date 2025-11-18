@@ -7,7 +7,6 @@
 package org.eclipse.xpanse.ai.tools;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +28,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.exceptions.Serv
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -44,12 +44,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 @Profile("ai")
 public class McpTools {
 
-    @Resource private ServiceCatalogApi serviceCatalogApi;
+    private final ServiceCatalogApi serviceCatalogApi;
+    private final ServiceDeployerApi serviceDeployerApi;
+    private final ApplicationGenerationManager applicationGenerationManager;
+    private final ServiceTemplateGenerator serviceTemplateGenerator;
 
-    @Resource private ServiceDeployerApi serviceDeployerApi;
-
-    @Resource private ApplicationGenerationManager applicationGenerationManager;
-    @Resource private ServiceTemplateGenerator serviceTemplateGenerator;
+    /** Constructor method. */
+    @Autowired
+    public McpTools(
+            ServiceCatalogApi serviceCatalogApi,
+            ServiceDeployerApi serviceDeployerApi,
+            ApplicationGenerationManager applicationGenerationManager,
+            ServiceTemplateGenerator serviceTemplateGenerator) {
+        this.serviceCatalogApi = serviceCatalogApi;
+        this.serviceDeployerApi = serviceDeployerApi;
+        this.applicationGenerationManager = applicationGenerationManager;
+        this.serviceTemplateGenerator = serviceTemplateGenerator;
+    }
 
     /**
      * Get deployable service by id.

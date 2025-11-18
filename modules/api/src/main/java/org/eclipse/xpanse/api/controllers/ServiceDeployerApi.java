@@ -15,7 +15,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +43,7 @@ import org.eclipse.xpanse.modules.models.service.view.DeployedService;
 import org.eclipse.xpanse.modules.models.service.view.DeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServiceDetails;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
@@ -75,10 +75,23 @@ import org.springframework.web.context.request.async.DeferredResult;
         matchIfMissing = true)
 public class ServiceDeployerApi {
 
-    @Resource private CacheProperties cacheProperties;
-    @Resource private DeployService deployService;
-    @Resource private ServiceLockConfigService lockConfigService;
-    @Resource private ServiceDetailsViewManager serviceDetailsViewManager;
+    private final CacheProperties cacheProperties;
+    private final DeployService deployService;
+    private final ServiceLockConfigService lockConfigService;
+    private final ServiceDetailsViewManager serviceDetailsViewManager;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceDeployerApi(
+            CacheProperties cacheProperties,
+            DeployService deployService,
+            ServiceLockConfigService lockConfigService,
+            ServiceDetailsViewManager serviceDetailsViewManager) {
+        this.cacheProperties = cacheProperties;
+        this.deployService = deployService;
+        this.lockConfigService = lockConfigService;
+        this.serviceDetailsViewManager = serviceDetailsViewManager;
+    }
 
     /**
      * Get details of the managed service by serviceId.

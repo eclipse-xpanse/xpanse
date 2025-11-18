@@ -12,7 +12,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,7 @@ import org.eclipse.xpanse.modules.models.workflow.WorkFlowTask;
 import org.eclipse.xpanse.modules.models.workflow.WorkFlowTaskStatus;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,9 +49,15 @@ import org.springframework.web.bind.annotation.RestController;
         matchIfMissing = true)
 public class WorkFlowApi {
 
-    @Resource private WorkflowUtils workflowUtils;
+    private final WorkflowUtils workflowUtils;
+    private final UserServiceHelper userServiceHelper;
 
-    @Resource private UserServiceHelper userServiceHelper;
+    /** Constructor method. */
+    @Autowired
+    public WorkFlowApi(WorkflowUtils workflowUtils, UserServiceHelper userServiceHelper) {
+        this.workflowUtils = workflowUtils;
+        this.userServiceHelper = userServiceHelper;
+    }
 
     /** Query tasks of the given user by status. */
     @Tag(name = "Workflow", description = "APIs to manage the Workflow")

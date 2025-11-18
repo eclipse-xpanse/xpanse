@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.plugins.openstack.common.monitor;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +30,7 @@ import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.metric
 import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.resources.InstanceNetworkResource;
 import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.models.resources.InstanceResource;
 import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.utils.GnocchiToXpanseModelConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -39,12 +39,29 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class OpenstackServiceMetricsManager {
 
-    @Resource private ResourcesService resourcesService;
-    @Resource private GnocchiToXpanseModelConverter gnocchiToXpanseModelConverter;
-    @Resource private AggregationService aggregationService;
-    @Resource private MeasuresService measuresService;
-    @Resource private MonitorMetricsStore monitorMetricsStore;
-    @Resource private ProviderAuthInfoResolver providerAuthInfoResolver;
+    private final ResourcesService resourcesService;
+    private final GnocchiToXpanseModelConverter gnocchiToXpanseModelConverter;
+    private final AggregationService aggregationService;
+    private final MeasuresService measuresService;
+    private final MonitorMetricsStore monitorMetricsStore;
+    private final ProviderAuthInfoResolver providerAuthInfoResolver;
+
+    /** Constructor method. */
+    @Autowired
+    public OpenstackServiceMetricsManager(
+            ResourcesService resourcesService,
+            GnocchiToXpanseModelConverter gnocchiToXpanseModelConverter,
+            AggregationService aggregationService,
+            MeasuresService measuresService,
+            MonitorMetricsStore monitorMetricsStore,
+            ProviderAuthInfoResolver providerAuthInfoResolver) {
+        this.resourcesService = resourcesService;
+        this.gnocchiToXpanseModelConverter = gnocchiToXpanseModelConverter;
+        this.aggregationService = aggregationService;
+        this.measuresService = measuresService;
+        this.monitorMetricsStore = monitorMetricsStore;
+        this.providerAuthInfoResolver = providerAuthInfoResolver;
+    }
 
     /**
      * Method which does the actual implementation for MetricsExporter. {@link

@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.plugins.huaweicloud.price;
 
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.billing.FlavorPriceResult;
 import org.eclipse.xpanse.modules.models.billing.Price;
@@ -15,6 +14,7 @@ import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.servicetemplate.price.BillingCommonUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class HuaweiCloudPriceCalculator {
-    @Resource private HuaweiCloudGlobalPriceCalculator globalPriceCalculator;
+    private final HuaweiCloudGlobalPriceCalculator globalPriceCalculator;
+
+    /** Constructor method. */
+    @Autowired
+    public HuaweiCloudPriceCalculator(HuaweiCloudGlobalPriceCalculator globalPriceCalculator) {
+        this.globalPriceCalculator = globalPriceCalculator;
+    }
 
     /**
      * Get the price of the service.

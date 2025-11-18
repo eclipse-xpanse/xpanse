@@ -1,0 +1,10 @@
+---
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: Xpanse@2023
+xpanse:
+  cache:
+    redis-enabled: true

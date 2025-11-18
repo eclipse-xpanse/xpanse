@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +19,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.security.secrets.SecretsManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -33,9 +33,17 @@ public class SensitiveDataHandler {
 
     private static final String REQUEST_PROPERTIES_FIELD = "serviceRequestProperties";
 
-    @Resource private SecretsManager secretsManager;
+    private final SecretsManager secretsManager;
 
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+
+    /** Constructor method. */
+    @Autowired
+    public SensitiveDataHandler(
+            SecretsManager secretsManager, ServiceDeploymentStorage serviceDeploymentStorage) {
+        this.secretsManager = secretsManager;
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+    }
 
     /**
      * Method to mask all sensitive data after deployment is completed.
