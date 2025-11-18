@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
@@ -38,7 +37,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/agent/xpanse")
 public class AgentPollingApi {
 
-    @Resource private ServiceChangeManager serviceChangeManager;
+    private final ServiceChangeManager serviceChangeManager;
+
+    /** Constructor method. */
+    public AgentPollingApi(ServiceChangeManager serviceChangeManager) {
+        this.serviceChangeManager = serviceChangeManager;
+    }
 
     /**
      * Query pending service change request for agent.

@@ -13,7 +13,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.Comparator;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.request.enums.ServiceTe
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.servicetemplate.view.ServiceTemplateDetailVo;
 import org.eclipse.xpanse.modules.servicetemplate.ServiceTemplateManage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,11 +60,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_ISV})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class ServiceTemplateApi {
 
-    @Resource private ServiceTemplateManage serviceTemplateManage;
-    @Resource private OclLoader oclLoader;
+    private final ServiceTemplateManage serviceTemplateManage;
+    private final OclLoader oclLoader;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceTemplateApi(ServiceTemplateManage serviceTemplateManage, OclLoader oclLoader) {
+        this.serviceTemplateManage = serviceTemplateManage;
+        this.oclLoader = oclLoader;
+    }
 
     /**
      * Register new service template using ocl model.

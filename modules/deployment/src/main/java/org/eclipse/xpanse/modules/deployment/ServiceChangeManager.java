@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -41,6 +40,7 @@ import org.eclipse.xpanse.modules.models.serviceconfiguration.exceptions.Service
 import org.eclipse.xpanse.modules.models.servicetemplate.AnsibleScriptConfig;
 import org.eclipse.xpanse.modules.models.servicetemplate.ServiceChangeScript;
 import org.hibernate.exception.LockTimeoutException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -57,12 +57,29 @@ public class ServiceChangeManager {
     private static final String IP = "ip";
     private static final String HOSTS = "hosts";
 
-    @Resource private ServiceChangeRequestStorage serviceChangeRequestStorage;
-    @Resource private ServiceOrderManager serviceOrderManager;
-    @Resource private ServiceConfigurationManager serviceConfigurationManager;
-    @Resource private ServiceActionManager serviceActionManager;
-    @Resource private ServiceObjectManager serviceObjectManager;
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final ServiceChangeRequestStorage serviceChangeRequestStorage;
+    private final ServiceOrderManager serviceOrderManager;
+    private final ServiceConfigurationManager serviceConfigurationManager;
+    private final ServiceActionManager serviceActionManager;
+    private final ServiceObjectManager serviceObjectManager;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceChangeManager(
+            ServiceChangeRequestStorage serviceChangeRequestStorage,
+            ServiceOrderManager serviceOrderManager,
+            ServiceConfigurationManager serviceConfigurationManager,
+            ServiceActionManager serviceActionManager,
+            ServiceObjectManager serviceObjectManager,
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler) {
+        this.serviceChangeRequestStorage = serviceChangeRequestStorage;
+        this.serviceOrderManager = serviceOrderManager;
+        this.serviceConfigurationManager = serviceConfigurationManager;
+        this.serviceActionManager = serviceActionManager;
+        this.serviceObjectManager = serviceObjectManager;
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+    }
 
     /** returns the oldest pending request for a specific resource of the service. */
     @Transactional

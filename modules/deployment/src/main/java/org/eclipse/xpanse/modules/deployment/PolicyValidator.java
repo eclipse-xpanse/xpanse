@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +25,7 @@ import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.policy.ServicePolicyManager;
 import org.eclipse.xpanse.modules.policy.UserPolicyManager;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -34,11 +34,26 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class PolicyValidator {
 
-    @Resource private PolicyManager policyManager;
-    @Resource private UserPolicyManager userPolicyManager;
-    @Resource private ServicePolicyManager servicePolicyManager;
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
-    @Resource private DeployerKindManager deployerKindManager;
+    private final PolicyManager policyManager;
+    private final UserPolicyManager userPolicyManager;
+    private final ServicePolicyManager servicePolicyManager;
+    private final ServiceTemplateStorage serviceTemplateStorage;
+    private final DeployerKindManager deployerKindManager;
+
+    /** Constructor method. */
+    @Autowired
+    public PolicyValidator(
+            PolicyManager policyManager,
+            UserPolicyManager userPolicyManager,
+            ServicePolicyManager servicePolicyManager,
+            ServiceTemplateStorage serviceTemplateStorage,
+            DeployerKindManager deployerKindManager) {
+        this.policyManager = policyManager;
+        this.userPolicyManager = userPolicyManager;
+        this.servicePolicyManager = servicePolicyManager;
+        this.serviceTemplateStorage = serviceTemplateStorage;
+        this.deployerKindManager = deployerKindManager;
+    }
 
     private List<ServicePolicy> getServicePolicies(UUID serviceTemplateId) {
         ServiceTemplateEntity existedServiceTemplate =
@@ -51,10 +66,7 @@ public class PolicyValidator {
                                     servicePolicyEntity.getEnabled()
                                             && StringUtils.isNotBlank(
                                                     servicePolicyEntity.getPolicy()))
-                    .map(
-                            servicePolicyEntity ->
-                                    servicePolicyManager.conventToServicePolicy(
-                                            servicePolicyEntity))
+                    .map(servicePolicyManager::conventToServicePolicy)
                     .toList();
         }
         return Collections.emptyList();

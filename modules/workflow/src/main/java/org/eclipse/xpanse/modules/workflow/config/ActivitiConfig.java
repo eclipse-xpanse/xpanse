@@ -24,7 +24,6 @@ import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
@@ -42,13 +41,14 @@ public class ActivitiConfig {
 
     private final ApplicationContext applicationContext;
 
-    @Value("${spring.activiti.history-level}")
-    private HistoryLevel historyLevel;
+    private final ActivitiProperties activitiProperties;
 
     /** constructor for ActivitiConfig bean. */
     @Autowired
-    public ActivitiConfig(ApplicationContext applicationContext) {
+    public ActivitiConfig(
+            ApplicationContext applicationContext, ActivitiProperties activitiProperties) {
         this.applicationContext = applicationContext;
+        this.activitiProperties = activitiProperties;
     }
 
     @Bean(name = "activitiDataSource")
@@ -77,7 +77,8 @@ public class ActivitiConfig {
                         .getResources(
                                 ResourceLoader.CLASSPATH_URL_PREFIX + "processes/**.bpmn20.xml");
         springProcessEngineConfiguration.setDeploymentResources(resources);
-        springProcessEngineConfiguration.setHistoryLevel(historyLevel);
+        springProcessEngineConfiguration.setHistoryLevel(
+                HistoryLevel.getHistoryLevelForKey(activitiProperties.getHistoryLevel()));
         springProcessEngineConfiguration.setApplicationContext(this.applicationContext);
         springProcessEngineConfiguration.setSerializePOJOsInVariablesToJson(true);
         return springProcessEngineConfiguration;

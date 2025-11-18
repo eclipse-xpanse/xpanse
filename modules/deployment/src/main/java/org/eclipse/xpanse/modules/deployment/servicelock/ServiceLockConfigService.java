@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment.servicelock;
 
-import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +22,7 @@ import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -31,13 +31,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceLockConfigService {
 
-    @Resource private ServiceOrderManager serviceOrderManager;
+    private final ServiceOrderManager serviceOrderManager;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final ServiceOrderStorage serviceOrderStorage;
+    private final UserServiceHelper userServiceHelper;
 
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-
-    @Resource private ServiceOrderStorage serviceOrderStorage;
-
-    @Resource private UserServiceHelper userServiceHelper;
+    /** Constructor method. */
+    @Autowired
+    public ServiceLockConfigService(
+            ServiceOrderManager serviceOrderManager,
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            ServiceOrderStorage serviceOrderStorage,
+            UserServiceHelper userServiceHelper) {
+        this.serviceOrderManager = serviceOrderManager;
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.serviceOrderStorage = serviceOrderStorage;
+        this.userServiceHelper = userServiceHelper;
+    }
 
     /**
      * Method to change lock config of service.

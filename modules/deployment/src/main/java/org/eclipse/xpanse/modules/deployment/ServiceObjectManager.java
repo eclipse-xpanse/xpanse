@@ -8,7 +8,6 @@ package org.eclipse.xpanse.modules.deployment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -55,6 +54,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ObjectActionType;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -66,23 +66,37 @@ public class ServiceObjectManager {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Resource private UserServiceHelper userServiceHelper;
+    private final UserServiceHelper userServiceHelper;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final DeployService deployService;
+    private final ServiceChangeRequestsManager serviceChangeRequestsManager;
+    private final ServiceObjectVariablesJsonSchemaValidator
+            serviceObjectVariablesJsonSchemaValidator;
+    private final ServiceObjectVariablesJsonSchemaGenerator
+            serviceObjectVariablesJsonSchemaGenerator;
+    private final ServiceObjectStorage serviceObjectStorage;
+    private final ServiceOrderStorage serviceOrderStorage;
 
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-
-    @Resource private DeployService deployService;
-
-    @Resource private ServiceChangeRequestsManager serviceChangeRequestsManager;
-
-    @Resource
-    private ServiceObjectVariablesJsonSchemaValidator serviceObjectVariablesJsonSchemaValidator;
-
-    @Resource
-    private ServiceObjectVariablesJsonSchemaGenerator serviceObjectVariablesJsonSchemaGenerator;
-
-    @Resource private ServiceObjectStorage serviceObjectStorage;
-
-    @Resource private ServiceOrderStorage serviceOrderStorage;
+    /** Constructor method. */
+    @Autowired
+    public ServiceObjectManager(
+            UserServiceHelper userServiceHelper,
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            DeployService deployService,
+            ServiceChangeRequestsManager serviceChangeRequestsManager,
+            ServiceObjectVariablesJsonSchemaValidator serviceObjectVariablesJsonSchemaValidator,
+            ServiceObjectVariablesJsonSchemaGenerator serviceObjectVariablesJsonSchemaGenerator,
+            ServiceObjectStorage serviceObjectStorage,
+            ServiceOrderStorage serviceOrderStorage) {
+        this.userServiceHelper = userServiceHelper;
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.deployService = deployService;
+        this.serviceChangeRequestsManager = serviceChangeRequestsManager;
+        this.serviceObjectVariablesJsonSchemaValidator = serviceObjectVariablesJsonSchemaValidator;
+        this.serviceObjectVariablesJsonSchemaGenerator = serviceObjectVariablesJsonSchemaGenerator;
+        this.serviceObjectStorage = serviceObjectStorage;
+        this.serviceOrderStorage = serviceOrderStorage;
+    }
 
     /**
      * Get service objects grouped by type with service id.

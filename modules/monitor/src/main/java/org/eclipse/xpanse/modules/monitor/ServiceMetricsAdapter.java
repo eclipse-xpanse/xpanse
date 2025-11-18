@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.monitor;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -31,6 +30,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -41,10 +41,23 @@ import org.springframework.util.CollectionUtils;
 public class ServiceMetricsAdapter {
 
     private static final long FIVE_MINUTES_MILLISECONDS = 5 * 60 * 1000;
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource private ServiceResourceStorage serviceResourceStorage;
-    @Resource private PluginManager pluginManager;
-    @Resource private UserServiceHelper userServiceHelper;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+    private final ServiceResourceStorage serviceResourceStorage;
+    private final PluginManager pluginManager;
+    private final UserServiceHelper userServiceHelper;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceMetricsAdapter(
+            ServiceDeploymentStorage serviceDeploymentStorage,
+            ServiceResourceStorage serviceResourceStorage,
+            PluginManager pluginManager,
+            UserServiceHelper userServiceHelper) {
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+        this.serviceResourceStorage = serviceResourceStorage;
+        this.pluginManager = pluginManager;
+        this.userServiceHelper = userServiceHelper;
+    }
 
     /** Get metrics of the service instance. */
     public List<Metric> getMetricsByServiceId(

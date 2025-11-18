@@ -51,7 +51,7 @@ class AdminHealthCheckWithRedisCacheTest extends AbstractRedisIntegrationTest {
         // Run the test
         StackStatus stackStatus = adminServicesApi.stackHealthStatus();
         assertNotNull(stackStatus);
-        assertEquals(stackStatus.getHealthStatus(), HealthStatus.OK);
+        assertEquals(HealthStatus.OK, stackStatus.getHealthStatus());
         List<BackendSystemStatus> backendSystemStatuses = stackStatus.getBackendSystemStatuses();
         assertEquals(4, backendSystemStatuses.size());
 

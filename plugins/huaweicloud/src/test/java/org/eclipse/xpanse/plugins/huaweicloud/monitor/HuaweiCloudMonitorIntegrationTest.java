@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
+import org.eclipse.xpanse.modules.cache.config.CacheProperties;
 import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsStore;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
@@ -32,6 +33,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.HuaweiCloudOrchestratorPlugin;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
+import org.eclipse.xpanse.plugins.huaweicloud.config.HuaweiCloudPluginProperties;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudServerManageRequestConverter;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
@@ -65,7 +67,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             HuaweiCloudPriceCalculator.class,
             HuaweiCloudGlobalPriceCalculator.class,
             HuaweiCloudRetryStrategy.class,
-            ProxyConfigurationManager.class
+            ProxyConfigurationManager.class,
+            CacheProperties.class,
+            HuaweiCloudPluginProperties.class
         })
 class HuaweiCloudMonitorIntegrationTest {
 

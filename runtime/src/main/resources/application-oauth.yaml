@@ -1,0 +1,58 @@
+---
+xpanse:
+  security:
+    enable-web-security: true
+    enable-role-protection: true
+    oauth:
+      auth-provider-endpoint: ""
+      auth-url: ""
+      token-url: ""
+      token-type: ""
+      server:
+        api-client-id: ""
+        api-client-secret: ""
+      client:
+        client-id: ""
+        client-secret: ""
+      swagger-ui:
+        client-id: ""
+      scopes:
+        openid: ""
+        profile: ""
+        metadata: ""
+        roles: ""
+        required-scopes: ""
+      claims:
+        username-key: ""
+        meta-data-key: ""
+        granted-roles-key: ""
+        user-id-key: ""
+      meta-data:
+        isv-key: ""
+        csp-key: ""
+      default-role: user
+
+# spring security oauth2 config when using token type JWT
+spring:
+  security:
+    oauth2.:
+      resourceserver:
+        jwt.:
+          issuer-uri: ${xpanse.security.oauth.auth-provider-endpoint}
+          jwk-set-uri: ${xpanse.security.oauth.auth-provider-endpoint}/oauth/v2/keys
+        opaquetoken:
+          introspection-uri: ${xpanse.security.oauth.auth-provider-endpoint}/oauth/v2/introspect
+          client-id: ${xpanse.security.oauth.server.api-client-id}
+          client-secret: ${xpanse.security.oauth.server.api-client-secret}
+
+springdoc:
+  show-login-endpoint: true
+  swagger-ui:
+    oauth:
+      use-pkce-with-authorization-code-grant: true
+      client-id: ${xpanse.security.oauth.swagger-ui.client-id}
+
+logging:
+  level:
+    org.springframework.web: INFO
+    org.springframework.security: INFO

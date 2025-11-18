@@ -23,7 +23,7 @@ class FlexibleEngineClientTest {
 
     @BeforeEach
     void setUp() {
-        testClient = new FlexibleEngineClient();
+        testClient = new FlexibleEngineClient(null, null);
     }
 
     @Test

@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +18,7 @@ import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceChangeRequestsManager;
 import org.eclipse.xpanse.modules.models.servicechange.ServiceChangeOrderDetails;
 import org.eclipse.xpanse.modules.models.servicechange.enums.ServiceChangeStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,10 +36,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class ServiceChangeRequestDetailsApi {
 
-    @Resource private ServiceChangeRequestsManager serviceChangeRequestsManager;
+    private final ServiceChangeRequestsManager serviceChangeRequestsManager;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceChangeRequestDetailsApi(
+            ServiceChangeRequestsManager serviceChangeRequestsManager) {
+        this.serviceChangeRequestsManager = serviceChangeRequestsManager;
+    }
 
     /** List all service change request. */
     @Tag(name = "ServiceChangeDetails", description = "APIs for Service Change Details.")

@@ -15,7 +15,6 @@ import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.auth.ICredential;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -45,10 +45,23 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class HuaweiCloudMetricsService {
 
-    @Resource private HuaweiCloudClient huaweiCloudClient;
-    @Resource private MonitorMetricsStore monitorMetricsStore;
-    @Resource private HuaweiCloudDataModelConverter huaweiCloudDataModelConverter;
-    @Resource private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
+    private final HuaweiCloudClient huaweiCloudClient;
+    private final MonitorMetricsStore monitorMetricsStore;
+    private final HuaweiCloudDataModelConverter huaweiCloudDataModelConverter;
+    private final HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
+
+    /** Constructor method. */
+    @Autowired
+    public HuaweiCloudMetricsService(
+            HuaweiCloudClient huaweiCloudClient,
+            MonitorMetricsStore monitorMetricsStore,
+            HuaweiCloudDataModelConverter huaweiCloudDataModelConverter,
+            HuaweiCloudRetryStrategy huaweiCloudRetryStrategy) {
+        this.huaweiCloudClient = huaweiCloudClient;
+        this.monitorMetricsStore = monitorMetricsStore;
+        this.huaweiCloudDataModelConverter = huaweiCloudDataModelConverter;
+        this.huaweiCloudRetryStrategy = huaweiCloudRetryStrategy;
+    }
 
     /**
      * Get metrics of the @deployResource.
@@ -58,8 +71,9 @@ public class HuaweiCloudMetricsService {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<Metric> getMetricsByResource(ResourceMetricsRequest resourceMetricRequest) {
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         String siteName = resourceMetricRequest.getRegion().getSite();
@@ -110,8 +124,9 @@ public class HuaweiCloudMetricsService {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<Metric> getMetricsByService(ServiceMetricsRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
 

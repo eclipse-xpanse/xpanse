@@ -39,7 +39,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RequestMapping("/xpanse")
 @Secured({ROLE_ADMIN, ROLE_USER})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class ServiceMetricsApi {
 
     private final ServiceMetricsAdapter serviceMetricsAdapter;

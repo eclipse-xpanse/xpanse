@@ -20,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(
         properties = {
-            "http.request.retry.max.attempts=1",
+            "xpanse.http-client-request.retry-max-attempts=1",
             "enable.redis.distributed.cache=true",
             "support.default.deployment.tool.versions.only=false",
             "spring.profiles.active=noauth,dev"

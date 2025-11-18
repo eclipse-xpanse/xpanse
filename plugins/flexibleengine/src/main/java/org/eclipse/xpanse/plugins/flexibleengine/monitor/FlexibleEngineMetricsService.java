@@ -15,7 +15,6 @@ import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataRequest;
 import com.huaweicloud.sdk.ces.v1.model.ShowMetricDataResponse;
 import com.huaweicloud.sdk.core.auth.ICredential;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +37,7 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineClient;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineRetryStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -48,11 +48,26 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class FlexibleEngineMetricsService {
 
-    @Resource private FlexibleEngineClient flexibleEngineClient;
-    @Resource private MonitorMetricsStore monitorMetricsStore;
-    @Resource private FlexibleEngineDataModelConverter modelConverter;
-    @Resource private CredentialCenter credentialCenter;
-    @Resource private FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+    private final FlexibleEngineClient flexibleEngineClient;
+    private final MonitorMetricsStore monitorMetricsStore;
+    private final FlexibleEngineDataModelConverter modelConverter;
+    private final CredentialCenter credentialCenter;
+    private final FlexibleEngineRetryStrategy flexibleEngineRetryStrategy;
+
+    /** Constructor method. */
+    @Autowired
+    public FlexibleEngineMetricsService(
+            FlexibleEngineClient flexibleEngineClient,
+            MonitorMetricsStore monitorMetricsStore,
+            FlexibleEngineDataModelConverter modelConverter,
+            CredentialCenter credentialCenter,
+            FlexibleEngineRetryStrategy flexibleEngineRetryStrategy) {
+        this.flexibleEngineClient = flexibleEngineClient;
+        this.monitorMetricsStore = monitorMetricsStore;
+        this.modelConverter = modelConverter;
+        this.credentialCenter = credentialCenter;
+        this.flexibleEngineRetryStrategy = flexibleEngineRetryStrategy;
+    }
 
     /**
      * Get metrics of the @deployResource.
@@ -62,8 +77,9 @@ public class FlexibleEngineMetricsService {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<Metric> getMetricsByResource(ResourceMetricsRequest resourceMetricRequest) {
         DeployResource deployResource = resourceMetricRequest.getDeployResource();
         String regionName = deployResource.getProperties().get("region");
@@ -118,8 +134,9 @@ public class FlexibleEngineMetricsService {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<Metric> getMetricsByService(ServiceMetricsRequest serviceMetricRequest) {
         List<DeployResource> deployResources = serviceMetricRequest.getDeployResources();
         String regionName = deployResources.getFirst().getProperties().get("region");

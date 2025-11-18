@@ -18,10 +18,11 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.xpanse.modules.deployment.config.GitProperties;
 import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentScriptsCreationFailedException;
 import org.eclipse.xpanse.modules.models.common.exceptions.GitRepoCloneException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -33,8 +34,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScriptsGitRepoManage {
 
-    @Value("${git.command.timeout.seconds:10}")
-    private int gitCommandTimeoutSeconds;
+    private final GitProperties gitProperties;
+
+    @Autowired
+    public ScriptsGitRepoManage(GitProperties gitProperties) {
+        this.gitProperties = gitProperties;
+    }
 
     /**
      * Method to check out scripts from a GIT repo.
@@ -44,14 +49,18 @@ public class ScriptsGitRepoManage {
      */
     @Retryable(
             retryFor = GitRepoCloneException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<File> checkoutScripts(String workspace, ScriptsRepo scriptsRepo) {
         File workspaceDirectory = new File(workspace);
         FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
         repositoryBuilder.findGitDir(workspaceDirectory);
         if (Objects.isNull(repositoryBuilder.getGitDir())) {
-            int timeoutSeconds = gitCommandTimeoutSeconds > 0 ? gitCommandTimeoutSeconds : 10;
+            int timeoutSeconds =
+                    gitProperties.getCommandTimeoutSeconds() > 0
+                            ? gitProperties.getCommandTimeoutSeconds()
+                            : 10;
             CloneCommand cloneCommand = new CloneCommand();
             cloneCommand.setURI(scriptsRepo.getRepoUrl());
             cloneCommand.setProgressMonitor(null);

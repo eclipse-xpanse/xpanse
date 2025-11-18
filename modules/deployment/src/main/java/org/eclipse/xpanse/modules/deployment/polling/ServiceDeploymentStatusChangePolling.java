@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.polling;
 
-import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -17,10 +16,11 @@ import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
+import org.eclipse.xpanse.modules.deployment.config.OrderProperties;
 import org.eclipse.xpanse.modules.models.service.deployment.DeploymentStatusUpdate;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -40,13 +40,15 @@ public class ServiceDeploymentStatusChangePolling {
                     ServiceDeploymentState.ROLLBACK_FAILED,
                     ServiceDeploymentState.MANUAL_CLEANUP_REQUIRED);
 
-    @Value("${service.status.long.polling.interval.in.seconds:5}")
-    private int pollingInterval;
+    private final OrderProperties orderProperties;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
 
-    @Value("${service.status.long.polling.wait.time.in.seconds:30}")
-    private int pollingWaitPeriod;
-
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
+    @Autowired
+    public ServiceDeploymentStatusChangePolling(
+            OrderProperties orderProperties, ServiceDeploymentStorage serviceDeploymentStorage) {
+        this.orderProperties = orderProperties;
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+    }
 
     /**
      * Method to fetch order status by polling database for a fixed period of time.
@@ -69,9 +71,13 @@ public class ServiceDeploymentStatusChangePolling {
                                         previousKnownServiceDeploymentState)));
         try {
             Awaitility.await()
-                    .atMost(pollingWaitPeriod, TimeUnit.SECONDS)
+                    .atMost(
+                            orderProperties.getOrderStatus().getLongPollingSeconds(),
+                            TimeUnit.SECONDS)
                     .pollDelay(0, TimeUnit.SECONDS) // first check runs without wait.
-                    .pollInterval(pollingInterval, TimeUnit.SECONDS)
+                    .pollInterval(
+                            orderProperties.getOrderStatus().getPollingIntervalSeconds(),
+                            TimeUnit.SECONDS)
                     .until(
                             () -> {
                                 ServiceDeploymentEntity serviceDeploymentEntity =

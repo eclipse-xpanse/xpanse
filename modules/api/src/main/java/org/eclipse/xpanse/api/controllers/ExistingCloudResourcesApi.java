@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +38,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class ExistingCloudResourcesApi {
 
-    @Resource private PluginManager pluginManager;
+    private final PluginManager pluginManager;
+    private final UserServiceHelper userServiceHelper;
 
-    @Resource private UserServiceHelper userServiceHelper;
+    /** Constructor method. */
+    public ExistingCloudResourcesApi(
+            PluginManager pluginManager, UserServiceHelper userServiceHelper) {
+        this.pluginManager = pluginManager;
+        this.userServiceHelper = userServiceHelper;
+    }
 
     /** List existing cloud resources based on type. */
     @Tag(name = "CloudResources", description = "API to view cloud resources by type")

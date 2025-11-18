@@ -1,0 +1,17 @@
+---
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: DEBUG
+
+xpanse:
+  ai:
+    llm:
+      providerApiEndpointUrl: http://localhost:11434
+      modelName: meta-llama/llama-4-scout-17b-16e-instruct
+      providerApiKey: ""
+    docker:
+      registry-url: "ghcr.io"
+      registry-username: ""
+      registry-password: ""
+      registry-organization: ""
+      proxy-url: ""

@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.config.OpenApiGeneratorProperties;
 import org.eclipse.xpanse.common.openapi.OpenApiGeneratorJarManage;
 import org.eclipse.xpanse.common.openapi.OpenApiUrlManage;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
@@ -22,52 +23,58 @@ import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariabl
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.JsonObjectSchema;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.eclipse.xpanse.modules.servicetemplate.utils.AvailabilityZoneSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.InputVariablesSchemaValidator;
 import org.eclipse.xpanse.modules.servicetemplate.utils.ServiceTemplateOpenApiGenerator;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /** Test for ServiceTemplateOpenApiGenerator. */
 @Slf4j
+@ContextConfiguration(
+        classes = {
+            ServiceTemplateOpenApiGenerator.class,
+            SecurityProperties.class,
+            OpenApiGeneratorProperties.class,
+            OpenApiUrlManage.class,
+            OpenApiGeneratorJarManage.class
+        })
+@TestPropertySource(
+        properties = {
+            "server.port=8080",
+            "xpanse.security.enable-web-security=true",
+            "xpanse.openapi-generator.file-resources-uri=/openapi/*",
+            "xpanse.openapi-generator.file-generation-path=openapi/",
+            "xpanse.openapi-generator.client.version=6.6.0",
+            "xpanse.openapi-generator.client.download-url=:https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar"
+        })
+@Import(RefreshAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
 class ServiceTemplateOpenApiGeneratorTest {
 
     private static final String appVersion = "1.0.0";
-    private UUID serviceId;
-    private OpenApiGeneratorJarManage openApiGeneratorJarManage;
-    @InjectMocks private ServiceTemplateOpenApiGenerator openApiGenerator;
-
-    @BeforeEach
-    void init() {
-        String openApiPath = "openapi/";
-        Integer serverPort = 8080;
-        serviceId = UUID.randomUUID();
-        OpenApiUrlManage openApiUrlManage = new OpenApiUrlManage(openApiPath, serverPort);
-        String clientDownloadURL =
-                "https://repo1.maven.org/maven2/org/"
-                    + "openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar";
-        openApiGeneratorJarManage = new OpenApiGeneratorJarManage(clientDownloadURL, openApiPath);
-        PluginManager pluginManager = new PluginManager();
-        openApiGenerator =
-                new ServiceTemplateOpenApiGenerator(
-                        appVersion,
-                        null,
-                        pluginManager,
-                        openApiUrlManage,
-                        openApiGeneratorJarManage);
-    }
+    private UUID serviceId = UUID.randomUUID();
+    @Autowired private OpenApiGeneratorJarManage openApiGeneratorJarManage;
+    @Autowired private ServiceTemplateOpenApiGenerator openApiGenerator;
+    @MockitoBean private PluginManager pluginManager;
+    @MockitoBean private Environment environment;
+    @Autowired SecurityProperties securityProperties;
 
     void setConfiguration(Boolean webSecurityIsEnabled, Boolean roleProtectionIsEnabled) {
-
-        ReflectionTestUtils.setField(openApiGenerator, "appVersion", appVersion);
-
+        ReflectionTestUtils.setField(securityProperties, "enableWebSecurity", webSecurityIsEnabled);
         ReflectionTestUtils.setField(
-                openApiGenerator, "webSecurityIsEnabled", webSecurityIsEnabled);
-        ReflectionTestUtils.setField(
-                openApiGenerator, "roleProtectionIsEnabled", roleProtectionIsEnabled);
+                securityProperties, "enableRoleProtection", roleProtectionIsEnabled);
     }
 
     @Test

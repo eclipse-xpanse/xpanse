@@ -31,31 +31,43 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
+import org.eclipse.xpanse.plugins.huaweicloud.config.HuaweiCloudPluginProperties;
+import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudResourceManager;
 import org.eclipse.xpanse.plugins.huaweicloud.manage.HuaweiCloudVmStateManager;
 import org.eclipse.xpanse.plugins.huaweicloud.monitor.HuaweiCloudMetricsService;
+import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@TestPropertySource(
+        properties = {
+            "xpanse.plugins.huaweicloud.service-template.auto-approve=true",
+        })
+@Import(RefreshAutoConfiguration.class)
+@ContextConfiguration(
+        classes = {HuaweiCloudOrchestratorPlugin.class, HuaweiCloudPluginProperties.class})
+@ExtendWith(SpringExtension.class)
 class HuaweiCloudOrchestratorPluginTest {
 
-    @Mock private HuaweiCloudMetricsService mockHuaweiCloudMetricsService;
-    @Mock private HuaweiCloudVmStateManager mockHuaweiCloudVmStateManager;
-    @Mock private HuaweiCloudTerraformResourceHandler mockHuaweiCloudTerraformResourceHandler;
+    @MockitoBean private HuaweiCloudMetricsService mockHuaweiCloudMetricsService;
+    @MockitoBean private HuaweiCloudVmStateManager mockHuaweiCloudVmStateManager;
 
-    @InjectMocks private HuaweiCloudOrchestratorPlugin plugin;
+    @MockitoBean
+    private HuaweiCloudTerraformResourceHandler mockHuaweiCloudTerraformResourceHandler;
 
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(plugin, "autoApproveServiceTemplateEnabled", true);
-    }
+    @MockitoBean private HuaweiCloudResourceManager huaweiCloudResourceManager;
+    @MockitoBean private HuaweiCloudPriceCalculator huaweiCloudPriceCalculator;
+
+    @Autowired private HuaweiCloudOrchestratorPlugin plugin;
 
     @Test
     void testGetResourceHandler() {

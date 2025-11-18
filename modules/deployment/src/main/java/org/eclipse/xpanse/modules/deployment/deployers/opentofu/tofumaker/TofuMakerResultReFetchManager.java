@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +18,7 @@ import org.eclipse.xpanse.modules.deployment.DeployResultManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.ReFetchResult;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
@@ -28,11 +28,20 @@ import org.springframework.web.client.RestClientException;
 @Component
 public class TofuMakerResultReFetchManager {
 
-    @Resource
-    private OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+    private final OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+    private final DeployResultManager deployResultManager;
+    private final TofuMakerApiStoredResultsFetcher tofuMakerApiStoredResultsFetcher;
 
-    @Resource private DeployResultManager deployResultManager;
-    @Resource private TofuMakerApiStoredResultsFetcher tofuMakerApiStoredResultsFetcher;
+    /** Constructor method. */
+    @Autowired
+    public TofuMakerResultReFetchManager(
+            OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager,
+            DeployResultManager deployResultManager,
+            TofuMakerApiStoredResultsFetcher tofuMakerApiStoredResultsFetcher) {
+        this.openTofuDeploymentResultCallbackManager = openTofuDeploymentResultCallbackManager;
+        this.deployResultManager = deployResultManager;
+        this.tofuMakerApiStoredResultsFetcher = tofuMakerApiStoredResultsFetcher;
+    }
 
     /** retrieve openTofu result. */
     public void retrieveOpenTofuResult(ServiceOrderEntity serviceOrder) {

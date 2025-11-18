@@ -13,8 +13,8 @@ import java.net.URL;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.eclipse.xpanse.common.config.OpenApiGeneratorProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.ClassPathResource;
@@ -28,22 +28,12 @@ public class OpenApiGeneratorJarManage implements ApplicationListener<ContextRef
 
     private static final String OPENAPI_GENERATOR_FILE_NAME = "openapi-generator-cli.jar";
 
-    private final String clientDownLoadUrl;
+    private final OpenApiGeneratorProperties openApiGeneratorProperties;
 
-    private final String openapiPath;
-
-    /**
-     * Constructor for instantiating OpenApiGeneratorJarManage bean.
-     *
-     * @param clientDownLoadUrl URL for downloading openapi-generator jar from maven central.
-     * @param openapiPath folder where the jar must be available.
-     */
+    /** Constructor for instantiating OpenApiGeneratorJarManage bean. */
     @Autowired
-    public OpenApiGeneratorJarManage(
-            @Value("${openapi.generator.client.download-url}") String clientDownLoadUrl,
-            @Value("${openapi.path:openapi/}") String openapiPath) {
-        this.clientDownLoadUrl = clientDownLoadUrl;
-        this.openapiPath = openapiPath;
+    public OpenApiGeneratorJarManage(OpenApiGeneratorProperties openApiGeneratorProperties) {
+        this.openApiGeneratorProperties = openApiGeneratorProperties;
     }
 
     /**
@@ -84,14 +74,16 @@ public class OpenApiGeneratorJarManage implements ApplicationListener<ContextRef
      */
     public boolean downloadClientJar() {
         try {
-            log.info("Downloading openapi generator client jar from URL {}", clientDownLoadUrl);
-            URL url = URI.create(clientDownLoadUrl).toURL();
+            log.info(
+                    "Downloading openapi generator client jar from URL {}",
+                    openApiGeneratorProperties.getClient().getDownloadUrl());
+            URL url = URI.create(openApiGeneratorProperties.getClient().getDownloadUrl()).toURL();
             File cliJarFile = getCliFile();
             FileUtils.copyURLToFile(url, cliJarFile);
             log.info(
                     "Downloading openapi generator client into path {} from URL {} successful.",
                     cliJarFile.getPath(),
-                    clientDownLoadUrl);
+                    openApiGeneratorProperties.getClient().getDownloadUrl());
             return true;
         } catch (IOException ioException) {
             log.error("Downloading openapi generator client jar from URL failed.", ioException);
@@ -111,7 +103,8 @@ public class OpenApiGeneratorJarManage implements ApplicationListener<ContextRef
             if (runtimeIndex > 1) {
                 rootPath = rootPath.substring(0, runtimeIndex);
             }
-            File openApiDir = new File(rootPath, openapiPath);
+            File openApiDir =
+                    new File(rootPath, openApiGeneratorProperties.getFileGenerationPath());
             if (!openApiDir.exists() && !openApiDir.mkdirs()) {
                 throw new FileNotFoundException("Create open API workspace failed!");
             }

@@ -12,7 +12,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +41,8 @@ import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -53,13 +54,26 @@ public class ServiceOrderManager {
 
     private final ObjectMapper objectMapper =
             new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    @Resource private ServiceOrderStorage serviceOrderStorage;
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource private UserServiceHelper userServiceHelper;
-    @Resource private ServiceOrderStatusChangePolling serviceOrderStatusChangePolling;
+    private final ServiceOrderStorage serviceOrderStorage;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+    private final UserServiceHelper userServiceHelper;
+    private final ServiceOrderStatusChangePolling serviceOrderStatusChangePolling;
+    private final Executor taskExecutor;
 
-    @Resource(name = ASYNC_EXECUTOR_NAME)
-    private Executor taskExecutor;
+    /** Constructor method. */
+    @Autowired
+    public ServiceOrderManager(
+            ServiceOrderStorage serviceOrderStorage,
+            ServiceDeploymentStorage serviceDeploymentStorage,
+            UserServiceHelper userServiceHelper,
+            ServiceOrderStatusChangePolling serviceOrderStatusChangePolling,
+            @Qualifier(ASYNC_EXECUTOR_NAME) Executor taskExecutor) {
+        this.serviceOrderStorage = serviceOrderStorage;
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+        this.userServiceHelper = userServiceHelper;
+        this.serviceOrderStatusChangePolling = serviceOrderStatusChangePolling;
+        this.taskExecutor = taskExecutor;
+    }
 
     /**
      * Create service order entity and store into the database.

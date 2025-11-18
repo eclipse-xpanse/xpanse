@@ -4,10 +4,6 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithJwt;
@@ -20,23 +16,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.logging.LoggingKeyConstant;
 import org.eclipse.xpanse.modules.models.response.ErrorResponse;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
-import org.eclipse.xpanse.modules.models.security.TokenResponse;
 import org.eclipse.xpanse.runtime.util.ApisTestCommon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.client.RestTemplate;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(properties = {"spring.profiles.active=oauth,zitadel,zitadel-local,test,dev"})
@@ -58,12 +48,8 @@ class AuthorizationApiTest extends ApisTestCommon {
                                                     Collections.emptyList())))
                     .build();
 
-    @Value("${authorization.server.endpoint}")
+    @Value("${xpanse.security.oauth.auth-provider-endpoint}")
     private String iamServiceEndpoint;
-
-    @Qualifier("zitadelRestTemplate")
-    @MockitoBean
-    private RestTemplate restTemplate;
 
     @Test
     void testAuthorize() throws Exception {
@@ -86,14 +72,6 @@ class AuthorizationApiTest extends ApisTestCommon {
 
     @Test
     void testGetAccessToken() throws Exception {
-
-        // Setup
-        when(restTemplate.postForEntity(anyString(), any(), eq(TokenResponse.class)))
-                .thenReturn(
-                        getAccessToken(
-                                wireMockExtension.getRuntimeInfo().getHttpBaseUrl()
-                                        + "/oauth/v2/token"));
-
         // Run the test
         final MockHttpServletResponse response =
                 mockMvc.perform(
@@ -150,11 +128,5 @@ class AuthorizationApiTest extends ApisTestCommon {
         assertTrue(StringUtils.isNotEmpty(response.getContentAsString()));
         assertEquals(resBody, response.getContentAsString());
         assertNotNull(response.getHeader(LoggingKeyConstant.HEADER_TRACKING_ID));
-    }
-
-    private ResponseEntity<TokenResponse> getAccessToken(String url) {
-        TestRestTemplate testRestTemplate = new TestRestTemplate();
-        return new ResponseEntity<>(
-                testRestTemplate.postForObject(url, "{}", TokenResponse.class), HttpStatus.OK);
     }
 }

@@ -1,0 +1,12 @@
+---
+xpanse:
+  http-server-request-logging:
+    enabled: false
+  http-client-request:
+    retry-max-attempts: 1
+    delay-milliseconds: 1000
+
+OPENSTACK_TESTLAB_AUTH_URL: http://127.0.0.1/identity/v3
+PLUS_SERVER_AUTH_URL: http://127.0.0.1/identity/v3
+REGIO_CLOUD_AUTH_URL: http://127.0.0.1/identity/v3
+OS_AUTH_URL: http://127.0.0.1/v3/identity

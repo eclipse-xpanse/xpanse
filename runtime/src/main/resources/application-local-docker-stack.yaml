@@ -1,0 +1,5 @@
+---
+xpanse:
+  deployer:
+    terra-boot:
+      webhook-endpoint: "http://host.docker.internal:8080"

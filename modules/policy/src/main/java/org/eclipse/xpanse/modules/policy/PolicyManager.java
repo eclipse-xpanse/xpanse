@@ -6,13 +6,13 @@
 
 package org.eclipse.xpanse.modules.policy;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.models.policy.exceptions.PoliciesValidationFailedException;
 import org.eclipse.xpanse.modules.models.system.BackendSystemStatus;
 import org.eclipse.xpanse.modules.models.system.enums.BackendSystemType;
 import org.eclipse.xpanse.modules.models.system.enums.HealthStatus;
+import org.eclipse.xpanse.modules.policy.policyman.config.PolicyManProperties;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.AdminApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesEvaluationApi;
 import org.eclipse.xpanse.modules.policy.policyman.generated.api.PoliciesValidateApi;
@@ -20,7 +20,7 @@ import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalCmdList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.EvalResult;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidatePolicyList;
 import org.eclipse.xpanse.modules.policy.policyman.generated.model.ValidateResponse;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
@@ -29,14 +29,26 @@ import org.springframework.web.client.RestClientException;
 @Component
 public class PolicyManager {
 
-    @Resource private AdminApi adminApi;
+    private final AdminApi adminApi;
 
-    @Resource private PoliciesValidateApi policiesValidateApi;
+    private final PoliciesValidateApi policiesValidateApi;
 
-    @Resource private PoliciesEvaluationApi policiesEvaluationApi;
+    private final PoliciesEvaluationApi policiesEvaluationApi;
 
-    @Value("${policy.man.endpoint:http://localhost:8090}")
-    private String policyManBaseUrl;
+    private final PolicyManProperties policyManProperties;
+
+    /** Constructor method. */
+    @Autowired
+    public PolicyManager(
+            AdminApi adminApi,
+            PoliciesValidateApi policiesValidateApi,
+            PoliciesEvaluationApi policiesEvaluationApi,
+            PolicyManProperties policyManProperties) {
+        this.adminApi = adminApi;
+        this.policiesValidateApi = policiesValidateApi;
+        this.policiesEvaluationApi = policiesEvaluationApi;
+        this.policyManProperties = policyManProperties;
+    }
 
     /**
      * Get system status of the policyMan.
@@ -47,7 +59,7 @@ public class PolicyManager {
         BackendSystemStatus policyManStatus = new BackendSystemStatus();
         policyManStatus.setBackendSystemType(BackendSystemType.POLICY_MAN);
         policyManStatus.setName(BackendSystemType.POLICY_MAN.toValue());
-        policyManStatus.setEndpoint(policyManBaseUrl);
+        policyManStatus.setEndpoint(policyManProperties.getEndpoint());
         try {
             org.eclipse.xpanse.modules.policy.policyman.generated.model.SystemStatus
                     policyManSystemStatus = adminApi.healthGet();

@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +18,7 @@ import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.ServiceActionManager;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrder;
 import org.eclipse.xpanse.modules.models.serviceaction.ServiceActionRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,10 +37,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/xpanse")
 @Secured({ROLE_ADMIN, ROLE_USER})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class ServiceActionsApi {
 
-    @Resource private ServiceActionManager serviceActionManager;
+    private final ServiceActionManager serviceActionManager;
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceActionsApi(ServiceActionManager serviceActionManager) {
+        this.serviceActionManager = serviceActionManager;
+    }
 
     @Tag(name = "ServiceActions", description = "APIs for Service Actions.")
     @PutMapping(value = "/services/action/{serviceId}", produces = MediaType.APPLICATION_JSON_VALUE)

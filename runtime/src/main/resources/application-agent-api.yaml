@@ -1,0 +1,7 @@
+---
+xpanse:
+  security:
+    enable-web-security: false
+    enable-role-protection: false
+  agent-api:
+    enable-agent-api-only: true

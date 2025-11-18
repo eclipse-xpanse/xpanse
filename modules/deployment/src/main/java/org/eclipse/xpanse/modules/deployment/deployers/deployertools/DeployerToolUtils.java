@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.deployertools;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,7 +39,12 @@ public class DeployerToolUtils {
     private static final Pattern DEPLOYER_TOOL_REQUIRED_VERSION_PATTERN =
             Pattern.compile(DeployerTool.DEPLOYER_TOOL_REQUIRED_VERSION_REGEX);
     private final SystemCmd systemCmd = new SystemCmd();
-    @Resource private DeployerToolVersionsCacheManager versionsCacheManager;
+    private final DeployerToolVersionsCacheManager versionsCacheManager;
+
+    /** Constructor method. */
+    public DeployerToolUtils(DeployerToolVersionsCacheManager versionsCacheManager) {
+        this.versionsCacheManager = versionsCacheManager;
+    }
 
     /**
      * Get executor path which matches the required version.

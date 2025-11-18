@@ -9,7 +9,6 @@ package org.eclipse.xpanse.modules.deployment;
 import static org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper.TF_STATE_FILE_NAME;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +48,7 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.workflow.utils.WorkflowUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -58,14 +58,35 @@ import org.springframework.util.CollectionUtils;
 public class DeployResultManager {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource private ServiceOrderStorage serviceOrderStorage;
-    @Resource private ResourceHandlerManager resourceHandlerManager;
-    @Resource private WorkflowUtils workflowUtils;
-    @Resource private SensitiveDataHandler sensitiveDataHandler;
-    @Resource private ServiceDeploymentEntityConverter serviceDeploymentEntityConverter;
-    @Resource private ServiceOrderManager serviceOrderManager;
-    @Resource private DeployerKindManager deployerKindManager;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+    private final ServiceOrderStorage serviceOrderStorage;
+    private final ResourceHandlerManager resourceHandlerManager;
+    private final WorkflowUtils workflowUtils;
+    private final SensitiveDataHandler sensitiveDataHandler;
+    private final ServiceDeploymentEntityConverter serviceDeploymentEntityConverter;
+    private final ServiceOrderManager serviceOrderManager;
+    private final DeployerKindManager deployerKindManager;
+
+    /** Constructor method. */
+    @Autowired
+    public DeployResultManager(
+            ServiceDeploymentStorage serviceDeploymentStorage,
+            ServiceOrderStorage serviceOrderStorage,
+            ResourceHandlerManager resourceHandlerManager,
+            WorkflowUtils workflowUtils,
+            SensitiveDataHandler sensitiveDataHandler,
+            ServiceDeploymentEntityConverter serviceDeploymentEntityConverter,
+            ServiceOrderManager serviceOrderManager,
+            DeployerKindManager deployerKindManager) {
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+        this.serviceOrderStorage = serviceOrderStorage;
+        this.resourceHandlerManager = resourceHandlerManager;
+        this.workflowUtils = workflowUtils;
+        this.sensitiveDataHandler = sensitiveDataHandler;
+        this.serviceDeploymentEntityConverter = serviceDeploymentEntityConverter;
+        this.serviceOrderManager = serviceOrderManager;
+        this.deployerKindManager = deployerKindManager;
+    }
 
     /**
      * Get failed deploy result.

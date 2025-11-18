@@ -13,7 +13,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +35,7 @@ import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.security.auth.IdentityProviderManager;
 import org.eclipse.xpanse.modules.security.auth.IdentityProviderService;
-import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,27 +53,40 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/xpanse")
 @Secured({ROLE_ADMIN})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class AdminServicesApi {
 
     private final TerraBootManager terraBootManager;
     private final TofuMakerManager tofuMakerManager;
     private final RedisCacheConfig redisCacheConfig;
-    @Resource private IdentityProviderManager identityProviderManager;
-    @Resource private PluginManager pluginManager;
-    @Resource private DatabaseManager databaseManager;
-    @Resource private PolicyManager policyManager;
-    @Resource private OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
-    @Resource private UserServiceHelper userServiceHelper;
+    private final IdentityProviderManager identityProviderManager;
+    private final PluginManager pluginManager;
+    private final DatabaseManager databaseManager;
+    private final PolicyManager policyManager;
+    private final OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck;
 
-    /** Constructor for AdminServicesApi bean. */
+    /** Constructor method. */
+    @Autowired
     public AdminServicesApi(
             @Nullable TerraBootManager terraBootManager,
             @Nullable TofuMakerManager tofuMakerManager,
-            @Nullable RedisCacheConfig redisCacheConfig) {
+            @Nullable RedisCacheConfig redisCacheConfig,
+            @Nullable IdentityProviderManager identityProviderManager,
+            PluginManager pluginManager,
+            DatabaseManager databaseManager,
+            PolicyManager policyManager,
+            OpenTelemetryCollectorHealthCheck openTelemetryHealthCheck) {
         this.terraBootManager = terraBootManager;
         this.tofuMakerManager = tofuMakerManager;
         this.redisCacheConfig = redisCacheConfig;
+        this.identityProviderManager = identityProviderManager;
+        this.pluginManager = pluginManager;
+        this.databaseManager = databaseManager;
+        this.policyManager = policyManager;
+        this.openTelemetryHealthCheck = openTelemetryHealthCheck;
     }
 
     /**

@@ -7,7 +7,6 @@ package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal
 
 import static org.eclipse.xpanse.modules.async.TaskConfiguration.ASYNC_EXECUTOR_NAME;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +17,10 @@ import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootDeployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformResult;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
@@ -31,6 +30,8 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.Deployer;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -40,16 +41,32 @@ import org.springframework.stereotype.Component;
 @ConditionalOnMissingBean(TerraBootDeployment.class)
 public class TerraformLocalDeployment implements Deployer {
     public static final String TF_DEBUG_FLAG = "TF_LOG";
-    @Resource private TerraformInstaller terraformInstaller;
-    @Resource private DeployEnvironments deployEnvironments;
-    @Resource private TerraformLocalConfig terraformLocalConfig;
+    private final TerraformInstaller terraformInstaller;
+    private final DeployEnvironments deployEnvironments;
+    private final DeploymentProperties deploymentProperties;
+    private final Executor taskExecutor;
+    private final TerraformDeploymentResultCallbackManager terraformResultCallbackManager;
+    private final ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    private final DeploymentScriptsHelper scriptsHelper;
 
-    @Resource(name = ASYNC_EXECUTOR_NAME)
-    private Executor taskExecutor;
-
-    @Resource private TerraformDeploymentResultCallbackManager terraformResultCallbackManager;
-    @Resource private ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Resource private DeploymentScriptsHelper scriptsHelper;
+    /** Constructor method. */
+    @Autowired
+    public TerraformLocalDeployment(
+            TerraformInstaller terraformInstaller,
+            DeployEnvironments deployEnvironments,
+            DeploymentProperties deploymentProperties,
+            @Qualifier(ASYNC_EXECUTOR_NAME) Executor taskExecutor,
+            TerraformDeploymentResultCallbackManager terraformResultCallbackManager,
+            ServiceDeploymentEntityHandler serviceDeploymentEntityHandler,
+            DeploymentScriptsHelper scriptsHelper) {
+        this.terraformInstaller = terraformInstaller;
+        this.deployEnvironments = deployEnvironments;
+        this.deploymentProperties = deploymentProperties;
+        this.taskExecutor = taskExecutor;
+        this.terraformResultCallbackManager = terraformResultCallbackManager;
+        this.serviceDeploymentEntityHandler = serviceDeploymentEntityHandler;
+        this.scriptsHelper = scriptsHelper;
+    }
 
     /**
      * Deploy the DeployTask.
@@ -235,11 +252,13 @@ public class TerraformLocalDeployment implements Deployer {
             Map<String, Object> inputVariables,
             String workspace,
             Deployment deployment) {
-        if (terraformLocalConfig.isDebugEnabled()) {
+        if (deploymentProperties.getTerraformLocal().getDebug().getEnabled()) {
             log.info(
                     "Debug enabled for Terraform CLI with level {}",
-                    terraformLocalConfig.getDebugLogLevel());
-            envVariables.put(TF_DEBUG_FLAG, terraformLocalConfig.getDebugLogLevel());
+                    deploymentProperties.getTerraformLocal().getDebug().getLevelValue());
+            envVariables.put(
+                    TF_DEBUG_FLAG,
+                    deploymentProperties.getTerraformLocal().getDebug().getLevelValue());
         }
         String executorPath =
                 terraformInstaller.getExecutorPathThatMatchesRequiredVersion(
@@ -273,6 +292,6 @@ public class TerraformLocalDeployment implements Deployer {
     }
 
     private String getDeployerConfigWorkspace() {
-        return terraformLocalConfig.getWorkspaceDirectory();
+        return deploymentProperties.getTerraformLocal().getWorkspace().getDirectory();
     }
 }

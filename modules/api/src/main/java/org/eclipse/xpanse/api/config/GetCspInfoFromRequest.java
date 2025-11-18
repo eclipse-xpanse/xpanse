@@ -10,7 +10,6 @@ import static org.eclipse.xpanse.modules.logging.LoggingKeyConstant.SERVICE_ID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import jakarta.annotation.Resource;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.eclipse.xpanse.modules.database.userpolicy.UserPolicyStorage;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -46,14 +46,35 @@ import org.springframework.util.CollectionUtils;
 public class GetCspInfoFromRequest {
 
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
-    @Resource private ServiceDeploymentStorage deployServiceStorage;
-    @Resource private ServicePolicyStorage servicePolicyStorage;
-    @Resource private UserPolicyStorage userPolicyStorage;
-    @Resource private TaskService taskService;
-    @Resource private ServiceOrderStorage serviceOrderStorage;
-    @Resource private ServiceTemplateRequestHistoryStorage serviceTemplateHistoryStorage;
-    @Resource private ServiceChangeRequestStorage serviceChangeRequestStorage;
+    private final ServiceTemplateStorage serviceTemplateStorage;
+    private final ServiceDeploymentStorage deployServiceStorage;
+    private final ServicePolicyStorage servicePolicyStorage;
+    private final UserPolicyStorage userPolicyStorage;
+    private final TaskService taskService;
+    private final ServiceOrderStorage serviceOrderStorage;
+    private final ServiceTemplateRequestHistoryStorage serviceTemplateHistoryStorage;
+    private final ServiceChangeRequestStorage serviceChangeRequestStorage;
+
+    /** Constructor method. */
+    @Autowired
+    public GetCspInfoFromRequest(
+            ServiceTemplateStorage serviceTemplateStorage,
+            ServiceDeploymentStorage deployServiceStorage,
+            ServicePolicyStorage servicePolicyStorage,
+            UserPolicyStorage userPolicyStorage,
+            TaskService taskService,
+            ServiceOrderStorage serviceOrderStorage,
+            ServiceTemplateRequestHistoryStorage serviceTemplateHistoryStorage,
+            ServiceChangeRequestStorage serviceChangeRequestStorage) {
+        this.serviceTemplateStorage = serviceTemplateStorage;
+        this.deployServiceStorage = deployServiceStorage;
+        this.servicePolicyStorage = servicePolicyStorage;
+        this.userPolicyStorage = userPolicyStorage;
+        this.taskService = taskService;
+        this.serviceOrderStorage = serviceOrderStorage;
+        this.serviceTemplateHistoryStorage = serviceTemplateHistoryStorage;
+        this.serviceChangeRequestStorage = serviceChangeRequestStorage;
+    }
 
     /**
      * Get Csp with the URL of Ocl.

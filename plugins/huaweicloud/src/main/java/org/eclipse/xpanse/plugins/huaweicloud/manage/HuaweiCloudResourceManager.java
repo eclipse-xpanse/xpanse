@@ -37,7 +37,6 @@ import com.huaweicloud.sdk.vpc.v2.model.SecurityGroup;
 import com.huaweicloud.sdk.vpc.v2.model.SecurityGroupRule;
 import com.huaweicloud.sdk.vpc.v2.model.Subnet;
 import com.huaweicloud.sdk.vpc.v2.model.Vpc;
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,6 +50,7 @@ import org.eclipse.xpanse.modules.models.service.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScriptFormatInvalidException;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudClient;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudRetryStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -63,14 +63,24 @@ public class HuaweiCloudResourceManager {
 
     public static final String RESOURCE = "resource";
     public static final String HUAWEI_CLOUD_COMPUTE_INSTANCE = "huaweicloud_compute_instance";
-    @Resource private HuaweiCloudClient huaweiCloudClient;
-    @Resource private HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
+    private final HuaweiCloudClient huaweiCloudClient;
+    private final HuaweiCloudRetryStrategy huaweiCloudRetryStrategy;
+
+    /** Constructor method. */
+    @Autowired
+    public HuaweiCloudResourceManager(
+            HuaweiCloudClient huaweiCloudClient,
+            HuaweiCloudRetryStrategy huaweiCloudRetryStrategy) {
+        this.huaweiCloudClient = huaweiCloudClient;
+        this.huaweiCloudRetryStrategy = huaweiCloudRetryStrategy;
+    }
 
     /** List HuaweiCloud resource by the kind of ReusableCloudResource. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<String> getExistingResourceNamesWithKind(
             String siteName, String regionName, String userId, DeployResourceKind kind) {
         if (kind == DeployResourceKind.VPC) {
@@ -102,8 +112,9 @@ public class HuaweiCloudResourceManager {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<String> getAvailabilityZonesOfRegion(
             String siteName, String regionName, String userId) {
         List<String> availabilityZoneNames = new ArrayList<>();

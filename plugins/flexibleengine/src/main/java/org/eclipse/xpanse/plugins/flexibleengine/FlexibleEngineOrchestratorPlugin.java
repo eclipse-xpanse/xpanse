@@ -14,7 +14,6 @@ import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineCon
 import static org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants.PROTOCOL_HTTPS;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,12 +42,13 @@ import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.orchestrator.servicestate.ServiceStateManageRequest;
 import org.eclipse.xpanse.plugins.flexibleengine.common.FlexibleEngineConstants;
+import org.eclipse.xpanse.plugins.flexibleengine.config.FlexibleEnginePluginProperties;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineResourceManager;
 import org.eclipse.xpanse.plugins.flexibleengine.manage.FlexibleEngineVmStateManager;
 import org.eclipse.xpanse.plugins.flexibleengine.monitor.FlexibleEngineMetricsService;
 import org.eclipse.xpanse.plugins.flexibleengine.price.FlexibleEnginePriceCalculator;
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
@@ -64,14 +64,29 @@ import org.springframework.web.client.RestTemplate;
 public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    @Resource private FlexibleEngineTerraformResourceHandler terraformResourceHandler;
-    @Resource private FlexibleEngineMetricsService metricsService;
-    @Resource private FlexibleEngineVmStateManager vmStateManager;
-    @Resource private FlexibleEngineResourceManager resourceManager;
-    @Resource private FlexibleEnginePriceCalculator pricingCalculator;
+    private final FlexibleEngineTerraformResourceHandler terraformResourceHandler;
+    private final FlexibleEngineMetricsService metricsService;
+    private final FlexibleEngineVmStateManager vmStateManager;
+    private final FlexibleEngineResourceManager resourceManager;
+    private final FlexibleEnginePriceCalculator pricingCalculator;
+    private final FlexibleEnginePluginProperties flexibleEnginePluginProperties;
 
-    @Value("${flexibleengine.auto.approve.service.template.enabled:false}")
-    private boolean autoApproveServiceTemplateEnabled;
+    /** Constructor method. */
+    @Autowired
+    public FlexibleEngineOrchestratorPlugin(
+            FlexibleEngineTerraformResourceHandler terraformResourceHandler,
+            FlexibleEngineMetricsService metricsService,
+            FlexibleEngineVmStateManager vmStateManager,
+            FlexibleEngineResourceManager resourceManager,
+            FlexibleEnginePriceCalculator pricingCalculator,
+            FlexibleEnginePluginProperties flexibleEnginePluginProperties) {
+        this.terraformResourceHandler = terraformResourceHandler;
+        this.metricsService = metricsService;
+        this.vmStateManager = vmStateManager;
+        this.resourceManager = resourceManager;
+        this.pricingCalculator = pricingCalculator;
+        this.flexibleEnginePluginProperties = flexibleEnginePluginProperties;
+    }
 
     @Override
     public Map<DeployerKind, DeployResourceHandler> resourceHandlers() {
@@ -111,7 +126,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public ServiceTemplateReviewPluginResultType validateServiceTemplate(Ocl ocl) {
-        if (autoApproveServiceTemplateEnabled) {
+        if (flexibleEnginePluginProperties.getServiceTemplate().getAutoApprove()) {
             return ServiceTemplateReviewPluginResultType.APPROVED;
         }
         return ServiceTemplateReviewPluginResultType.MANUAL_REVIEW_REQUIRED;
@@ -128,8 +143,9 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     @Override
     @Retryable(
             retryFor = UnavailableServiceRegionsException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean validateRegionsOfService(Ocl ocl) {
         List<String> errors = new ArrayList<>();
         ocl.getCloudServiceProvider()
@@ -221,7 +237,7 @@ public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
     }
 
     /**
-     * Get metrics for resource instance by the @resourceMetricRequest.
+     * Get metrics for resource instance by the MetricRequest.
      *
      * @param resourceMetricRequest The request model to query metrics for resource instance.
      * @return Returns list of metric result.

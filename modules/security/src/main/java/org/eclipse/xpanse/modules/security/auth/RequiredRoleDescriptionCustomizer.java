@@ -18,7 +18,10 @@ import org.springframework.web.method.HandlerMethod;
 /** Customizer for appending required role to description of Swagger Annotation operation. */
 @Profile("oauth")
 @Configuration
-@ConditionalOnProperty(name = "enable.role.protection", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.security.enable-role-protection",
+        havingValue = "true",
+        matchIfMissing = true)
 public class RequiredRoleDescriptionCustomizer implements OperationCustomizer {
 
     @Override

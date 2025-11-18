@@ -16,7 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(
-        properties = {"http.request.retry.max.attempts=1", "spring.profiles.active=noauth,dev"})
+        properties = {
+            "xpanse.http-client-request.retry-max-attempts=1",
+            "spring.profiles.active=noauth,dev"
+        })
 class OpenTofuInstallerTest {
 
     @Resource private OpenTofuInstaller installer;

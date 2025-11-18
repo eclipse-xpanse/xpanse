@@ -8,24 +8,37 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import org.eclipse.xpanse.modules.models.system.enums.IdentityProviderType;
 import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.security.auth.common.RoleConstants;
 import org.eclipse.xpanse.modules.security.auth.common.XpanseAuthentication;
-import org.junit.jupiter.api.BeforeEach;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
-@ExtendWith(MockitoExtension.class)
+@ContextConfiguration(classes = {ZitadelIdentityProviderService.class, SecurityProperties.class})
+@Import(RefreshAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
+@ActiveProfiles(value = {"oauth", "zitadel"})
 class ZitadelIdentityProviderServiceTest {
 
     private static final String GRANTED_ROLES_SCOPE = "urn:zitadel:iam:org:project:roles";
@@ -33,33 +46,48 @@ class ZitadelIdentityProviderServiceTest {
     private static final String ISV_KEY = "isv";
     private static final String USERID_KEY = "sub";
     private static final String USERNAME_KEY = "name";
-    private final String REQUIRED_SCOPES =
-            "openid profile urn:zitadel:iam:org:projects:roles urn:zitadel:iam:user:metadata";
     private static final String CSP_KEY = "csp";
 
-    @InjectMocks private ZitadelIdentityProviderService zitadelIdentityProviderServiceUnderTest;
+    @MockitoBean
+    @Qualifier("zitadelRestTemplate")
+    RestTemplate restTemplate;
 
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(
-                zitadelIdentityProviderServiceUnderTest,
-                "iamServerEndpoint",
-                "http://localhost:8081");
-        ReflectionTestUtils.setField(
-                zitadelIdentityProviderServiceUnderTest, "clientId", "clientId");
-        ReflectionTestUtils.setField(
-                zitadelIdentityProviderServiceUnderTest, "restTemplate", new RestTemplate());
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "cspKey", CSP_KEY);
-        ReflectionTestUtils.setField(
-                zitadelIdentityProviderServiceUnderTest, "requiredScopes", REQUIRED_SCOPES);
-        ReflectionTestUtils.setField(
-                zitadelIdentityProviderServiceUnderTest, "userIdKey", USERID_KEY);
-        ReflectionTestUtils.setField(
-                zitadelIdentityProviderServiceUnderTest, "usernameKey", USERNAME_KEY);
+    @Autowired private ZitadelIdentityProviderService zitadelIdentityProviderServiceUnderTest;
 
-        ReflectionTestUtils.setField(
-                zitadelIdentityProviderServiceUnderTest, "metadataKey", METADATA_KEY);
-        ReflectionTestUtils.setField(zitadelIdentityProviderServiceUnderTest, "isvKey", ISV_KEY);
+    @DynamicPropertySource
+    static void properties(DynamicPropertyRegistry registry) {
+        String yamlContent =
+                """
+                    xpanse:
+                     security:
+                       oauth:
+                         swagger-ui:
+                           auth-url: ${xpanse.security.oauth.auth-provider-endpoint}/oauth/v2/authorize
+                           token:url: ${xpanse.security.oauth.auth-provider-endpoint}/oauth/v2/authorize
+                         scopes:
+                           openid: "openid"
+                           profile: "profile"
+                           metadata: "urn:zitadel:iam:user:metadata"
+                           roles: "urn:zitadel:iam:org:project:roles"
+                           required-scopes:  "openid profile urn:zitadel:iam:org:projects:roles urn:zitadel:iam:user:metadata"
+                         # keys to parse the claims map.
+                         claims:
+                           username-key: "name"
+                           meta-data-key: "urn:zitadel:iam:user:metadata"
+                           granted-roles-key: "urn:zitadel:iam:user:metadata"
+                           user-id-key: "sub"
+                         meta-data:
+                           isv-key: "isv"
+                           csp-key: "csp"
+                         default-role: user
+                """;
+
+        YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
+        yaml.setResources(new ByteArrayResource(yamlContent.getBytes()));
+        Properties properties = yaml.getObject();
+
+        assert properties != null;
+        properties.forEach((key, value) -> registry.add(key.toString(), () -> value));
     }
 
     Map<String, Object> getAttributesMap(boolean putMetaData) {

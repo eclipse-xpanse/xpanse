@@ -7,17 +7,40 @@ import io.swagger.v3.oas.models.Operation;
 import java.util.List;
 import org.eclipse.xpanse.api.controllers.AdminServicesApi;
 import org.eclipse.xpanse.modules.cache.RedisCacheConfig;
+import org.eclipse.xpanse.modules.cache.config.CacheProperties;
+import org.eclipse.xpanse.modules.database.DatabaseManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootManager;
+import org.eclipse.xpanse.modules.observability.OpenTelemetryCollectorHealthCheck;
+import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.policy.PolicyManager;
 import org.eclipse.xpanse.modules.security.auth.RequiredRoleDescriptionCustomizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.method.HandlerMethod;
 
 @ExtendWith(SpringExtension.class)
+@ContextConfiguration(
+        classes = {
+            RequiredRoleDescriptionCustomizerTest.class,
+            AdminServicesApi.class,
+        })
 class RequiredRoleDescriptionCustomizerTest {
+
+    @MockitoBean private TerraBootManager terraBootManager;
+    @MockitoBean private TofuMakerManager tofuMakerManager;
+    @MockitoBean CacheProperties cacheProperties;
+    @MockitoBean private RedisCacheConfig redisCacheConfig;
+    @MockitoBean PluginManager pluginManager;
+    @MockitoBean DatabaseManager databaseManager;
+    @MockitoBean PolicyManager policyManager;
+    @MockitoBean OpenTelemetryCollectorHealthCheck openTelemetryCollectorHealthCheck;
+    @Autowired private AdminServicesApi adminServicesApi;
 
     private RequiredRoleDescriptionCustomizer requiredRoleDescriptionCustomizerUnderTest;
 
@@ -36,11 +59,6 @@ class RequiredRoleDescriptionCustomizerTest {
         final ExternalDocumentation externalDocs = new ExternalDocumentation();
         externalDocs.description("description");
         operation.externalDocs(externalDocs);
-
-        final AdminServicesApi adminServicesApi =
-                new AdminServicesApi(
-                        new TerraBootManager(), new TofuMakerManager(), new RedisCacheConfig());
-
         final HandlerMethod handlerMethod = new HandlerMethod(adminServicesApi, "healthCheck");
         final Operation expectedResult = new Operation();
         expectedResult.tags(List.of("value"));

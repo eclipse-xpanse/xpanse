@@ -10,8 +10,8 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraBootRequestFailedException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.config.TerraBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformScriptsGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -29,15 +29,16 @@ import org.springframework.stereotype.Component;
 public class TerraBootHelper {
 
     private static final String SPLIT = "/";
-    private final TerraBootConfig terraBootConfig;
+    private final DeploymentProperties deploymentProperties;
     private final DeployEnvironments deployEnvironments;
 
     @Value("${server.port}")
     private String port;
 
     /** Constructor for TerraBootHelper. */
-    public TerraBootHelper(TerraBootConfig terraBootConfig, DeployEnvironments deployEnvironments) {
-        this.terraBootConfig = terraBootConfig;
+    public TerraBootHelper(
+            DeploymentProperties deploymentProperties, DeployEnvironments deployEnvironments) {
+        this.deploymentProperties = deploymentProperties;
         this.deployEnvironments = deployEnvironments;
     }
 
@@ -68,7 +69,9 @@ public class TerraBootHelper {
     /** generates webhook config. */
     public WebhookConfig getWebhookConfigWithTask(DeployTask deployTask) {
         WebhookConfig webhookConfig = new WebhookConfig();
-        String callbackUrl = getClientRequestBaseUrl(port) + terraBootConfig.getOrderCallbackUri();
+        String callbackUrl =
+                getClientRequestBaseUrl(port)
+                        + deploymentProperties.getTerraBoot().getWebhookCallbackUri();
         webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getOrderId());
         webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.HMAC);
         return webhookConfig;
@@ -76,7 +79,7 @@ public class TerraBootHelper {
 
     private String getClientRequestBaseUrl(String port) {
         try {
-            String clientBaseUri = terraBootConfig.getClientBaseUri();
+            String clientBaseUri = deploymentProperties.getTerraBoot().getWebhookEndpoint();
             if (StringUtils.isBlank(clientBaseUri)) {
                 return String.format(
                         "http://%s:%s", InetAddress.getLocalHost().getHostAddress(), port);

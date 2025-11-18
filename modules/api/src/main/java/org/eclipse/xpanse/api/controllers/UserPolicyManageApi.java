@@ -12,7 +12,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +23,7 @@ import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyCreateReque
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyQueryRequest;
 import org.eclipse.xpanse.modules.models.policy.userpolicy.UserPolicyUpdateRequest;
 import org.eclipse.xpanse.modules.policy.UserPolicyManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,10 +46,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class UserPolicyManageApi {
 
-    @Resource private UserPolicyManager userPolicyManager;
+    private final UserPolicyManager userPolicyManager;
+
+    /** Constructor method. */
+    @Autowired
+    public UserPolicyManageApi(UserPolicyManager userPolicyManager) {
+        this.userPolicyManager = userPolicyManager;
+    }
 
     /**
      * List the policies created by the user.

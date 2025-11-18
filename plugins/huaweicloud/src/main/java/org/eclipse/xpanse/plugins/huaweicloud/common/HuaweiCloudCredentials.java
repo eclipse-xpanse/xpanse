@@ -13,7 +13,6 @@ import com.huaweicloud.sdk.core.auth.BasicCredentials;
 import com.huaweicloud.sdk.core.auth.GlobalCredentials;
 import com.huaweicloud.sdk.core.auth.ICredential;
 import com.huaweicloud.sdk.iam.v3.region.IamRegion;
-import jakarta.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,7 @@ import org.eclipse.xpanse.modules.models.credential.CredentialVariable;
 import org.eclipse.xpanse.modules.models.credential.CredentialVariables;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /** HuaweiCloud Credentials Class. */
@@ -33,7 +33,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class HuaweiCloudCredentials {
 
-    @Resource private CredentialCenter credentialCenter;
+    private final CredentialCenter credentialCenter;
+
+    /** Constructor method. */
+    @Autowired
+    public HuaweiCloudCredentials(CredentialCenter credentialCenter) {
+        this.credentialCenter = credentialCenter;
+    }
 
     /**
      * Get Basic Credential For Huawei Cloud Client.

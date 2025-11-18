@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.servicetemplate.price;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +27,7 @@ import org.eclipse.xpanse.modules.orchestrator.OrchestratorPlugin;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -36,11 +36,20 @@ import org.springframework.util.CollectionUtils;
 @Service
 public class ServicePricesManager {
 
-    @Resource private PluginManager pluginManager;
+    private final PluginManager pluginManager;
+    private final UserServiceHelper userServiceHelper;
+    private final ServiceTemplateStorage serviceTemplateStorage;
 
-    @Resource private UserServiceHelper userServiceHelper;
-
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
+    /** Constructor method. */
+    @Autowired
+    public ServicePricesManager(
+            PluginManager pluginManager,
+            UserServiceHelper userServiceHelper,
+            ServiceTemplateStorage serviceTemplateStorage) {
+        this.pluginManager = pluginManager;
+        this.userServiceHelper = userServiceHelper;
+        this.serviceTemplateStorage = serviceTemplateStorage;
+    }
 
     /**
      * Get the price of one specific flavor of the service.

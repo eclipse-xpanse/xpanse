@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.policy;
 
-import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,6 +27,7 @@ import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdat
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FlavorInvalidException;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -38,13 +38,23 @@ import org.springframework.util.CollectionUtils;
 public class ServicePolicyManager {
     private static final String SEPARATOR = ",";
 
-    @Resource private PolicyManager policyManager;
+    private final PolicyManager policyManager;
+    private final UserServiceHelper userServiceHelper;
+    private final ServicePolicyStorage servicePolicyStorage;
+    private final ServiceTemplateStorage serviceTemplateStorage;
 
-    @Resource private UserServiceHelper userServiceHelper;
-
-    @Resource private ServicePolicyStorage servicePolicyStorage;
-
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
+    /** Constructor method. */
+    @Autowired
+    public ServicePolicyManager(
+            PolicyManager policyManager,
+            UserServiceHelper userServiceHelper,
+            ServicePolicyStorage servicePolicyStorage,
+            ServiceTemplateStorage serviceTemplateStorage) {
+        this.policyManager = policyManager;
+        this.userServiceHelper = userServiceHelper;
+        this.servicePolicyStorage = servicePolicyStorage;
+        this.serviceTemplateStorage = serviceTemplateStorage;
+    }
 
     /**
      * List policies owned by the registered service template.

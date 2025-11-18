@@ -65,7 +65,17 @@ class TfOutputTest {
 
     @Test
     void testToString() {
-        String expectedToString = "TfOutput(" + "type=" + type + ", " + "value=" + value + ")";
+        String expectedToString =
+                "TfOutput("
+                        + "type="
+                        + type
+                        + ", "
+                        + "value="
+                        + value
+                        + ", "
+                        + "sensitive="
+                        + false
+                        + ")";
         assertEquals(expectedToString, tfOutput.toString());
     }
 }

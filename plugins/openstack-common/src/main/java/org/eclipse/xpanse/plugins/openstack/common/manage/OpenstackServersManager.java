@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.plugins.openstack.common.manage;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +19,7 @@ import org.openstack4j.model.common.ActionResponse;
 import org.openstack4j.model.compute.Action;
 import org.openstack4j.model.compute.RebootType;
 import org.openstack4j.model.compute.Server;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -30,13 +30,20 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class OpenstackServersManager {
 
-    @Resource private ProviderAuthInfoResolver providerAuthInfoResolver;
+    private final ProviderAuthInfoResolver providerAuthInfoResolver;
+
+    /** Constructor method. */
+    @Autowired
+    public OpenstackServersManager(ProviderAuthInfoResolver providerAuthInfoResolver) {
+        this.providerAuthInfoResolver = providerAuthInfoResolver;
+    }
 
     /** Start the OpenStack Nova VM. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean startService(Csp csp, ServiceStateManageRequest request) {
         try {
             String userId = request.getUserId();
@@ -78,8 +85,9 @@ public class OpenstackServersManager {
     /** Stop the OpenStack Nova VM. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean stopService(Csp csp, ServiceStateManageRequest request) {
         try {
             String site = request.getRegion().getSite();
@@ -121,8 +129,9 @@ public class OpenstackServersManager {
     /** Restart the OpenStack Nova VM. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public boolean restartService(Csp csp, ServiceStateManageRequest request) {
         try {
             String site = request.getRegion().getSite();

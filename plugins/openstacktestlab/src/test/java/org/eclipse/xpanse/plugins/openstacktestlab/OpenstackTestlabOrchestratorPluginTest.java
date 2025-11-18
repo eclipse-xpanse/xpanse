@@ -23,7 +23,6 @@ import com.github.tomakehurst.wiremock.common.ClasspathFileSource;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngine;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -65,7 +64,6 @@ import org.eclipse.xpanse.modules.models.servicetemplate.TerraformDeployment;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceTemplateReviewPluginResultType;
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.UnavailableServiceRegionsException;
-import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ResourceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.monitor.ServiceMetricsRequest;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
@@ -85,20 +83,22 @@ import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.utils.Gnocchi
 import org.eclipse.xpanse.plugins.openstack.common.monitor.gnocchi.utils.MetricsQueryBuilder;
 import org.eclipse.xpanse.plugins.openstack.common.price.OpenstackServicePriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerraformResourceHandler;
+import org.eclipse.xpanse.plugins.openstacktestlab.config.OpenstackTestlabPluginProperties;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
@@ -112,27 +112,21 @@ import org.springframework.test.util.ReflectionTestUtils;
             AggregationService.class,
             MeasuresService.class,
             MetricsQueryBuilder.class,
-            CredentialCenter.class,
-            SecretsManager.class,
-            MonitorMetricsStore.class,
             OpenstackTerraformResourceHandler.class,
-            PluginManager.class,
             ServiceTemplateStorage.class,
             OpenstackResourceManager.class,
             OpenstackServicePriceCalculator.class,
             ProviderAuthInfoResolver.class,
-            ProxyConfigurationManager.class
+            ProxyConfigurationManager.class,
+            OpenstackTestlabPluginProperties.class,
         })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestPropertySource(
         properties = {
             "OPENSTACK_TESTLAB_AUTH_URL=http://127.0.0.1/identity/v3",
-            "xpanse.secrets.encryption.initial.vector=p3zV90BqEf3TquKV",
-            "xpanse.secrets.encryption.algorithm.name=AES",
-            "xpanse.secrets.encryption.algorithm.mode=CBC",
-            "xpanse.secrets.encryption.algorithm.padding=ISO10126Padding",
-            "xpanse.secrets.encryption.secrete.key.value=Bx33eHoeifIxykJfMZVPjDRGMKqA75eH"
+            "xpanse.plugins.openstacktestlab.service-template.auto-approve=true"
         })
+@Import(RefreshAutoConfiguration.class)
 class OpenstackTestlabOrchestratorPluginTest {
     @RegisterExtension
     static WireMockExtension wireMockExtension =
@@ -163,13 +157,9 @@ class OpenstackTestlabOrchestratorPluginTest {
     @MockitoBean private ServiceDeploymentStorage mockServiceDeploymentStorage;
     @MockitoBean private ServiceTemplateStorage mockServiceTemplateStorage;
     @MockitoBean private DeployEnvironments deployEnvironments;
+    @MockitoBean private SecretsManager secretsManager;
 
-    @Resource private OpenstackTestlabOrchestratorPlugin plugin;
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(plugin, "autoApproveServiceTemplateEnabled", true);
-    }
+    @Autowired private OpenstackTestlabOrchestratorPlugin plugin;
 
     @BeforeAll
     void setEnvVar() {

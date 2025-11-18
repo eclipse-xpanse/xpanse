@@ -213,8 +213,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         if (waitServiceOrderIsCompleted(serviceOrder.getOrderId())) {
             ServiceOrderDetails serviceOrderDetails =
                     serviceOrderManageApi.getOrderDetailsByOrderId(serviceOrder.getOrderId());
-            assertEquals(serviceOrderDetails.getOrderStatus(), OrderStatus.SUCCESSFUL);
-            assertEquals(serviceOrderDetails.getTaskType(), ServiceOrderType.MODIFY);
+            assertEquals(OrderStatus.SUCCESSFUL, serviceOrderDetails.getOrderStatus());
+            assertEquals(ServiceOrderType.MODIFY, serviceOrderDetails.getTaskType());
         }
     }
 
@@ -225,8 +225,8 @@ class DeploymentWithMysqlTest extends AbstractMysqlIntegrationTest {
         if (waitServiceOrderIsCompleted(serviceOrder.getOrderId())) {
             ServiceOrderDetails serviceOrderDetails =
                     serviceOrderManageApi.getOrderDetailsByOrderId(serviceOrder.getOrderId());
-            assertEquals(serviceOrderDetails.getOrderStatus(), OrderStatus.SUCCESSFUL);
-            assertEquals(serviceOrderDetails.getTaskType(), ServiceOrderType.DESTROY);
+            assertEquals(OrderStatus.SUCCESSFUL, serviceOrderDetails.getOrderStatus());
+            assertEquals(ServiceOrderType.DESTROY, serviceOrderDetails.getTaskType());
         }
     }
 

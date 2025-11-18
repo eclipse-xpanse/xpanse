@@ -17,9 +17,8 @@ class PolicyManRestTemplateConfigTest {
 
     @BeforeEach
     void setUp() {
-        policyManRestTemplateConfigUnderTest = new PolicyManRestTemplateConfig();
-        policyManRestTemplateConfigUnderTest.restTemplateLoggingInterceptor =
-                mockRestTemplateLoggingInterceptor;
+        policyManRestTemplateConfigUnderTest =
+                new PolicyManRestTemplateConfig(mockRestTemplateLoggingInterceptor);
     }
 
     @Test

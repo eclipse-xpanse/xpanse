@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
@@ -36,10 +35,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_CSP})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class CspServiceDeployApi {
 
-    @Resource private ServiceDetailsViewManager serviceDetailsViewManager;
+    private final ServiceDetailsViewManager serviceDetailsViewManager;
+
+    /** Constructor method. */
+    public CspServiceDeployApi(ServiceDetailsViewManager serviceDetailsViewManager) {
+        this.serviceDetailsViewManager = serviceDetailsViewManager;
+    }
 
     /**
      * List all deployed services by a user of CSP.

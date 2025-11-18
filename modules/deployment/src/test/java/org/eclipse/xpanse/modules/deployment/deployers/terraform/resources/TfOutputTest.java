@@ -38,7 +38,7 @@ class TfOutputTest {
 
         Object obj = new Object();
         assertNotEquals(tfOutput, obj);
-        assertNotEquals(tfOutput, null);
+        assertNotEquals(null, tfOutput);
         assertNotEquals(tfOutput.hashCode(), obj.hashCode());
 
         TfOutput tfOutput1 = new TfOutput();
@@ -65,7 +65,17 @@ class TfOutputTest {
 
     @Test
     void testToString() {
-        String expectedToString = "TfOutput(" + "type=" + type + ", " + "value=" + value + ")";
+        String expectedToString =
+                "TfOutput("
+                        + "type="
+                        + type
+                        + ", "
+                        + "value="
+                        + value
+                        + ", "
+                        + "sensitive="
+                        + false
+                        + ")";
         assertEquals(expectedToString, tfOutput.toString());
     }
 }

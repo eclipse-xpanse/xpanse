@@ -13,10 +13,10 @@ import jakarta.annotation.Nullable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.cache.config.CacheProperties;
 import org.eclipse.xpanse.modules.cache.exceptions.CacheNotFoundException;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,19 +29,14 @@ import org.springframework.stereotype.Component;
 public class CredentialsStore {
 
     private final RedisTemplate<String, AbstractCredentialInfo> credentialRedisTemplate;
-    private final Boolean redisCacheEnabled;
+    private final CacheProperties cacheProperties;
 
-    /**
-     * Constructor for CredentialsStore.
-     *
-     * @param redisCacheEnabled Enable redis distributed cache.
-     * @param credentialRedisTemplate credentialRedisTemplate.
-     */
+    /** Constructor for CredentialsStore. */
     @Autowired
     public CredentialsStore(
-            @Value("${enable.redis.distributed.cache:false}") Boolean redisCacheEnabled,
+            CacheProperties cacheProperties,
             @Nullable RedisTemplate<String, AbstractCredentialInfo> credentialRedisTemplate) {
-        this.redisCacheEnabled = redisCacheEnabled;
+        this.cacheProperties = cacheProperties;
         this.credentialRedisTemplate = credentialRedisTemplate;
     }
 
@@ -88,7 +83,7 @@ public class CredentialsStore {
             value = "REC_CATCH_EXCEPTION",
             justification = "Errors need not be forwarded to client.")
     public void updateCredentialCacheTimeToLive(CredentialCacheKey cacheKey) {
-        if (!redisCacheEnabled
+        if (!cacheProperties.isRedisEnabled()
                 || Objects.isNull(credentialRedisTemplate)
                 || Objects.isNull(cacheKey)) {
             return;

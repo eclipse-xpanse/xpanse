@@ -14,6 +14,8 @@ import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,29 +26,15 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class OpenApiOauth2Config {
 
-    @Value("${app.version}")
-    private String appVersion;
+    private final String appVersion;
+    private final SecurityProperties securityProperties;
 
-    @Value("${oauth.authorization.url}")
-    private String authorizationUrl;
-
-    @Value("${oauth.token.url}")
-    private String tokenUrl;
-
-    @Value("${authorization.openid.scope}")
-    private String openidScope;
-
-    @Value("${authorization.profile.scope}")
-    private String profileScope;
-
-    @Value("${authorization.granted.roles.scope}")
-    private String rolesScope;
-
-    @Value("${authorization.metadata.scope}")
-    private String metadataScope;
-
-    @Value("${enable.role.protection:false}")
-    private Boolean roleProtectionIsEnabled;
+    @Autowired
+    public OpenApiOauth2Config(
+            SecurityProperties securityProperties, @Value("${app.version}") String appVersion) {
+        this.securityProperties = securityProperties;
+        this.appVersion = appVersion;
+    }
 
     /**
      * Config open api.
@@ -59,8 +47,8 @@ public class OpenApiOauth2Config {
         OAuthFlows oauthFlows = new OAuthFlows();
         OAuthFlow oauthFlow =
                 new OAuthFlow()
-                        .authorizationUrl(authorizationUrl)
-                        .tokenUrl(tokenUrl)
+                        .authorizationUrl(securityProperties.getOauth().getAuthUrl())
+                        .tokenUrl(securityProperties.getOauth().getTokenUrl())
                         .scopes(getScopes());
         oauthFlows.authorizationCode(oauthFlow);
 
@@ -83,12 +71,20 @@ public class OpenApiOauth2Config {
 
     private Scopes getScopes() {
         Scopes scopes = new Scopes();
-        if (roleProtectionIsEnabled) {
-            scopes.addString(rolesScope, "mandatory must be selected.");
+        if (securityProperties.isEnableRoleProtection()) {
+            scopes.addString(
+                    securityProperties.getOauth().getScopes().getRoles(),
+                    "mandatory must be selected.");
         }
-        scopes.addString(openidScope, "mandatory must be selected.");
-        scopes.addString(profileScope, "mandatory must be selected.");
-        scopes.addString(metadataScope, "mandatory must be selected.");
+        scopes.addString(
+                securityProperties.getOauth().getScopes().getOpenid(),
+                "mandatory must be selected.");
+        scopes.addString(
+                securityProperties.getOauth().getScopes().getProfile(),
+                "mandatory must be selected.");
+        scopes.addString(
+                securityProperties.getOauth().getScopes().getMetadata(),
+                "mandatory must be selected.");
         return scopes;
     }
 }

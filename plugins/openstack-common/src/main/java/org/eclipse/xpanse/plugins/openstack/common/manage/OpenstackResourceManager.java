@@ -7,7 +7,6 @@ package org.eclipse.xpanse.plugins.openstack.common.manage;
 
 import com.bertramlabs.plugins.hcl4j.HCLParser;
 import com.bertramlabs.plugins.hcl4j.HCLParserException;
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.TerraformScr
 import org.eclipse.xpanse.plugins.openstack.common.auth.ProviderAuthInfoResolver;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.OSClient.OSClientV3;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -35,13 +35,20 @@ import org.springframework.util.CollectionUtils;
 public class OpenstackResourceManager {
     public static final String RESOURCE = "resource";
     public static final String OPENSTACK_COMPUTE_INSTANCE = "openstack_compute_instance_v2";
-    @Resource private ProviderAuthInfoResolver providerAuthInfoResolver;
+    private final ProviderAuthInfoResolver providerAuthInfoResolver;
+
+    /** Constructor method. */
+    @Autowired
+    public OpenstackResourceManager(ProviderAuthInfoResolver providerAuthInfoResolver) {
+        this.providerAuthInfoResolver = providerAuthInfoResolver;
+    }
 
     /** List Openstack resource by the kind of ReusableCloudResource. */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<String> getExistingResourceNamesWithKind(
             Csp csp,
             String site,
@@ -76,8 +83,9 @@ public class OpenstackResourceManager {
      */
     @Retryable(
             retryFor = ClientApiCallFailedException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<String> getAvailabilityZonesOfRegion(
             Csp csp,
             String site,

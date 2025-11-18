@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +22,12 @@ import org.springframework.stereotype.Component;
 public class DeployerKindManager implements ApplicationListener<ContextRefreshedEvent> {
     private final Map<DeployerKind, Deployer> deploymentMap = new ConcurrentHashMap<>();
 
-    @Resource private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
+
+    /** Constructor method. */
+    public DeployerKindManager(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {

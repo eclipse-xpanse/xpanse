@@ -28,8 +28,9 @@ import org.eclipse.xpanse.modules.models.billing.enums.PricingPeriod;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.modules.orchestrator.price.ServiceFlavorPriceRequest;
 import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
+import org.eclipse.xpanse.plugins.huaweicloud.config.HuaweiCloudPluginProperties;
 import org.eclipse.xpanse.plugins.huaweicloud.price.model.ProductInfo;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -44,14 +45,13 @@ public class HuaweiCloudGlobalPriceCalculator {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${huaweicloud.international.price.calculator.url}")
-    private String priceCalculatorRestApiUrlForInternational;
+    private final HuaweiCloudPluginProperties huaweiCloudPluginProperties;
 
-    @Value("${huaweicloud.chinese.price.calculator.url}")
-    private String priceCalculatorRestApiUrlForChinese;
-
-    @Value("${huaweicloud.european.price.calculator.url}")
-    private String priceCalculatorRestApiUrlForEurope;
+    @Autowired
+    public HuaweiCloudGlobalPriceCalculator(
+            HuaweiCloudPluginProperties huaweiCloudPluginProperties) {
+        this.huaweiCloudPluginProperties = huaweiCloudPluginProperties;
+    }
 
     /**
      * Get the price of the service with global rest api.
@@ -94,11 +94,11 @@ public class HuaweiCloudGlobalPriceCalculator {
     private String getPriceCalculatorUrlBySite(String site) {
         String requestUrl;
         if (StringUtils.equalsIgnoreCase(HuaweiCloudConstants.CHINESE_MAINLAND_SITE, site)) {
-            requestUrl = priceCalculatorRestApiUrlForChinese;
+            requestUrl = huaweiCloudPluginProperties.getChinesePriceCalculatorUrl();
         } else if (StringUtils.equalsIgnoreCase(HuaweiCloudConstants.EUROPE_SITE, site)) {
-            requestUrl = priceCalculatorRestApiUrlForEurope;
+            requestUrl = huaweiCloudPluginProperties.getEuropeanPriceCalculatorUrl();
         } else {
-            requestUrl = priceCalculatorRestApiUrlForInternational;
+            requestUrl = huaweiCloudPluginProperties.getInternationalPriceCalculatorUrl();
         }
         if (StringUtils.isBlank(requestUrl)) {
             String errorMessage =

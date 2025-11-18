@@ -7,12 +7,12 @@ package org.eclipse.xpanse.modules.deployment.deployers.deployertools.cache;
 
 import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.DEPLOYER_VERSIONS_CACHE_NAME;
 
-import jakarta.annotation.Resource;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolVersionsFetcher;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -22,10 +22,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class DeployerToolVersionsCache {
 
-    @Value("${support.default.deployment.tool.versions.only:true}")
-    private boolean getDefaultVersionsOnly;
+    private final DeployerToolVersionsFetcher versionsFetcher;
+    private final DeploymentProperties deploymentProperties;
 
-    @Resource private DeployerToolVersionsFetcher versionsFetcher;
+    public DeployerToolVersionsCache(
+            DeployerToolVersionsFetcher versionsFetcher,
+            DeploymentProperties deploymentProperties) {
+        this.versionsFetcher = versionsFetcher;
+        this.deploymentProperties = deploymentProperties;
+    }
 
     /**
      * Get the available versions of OpenTofu.
@@ -34,8 +39,8 @@ public class DeployerToolVersionsCache {
      */
     @Cacheable(value = DEPLOYER_VERSIONS_CACHE_NAME, key = "#deployerKind")
     public Set<String> getVersionsCacheOfDeployerTool(DeployerKind deployerKind) {
-        if (getDefaultVersionsOnly) {
-            return versionsFetcher.getVersionsFromDefaultConfigOfDeployerTool(deployerKind);
+        if (deploymentProperties.getSupportOnlyDefaultVersionsEnabled()) {
+            return new HashSet<>(versionsFetcher.getDefaultVersionsByDeployerKind(deployerKind));
         }
         try {
             return versionsFetcher.fetchOfficialVersionsOfDeployerTool(deployerKind);
@@ -45,7 +50,7 @@ public class DeployerToolVersionsCache {
                             + "versions from default config.",
                     deployerKind.toValue(),
                     e);
-            return versionsFetcher.getVersionsFromDefaultConfigOfDeployerTool(deployerKind);
+            return new HashSet<>(versionsFetcher.getDefaultVersionsByDeployerKind(deployerKind));
         }
     }
 

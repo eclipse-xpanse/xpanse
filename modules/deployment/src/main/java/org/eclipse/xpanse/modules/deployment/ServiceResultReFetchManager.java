@@ -6,7 +6,6 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.serviceorder.ServiceOrderEntity;
 import org.eclipse.xpanse.modules.database.servicetemplate.ServiceTemplateEntity;
+import org.eclipse.xpanse.modules.deployment.config.OrderProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.TofuMakerResultReFetchManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.TerraBootResultReFetchManager;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
@@ -23,7 +23,7 @@ import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.eclipse.xpanse.modules.models.service.order.enums.ServiceOrderType;
 import org.eclipse.xpanse.modules.models.service.order.exceptions.ServiceOrderNotFound;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -32,11 +32,20 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class ServiceResultReFetchManager {
 
-    @Value("${max.service.order.processing.duration.in.seconds}")
-    private int maxServiceOrderProcessingDuration;
+    private final OrderProperties orderProperties;
+    private final TerraBootResultReFetchManager terraBootResultRefetchManager;
+    private final TofuMakerResultReFetchManager tofuMakerResultRefetchManager;
 
-    @Resource private TerraBootResultReFetchManager terraBootResultRefetchManager;
-    @Resource private TofuMakerResultReFetchManager tofuMakerResultRefetchManager;
+    /** Constructor method. */
+    @Autowired
+    public ServiceResultReFetchManager(
+            OrderProperties orderProperties,
+            TerraBootResultReFetchManager terraBootResultRefetchManager,
+            TofuMakerResultReFetchManager tofuMakerResultRefetchManager) {
+        this.orderProperties = orderProperties;
+        this.terraBootResultRefetchManager = terraBootResultRefetchManager;
+        this.tofuMakerResultRefetchManager = tofuMakerResultRefetchManager;
+    }
 
     /** ReFetch deploymentState for missing service orders. */
     public void reFetchDeploymentStateForMissingOrdersFromDeployers(
@@ -158,7 +167,7 @@ public class ServiceResultReFetchManager {
     private boolean waitTimeExceedMaxServiceOrderProcessingDuration(
             ServiceOrderEntity serviceOrder) {
         return Duration.between(serviceOrder.getStartedTime(), OffsetDateTime.now()).getSeconds()
-                > maxServiceOrderProcessingDuration;
+                > orderProperties.getMaxOrderProcessingDurationSeconds();
     }
 
     private void batchFeFetchDeploymentStateForMissingOrdersFromDeployers(

@@ -13,7 +13,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -56,11 +55,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_CSP})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class CspServiceTemplateApi {
 
-    @Resource private ServiceTemplateManage serviceTemplateManage;
-    @Resource private UserServiceHelper userServiceHelper;
+    private final ServiceTemplateManage serviceTemplateManage;
+    private final UserServiceHelper userServiceHelper;
+
+    /** Constructor method. */
+    public CspServiceTemplateApi(
+            ServiceTemplateManage serviceTemplateManage, UserServiceHelper userServiceHelper) {
+        this.serviceTemplateManage = serviceTemplateManage;
+        this.userServiceHelper = userServiceHelper;
+    }
 
     /**
      * List service templates with query params.

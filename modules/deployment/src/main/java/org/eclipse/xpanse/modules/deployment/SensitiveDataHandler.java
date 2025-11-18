@@ -6,19 +6,20 @@
 
 package org.eclipse.xpanse.modules.deployment;
 
-import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentStorage;
+import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncryptionOrDecryptionFailedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.InputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.OutputVariable;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.SensitiveScope;
 import org.eclipse.xpanse.modules.security.secrets.SecretsManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -30,12 +31,19 @@ public class SensitiveDataHandler {
     /** The value of sensitive data will be masked as "******". */
     public static final String SENSITIVE_VALUE = "******";
 
-    private static final String PROPERTIES_ALREADY_VIEWED = "is_already_viewed";
     private static final String REQUEST_PROPERTIES_FIELD = "serviceRequestProperties";
 
-    @Resource private SecretsManager secretsManager;
+    private final SecretsManager secretsManager;
 
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+
+    /** Constructor method. */
+    @Autowired
+    public SensitiveDataHandler(
+            SecretsManager secretsManager, ServiceDeploymentStorage serviceDeploymentStorage) {
+        this.secretsManager = secretsManager;
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+    }
 
     /**
      * Method to mask all sensitive data after deployment is completed.
@@ -152,71 +160,55 @@ public class SensitiveDataHandler {
         if (CollectionUtils.isEmpty(outputVariables) || CollectionUtils.isEmpty(outputProperties)) {
             return;
         }
-        boolean containsSensitiveOnceKey =
-                outputVariables.stream()
-                        .anyMatch(
-                                variable ->
-                                        SensitiveScope.ONCE.equals(variable.getSensitiveScope()));
-        if (containsSensitiveOnceKey) {
-            boolean isReviewed = isOutputVariablesAlreadyReviewed(serviceId);
-            outputVariables.stream()
-                    .filter(variable -> variable.getSensitiveScope() == SensitiveScope.ONCE)
-                    .forEach(
-                            variable -> {
-                                if (outputProperties.containsKey(variable.getName())) {
-                                    String decodedValue =
-                                            getValueForSensitiveOnceField(
-                                                    isReviewed,
-                                                    outputProperties.get(variable.getName()));
-                                    outputProperties.put(variable.getName(), decodedValue);
-                                }
-                            });
-            maskOutputVariablesIsReviewed(serviceId);
-            outputProperties.remove(PROPERTIES_ALREADY_VIEWED);
-        } else {
-            outputVariables.stream()
-                    .filter(variable -> variable.getSensitiveScope() == SensitiveScope.ALWAYS)
-                    .forEach(
-                            variable -> {
-                                if (outputProperties.containsKey(variable.getName())) {
-                                    String decodedValue =
-                                            String.valueOf(
-                                                    secretsManager.decodeBackToOriginalType(
-                                                            variable.getDataType(),
-                                                            outputProperties.get(
-                                                                    variable.getName())));
-                                    outputProperties.put(variable.getName(), decodedValue);
-                                }
-                            });
+        List<String> variablesWithSensitiveTypeOnce = new ArrayList<>();
+        outputVariables.stream()
+                .filter(variable -> variable.getSensitiveScope() == SensitiveScope.ALWAYS)
+                .forEach(
+                        variable -> {
+                            if (outputProperties.containsKey(variable.getName())) {
+                                String decodedValue =
+                                        String.valueOf(
+                                                secretsManager.decodeBackToOriginalType(
+                                                        variable.getDataType(),
+                                                        outputProperties.get(variable.getName())));
+                                outputProperties.put(variable.getName(), decodedValue);
+                                variablesWithSensitiveTypeOnce.add(variable.getName());
+                            }
+                        });
+
+        outputVariables.stream()
+                .filter(variable -> variable.getSensitiveScope() == SensitiveScope.ONCE)
+                .forEach(
+                        variable -> {
+                            if (outputProperties.containsKey(variable.getName())) {
+                                String decodedValue =
+                                        getValueForSensitiveOnceField(
+                                                outputProperties.get(variable.getName()));
+                                outputProperties.put(variable.getName(), decodedValue);
+                            }
+                        });
+        if (!variablesWithSensitiveTypeOnce.isEmpty()) {
+            removeOnceViewedVariables(serviceId, variablesWithSensitiveTypeOnce);
         }
     }
 
-    private String getValueForSensitiveOnceField(boolean isAlreadyReviewed, String encodedValue) {
-        if (isAlreadyReviewed) {
-            return SENSITIVE_VALUE;
-        } else {
+    private String getValueForSensitiveOnceField(String encodedValue) {
+        try {
             return secretsManager.decrypt(encodedValue);
+        } catch (SensitiveFieldEncryptionOrDecryptionFailedException e) {
+            log.info("decryption fails. This means, the value is already decrypted.");
+            return encodedValue;
         }
     }
 
-    private boolean isOutputVariablesAlreadyReviewed(UUID serviceId) {
+    private void removeOnceViewedVariables(UUID serviceId, List<String> onceViewedVariables) {
         ServiceDeploymentEntity serviceDeploymentEntity =
                 serviceDeploymentStorage.findServiceDeploymentById(serviceId);
         if (Objects.nonNull(serviceDeploymentEntity)
                 && !CollectionUtils.isEmpty(serviceDeploymentEntity.getOutputProperties())) {
-            String value =
-                    serviceDeploymentEntity.getOutputProperties().get(PROPERTIES_ALREADY_VIEWED);
-            return StringUtils.equals(value, "true");
-        }
-        return false;
-    }
-
-    private void maskOutputVariablesIsReviewed(UUID serviceId) {
-        ServiceDeploymentEntity serviceDeploymentEntity =
-                serviceDeploymentStorage.findServiceDeploymentById(serviceId);
-        if (Objects.nonNull(serviceDeploymentEntity)
-                && !CollectionUtils.isEmpty(serviceDeploymentEntity.getOutputProperties())) {
-            serviceDeploymentEntity.getOutputProperties().put(PROPERTIES_ALREADY_VIEWED, "true");
+            onceViewedVariables.forEach(
+                    variableName ->
+                            serviceDeploymentEntity.getOutputProperties().remove(variableName));
             serviceDeploymentStorage.storeAndFlush(serviceDeploymentEntity);
         }
     }

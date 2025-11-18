@@ -13,9 +13,9 @@ import com.huaweicloud.sdk.core.retry.backoff.BackoffStrategy;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.config.HttpClientRequestRetryProperties;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
 import org.eclipse.xpanse.modules.models.credential.exceptions.CredentialsNotFoundException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.support.RetrySynchronizationManager;
@@ -30,52 +30,47 @@ public class HuaweiCloudRetryStrategy implements BackoffStrategy {
     public static final int WAITING_JOB_SUCCESS_RETRY_TIMES = 30;
     private static final int ERROR_CODE_TOO_MANY_REQUESTS = 429;
     private static final int ERROR_CODE_INTERNAL_SERVER_ERROR = 500;
-    private static final int DEFAULT_RETRY_ATTEMPTS = 5;
     private static final long DEFAULT_DELAY_MILLIONS = 30000L;
-    private int retryMaxAttempts;
-    private long retryMaxDelayMillions;
+    private static final int DEFAULT_RETRY_ATTEMPTS = 5;
+
+    private final HttpClientRequestRetryProperties httpClientRequestRetryProperties;
+
+    public HuaweiCloudRetryStrategy(
+            HttpClientRequestRetryProperties httpClientRequestRetryProperties) {
+        this.httpClientRequestRetryProperties = httpClientRequestRetryProperties;
+    }
 
     @Override
     public <T> long computeDelayBeforeNextRetry(
             com.huaweicloud.sdk.core.retry.RetryContext<T> retryContext) {
-        return retryMaxDelayMillions;
+        return getRetryDelayMilliSeconds();
     }
 
     @Override
     public long computeDelayBeforeNextRetry(int i) {
-        return retryMaxDelayMillions;
+        return getRetryDelayMilliSeconds();
     }
 
-    /**
-     * Set retry max attempts with config.
-     *
-     * @param maxAttempts retry max attempts.
-     */
-    @Value("${http.request.retry.max.attempts:5}")
-    public void setRetryAttempts(int maxAttempts) {
-        if (maxAttempts <= 0) {
-            retryMaxAttempts = DEFAULT_RETRY_ATTEMPTS;
-            log.warn(
-                    "The retry max attempts is invalid, use default value {}",
-                    DEFAULT_RETRY_ATTEMPTS);
-        }
-        retryMaxAttempts = maxAttempts;
-    }
-
-    /**
-     * Set max delay millions time with config.
-     *
-     * @param delayMillions max delay millions time.
-     */
-    @Value("${http.request.retry.delay.milliseconds:30000}")
-    public void setRetryDelayMillions(long delayMillions) {
-        if (delayMillions <= 0) {
-            retryMaxDelayMillions = DEFAULT_DELAY_MILLIONS;
+    /** Calculates the maximum gap between two retries in case of failures. */
+    public long getRetryDelayMilliSeconds() {
+        if (httpClientRequestRetryProperties.getDelayMilliseconds() <= 0) {
             log.warn(
                     "The max delay millions time is invalid, use default value {}",
                     DEFAULT_DELAY_MILLIONS);
+            return DEFAULT_DELAY_MILLIONS;
         }
-        retryMaxDelayMillions = delayMillions;
+        return httpClientRequestRetryProperties.getDelayMilliseconds().longValue();
+    }
+
+    /** Calculates the maximum retry attempts to be done for an HTTP request. */
+    public int getRetryMaxAttempts() {
+        if (httpClientRequestRetryProperties.getRetryMaxAttempts() <= 0) {
+            log.warn(
+                    "The retry max attempts is invalid, use default value {}",
+                    DEFAULT_RETRY_ATTEMPTS);
+            return DEFAULT_RETRY_ATTEMPTS;
+        }
+        return httpClientRequestRetryProperties.getRetryMaxAttempts();
     }
 
     /**
@@ -105,7 +100,7 @@ public class HuaweiCloudRetryStrategy implements BackoffStrategy {
     public void handleAuthExceptionForSpringRetry(Exception ex) {
         RetryContext retryContext = RetrySynchronizationManager.getContext();
         int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
-        log.error(ex.getMessage() + System.lineSeparator() + "Retry count:" + retryCount);
+        log.error("{}{}Retry count:{}", ex.getMessage(), System.lineSeparator(), retryCount);
         if (ex instanceof ClientAuthenticationFailedException authEx) {
             throw authEx;
         }

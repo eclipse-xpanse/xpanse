@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLA
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OS_AUTH_URL;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.REGIO_CLOUD_AUTH_URL;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +44,8 @@ import org.eclipse.xpanse.plugins.openstack.common.manage.OpenstackResourceManag
 import org.eclipse.xpanse.plugins.openstack.common.manage.OpenstackServersManager;
 import org.eclipse.xpanse.plugins.openstack.common.price.OpenstackServicePriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerraformResourceHandler;
-import org.springframework.beans.factory.annotation.Value;
+import org.eclipse.xpanse.plugins.regiocloud.config.RegioCloudPluginProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -55,14 +55,29 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
     private static final String DEFAULT_SITE = "default";
-    @Resource private OpenstackTerraformResourceHandler terraformResourceHandler;
-    @Resource private OpenstackServersManager serversManager;
-    @Resource private OpenstackResourceManager resourceManager;
-    @Resource private OpenstackServicePriceCalculator priceCalculator;
-    @Resource private ProviderAuthInfoResolver providerAuthInfoResolver;
+    private final OpenstackTerraformResourceHandler terraformResourceHandler;
+    private final OpenstackServersManager serversManager;
+    private final OpenstackResourceManager resourceManager;
+    private final OpenstackServicePriceCalculator priceCalculator;
+    private final ProviderAuthInfoResolver providerAuthInfoResolver;
+    private final RegioCloudPluginProperties regioCloudPluginProperties;
 
-    @Value("${regiocloud.auto.approve.service.template.enabled:false}")
-    private boolean autoApproveServiceTemplateEnabled;
+    /** Constructor method. */
+    @Autowired
+    public RegioCloudOrchestratorPlugin(
+            OpenstackTerraformResourceHandler terraformResourceHandler,
+            OpenstackServersManager serversManager,
+            OpenstackResourceManager resourceManager,
+            OpenstackServicePriceCalculator priceCalculator,
+            ProviderAuthInfoResolver providerAuthInfoResolver,
+            RegioCloudPluginProperties regioCloudPluginProperties) {
+        this.terraformResourceHandler = terraformResourceHandler;
+        this.serversManager = serversManager;
+        this.resourceManager = resourceManager;
+        this.priceCalculator = priceCalculator;
+        this.providerAuthInfoResolver = providerAuthInfoResolver;
+        this.regioCloudPluginProperties = regioCloudPluginProperties;
+    }
 
     @Override
     public Csp getCsp() {
@@ -91,7 +106,7 @@ public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public ServiceTemplateReviewPluginResultType validateServiceTemplate(Ocl ocl) {
-        if (autoApproveServiceTemplateEnabled) {
+        if (regioCloudPluginProperties.getServiceTemplate().getAutoApprove()) {
             return ServiceTemplateReviewPluginResultType.APPROVED;
         }
         return ServiceTemplateReviewPluginResultType.MANUAL_REVIEW_REQUIRED;

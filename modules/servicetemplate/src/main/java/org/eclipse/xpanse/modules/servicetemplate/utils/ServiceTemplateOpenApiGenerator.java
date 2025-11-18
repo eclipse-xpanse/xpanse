@@ -43,6 +43,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.ServiceHostingTyp
 import org.eclipse.xpanse.modules.models.servicetemplate.exceptions.ServiceTemplateNotRegistered;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
 import org.eclipse.xpanse.modules.security.auth.zitadel.ZitadelIdentityProviderService;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
@@ -66,12 +67,7 @@ public class ServiceTemplateOpenApiGenerator {
     private final PluginManager pluginManager;
     private final ZitadelIdentityProviderService zitadelIdentityProviderService;
     private final String appVersion;
-
-    @Value("${enable.web.security:false}")
-    private Boolean webSecurityIsEnabled;
-
-    @Value("${enable.role.protection:false}")
-    private Boolean roleProtectionIsEnabled;
+    private final SecurityProperties securityProperties;
 
     /** Constructor to instantiate ServiceTemplateOpenApiGenerator bean. */
     @Autowired
@@ -80,12 +76,14 @@ public class ServiceTemplateOpenApiGenerator {
             @Nullable ZitadelIdentityProviderService zitadelIdentityProviderService,
             PluginManager pluginManager,
             OpenApiUrlManage openApiUrlManage,
-            OpenApiGeneratorJarManage openApiGeneratorJarManage) {
+            OpenApiGeneratorJarManage openApiGeneratorJarManage,
+            SecurityProperties securityProperties) {
         this.appVersion = appVersion;
         this.zitadelIdentityProviderService = zitadelIdentityProviderService;
         this.pluginManager = pluginManager;
         this.openApiUrlManage = openApiUrlManage;
         this.openApiGeneratorJarManage = openApiGeneratorJarManage;
+        this.securityProperties = securityProperties;
     }
 
     /**
@@ -640,9 +638,11 @@ public class ServiceTemplateOpenApiGenerator {
     }
 
     private String getSecurityConfigList() {
-        if (webSecurityIsEnabled) {
+        if (securityProperties.isEnableWebSecurity()) {
             String roleScopeStr =
-                    roleProtectionIsEnabled ? "\"urn:zitadel:iam:org:project:roles\"," : "";
+                    securityProperties.isEnableRoleProtection()
+                            ? "\"urn:zitadel:iam:org:project:roles\","
+                            : "";
             return String.format(
                     """
                     "security": [
@@ -662,7 +662,8 @@ public class ServiceTemplateOpenApiGenerator {
     }
 
     private String getRequiredRolesDesc() {
-        if (webSecurityIsEnabled && roleProtectionIsEnabled) {
+        if (securityProperties.isEnableWebSecurity()
+                && securityProperties.isEnableRoleProtection()) {
             return "<br>Required role:<b> admin</b> or <b>user</b>";
         }
         return "";

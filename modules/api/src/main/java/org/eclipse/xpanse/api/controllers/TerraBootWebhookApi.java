@@ -9,13 +9,13 @@ package org.eclipse.xpanse.api.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.TerraformResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -36,17 +36,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("terra-boot")
 @CrossOrigin
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class TerraBootWebhookApi {
 
-    @Resource
-    private TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+    private final TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+
+    /** Constructor method. */
+    @Autowired
+    public TerraBootWebhookApi(
+            TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager) {
+        this.terraformDeploymentResultCallbackManager = terraformDeploymentResultCallbackManager;
+    }
 
     /** Webhook method to receive the execution result of the order task from terra-boot. */
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result of the order task from terra-boot.")
     @PostMapping(
-            value = "${webhook.terra-boot.orderCallbackUri}/{orderId}",
+            value = "${xpanse.deployer.terra-boot.webhook-callback-uri}/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceOrderId", paramTypes = UUID.class)

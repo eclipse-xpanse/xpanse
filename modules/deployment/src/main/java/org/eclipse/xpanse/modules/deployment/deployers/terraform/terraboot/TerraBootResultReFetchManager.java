@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +18,7 @@ import org.eclipse.xpanse.modules.deployment.DeployResultManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.model.ReFetchResult;
 import org.eclipse.xpanse.modules.models.response.ErrorType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClientException;
@@ -28,11 +28,20 @@ import org.springframework.web.client.RestClientException;
 @Component
 public class TerraBootResultReFetchManager {
 
-    @Resource
-    private TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+    private final TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+    private final DeployResultManager deployResultManager;
+    private final TerraBootApiStoredResultsFetcher terraBootApiStoredResultsFetcher;
 
-    @Resource private DeployResultManager deployResultManager;
-    @Resource private TerraBootApiStoredResultsFetcher terraBootApiStoredResultsFetcher;
+    /** Constructor method. */
+    @Autowired
+    public TerraBootResultReFetchManager(
+            TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager,
+            DeployResultManager deployResultManager,
+            TerraBootApiStoredResultsFetcher terraBootApiStoredResultsFetcher) {
+        this.terraformDeploymentResultCallbackManager = terraformDeploymentResultCallbackManager;
+        this.deployResultManager = deployResultManager;
+        this.terraBootApiStoredResultsFetcher = terraBootApiStoredResultsFetcher;
+    }
 
     /** retrieve terraform result. */
     public void retrieveTerraformResult(ServiceOrderEntity serviceOrder) {

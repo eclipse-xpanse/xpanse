@@ -9,7 +9,7 @@ package org.eclipse.xpanse.modules.security.auth;
 import java.util.Collection;
 import java.util.Map;
 import org.eclipse.xpanse.modules.security.auth.common.XpanseAuthentication;
-import org.springframework.beans.factory.annotation.Value;
+import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,19 +24,26 @@ import org.springframework.security.oauth2.server.resource.introspection.OpaqueT
 @Profile("oauth")
 public class Oauth2OpaqueTokenConfig {
 
-    @Value("${authorization.userid.key}")
-    private String userIdKey;
+    private final SecurityProperties securityProperties;
+
+    public Oauth2OpaqueTokenConfig(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+    }
 
     /*
      * OpaqueTokenAuthenticationConverter must be exposed as a bean to be
      * picked by @WithOpaqueToken in tests.
      */
     @Bean
-    @ConditionalOnProperty(name = "authorization.token.type", havingValue = "OpaqueToken")
+    @ConditionalOnProperty(name = "xpanse.security.oauth.token-type", havingValue = "OpaqueToken")
     OpaqueTokenAuthenticationConverter opaqueTokenAuthenticationConverter(
             Converter<Map<String, Object>, Collection<GrantedAuthority>> authoritiesConverter) {
         return (String introspectedToken, OAuth2AuthenticatedPrincipal authenticatedPrincipal) -> {
-            final var username = (String) authenticatedPrincipal.getAttributes().get(userIdKey);
+            final var username =
+                    (String)
+                            authenticatedPrincipal
+                                    .getAttributes()
+                                    .get(securityProperties.getOauth().getClaims().getUserIdKey());
             final var authorities =
                     authoritiesConverter.convert(authenticatedPrincipal.getAttributes());
             return new XpanseAuthentication(

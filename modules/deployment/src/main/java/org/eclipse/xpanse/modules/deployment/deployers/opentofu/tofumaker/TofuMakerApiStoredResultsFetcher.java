@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker;
 
-import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,7 +23,11 @@ import org.springframework.web.client.RestClientException;
 @Component
 public class TofuMakerApiStoredResultsFetcher {
 
-    @Resource private RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
+    private final RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
+
+    public TofuMakerApiStoredResultsFetcher(RetrieveOpenTofuResultApi retrieveOpenTofuResultApi) {
+        this.retrieveOpenTofuResultApi = retrieveOpenTofuResultApi;
+    }
 
     /**
      * Fetch result by service order id.
@@ -34,8 +37,9 @@ public class TofuMakerApiStoredResultsFetcher {
      */
     @Retryable(
             retryFor = RestClientException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public ReFetchResult reFetchResultByOrderId(UUID orderId) {
         RetryContext retryContext = RetrySynchronizationManager.getContext();
         int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();
@@ -51,8 +55,9 @@ public class TofuMakerApiStoredResultsFetcher {
      */
     @Retryable(
             retryFor = RestClientException.class,
-            maxAttemptsExpression = "${http.request.retry.max.attempts}",
-            backoff = @Backoff(delayExpression = "${http.request.retry.delay.milliseconds}"))
+            maxAttemptsExpression = "${xpanse.http-client-request.retry-max-attempts}",
+            backoff =
+                    @Backoff(delayExpression = "${xpanse.http-client-request.delay-milliseconds}"))
     public List<ReFetchResult> batchReFetchResultsByOrderIds(List<UUID> orderIds) {
         RetryContext retryContext = RetrySynchronizationManager.getContext();
         int retryCount = Objects.isNull(retryContext) ? 0 : retryContext.getRetryCount();

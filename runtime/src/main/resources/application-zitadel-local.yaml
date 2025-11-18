@@ -1,0 +1,14 @@
+---
+xpanse:
+  security:
+    oauth:
+      auth-provider-endpoint: http://localhost:8088
+      token-type: JWT
+      server:
+        api-client-id: 306935357671276547
+        api-client-secret: AhOc8tsQv8nzk5diQx4EscdoEUKkVfTLM8R06mw7xZ5HIWViiOkfBK6VEWaRCXPR
+      client:
+        client-id: apiclient
+        client-secret: MBYYOjjwMbLrK5jTSEqK2odXWoRei83WlnIzvOAs6W1x4mYIsUpEm3VdPnbAYdUC
+      swagger-ui:
+        client-id: 306935358862458883

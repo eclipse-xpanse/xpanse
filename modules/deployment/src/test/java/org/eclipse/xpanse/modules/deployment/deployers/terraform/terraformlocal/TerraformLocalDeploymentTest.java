@@ -20,14 +20,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.xpanse.modules.async.TaskConfiguration;
+import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.database.service.ServiceDeploymentEntity;
 import org.eclipse.xpanse.modules.deployment.DeployService;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
+import org.eclipse.xpanse.modules.deployment.config.GitProperties;
+import org.eclipse.xpanse.modules.deployment.config.OrderProperties;
+import org.eclipse.xpanse.modules.deployment.deployers.terraform.callbacks.TerraformDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraformExecutorException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraformlocal.config.TerraformLocalConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.utils.TfResourceTransUtils;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
@@ -42,6 +46,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.DeploymentVariableHelper;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.eclipse.xpanse.modules.orchestrator.config.OrchestratorProperties;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeployTask;
 import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValidationResult;
 import org.eclipse.xpanse.modules.orchestrator.deployment.InputValidateDiagnostics;
@@ -49,17 +54,44 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /** Test for TerraformDeployment. */
+@ContextConfiguration(
+        classes = {
+            TerraformLocalDeployment.class,
+            DeploymentScriptsHelper.class,
+            ScriptsGitRepoManage.class,
+            DeployEnvironments.class,
+            PluginManager.class,
+            DeployService.class,
+            ServiceDeploymentEntityHandler.class,
+            DeploymentProperties.class,
+            TaskConfiguration.class,
+            GitProperties.class,
+            OrderProperties.class,
+            OrchestratorProperties.class
+        })
+@Import(RefreshAutoConfiguration.class)
+@TestPropertySource(
+        properties = {
+            "xpanse.deployer.clean-workspace-after-deployment-enabled=true",
+            "xpanse.deployer.terraform-local.debug.enabled=false",
+            "xpanse.deployer.terraform-local.workspace.directory=xpanse_workspace",
+            "xpanse.order.order-status.long-polling-seconds=10",
+            "xpanse.order.order-status.polling-interval-seconds=5"
+        })
 @Slf4j
-@ExtendWith({MockitoExtension.class})
+@ExtendWith(SpringExtension.class)
 class TerraformLocalDeploymentTest {
 
     private final String errorScript = "error_script";
@@ -73,29 +105,21 @@ class TerraformLocalDeploymentTest {
               value = resource.random_id_2.new.id
             }
             """;
-    @InjectMocks TerraformLocalDeployment terraformLocalDeployment;
-    @InjectMocks DeploymentScriptsHelper scriptsHelper;
-    @InjectMocks TerraformLocalConfig terraformLocalConfig;
-    @InjectMocks ScriptsGitRepoManage scriptsGitRepoManage;
-    @Mock DeployEnvironments deployEnvironments;
-    @Mock PluginManager pluginManager;
-    @Mock DeployService deployService;
-    @Mock Executor taskExecutor;
-    @Mock ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
-    @Mock TerraformInstaller terraformInstaller;
+    @MockitoBean TerraformInstaller terraformInstaller;
+    @MockitoBean ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+    @MockitoBean DeployEnvironments deployEnvironments;
+    @MockitoBean TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
+
+    @MockitoBean DeployService deployService;
+    @MockitoBean CredentialCenter credentialCenter;
+    @MockitoBean PluginManager pluginManager;
+    @Autowired TerraformLocalDeployment terraformLocalDeployment;
 
     private Ocl ocl;
     private Ocl oclWithGitScripts;
 
     @BeforeEach
     void setUp() throws Exception {
-        ReflectionTestUtils.setField(terraformLocalConfig, "workspaceDirectory", "ws-test");
-        ReflectionTestUtils.setField(scriptsHelper, "awaitAtMost", 60);
-        ReflectionTestUtils.setField(scriptsHelper, "awaitPollingInterval", 1);
-        ReflectionTestUtils.setField(scriptsHelper, "scriptsGitRepoManage", scriptsGitRepoManage);
-        ReflectionTestUtils.setField(
-                terraformLocalDeployment, "terraformLocalConfig", terraformLocalConfig);
-        ReflectionTestUtils.setField(terraformLocalDeployment, "scriptsHelper", scriptsHelper);
         OclLoader oclLoader = new OclLoader();
         ocl =
                 oclLoader.getOcl(

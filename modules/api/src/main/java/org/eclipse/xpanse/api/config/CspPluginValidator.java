@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.api.config;
 
-import jakarta.annotation.Resource;
 import java.net.URI;
 import java.util.Objects;
 import java.util.UUID;
@@ -26,6 +25,7 @@ import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.eclipse.xpanse.modules.models.workflow.serviceporting.ServicePortingRequest;
 import org.eclipse.xpanse.modules.orchestrator.PluginManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /** Validate whether the plugin for csp is enabled. */
@@ -34,8 +34,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class CspPluginValidator {
 
-    @Resource private PluginManager pluginManager;
-    @Resource private OclLoader oclLoader;
+    private final PluginManager pluginManager;
+    private final OclLoader oclLoader;
+
+    /** Constructor method. */
+    @Autowired
+    public CspPluginValidator(PluginManager pluginManager, OclLoader oclLoader) {
+        this.pluginManager = pluginManager;
+        this.oclLoader = oclLoader;
+    }
 
     private void validatePluginForCspIsActive(Csp csp) {
         if (Objects.nonNull(csp)) {

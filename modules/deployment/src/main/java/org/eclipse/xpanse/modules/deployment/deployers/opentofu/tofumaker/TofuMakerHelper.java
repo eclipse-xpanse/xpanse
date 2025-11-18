@@ -10,8 +10,8 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.exceptions.OpenTofuMakerRequestFailedException;
-import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.config.TofuMakerConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuScriptsGitRepoDetails;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.WebhookConfig;
 import org.eclipse.xpanse.modules.deployment.utils.DeployEnvironments;
@@ -29,16 +29,17 @@ import org.springframework.stereotype.Component;
 public class TofuMakerHelper {
 
     private static final String SPLIT = "/";
-    private final TofuMakerConfig tofuMakerConfig;
     private final DeployEnvironments deployEnvironments;
+    private final DeploymentProperties deploymentProperties;
 
     @Value("${server.port}")
     private String port;
 
     /** Constructor for OpenTofuMakerHelper. */
-    public TofuMakerHelper(TofuMakerConfig tofuMakerConfig, DeployEnvironments deployEnvironments) {
-        this.tofuMakerConfig = tofuMakerConfig;
+    public TofuMakerHelper(
+            DeployEnvironments deployEnvironments, DeploymentProperties deploymentProperties) {
         this.deployEnvironments = deployEnvironments;
+        this.deploymentProperties = deploymentProperties;
     }
 
     /** Converts OCL DeployFromGitRepo type to tofu-maker OpenTofuScriptGitRepoDetails type. */
@@ -68,7 +69,9 @@ public class TofuMakerHelper {
     /** generates webhook config. */
     public WebhookConfig getWebhookConfigWithTask(DeployTask deployTask) {
         WebhookConfig webhookConfig = new WebhookConfig();
-        String callbackUrl = getClientRequestBaseUrl(port) + tofuMakerConfig.getOrderCallbackUri();
+        String callbackUrl =
+                getClientRequestBaseUrl(port)
+                        + deploymentProperties.getTofuMaker().getWebhookCallbackUri();
         webhookConfig.setUrl(callbackUrl + SPLIT + deployTask.getOrderId());
         webhookConfig.setAuthType(WebhookConfig.AuthTypeEnum.HMAC);
         return webhookConfig;
@@ -76,12 +79,12 @@ public class TofuMakerHelper {
 
     private String getClientRequestBaseUrl(String port) {
         try {
-            String clientBaseUri = tofuMakerConfig.getClientBaseUri();
-            if (StringUtils.isBlank(clientBaseUri)) {
+            String callbackBaseUrl = deploymentProperties.getTofuMaker().getWebhookEndpoint();
+            if (StringUtils.isBlank(callbackBaseUrl)) {
                 return String.format(
                         "http://%s:%s", InetAddress.getLocalHost().getHostAddress(), port);
             } else {
-                return clientBaseUri;
+                return callbackBaseUrl;
             }
         } catch (UnknownHostException e) {
             log.error(ErrorType.TOFU_MAKER_REQUEST_FAILED.toValue());

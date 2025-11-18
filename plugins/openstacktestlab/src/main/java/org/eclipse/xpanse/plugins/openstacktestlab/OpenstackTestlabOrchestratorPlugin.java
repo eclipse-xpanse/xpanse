@@ -11,7 +11,6 @@ import static org.eclipse.xpanse.modules.cache.consts.CacheConstants.SERVICE_FLA
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OPENSTACK_TESTLAB_AUTH_URL;
 import static org.eclipse.xpanse.plugins.openstack.common.auth.constants.OpenstackCommonEnvironmentConstants.OS_AUTH_URL;
 
-import jakarta.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +45,8 @@ import org.eclipse.xpanse.plugins.openstack.common.manage.OpenstackServersManage
 import org.eclipse.xpanse.plugins.openstack.common.monitor.OpenstackServiceMetricsManager;
 import org.eclipse.xpanse.plugins.openstack.common.price.OpenstackServicePriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerraformResourceHandler;
-import org.springframework.beans.factory.annotation.Value;
+import org.eclipse.xpanse.plugins.openstacktestlab.config.OpenstackTestlabPluginProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -56,15 +56,32 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     private static final String DEFAULT_SITE = "default";
-    @Resource private OpenstackTerraformResourceHandler terraformResourceHandler;
-    @Resource private OpenstackServiceMetricsManager metricsManager;
-    @Resource private OpenstackServersManager serversManager;
-    @Resource private OpenstackResourceManager resourceManager;
-    @Resource private OpenstackServicePriceCalculator priceCalculator;
-    @Resource private ProviderAuthInfoResolver providerAuthInfoResolver;
+    private final OpenstackTerraformResourceHandler terraformResourceHandler;
+    private final OpenstackServiceMetricsManager metricsManager;
+    private final OpenstackServersManager serversManager;
+    private final OpenstackResourceManager resourceManager;
+    private final OpenstackServicePriceCalculator priceCalculator;
+    private final ProviderAuthInfoResolver providerAuthInfoResolver;
+    private final OpenstackTestlabPluginProperties openstackTestlabPluginProperties;
 
-    @Value("${openstacktestlab.auto.approve.service.template.enabled:false}")
-    private boolean autoApproveServiceTemplateEnabled;
+    /** Constructor method. */
+    @Autowired
+    public OpenstackTestlabOrchestratorPlugin(
+            OpenstackTerraformResourceHandler terraformResourceHandler,
+            OpenstackServiceMetricsManager metricsManager,
+            OpenstackServersManager serversManager,
+            OpenstackResourceManager resourceManager,
+            OpenstackServicePriceCalculator priceCalculator,
+            ProviderAuthInfoResolver providerAuthInfoResolver,
+            OpenstackTestlabPluginProperties openstackTestlabPluginProperties) {
+        this.terraformResourceHandler = terraformResourceHandler;
+        this.metricsManager = metricsManager;
+        this.serversManager = serversManager;
+        this.resourceManager = resourceManager;
+        this.priceCalculator = priceCalculator;
+        this.providerAuthInfoResolver = providerAuthInfoResolver;
+        this.openstackTestlabPluginProperties = openstackTestlabPluginProperties;
+    }
 
     @Override
     public Csp getCsp() {
@@ -93,7 +110,7 @@ public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
 
     @Override
     public ServiceTemplateReviewPluginResultType validateServiceTemplate(Ocl ocl) {
-        if (autoApproveServiceTemplateEnabled) {
+        if (openstackTestlabPluginProperties.getServiceTemplate().getAutoApprove()) {
             return ServiceTemplateReviewPluginResultType.APPROVED;
         }
         return ServiceTemplateReviewPluginResultType.MANUAL_REVIEW_REQUIRED;

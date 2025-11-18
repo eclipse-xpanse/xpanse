@@ -13,8 +13,12 @@ import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.common.systemcmd.SystemCmdResult;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
+import org.eclipse.xpanse.modules.deployment.config.GitProperties;
+import org.eclipse.xpanse.modules.deployment.config.OrderProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.resources.TfState;
 import org.eclipse.xpanse.modules.deployment.utils.DeploymentScriptsHelper;
+import org.eclipse.xpanse.modules.deployment.utils.ScriptsGitRepoManage;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.utils.OclLoader;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,19 +28,39 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@ContextConfiguration(
+        classes = {
+            ScriptsGitRepoManage.class,
+            OrderProperties.class,
+            DeploymentProperties.class,
+            GitProperties.class,
+            DeploymentScriptsHelper.class
+        })
+@TestPropertySource(
+        properties = {
+            "xpanse.deployer.clean-workspace-after-deployment-enabled=true",
+            "xpanse.deployer.opentofu-local.debug.enabled=false",
+            "xpanse.deployer.opentofu-local.workspace.directory=xpanse_workspace",
+            "xpanse.order.order-status.long-polling-seconds=10",
+            "xpanse.order.order-status.polling-interval-seconds=5"
+        })
+@Import(RefreshAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class OpenTofuLocalExecutorTest {
     private static String workspace = "";
     @Mock private Map<String, String> mockEnv;
     @Mock private Map<String, Object> mockVariables;
-    @InjectMocks private OpenTofuLocalExecutor openTofuLocalExecutor;
-    @InjectMocks private DeploymentScriptsHelper deploymentScriptsHelper;
+    private OpenTofuLocalExecutor openTofuLocalExecutor;
+    @Autowired private DeploymentScriptsHelper deploymentScriptsHelper;
 
     @BeforeAll
     static void initTaskWorkspace() throws Exception {
@@ -62,8 +86,6 @@ class OpenTofuLocalExecutorTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(deploymentScriptsHelper, "awaitAtMost", 60);
-        ReflectionTestUtils.setField(deploymentScriptsHelper, "awaitPollingInterval", 1);
         openTofuLocalExecutor =
                 new OpenTofuLocalExecutor("tofu", mockEnv, mockVariables, workspace);
     }
@@ -75,8 +97,8 @@ class OpenTofuLocalExecutorTest {
         final SystemCmdResult result = openTofuLocalExecutor.tfInit();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
-        assertEquals(result.getCommandStdError(), "");
-        assertEquals(result.getCommandExecuted(), "tofu init -no-color");
+        assertEquals("", result.getCommandStdError());
+        assertEquals("tofu init -no-color", result.getCommandExecuted());
     }
 
     @Test
@@ -92,10 +114,10 @@ class OpenTofuLocalExecutorTest {
         final SystemCmdResult result = openTofuLocalExecutor.tfPlan();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
-        assertEquals(result.getCommandStdError(), "");
+        assertEquals("", result.getCommandStdError());
         assertEquals(
-                result.getCommandExecuted(),
-                "tofu plan -input=false -no-color  -var-file=variables.tfvars.json");
+                "tofu plan -input=false -no-color  -var-file=variables.tfvars.json",
+                result.getCommandExecuted());
     }
 
     @Test
@@ -106,11 +128,11 @@ class OpenTofuLocalExecutorTest {
         final SystemCmdResult result = openTofuLocalExecutor.tfPlanWithOutput();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
-        assertEquals(result.getCommandStdError(), "");
+        assertEquals("", result.getCommandStdError());
         assertEquals(
-                result.getCommandExecuted(),
                 "tofu plan -input=false -no-color --out tfplan.binary"
-                        + " -var-file=variables.tfvars.json");
+                        + " -var-file=variables.tfvars.json",
+                result.getCommandExecuted());
     }
 
     @Test
@@ -120,10 +142,10 @@ class OpenTofuLocalExecutorTest {
         final SystemCmdResult result = openTofuLocalExecutor.tfApply();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
-        assertEquals(result.getCommandStdError(), "");
+        assertEquals("", result.getCommandStdError());
         assertEquals(
-                result.getCommandExecuted(),
-                "tofu apply -auto-approve -input=false -no-color  -var-file=variables.tfvars.json");
+                "tofu apply -auto-approve -input=false -no-color  -var-file=variables.tfvars.json",
+                result.getCommandExecuted());
     }
 
     @Test
@@ -133,11 +155,11 @@ class OpenTofuLocalExecutorTest {
         final SystemCmdResult result = openTofuLocalExecutor.tfDestroy();
         // Verify the results
         assertTrue(result.isCommandSuccessful());
-        assertEquals(result.getCommandStdError(), "");
+        assertEquals("", result.getCommandStdError());
         assertEquals(
-                result.getCommandExecuted(),
                 "tofu destroy -auto-approve -input=false -no-color "
-                        + " -var-file=variables.tfvars.json");
+                        + " -var-file=variables.tfvars.json",
+                result.getCommandExecuted());
     }
 
     @Test

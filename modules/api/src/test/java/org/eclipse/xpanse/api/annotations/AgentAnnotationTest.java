@@ -53,8 +53,9 @@ public class AgentAnnotationTest {
                                             "%s has wrong conditional property", clazz.getName()));
                             Assertions.assertTrue(
                                     Arrays.asList(((ConditionalOnProperty) annotation).name())
-                                            .contains("enable.agent.api.only"),
-                                    "enable.agent.api.only property missing on class "
+                                            .contains("xpanse.agent-api.enable-agent-api-only"),
+                                    "xpanse.agent-api.enable-agent-api-only property missing on"
+                                            + " class "
                                             + clazz.getName());
                         }
                     }

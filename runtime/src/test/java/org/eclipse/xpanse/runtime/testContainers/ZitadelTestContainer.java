@@ -37,7 +37,7 @@ public class ZitadelTestContainer {
     static void registerProperties(DynamicPropertyRegistry registry) {
         int dynamicPort = zitadelComposeContainer.getServicePort("zitadel", 8080);
         String authEndpoint = "http://localhost:" + dynamicPort;
-        registry.add("authorization.server.endpoint", () -> authEndpoint);
+        registry.add("xpanse.security.oauth.auth-provider-endpoint", () -> authEndpoint);
         log.info("Zitadel started at: {}", authEndpoint);
     }
 }

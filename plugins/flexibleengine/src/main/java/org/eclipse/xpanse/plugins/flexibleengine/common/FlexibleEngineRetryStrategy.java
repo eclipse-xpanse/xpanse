@@ -14,8 +14,8 @@ import com.huaweicloud.sdk.core.retry.backoff.BackoffStrategy;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.config.HttpClientRequestRetryProperties;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
@@ -31,49 +31,43 @@ public class FlexibleEngineRetryStrategy implements BackoffStrategy {
     private static final int ERROR_CODE_INTERNAL_SERVER_ERROR = 500;
     private static final int DEFAULT_RETRY_ATTEMPTS = 5;
     private static final long DEFAULT_DELAY_MILLIONS = 30000L;
-    private int retryMaxAttempts;
-    private long retryMaxDelayMillions;
+    private final HttpClientRequestRetryProperties httpClientRequestRetryProperties;
+
+    public FlexibleEngineRetryStrategy(
+            HttpClientRequestRetryProperties httpClientRequestRetryProperties) {
+        this.httpClientRequestRetryProperties = httpClientRequestRetryProperties;
+    }
 
     @Override
     public <T> long computeDelayBeforeNextRetry(RetryContext<T> retryContext) {
-        return retryMaxDelayMillions;
+        return getRetryDelayMilliSeconds();
     }
 
     @Override
     public long computeDelayBeforeNextRetry(int retries) {
-        return retryMaxDelayMillions;
+        return getRetryDelayMilliSeconds();
     }
 
-    /**
-     * Set retry max attempts with config.
-     *
-     * @param maxAttempts retry max attempts.
-     */
-    @Value("${http.request.retry.max.attempts:5}")
-    public void setRetryAttempts(int maxAttempts) {
-        if (maxAttempts <= 0) {
-            retryMaxAttempts = DEFAULT_RETRY_ATTEMPTS;
-            log.warn(
-                    "The retry max attempts is invalid, use default value {}",
-                    DEFAULT_RETRY_ATTEMPTS);
-        }
-        retryMaxAttempts = maxAttempts;
-    }
-
-    /**
-     * Set max delay millions time with config.
-     *
-     * @param delayMillions max delay millions time.
-     */
-    @Value("${http.request.retry.delay.milliseconds:30000}")
-    public void setRetryDelayMillions(long delayMillions) {
-        if (delayMillions <= 0) {
-            retryMaxDelayMillions = DEFAULT_DELAY_MILLIONS;
+    /** Calculates the maximum gap between two retries in case of failures. */
+    public long getRetryDelayMilliSeconds() {
+        if (httpClientRequestRetryProperties.getDelayMilliseconds() <= 0) {
             log.warn(
                     "The max delay millions time is invalid, use default value {}",
                     DEFAULT_DELAY_MILLIONS);
+            return DEFAULT_DELAY_MILLIONS;
         }
-        retryMaxDelayMillions = delayMillions;
+        return httpClientRequestRetryProperties.getDelayMilliseconds().longValue();
+    }
+
+    /** Calculates the maximum retry attempts to be done for an HTTP request. */
+    public int getRetryMaxAttempts() {
+        if (httpClientRequestRetryProperties.getRetryMaxAttempts() <= 0) {
+            log.warn(
+                    "The retry max attempts is invalid, use default value {}",
+                    DEFAULT_RETRY_ATTEMPTS);
+            return DEFAULT_RETRY_ATTEMPTS;
+        }
+        return httpClientRequestRetryProperties.getRetryMaxAttempts();
     }
 
     /**

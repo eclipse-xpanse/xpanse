@@ -6,9 +6,9 @@
 package org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.config;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.ApiClient;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
@@ -17,13 +17,18 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class TerraBootApiClientConfig {
 
-    @Resource private ApiClient apiClient;
+    private final ApiClient apiClient;
+    private final DeploymentProperties deploymentProperties;
 
-    @Value("${terra-boot.endpoint}")
-    private String terraBootBaseUrl;
+    @Autowired
+    public TerraBootApiClientConfig(
+            ApiClient apiClient, DeploymentProperties deploymentProperties) {
+        this.apiClient = apiClient;
+        this.deploymentProperties = deploymentProperties;
+    }
 
     @PostConstruct
     public void apiClientConfig() {
-        apiClient.setBasePath(terraBootBaseUrl);
+        apiClient.setBasePath(deploymentProperties.getTerraBoot().getEndpoint());
     }
 }

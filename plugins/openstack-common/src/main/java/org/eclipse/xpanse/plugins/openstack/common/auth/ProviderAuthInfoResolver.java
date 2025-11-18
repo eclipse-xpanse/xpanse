@@ -5,7 +5,6 @@
 
 package org.eclipse.xpanse.plugins.openstack.common.auth;
 
-import jakarta.annotation.Resource;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -32,6 +31,7 @@ import org.eclipse.xpanse.plugins.openstack.common.auth.keystone.OpenstackKeysto
 import org.eclipse.xpanse.plugins.openstack.common.auth.keystone.ScsKeystoneManager;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.exceptions.AuthenticationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.RetryContext;
@@ -43,13 +43,32 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProviderAuthInfoResolver {
 
-    @Resource private CredentialCenter credentialCenter;
-    @Resource private DeployEnvironments deployEnvironments;
-    @Resource private ServiceDeploymentStorage serviceDeploymentStorage;
-    @Resource private Environment environment;
-    @Resource private ServiceTemplateStorage serviceTemplateStorage;
-    @Resource private OpenstackKeystoneManager openstackKeystoneManager;
-    @Resource private ScsKeystoneManager scsKeystoneManager;
+    private final CredentialCenter credentialCenter;
+    private final DeployEnvironments deployEnvironments;
+    private final ServiceDeploymentStorage serviceDeploymentStorage;
+    private final Environment environment;
+    private final ServiceTemplateStorage serviceTemplateStorage;
+    private final OpenstackKeystoneManager openstackKeystoneManager;
+    private final ScsKeystoneManager scsKeystoneManager;
+
+    /** Constructor method. */
+    @Autowired
+    public ProviderAuthInfoResolver(
+            CredentialCenter credentialCenter,
+            DeployEnvironments deployEnvironments,
+            ServiceDeploymentStorage serviceDeploymentStorage,
+            Environment environment,
+            ServiceTemplateStorage serviceTemplateStorage,
+            OpenstackKeystoneManager openstackKeystoneManager,
+            ScsKeystoneManager scsKeystoneManager) {
+        this.credentialCenter = credentialCenter;
+        this.deployEnvironments = deployEnvironments;
+        this.serviceDeploymentStorage = serviceDeploymentStorage;
+        this.environment = environment;
+        this.serviceTemplateStorage = serviceTemplateStorage;
+        this.openstackKeystoneManager = openstackKeystoneManager;
+        this.scsKeystoneManager = scsKeystoneManager;
+    }
 
     /**
      * Get the mapping key of the env variable OS_AUTH_URL by csp.

@@ -6,9 +6,7 @@
 
 package org.eclipse.xpanse.modules.orchestrator;
 
-import jakarta.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -22,7 +20,7 @@ import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.exceptions.DuplicateCredentialDefinition;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.PluginNotFoundException;
-import org.springframework.beans.factory.annotation.Value;
+import org.eclipse.xpanse.modules.orchestrator.config.OrchestratorProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -36,10 +34,15 @@ public class PluginManager implements ApplicationListener<ContextRefreshedEvent>
 
     @Getter private final Map<Csp, OrchestratorPlugin> pluginsMap = new ConcurrentHashMap<>();
 
-    @Value("${multiple.providers.black.properties}")
-    private String multipleProvidersBlackProperties;
+    private final OrchestratorProperties orchestratorProperties;
 
-    @Resource private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
+
+    public PluginManager(
+            OrchestratorProperties orchestratorProperties, ApplicationContext applicationContext) {
+        this.orchestratorProperties = orchestratorProperties;
+        this.applicationContext = applicationContext;
+    }
 
     /** Instantiates plugins map. */
     @Override
@@ -58,8 +61,7 @@ public class PluginManager implements ApplicationListener<ContextRefreshedEvent>
             throw new PluginNotFoundException("No plugin is activated.");
         }
         if (pluginsMap.size() > 1) {
-            List<String> blackProperties =
-                    Arrays.asList(StringUtils.split(multipleProvidersBlackProperties, ","));
+            List<String> blackProperties = orchestratorProperties.getNotSupportedEnvValues();
             if (!CollectionUtils.isEmpty(blackProperties)) {
                 blackProperties.forEach(
                         env -> {

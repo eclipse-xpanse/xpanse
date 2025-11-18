@@ -13,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.eclipse.xpanse.common.oauth2.client.Oauth2ClientAccessTokenProvider;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.ApiClient;
+import org.eclipse.xpanse.modules.security.auth.client.Oauth2ClientAccessTokenProvider;
 import org.springframework.stereotype.Component;
 
 /** Aspect for inserting bearer token implicitly to all API calls. */

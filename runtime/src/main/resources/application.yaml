@@ -1,0 +1,182 @@
+---
+app:
+  version: "@project.version@"
+server:
+  port: 8080
+  shutdown: graceful
+spring:
+  application:
+    name: xpanse-runtime
+  profiles:
+    active: dev,noauth,terra-boot,tofu-maker
+  banner:
+    location: classpath:banner.txt
+  datasource:
+    name: h2
+    jdbcUrl: jdbc:h2:file:./xpanse;DB_CLOSE_ON_EXIT=FALSE;
+    driverClassName: org.h2.Driver
+    username: xpanse
+    password: Xpanse@2023
+  activiti:
+    datasource:
+      jdbcUrl: jdbc:h2:file:./activiti;DB_CLOSE_ON_EXIT=FALSE;
+      driverClassName: org.h2.Driver
+      username: activiti
+      password: Activiti@2023
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.eclipse.xpanse.modules.database.naming.HibernateUppercaseNamingStrategy
+        implicit-strategy: org.eclipse.xpanse.modules.database.naming.CustomConstraintNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        enable_lazy_load_no_trans: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  hateoas:
+    use-hal-as-default-json-media-type: false
+  lifecycle:
+    timeout-per-shutdown-phase: 300s
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh
+
+springdoc:
+  default-produces-media-type: application/json
+
+xpanse:
+  security:
+    enable-web-security: false
+    enable-role-protection: false
+    webhook-hmac-signing-key: ""
+    secrets-encryption:
+      initial-vector: ""
+      algorithm-name: AES
+      algorithm-mode: CBC
+      algorithm-padding: ISO10126Padding
+      secret-key-value: ""
+      secret-key-file: aes_sec
+  http-server-request-logging:
+    enabled: true
+    exclude-uri: /v3/**,/swagger-ui/**,/favicon.ico,/h2-console/**,/openapi/*.html
+  http-client-request:
+      retry-max-attempts: 5
+      delay-milliseconds: 1000
+  agent-api:
+    enable-agent-api-only: false
+    endpoint: http://localhost:8080
+  openapi-generator:
+    client:
+        version: "@openapi.generator.plugin.version@"
+        download-url: "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/${openapi.generator.client.version}/openapi-generator-cli-${openapi.generator.client.version}.jar"
+    file-generation-path: openapi/
+    file-resources-uri: /openapi/*
+  cache:
+    redis-enabled: false
+    availability-zone-cache-minutes: 60
+    service-price-cache-minutes: 60
+    monitor-metrics-cache-minutes: 60
+  policy-man:
+    endpoint: http://localhost:8090
+  git:
+    command-timeout-seconds: 10
+  order:
+    order-status:
+      long-polling-seconds: 30
+      polling-interval-seconds: 5
+    max-order-processing-duration-seconds: 180
+  orchestrator:
+    not-supported-env-values:
+      - OS_AUTH_URL
+  plugins:
+    huaweicloud:
+      enable-sdk-http-debug-logs: false
+      service-template:
+        auto-approve: false
+      international-price-calculator-url: https://portal-intl.huaweicloud.com/api/cbc/global/rest/BSS/billing/ratingservice/v2/inquiry/resource
+      european-price-calculator-url: https://portal.eu.huaweicloud.com/api/cbc/global/rest/BSS/billing/ratingservice/v2/inquiry/resource
+      chinese-price-calculator-url:  https://portal.huaweicloud.com/api/cbc/global/rest/BSS/billing/ratingservice/v2/inquiry/resource
+    flexibleengine:
+      enable-sdk-http-debug-logs: false
+      service-template:
+        auto-approve: false
+    openstacktestlab:
+      service-template:
+        auto-approve: false
+    regiocloud:
+      service-template:
+        auto-approve: false
+    plusserver:
+      service-template:
+        auto-approve: false
+  deployer:
+    lock-file-polling-in-seconds: 1
+    support-only-default-versions-enabled: true
+    clean-workspace-after-deployment-enabled: true
+    terraform-local:
+      install-dir: /opt/terraform
+      github:
+        api-endpoint: https://api.github.com
+        repository: hashicorp/terraform
+      download-base-url: https://releases.hashicorp.com/terraform
+      default-supported-versions:
+        - 1.6.0
+        - 1.7.0
+        - 1.8.0
+        - 1.9.0
+      workspace:
+        directory: xpanse_deploy_ws
+      debug:
+        enabled: false
+        levelValue: DEBUG
+    opentofu-local:
+      install-dir: /opt/opentofu
+      default-supported-versions:
+        - 1.6.0
+        - 1.7.0
+        - 1.8.0
+      github:
+        api-endpoint: https://api.github.com
+        repository: opentofu/opentofu
+      download-base-url: https://github.com/opentofu/opentofu/releases
+      workspace:
+        directory: xpanse_deploy_opentofu_ws
+      debug:
+        enabled: false
+        levelValue: DEBUG
+    helm:
+      install-dir: /opt/helm
+      github:
+        api-endpoint: https://api.github.com
+        repository: helm/helm
+      download-base-url: https://get.helm.sh/
+      default-supported-versions:
+        - 3.17.3
+        - 3.17.2
+    terra-boot:
+      webhook-endpoint: http://localhost:8080
+      webhook-callback-uri: /webhook/terra-boot/order
+      endpoint: http://localhost:9090
+    tofu-maker:
+      webhook-endpoint: http://localhost:8080
+      webhook-callback-uri: /webhook/tofu-maker/order
+      endpoint: http://localhost:9092
+  activiti:
+    history-level: full
+
+otel:
+  sdk:
+    disabled: true

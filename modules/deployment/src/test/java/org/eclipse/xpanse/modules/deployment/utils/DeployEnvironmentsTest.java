@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.common.config.AgentApiProperties;
 import org.eclipse.xpanse.modules.credential.CredentialCenter;
 import org.eclipse.xpanse.modules.models.common.enums.Csp;
 import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
@@ -78,6 +79,7 @@ class DeployEnvironmentsTest {
     @Mock private PluginManager pluginManager;
     @Mock private Environment environment;
     @Mock private OrchestratorPlugin mockOrchestratorPlugin;
+    @Mock private AgentApiProperties agentApiProperties;
     private DeployEnvironments deployEnvironmentsUnderTest;
 
     @BeforeEach
@@ -151,7 +153,11 @@ class DeployEnvironmentsTest {
 
         deployEnvironmentsUnderTest =
                 new DeployEnvironments(
-                        mockCredentialCenter, secretsManager, pluginManager, environment);
+                        mockCredentialCenter,
+                        secretsManager,
+                        pluginManager,
+                        environment,
+                        agentApiProperties);
     }
 
     @Test

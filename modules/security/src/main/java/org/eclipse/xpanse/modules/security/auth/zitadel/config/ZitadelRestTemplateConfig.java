@@ -6,9 +6,9 @@
 
 package org.eclipse.xpanse.modules.security.auth.zitadel.config;
 
-import jakarta.annotation.Resource;
 import java.util.Collections;
 import org.eclipse.xpanse.modules.logging.RestTemplateLoggingInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -19,7 +19,14 @@ import org.springframework.web.client.RestTemplate;
 @Profile("zitadel")
 public class ZitadelRestTemplateConfig {
 
-    @Resource private RestTemplateLoggingInterceptor restTemplateLoggingInterceptor;
+    private final RestTemplateLoggingInterceptor restTemplateLoggingInterceptor;
+
+    /** Constructor method. */
+    @Autowired
+    public ZitadelRestTemplateConfig(
+            RestTemplateLoggingInterceptor restTemplateLoggingInterceptor) {
+        this.restTemplateLoggingInterceptor = restTemplateLoggingInterceptor;
+    }
 
     /** create a RestTemplate bean named 'zitadelRestTemplate'. */
     @Bean("zitadelRestTemplate")

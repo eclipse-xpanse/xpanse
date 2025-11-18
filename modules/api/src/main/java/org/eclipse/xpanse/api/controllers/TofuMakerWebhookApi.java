@@ -9,13 +9,13 @@ package org.eclipse.xpanse.api.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.config.AuditApiRequest;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.callbacks.OpenTofuDeploymentResultCallbackManager;
 import org.eclipse.xpanse.modules.deployment.deployers.opentofu.tofumaker.generated.model.OpenTofuResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -36,17 +36,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Profile("tofu-maker")
 @CrossOrigin
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class TofuMakerWebhookApi {
 
-    @Resource
-    private OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+    private final OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager;
+
+    /** Constructor method. */
+    @Autowired
+    public TofuMakerWebhookApi(
+            OpenTofuDeploymentResultCallbackManager openTofuDeploymentResultCallbackManager) {
+        this.openTofuDeploymentResultCallbackManager = openTofuDeploymentResultCallbackManager;
+    }
 
     /** Webhook methods to receive openTofu execution result. */
     @Tag(name = "Webhook", description = "Webhook APIs")
     @Operation(description = "Process the execution result of the order task from tofu-maker")
     @PostMapping(
-            value = "${webhook.tofu-maker.orderCallbackUri}/{orderId}",
+            value = "${xpanse.deployer.tofu-maker.webhook-callback-uri}/{orderId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @AuditApiRequest(methodName = "getCspFromServiceOrderId", paramTypes = UUID.class)

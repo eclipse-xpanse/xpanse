@@ -13,6 +13,7 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngi
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import java.util.Collections;
 import org.eclipse.xpanse.common.proxy.ProxyConfigurationManager;
+import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerTarGzFileManage;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolUtils;
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToolVersionsFetcher;
@@ -23,9 +24,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -37,8 +41,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             DeployerToolVersionsFetcher.class,
             DeployerToolVersionsCacheManager.class,
             DeployerToolVersionsCache.class,
-            ProxyConfigurationManager.class
+            ProxyConfigurationManager.class,
+            DeploymentProperties.class
         })
+@TestPropertySource(
+        properties = {
+            "xpanse.deployer.helm.install-dir=/tmp/helm",
+            "xpanse.deployer.support-only-default-versions-enabled=true",
+            "xpanse.deployer.helm.default-supported-versions=3.17.3,3.17.2",
+            "xpanse.deployer.helm.github.repository=helm/helm",
+            "xpanse.deployer.helm.download-base-url=https://get.helm.sh/"
+        })
+@Import(RefreshAutoConfiguration.class)
 public class HelmBinaryInstallerTest {
 
     @RegisterExtension
@@ -59,7 +73,7 @@ public class HelmBinaryInstallerTest {
     @DynamicPropertySource
     static void props(DynamicPropertyRegistry registry) {
         registry.add(
-                "deployer.helm.github.api.endpoint",
+                "xpanse.deployer.helm.github.apiEndpoint",
                 wireMockExtension.getRuntimeInfo()::getHttpBaseUrl);
     }
 

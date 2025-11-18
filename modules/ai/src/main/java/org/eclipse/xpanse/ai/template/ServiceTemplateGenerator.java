@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.pebbletemplates.pebble.PebbleEngine;
 import io.pebbletemplates.pebble.template.PebbleTemplate;
-import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -22,6 +21,7 @@ import org.eclipse.xpanse.modules.models.ai.enums.AiApplicationType;
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Ocl;
 import org.eclipse.xpanse.modules.models.servicetemplate.request.ServiceTemplateRequestInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
@@ -32,10 +32,15 @@ import org.springframework.util.ResourceUtils;
 @Profile("ai")
 public class ServiceTemplateGenerator {
 
-    @Resource private ServiceTemplateApi serviceTemplateApi;
-
+    private final ServiceTemplateApi serviceTemplateApi;
     private static final String TEMPLATES_FOLDER = "templates";
     private final Map<String, Object> templateContext = new HashMap<>();
+
+    /** Constructor method. */
+    @Autowired
+    public ServiceTemplateGenerator(ServiceTemplateApi serviceTemplateApi) {
+        this.serviceTemplateApi = serviceTemplateApi;
+    }
 
     /** Generates a service template and registers it to catalog. */
     public ServiceTemplateRequestInfo generateServiceTemplate(

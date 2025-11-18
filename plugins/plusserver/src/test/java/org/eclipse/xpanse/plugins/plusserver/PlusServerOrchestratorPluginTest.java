@@ -43,17 +43,24 @@ import org.eclipse.xpanse.plugins.openstack.common.manage.OpenstackResourceManag
 import org.eclipse.xpanse.plugins.openstack.common.manage.OpenstackServersManager;
 import org.eclipse.xpanse.plugins.openstack.common.price.OpenstackServicePriceCalculator;
 import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerraformResourceHandler;
-import org.junit.jupiter.api.BeforeEach;
+import org.eclipse.xpanse.plugins.plusserver.config.PlusServerPluginProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
+@TestPropertySource(properties = {"xpanse.plugins.plusserver.service-template.auto-approve=true"})
+@ContextConfiguration(
+        classes = {PlusServerOrchestratorPlugin.class, PlusServerPluginProperties.class})
+@Import(RefreshAutoConfiguration.class)
+@ExtendWith(SpringExtension.class)
 class PlusServerOrchestratorPluginTest {
 
     private static final Csp csp = Csp.PLUS_SERVER;
@@ -61,19 +68,14 @@ class PlusServerOrchestratorPluginTest {
     private final String siteName = "default";
     private final String regionName = "RegionOne";
     private final UUID uuid = UUID.randomUUID();
-    @Mock private OpenstackTerraformResourceHandler mockTerraformResourceHandler;
-    @Mock private OpenstackServersManager mockServersManager;
-    @Mock private OpenstackResourceManager mockResourceManager;
-    @Mock private OpenstackServicePriceCalculator mockPricingCalculator;
-    @Mock private ProviderAuthInfoResolver mockProviderAuthInfoResolver;
-    @Mock private Environment mockEnvironment;
+    @MockitoBean private OpenstackTerraformResourceHandler mockTerraformResourceHandler;
+    @MockitoBean private OpenstackServersManager mockServersManager;
+    @MockitoBean private OpenstackResourceManager mockResourceManager;
+    @MockitoBean private OpenstackServicePriceCalculator mockPricingCalculator;
+    @MockitoBean private ProviderAuthInfoResolver mockProviderAuthInfoResolver;
+    @MockitoBean private Environment mockEnvironment;
 
-    @InjectMocks private PlusServerOrchestratorPlugin plugin;
-
-    @BeforeEach
-    void setUp() {
-        ReflectionTestUtils.setField(plugin, "autoApproveServiceTemplateEnabled", true);
-    }
+    @Autowired private PlusServerOrchestratorPlugin plugin;
 
     @Test
     void testGetCsp() {

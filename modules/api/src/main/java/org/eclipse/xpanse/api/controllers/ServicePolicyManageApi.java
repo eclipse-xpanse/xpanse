@@ -12,7 +12,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +21,7 @@ import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicy;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyCreateRequest;
 import org.eclipse.xpanse.modules.models.policy.servicepolicy.ServicePolicyUpdateRequest;
 import org.eclipse.xpanse.modules.policy.ServicePolicyManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,10 +43,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_ISV})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class ServicePolicyManageApi {
 
-    @Resource private ServicePolicyManager servicePolicyManager;
+    private final ServicePolicyManager servicePolicyManager;
+
+    /** Constructor method. */
+    @Autowired
+    public ServicePolicyManageApi(ServicePolicyManager servicePolicyManager) {
+        this.servicePolicyManager = servicePolicyManager;
+    }
 
     /**
      * List the policies by the id of registered service template.

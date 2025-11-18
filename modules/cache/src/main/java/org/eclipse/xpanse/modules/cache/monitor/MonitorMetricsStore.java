@@ -13,10 +13,10 @@ import jakarta.annotation.Nullable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.cache.config.CacheProperties;
 import org.eclipse.xpanse.modules.cache.exceptions.CacheNotFoundException;
 import org.eclipse.xpanse.modules.models.monitor.Metric;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,24 +29,14 @@ import org.springframework.stereotype.Component;
 public class MonitorMetricsStore {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final Boolean redisCacheEnabled;
-    private final long monitorMetricsCacheDuration;
+    private final CacheProperties cacheProperties;
 
-    /**
-     * Constructor for MonitorMetricsStore.
-     *
-     * @param redisCacheEnabled Enable redis cache.
-     * @param monitorMetricsCacheDuration monitorMetricsCacheDuration.
-     * @param redisTemplate redisTemplate.
-     */
+    /** Constructor for MonitorMetricsStore. */
     @Autowired
     public MonitorMetricsStore(
-            @Value("${enable.redis.distributed.cache:false}") Boolean redisCacheEnabled,
-            @Value("${service.monitor.metrics.cache.expire.time.in.minutes:60}")
-                    long monitorMetricsCacheDuration,
-            @Nullable RedisTemplate<String, Object> redisTemplate) {
-        this.redisCacheEnabled = redisCacheEnabled;
-        this.monitorMetricsCacheDuration = monitorMetricsCacheDuration;
+            @Nullable RedisTemplate<String, Object> redisTemplate,
+            CacheProperties cacheProperties) {
+        this.cacheProperties = cacheProperties;
         this.redisTemplate = redisTemplate;
     }
 
@@ -90,13 +80,15 @@ public class MonitorMetricsStore {
             value = "REC_CATCH_EXCEPTION",
             justification = "Errors need not be forwarded to client.")
     public void updateMetricsCacheTimeToLive(MonitorMetricsCacheKey cacheKey) {
-        if (!redisCacheEnabled || Objects.isNull(redisTemplate) || Objects.isNull(cacheKey)) {
+        if (!cacheProperties.isRedisEnabled()
+                || Objects.isNull(redisTemplate)
+                || Objects.isNull(cacheKey)) {
             return;
         }
         String redisKey = MONITOR_METRICS_CACHE_NAME + "::" + cacheKey;
         long timeToLive =
-                monitorMetricsCacheDuration > 0
-                        ? monitorMetricsCacheDuration
+                cacheProperties.getMonitorMetricsCacheMinutes() > 0
+                        ? cacheProperties.getMonitorMetricsCacheMinutes()
                         : DEFAULT_CACHE_EXPIRE_TIME_IN_MINUTES;
         try {
             Boolean flag = redisTemplate.expire(redisKey, timeToLive, TimeUnit.MINUTES);

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.eclipse.xpanse.modules.deployment.ServiceDeploymentEntityHandler;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.exceptions.TerraBootRequestFailedException;
-import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.config.TerraBootConfig;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.AdminApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.RetrieveTerraformResultApi;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.api.TerraformFromGitRepoApi;
@@ -57,13 +56,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             DeployEnvironments.class,
             PluginManager.class,
             TerraformFromScriptsApi.class,
-            TerraBootConfig.class,
             ServiceDeploymentEntityHandler.class,
             TerraBootScriptValidator.class,
             TerraBootServiceDeployer.class,
             TerraBootDeployment.class,
             TerraformFromGitRepoApi.class,
-            TerraBootHelper.class,
             AdminApi.class,
             TerraBootDeploymentPlanManage.class,
             TerraBootServiceDestroyer.class
@@ -89,13 +86,11 @@ class TerraBootDeploymentTest {
     @MockitoBean PluginManager pluginManager;
     @MockitoBean TerraformFromScriptsApi terraformApi;
     @MockitoBean TerraformFromGitRepoApi terraformFromGitRepoApi;
-    @MockitoBean TerraBootConfig terraBootConfig;
     @MockitoBean ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
     @MockitoBean RetrieveTerraformResultApi retrieveTerraformResultApi;
     @MockitoBean TerraBootScriptValidator terraBootScriptValidator;
-    @Autowired TerraBootServiceDeployer terraBootServiceDeployer;
-    @Autowired TerraBootServiceModifier terraBootServiceModifier;
     @MockitoBean AdminApi adminApi;
+    @MockitoBean TerraBootHelper terraBootHelper;
 
     @Autowired private TerraBootDeployment terraBootDeployment;
 

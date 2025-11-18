@@ -12,7 +12,6 @@ import static org.eclipse.xpanse.modules.security.auth.common.RoleConstants.ROLE
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +22,7 @@ import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.CreateCredential;
 import org.eclipse.xpanse.modules.models.credential.enums.CredentialType;
 import org.eclipse.xpanse.modules.security.auth.UserServiceHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -44,12 +44,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/xpanse/user")
 @CrossOrigin
 @Secured({ROLE_ADMIN, ROLE_USER})
-@ConditionalOnProperty(name = "enable.agent.api.only", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(
+        name = "xpanse.agent-api.enable-agent-api-only",
+        havingValue = "false",
+        matchIfMissing = true)
 public class UserCloudCredentialsApi {
 
-    @Resource private CredentialCenter credentialCenter;
+    private final CredentialCenter credentialCenter;
+    private final UserServiceHelper userServiceHelper;
 
-    @Resource private UserServiceHelper userServiceHelper;
+    /** Constructor method. */
+    @Autowired
+    public UserCloudCredentialsApi(
+            CredentialCenter credentialCenter, UserServiceHelper userServiceHelper) {
+        this.credentialCenter = credentialCenter;
+        this.userServiceHelper = userServiceHelper;
+    }
 
     /**
      * Get all cloud provider credentials added by the user for a cloud service provider.
