@@ -48,11 +48,13 @@ import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerr
 import org.eclipse.xpanse.plugins.openstacktestlab.config.OpenstackTestlabPluginProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /** OrchestratorPlugin implementation for the provider OpenstackTestlab. */
 @Slf4j
+@RefreshScope
 @Component
 public class OpenstackTestlabOrchestratorPlugin implements OrchestratorPlugin {
     private static final String DEFAULT_SITE = "default";

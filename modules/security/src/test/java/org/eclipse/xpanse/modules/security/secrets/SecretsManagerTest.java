@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -26,8 +25,8 @@ import org.springframework.test.util.ReflectionTestUtils;
             "xpanse.security.secrets-encryption.secret-key-file=src/test/resources/aes_sec_test"
         })
 @EnableConfigurationProperties(value = {SecurityProperties.class})
-@ContextConfiguration(classes = {SecretsManager.class, SecretsManagerTest.class})
-@Import(RefreshAutoConfiguration.class)
+@ContextConfiguration(
+        classes = {SecretsManager.class, SecretsManagerTest.class, RefreshAutoConfiguration.class})
 class SecretsManagerTest {
 
     @Autowired private SecretsManager secretsManagerTest;

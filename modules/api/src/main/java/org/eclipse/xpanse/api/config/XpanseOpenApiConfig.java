@@ -9,6 +9,7 @@ package org.eclipse.xpanse.api.config;
 import java.io.File;
 import org.eclipse.xpanse.common.config.OpenApiGeneratorProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.ForwardedHeaderFilter;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /** XpanseOpenApiConfig. */
+@RefreshScope
 @Configuration
 public class XpanseOpenApiConfig implements WebMvcConfigurer {
 

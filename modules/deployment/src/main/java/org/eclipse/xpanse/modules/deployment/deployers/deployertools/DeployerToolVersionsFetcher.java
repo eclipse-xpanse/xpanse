@@ -29,6 +29,7 @@ import org.kohsuke.github.GitHubRateLimitHandler;
 import org.kohsuke.github.PagedIterable;
 import org.kohsuke.github.connector.GitHubConnectorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpMethod;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.annotation.Backoff;
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Component;
 
 /** Beans for fetching all available versions of the deployer tool. */
 @Slf4j
+@RefreshScope
 @Component
 public class DeployerToolVersionsFetcher {
 

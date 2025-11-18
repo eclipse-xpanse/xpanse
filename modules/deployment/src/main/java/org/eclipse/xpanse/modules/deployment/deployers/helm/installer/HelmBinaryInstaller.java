@@ -16,12 +16,14 @@ import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToo
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 /** Component to manage helm binary installation based on the service template requirements. */
 @Slf4j
+@RefreshScope
 @Component
 public class HelmBinaryInstaller {
 

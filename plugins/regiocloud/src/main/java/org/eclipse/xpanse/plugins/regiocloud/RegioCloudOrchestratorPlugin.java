@@ -47,11 +47,13 @@ import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerr
 import org.eclipse.xpanse.plugins.regiocloud.config.RegioCloudPluginProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /** OrchestratorPlugin implementation for the provider RegionCloud. */
 @Slf4j
+@RefreshScope
 @Component
 public class RegioCloudOrchestratorPlugin implements OrchestratorPlugin {
     private static final String DEFAULT_SITE = "default";

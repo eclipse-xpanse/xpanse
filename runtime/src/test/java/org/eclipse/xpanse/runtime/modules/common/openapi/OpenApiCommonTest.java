@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -30,7 +29,8 @@ import org.springframework.test.context.TestPropertySource;
         classes = {
             OpenApiUrlManage.class,
             OpenApiGeneratorJarManage.class,
-            OpenApiGeneratorProperties.class
+            OpenApiGeneratorProperties.class,
+            RefreshAutoConfiguration.class
         })
 @SpringBootTest(properties = {"spring.profiles.active=test,dev"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -38,7 +38,6 @@ import org.springframework.test.context.TestPropertySource;
         properties = {
             "xpanse.openapi-generator.client.download-url=https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.16.0/openapi-generator-cli-7.16.0.jar"
         })
-@Import(RefreshAutoConfiguration.class)
 @ConfigurationPropertiesScan
 class OpenApiCommonTest {
 

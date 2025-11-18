@@ -20,11 +20,13 @@ import org.eclipse.xpanse.modules.deployment.config.OrderProperties;
 import org.eclipse.xpanse.modules.models.service.enums.OrderStatus;
 import org.eclipse.xpanse.modules.models.service.order.ServiceOrderStatusUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
 /** Bean implements long-polling mechanism to return the task status of the service order. */
 @Slf4j
+@RefreshScope
 @Component
 public class ServiceOrderStatusChangePolling {
 

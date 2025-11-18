@@ -21,11 +21,13 @@ import org.eclipse.xpanse.modules.models.service.deployment.DeploymentStatusUpda
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.ServiceNotDeployedException;
 import org.eclipse.xpanse.modules.models.service.enums.ServiceDeploymentState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
 /** Bean implements long-polling mechanism to return the status of the order. */
 @Slf4j
+@RefreshScope
 @Component
 public class ServiceDeploymentStatusChangePolling {
 

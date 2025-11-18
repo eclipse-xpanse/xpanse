@@ -16,12 +16,14 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.common.config.HttpClientRequestRetryProperties;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationFailedException;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
 /** Define retry strategy. */
 @Slf4j
+@RefreshScope
 @Component
 @Getter
 public class FlexibleEngineRetryStrategy implements BackoffStrategy {

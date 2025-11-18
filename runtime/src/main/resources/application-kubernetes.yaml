@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Huawei Inc.
+---
+spring:
+  config:
+    import: "kubernetes:"
+  cloud:
+    kubernetes:
+      config:
+        name: xpanse-config
+        namespace: xpanse
+      reload:
+        enabled: true
+        mode: event
+        strategy: refresh
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    refresh:
+      access: unrestricted

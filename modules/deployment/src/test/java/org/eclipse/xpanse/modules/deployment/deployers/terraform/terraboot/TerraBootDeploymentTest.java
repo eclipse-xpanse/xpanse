@@ -53,15 +53,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         classes = {
             TerraBootServiceDeployer.class,
             TerraBootServiceModifier.class,
-            DeployEnvironments.class,
-            PluginManager.class,
-            TerraformFromScriptsApi.class,
-            ServiceDeploymentEntityHandler.class,
-            TerraBootScriptValidator.class,
             TerraBootServiceDeployer.class,
             TerraBootDeployment.class,
-            TerraformFromGitRepoApi.class,
-            AdminApi.class,
             TerraBootDeploymentPlanManage.class,
             TerraBootServiceDestroyer.class
         })

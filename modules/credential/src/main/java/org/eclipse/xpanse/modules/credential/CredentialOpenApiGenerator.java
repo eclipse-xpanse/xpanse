@@ -36,6 +36,7 @@ import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Component;
 
 /** Class for credentialApi generation. */
 @Slf4j
+@RefreshScope
 @Component
 public class CredentialOpenApiGenerator implements ApplicationListener<ApplicationStartedEvent> {
 

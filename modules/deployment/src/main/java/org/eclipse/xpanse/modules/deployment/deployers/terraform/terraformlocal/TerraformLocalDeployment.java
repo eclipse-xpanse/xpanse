@@ -33,10 +33,12 @@ import org.eclipse.xpanse.modules.orchestrator.deployment.DeploymentScriptValida
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 /** Implementation of the deployment with terraform. */
 @Slf4j
+@RefreshScope
 @Component
 @ConditionalOnMissingBean(TerraBootDeployment.class)
 public class TerraformLocalDeployment implements Deployer {

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.zalando.logbook.HttpRequest;
@@ -19,6 +20,7 @@ import org.zalando.logbook.Logbook;
 import org.zalando.logbook.core.DefaultSink;
 
 /** Bean to auto configure Logbook configuration. */
+@RefreshScope
 @Configuration
 public class LogbookConfiguration {
 

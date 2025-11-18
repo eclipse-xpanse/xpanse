@@ -37,10 +37,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.modules.models.common.exceptions.ClientApiCallFailedException;
 import org.eclipse.xpanse.plugins.flexibleengine.config.FlexibleEnginePluginProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 /** FlexibleEngine Service Client. */
 @Slf4j
+@RefreshScope
 @Component
 public class FlexibleEngineClient extends FlexibleEngineCredentials {
 

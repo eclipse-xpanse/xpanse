@@ -31,6 +31,7 @@ import org.eclipse.xpanse.plugins.huaweicloud.common.HuaweiCloudConstants;
 import org.eclipse.xpanse.plugins.huaweicloud.config.HuaweiCloudPluginProperties;
 import org.eclipse.xpanse.plugins.huaweicloud.price.model.ProductInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,6 +41,7 @@ import org.springframework.web.client.RestTemplate;
 
 /** Class that implements the price calculation for the global rest apis of HuaweiCloud. */
 @Slf4j
+@RefreshScope
 @Component
 public class HuaweiCloudGlobalPriceCalculator {
 

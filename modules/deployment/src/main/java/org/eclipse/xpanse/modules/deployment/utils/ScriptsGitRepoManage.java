@@ -23,6 +23,7 @@ import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentScriptsCreatio
 import org.eclipse.xpanse.modules.models.common.exceptions.GitRepoCloneException;
 import org.eclipse.xpanse.modules.models.servicetemplate.ScriptsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 /** Bean to manage GIT clone. */
 @Slf4j
+@RefreshScope
 @Component
 public class ScriptsGitRepoManage {
 

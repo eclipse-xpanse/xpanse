@@ -50,6 +50,7 @@ import org.eclipse.xpanse.plugins.flexibleengine.price.FlexibleEnginePriceCalcul
 import org.eclipse.xpanse.plugins.flexibleengine.resourcehandler.FlexibleEngineTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -60,6 +61,7 @@ import org.springframework.web.client.RestTemplate;
 
 /** Plugin to deploy managed services on FlexibleEngine cloud. */
 @Slf4j
+@RefreshScope
 @Component
 public class FlexibleEngineOrchestratorPlugin implements OrchestratorPlugin {
 

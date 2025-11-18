@@ -38,7 +38,6 @@ import org.springframework.web.context.WebApplicationContext;
             UserPolicyManageApi.class,
             PolicyManageExceptionHandler.class,
             CspPluginValidator.class,
-            PluginManager.class,
             OclLoader.class
         })
 @WebMvcTest

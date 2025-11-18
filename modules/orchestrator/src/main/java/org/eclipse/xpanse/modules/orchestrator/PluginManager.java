@@ -21,6 +21,7 @@ import org.eclipse.xpanse.modules.models.credential.AbstractCredentialInfo;
 import org.eclipse.xpanse.modules.models.credential.exceptions.DuplicateCredentialDefinition;
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.PluginNotFoundException;
 import org.eclipse.xpanse.modules.orchestrator.config.OrchestratorProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -29,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 
 /** The instance to manage all the plugins. */
 @Slf4j
+@RefreshScope
 @Component
 public class PluginManager implements ApplicationListener<ContextRefreshedEvent> {
 

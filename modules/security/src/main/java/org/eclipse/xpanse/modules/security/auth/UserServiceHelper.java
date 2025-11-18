@@ -15,6 +15,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.UserNotLoggedInExcept
 import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 
 /** The service helper provider methods to get all info of the current user. */
 @Slf4j
+@RefreshScope
 @Component
 public class UserServiceHelper {
 

@@ -15,12 +15,14 @@ import org.eclipse.xpanse.modules.observability.config.OtelProperties;
 import org.eclipse.xpanse.modules.observability.model.CollectorStatus;
 import org.eclipse.xpanse.modules.observability.model.OpenTelemetryHealthCheckResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 /** Bean to manage OpenTelemetry Collector Health check. */
 @Component
+@RefreshScope
 @Slf4j
 public class OpenTelemetryCollectorHealthCheck {
 

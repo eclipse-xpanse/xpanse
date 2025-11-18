@@ -58,7 +58,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -71,17 +70,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             TerraformLocalDeployment.class,
             DeploymentScriptsHelper.class,
             ScriptsGitRepoManage.class,
-            DeployEnvironments.class,
-            PluginManager.class,
             DeployService.class,
             ServiceDeploymentEntityHandler.class,
             DeploymentProperties.class,
             TaskConfiguration.class,
             GitProperties.class,
             OrderProperties.class,
-            OrchestratorProperties.class
+            OrchestratorProperties.class,
+            RefreshAutoConfiguration.class
         })
-@Import(RefreshAutoConfiguration.class)
 @TestPropertySource(
         properties = {
             "xpanse.deployer.clean-workspace-after-deployment-enabled=true",
@@ -107,12 +104,16 @@ class TerraformLocalDeploymentTest {
             """;
     @MockitoBean TerraformInstaller terraformInstaller;
     @MockitoBean ServiceDeploymentEntityHandler serviceDeploymentEntityHandler;
+
     @MockitoBean DeployEnvironments deployEnvironments;
+
     @MockitoBean TerraformDeploymentResultCallbackManager terraformDeploymentResultCallbackManager;
 
     @MockitoBean DeployService deployService;
     @MockitoBean CredentialCenter credentialCenter;
+
     @MockitoBean PluginManager pluginManager;
+
     @Autowired TerraformLocalDeployment terraformLocalDeployment;
 
     private Ocl ocl;

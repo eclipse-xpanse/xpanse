@@ -9,8 +9,10 @@ import jakarta.annotation.PostConstruct;
 import org.eclipse.xpanse.modules.deployment.config.DeploymentProperties;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.terraboot.generated.ApiClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.EventListener;
 
 /** Configure ApiClient for communication with terra-boot service. */
 @Profile("terra-boot")
@@ -27,6 +29,7 @@ public class TerraBootApiClientConfig {
         this.deploymentProperties = deploymentProperties;
     }
 
+    @EventListener(RefreshScopeRefreshedEvent.class)
     @PostConstruct
     public void apiClientConfig() {
         apiClient.setBasePath(deploymentProperties.getTerraBoot().getEndpoint());

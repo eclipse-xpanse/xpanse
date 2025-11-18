@@ -48,11 +48,13 @@ import org.eclipse.xpanse.plugins.huaweicloud.price.HuaweiCloudPriceCalculator;
 import org.eclipse.xpanse.plugins.huaweicloud.resourcehandler.HuaweiCloudTerraformResourceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /** Plugin to deploy managed services on Huawei cloud. */
 @Slf4j
+@RefreshScope
 @Component
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin {
 

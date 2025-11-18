@@ -30,7 +30,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,10 +49,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
             CommonExceptionHandler.class,
             OclLoader.class,
             CspPluginValidator.class,
-            PluginManager.class,
-            SecurityProperties.class
+            SecurityProperties.class,
+            RefreshAutoConfiguration.class
         })
-@Import(RefreshAutoConfiguration.class)
 @WebMvcTest
 class CommonExceptionHandlerTest {
 

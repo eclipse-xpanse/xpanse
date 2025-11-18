@@ -45,6 +45,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -56,17 +57,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             FlexibleEngineVmStateManager.class,
             FlexibleEngineServerManageRequestConverter.class,
             FlexibleEngineMetricsService.class,
-            FlexibleEngineClient.class,
             FlexibleEngineMonitorConstants.class,
             FlexibleEngineDataModelConverter.class,
-            CredentialCenter.class,
             MonitorMetricsStore.class,
             FlexibleEngineTerraformResourceHandler.class,
             FlexibleEngineResourceManager.class,
             FlexibleEnginePriceCalculator.class,
-            FlexibleEngineRetryStrategy.class,
             CacheProperties.class,
             FlexibleEnginePluginProperties.class,
+            RefreshAutoConfiguration.class,
         })
 class FlexibleEngineMonitorIntegrationTest {
 
@@ -86,11 +85,8 @@ class FlexibleEngineMonitorIntegrationTest {
                     .build();
 
     @Autowired FlexibleEngineOrchestratorPlugin plugin;
-
     @MockitoBean CredentialCenter credentialCenter;
-
     @MockitoBean FlexibleEngineClient client;
-
     @MockitoBean FlexibleEngineRetryStrategy retryStrategy;
 
     ResourceMetricsRequest setUpResourceMetricRequest(

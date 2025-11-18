@@ -45,6 +45,7 @@ import org.eclipse.xpanse.modules.models.service.view.VendorHostedDeployedServic
 import org.eclipse.xpanse.modules.models.servicetemplate.view.UserOrderableServiceVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -65,6 +66,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 /** REST interface methods for processing OCL. */
 @Slf4j
+@RefreshScope
 @RestController
 @RequestMapping("/xpanse")
 @CrossOrigin

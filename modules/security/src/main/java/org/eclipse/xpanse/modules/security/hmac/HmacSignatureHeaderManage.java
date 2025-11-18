@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.ClientAuthenticationF
 import org.eclipse.xpanse.modules.models.common.exceptions.XpanseUnhandledException;
 import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
@@ -34,6 +35,7 @@ import org.springframework.util.StreamUtils;
  * URL, payload.
  */
 @Slf4j
+@RefreshScope
 @Component
 public class HmacSignatureHeaderManage {
 

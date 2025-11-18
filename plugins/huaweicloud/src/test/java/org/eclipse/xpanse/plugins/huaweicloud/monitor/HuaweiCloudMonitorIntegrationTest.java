@@ -46,6 +46,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -54,11 +55,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(
         classes = {
             HuaweiCloudOrchestratorPlugin.class,
-            CredentialCenter.class,
             HuaweiCloudVmStateManager.class,
             HuaweiCloudServerManageRequestConverter.class,
             HuaweiCloudMetricsService.class,
-            HuaweiCloudClient.class,
             HuaweiCloudMonitorConstants.class,
             HuaweiCloudDataModelConverter.class,
             MonitorMetricsStore.class,
@@ -66,10 +65,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             HuaweiCloudTerraformResourceHandler.class,
             HuaweiCloudPriceCalculator.class,
             HuaweiCloudGlobalPriceCalculator.class,
-            HuaweiCloudRetryStrategy.class,
             ProxyConfigurationManager.class,
             CacheProperties.class,
-            HuaweiCloudPluginProperties.class
+            HuaweiCloudPluginProperties.class,
+            RefreshAutoConfiguration.class
         })
 class HuaweiCloudMonitorIntegrationTest {
 

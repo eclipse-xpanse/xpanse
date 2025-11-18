@@ -30,6 +30,7 @@ import org.eclipse.xpanse.modules.security.auth.common.XpanseAuthentication;
 import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -41,7 +42,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
@@ -50,8 +51,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /** Service for authorization of IAM 'Zitadel'. */
 @Slf4j
+@RefreshScope
 @Profile("zitadel")
-@Service
+@Component
 public class ZitadelIdentityProviderService implements IdentityProviderService {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();

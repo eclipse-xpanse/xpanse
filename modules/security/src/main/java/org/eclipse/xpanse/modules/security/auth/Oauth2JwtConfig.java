@@ -14,6 +14,7 @@ import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +25,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 /** Beans necessary to manage Oauth2 with OpaqueToken. */
 @Configuration
+@RefreshScope
 @Profile("oauth")
 public class Oauth2JwtConfig {
 

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
  * Converter to map claims to GrantedAuthorities. This class is used by both JWT and OpaqueToken.
  */
 @Slf4j
+@RefreshScope
 @Profile("oauth")
 @Component
 public class Oauth2GrantedAuthoritiesExtractor

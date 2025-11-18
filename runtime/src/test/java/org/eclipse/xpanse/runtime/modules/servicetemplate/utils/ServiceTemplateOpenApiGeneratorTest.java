@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -48,7 +47,8 @@ import org.springframework.test.util.ReflectionTestUtils;
             SecurityProperties.class,
             OpenApiGeneratorProperties.class,
             OpenApiUrlManage.class,
-            OpenApiGeneratorJarManage.class
+            OpenApiGeneratorJarManage.class,
+            RefreshAutoConfiguration.class
         })
 @TestPropertySource(
         properties = {
@@ -59,7 +59,6 @@ import org.springframework.test.util.ReflectionTestUtils;
             "xpanse.openapi-generator.client.version=6.6.0",
             "xpanse.openapi-generator.client.download-url=:https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar"
         })
-@Import(RefreshAutoConfiguration.class)
 @ExtendWith(SpringExtension.class)
 class ServiceTemplateOpenApiGeneratorTest {
 

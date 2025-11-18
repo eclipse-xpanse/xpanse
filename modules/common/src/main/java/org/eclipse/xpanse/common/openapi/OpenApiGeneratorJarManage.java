@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.xpanse.common.config.OpenApiGeneratorProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.ClassPathResource;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 /** Class to manage all methods related to Openapi generator jar. */
 @Getter
+@RefreshScope
 @Component
 @Slf4j
 public class OpenApiGeneratorJarManage implements ApplicationListener<ContextRefreshedEvent> {

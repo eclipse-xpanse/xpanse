@@ -26,11 +26,13 @@ import org.eclipse.xpanse.modules.cache.monitor.MonitorMetricsCacheKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /** Caffeine cache configuration class. */
 @Slf4j
+@RefreshScope
 @Configuration
 public class CaffeineCacheConfig {
 

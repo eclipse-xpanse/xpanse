@@ -37,10 +37,12 @@ import org.eclipse.xpanse.modules.deployment.exceptions.DeploymentScriptsCreatio
 import org.eclipse.xpanse.modules.models.service.deployment.exceptions.FileLockedException;
 import org.eclipse.xpanse.modules.models.servicetemplate.Deployment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 /** Bean to manage deployment scripts. */
 @Slf4j
+@RefreshScope
 @Component
 public class DeploymentScriptsHelper {
 

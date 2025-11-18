@@ -14,12 +14,14 @@ import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerToo
 import org.eclipse.xpanse.modules.deployment.deployers.deployertools.DeployerZipFileManage;
 import org.eclipse.xpanse.modules.models.common.exceptions.InvalidDeployerToolException;
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.DeployerKind;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 /** Defines methods for handling open tofu with required version. */
 @Slf4j
+@RefreshScope
 @Component
 public class OpenTofuInstaller {
 

@@ -22,6 +22,7 @@ import org.eclipse.xpanse.modules.models.billing.enums.BillingMode;
 import org.eclipse.xpanse.modules.servicetemplate.price.ServicePricesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** REST interface methods for service prices calculation. */
 @Slf4j
+@RefreshScope
 @RestController
 @RequestMapping("/xpanse")
 @CrossOrigin

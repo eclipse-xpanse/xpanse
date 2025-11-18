@@ -7,6 +7,7 @@
 package org.eclipse.xpanse.modules.security.auth;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfo;
 import org.eclipse.xpanse.modules.security.auth.common.CurrentUserInfoHolder;
 import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -23,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 
 /** The instance to manage active identity provider service. */
 @Slf4j
+@RefreshScope
 @Component
 public class IdentityProviderManager implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -51,8 +54,13 @@ public class IdentityProviderManager implements ApplicationListener<ContextRefre
             activeIdentityProviderService = null;
             return;
         }
+        // with RefreshScope, there is also a proxy bean which is of the same type.
+        // Hence, it's necessary to filter and take onyl the actual bean which is used by other
+        // beans.
         List<IdentityProviderService> identityProviderServices =
-                applicationContext.getBeansOfType(IdentityProviderService.class).values().stream()
+                applicationContext.getBeansOfType(IdentityProviderService.class).entrySet().stream()
+                        .filter(e -> !e.getKey().startsWith("scopedTarget."))
+                        .map(Map.Entry::getValue)
                         .toList();
         if (CollectionUtils.isEmpty(identityProviderServices)) {
             String errorMsg = "Security is enabled, but no identity provider service is active.";

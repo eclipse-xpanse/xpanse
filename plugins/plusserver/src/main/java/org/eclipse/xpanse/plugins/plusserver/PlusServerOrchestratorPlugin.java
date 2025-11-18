@@ -47,11 +47,13 @@ import org.eclipse.xpanse.plugins.openstack.common.resourcehandler.OpenstackTerr
 import org.eclipse.xpanse.plugins.plusserver.config.PlusServerPluginProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 /** OrchestratorPlugin implementation for the provider PlusServer. */
 @Slf4j
+@RefreshScope
 @Component
 public class PlusServerOrchestratorPlugin implements OrchestratorPlugin {
     public static final String DEFAULT_SITE = "default";

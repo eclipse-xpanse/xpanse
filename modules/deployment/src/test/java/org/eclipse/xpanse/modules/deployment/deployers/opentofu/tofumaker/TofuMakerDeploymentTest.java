@@ -54,7 +54,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             TofuMakerServiceDeployer.class,
             TofuMakerServiceModifier.class,
             DeployEnvironments.class,
-            PluginManager.class,
             OpenTofuFromScriptsApi.class,
             ServiceDeploymentEntityHandler.class,
             TofuMakerScriptValidator.class,
@@ -88,8 +87,6 @@ class TofuMakerDeploymentTest {
     @MockitoBean TofuMakerScriptValidator tofuMakerScriptValidator;
     @MockitoBean OpenTofuFromGitRepoApi openTofuFromGitRepoApi;
     @MockitoBean RetrieveOpenTofuResultApi retrieveOpenTofuResultApi;
-    @Autowired TofuMakerServiceDeployer tofuMakerServiceDeployer;
-    @Autowired TofuMakerServiceModifier tofuMakerServiceModifier;
     @MockitoBean AdminApi adminApi;
     @MockitoBean TofuMakerHelper tofuMakerHelper;
 

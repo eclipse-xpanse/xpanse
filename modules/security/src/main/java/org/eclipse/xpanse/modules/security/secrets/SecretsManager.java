@@ -29,6 +29,7 @@ import org.eclipse.xpanse.modules.models.common.exceptions.SensitiveFieldEncrypt
 import org.eclipse.xpanse.modules.models.servicetemplate.enums.VariableDataType;
 import org.eclipse.xpanse.modules.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Component;
  * Doc</a>
  */
 @Slf4j
+@RefreshScope
 @Component
 public class SecretsManager {
 
