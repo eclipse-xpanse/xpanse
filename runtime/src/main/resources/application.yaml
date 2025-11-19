@@ -52,7 +52,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,refresh
+        include: health,info,refresh,restart
+  endpoint:
+    restart:
+      access: unrestricted
 
 springdoc:
   default-produces-media-type: application/json

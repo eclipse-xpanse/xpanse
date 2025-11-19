@@ -7,11 +7,9 @@ package org.eclipse.xpanse.modules.observability.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 /** Properties class. */
 @Data
-@RefreshScope
 @ConfigurationProperties(prefix = "otel")
 public class OtelProperties {
 

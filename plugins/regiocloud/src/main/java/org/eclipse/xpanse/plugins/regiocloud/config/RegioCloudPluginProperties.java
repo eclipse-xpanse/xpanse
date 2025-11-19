@@ -7,11 +7,9 @@ package org.eclipse.xpanse.plugins.regiocloud.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 /** properties class. */
 @Data
-@RefreshScope
 @ConfigurationProperties(prefix = "xpanse.plugins.regiocloud")
 public class RegioCloudPluginProperties {
 
