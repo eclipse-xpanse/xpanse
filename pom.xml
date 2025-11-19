@@ -96,6 +96,7 @@
         <spotbugs.plugin.version>4.9.3.2</spotbugs.plugin.version>
         <spotbugs.annotations.version>4.9.7</spotbugs.annotations.version>
         <spring.cloud.version>2025.0.0</spring.cloud.version>
+        <netty.version>4.2.7.Final</netty.version>
     </properties>
     <scm>
         <connection>scm:git:git@github.com:https://github.com/eclipse-xpanse/xpanse.git</connection>
