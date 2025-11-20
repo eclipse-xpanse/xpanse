@@ -9,11 +9,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.validation.annotation.Validated;
 
 /** Config class. */
-@RefreshScope
 @ConfigurationProperties(prefix = "xpanse.ai")
 @Validated
 @Data

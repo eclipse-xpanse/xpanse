@@ -7,10 +7,8 @@ package org.eclipse.xpanse.plugins.flexibleengine.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 /** properties class. */
-@RefreshScope
 @Data
 @ConfigurationProperties(prefix = "xpanse.plugins.flexibleengine")
 public class FlexibleEnginePluginProperties {

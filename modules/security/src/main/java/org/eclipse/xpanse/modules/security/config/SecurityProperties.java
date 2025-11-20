@@ -8,11 +8,9 @@ package org.eclipse.xpanse.modules.security.config;
 import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.validation.annotation.Validated;
 
 /** properties class. */
-@RefreshScope
 @ConfigurationProperties(prefix = "xpanse.security")
 @Validated
 @Data

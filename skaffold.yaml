@@ -1,0 +1,17 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: xpanse
+build:
+  artifacts:
+    - image: ghcr.io/eclipse-xpanse/xpanse
+      context: .
+      docker:
+        dockerfile: Dockerfile
+  local:
+    push: false
+manifests:
+  kustomize:
+    paths:
+      # ensure the xpanse-relops repo is checked right next to this xpanse project.
+      - ../xpanse-relops/k8s/overlays/dev

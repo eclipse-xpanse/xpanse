@@ -7,11 +7,9 @@ package org.eclipse.xpanse.plugins.plusserver.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 /** properties class. */
 @Data
-@RefreshScope
 @ConfigurationProperties(prefix = "xpanse.plugins.plusserver")
 public class PlusServerPluginProperties {
 
