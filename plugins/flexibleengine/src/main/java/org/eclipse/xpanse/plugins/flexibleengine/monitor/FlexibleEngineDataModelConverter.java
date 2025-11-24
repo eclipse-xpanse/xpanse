@@ -18,6 +18,7 @@ import com.huaweicloud.sdk.ces.v1.model.BatchListMetricDataResponse;
 import com.huaweicloud.sdk.ces.v1.model.BatchMetricData;
 import com.huaweicloud.sdk.ces.v1.model.Datapoint;
 import com.huaweicloud.sdk.ces.v1.model.DatapointForBatchMetric;
+import com.huaweicloud.sdk.ces.v1.model.Filter;
 import com.huaweicloud.sdk.ces.v1.model.ListMetricsRequest;
 import com.huaweicloud.sdk.ces.v1.model.MetricInfo;
 import com.huaweicloud.sdk.ces.v1.model.MetricInfoList;
@@ -93,8 +94,10 @@ public class FlexibleEngineDataModelConverter {
                 .withDim0(
                         FlexibleEngineMonitorConstants.DIM0_PREFIX
                                 + resourceMetricRequest.getDeployResource().getResourceId())
-                .withFilter(FilterEnum.valueOf(FlexibleEngineMonitorConstants.FILTER_AVERAGE))
-                .withPeriod(resourceMetricRequest.getGranularity())
+                .withFilter(FilterEnum.AVERAGE)
+                .withPeriod(
+                        ShowMetricDataRequest.PeriodEnum.valueOf(
+                                resourceMetricRequest.getGranularity()))
                 .withFrom(resourceMetricRequest.getFrom())
                 .withTo(resourceMetricRequest.getTo())
                 .withNamespace(metricInfoList.getNamespace())
@@ -110,8 +113,10 @@ public class FlexibleEngineDataModelConverter {
         BatchListMetricDataRequestBody body = new BatchListMetricDataRequestBody();
         body.withTo(serviceMetricRequest.getTo());
         body.withFrom(serviceMetricRequest.getFrom());
-        body.withFilter(FlexibleEngineMonitorConstants.FILTER_AVERAGE);
-        body.withPeriod(serviceMetricRequest.getGranularity().toString());
+        body.withFilter(Filter.AVERAGE);
+        body.withPeriod(
+                BatchListMetricDataRequestBody.PeriodEnum.valueOf(
+                        serviceMetricRequest.getGranularity().toString()));
         body.withMetrics(metricInfos);
         BatchListMetricDataRequest batchListMetricDataRequest = new BatchListMetricDataRequest();
         batchListMetricDataRequest.withBody(body);
