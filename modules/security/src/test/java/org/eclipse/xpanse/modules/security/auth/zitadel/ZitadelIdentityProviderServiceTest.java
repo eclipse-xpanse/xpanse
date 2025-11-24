@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,8 +34,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
-@ContextConfiguration(classes = {ZitadelIdentityProviderService.class, SecurityProperties.class})
-@Import(RefreshAutoConfiguration.class)
+@ContextConfiguration(
+        classes = {
+            ZitadelIdentityProviderService.class,
+            SecurityProperties.class,
+            RefreshAutoConfiguration.class
+        })
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(value = {"oauth", "zitadel"})
 class ZitadelIdentityProviderServiceTest {

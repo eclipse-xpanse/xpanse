@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -21,8 +20,12 @@ import wiremock.org.apache.commons.io.IOUtils;
         properties = {
             "xpanse.security.webhook-hmac-signing-key=1c30e4b1fad574f88572e25d0da03f34365f4ae92eda22bfd3a8c53cb5102f27",
         })
-@Import(RefreshAutoConfiguration.class)
-@ContextConfiguration(classes = {HmacSignatureHeaderManage.class, SecurityProperties.class})
+@ContextConfiguration(
+        classes = {
+            HmacSignatureHeaderManage.class,
+            SecurityProperties.class,
+            RefreshAutoConfiguration.class
+        })
 public class HmacValidationTest {
 
     @Autowired HmacSignatureHeaderManage hmacSignatureHeaderManage;

@@ -49,7 +49,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -58,8 +57,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @TestPropertySource(properties = {"xpanse.plugins.plusserver.service-template.auto-approve=true"})
 @ContextConfiguration(
-        classes = {PlusServerOrchestratorPlugin.class, PlusServerPluginProperties.class})
-@Import(RefreshAutoConfiguration.class)
+        classes = {
+            PlusServerOrchestratorPlugin.class,
+            PlusServerPluginProperties.class,
+            RefreshAutoConfiguration.class
+        })
 @ExtendWith(SpringExtension.class)
 class PlusServerOrchestratorPluginTest {
 

@@ -59,7 +59,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -83,9 +82,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             TaskConfiguration.class,
             GitProperties.class,
             OrderProperties.class,
-            OrchestratorProperties.class
+            OrchestratorProperties.class,
+            RefreshAutoConfiguration.class
         })
-@Import(RefreshAutoConfiguration.class)
 @TestPropertySource(
         properties = {
             "xpanse.deployer.clean-workspace-after-deployment-enabled=true",
