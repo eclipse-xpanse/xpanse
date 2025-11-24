@@ -16,14 +16,6 @@ public class FlexibleEngineMonitorConstants extends FlexibleEngineConstants {
     public static final String BATCH_METRIC_PATH = "batch-query-metric-data";
     public static final String LIST_METRICS_PATH = "metrics";
 
-    /** Aggregation method of indicator monitoring data: average. */
-    public static final String FILTER_AVERAGE = "average";
-
-    /*
-     * Aggregation method of indicator monitoring data: max.
-     */
-    public static final String FILTER_MAX = "max";
-
     /** Dimension name for identifying the instance ID of an ECS. */
     public static final String VM_DIMENSION_NAME = "instance_id";
 
