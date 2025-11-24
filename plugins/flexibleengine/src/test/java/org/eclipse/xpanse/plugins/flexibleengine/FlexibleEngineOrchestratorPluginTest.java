@@ -41,7 +41,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -51,9 +50,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
         properties = {
             "xpanse.plugins.flexibleengine.service-template.auto-approve=true",
         })
-@Import(RefreshAutoConfiguration.class)
 @ContextConfiguration(
-        classes = {FlexibleEngineOrchestratorPlugin.class, FlexibleEnginePluginProperties.class})
+        classes = {
+            FlexibleEngineOrchestratorPlugin.class,
+            FlexibleEnginePluginProperties.class,
+            RefreshAutoConfiguration.class
+        })
 @ExtendWith(SpringExtension.class)
 class FlexibleEngineOrchestratorPluginTest {
     @MockitoBean

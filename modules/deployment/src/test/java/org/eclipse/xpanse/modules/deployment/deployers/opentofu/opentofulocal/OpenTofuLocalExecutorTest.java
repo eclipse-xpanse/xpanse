@@ -31,7 +31,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -42,7 +41,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             OrderProperties.class,
             DeploymentProperties.class,
             GitProperties.class,
-            DeploymentScriptsHelper.class
+            DeploymentScriptsHelper.class,
+            RefreshAutoConfiguration.class
         })
 @TestPropertySource(
         properties = {
@@ -52,7 +52,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             "xpanse.order.order-status.long-polling-seconds=10",
             "xpanse.order.order-status.polling-interval-seconds=5"
         })
-@Import(RefreshAutoConfiguration.class)
 @ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class OpenTofuLocalExecutorTest {

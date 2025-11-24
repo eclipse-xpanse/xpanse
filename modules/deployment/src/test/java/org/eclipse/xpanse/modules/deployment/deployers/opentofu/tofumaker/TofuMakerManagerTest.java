@@ -18,20 +18,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientException;
 
-@ContextConfiguration(classes = {DeploymentProperties.class, TofuMakerManager.class})
+@ContextConfiguration(
+        classes = {
+            DeploymentProperties.class,
+            TofuMakerManager.class,
+            RefreshAutoConfiguration.class
+        })
 @TestPropertySource(
         properties = {
             "spring.profiles.active=tofu-maker",
             "xpanse.deployer.tofu-maker.endpoint=http://localhost:8090"
         })
-@Import(RefreshAutoConfiguration.class)
 @ExtendWith(SpringExtension.class)
 class TofuMakerManagerTest {
 

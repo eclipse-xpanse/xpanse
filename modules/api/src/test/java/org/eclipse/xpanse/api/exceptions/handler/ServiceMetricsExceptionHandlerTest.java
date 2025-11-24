@@ -27,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -44,9 +43,9 @@ import org.springframework.web.context.WebApplicationContext;
             IdentityProviderManager.class,
             PluginManager.class,
             CspPluginValidator.class,
-            SecurityProperties.class
+            SecurityProperties.class,
+            RefreshAutoConfiguration.class
         })
-@Import(RefreshAutoConfiguration.class)
 @WebMvcTest
 class ServiceMetricsExceptionHandlerTest {
 

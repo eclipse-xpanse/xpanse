@@ -18,20 +18,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientException;
 
-@ContextConfiguration(classes = {TerraBootManager.class, DeploymentProperties.class})
+@ContextConfiguration(
+        classes = {
+            TerraBootManager.class,
+            DeploymentProperties.class,
+            RefreshAutoConfiguration.class
+        })
 @TestPropertySource(
         properties = {
             "spring.profiles.active=terra-boot",
             "xpanse.deployer.terra-boot.endpoint=http://localhost:8090"
         })
-@Import(RefreshAutoConfiguration.class)
 @ExtendWith(SpringExtension.class)
 class TerraBootManagerTest {
 
