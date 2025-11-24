@@ -63,7 +63,7 @@
         <jackson.databind.version>2.15.2</jackson.databind.version>
         <huaweicloud.sdk.version>3.1.175</huaweicloud.sdk.version>
         <maven.clean.plugin.version>3.5.0</maven.clean.plugin.version>
-        <maven.compile.plugin.version>3.14.0</maven.compile.plugin.version>
+        <maven.compile.plugin.version>3.14.1</maven.compile.plugin.version>
         <maven.javadoc.plugin.version>3.12.0</maven.javadoc.plugin.version>
         <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
         <maven.dependency.plugin.version>3.9.0</maven.dependency.plugin.version>
