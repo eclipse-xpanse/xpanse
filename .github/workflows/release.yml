@@ -63,7 +63,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           token: ${{ secrets.BOT_GITHUB_TOKEN }}
@@ -198,7 +198,7 @@ jobs:
     needs: release
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: v${{ needs.release.outputs.next-version }}
@@ -233,7 +233,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
           token: ${{ secrets.BOT_GITHUB_TOKEN }}
