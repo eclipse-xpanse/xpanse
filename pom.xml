@@ -93,7 +93,7 @@
         <pebble.version>3.2.4</pebble.version>
         <apache.commons.compress.version>1.28.0</apache.commons.compress.version>
         <spring.ai.version>1.0.3</spring.ai.version>
-        <spotbugs.plugin.version>4.9.3.2</spotbugs.plugin.version>
+        <spotbugs.plugin.version>4.9.8.1</spotbugs.plugin.version>
         <spotbugs.annotations.version>4.9.8</spotbugs.annotations.version>
         <spring.cloud.version>2025.0.0</spring.cloud.version>
         <netty.version>4.2.7.Final</netty.version>
