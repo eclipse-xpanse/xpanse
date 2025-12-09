@@ -86,7 +86,7 @@
         <swagger.core.v3.version>2.2.39</swagger.core.v3.version>
         <hcl4j.version>0.9.8</hcl4j.version>
         <jackson.datatype.jsr310.version>2.20.1</jackson.datatype.jsr310.version>
-        <spotless.version>3.0.0</spotless.version>
+        <spotless.version>3.1.0</spotless.version>
         <liquibase.version>5.0.1</liquibase.version>
         <org.reflections.version>0.10.2</org.reflections.version>
         <docker.java.version>3.7.0</docker.java.version>
