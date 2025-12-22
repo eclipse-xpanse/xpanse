@@ -31,7 +31,7 @@ jobs:
         with:
           terraform_version: 1.6.0
       - name: Set up OpenTofu
-        uses: opentofu/setup-opentofu@v1.0.6
+        uses: opentofu/setup-opentofu@v1.0.7
         with:
           tofu_version: 1.7.0
       - name: Format check
